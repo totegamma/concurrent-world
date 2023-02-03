@@ -72,35 +72,41 @@ function App() {
         });
     }
 
-    return (<Box sx={{display: "flex", padding: "10px", gap: "10px"}}>
-        <Paper sx={{width: "300px", padding: "5px"}}>
-            <Typography variant="h5" gutterBottom>Settings</Typography>
+    return (<Box sx={{display: "flex", padding: "10px", gap: "10px", backgroundColor: "#f2f2f2", width: "100vw", height: "100vh"}}>
+        <Paper sx={{width: "800px", padding: "15px"}}>
+            <Typography variant="h5" gutterBottom>Timeline</Typography>
             <Divider/>
-            <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
-                <TextField label="server" variant="outlined" value={server} onChange={(e) => setServer(e.target.value)}/>
-                <TextField label="privateKey" variant="outlined" value={prvkey} onChange={(e) => setPrvKey(e.target.value)}/>
-                <TextField label="publicKey" variant="outlined" value={pubkey} onChange={(e) => setPubKey(e.target.value)}/>
-                <Button variant="contained" onClick={_ => regenerateKeys()}>Generate Key</Button>
-            </Box>
         </Paper>
+        <Box sx={{display: "flex", flexDirection: "column", gap: "15px"}}>
+            <Paper sx={{width: "300px", padding: "5px"}}>
+                <Typography variant="h5" gutterBottom>Post</Typography>
+                <Divider/>
+                <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
+                    <TextField multiline rows={6} label="message" variant="outlined" value={draft} onChange={(e) => setDraft(e.target.value)}/>
+                    <Button variant="contained" onClick={_ => post()}>post</Button>
+                </Box>
+            </Paper>
 
-        <Paper sx={{width: "300px", padding: "5px"}}>
-            <Typography variant="h5" gutterBottom>Avatar</Typography>
-            <Divider/>
-            <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
-                <TextField label="username" variant="outlined" value={username} onChange={(e) => setUsername(e.target.value)}/>
-                <TextField label="avatarURL" variant="outlined" value={avatar} onChange={(e) => setAvatar(e.target.value)}/>
-            </Box>
-        </Paper>
+            <Paper sx={{width: "300px", padding: "5px"}}>
+                <Typography variant="h5" gutterBottom>Profile</Typography>
+                <Divider/>
+                <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
+                    <TextField label="username" variant="outlined" value={username} onChange={(e) => setUsername(e.target.value)}/>
+                    <TextField label="avatarURL" variant="outlined" value={avatar} onChange={(e) => setAvatar(e.target.value)}/>
+                </Box>
+            </Paper>
 
-        <Paper sx={{width: "300px", padding: "5px"}}>
-            <Typography variant="h5" gutterBottom>Post</Typography>
-            <Divider/>
-            <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
-                <TextField multiline rows={6} label="message" variant="outlined" value={draft} onChange={(e) => setDraft(e.target.value)}/>
-                <Button variant="contained" onClick={_ => post()}>post</Button>
-            </Box>
-        </Paper>
+            <Paper sx={{width: "300px", padding: "5px"}}>
+                <Typography variant="h5" gutterBottom>Settings</Typography>
+                <Divider/>
+                <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
+                    <TextField label="server" variant="outlined" value={server} onChange={(e) => setServer(e.target.value)}/>
+                    <TextField label="privateKey" variant="outlined" value={prvkey} onChange={(e) => setPrvKey(e.target.value)}/>
+                    <TextField label="publicKey" variant="outlined" value={pubkey} onChange={(e) => setPubKey(e.target.value)}/>
+                    <Button variant="contained" onClick={_ => regenerateKeys()}>Generate Key</Button>
+                </Box>
+            </Paper>
+        </Box>
     </Box>)
 }
 
