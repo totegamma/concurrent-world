@@ -3,6 +3,10 @@ import { Box, Button, Divider, Paper, TextField, Typography } from '@mui/materia
 import { pki, md, util } from 'node-forge';
 
 import { usePersistent } from './hooks/usePersistent';
+import { Timeline } from './components/Timeline';
+
+import { useObjectList } from './hooks/useObjectList';
+import { RTMMessage} from './model';
 
 function App() {
 
@@ -10,16 +14,33 @@ function App() {
     const [pubkey, setPubKey] = usePersistent<string>("PublicKey", "");
     const [prvkey, setPrvKey] = usePersistent<string>("PrivateKey", "");
 
-
     const [username, setUsername] = usePersistent<string>("Username", "anonymous");
     const [avatar, setAvatar] = usePersistent<string>("AvatarURL", "");
 
     const [draft, setDraft] = useState<string>("");
 
+    const messages = useObjectList<RTMMessage>();
+
 
     useEffect(() => {
         if (pubkey == "" && prvkey == "") regenerateKeys();
+        reload();
     }, []);
+
+    const reload = () => {
+        messages.clear();
+        const requestOptions = {
+            method: 'GET',
+            headers: {}
+        };
+
+        fetch(server, requestOptions)
+        .then(res => res.json())
+        .then(data => {
+            console.log(data);
+            data.messages.reverse().forEach((e: any) => messages.push(e));
+        });
+    }
 
     const regenerateKeys = () => {
         pki.rsa.generateKeyPair({bits: 512, workers: 2}, function(_, keypair) {
@@ -69,13 +90,18 @@ function App() {
         .then(res => res.json())
         .then(data => {
             console.log(data);
+            setDraft("");
+            reload();
         });
     }
 
-    return (<Box sx={{display: "flex", padding: "10px", gap: "10px", backgroundColor: "#f2f2f2", width: "100vw", height: "100vh"}}>
-        <Paper sx={{width: "800px", padding: "15px"}}>
+    return (<Box sx={{display: "flex", padding: "10px", gap: "10px", backgroundColor: "#f2f2f2", width: "100vw", height: "100vh", justifyContent: "center"}}>
+        <Paper sx={{width: "800px", padding: "15px", display: "flex", flexFlow: "column"}}>
             <Typography variant="h5" gutterBottom>Timeline</Typography>
             <Divider/>
+            <Box sx={{overflowY: "scroll"}}>
+                <Timeline messages={messages}/>
+            </Box>
         </Paper>
         <Box sx={{display: "flex", flexDirection: "column", gap: "15px"}}>
             <Paper sx={{width: "300px", padding: "5px"}}>
