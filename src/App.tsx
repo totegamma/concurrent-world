@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Avatar, Box, Button, Divider, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Paper, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { pki, md, util } from 'node-forge';
+import { ec } from 'elliptic';
+import { keccak256 } from 'ethers';
+import { Buffer } from 'buffer'
 
 import { usePersistent } from './hooks/usePersistent';
 import { Timeline } from './components/Timeline';
@@ -46,6 +49,21 @@ function App() {
     useEffect(() => {
         if (pubkey == "" && prvkey == "") regenerateKeys();
         reload();
+    }, []);
+
+    useEffect(() => {
+        const ellipsis = new ec("secp256k1")
+        const keyPair = ellipsis.genKeyPair()
+        const privateKey = keyPair.getPrivate().toString('hex')
+        const publicKey = keyPair.getPublic().encode('hex', false)
+        console.log('Private key: ', privateKey)
+        console.log('Public key: ', publicKey)
+
+        const message = "Hello, world!"
+        const messageHash = keccak256(Buffer.from(message))
+        const signature = keyPair.sign(messageHash)
+
+        console.log(signature)
     }, []);
 
     useEffect(() => {
