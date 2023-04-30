@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Avatar, Box, Button, Divider, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Paper, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
-import { pki, md, util } from 'node-forge';
+import { ec } from 'elliptic';
+import { keccak256 } from 'ethers';
 
 import { usePersistent } from './hooks/usePersistent';
 import { Timeline } from './components/Timeline';
@@ -72,45 +73,46 @@ function App() {
     }
 
     const regenerateKeys = () => {
-        pki.rsa.generateKeyPair({bits: 512, workers: 2}, function(_, keypair) {
-            let publickey = pki.publicKeyToPem(keypair.publicKey);
-            let privatekey = pki.privateKeyToPem(keypair.privateKey);
+        const ellipsis = new ec("secp256k1")
+        const keyPair = ellipsis.genKeyPair()
+        const privateKey = keyPair.getPrivate().toString('hex')
+        const publicKey = keyPair.getPublic().encode('hex', false)
+        console.log('Private key: ', privateKey)
+        console.log('Public key: ', publicKey)
 
-            publickey = publickey.replace("-----BEGIN PUBLIC KEY-----", "");
-            publickey = publickey.replace("-----END PUBLIC KEY-----", "");
-            publickey = publickey.replace(/\r?\n/g, '');
+        setPubKey(publicKey)
+        setPrvKey(privateKey)
+    }
 
-            privatekey = privatekey.replace("-----BEGIN RSA PRIVATE KEY-----", "");
-            privatekey = privatekey.replace("-----END RSA PRIVATE KEY-----", "");
-            privatekey = privatekey.replace(/\r?\n/g, '');
-
-            setPubKey(publickey);
-            setPrvKey(privatekey);
-        });
+    function toHexString(byteArray: Uint8Array | number[]) {
+        return Array.from(byteArray, function(byte) {
+            return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+        }).join('')
     }
 
     const post = () => {
-
-        let privatekey = pki.privateKeyFromPem(
-            "-----BEGIN RSA PRIVATE KEY-----"
-            + prvkey
-            + "-----END RSA PRIVATE KEY-----");
+        const ellipsis = new ec("secp256k1")
+        const keyPair = ellipsis.keyFromPrivate(prvkey)
 
         const payload_obj = {
             'body': draft
         }
 
-        const payload = JSON.stringify(payload_obj);
-
-        let hash = md.sha256.create();
-        hash.update(payload, 'utf8');
-        let signature = util.encode64(privatekey.sign(hash));
-        console.log(signature);
+        const payload = JSON.stringify(payload_obj)
+        const messageHash = keccak256(new TextEncoder().encode(payload)).slice(2)
+        const signature = keyPair.sign(messageHash, 'hex', {canonical: true})
+        const r = toHexString(signature.r.toArray())
+        const s = toHexString(signature.s.toArray())
 
         const requestOptions = {
             method: 'POST',
             headers: {},
-            body: JSON.stringify({'author': pubkey, 'payload': payload, 'signature': signature})
+            body: JSON.stringify({
+                author: pubkey,
+                payload: payload,
+                r: r,
+                s: s
+            })
         };
 
         fetch(server + 'messages', requestOptions)
@@ -123,10 +125,8 @@ function App() {
     }
 
     const updateProfile = () => {
-        let privatekey = pki.privateKeyFromPem(
-            "-----BEGIN RSA PRIVATE KEY-----"
-            + prvkey
-            + "-----END RSA PRIVATE KEY-----");
+        const ellipsis = new ec("secp256k1")
+        const keyPair = ellipsis.keyFromPrivate(prvkey)
 
         const payload_obj = {
             'username': username,
@@ -135,11 +135,10 @@ function App() {
         }
 
         const payload = JSON.stringify(payload_obj);
-
-        let hash = md.sha256.create();
-        hash.update(payload, 'utf8');
-        let signature = util.encode64(privatekey.sign(hash));
-        console.log(signature);
+        const messageHash = keccak256(new TextEncoder().encode(payload)).slice(2)
+        const signature = keyPair.sign(messageHash, 'hex', {canonical: true})
+        const r = toHexString(signature.r.toArray())
+        const s = toHexString(signature.s.toArray())
 
         const requestOptions = {
             method: 'PUT',
@@ -148,7 +147,8 @@ function App() {
                 'author': pubkey,
                 'schema': profile_schema,
                 'payload': payload,
-                'signature': signature
+                r: r,
+                s: s
             })
         };
 
