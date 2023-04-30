@@ -98,33 +98,21 @@ function App() {
             'body': draft
         }
 
-        console.log('pubkey: ', keyPair.getPublic())
-        console.log('pubkey: ', keyPair.getPublic().encode('hex', false))
         const payload = JSON.stringify(payload_obj)
-        console.log('payload: ', payload)
         const messageHash = keccak256(new TextEncoder().encode(payload)).slice(2)
-        console.log('messageHash: ', messageHash)
         const signature = keyPair.sign(messageHash, 'hex', {canonical: true})
         const r = toHexString(signature.r.toArray())
         const s = toHexString(signature.s.toArray())
-        console.log(signature)
-        console.log('r: ', r)
-        console.log('s: ', s)
-
-/*
-        const mypubkey = ellipsis.keyFromPublic(pubkey, 'hex')
-        const mysig = 
-        mysig.v = 28
-        mysig.r = '0x' + r
-        mysig.s = '0x' + s
-        const verified = mypubkey.verify(messageHash, mysig)
-        console.log('verified: ', verified)
-        */
 
         const requestOptions = {
             method: 'POST',
             headers: {},
-            body: JSON.stringify({'author': pubkey, 'payload': payload, 'signature': signature})
+            body: JSON.stringify({
+                author: pubkey,
+                payload: payload,
+                r: r,
+                s: s
+            })
         };
 
         fetch(server + 'messages', requestOptions)
@@ -147,9 +135,10 @@ function App() {
         }
 
         const payload = JSON.stringify(payload_obj);
-        const messageHash = keccak256(new TextEncoder().encode(payload))
-        const signature = keyPair.sign(messageHash)
-        console.log(signature);
+        const messageHash = keccak256(new TextEncoder().encode(payload)).slice(2)
+        const signature = keyPair.sign(messageHash, 'hex', {canonical: true})
+        const r = toHexString(signature.r.toArray())
+        const s = toHexString(signature.s.toArray())
 
         const requestOptions = {
             method: 'PUT',
@@ -158,7 +147,8 @@ function App() {
                 'author': pubkey,
                 'schema': profile_schema,
                 'payload': payload,
-                'signature': signature
+                r: r,
+                s: s
             })
         };
 
