@@ -19,9 +19,10 @@ function App() {
     const [prvkey, setPrvKey] = usePersistent<string>("PrivateKey", "");
 
     const [postStreams, setPostStreams] = usePersistent<string>("postStream", "common");
-    const [currentStreams, setCurrentStreams] = usePersistent<string>("currentStream", "common,0");
+    let [currentStreams, setCurrentStreams] = usePersistent<string>("currentStream", "common,0");
 
     const [followee, setFollowee] = usePersistent<User[]>("Follow", []);
+    const [streams, setStreams] = useState<string[]>([]);
 
     const [username, setUsername] = usePersistent<string>("Username", "anonymous");
     const [avatar, setAvatar] = usePersistent<string>("AvatarURL", "");
@@ -56,6 +57,11 @@ function App() {
 
     useEffect(() => {
         if (pubkey == "" && prvkey == "") regenerateKeys();
+        fetch(server + 'stream/list').then((data) => {
+            data.json().then((json) => {
+                setStreams(json)
+            });
+        });
         reload();
     }, []);
 
@@ -116,7 +122,7 @@ function App() {
                 payload: payload,
                 r: r,
                 s: s,
-                streams: "common,local"
+                streams: postStreams
             })
         };
 
@@ -196,9 +202,34 @@ function App() {
                 <Typography variant="h5" gutterBottom>Post</Typography>
                 <Divider/>
                 <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
-                    <TextField label="postStreams" variant="outlined" value={postStreams} onChange={(e) => setUsername(e.target.value)}/>
+                    <TextField label="postStreams" variant="outlined" value={postStreams} onChange={(e) => setPostStreams(e.target.value)}/>
                     <TextField multiline rows={6} label="message" variant="outlined" value={draft} onChange={(e) => setDraft(e.target.value)}/>
                     <Button variant="contained" onClick={_ => post()}>post</Button>
+                </Box>
+            </Paper>
+
+            <Paper sx={{width: "300px", padding: "5px"}}>
+                <Typography variant="h5" gutterBottom>Stream List</Typography>
+                <Divider/>
+                <Box sx={{display: "flex", flexDirection: "column", gap: "5px"}}>
+                    <List dense sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+                    {streams.map((value) => {
+                        const labelId = `checkbox-list-secondary-label-${value}`;
+                        return (
+                        <ListItem
+                            key={value}
+                            secondaryAction={
+                                <Button onClick={() => {setCurrentStreams(currentStreams = `${value},0`); reload()}}>switch</Button>
+                            }
+                            disablePadding
+                        >
+                            <ListItemButton>
+                                <ListItemText id={labelId} primary={value} />
+                            </ListItemButton>
+                        </ListItem>
+                        );
+                    })}
+                    </List>
                 </Box>
             </Paper>
 
