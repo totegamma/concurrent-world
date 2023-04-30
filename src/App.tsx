@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Avatar, Box, Button, Divider, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Paper, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
-import { pki, md, util } from 'node-forge';
 import { ec } from 'elliptic';
 import { keccak256 } from 'ethers';
-import { Buffer } from 'buffer'
 
 import { usePersistent } from './hooks/usePersistent';
 import { Timeline } from './components/Timeline';
@@ -52,21 +50,6 @@ function App() {
     }, []);
 
     useEffect(() => {
-        const ellipsis = new ec("secp256k1")
-        const keyPair = ellipsis.genKeyPair()
-        const privateKey = keyPair.getPrivate().toString('hex')
-        const publicKey = keyPair.getPublic().encode('hex', false)
-        console.log('Private key: ', privateKey)
-        console.log('Public key: ', publicKey)
-
-        const message = "Hello, world!"
-        const messageHash = keccak256(Buffer.from(message))
-        const signature = keyPair.sign(messageHash)
-
-        console.log(signature)
-    }, []);
-
-    useEffect(() => {
         reload();
     }, [mode]);
 
@@ -90,40 +73,53 @@ function App() {
     }
 
     const regenerateKeys = () => {
-        pki.rsa.generateKeyPair({bits: 512, workers: 2}, function(_, keypair) {
-            let publickey = pki.publicKeyToPem(keypair.publicKey);
-            let privatekey = pki.privateKeyToPem(keypair.privateKey);
+        const ellipsis = new ec("secp256k1")
+        const keyPair = ellipsis.genKeyPair()
+        const privateKey = keyPair.getPrivate().toString('hex')
+        const publicKey = keyPair.getPublic().encode('hex', false)
+        console.log('Private key: ', privateKey)
+        console.log('Public key: ', publicKey)
 
-            publickey = publickey.replace("-----BEGIN PUBLIC KEY-----", "");
-            publickey = publickey.replace("-----END PUBLIC KEY-----", "");
-            publickey = publickey.replace(/\r?\n/g, '');
+        setPubKey(publicKey)
+        setPrvKey(privateKey)
+    }
 
-            privatekey = privatekey.replace("-----BEGIN RSA PRIVATE KEY-----", "");
-            privatekey = privatekey.replace("-----END RSA PRIVATE KEY-----", "");
-            privatekey = privatekey.replace(/\r?\n/g, '');
-
-            setPubKey(publickey);
-            setPrvKey(privatekey);
-        });
+    function toHexString(byteArray: Uint8Array | number[]) {
+        return Array.from(byteArray, function(byte) {
+            return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+        }).join('')
     }
 
     const post = () => {
-
-        let privatekey = pki.privateKeyFromPem(
-            "-----BEGIN RSA PRIVATE KEY-----"
-            + prvkey
-            + "-----END RSA PRIVATE KEY-----");
+        const ellipsis = new ec("secp256k1")
+        const keyPair = ellipsis.keyFromPrivate(prvkey)
 
         const payload_obj = {
             'body': draft
         }
 
-        const payload = JSON.stringify(payload_obj);
+        console.log('pubkey: ', keyPair.getPublic())
+        console.log('pubkey: ', keyPair.getPublic().encode('hex', false))
+        const payload = JSON.stringify(payload_obj)
+        console.log('payload: ', payload)
+        const messageHash = keccak256(new TextEncoder().encode(payload)).slice(2)
+        console.log('messageHash: ', messageHash)
+        const signature = keyPair.sign(messageHash, 'hex', {canonical: true})
+        const r = toHexString(signature.r.toArray())
+        const s = toHexString(signature.s.toArray())
+        console.log(signature)
+        console.log('r: ', r)
+        console.log('s: ', s)
 
-        let hash = md.sha256.create();
-        hash.update(payload, 'utf8');
-        let signature = util.encode64(privatekey.sign(hash));
-        console.log(signature);
+/*
+        const mypubkey = ellipsis.keyFromPublic(pubkey, 'hex')
+        const mysig = 
+        mysig.v = 28
+        mysig.r = '0x' + r
+        mysig.s = '0x' + s
+        const verified = mypubkey.verify(messageHash, mysig)
+        console.log('verified: ', verified)
+        */
 
         const requestOptions = {
             method: 'POST',
@@ -141,10 +137,8 @@ function App() {
     }
 
     const updateProfile = () => {
-        let privatekey = pki.privateKeyFromPem(
-            "-----BEGIN RSA PRIVATE KEY-----"
-            + prvkey
-            + "-----END RSA PRIVATE KEY-----");
+        const ellipsis = new ec("secp256k1")
+        const keyPair = ellipsis.keyFromPrivate(prvkey)
 
         const payload_obj = {
             'username': username,
@@ -153,10 +147,8 @@ function App() {
         }
 
         const payload = JSON.stringify(payload_obj);
-
-        let hash = md.sha256.create();
-        hash.update(payload, 'utf8');
-        let signature = util.encode64(privatekey.sign(hash));
+        const messageHash = keccak256(new TextEncoder().encode(payload))
+        const signature = keyPair.sign(messageHash)
         console.log(signature);
 
         const requestOptions = {
