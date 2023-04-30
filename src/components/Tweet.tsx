@@ -4,24 +4,31 @@ import { ListItem, Box, Avatar, Typography, Link, IconButton } from '@mui/materi
 import { RTMMessage, User } from '../model';
 import { IuseResourceManager } from '../hooks/useResourceManager';
 export interface TweetProps {
-    message: RTMMessage;
+    message: Promise<RTMMessage>;
     userDict: IuseResourceManager<User>;
     clickAvatar: () => void;
 }
 
 function Template(props: TweetProps & {children?: ReactNode}){
     let [user, setUser] = useState<User | null>();
+    let [message, setMessage] = useState<RTMMessage | undefined>();
 
     useEffect(() => {
-        const f = async () => {
-            let req_user = await props.userDict.get(props.message.author);
-            setUser(req_user);
-        };
-        f();
+        props.message.then((msg) => {
+            setMessage(msg)
+            props.userDict.get(msg.author).then((user) => {
+                setUser(user)
+            }).catch((error) => {
+                console.error(error);
+            })
+        }).catch((error) => {
+            console.error(error);
+        });
     }, [props.message]);
 
     return (
         <ListItem sx={{alignItems: 'flex-start', flex: 1}}>
+            { message && <>
             {props.children}
             <Box sx={{width: '48px', mr: '12px'}}>
                 <IconButton
@@ -35,14 +42,16 @@ function Template(props: TweetProps & {children?: ReactNode}){
                     <Typography component="span" sx={{fontWeight: '700'}}>{user?.username} </Typography>
                     <Typography component="span" sx={{fontWeight: '400'}}>
                         <Link component="button" underline="hover" color="inherit">
-                            {props.message.cdate}
+                            {message.cdate}
                         </Link>
                     </Typography>
                 </Box>
                 <Box>
-                    {JSON.parse(props.message.payload).body}
+                    {JSON.parse(message.payload).body}
                 </Box>
             </Box>
+            </>
+            }
         </ListItem>
     )
 }

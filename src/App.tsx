@@ -28,7 +28,7 @@ function App() {
 
     const [draft, setDraft] = useState<string>("");
 
-    const messages = useObjectList<RTMMessage>();
+    const messages = useObjectList<StreamElement>();
 
     const userDict = useResourceManager<User>(async (key: string) => {
         const res = await fetch(server + 'characters?author=' + encodeURIComponent(key) + '&schema=' + encodeURIComponent(profile_schema), {
@@ -45,6 +45,14 @@ function App() {
         };
     });
 
+    const messageDict = useResourceManager<RTMMessage>(async (key: string) => {
+        const res = await fetch(server + `messages/${key}`, {
+            method: 'GET',
+            headers: {}
+        });
+        const data = await res.json()
+        return data.message
+    });
 
     useEffect(() => {
         if (pubkey == "" && prvkey == "") regenerateKeys();
@@ -64,14 +72,7 @@ function App() {
         .then((data: StreamElement[]) => {
             console.log(data);
             messages.clear();
-            data.forEach((e: StreamElement) => {
-                fetch(server+`messages/${e.Values.id}`, requestOptions)
-                .then(res => res.json())
-                .then((msg: RTMMessage) => {
-                    console.log(msg);
-                    messages.push(msg.message);
-                })
-            });
+            data.sort((a, b) => a.ID > b.ID ? -1 : 1).forEach((e: StreamElement) => messages.push(e));
         });
     }
 
@@ -187,7 +188,7 @@ function App() {
             </Box>
             <Divider/>
             <Box sx={{overflowY: "scroll"}}>
-                <Timeline messages={messages} clickAvatar={follow} userDict={userDict}/>
+                <Timeline messages={messages} messageDict={messageDict} clickAvatar={follow} userDict={userDict}/>
             </Box>
         </Paper>
         <Box sx={{display: "flex", flexDirection: "column", gap: "15px"}}>
