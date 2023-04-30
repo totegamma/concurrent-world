@@ -4,7 +4,8 @@ export interface RTMMessage {
     cdate: string;
     author: string;
     payload: string;
-    signature: string;
+    r: string;
+    s: string;
 }
 
 export interface User {

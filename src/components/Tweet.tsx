@@ -42,9 +42,6 @@ function Template(props: TweetProps & {children?: ReactNode}){
                 <Box>
                     {JSON.parse(props.message.payload).body}
                 </Box>
-                <Box sx={{color: "#ddd", wordBreak: "break-all"}}>
-                    {props.message.signature}
-                </Box>
             </Box>
         </ListItem>
     )
