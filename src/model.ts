@@ -1,3 +1,9 @@
+export interface StreamElement {
+    ID: string,
+    Values: {
+        id: string
+    }
+}
 
 export interface RTMMessage {
     id: string;

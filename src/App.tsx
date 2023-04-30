@@ -8,7 +8,7 @@ import { Timeline } from './components/Timeline';
 
 import { useObjectList } from './hooks/useObjectList';
 import { useResourceManager } from './hooks/useResourceManager';
-import { RTMMessage, User } from './model';
+import type { StreamElement, RTMMessage, User } from './model';
 
 const profile_schema = 'https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/characters/profile/v1.json';
 
@@ -18,13 +18,15 @@ function App() {
     const [pubkey, setPubKey] = usePersistent<string>("PublicKey", "");
     const [prvkey, setPrvKey] = usePersistent<string>("PrivateKey", "");
 
+    const [postStreams, setPostStreams] = usePersistent<string>("postStream", "common");
+    const [currentStreams, setCurrentStreams] = usePersistent<string>("currentStream", "common,0");
+
     const [followee, setFollowee] = usePersistent<User[]>("Follow", []);
 
     const [username, setUsername] = usePersistent<string>("Username", "anonymous");
     const [avatar, setAvatar] = usePersistent<string>("AvatarURL", "");
 
     const [draft, setDraft] = useState<string>("");
-    const [mode, setMode] = useState<string>("htl");
 
     const messages = useObjectList<RTMMessage>();
 
@@ -49,14 +51,8 @@ function App() {
         reload();
     }, []);
 
-    useEffect(() => {
-        reload();
-    }, [mode]);
-
     const reload = () => {
-
-        let url = (mode == 'ltl') ? server + 'messages'
-                                  : server + 'messages?users=' + encodeURIComponent(followee.map(e => e.pubkey).join(','))
+        let url = server + `stream?streams=${currentStreams}`
 
         const requestOptions = {
             method: 'GET',
@@ -65,10 +61,17 @@ function App() {
 
         fetch(url, requestOptions)
         .then(res => res.json())
-        .then(data => {
+        .then((data: StreamElement[]) => {
             console.log(data);
             messages.clear();
-            data.messages.reverse().forEach((e: any) => messages.push(e));
+            data.forEach((e: StreamElement) => {
+                fetch(server+`messages/${e.Values.id}`, requestOptions)
+                .then(res => res.json())
+                .then((msg: RTMMessage) => {
+                    console.log(msg);
+                    messages.push(msg.message);
+                })
+            });
         });
     }
 
@@ -111,7 +114,8 @@ function App() {
                 author: pubkey,
                 payload: payload,
                 r: r,
-                s: s
+                s: s,
+                streams: "common,local"
             })
         };
 
@@ -176,16 +180,10 @@ function App() {
         <Paper sx={{width: "800px", padding: "15px", display: "flex", flexFlow: "column"}}>
             <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "5px"}}>
             <Typography variant="h5" gutterBottom>Timeline</Typography>
-            <ToggleButtonGroup
-                color="primary"
-                value={mode}
-                exclusive
-                onChange={(_, newvalue) => {setMode(newvalue)}}
-                aria-label="Platform"
-                >
-                <ToggleButton value="htl">HTL</ToggleButton>
-                <ToggleButton value="ltl">LTL</ToggleButton>
-            </ToggleButtonGroup>
+            <Box>
+                <TextField label="watchStreams" variant="outlined" value={currentStreams} onChange={(e) => setCurrentStreams(e.target.value)}/>
+                <Button variant="contained" onClick={_ => reload()}>GO</Button>
+            </Box>
             </Box>
             <Divider/>
             <Box sx={{overflowY: "scroll"}}>
@@ -197,6 +195,7 @@ function App() {
                 <Typography variant="h5" gutterBottom>Post</Typography>
                 <Divider/>
                 <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
+                    <TextField label="postStreams" variant="outlined" value={postStreams} onChange={(e) => setUsername(e.target.value)}/>
                     <TextField multiline rows={6} label="message" variant="outlined" value={draft} onChange={(e) => setDraft(e.target.value)}/>
                     <Button variant="contained" onClick={_ => post()}>post</Button>
                 </Box>
