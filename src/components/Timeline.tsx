@@ -12,6 +12,7 @@ export interface TimelineProps {
     messageDict: IuseResourceManager<RTMMessage>;
     clickAvatar: (userid: string) => void;
     favorite: (messageID: string | undefined, deletekey?: string) => void;
+    inspect: (message: RTMMessage | null) => void;
 }
 
 export function Timeline(props: TimelineProps) {
@@ -20,8 +21,12 @@ export function Timeline(props: TimelineProps) {
             <List sx={{flex: 1}}>
             {props.messages.current.map(e =>
                 <React.Fragment key={e.ID}>
-                    <Tweet message={props.messageDict.get(e.Values.id)} favorite={props.favorite} address={props.address}
+                    <Tweet 
+                        message={props.messageDict.get(e.Values.id)}
+                        favorite={props.favorite}
+                        address={props.address}
                         userDict={props.userDict}
+                        inspect={props.inspect}
                         clickAvatar={() => {
                             //props.clickAvatar(e.author)
                         }}/>

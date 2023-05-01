@@ -11,6 +11,7 @@ export interface TweetProps {
     userDict: IuseResourceManager<User>;
     clickAvatar: () => void;
     favorite: (messageID: string | undefined, deleteKey?: string) => void;
+    inspect: (message: RTMMessage | null) => void;
 }
 
 function Template(props: TweetProps & {children?: ReactNode}){
@@ -18,6 +19,7 @@ function Template(props: TweetProps & {children?: ReactNode}){
     let [message, setMessage] = useState<RTMMessage | undefined>();
 
     useEffect(() => {
+        console.log("effect!!!!")
         props.message.then((msg) => {
             setMessage(msg)
             props.userDict.get(msg.author).then((user) => {
@@ -63,7 +65,7 @@ function Template(props: TweetProps & {children?: ReactNode}){
                         <StarIcon/> {message.associations_data.filter(e => e.schema == "https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/associations/like/v1.json").length}
                     </IconButton>
                     }
-                    <IconButton onClick={() => props.clickAvatar()} >
+                    <IconButton onClick={() => props.inspect(message ?? null)} >
                         <MoreHorizIcon/>
                     </IconButton>
                 </Box>

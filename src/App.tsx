@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Avatar, Box, Button, Divider, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Paper, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { Avatar, Box, Button, Divider, Drawer, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Paper, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { ec } from 'elliptic';
 import { keccak256, computeAddress } from 'ethers';
 
@@ -14,6 +14,7 @@ const profile_schema = 'https://raw.githubusercontent.com/totegamma/concurrent-s
 
 function App() {
 
+    const [inspectItem, setInspectItem] = useState<RTMMessage | null>(null)
     const [server, setServer] = usePersistent<string>("ServerAddress", "");
     const [pubkey, setPubKey] = usePersistent<string>("PublicKey", "");
     const [prvkey, setPrvKey] = usePersistent<string>("PrivateKey", "");
@@ -205,7 +206,6 @@ function App() {
         .then(res => res.json())
         .then(data => {
             console.log(data);
-            setDraft("");
             reload();
         });
 
@@ -232,7 +232,7 @@ function App() {
             </Box>
             <Divider/>
             <Box sx={{overflowY: "scroll"}}>
-                <Timeline messages={messages} messageDict={messageDict} clickAvatar={follow} userDict={userDict} favorite={favorite} address={address}/>
+                <Timeline messages={messages} messageDict={messageDict} clickAvatar={follow} userDict={userDict} favorite={favorite} address={address} inspect={setInspectItem}/>
             </Box>
         </Paper>
         <Box sx={{display: "flex", flexDirection: "column", gap: "15px"}}>
@@ -321,6 +321,17 @@ function App() {
                 </Box>
             </Paper>
         </Box>
+        <Drawer
+            anchor={'right'}
+            open={inspectItem != null}
+            onClose={() => setInspectItem(null)}
+        >
+            <Box sx={{width: "40vw", fontSize: "13px"}}>
+                <pre>
+                    {JSON.stringify(inspectItem, null, 4)}
+                </pre>
+            </Box>
+        </Drawer>
     </Box>)
 }
 
