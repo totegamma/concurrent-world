@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Avatar, Box, Button, Divider, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Paper, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { ec } from 'elliptic';
-import { keccak256 } from 'ethers';
+import { keccak256, computeAddress } from 'ethers';
 
 import { usePersistent } from './hooks/usePersistent';
 import { Timeline } from './components/Timeline';
@@ -17,6 +17,7 @@ function App() {
     const [server, setServer] = usePersistent<string>("ServerAddress", "");
     const [pubkey, setPubKey] = usePersistent<string>("PublicKey", "");
     const [prvkey, setPrvKey] = usePersistent<string>("PrivateKey", "");
+    const [address, setAddress] = usePersistent<string>("Address", "");
 
     const [postStreams, setPostStreams] = usePersistent<string>("postStream", "common");
     let [currentStreams, setCurrentStreams] = usePersistent<string>("currentStream", "common,0");
@@ -87,11 +88,15 @@ function App() {
         const keyPair = ellipsis.genKeyPair()
         const privateKey = keyPair.getPrivate().toString('hex')
         const publicKey = keyPair.getPublic().encode('hex', false)
+        const ethAddress = computeAddress('0x' + publicKey)
+        const ccAddress = 'CC' + ethAddress.slice(2)
         console.log('Private key: ', privateKey)
         console.log('Public key: ', publicKey)
+        console.log('address: ', ccAddress)
 
         setPubKey(publicKey)
         setPrvKey(privateKey)
+        setAddress(ccAddress)
     }
 
     function toHexString(byteArray: Uint8Array | number[]) {
@@ -111,17 +116,18 @@ function App() {
         const payload = JSON.stringify(payload_obj)
         const messageHash = keccak256(new TextEncoder().encode(payload)).slice(2)
         const signature = keyPair.sign(messageHash, 'hex', {canonical: true})
+        console.log(signature)
         const r = toHexString(signature.r.toArray())
         const s = toHexString(signature.s.toArray())
+        const v = signature.recoveryParam == 0 ? '00' : '01'
 
         const requestOptions = {
             method: 'POST',
             headers: {},
             body: JSON.stringify({
-                author: pubkey,
+                author: address,
                 payload: payload,
-                r: r,
-                s: s,
+                signature: r + s + v,
                 streams: postStreams
             })
         };
@@ -150,16 +156,16 @@ function App() {
         const signature = keyPair.sign(messageHash, 'hex', {canonical: true})
         const r = toHexString(signature.r.toArray())
         const s = toHexString(signature.s.toArray())
+        const v = signature.recoveryParam == 0 ? '00' : '01'
 
         const requestOptions = {
             method: 'PUT',
             headers: {},
             body: JSON.stringify({
-                'author': pubkey,
+                'author': address,
                 'schema': profile_schema,
                 'payload': payload,
-                r: r,
-                s: s
+                signature: r + s + v,
             })
         };
 
@@ -277,6 +283,7 @@ function App() {
                 <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
                     <TextField label="server" variant="outlined" value={server} onChange={(e) => setServer(e.target.value)}/>
                     <TextField label="privateKey" variant="outlined" value={prvkey} onChange={(e) => setPrvKey(e.target.value)}/>
+                    <TextField label="address" variant="outlined" value={address} onChange={(e) => setAddress(e.target.value)}/>
                     <TextField label="publicKey" variant="outlined" value={pubkey} onChange={(e) => setPubKey(e.target.value)}/>
                     <Button variant="contained" onClick={_ => regenerateKeys()}>Generate Key</Button>
                 </Box>
