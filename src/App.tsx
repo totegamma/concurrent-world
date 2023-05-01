@@ -222,32 +222,45 @@ function App() {
     }
 
     return (<Box sx={{display: "flex", padding: "10px", gap: "10px", backgroundColor: "#f2f2f2", width: "100vw", height: "100vh", justifyContent: "center"}}>
-        <Paper sx={{width: "800px", padding: "15px", display: "flex", flexFlow: "column"}}>
-            <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "5px"}}>
-            <Typography variant="h5" gutterBottom>Timeline</Typography>
-            <Box>
-                <TextField label="watchStreams" variant="outlined" value={currentStreams} onChange={(e) => setCurrentStreams(e.target.value)}/>
-                <Button variant="contained" onClick={_ => reload()}>GO</Button>
-            </Box>
-            </Box>
-            <Divider/>
-            <Box sx={{overflowY: "scroll"}}>
-                <Timeline messages={messages} messageDict={messageDict} clickAvatar={follow} userDict={userDict} favorite={favorite} address={address} inspect={setInspectItem}/>
-            </Box>
-        </Paper>
         <Box sx={{display: "flex", flexDirection: "column", gap: "15px"}}>
-            <Paper sx={{width: "300px", padding: "5px"}}>
-                <Typography variant="h5" gutterBottom>Post</Typography>
-                <Divider/>
-                <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
-                    <TextField label="postStreams" variant="outlined" value={postStreams} onChange={(e) => setPostStreams(e.target.value)}/>
-                    <TextField multiline rows={6} label="message" variant="outlined" value={draft} onChange={(e) => setDraft(e.target.value)}/>
-                    <Button variant="contained" onClick={_ => post()}>post</Button>
-                </Box>
-            </Paper>
 
-            <Paper sx={{width: "300px", padding: "5px"}}>
-                <Typography variant="h5" gutterBottom>Stream List</Typography>
+            <Paper sx={{width: "300px", padding: "15px"}}>
+                <Typography variant="h5" gutterBottom>Concurrent</Typography>
+                <Divider/>
+                <Box sx={{display: "flex", flexDirection: "column", gap: "5px"}}>
+                    <List dense sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+                        <ListItem disablePadding >
+                            <ListItemButton>
+                                <ListItemText primary="Home" />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding >
+                            <ListItemButton>
+                                <ListItemText primary="Notification" />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding >
+                            <ListItemButton>
+                                <ListItemText primary="Associations" />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding >
+                            <ListItemButton>
+                                <ListItemText primary="Explorer" />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding >
+                            <ListItemButton>
+                                <ListItemText primary="Profile" />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding >
+                            <ListItemButton>
+                                <ListItemText primary="Settings" />
+                            </ListItemButton>
+                        </ListItem>
+                    </List>
+                </Box>
                 <Divider/>
                 <Box sx={{display: "flex", flexDirection: "column", gap: "5px"}}>
                     <List dense sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
@@ -257,7 +270,11 @@ function App() {
                         <ListItem
                             key={value}
                             secondaryAction={
-                                <Button onClick={() => {setCurrentStreams(currentStreams = `${value},0`); reload()}}>switch</Button>
+                                <Button onClick={() => {
+                                    setCurrentStreams(currentStreams = `${value},0`);
+                                    setPostStreams(value);
+                                    reload()
+                                }}>switch</Button>
                             }
                             disablePadding
                         >
@@ -271,35 +288,7 @@ function App() {
                 </Box>
             </Paper>
 
-            <Paper sx={{width: "300px", padding: "5px"}}>
-                <Typography variant="h5" gutterBottom>Following</Typography>
-                <Divider/>
-                <Box sx={{display: "flex", flexDirection: "column", gap: "5px"}}>
-                    <List dense sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-                    {followee.map((value) => {
-                        const labelId = `checkbox-list-secondary-label-${value.pubkey}`;
-                        return (
-                        <ListItem
-                            key={value.username}
-                            secondaryAction={
-                                <Button onClick={() => unfollow(value.pubkey)}>unfollow</Button>
-                            }
-                            disablePadding
-                        >
-                            <ListItemButton>
-                                <ListItemAvatar>
-                                    <Avatar src={value.avatar} />
-                                </ListItemAvatar>
-                                <ListItemText id={labelId} primary={value.username} />
-                            </ListItemButton>
-                        </ListItem>
-                        );
-                    })}
-                    </List>
-                </Box>
-            </Paper>
-
-            <Paper sx={{width: "300px", padding: "5px"}}>
+            <Paper sx={{width: "300px", padding: "15px"}}>
                 <Typography variant="h5" gutterBottom>Profile</Typography>
                 <Divider/>
                 <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
@@ -309,7 +298,7 @@ function App() {
                 </Box>
             </Paper>
 
-            <Paper sx={{width: "300px", padding: "5px"}}>
+            <Paper sx={{width: "300px", padding: "15px"}}>
                 <Typography variant="h5" gutterBottom>Settings</Typography>
                 <Divider/>
                 <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
@@ -321,6 +310,28 @@ function App() {
                 </Box>
             </Paper>
         </Box>
+        <Paper sx={{width: "800px", padding: "15px", display: "flex", flexFlow: "column"}}>
+            <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "5px"}}>
+            <Typography variant="h5" gutterBottom>Timeline</Typography>
+            <Box>
+                <TextField label="watchStreams" variant="outlined" value={currentStreams} onChange={(e) => setCurrentStreams(e.target.value)}/>
+                <Button variant="contained" onClick={_ => reload()}>GO</Button>
+            </Box>
+            </Box>
+            <Divider/>
+            <Box>
+                <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
+                    <TextField label="postStreams" variant="outlined" value={postStreams} onChange={(e) => setPostStreams(e.target.value)}/>
+                    <TextField multiline rows={6} label="message" variant="outlined" value={draft} onChange={(e) => setDraft(e.target.value)}/>
+                    <Button variant="contained" onClick={_ => post()}>post</Button>
+                </Box>
+            </Box>
+            <Divider/>
+            <Box sx={{overflowY: "scroll"}}>
+                <Timeline messages={messages} messageDict={messageDict} clickAvatar={follow} userDict={userDict} favorite={favorite} address={address} inspect={setInspectItem}/>
+            </Box>
+        </Paper>
+
         <Drawer
             anchor={'right'}
             open={inspectItem != null}
