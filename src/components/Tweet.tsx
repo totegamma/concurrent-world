@@ -1,12 +1,16 @@
 import { ReactNode, useState, useEffect } from 'react';
 import { ListItem, Box, Avatar, Typography, Link, IconButton } from '@mui/material';
+import StarIcon from '@mui/icons-material/Star';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 
 import { RTMMessage, User } from '../model';
 import { IuseResourceManager } from '../hooks/useResourceManager';
 export interface TweetProps {
+    address: string;
     message: Promise<RTMMessage>;
     userDict: IuseResourceManager<User>;
     clickAvatar: () => void;
+    favorite: (messageID: string | undefined, deleteKey?: string) => void;
 }
 
 function Template(props: TweetProps & {children?: ReactNode}){
@@ -48,6 +52,20 @@ function Template(props: TweetProps & {children?: ReactNode}){
                 </Box>
                 <Box>
                     {JSON.parse(message.payload).body}
+                </Box>
+                <Box>
+                    {message.associations_data.find((e) => e.author == props.address) ?
+                    <IconButton color="primary" onClick={() => props.favorite(message?.id, message?.associations_data.find((e) => e.author == props.address)?.id)} >
+                        <StarIcon/> {message.associations_data.filter(e => e.schema == "https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/associations/like/v1.json").length}
+                    </IconButton>
+                    :
+                    <IconButton onClick={() => props.favorite(message?.id)} >
+                        <StarIcon/> {message.associations_data.filter(e => e.schema == "https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/associations/like/v1.json").length}
+                    </IconButton>
+                    }
+                    <IconButton onClick={() => props.clickAvatar()} >
+                        <MoreHorizIcon/>
+                    </IconButton>
                 </Box>
             </Box>
             </>

@@ -53,6 +53,7 @@ function App() {
             headers: {}
         });
         const data = await res.json()
+        console.log(data.message)
         return data.message
     });
 
@@ -99,27 +100,65 @@ function App() {
         setAddress(ccAddress)
     }
 
+    const favorite = (messageID: string | undefined, deletekey?: string) => {
+        const favoliteScheme = "https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/associations/like/v1.json"
+        if (!messageID) return;
+        const payload_obj = {
+        }
+        const payload = JSON.stringify(payload_obj)
+        const signature = sign(payload)
+
+        const requestOptions = !deletekey ? {
+            method: 'POST',
+            headers: {},
+            body: JSON.stringify({
+                author: address,
+                schema: favoliteScheme,
+                target: messageID,
+                payload: payload,
+                signature: signature,
+            })
+        } : {
+            method: 'DELETE',
+            headers: {},
+            body: JSON.stringify({
+                id: deletekey
+            })
+        };
+
+        fetch(server + 'associations', requestOptions)
+        .then(res => res.json())
+        .then(data => {
+            console.log(data);
+            messageDict.invalidate(messageID);
+            reload();
+        });
+    }
+
     function toHexString(byteArray: Uint8Array | number[]) {
         return Array.from(byteArray, function(byte) {
             return ('0' + (byte & 0xFF).toString(16)).slice(-2);
         }).join('')
     }
 
-    const post = () => {
+    const sign = (payload: string) => {
         const ellipsis = new ec("secp256k1")
         const keyPair = ellipsis.keyFromPrivate(prvkey)
-
-        const payload_obj = {
-            'body': draft
-        }
-
-        const payload = JSON.stringify(payload_obj)
         const messageHash = keccak256(new TextEncoder().encode(payload)).slice(2)
         const signature = keyPair.sign(messageHash, 'hex', {canonical: true})
         console.log(signature)
         const r = toHexString(signature.r.toArray())
         const s = toHexString(signature.s.toArray())
         const v = signature.recoveryParam == 0 ? '00' : '01'
+        return r + s + v
+    }
+
+    const post = () => {
+        const payload_obj = {
+            'body': draft
+        }
+        const payload = JSON.stringify(payload_obj)
+        const signature = sign(payload)
 
         const requestOptions = {
             method: 'POST',
@@ -127,7 +166,7 @@ function App() {
             body: JSON.stringify({
                 author: address,
                 payload: payload,
-                signature: r + s + v,
+                signature: signature,
                 streams: postStreams
             })
         };
@@ -142,9 +181,6 @@ function App() {
     }
 
     const updateProfile = () => {
-        const ellipsis = new ec("secp256k1")
-        const keyPair = ellipsis.keyFromPrivate(prvkey)
-
         const payload_obj = {
             'username': username,
             'avatar': avatar,
@@ -152,11 +188,7 @@ function App() {
         }
 
         const payload = JSON.stringify(payload_obj);
-        const messageHash = keccak256(new TextEncoder().encode(payload)).slice(2)
-        const signature = keyPair.sign(messageHash, 'hex', {canonical: true})
-        const r = toHexString(signature.r.toArray())
-        const s = toHexString(signature.s.toArray())
-        const v = signature.recoveryParam == 0 ? '00' : '01'
+        const signature = sign(payload)
 
         const requestOptions = {
             method: 'PUT',
@@ -165,7 +197,7 @@ function App() {
                 'author': address,
                 'schema': profile_schema,
                 'payload': payload,
-                signature: r + s + v,
+                signature: signature,
             })
         };
 
@@ -200,7 +232,7 @@ function App() {
             </Box>
             <Divider/>
             <Box sx={{overflowY: "scroll"}}>
-                <Timeline messages={messages} messageDict={messageDict} clickAvatar={follow} userDict={userDict}/>
+                <Timeline messages={messages} messageDict={messageDict} clickAvatar={follow} userDict={userDict} favorite={favorite} address={address}/>
             </Box>
         </Paper>
         <Box sx={{display: "flex", flexDirection: "column", gap: "15px"}}>

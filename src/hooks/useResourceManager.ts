@@ -5,6 +5,7 @@ export interface IuseResourceManager<T> {
     current: {[key: string]: T};
     get: (key: string) => Promise<T>;
     register: (key: string, value:T) => void;
+    invalidate: (key: string) => void;
 }
 
 
@@ -23,9 +24,14 @@ export function useResourceManager<T>(resolver: (key: string) => Promise<T>): Iu
         body.current[key] = value;
     }
 
+    const invalidate = (key: string) => {
+        delete body.current[key]
+    }
+
     return {
         current: body.current,
         get: get,
-        register: register
+        register: register,
+        invalidate: invalidate
     }
 }

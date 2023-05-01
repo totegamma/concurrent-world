@@ -5,13 +5,26 @@ export interface StreamElement {
     }
 }
 
-export interface RTMMessage {
-    id: string;
-    cdate: string;
+export interface Association {
     author: string;
+    cdate: string;
+    id: string;
     payload: string;
-    r: string;
-    s: string;
+    schema: string;
+    signature: string;
+    target: string;
+}
+
+export interface RTMMessage {
+    associations: string;
+    associations_data: Association[];
+    author: string;
+    cdate: string;
+    id: string;
+    payload: string;
+    schema: string;
+    signature: string;
+    streams: string;
 }
 
 export interface User {

@@ -6,22 +6,21 @@ import { StreamElement, RTMMessage, User } from '../model';
 import { IuseResourceManager } from '../hooks/useResourceManager';
 
 export interface TimelineProps {
+    address: string;
     messages: IuseObjectList<StreamElement>;
     userDict: IuseResourceManager<User>;
     messageDict: IuseResourceManager<RTMMessage>;
     clickAvatar: (userid: string) => void;
+    favorite: (messageID: string | undefined, deletekey?: string) => void;
 }
 
 export function Timeline(props: TimelineProps) {
-    
-    
-    
     return (<>
         <Paper sx={{display: 'flex', flex: 1}}>
             <List sx={{flex: 1}}>
             {props.messages.current.map(e =>
                 <React.Fragment key={e.ID}>
-                    <Tweet message={props.messageDict.get(e.Values.id)}
+                    <Tweet message={props.messageDict.get(e.Values.id)} favorite={props.favorite} address={props.address}
                         userDict={props.userDict}
                         clickAvatar={() => {
                             //props.clickAvatar(e.author)
