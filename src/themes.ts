@@ -24,6 +24,19 @@ export const Themes = {
                 default: "#023059"
             }
         }
+    },
+    orange: {
+        palette: {
+            primary: {
+                main: "#D95204"
+            },
+            secondary: {
+                main: "#730217"
+            },
+            background: {
+                default: "#F25C05"
+            }
+        }
     }
 }
 
