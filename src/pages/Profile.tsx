@@ -51,10 +51,16 @@ export function Profile() {
         </Box>
         <Divider/>
         <Typography variant="h6" gutterBottom>Concurrent Address</Typography>
-        {appData.userAddress}
+        <Typography sx={{wordBreak: 'break-all'}}>
+            {appData.userAddress}
+        </Typography>
         <Typography variant="h6" gutterBottom>Publickey</Typography>
-        {appData.publickey}
+        <Typography sx={{wordBreak: 'break-all'}}>
+            {appData.publickey}
+        </Typography>
         <Typography variant="h6" gutterBottom>Privatekey</Typography>
-        {appData.privatekey}
+        <Typography sx={{wordBreak: 'break-all'}}>
+            {appData.privatekey}
+        </Typography>
     </>)
 }
