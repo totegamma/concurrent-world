@@ -1,6 +1,6 @@
-import React, { useContext, useEffect } from 'react';
+import React from 'react';
 import { Paper, List, Divider } from '@mui/material';
-import { Tweet } from './Tweet'
+import { Tweet } from '../components/Tweet'
 import { RTMMessage, StreamElement, User } from '../model';
 import { IuseResourceManager } from '../hooks/useResourceManager';
 import { IuseObjectList } from '../hooks/useObjectList';

@@ -1,9 +1,13 @@
+
 import { useEffect, useState, createContext } from 'react';
 import { Box, Button, Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Paper, TextField, Typography } from '@mui/material';
 import { Sign, Keygen } from './util'
 
+import { Outlet, Link } from 'react-router-dom'
+
 import { usePersistent } from './hooks/usePersistent';
-import { Timeline } from './components/Timeline';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Associations, Explorer, Notification, Profile, Settings, Timeline } from './pages';
 
 import { useResourceManager } from './hooks/useResourceManager';
 import type { RTMMessage, StreamElement, User } from './model';
@@ -166,6 +170,8 @@ function App() {
 
     return (
     <ApplicationContext.Provider value={{serverAddress: server, publickey: pubkey, privatekey: prvkey, userAddress: address}}>
+    <BrowserRouter>
+
     <Box sx={{display: "flex", padding: "10px", gap: "10px", backgroundColor: "#f2f2f2", width: "100vw", height: "100vh", justifyContent: "center"}}>
         <Box sx={{display: "flex", flexDirection: "column", gap: "15px"}}>
 
@@ -175,32 +181,32 @@ function App() {
                 <Box sx={{display: "flex", flexDirection: "column", gap: "5px"}}>
                     <List dense sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
                         <ListItem disablePadding >
-                            <ListItemButton>
+                            <ListItemButton component={Link} to="/">
                                 <ListItemText primary="Home" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding >
-                            <ListItemButton>
+                            <ListItemButton component={Link} to="/notification">
                                 <ListItemText primary="Notification" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding >
-                            <ListItemButton>
+                            <ListItemButton component={Link} to="/associations">
                                 <ListItemText primary="Associations" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding >
-                            <ListItemButton>
+                            <ListItemButton component={Link} to="/explorer">
                                 <ListItemText primary="Explorer" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding >
-                            <ListItemButton>
+                            <ListItemButton component={Link} to="/profile">
                                 <ListItemText primary="Profile" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding >
-                            <ListItemButton>
+                            <ListItemButton component={Link} to="/settings">
                                 <ListItemText primary="Settings" />
                             </ListItemButton>
                         </ListItem>
@@ -258,6 +264,7 @@ function App() {
         <Paper sx={{width: "800px", padding: "15px", display: "flex", flexFlow: "column"}}>
             <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "5px"}}>
             <Typography variant="h5" gutterBottom>Timeline</Typography>
+
             <Box>
                 <TextField label="watchStreams" variant="outlined" value={currentStreams} onChange={(e) => setCurrentStreams(e.target.value)}/>
                 <Button variant="contained" onClick={_ => reload()}>GO</Button>
@@ -273,7 +280,16 @@ function App() {
             </Box>
             <Divider/>
             <Box sx={{overflowY: "scroll"}}>
-                <Timeline messages={messages} currentStreams={currentStreams} messageDict={messageDict} userDict={userDict} inspect={setInspectItem}/>
+                <Routes>
+                    <Route index element={ 
+                    <Timeline messages={messages} currentStreams={currentStreams} messageDict={messageDict} userDict={userDict} inspect={setInspectItem}/>
+        } />
+                    <Route path="/associations" element={<Associations/>} />
+                    <Route path="/explorer" element={<Explorer/>} />
+                    <Route path="/notification" element={<Notification/>} />
+                    <Route path="/profile" element={<Profile/>} />
+                    <Route path="/settings" element={<Settings/>} />
+                </Routes>
             </Box>
         </Paper>
 
@@ -289,6 +305,7 @@ function App() {
             </Box>
         </Drawer>
     </Box>
+    </BrowserRouter>
     </ApplicationContext.Provider>
     )
 }
