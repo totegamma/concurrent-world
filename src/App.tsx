@@ -32,7 +32,7 @@ function App() {
     const [pubkey, setPubKey] = usePersistent<string>("PublicKey", "");
     const [prvkey, setPrvKey] = usePersistent<string>("PrivateKey", "");
     const [address, setAddress] = usePersistent<string>("Address", "");
-    const [postStreams, setPostStreams] = usePersistent<string>("postStream", "common");
+    //const [postStreams, setPostStreams] = usePersistent<string>("postStream", "common");
     const [currentStreams, setCurrentStreams] = usePersistent<string>("currentStream", "common,0");
     const [themeName, setThemeName] = usePersistent<string>("Theme", Object.keys(Themes)[0]);
     const [watchstreams, setWatchStreams] = usePersistent<string[]>("watchStreamList", ["common"]);
@@ -99,7 +99,6 @@ function App() {
         <Menu
             streams={watchstreams}
             setCurrentStreams={setCurrentStreams}
-            setPostStreams={setPostStreams}
         />
         <Paper sx={{flexGrow: "1", margin: "10px", padding: "20px", display: "flex", flexFlow: "column", borderRadius: "20px"}}>
             <Routes>
@@ -110,8 +109,6 @@ function App() {
                         userDict={userDict}
                         currentStreams={currentStreams}
                         setCurrentStreams={setCurrentStreams}
-                        postStreams={postStreams}
-                        setPostStreams={setPostStreams}
                         reload={reload}
                         inspect={setInspectItem}
                     />

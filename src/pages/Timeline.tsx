@@ -14,8 +14,6 @@ export interface TimelineProps {
     userDict: IuseResourceManager<User>;
     messageDict: IuseResourceManager<RTMMessage>;
     inspect: (message: RTMMessage | null) => void;
-    postStreams: string;
-    setPostStreams: (streams: string) => void;
     currentStreams: string;
     setCurrentStreams: (streams: string) => void;
     reload: () => void;
@@ -41,7 +39,7 @@ export function Timeline(props: TimelineProps) {
                 author: appData.userAddress,
                 payload: payload,
                 signature: signature,
-                streams: props.postStreams
+                streams: props.currentStreams
             })
         };
 

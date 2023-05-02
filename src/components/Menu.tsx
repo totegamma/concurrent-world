@@ -12,7 +12,6 @@ import PercentIcon from '@mui/icons-material/Percent';
 export interface MenuProps {
     streams: string[]
     setCurrentStreams: (input: string) => void
-    setPostStreams: (input: string) => void
 }
 
 export function Menu(props: MenuProps) {
@@ -87,7 +86,6 @@ export function Menu(props: MenuProps) {
                             </ListItemIcon>
                             <ListItemButton  onClick={() => {
                                     props.setCurrentStreams(value);
-                                    props.setPostStreams(value);
                                 }}>
                                 <ListItemText id={labelId} primary={value} />
                             </ListItemButton>
