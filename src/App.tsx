@@ -1,18 +1,16 @@
 import { useEffect, useState, createContext } from 'react';
-import { Box, createTheme, Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Paper, Theme, ThemeProvider, Typography } from '@mui/material';
-
-import { Link } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { darken, Box, createTheme, Drawer, Paper, Theme, ThemeProvider } from '@mui/material';
 
 import { usePersistent } from './hooks/usePersistent';
-import { darken } from '@mui/material';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Associations, Explorer, Notification, Profile, Settings, Timeline } from './pages';
-
-import { useResourceManager } from './hooks/useResourceManager';
-import type { RTMMessage, StreamElement, User } from './model';
-import { Schemas } from './schemas';
 import { useObjectList } from './hooks/useObjectList';
+import { useResourceManager } from './hooks/useResourceManager';
+
+import { Schemas } from './schemas';
 import { Themes } from './themes';
+import { Menu } from './components/Menu';
+import type { RTMMessage, StreamElement, User } from './model';
+import { Associations, Explorer, Notification, Profile, Settings, Timeline } from './pages';
 
 export const ApplicationContext = createContext<appData>({
     serverAddress: '',
@@ -35,20 +33,12 @@ function App() {
     const [pubkey, setPubKey] = usePersistent<string>("PublicKey", "");
     const [prvkey, setPrvKey] = usePersistent<string>("PrivateKey", "");
     const [address, setAddress] = usePersistent<string>("Address", "");
-
     const [postStreams, setPostStreams] = usePersistent<string>("postStream", "common");
-    let [currentStreams, setCurrentStreams] = usePersistent<string>("currentStream", "common,0");
-
+    const [currentStreams, setCurrentStreams] = usePersistent<string>("currentStream", "common,0");
     const [streams, setStreams] = useState<string[]>([]);
-
-
     const [themeName, setThemeName] = usePersistent<string>("Theme", Object.keys(Themes)[0]);
     const [theme, setTheme] = useState<Theme>(createTheme((Themes as any)[themeName]))
-
-    useEffect(() => {
-        setTheme(createTheme((Themes as any)[themeName]))
-    }, [themeName]);
-
+    const messages = useObjectList<StreamElement>();
 
     const userDict = useResourceManager<User>(async (key: string) => {
         const res = await fetch(server + 'characters?author=' + encodeURIComponent(key) + '&schema=' + encodeURIComponent(Schemas.profile), {
@@ -75,8 +65,6 @@ function App() {
         return data.message
     });
 
-    const messages = useObjectList<StreamElement>();
-
     const reload = () => {
         let url = server + `stream?streams=${currentStreams}`
 
@@ -96,7 +84,11 @@ function App() {
 
     useEffect(() => {
         reload()
-    }, [])
+    }, [currentStreams])
+
+    useEffect(() => {
+        setTheme(createTheme((Themes as any)[themeName]))
+    }, [themeName]);
 
     useEffect(() => {
         fetch(server + 'stream/list').then((data) => {
@@ -111,68 +103,11 @@ function App() {
     <ApplicationContext.Provider value={{serverAddress: server, publickey: pubkey, privatekey: prvkey, userAddress: address}}>
     <BrowserRouter>
     <Box sx={{display: "flex", padding: "10px", gap: "10px", background: `linear-gradient(${theme.palette.background.default}, ${darken(theme.palette.background.default, 0.1)})`, width: "100vw", height: "100vh", justifyContent: "center"}}>
-        <Box sx={{display: "flex", flexDirection: "column", gap: "15px"}}>
-            <Box sx={{width: "200px", paddingTop: "30px", color: "#fff"}}>
-                <Typography variant="h5" gutterBottom>Concurrent</Typography>
-                <Divider/>
-                <Box sx={{display: "flex", flexDirection: "column", gap: "5px"}}>
-                    <List dense sx={{ width: '100%', maxWidth: 360 }}>
-                        <ListItem disablePadding >
-                            <ListItemButton component={Link} to="/">
-                                <ListItemText primary="Home" />
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding >
-                            <ListItemButton component={Link} to="/notification">
-                                <ListItemText primary="Notification" />
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding >
-                            <ListItemButton component={Link} to="/associations">
-                                <ListItemText primary="Associations" />
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding >
-                            <ListItemButton component={Link} to="/explorer">
-                                <ListItemText primary="Explorer" />
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding >
-                            <ListItemButton component={Link} to="/profile">
-                                <ListItemText primary="Profile" />
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding >
-                            <ListItemButton component={Link} to="/settings">
-                                <ListItemText primary="Settings" />
-                            </ListItemButton>
-                        </ListItem>
-                    </List>
-                </Box>
-                <Divider/>
-                <Box sx={{display: "flex", flexDirection: "column", gap: "5px"}}>
-                    <List dense sx={{ width: '100%', maxWidth: 360 }}>
-                    {streams.map((value) => {
-                        const labelId = `checkbox-list-secondary-label-${value}`;
-                        return (
-                        <ListItem
-                            key={value}
-                            disablePadding
-                        >
-                            <ListItemButton  onClick={() => {
-                                    setCurrentStreams(currentStreams = `${value},0`);
-                                    setPostStreams(value);
-                                    reload()
-                                }}>
-                                <ListItemText id={labelId} primary={`%${value}`} />
-                            </ListItemButton>
-                        </ListItem>
-                        );
-                    })}
-                    </List>
-                </Box>
-            </Box>
-        </Box>
+        <Menu
+            streams={streams}
+            setCurrentStreams={setCurrentStreams}
+            setPostStreams={setPostStreams}
+        />
         <Paper sx={{flexGrow: "1", maxWidth: "70vw", margin: "10px", padding: "20px", display: "flex", flexFlow: "column", borderRadius: "20px"}}>
             <Box sx={{overflowY: "scroll"}}>
                 <Routes>
