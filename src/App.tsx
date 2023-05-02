@@ -1,6 +1,5 @@
 import { useEffect, useState, createContext } from 'react';
-import { Box, Button, createTheme, Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Paper, TextField, Theme, ThemeProvider, Typography } from '@mui/material';
-import { Sign, Keygen } from './util'
+import { Box, createTheme, Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Paper, Theme, ThemeProvider, Typography } from '@mui/material';
 
 import { Link } from 'react-router-dom'
 
@@ -113,8 +112,7 @@ function App() {
     <BrowserRouter>
     <Box sx={{display: "flex", padding: "10px", gap: "10px", background: `linear-gradient(${theme.palette.background.default}, ${darken(theme.palette.background.default, 0.1)})`, width: "100vw", height: "100vh", justifyContent: "center"}}>
         <Box sx={{display: "flex", flexDirection: "column", gap: "15px"}}>
-
-            <Box sx={{width: "300px", padding: "15px", color: "#fff"}}>
+            <Box sx={{width: "200px", paddingTop: "30px", color: "#fff"}}>
                 <Typography variant="h5" gutterBottom>Concurrent</Typography>
                 <Divider/>
                 <Box sx={{display: "flex", flexDirection: "column", gap: "5px"}}>
@@ -174,8 +172,6 @@ function App() {
                     </List>
                 </Box>
             </Box>
-
-
         </Box>
         <Paper sx={{flexGrow: "1", maxWidth: "70vw", margin: "10px", padding: "20px", display: "flex", flexFlow: "column", borderRadius: "20px"}}>
             <Box sx={{overflowY: "scroll"}}>
