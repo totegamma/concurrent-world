@@ -1,4 +1,4 @@
-import { useEffect, useState, createContext, useMemo } from 'react';
+import { useEffect, useState, createContext } from 'react';
 import { Box, Button, createTheme, Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Paper, TextField, ThemeProvider, Typography } from '@mui/material';
 import { Sign, Keygen } from './util'
 
@@ -30,7 +30,6 @@ export interface appData {
     userAddress: string
 }
 
-
 function App() {
 
     const [inspectItem, setInspectItem] = useState<RTMMessage | null>(null)
@@ -44,8 +43,6 @@ function App() {
 
     const [streams, setStreams] = useState<string[]>([]);
 
-    const [username, setUsername] = usePersistent<string>("Username", "anonymous");
-    const [avatar, setAvatar] = usePersistent<string>("AvatarURL", "");
 
     const [themeName, setThemeName] = usePersistent<string>("Theme", Object.keys(Themes)[0]);
     const [theme, setTheme] = useState<Theme>(createTheme((Themes as any)[themeName]))
@@ -122,35 +119,6 @@ function App() {
 
 
 
-    const updateProfile = () => {
-        const payload_obj = {
-            'username': username,
-            'avatar': avatar,
-            'description': ''
-        }
-
-        const payload = JSON.stringify(payload_obj);
-        const signature = Sign(prvkey, payload)
-
-        const requestOptions = {
-            method: 'PUT',
-            headers: {},
-            body: JSON.stringify({
-                'author': address,
-                'schema': Schemas.profile,
-                'payload': payload,
-                signature: signature,
-            })
-        };
-
-        fetch(server + 'characters', requestOptions)
-        .then(res => res.json())
-        .then(data => {
-            console.log(data);
-            reload();
-        });
-
-    }
 
     return (
     <ThemeProvider theme={theme}>
@@ -220,15 +188,6 @@ function App() {
                 </Box>
             </Box>
 
-            <Box sx={{width: "300px", padding: "15px"}}>
-                <Typography variant="h5" gutterBottom>Profile</Typography>
-                <Divider/>
-                <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
-                    <TextField label="username" variant="outlined" value={username} onChange={(e) => setUsername(e.target.value)}/>
-                    <TextField label="avatarURL" variant="outlined" value={avatar} onChange={(e) => setAvatar(e.target.value)}/>
-                    <Button variant="contained" onClick={_ => updateProfile()}>Update</Button>
-                </Box>
-            </Box>
 
             <Box sx={{width: "300px", padding: "15px"}}>
                 <Typography variant="h5" gutterBottom>Settings</Typography>
