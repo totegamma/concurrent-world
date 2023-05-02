@@ -1,9 +1,8 @@
-
 import { useEffect, useState, createContext } from 'react';
-import { Box, Button, Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Paper, TextField, Typography } from '@mui/material';
+import { Box, Button, createTheme, Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Paper, TextField, ThemeProvider, Typography } from '@mui/material';
 import { Sign, Keygen } from './util'
 
-import { Outlet, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 import { usePersistent } from './hooks/usePersistent';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -28,6 +27,7 @@ export interface appData {
     userAddress: string
 }
 
+
 function App() {
 
     const [inspectItem, setInspectItem] = useState<RTMMessage | null>(null)
@@ -44,7 +44,16 @@ function App() {
     const [username, setUsername] = usePersistent<string>("Username", "anonymous");
     const [avatar, setAvatar] = usePersistent<string>("AvatarURL", "");
 
-    const [draft, setDraft] = useState<string>("");
+    const theme = createTheme({
+        palette: {
+            primary: {
+                main: "#E0576F"
+            },
+            secondary: {
+                main: "#00bcd4"
+            }
+        }
+    });
 
     const userDict = useResourceManager<User>(async (key: string) => {
         const res = await fetch(server + 'characters?author=' + encodeURIComponent(key) + '&schema=' + encodeURIComponent(Schemas.profile), {
@@ -111,32 +120,7 @@ function App() {
         setAddress(key.ccaddress)
     }
 
-    const post = () => {
-        const payload_obj = {
-            'body': draft
-        }
-        const payload = JSON.stringify(payload_obj)
-        const signature = Sign(prvkey, payload)
 
-        const requestOptions = {
-            method: 'POST',
-            headers: {},
-            body: JSON.stringify({
-                author: address,
-                payload: payload,
-                signature: signature,
-                streams: postStreams
-            })
-        };
-
-        fetch(server + 'messages', requestOptions)
-        .then(res => res.json())
-        .then(data => {
-            console.log(data);
-            setDraft("");
-            reload();
-        });
-    }
 
     const updateProfile = () => {
         const payload_obj = {
@@ -169,17 +153,17 @@ function App() {
     }
 
     return (
+    <ThemeProvider theme={theme}>
     <ApplicationContext.Provider value={{serverAddress: server, publickey: pubkey, privatekey: prvkey, userAddress: address}}>
     <BrowserRouter>
-
-    <Box sx={{display: "flex", padding: "10px", gap: "10px", backgroundColor: "#f2f2f2", width: "100vw", height: "100vh", justifyContent: "center"}}>
+    <Box sx={{display: "flex", padding: "10px", gap: "10px", background: "linear-gradient(#C74E64, #A13F51)", width: "100vw", height: "100vh", justifyContent: "center"}}>
         <Box sx={{display: "flex", flexDirection: "column", gap: "15px"}}>
 
-            <Paper sx={{width: "300px", padding: "15px"}}>
+            <Box sx={{width: "300px", padding: "15px", color: "#fff"}}>
                 <Typography variant="h5" gutterBottom>Concurrent</Typography>
                 <Divider/>
                 <Box sx={{display: "flex", flexDirection: "column", gap: "5px"}}>
-                    <List dense sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+                    <List dense sx={{ width: '100%', maxWidth: 360 }}>
                         <ListItem disablePadding >
                             <ListItemButton component={Link} to="/">
                                 <ListItemText primary="Home" />
@@ -214,32 +198,29 @@ function App() {
                 </Box>
                 <Divider/>
                 <Box sx={{display: "flex", flexDirection: "column", gap: "5px"}}>
-                    <List dense sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+                    <List dense sx={{ width: '100%', maxWidth: 360 }}>
                     {streams.map((value) => {
                         const labelId = `checkbox-list-secondary-label-${value}`;
                         return (
                         <ListItem
                             key={value}
-                            secondaryAction={
-                                <Button onClick={() => {
+                            disablePadding
+                        >
+                            <ListItemButton  onClick={() => {
                                     setCurrentStreams(currentStreams = `${value},0`);
                                     setPostStreams(value);
                                     reload()
-                                }}>switch</Button>
-                            }
-                            disablePadding
-                        >
-                            <ListItemButton>
-                                <ListItemText id={labelId} primary={value} />
+                                }}>
+                                <ListItemText id={labelId} primary={`%${value}`} />
                             </ListItemButton>
                         </ListItem>
                         );
                     })}
                     </List>
                 </Box>
-            </Paper>
+            </Box>
 
-            <Paper sx={{width: "300px", padding: "15px"}}>
+            <Box sx={{width: "300px", padding: "15px"}}>
                 <Typography variant="h5" gutterBottom>Profile</Typography>
                 <Divider/>
                 <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
@@ -247,9 +228,9 @@ function App() {
                     <TextField label="avatarURL" variant="outlined" value={avatar} onChange={(e) => setAvatar(e.target.value)}/>
                     <Button variant="contained" onClick={_ => updateProfile()}>Update</Button>
                 </Box>
-            </Paper>
+            </Box>
 
-            <Paper sx={{width: "300px", padding: "15px"}}>
+            <Box sx={{width: "300px", padding: "15px"}}>
                 <Typography variant="h5" gutterBottom>Settings</Typography>
                 <Divider/>
                 <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
@@ -259,31 +240,24 @@ function App() {
                     <TextField label="publicKey" variant="outlined" value={pubkey} onChange={(e) => setPubKey(e.target.value)}/>
                     <Button variant="contained" onClick={_ => regenerateKeys()}>Generate Key</Button>
                 </Box>
-            </Paper>
+            </Box>
         </Box>
-        <Paper sx={{width: "800px", padding: "15px", display: "flex", flexFlow: "column"}}>
-            <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "5px"}}>
-            <Typography variant="h5" gutterBottom>Timeline</Typography>
-
-            <Box>
-                <TextField label="watchStreams" variant="outlined" value={currentStreams} onChange={(e) => setCurrentStreams(e.target.value)}/>
-                <Button variant="contained" onClick={_ => reload()}>GO</Button>
-            </Box>
-            </Box>
-            <Divider/>
-            <Box>
-                <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
-                    <TextField label="postStreams" variant="outlined" value={postStreams} onChange={(e) => setPostStreams(e.target.value)}/>
-                    <TextField multiline rows={6} label="message" variant="outlined" value={draft} onChange={(e) => setDraft(e.target.value)}/>
-                    <Button variant="contained" onClick={_ => post()}>post</Button>
-                </Box>
-            </Box>
-            <Divider/>
+        <Paper sx={{flexGrow: "1", maxWidth: "70vw", margin: "10px", padding: "20px", display: "flex", flexFlow: "column", borderRadius: "20px"}}>
             <Box sx={{overflowY: "scroll"}}>
                 <Routes>
                     <Route index element={ 
-                    <Timeline messages={messages} currentStreams={currentStreams} messageDict={messageDict} userDict={userDict} inspect={setInspectItem}/>
-        } />
+                        <Timeline
+                            messages={messages}
+                            messageDict={messageDict}
+                            userDict={userDict}
+                            currentStreams={currentStreams}
+                            setCurrentStreams={setCurrentStreams}
+                            postStreams={postStreams}
+                            setPostStreams={setPostStreams}
+                            reload={reload}
+                            inspect={setInspectItem}
+                        />
+                    } />
                     <Route path="/associations" element={<Associations/>} />
                     <Route path="/explorer" element={<Explorer/>} />
                     <Route path="/notification" element={<Notification/>} />
@@ -307,6 +281,7 @@ function App() {
     </Box>
     </BrowserRouter>
     </ApplicationContext.Provider>
+    </ThemeProvider>
     )
 }
 
