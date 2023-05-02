@@ -10,9 +10,8 @@ export interface MenuProps {
 export function Menu(props: MenuProps) {
     return (
         <Box sx={{display: "flex", flexDirection: "column", gap: "15px"}}>
-            <Box sx={{width: "200px", paddingTop: "30px", color: "#fff"}}>
+            <Box sx={{width: "200px", padding: "20px", color: "#fff"}}>
                 <Typography variant="h5" gutterBottom>Concurrent</Typography>
-                <Divider/>
                 <Box sx={{display: "flex", flexDirection: "column", gap: "5px"}}>
                     <List dense sx={{ width: '100%', maxWidth: 360 }}>
                         <ListItem disablePadding >

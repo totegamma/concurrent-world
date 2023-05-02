@@ -28,16 +28,16 @@ export interface appData {
 
 function App() {
 
-    const [inspectItem, setInspectItem] = useState<RTMMessage | null>(null)
     const [server, setServer] = usePersistent<string>("ServerAddress", "");
     const [pubkey, setPubKey] = usePersistent<string>("PublicKey", "");
     const [prvkey, setPrvKey] = usePersistent<string>("PrivateKey", "");
     const [address, setAddress] = usePersistent<string>("Address", "");
     const [postStreams, setPostStreams] = usePersistent<string>("postStream", "common");
     const [currentStreams, setCurrentStreams] = usePersistent<string>("currentStream", "common,0");
-    const [streams, setStreams] = useState<string[]>([]);
     const [themeName, setThemeName] = usePersistent<string>("Theme", Object.keys(Themes)[0]);
+    const [watchstreams, setWatchStreams] = usePersistent<string[]>("watchStreamList", ["common"]);
     const [theme, setTheme] = useState<Theme>(createTheme((Themes as any)[themeName]))
+    const [inspectItem, setInspectItem] = useState<RTMMessage | null>(null)
     const messages = useObjectList<StreamElement>();
 
     const userDict = useResourceManager<User>(async (key: string) => {
@@ -90,25 +90,18 @@ function App() {
         setTheme(createTheme((Themes as any)[themeName]))
     }, [themeName]);
 
-    useEffect(() => {
-        fetch(server + 'stream/list').then((data) => {
-            data.json().then((json) => {
-                setStreams(json)
-            });
-        });
-    }, []);
 
     return (
     <ThemeProvider theme={theme}>
     <ApplicationContext.Provider value={{serverAddress: server, publickey: pubkey, privatekey: prvkey, userAddress: address}}>
     <BrowserRouter>
-    <Box sx={{display: "flex", padding: "10px", gap: "10px", background: `linear-gradient(${theme.palette.background.default}, ${darken(theme.palette.background.default, 0.1)})`, width: "100vw", height: "100vh", justifyContent: "center"}}>
+    <Box sx={{display: "flex", padding: "10px", gap: "10px", background: `linear-gradient(${theme.palette.background.default}, ${darken(theme.palette.background.default, 0.1)})`, height: "100vh"}}>
         <Menu
-            streams={streams}
+            streams={watchstreams}
             setCurrentStreams={setCurrentStreams}
             setPostStreams={setPostStreams}
         />
-        <Paper sx={{flexGrow: "1", maxWidth: "70vw", margin: "10px", padding: "20px", display: "flex", flexFlow: "column", borderRadius: "20px"}}>
+        <Paper sx={{flexGrow: "1", margin: "10px", padding: "20px", display: "flex", flexFlow: "column", borderRadius: "20px"}}>
             <Box sx={{overflowY: "scroll"}}>
                 <Routes>
                     <Route index element={ 
@@ -125,7 +118,12 @@ function App() {
                         />
                     } />
                     <Route path="/associations" element={<Associations/>} />
-                    <Route path="/explorer" element={<Explorer/>} />
+                    <Route path="/explorer" element={
+                        <Explorer
+                            watchList={watchstreams}
+                            setWatchList={setWatchStreams}
+                        />
+                    } />
                     <Route path="/notification" element={<Notification/>} />
                     <Route path="/profile" element={<Profile/>} />
                     <Route path="/settings" element={

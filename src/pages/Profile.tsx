@@ -39,7 +39,6 @@ export function Profile() {
             console.log(data);
             //reload();
         });
-
     }
 
     return (<>
