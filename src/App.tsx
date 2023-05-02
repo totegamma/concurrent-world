@@ -1,16 +1,28 @@
-import { useEffect, useState } from 'react';
-import { Avatar, Box, Button, Divider, Drawer, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Paper, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
-import { ec } from 'elliptic';
-import { keccak256, computeAddress } from 'ethers';
+import { useEffect, useState, createContext } from 'react';
+import { Box, Button, Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Paper, TextField, Typography } from '@mui/material';
+import { Sign, Keygen } from './util'
 
 import { usePersistent } from './hooks/usePersistent';
 import { Timeline } from './components/Timeline';
 
-import { useObjectList } from './hooks/useObjectList';
 import { useResourceManager } from './hooks/useResourceManager';
-import type { StreamElement, RTMMessage, User } from './model';
+import type { RTMMessage, StreamElement, User } from './model';
+import { Schemas } from './schemas';
+import { useObjectList } from './hooks/useObjectList';
 
-const profile_schema = 'https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/characters/profile/v1.json';
+export const ApplicationContext = createContext<appData>({
+    serverAddress: '',
+    publickey: '',
+    privatekey: '',
+    userAddress: ''
+});
+
+export interface appData {
+    serverAddress: string
+    publickey: string
+    privatekey: string
+    userAddress: string
+}
 
 function App() {
 
@@ -23,7 +35,6 @@ function App() {
     const [postStreams, setPostStreams] = usePersistent<string>("postStream", "common");
     let [currentStreams, setCurrentStreams] = usePersistent<string>("currentStream", "common,0");
 
-    const [followee, setFollowee] = usePersistent<User[]>("Follow", []);
     const [streams, setStreams] = useState<string[]>([]);
 
     const [username, setUsername] = usePersistent<string>("Username", "anonymous");
@@ -31,10 +42,8 @@ function App() {
 
     const [draft, setDraft] = useState<string>("");
 
-    const messages = useObjectList<StreamElement>();
-
     const userDict = useResourceManager<User>(async (key: string) => {
-        const res = await fetch(server + 'characters?author=' + encodeURIComponent(key) + '&schema=' + encodeURIComponent(profile_schema), {
+        const res = await fetch(server + 'characters?author=' + encodeURIComponent(key) + '&schema=' + encodeURIComponent(Schemas.profile), {
             method: 'GET',
             headers: {}
         });
@@ -58,15 +67,7 @@ function App() {
         return data.message
     });
 
-    useEffect(() => {
-        if (pubkey == "" && prvkey == "") regenerateKeys();
-        fetch(server + 'stream/list').then((data) => {
-            data.json().then((json) => {
-                setStreams(json)
-            });
-        });
-        reload();
-    }, []);
+    const messages = useObjectList<StreamElement>();
 
     const reload = () => {
         let url = server + `stream?streams=${currentStreams}`
@@ -85,73 +86,25 @@ function App() {
         });
     }
 
-    const regenerateKeys = () => {
-        const ellipsis = new ec("secp256k1")
-        const keyPair = ellipsis.genKeyPair()
-        const privateKey = keyPair.getPrivate().toString('hex')
-        const publicKey = keyPair.getPublic().encode('hex', false)
-        const ethAddress = computeAddress('0x' + publicKey)
-        const ccAddress = 'CC' + ethAddress.slice(2)
-        console.log('Private key: ', privateKey)
-        console.log('Public key: ', publicKey)
-        console.log('address: ', ccAddress)
+    useEffect(() => {
+        reload()
+    }, [])
 
-        setPubKey(publicKey)
-        setPrvKey(privateKey)
-        setAddress(ccAddress)
-    }
-
-    const favorite = (messageID: string | undefined, deletekey?: string) => {
-        const favoliteScheme = "https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/associations/like/v1.json"
-        if (!messageID) return;
-        const payload_obj = {
-        }
-        const payload = JSON.stringify(payload_obj)
-        const signature = sign(payload)
-
-        const requestOptions = !deletekey ? {
-            method: 'POST',
-            headers: {},
-            body: JSON.stringify({
-                author: address,
-                schema: favoliteScheme,
-                target: messageID,
-                payload: payload,
-                signature: signature,
-            })
-        } : {
-            method: 'DELETE',
-            headers: {},
-            body: JSON.stringify({
-                id: deletekey
-            })
-        };
-
-        fetch(server + 'associations', requestOptions)
-        .then(res => res.json())
-        .then(data => {
-            console.log(data);
-            messageDict.invalidate(messageID);
-            reload();
+    useEffect(() => {
+        if (pubkey == "" && prvkey == "") regenerateKeys();
+        fetch(server + 'stream/list').then((data) => {
+            data.json().then((json) => {
+                setStreams(json)
+            });
         });
-    }
+    }, []);
 
-    function toHexString(byteArray: Uint8Array | number[]) {
-        return Array.from(byteArray, function(byte) {
-            return ('0' + (byte & 0xFF).toString(16)).slice(-2);
-        }).join('')
-    }
 
-    const sign = (payload: string) => {
-        const ellipsis = new ec("secp256k1")
-        const keyPair = ellipsis.keyFromPrivate(prvkey)
-        const messageHash = keccak256(new TextEncoder().encode(payload)).slice(2)
-        const signature = keyPair.sign(messageHash, 'hex', {canonical: true})
-        console.log(signature)
-        const r = toHexString(signature.r.toArray())
-        const s = toHexString(signature.s.toArray())
-        const v = signature.recoveryParam == 0 ? '00' : '01'
-        return r + s + v
+    const regenerateKeys = () => {
+        const key = Keygen()
+        setPubKey(key.publickey)
+        setPrvKey(key.privatekey)
+        setAddress(key.ccaddress)
     }
 
     const post = () => {
@@ -159,7 +112,7 @@ function App() {
             'body': draft
         }
         const payload = JSON.stringify(payload_obj)
-        const signature = sign(payload)
+        const signature = Sign(prvkey, payload)
 
         const requestOptions = {
             method: 'POST',
@@ -189,14 +142,14 @@ function App() {
         }
 
         const payload = JSON.stringify(payload_obj);
-        const signature = sign(payload)
+        const signature = Sign(prvkey, payload)
 
         const requestOptions = {
             method: 'PUT',
             headers: {},
             body: JSON.stringify({
                 'author': address,
-                'schema': profile_schema,
+                'schema': Schemas.profile,
                 'payload': payload,
                 signature: signature,
             })
@@ -211,17 +164,9 @@ function App() {
 
     }
 
-    const follow = async (userid: string) => {
-        if (followee.find(e => e.pubkey == userid)) return;
-        let user = await userDict.get(userid)
-        setFollowee([...followee, user]);
-    }
-
-    const unfollow = (pubkey: string) => {
-        setFollowee(followee.filter(e => e.pubkey != pubkey));
-    }
-
-    return (<Box sx={{display: "flex", padding: "10px", gap: "10px", backgroundColor: "#f2f2f2", width: "100vw", height: "100vh", justifyContent: "center"}}>
+    return (
+    <ApplicationContext.Provider value={{serverAddress: server, publickey: pubkey, privatekey: prvkey, userAddress: address}}>
+    <Box sx={{display: "flex", padding: "10px", gap: "10px", backgroundColor: "#f2f2f2", width: "100vw", height: "100vh", justifyContent: "center"}}>
         <Box sx={{display: "flex", flexDirection: "column", gap: "15px"}}>
 
             <Paper sx={{width: "300px", padding: "15px"}}>
@@ -328,7 +273,7 @@ function App() {
             </Box>
             <Divider/>
             <Box sx={{overflowY: "scroll"}}>
-                <Timeline messages={messages} messageDict={messageDict} clickAvatar={follow} userDict={userDict} favorite={favorite} address={address} inspect={setInspectItem}/>
+                <Timeline messages={messages} currentStreams={currentStreams} messageDict={messageDict} userDict={userDict} inspect={setInspectItem}/>
             </Box>
         </Paper>
 
@@ -343,7 +288,9 @@ function App() {
                 </pre>
             </Box>
         </Drawer>
-    </Box>)
+    </Box>
+    </ApplicationContext.Provider>
+    )
 }
 
 export default App
