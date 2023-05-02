@@ -7,6 +7,7 @@ import MessageIcon from '@mui/icons-material/Message';
 import ExploreIcon from '@mui/icons-material/Explore';
 import SettingsIcon from '@mui/icons-material/Settings';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import PercentIcon from '@mui/icons-material/Percent';
 
 export interface MenuProps {
     streams: string[]
@@ -81,11 +82,14 @@ export function Menu(props: MenuProps) {
                             key={value}
                             disablePadding
                         >
+                            <ListItemIcon>
+                                <PercentIcon sx={{ color: "white" }} />
+                            </ListItemIcon>
                             <ListItemButton  onClick={() => {
                                     props.setCurrentStreams(value);
                                     props.setPostStreams(value);
                                 }}>
-                                <ListItemText id={labelId} primary={`%${value}`} />
+                                <ListItemText id={labelId} primary={value} />
                             </ListItemButton>
                         </ListItem>
                         );

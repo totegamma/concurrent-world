@@ -102,41 +102,39 @@ function App() {
             setPostStreams={setPostStreams}
         />
         <Paper sx={{flexGrow: "1", margin: "10px", padding: "20px", display: "flex", flexFlow: "column", borderRadius: "20px"}}>
-            <Box sx={{overflowY: "scroll"}}>
-                <Routes>
-                    <Route index element={ 
-                        <Timeline
-                            messages={messages}
-                            messageDict={messageDict}
-                            userDict={userDict}
-                            currentStreams={currentStreams}
-                            setCurrentStreams={setCurrentStreams}
-                            postStreams={postStreams}
-                            setPostStreams={setPostStreams}
-                            reload={reload}
-                            inspect={setInspectItem}
-                        />
-                    } />
-                    <Route path="/associations" element={<Associations/>} />
-                    <Route path="/explorer" element={
-                        <Explorer
-                            watchList={watchstreams}
-                            setWatchList={setWatchStreams}
-                        />
-                    } />
-                    <Route path="/notification" element={<Notification/>} />
-                    <Route path="/profile" element={<Profile/>} />
-                    <Route path="/settings" element={
-                        <Settings
-                            setThemeName={setThemeName}
-                            setPrvKey={setPrvKey}
-                            setPubKey={setPubKey}
-                            setUserAddr={setAddress}
-                            setServerAddr={setServer}
-                        />}
+            <Routes>
+                <Route index element={ 
+                    <Timeline
+                        messages={messages}
+                        messageDict={messageDict}
+                        userDict={userDict}
+                        currentStreams={currentStreams}
+                        setCurrentStreams={setCurrentStreams}
+                        postStreams={postStreams}
+                        setPostStreams={setPostStreams}
+                        reload={reload}
+                        inspect={setInspectItem}
                     />
-                </Routes>
-            </Box>
+                } />
+                <Route path="/associations" element={<Associations/>} />
+                <Route path="/explorer" element={
+                    <Explorer
+                        watchList={watchstreams}
+                        setWatchList={setWatchStreams}
+                    />
+                } />
+                <Route path="/notification" element={<Notification/>} />
+                <Route path="/profile" element={<Profile/>} />
+                <Route path="/settings" element={
+                    <Settings
+                        setThemeName={setThemeName}
+                        setPrvKey={setPrvKey}
+                        setPubKey={setPubKey}
+                        setUserAddr={setAddress}
+                        setServerAddr={setServer}
+                    />}
+                />
+            </Routes>
         </Paper>
 
         <Drawer

@@ -7,6 +7,7 @@ import { Sign } from '../util'
 import { ApplicationContext } from '../App';
 import { RTMMessage, User } from '../model';
 import { IuseResourceManager } from '../hooks/useResourceManager';
+import { Schemas } from '../schemas';
 export interface TweetProps {
     message: string;
     messageDict: IuseResourceManager<RTMMessage>;
@@ -38,7 +39,7 @@ export function Tweet(props: TweetProps) {
     }, [props.message]);
 
     const favorite = (messageID: string | undefined) => {
-        const favoliteScheme = "https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/associations/like/v1.json"
+        const favoliteScheme = Schemas.like
         if (!messageID) return;
         const payload_obj = {
         }
@@ -101,17 +102,19 @@ export function Tweet(props: TweetProps) {
                         </Link>
                     </Typography>
                 </Box>
-                <Box>
-                    {JSON.parse(message.payload).body}
+                <Box sx={{width: '100%'}}>
+                    <pre style={{ fontFamily: 'inherit', wordBreak: 'break-all', whiteSpace: 'pre-wrap', overflow: 'hidden'}}>
+                        {JSON.parse(message.payload).body}
+                    </pre>
                 </Box>
                 <Box>
                     {message.associations_data.find((e) => e.author == appData.userAddress) ?
                     <IconButton color="primary" onClick={() => unfavorite(message?.id, message?.associations_data.find((e) => e.author == appData.userAddress)?.id)} >
-                        <StarIcon/> {message.associations_data.filter(e => e.schema == "https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/associations/like/v1.json").length}
+                        <StarIcon/> {message.associations_data.filter(e => e.schema == Schemas.like).length}
                     </IconButton>
                     :
                     <IconButton onClick={() => favorite(message?.id)} >
-                        <StarIcon/> {message.associations_data.filter(e => e.schema == "https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/associations/like/v1.json").length}
+                        <StarIcon/> {message.associations_data.filter(e => e.schema == Schemas.like).length}
                     </IconButton>
                     }
                     <IconButton onClick={() => props.inspect(message ?? null)} >
