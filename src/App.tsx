@@ -1,10 +1,11 @@
-import { useEffect, useState, createContext } from 'react';
+import { useEffect, useState, createContext, useMemo } from 'react';
 import { Box, Button, createTheme, Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Paper, TextField, ThemeProvider, Typography } from '@mui/material';
 import { Sign, Keygen } from './util'
 
 import { Link } from 'react-router-dom'
 
 import { usePersistent } from './hooks/usePersistent';
+import { darken } from '@mui/material';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Associations, Explorer, Notification, Profile, Settings, Timeline } from './pages';
 
@@ -12,6 +13,8 @@ import { useResourceManager } from './hooks/useResourceManager';
 import type { RTMMessage, StreamElement, User } from './model';
 import { Schemas } from './schemas';
 import { useObjectList } from './hooks/useObjectList';
+import { Theme } from '@emotion/react';
+import { Themes } from './themes';
 
 export const ApplicationContext = createContext<appData>({
     serverAddress: '',
@@ -44,16 +47,13 @@ function App() {
     const [username, setUsername] = usePersistent<string>("Username", "anonymous");
     const [avatar, setAvatar] = usePersistent<string>("AvatarURL", "");
 
-    const theme = createTheme({
-        palette: {
-            primary: {
-                main: "#E0576F"
-            },
-            secondary: {
-                main: "#00bcd4"
-            }
-        }
-    });
+    const [themeName, setThemeName] = usePersistent<string>("Theme", Object.keys(Themes)[0]);
+    const [theme, setTheme] = useState<Theme>(createTheme((Themes as any)[themeName]))
+
+    useEffect(() => {
+        setTheme(createTheme((Themes as any)[themeName]))
+    }, [themeName]);
+
 
     const userDict = useResourceManager<User>(async (key: string) => {
         const res = await fetch(server + 'characters?author=' + encodeURIComponent(key) + '&schema=' + encodeURIComponent(Schemas.profile), {
@@ -156,7 +156,7 @@ function App() {
     <ThemeProvider theme={theme}>
     <ApplicationContext.Provider value={{serverAddress: server, publickey: pubkey, privatekey: prvkey, userAddress: address}}>
     <BrowserRouter>
-    <Box sx={{display: "flex", padding: "10px", gap: "10px", background: "linear-gradient(#C74E64, #A13F51)", width: "100vw", height: "100vh", justifyContent: "center"}}>
+    <Box sx={{display: "flex", padding: "10px", gap: "10px", background: `linear-gradient(${theme.palette.background.default}, ${darken(theme.palette.background.default, 0.1)})`, width: "100vw", height: "100vh", justifyContent: "center"}}>
         <Box sx={{display: "flex", flexDirection: "column", gap: "15px"}}>
 
             <Box sx={{width: "300px", padding: "15px", color: "#fff"}}>
@@ -262,7 +262,7 @@ function App() {
                     <Route path="/explorer" element={<Explorer/>} />
                     <Route path="/notification" element={<Notification/>} />
                     <Route path="/profile" element={<Profile/>} />
-                    <Route path="/settings" element={<Settings/>} />
+                    <Route path="/settings" element={<Settings setThemeName={setThemeName}/>} />
                 </Routes>
             </Box>
         </Paper>
