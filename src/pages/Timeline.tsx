@@ -101,7 +101,14 @@ export function Timeline(props: TimelineProps) {
                     <Stack sx={{
                         position: 'relative'
                     }}>
-                        <TextField multiline rows={6} label="message" variant="outlined" value={draft} onChange={(e) => setDraft(e.target.value)}/>
+                        <TextField multiline rows={6} label="message" variant="outlined" value={draft} onChange={(e) => setDraft(e.target.value)}
+                            onKeyDown={(e: any) => {
+                                if ((draft.length == 0) || (draft.trim().length == 0)) return
+                                if (e.key == 'Enter' && e.ctrlKey == true) {
+                                    post()
+                                }
+                            }}
+                        />
                             <Box sx={{
                                 position: 'absolute',
                                 bottom: 10,
