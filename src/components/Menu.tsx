@@ -1,5 +1,12 @@
-import { Box, Divider, List, ListItem, ListItemButton, ListItemText, Typography } from "@mui/material";
+import { Box, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
+
+import HomeIcon from '@mui/icons-material/Home';
+import BadgeIcon from '@mui/icons-material/Badge';
+import MessageIcon from '@mui/icons-material/Message';
+import ExploreIcon from '@mui/icons-material/Explore';
+import SettingsIcon from '@mui/icons-material/Settings';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 
 export interface MenuProps {
     streams: string[]
@@ -15,31 +22,49 @@ export function Menu(props: MenuProps) {
                 <Box sx={{display: "flex", flexDirection: "column", gap: "5px"}}>
                     <List dense sx={{ width: '100%', maxWidth: 360 }}>
                         <ListItem disablePadding >
+                            <ListItemIcon>
+                                <HomeIcon sx={{ color: "white" }} />
+                            </ListItemIcon>
                             <ListItemButton component={Link} to="/">
                                 <ListItemText primary="Home" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding >
+                            <ListItemIcon>
+                                <NotificationsIcon sx={{ color: "white" }} />
+                            </ListItemIcon>
                             <ListItemButton component={Link} to="/notification">
                                 <ListItemText primary="Notification" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding >
+                            <ListItemIcon>
+                                <MessageIcon sx={{ color: "white" }} />
+                            </ListItemIcon>
                             <ListItemButton component={Link} to="/associations">
                                 <ListItemText primary="Associations" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding >
+                            <ListItemIcon>
+                                <ExploreIcon sx={{ color: "white" }} />
+                            </ListItemIcon>
                             <ListItemButton component={Link} to="/explorer">
                                 <ListItemText primary="Explorer" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding >
+                            <ListItemIcon>
+                                <BadgeIcon sx={{ color: "white" }} />
+                            </ListItemIcon>
                             <ListItemButton component={Link} to="/profile">
                                 <ListItemText primary="Profile" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding >
+                            <ListItemIcon>
+                                <SettingsIcon sx={{ color: "white" }} />
+                            </ListItemIcon>
                             <ListItemButton component={Link} to="/settings">
                                 <ListItemText primary="Settings" />
                             </ListItemButton>
@@ -57,7 +82,7 @@ export function Menu(props: MenuProps) {
                             disablePadding
                         >
                             <ListItemButton  onClick={() => {
-                                    props.setCurrentStreams(`${value},0`);
+                                    props.setCurrentStreams(value);
                                     props.setPostStreams(value);
                                 }}>
                                 <ListItemText id={labelId} primary={`%${value}`} />
