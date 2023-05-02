@@ -1,7 +1,10 @@
+import { Box, Divider, Typography } from "@mui/material";
+
 export function Associations() {
     return (
-        <div>
-            Associations
-        </div>
+        <Box sx={{display: "flex", flexDirection: "column", gap: "5px", padding: "20px"}}>
+            <Typography variant="h5" gutterBottom>Associations</Typography>
+            <Divider/>
+        </Box>
     )
 }

@@ -8,6 +8,7 @@ import { Sign } from '../util'
 import { ApplicationContext } from '../App';
 import ExploreIcon from '@mui/icons-material/Explore';
 import SearchIcon from '@mui/icons-material/Search';
+import SendIcon from '@mui/icons-material/Send';
 
 export interface TimelineProps {
     messages: IuseObjectList<StreamElement>;
@@ -59,7 +60,6 @@ export function Timeline(props: TimelineProps) {
             alignItems: "center",
             background:
             theme.palette.primary.main,
-            margin: "-20px -20px 0px -20px",
             padding: "5px",
             borderRadius: "20px 20px 0 0"
         }}>
@@ -90,12 +90,9 @@ export function Timeline(props: TimelineProps) {
                 </IconButton>
             </Paper>
         </Box>
-        <Box sx={{overflowY: "scroll"}}>
+        <Box sx={{overflowY: "auto", padding: "20px"}}>
             <Box>
-                <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
-                    {/*
-                    <TextField label="postStreams" variant="outlined" value={props.postStreams} onChange={(e) => props.setPostStreams(e.target.value)}/>
-                    */}
+                <Box sx={{display: "flex", flexDirection: "column", gap: "5px", mb: '10px'}}>
                     <Stack sx={{
                         position: 'relative'
                     }}>
@@ -112,13 +109,20 @@ export function Timeline(props: TimelineProps) {
                                 bottom: 10,
                                 right: 10
                             }}>
-                            <Button disabled={(draft.length == 0) || (draft.trim().length == 0)} variant="contained" onClick={_ => post()}>post</Button>
+                            <Button
+                                color="primary"
+                                variant="contained"
+                                disabled={(draft.length == 0) || (draft.trim().length == 0)}
+                                onClick={_ => post()}
+                                endIcon={<SendIcon/>}
+                            >
+                                Send
+                            </Button>
                         </Box>
                     </Stack>
                 </Box>
             </Box>
-            <Divider/>
-            <Paper sx={{display: 'flex', flex: 1}}>
+            <Box sx={{display: 'flex', flex: 1}}>
                 <List sx={{flex: 1}}>
                 {props.messages.current.map(e =>
                     <React.Fragment key={e.ID}>
@@ -132,7 +136,7 @@ export function Timeline(props: TimelineProps) {
                     </React.Fragment>
                 )}
                 </List>
-            </Paper>
+            </Box>
         </Box>
     </>);
 }

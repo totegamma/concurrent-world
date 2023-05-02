@@ -33,6 +33,7 @@ export function Settings(props: SettingsProp) {
     }
 
     return (<>
+        <Box sx={{display: "flex", flexDirection: "column", gap: "5px", padding: "20px"}}>
         <Typography variant="h5" gutterBottom>Settings</Typography>
         <Divider/>
         <Typography>Your concurrent address: {appData.userAddress}</Typography>
@@ -54,6 +55,6 @@ export function Settings(props: SettingsProp) {
                 onClick={(_) => props.setThemeName(e)}
             >{e}</Button>
         )}
-                
+        </Box>
     </>)
 }

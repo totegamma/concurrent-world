@@ -42,25 +42,27 @@ export function Profile() {
     }
 
     return (<>
-        <Typography variant="h5" gutterBottom>Profile</Typography>
-        <Divider/>
-        <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
-            <TextField label="username" variant="outlined" value={username} onChange={(e) => setUsername(e.target.value)}/>
-            <TextField label="avatarURL" variant="outlined" value={avatar} onChange={(e) => setAvatar(e.target.value)}/>
-            <Button variant="contained" onClick={_ => updateProfile()}>Update</Button>
+        <Box sx={{display: "flex", flexDirection: "column", gap: "5px", padding: "20px"}}>
+            <Typography variant="h5" gutterBottom>Profile</Typography>
+            <Divider/>
+            <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
+                <TextField label="username" variant="outlined" value={username} onChange={(e) => setUsername(e.target.value)}/>
+                <TextField label="avatarURL" variant="outlined" value={avatar} onChange={(e) => setAvatar(e.target.value)}/>
+                <Button variant="contained" onClick={_ => updateProfile()}>Update</Button>
+            </Box>
+            <Divider/>
+            <Typography variant="h6" gutterBottom>Concurrent Address</Typography>
+            <Typography sx={{wordBreak: 'break-all'}}>
+                {appData.userAddress}
+            </Typography>
+            <Typography variant="h6" gutterBottom>Publickey</Typography>
+            <Typography sx={{wordBreak: 'break-all'}}>
+                {appData.publickey}
+            </Typography>
+            <Typography variant="h6" gutterBottom>Privatekey</Typography>
+            <Typography sx={{wordBreak: 'break-all'}}>
+                {appData.privatekey}
+            </Typography>
         </Box>
-        <Divider/>
-        <Typography variant="h6" gutterBottom>Concurrent Address</Typography>
-        <Typography sx={{wordBreak: 'break-all'}}>
-            {appData.userAddress}
-        </Typography>
-        <Typography variant="h6" gutterBottom>Publickey</Typography>
-        <Typography sx={{wordBreak: 'break-all'}}>
-            {appData.publickey}
-        </Typography>
-        <Typography variant="h6" gutterBottom>Privatekey</Typography>
-        <Typography sx={{wordBreak: 'break-all'}}>
-            {appData.privatekey}
-        </Typography>
     </>)
 }

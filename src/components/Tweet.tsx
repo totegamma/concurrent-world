@@ -86,35 +86,39 @@ export function Tweet(props: TweetProps) {
     }
 
     return (
-        <ListItem sx={{alignItems: 'flex-start', flex: 1}}>
+        <ListItem sx={{alignItems: 'flex-start', flex: 1, gap: '25px', p: '10px 0'}}>
             { message && <>
-            <Box sx={{width: '48px', mr: '12px'}}>
+            <Box sx={{width: '48px'}}>
                 <IconButton>
-                    <Avatar alt="Profile Picture" src={user?.avatar} sx={{marginTop: '5px', width: '48px', height: '48px'}} />
+                    <Avatar alt="Profile Picture" src={user?.avatar} sx={{width: '48px', height: '48px'}} />
                 </IconButton>
             </Box>
-            <Box sx={{display: 'flex', flex: 1, flexDirection: 'column'}}>
-                <Box>
-                    <Typography component="span" sx={{fontWeight: '700'}}>{user?.username} </Typography>
-                    <Typography component="span" sx={{fontWeight: '400'}}>
+            <Box sx={{display: 'flex', flex: 1, flexDirection: 'column', mt: '5px'}}>
+                <Box sx={{display: 'flex', alignItems: 'baseline', justifyContent: 'space-between'}}>
+                    <Box>
+                        <Typography component="span" sx={{fontWeight: '700'}}>{user?.username ?? "anonymouse"} </Typography>
+                        <Typography component="span" sx={{fontweight: '400', fontSize: '10px'}}>{message.author} · </Typography>
                         <Link component="button" underline="hover" color="inherit">
-                            {message.cdate}
+                            {new Date(message.cdate).toLocaleString()}
                         </Link>
+                    </Box>
+                    <Typography component="span" sx={{fontWeight: '400'}}>
+                        <Typography component="span" sx={{fontweight: '400', fontSize: '13px', color: '#aaa'}}>%{message.streams.replaceAll(',', ' %')} </Typography>
                     </Typography>
                 </Box>
                 <Box sx={{width: '100%'}}>
-                    <pre style={{ fontFamily: 'inherit', wordBreak: 'break-all', whiteSpace: 'pre-wrap', overflow: 'hidden'}}>
+                    <pre style={{margin: 0, fontFamily: 'inherit', wordBreak: 'break-all', whiteSpace: 'pre-wrap', overflow: 'hidden'}}>
                         {JSON.parse(message.payload).body}
                     </pre>
                 </Box>
-                <Box>
+                <Box sx={{display: 'flex', gap: '10px'}}>
                     {message.associations_data.find((e) => e.author == appData.userAddress) ?
-                    <IconButton color="primary" onClick={() => unfavorite(message?.id, message?.associations_data.find((e) => e.author == appData.userAddress)?.id)} >
-                        <StarIcon/> {message.associations_data.filter(e => e.schema == Schemas.like).length}
+                    <IconButton sx={{p: '0'}} color="primary" onClick={() => unfavorite(message?.id, message?.associations_data.find((e) => e.author == appData.userAddress)?.id)} >
+                        <StarIcon /> <Typography sx={{size: '16px'}}>{message.associations_data.filter(e => e.schema == Schemas.like).length}</Typography>
                     </IconButton>
                     :
-                    <IconButton onClick={() => favorite(message?.id)} >
-                        <StarIcon/> {message.associations_data.filter(e => e.schema == Schemas.like).length}
+                    <IconButton sx={{p: '0'}}onClick={() => favorite(message?.id)} >
+                        <StarIcon/> <Typography sx={{size: '16px'}}>{message.associations_data.filter(e => e.schema == Schemas.like).length}</Typography>
                     </IconButton>
                     }
                     <IconButton onClick={() => props.inspect(message ?? null)} >
