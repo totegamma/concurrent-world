@@ -68,12 +68,12 @@ export function Timeline(props: TimelineProps) {
                     position: 'relative'
                 }}>
                     <TextField multiline rows={6} label="message" variant="outlined" value={draft} onChange={(e) => setDraft(e.target.value)}/>
-                    <Box sx={{
-                        position: 'absolute',
-                        bottom: 10,
-                        right: 10
-                    }}>
-                        <Button variant="contained" onClick={_ => post()}>post</Button>
+                        <Box sx={{
+                            position: 'absolute',
+                            bottom: 10,
+                            right: 10
+                        }}>
+                        <Button disabled={(draft.length == 0) || (draft.trim().length == 0)} variant="contained" onClick={_ => post()}>post</Button>
                     </Box>
                 </Stack>
             </Box>
