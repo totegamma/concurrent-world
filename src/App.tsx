@@ -1,5 +1,5 @@
 import { useEffect, useState, createContext } from 'react';
-import { Box, Button, createTheme, Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Paper, TextField, ThemeProvider, Typography } from '@mui/material';
+import { Box, Button, createTheme, Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Paper, TextField, Theme, ThemeProvider, Typography } from '@mui/material';
 import { Sign, Keygen } from './util'
 
 import { Link } from 'react-router-dom'
@@ -13,7 +13,6 @@ import { useResourceManager } from './hooks/useResourceManager';
 import type { RTMMessage, StreamElement, User } from './model';
 import { Schemas } from './schemas';
 import { useObjectList } from './hooks/useObjectList';
-import { Theme } from '@emotion/react';
 import { Themes } from './themes';
 
 export const ApplicationContext = createContext<appData>({
@@ -101,24 +100,12 @@ function App() {
     }, [])
 
     useEffect(() => {
-        if (pubkey == "" && prvkey == "") regenerateKeys();
         fetch(server + 'stream/list').then((data) => {
             data.json().then((json) => {
                 setStreams(json)
             });
         });
     }, []);
-
-
-    const regenerateKeys = () => {
-        const key = Keygen()
-        setPubKey(key.publickey)
-        setPrvKey(key.privatekey)
-        setAddress(key.ccaddress)
-    }
-
-
-
 
     return (
     <ThemeProvider theme={theme}>
@@ -189,17 +176,6 @@ function App() {
             </Box>
 
 
-            <Box sx={{width: "300px", padding: "15px"}}>
-                <Typography variant="h5" gutterBottom>Settings</Typography>
-                <Divider/>
-                <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
-                    <TextField label="server" variant="outlined" value={server} onChange={(e) => setServer(e.target.value)}/>
-                    <TextField label="privateKey" variant="outlined" value={prvkey} onChange={(e) => setPrvKey(e.target.value)}/>
-                    <TextField label="address" variant="outlined" value={address} onChange={(e) => setAddress(e.target.value)}/>
-                    <TextField label="publicKey" variant="outlined" value={pubkey} onChange={(e) => setPubKey(e.target.value)}/>
-                    <Button variant="contained" onClick={_ => regenerateKeys()}>Generate Key</Button>
-                </Box>
-            </Box>
         </Box>
         <Paper sx={{flexGrow: "1", maxWidth: "70vw", margin: "10px", padding: "20px", display: "flex", flexFlow: "column", borderRadius: "20px"}}>
             <Box sx={{overflowY: "scroll"}}>
@@ -221,7 +197,15 @@ function App() {
                     <Route path="/explorer" element={<Explorer/>} />
                     <Route path="/notification" element={<Notification/>} />
                     <Route path="/profile" element={<Profile/>} />
-                    <Route path="/settings" element={<Settings setThemeName={setThemeName}/>} />
+                    <Route path="/settings" element={
+                        <Settings
+                            setThemeName={setThemeName}
+                            setPrvKey={setPrvKey}
+                            setPubKey={setPubKey}
+                            setUserAddr={setAddress}
+                            setServerAddr={setServer}
+                        />}
+                    />
                 </Routes>
             </Box>
         </Paper>

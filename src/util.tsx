@@ -27,6 +27,20 @@ export const Keygen = (): key => {
     }
 }
 
+export const LoadKey = (privateKey: string): key => {
+    const ellipsis = new ec("secp256k1")
+    const keyPair = ellipsis.keyFromPrivate(privateKey)
+    const privatekey = keyPair.getPrivate().toString('hex')
+    const publickey = keyPair.getPublic().encode('hex', false)
+    const ethAddress = computeAddress('0x' + publickey)
+    const ccaddress = 'CC' + ethAddress.slice(2)
+    return {
+        privatekey,
+        publickey,
+        ccaddress
+    }
+}
+
 function toHexString(byteArray: Uint8Array | number[]) {
     return Array.from(byteArray, function(byte) {
         return ('0' + (byte & 0xFF).toString(16)).slice(-2);

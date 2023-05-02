@@ -43,14 +43,19 @@ export function Profile() {
     }
 
     return (<>
-        <Box sx={{width: "300px", padding: "15px"}}>
-            <Typography variant="h5" gutterBottom>Profile</Typography>
-            <Divider/>
-            <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
-                <TextField label="username" variant="outlined" value={username} onChange={(e) => setUsername(e.target.value)}/>
-                <TextField label="avatarURL" variant="outlined" value={avatar} onChange={(e) => setAvatar(e.target.value)}/>
-                <Button variant="contained" onClick={_ => updateProfile()}>Update</Button>
-            </Box>
+        <Typography variant="h5" gutterBottom>Profile</Typography>
+        <Divider/>
+        <Box sx={{display: "flex", flexDirection: "column", padding: "15px", gap: "5px"}}>
+            <TextField label="username" variant="outlined" value={username} onChange={(e) => setUsername(e.target.value)}/>
+            <TextField label="avatarURL" variant="outlined" value={avatar} onChange={(e) => setAvatar(e.target.value)}/>
+            <Button variant="contained" onClick={_ => updateProfile()}>Update</Button>
         </Box>
+        <Divider/>
+        <Typography variant="h6" gutterBottom>Concurrent Address</Typography>
+        {appData.userAddress}
+        <Typography variant="h6" gutterBottom>Publickey</Typography>
+        {appData.publickey}
+        <Typography variant="h6" gutterBottom>Privatekey</Typography>
+        {appData.privatekey}
     </>)
 }
