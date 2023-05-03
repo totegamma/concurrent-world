@@ -1,14 +1,9 @@
-import React, { useContext, useState } from 'react';
-import { lighten, Paper, List, Divider, Box, Stack, TextField, Button, useTheme, IconButton, InputBase } from '@mui/material';
+import React from 'react';
+import { List, Divider, Box } from '@mui/material';
 import { Tweet } from '../components/Tweet'
 import { RTMMessage, StreamElement, User } from '../model';
 import { IuseResourceManager } from '../hooks/useResourceManager';
 import { IuseObjectList } from '../hooks/useObjectList';
-import { Sign } from '../util'
-import { ApplicationContext } from '../App';
-import ExploreIcon from '@mui/icons-material/Explore';
-import SearchIcon from '@mui/icons-material/Search';
-import SendIcon from '@mui/icons-material/Send';
 import { Draft } from '../components/Draft';
 import { StreamsBar } from '../components/StreamsBar';
 
@@ -16,17 +11,12 @@ export interface TimelineProps {
     messages: IuseObjectList<StreamElement>;
     userDict: IuseResourceManager<User>;
     messageDict: IuseResourceManager<RTMMessage>;
-    inspect: (message: RTMMessage | null) => void;
     currentStreams: string;
     setCurrentStreams: (streams: string) => void;
     reload: () => void;
 }
 
 export function Timeline(props: TimelineProps) {
-
-    const appData = useContext(ApplicationContext)
-    const [draft, setDraft] = useState<string>("");
-    const theme = useTheme();
 
     return (<>
         <StreamsBar 
@@ -46,7 +36,6 @@ export function Timeline(props: TimelineProps) {
                             message={e.Values.id}
                             messageDict={props.messageDict}
                             userDict={props.userDict}
-                            inspect={props.inspect}
                         />
                         <Divider variant="inset" component="li" sx={{margin: '0 5px'}} />
                     </React.Fragment>
