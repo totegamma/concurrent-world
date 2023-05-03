@@ -4,7 +4,12 @@ import { Sign } from '../util'
 import { ApplicationContext } from '../App';
 import SendIcon from '@mui/icons-material/Send';
 
-export function Draft(props: any) {
+export interface DraftProps {
+  reload: () => void,
+  currentStreams: string
+}
+
+export function Draft(props: DraftProps) {
 
   const appData = useContext(ApplicationContext)
 
@@ -16,8 +21,6 @@ export function Draft(props: any) {
     }
     const payload = JSON.stringify(payload_obj)
     const signature = Sign(appData.privatekey, payload)
-
-    console.log(appData)
 
     const requestOptions = {
       method: 'POST',

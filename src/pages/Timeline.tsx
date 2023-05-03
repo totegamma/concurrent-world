@@ -66,7 +66,7 @@ export function Timeline(props: TimelineProps) {
         </Box>
         <Box sx={{overflowY: "auto", padding: "20px"}}>
             <Box>
-                <Draft props={props} currentStreams={props.currentStreams} reload={props.reload} />
+                <Draft currentStreams={props.currentStreams} reload={props.reload} />
             </Box>
             <Box sx={{display: 'flex', flex: 1}}>
                 <List sx={{flex: 1}}>

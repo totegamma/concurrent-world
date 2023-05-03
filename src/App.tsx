@@ -66,7 +66,6 @@ function App() {
     });
 
     const reload = () => {
-        console.log('reload triggered')
         let url = server + `stream?streams=${currentStreams}`
 
         const requestOptions = {
