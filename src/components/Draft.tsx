@@ -3,6 +3,7 @@ import { TextField, Box, Stack, Button } from "@mui/material";
 import { Sign } from '../util'
 import { ApplicationContext } from '../App';
 import SendIcon from '@mui/icons-material/Send';
+import { Schemas } from "../schemas";
 
 export interface DraftProps {
   currentStreams: string
@@ -28,7 +29,8 @@ export function Draft(props: DraftProps) {
         author: appData.userAddress,
         payload: payload,
         signature: signature,
-        streams: props.currentStreams
+        streams: props.currentStreams,
+        schema: Schemas.simpleNote
       })
     };
 
