@@ -86,7 +86,7 @@ function App() {
             messages.clear();
             data.sort((a, b) => a.ID < b.ID ? -1 : 1).forEach((e: StreamElement) => messages.push(e));
         });
-    }, [server])
+    }, [server, currentStreams])
 
     const handleMessage = (event: ServerEvent) => {
         switch(event.type) {
