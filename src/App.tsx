@@ -1,6 +1,6 @@
 import { useEffect, useState, createContext } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { darken, Box, createTheme, Drawer, Paper, Theme, ThemeProvider } from '@mui/material';
+import { darken, Box, createTheme, Paper, Theme, ThemeProvider } from '@mui/material';
 
 import { usePersistent } from './hooks/usePersistent';
 import { useObjectList } from './hooks/useObjectList';
@@ -37,7 +37,6 @@ function App() {
     const [themeName, setThemeName] = usePersistent<string>("Theme", Object.keys(Themes)[0]);
     const [watchstreams, setWatchStreams] = usePersistent<string[]>("watchStreamList", ["common"]);
     const [theme, setTheme] = useState<Theme>(createTheme((Themes as any)[themeName]))
-    const [inspectItem, setInspectItem] = useState<RTMMessage | null>(null)
     const messages = useObjectList<StreamElement>();
 
     const userDict = useResourceManager<User>(async (key: string) => {
@@ -90,7 +89,6 @@ function App() {
         setTheme(createTheme((Themes as any)[themeName]))
     }, [themeName]);
 
-
     return (
     <ThemeProvider theme={theme}>
     <ApplicationContext.Provider value={{serverAddress: server, publickey: pubkey, privatekey: prvkey, userAddress: address}}>
@@ -110,7 +108,6 @@ function App() {
                         currentStreams={currentStreams}
                         setCurrentStreams={setCurrentStreams}
                         reload={reload}
-                        inspect={setInspectItem}
                     />
                 } />
                 <Route path="/associations" element={<Associations/>} />
@@ -133,18 +130,6 @@ function App() {
                 />
             </Routes>
         </Paper>
-
-        <Drawer
-            anchor={'right'}
-            open={inspectItem != null}
-            onClose={() => setInspectItem(null)}
-        >
-            <Box sx={{width: "40vw", fontSize: "13px"}}>
-                <pre>
-                    {JSON.stringify(inspectItem, null, 4)}
-                </pre>
-            </Box>
-        </Drawer>
     </Box>
     </BrowserRouter>
     </ApplicationContext.Provider>
