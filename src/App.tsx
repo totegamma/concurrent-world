@@ -12,6 +12,9 @@ import { Menu } from './components/Menu';
 import type { RTMMessage, StreamElement, User, ServerEvent, Association } from './model';
 import { Associations, Explorer, Notification, Profile, Settings, Timeline } from './pages';
 
+import Sound from './resources/Bubble.wav'
+import useSound from 'use-sound';
+
 export const ApplicationContext = createContext<appData>({
     serverAddress: '',
     publickey: '',
@@ -40,6 +43,11 @@ function App() {
     const messages = useObjectList<StreamElement>();
     const currentStreamsRef = useRef<string>(currentStreams)
 
+    const [playNotification] = useSound(Sound);
+    const playNotificationRef = useRef(playNotification)
+    useEffect(() => {
+        playNotificationRef.current = playNotification
+    }, [playNotification])
 
     const userDict = useResourceManager<User>(async (key: string) => {
         const res = await fetch(server + 'characters?author=' + encodeURIComponent(key) + '&schema=' + encodeURIComponent(Schemas.profile), {
@@ -104,6 +112,7 @@ function App() {
                                 id: message.id
                             }
                         })
+                        playNotificationRef.current()
                     break;
                     default:
                         console.log("unknown message action", event)
