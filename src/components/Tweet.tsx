@@ -115,7 +115,8 @@ export function Tweet(props: TweetProps) {
                         <ReactMarkdown
                             remarkPlugins={[[remarkGfm, {singleTilde: false}]]}
                             components={{
-                                p: ({ children }) => <Typography paragraph>{children}</Typography>
+                                p: ({ children }) => <Typography paragraph>{children}</Typography>,
+                                img: props => <img {...props} style={{ maxWidth: "100%" }} />
                             }}
                         >
                                 {JSON.parse(message.payload).body}
