@@ -8,6 +8,9 @@ import { ApplicationContext } from '../App';
 import { RTMMessage, User } from '../model';
 import { IuseResourceManager } from '../hooks/useResourceManager';
 import { Schemas } from '../schemas';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm'
+
 export interface TweetProps {
     message: string;
     messageDict: IuseResourceManager<RTMMessage>;
@@ -108,7 +111,14 @@ export function Tweet(props: TweetProps) {
                 </Box>
                 <Box sx={{width: '100%'}}>
                     <pre style={{margin: 0, fontFamily: 'inherit', wordBreak: 'break-all', whiteSpace: 'pre-wrap', overflow: 'hidden'}}>
-                        {JSON.parse(message.payload).body}
+                        <ReactMarkdown
+                            remarkPlugins={[[remarkGfm, {singleTilde: false}]]}
+                            components={{
+                                p: ({ children }) => <Typography paragraph>{children}</Typography>
+                            }}
+                        >
+                                {JSON.parse(message.payload).body}
+                        </ReactMarkdown>
                     </pre>
                 </Box>
                 <Box sx={{display: 'flex', gap: '10px'}}>
