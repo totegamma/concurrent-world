@@ -100,7 +100,7 @@ export function Tweet(props: TweetProps) {
             <Box sx={{display: 'flex', flex: 1, flexDirection: 'column', mt: '5px'}}>
                 <Box sx={{display: 'flex', alignItems: 'baseline', justifyContent: 'space-between'}}>
                     <Box>
-                        <Typography component="span" sx={{fontWeight: '700'}}>{user?.username ?? "anonymouse"} </Typography>
+                        <Typography component="span" sx={{fontWeight: '700'}}>{user?.username} </Typography>
                         <Typography component="span" sx={{fontweight: '400', fontSize: '10px'}}>{message.author} · </Typography>
                         <Link component="button" underline="hover" color="inherit">
                             {new Date(message.cdate).toLocaleString()}

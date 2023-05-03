@@ -47,6 +47,12 @@ function App() {
             headers: {}
         });
         const data = await res.json();
+        if (data.characters.length == 0) return {
+            pubkey: '',
+            username: 'anonymous',
+            avatar: '',
+            description: ''
+        };
         const payload = JSON.parse(data.characters[0].payload)
         return {
             pubkey: data.characters[0].author,
