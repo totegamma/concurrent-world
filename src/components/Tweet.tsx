@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { ListItem, Box, Avatar, Typography, Link, IconButton, Drawer } from '@mui/material';
+import { ListItem, Box, Avatar, Typography, Link, IconButton } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Sign } from '../util'
@@ -15,6 +15,7 @@ export interface TweetProps {
     message: string;
     messageDict: IuseResourceManager<RTMMessage>;
     userDict: IuseResourceManager<User>;
+    inspect: (message: RTMMessage | null) => void;
 }
 
 export function Tweet(props: TweetProps) {
@@ -22,8 +23,6 @@ export function Tweet(props: TweetProps) {
     let [message, setMessage] = useState<RTMMessage | undefined>();
 
     const appData = useContext(ApplicationContext)
-
-    const [inspectItem, setInspectItem] = useState<RTMMessage | null>(null)
 
     const loadTweet = () => {
         props.messageDict.get(props.message).then((msg) => {
@@ -132,25 +131,15 @@ export function Tweet(props: TweetProps) {
                         <StarIcon/> <Typography sx={{size: '16px'}}>{message.associations_data.filter(e => e.schema == Schemas.like).length}</Typography>
                     </IconButton>
                     }
-                    <IconButton onClick={() => setInspectItem(message ?? null)} >
+                    <IconButton onClick={() => props.inspect(message ?? null)} >
                         <MoreHorizIcon/>
                     </IconButton>
                 </Box>
-              <Drawer
-                  anchor={'right'}
-                  open={inspectItem != null}
-                  onClose={() => setInspectItem(null)}
-              >
-                  <Box sx={{width: "40vw", fontSize: "13px"}}>
-                      <pre>
-                          {JSON.stringify(inspectItem, null, 4)}
-                      </pre>
-                  </Box>
-              </Drawer>
             </Box>
             </>
             }
         </ListItem>
     )
+
 }
 
