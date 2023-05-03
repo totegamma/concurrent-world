@@ -119,7 +119,7 @@ export function Tweet(props: TweetProps) {
                                 img: props => <img {...props} style={{ maxWidth: "100%" }} />
                             }}
                         >
-                                {JSON.parse(message.payload).body}
+                            {JSON.parse(message.payload).body}
                         </ReactMarkdown>
                     </pre>
                 </Box>
@@ -137,16 +137,36 @@ export function Tweet(props: TweetProps) {
                         <MoreHorizIcon/>
                     </IconButton>
                 </Box>
-              <Drawer
-                  anchor={'right'}
-                  open={inspectItem != null}
-                  onClose={() => setInspectItem(null)}
-              >
-                  <Box sx={{width: "40vw", fontSize: "13px"}}>
-                      <pre>
-                          {JSON.stringify(inspectItem, null, 4)}
-                      </pre>
-                  </Box>
+                <Drawer
+                    anchor={'right'}
+                    open={inspectItem != null}
+                    onClose={() => setInspectItem(null)}
+                    PaperProps={{
+                        sx: {
+                            width: "40vw",
+                            borderRadius: "20px 0 0 20px",
+                            overflow: "hidden",
+                            padding: "20px",
+                        }
+                    }}
+                >
+                    <Box sx={{margin: 0, wordBreak: 'break-all', whiteSpace: 'pre-wrap', fontSize: "13px"}}>
+                        <Typography>ID: {inspectItem?.id}</Typography>
+                        <Typography>Author: {inspectItem?.author}</Typography>
+                        <Typography>Schema: {inspectItem?.schema}</Typography>
+                        <Typography>Signature: {inspectItem?.signature}</Typography>
+                        <Typography>Created: {inspectItem?.cdate}</Typography>
+                        <Typography>Payload:</Typography>
+                        <pre style={{ overflowX: "scroll" }}>
+                            {JSON.stringify(JSON.parse(inspectItem?.payload ?? "null"), null, 4).replaceAll('\\n', '\n')}
+                        </pre>
+                        <Typography>Associations: {inspectItem?.associations}</Typography>
+                        <Typography>AssociationsData:</Typography>
+                        <pre style={{ overflowX: "scroll" }}>
+                            {JSON.stringify(inspectItem?.associations_data, null, 4)}
+                        </pre>
+
+                    </Box>
               </Drawer>
             </Box>
             </>
