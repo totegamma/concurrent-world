@@ -1,4 +1,4 @@
-import { Box, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import { Box, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, useTheme } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { ApplicationContext } from "../App";
 import StarIcon from '@mui/icons-material/Star';
@@ -10,6 +10,8 @@ export interface ExplorerProps {
 }
 
 export function Explorer(props: ExplorerProps) {
+
+    const theme = useTheme()
 
     const appData = useContext(ApplicationContext)
     const [streams, setStreams] = useState<string[]>([]);
@@ -23,7 +25,7 @@ export function Explorer(props: ExplorerProps) {
     }, []);
 
     return (
-        <Box sx={{display: "flex", flexDirection: "column", gap: "5px", padding: "20px"}}>
+        <Box sx={{display: "flex", flexDirection: "column", gap: "5px", padding: "20px", background: theme.palette.background.paper, minHeight: '100%'}}>
             <Typography variant="h5" gutterBottom>Explorer</Typography>
             <Divider/>
             <Typography variant="h6" gutterBottom>streams</Typography>

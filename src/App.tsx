@@ -182,7 +182,7 @@ function App() {
             streams={watchstreams}
             setCurrentStreams={setCurrentStreams}
         />
-        <Paper sx={{flexGrow: "1", margin: "10px", display: "flex", flexFlow: "column", borderRadius: "20px", overflow: 'hidden'}}>
+        <Paper sx={{flexGrow: "1", margin: "10px", display: "flex", flexFlow: "column", borderRadius: "20px", overflow: 'hidden', background: "none"}}>
             <Routes>
                 <Route index element={ 
                     <Timeline

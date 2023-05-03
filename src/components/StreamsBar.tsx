@@ -35,10 +35,8 @@ export function StreamsBar(props: StreamsBarProps) {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    background:
-      theme.palette.primary.main,
-    padding: "5px",
-    borderRadius: "20px 20px 0 0"
+    background: theme.palette.primary.main,
+    padding: "5px"
   }}>
     <Paper
       component="form"

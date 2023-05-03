@@ -1,4 +1,4 @@
-import { Button, Divider, Typography, TextField, Box } from "@mui/material";
+import { Button, Divider, Typography, TextField, Box, useTheme } from "@mui/material";
 import { useContext, useState } from "react";
 import { ApplicationContext } from "../App";
 import { Themes } from '../themes'
@@ -14,6 +14,7 @@ export interface SettingsProp {
 
 export function Settings(props: SettingsProp) {
 
+    const theme = useTheme()
     const appData = useContext(ApplicationContext)
 
     const [draftPrivateKey, setDraftPrivateKey] = useState<string>('')
@@ -33,7 +34,7 @@ export function Settings(props: SettingsProp) {
     }
 
     return (<>
-        <Box sx={{display: "flex", flexDirection: "column", gap: "5px", padding: "20px"}}>
+        <Box sx={{display: "flex", flexDirection: "column", gap: "5px", padding: "20px", background: theme.palette.background.paper, minHeight: '100%'}}>
         <Typography variant="h5" gutterBottom>Settings</Typography>
         <Divider/>
         <Typography>Your concurrent address: {appData.userAddress}</Typography>
@@ -47,14 +48,16 @@ export function Settings(props: SettingsProp) {
         </Box>
 
         <Typography variant="h5">Theme</Typography>
-        {Object.keys(Themes).map(e =>
-            <Button
-                key={e}
-                variant="contained"
-                sx={{background: (Themes as any)[e].palette.primary.main}}
-                onClick={(_) => props.setThemeName(e)}
-            >{e}</Button>
-        )}
+            <Box sx={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gridAutoRows: '50px', gap: '10px'}}>
+            {Object.keys(Themes).map(e =>
+                <Button
+                    key={e}
+                    variant="contained"
+                    sx={{background: (Themes as any)[e].palette.primary.main}}
+                    onClick={(_) => props.setThemeName(e)}
+                >{e}</Button>
+            )}
+            </Box>
         </Box>
     </>)
 }

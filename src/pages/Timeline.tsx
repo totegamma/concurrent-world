@@ -1,5 +1,5 @@
 import React from 'react';
-import { List, Divider, Box } from '@mui/material';
+import { List, Divider, Box, useTheme } from '@mui/material';
 import { Tweet } from '../components/Tweet'
 import { RTMMessage, StreamElement, User } from '../model';
 import { IuseResourceManager } from '../hooks/useResourceManager';
@@ -18,13 +18,15 @@ export interface TimelineProps {
 
 export function Timeline(props: TimelineProps) {
 
+    const theme = useTheme()
+
     return (<>
         <StreamsBar 
             currentStreams={props.currentStreams}
             setCurrentStreams={props.setCurrentStreams}
             reload={props.reload}
         />
-        <Box sx={{overflowY: "auto", padding: "20px"}}>
+        <Box sx={{overflowY: "auto", padding: "20px", background: theme.palette.background.paper, minHeight: '100%'}}>
             <Box>
                 <Draft currentStreams={props.currentStreams} />
             </Box>
