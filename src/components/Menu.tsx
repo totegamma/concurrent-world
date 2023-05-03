@@ -84,7 +84,7 @@ export function Menu(props: MenuProps) {
                             <ListItemIcon>
                                 <PercentIcon sx={{ color: "white" }} />
                             </ListItemIcon>
-                            <ListItemButton  onClick={() => {
+                            <ListItemButton component={Link} to="/" onClick={() => {
                                     props.setCurrentStreams(value);
                                 }}>
                                 <ListItemText id={labelId} primary={value} />
