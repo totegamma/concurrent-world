@@ -9,6 +9,7 @@ import { ApplicationContext } from '../App';
 import ExploreIcon from '@mui/icons-material/Explore';
 import SearchIcon from '@mui/icons-material/Search';
 import SendIcon from '@mui/icons-material/Send';
+import { Draft } from '../components/Draft';
 
 export interface TimelineProps {
     messages: IuseObjectList<StreamElement>;
@@ -25,33 +26,6 @@ export function Timeline(props: TimelineProps) {
     const appData = useContext(ApplicationContext)
     const [draft, setDraft] = useState<string>("");
     const theme = useTheme();
-
-    const post = () => {
-        const payload_obj = {
-            'body': draft
-        }
-        const payload = JSON.stringify(payload_obj)
-        const signature = Sign(appData.privatekey, payload)
-
-        const requestOptions = {
-            method: 'POST',
-            headers: {},
-            body: JSON.stringify({
-                author: appData.userAddress,
-                payload: payload,
-                signature: signature,
-                streams: props.currentStreams
-            })
-        };
-
-        fetch(appData.serverAddress+ 'messages', requestOptions)
-        .then(res => res.json())
-        .then(data => {
-            console.log(data);
-            setDraft("");
-            props.reload();
-        });
-    }
 
     return (<>
         <Box sx={{
@@ -92,35 +66,7 @@ export function Timeline(props: TimelineProps) {
         </Box>
         <Box sx={{overflowY: "auto", padding: "20px"}}>
             <Box>
-                <Box sx={{display: "flex", flexDirection: "column", gap: "5px", mb: '10px'}}>
-                    <Stack sx={{
-                        position: 'relative'
-                    }}>
-                        <TextField multiline rows={6} label="message" variant="outlined" value={draft} onChange={(e) => setDraft(e.target.value)}
-                            onKeyDown={(e: any) => {
-                                if ((draft.length == 0) || (draft.trim().length == 0)) return
-                                if (e.key == 'Enter' && e.ctrlKey == true) {
-                                    post()
-                                }
-                            }}
-                        />
-                            <Box sx={{
-                                position: 'absolute',
-                                bottom: 10,
-                                right: 10
-                            }}>
-                            <Button
-                                color="primary"
-                                variant="contained"
-                                disabled={(draft.length == 0) || (draft.trim().length == 0)}
-                                onClick={_ => post()}
-                                endIcon={<SendIcon/>}
-                            >
-                                Send
-                            </Button>
-                        </Box>
-                    </Stack>
-                </Box>
+                <Draft currentStreams={props.currentStreams} reload={props.reload} />
             </Box>
             <Box sx={{display: 'flex', flex: 1}}>
                 <List sx={{flex: 1}}>
