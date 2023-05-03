@@ -1,4 +1,4 @@
-import { useEffect, useState, createContext } from 'react';
+import { useEffect, useState, createContext, useRef } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { darken, Box, createTheme, Paper, Theme, ThemeProvider } from '@mui/material';
 
@@ -9,7 +9,7 @@ import { useResourceManager } from './hooks/useResourceManager';
 import { Schemas } from './schemas';
 import { Themes } from './themes';
 import { Menu } from './components/Menu';
-import type { RTMMessage, StreamElement, User } from './model';
+import type { RTMMessage, StreamElement, User, ServerEvent } from './model';
 import { Associations, Explorer, Notification, Profile, Settings, Timeline } from './pages';
 
 export const ApplicationContext = createContext<appData>({
@@ -32,12 +32,14 @@ function App() {
     const [pubkey, setPubKey] = usePersistent<string>("PublicKey", "");
     const [prvkey, setPrvKey] = usePersistent<string>("PrivateKey", "");
     const [address, setAddress] = usePersistent<string>("Address", "");
-    //const [postStreams, setPostStreams] = usePersistent<string>("postStream", "common");
-    const [currentStreams, setCurrentStreams] = usePersistent<string>("currentStream", "common,0");
+    const [currentStreams, setCurrentStreams] = usePersistent<string>("currentStream", "common");
     const [themeName, setThemeName] = usePersistent<string>("Theme", Object.keys(Themes)[0]);
     const [watchstreams, setWatchStreams] = usePersistent<string[]>("watchStreamList", ["common"]);
     const [theme, setTheme] = useState<Theme>(createTheme((Themes as any)[themeName]))
+    const [connected, setConnected] = useState<boolean>(false)
     const messages = useObjectList<StreamElement>();
+    const currentStreamsRef = useRef<string>(currentStreams)
+
 
     const userDict = useResourceManager<User>(async (key: string) => {
         const res = await fetch(server + 'characters?author=' + encodeURIComponent(key) + '&schema=' + encodeURIComponent(Schemas.profile), {
@@ -60,7 +62,6 @@ function App() {
             headers: {}
         });
         const data = await res.json()
-        console.log(data.message)
         return data.message
     });
 
@@ -75,11 +76,74 @@ function App() {
         fetch(url, requestOptions)
         .then(res => res.json())
         .then((data: StreamElement[]) => {
-            console.log(data);
             messages.clear();
-            data.sort((a, b) => a.ID > b.ID ? -1 : 1).forEach((e: StreamElement) => messages.push(e));
+            data.sort((a, b) => a.ID < b.ID ? -1 : 1).forEach((e: StreamElement) => messages.push(e));
         });
     }
+
+    const handleMessage = (event: ServerEvent) => {
+        switch(event.type) {
+            case "message":
+                switch(event.action) {
+                    case "create":
+                        console.log(event)
+                        if (messages.current.find(e => e.Values.id == event.body.id)) return;
+                        const groupA = currentStreamsRef.current.split(',')
+                        console.log(groupA)
+                        const groupB = (event.body as RTMMessage).streams.split(',')
+                        console.log(groupB)
+                        if (!groupA.some(e => groupB.includes(e))) return;
+                        messages.push({
+                            ID: new Date(event.body.cdate).getTime().toString().replace('.', '-'),
+                            Values: {
+                                id: event.body.id
+                            }
+                        })
+                    break;
+                    default:
+                        console.log("unknown message action", event)
+                    break;
+                }
+            break;
+            case "association":
+            break;
+            default:
+                console.log("unknown event", event)
+            break;
+        }
+    }
+
+    useEffect(() => {
+        if (!server) return
+        const ws = new WebSocket(server.replace('http', 'ws') + 'socket');
+
+        ws.onopen = (event: any) => {
+            console.log("ws open");
+            console.info(event);
+            setConnected(true);
+        }
+
+        ws.onmessage = (event: any) => {
+            const body = JSON.parse(event.data);
+            handleMessage(body);
+        }
+
+        ws.onerror = (event: any) => {
+            console.log("ws error");
+            console.error(event);
+            setConnected(false);
+        }
+
+        ws.onclose = (event: any) => {
+            console.log("ws closed");
+            console.warn(event);
+            setConnected(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        currentStreamsRef.current = currentStreams
+    }, [currentStreams]);
 
     useEffect(() => {
         reload()

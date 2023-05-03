@@ -26,11 +26,11 @@ export function Timeline(props: TimelineProps) {
         />
         <Box sx={{overflowY: "auto", padding: "20px"}}>
             <Box>
-                <Draft currentStreams={props.currentStreams} reload={props.reload} />
+                <Draft currentStreams={props.currentStreams} />
             </Box>
             <Box sx={{display: 'flex', flex: 1}}>
                 <List sx={{flex: 1}}>
-                {props.messages.current.map(e =>
+                {props.messages.current.slice().reverse().map(e =>
                     <React.Fragment key={e.ID}>
                         <Tweet 
                             message={e.Values.id}

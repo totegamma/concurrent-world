@@ -5,7 +5,6 @@ import { ApplicationContext } from '../App';
 import SendIcon from '@mui/icons-material/Send';
 
 export interface DraftProps {
-  reload: () => void,
   currentStreams: string
 }
 
@@ -38,7 +37,6 @@ export function Draft(props: DraftProps) {
       .then(data => {
         console.log(data);
         setDraft("");
-        props.reload();
       });
   }
 

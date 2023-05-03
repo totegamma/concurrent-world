@@ -34,3 +34,9 @@ export interface User {
     description: string;
 }
 
+export interface ServerEvent {
+    type: string;
+    action: string;
+    body: RTMMessage | Association;
+}
+
