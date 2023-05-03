@@ -1,4 +1,4 @@
-import { useEffect, useState, createContext, useRef } from 'react';
+import { useEffect, useState, createContext, useRef, useCallback } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { darken, Box, createTheme, Paper, Theme, ThemeProvider } from '@mui/material';
 
@@ -9,7 +9,7 @@ import { useResourceManager } from './hooks/useResourceManager';
 import { Schemas } from './schemas';
 import { Themes } from './themes';
 import { Menu } from './components/Menu';
-import type { RTMMessage, StreamElement, User, ServerEvent } from './model';
+import type { RTMMessage, StreamElement, User, ServerEvent, Association } from './model';
 import { Associations, Explorer, Notification, Profile, Settings, Timeline } from './pages';
 
 export const ApplicationContext = createContext<appData>({
@@ -65,7 +65,8 @@ function App() {
         return data.message
     });
 
-    const reload = () => {
+    const reload = useCallback(() => {
+        console.warn('reload!')
         let url = server + `stream?streams=${currentStreams}`
 
         const requestOptions = {
@@ -79,24 +80,22 @@ function App() {
             messages.clear();
             data.sort((a, b) => a.ID < b.ID ? -1 : 1).forEach((e: StreamElement) => messages.push(e));
         });
-    }
+    }, [server])
 
     const handleMessage = (event: ServerEvent) => {
         switch(event.type) {
             case "message":
+                const message = event.body as RTMMessage
                 switch(event.action) {
                     case "create":
-                        console.log(event)
-                        if (messages.current.find(e => e.Values.id == event.body.id)) return;
+                        if (messages.current.find(e => e.Values.id == message.id)) return;
                         const groupA = currentStreamsRef.current.split(',')
-                        console.log(groupA)
-                        const groupB = (event.body as RTMMessage).streams.split(',')
-                        console.log(groupB)
+                        const groupB = message.streams.split(',')
                         if (!groupA.some(e => groupB.includes(e))) return;
                         messages.push({
-                            ID: new Date(event.body.cdate).getTime().toString().replace('.', '-'),
+                            ID: new Date(message.cdate).getTime().toString().replace('.', '-'),
                             Values: {
-                                id: event.body.id
+                                id: message.id
                             }
                         })
                     break;
@@ -106,6 +105,21 @@ function App() {
                 }
             break;
             case "association":
+                const association = event.body as Association
+                console.log(event)
+                switch(event.action) {
+                    case "create":
+                        messageDict.invalidate(association.target)
+                        // FIXME we have to notify to tweet component 
+                    break;
+                    case "delete":
+                        messageDict.invalidate(association.target)
+                        // FIXME we have to notify to tweet component 
+                    break;
+                    default:
+                        console.log("unknown message action", event)
+                    break;
+                }
             break;
             default:
                 console.log("unknown event", event)

@@ -39,7 +39,7 @@ export function Tweet(props: TweetProps) {
     }
 
     useEffect(() => {
-        loadTweet()    
+        loadTweet()
     }, [props.message]);
 
     const favorite = (messageID: string | undefined) => {
