@@ -35,9 +35,6 @@ export function Explorer(props: ExplorerProps) {
                     key={value}
                     disablePadding
                 >
-                    <ListItemIcon>
-                        { props.watchList.includes(value) ? <StarIcon /> : <StarBorderIcon /> }
-                    </ListItemIcon>
                     <ListItemButton  onClick={() => {
                         if (props.watchList.includes(value)) {
                             props.setWatchList(props.watchList.filter(e => e != value))
@@ -45,6 +42,7 @@ export function Explorer(props: ExplorerProps) {
                             props.setWatchList([...props.watchList, value])
                         }
                     }}>
+                        <ListItemIcon>{ props.watchList.includes(value) ? <StarIcon /> : <StarBorderIcon /> }</ListItemIcon>
                         <ListItemText id={labelId} primary={`%${value}`} />
                     </ListItemButton>
                 </ListItem>
