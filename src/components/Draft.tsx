@@ -29,8 +29,10 @@ export function Draft(props: DraftProps): JSX.Element {
                 payload,
                 signature,
                 streams: [
-                    ...props.currentStreams.split(','),
-                    appData.profile.homestream
+                    ...new Set([
+                        ...props.currentStreams.split(','),
+                        appData.profile.homestream
+                    ])
                 ]
                     .filter((e) => e)
                     .join(','),
