@@ -28,7 +28,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
         console.warn('reload!')
 
         let homequery = ''
-        if (!location.hash) {
+        if (!reactlocation.hash) {
             homequery = (
                 await Promise.all(
                     props.followList.map(
@@ -65,11 +65,32 @@ export function Timeline(props: TimelineProps): JSX.Element {
                     }
                 )
             })
-    }, [appData.serverAddress, location.hash])
+    }, [appData.serverAddress, reactlocation.hash])
 
     useEffect(() => {
-        reload()
-        props.setCurrentStreams(reactlocation.hash.replace('#', ''))
+        ;(async () => {
+            reload()
+            let homequery = ''
+            if (!reactlocation.hash) {
+                homequery = (
+                    await Promise.all(
+                        props.followList.map(
+                            async (ccaddress) =>
+                                (
+                                    await props.userDict.get(ccaddress)
+                                ).homestream
+                        )
+                    )
+                )
+                    .filter((e) => e)
+                    .join(',')
+            }
+            props.setCurrentStreams(
+                reactlocation.hash
+                    ? reactlocation.hash.replace('#', '')
+                    : homequery
+            )
+        })()
     }, [reactlocation.hash])
 
     return (

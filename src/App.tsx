@@ -159,10 +159,7 @@ function App(): JSX.Element {
                         ) {
                             return
                         }
-                        const groupA = [
-                            ...currentStreamsRef.current.split(','),
-                            profileRef.current.homestream
-                        ].filter((e) => e)
+                        const groupA = currentStreamsRef.current.split(',')
                         const groupB = message.streams.split(',')
                         if (!groupA.some((e) => groupB.includes(e))) return
                         messages.push({
