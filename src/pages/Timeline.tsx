@@ -41,7 +41,6 @@ export function Timeline(props: TimelineProps): JSX.Element {
             )
                 .filter((e) => e)
                 .join(',')
-            console.log(homequery)
         }
         const url =
             appData.serverAddress +
@@ -50,7 +49,6 @@ export function Timeline(props: TimelineProps): JSX.Element {
                     ? reactlocation.hash.replace('#', '')
                     : homequery
             }`
-        console.log(url)
 
         const requestOptions = {
             method: 'GET',

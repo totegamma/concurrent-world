@@ -39,7 +39,15 @@ export const ApplicationContext = createContext<appData>({
     serverAddress: '',
     publickey: '',
     privatekey: '',
-    userAddress: ''
+    userAddress: '',
+    profile: {
+        pubkey: '',
+        username: '',
+        avatar: '',
+        description: '',
+        homestream: '',
+        notificationstream: ''
+    }
 })
 
 export interface appData {
@@ -47,6 +55,7 @@ export interface appData {
     publickey: string
     privatekey: string
     userAddress: string
+    profile: User
 }
 
 function App(): JSX.Element {
@@ -76,6 +85,15 @@ function App(): JSX.Element {
 
     const [playNotification] = useSound(Sound)
     const playNotificationRef = useRef(playNotification)
+    const [profile, setProfile] = useState<User>({
+        pubkey: '',
+        username: 'anonymous',
+        avatar: '',
+        description: '',
+        homestream: '',
+        notificationstream: ''
+    })
+    const profileRef = useRef<User>(profile)
     useEffect(() => {
         playNotificationRef.current = playNotification
     }, [playNotification])
@@ -141,7 +159,10 @@ function App(): JSX.Element {
                         ) {
                             return
                         }
-                        const groupA = currentStreamsRef.current.split(',')
+                        const groupA = [
+                            ...currentStreamsRef.current.split(','),
+                            profileRef.current.homestream
+                        ].filter((e) => e)
                         const groupB = message.streams.split(',')
                         if (!groupA.some((e) => groupB.includes(e))) return
                         messages.push({
@@ -187,6 +208,14 @@ function App(): JSX.Element {
     }
 
     useEffect(() => {
+        ;(async () => {
+            const profile = await userDict.get(address)
+            setProfile(profile)
+            profileRef.current = profile
+        })()
+    }, [])
+
+    useEffect(() => {
         if (!server) return
         if (connected) return
         const ws = new WebSocket(server.replace('http', 'ws') + 'socket')
@@ -230,7 +259,8 @@ function App(): JSX.Element {
                     serverAddress: server,
                     publickey: pubkey,
                     privatekey: prvkey,
-                    userAddress: address
+                    userAddress: address,
+                    profile
                 }}
             >
                 <BrowserRouter>

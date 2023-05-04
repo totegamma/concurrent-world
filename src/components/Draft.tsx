@@ -28,7 +28,12 @@ export function Draft(props: DraftProps): JSX.Element {
                 author: appData.userAddress,
                 payload,
                 signature,
-                streams: props.currentStreams,
+                streams: [
+                    ...props.currentStreams.split(','),
+                    appData.profile.homestream
+                ]
+                    .filter((e) => e)
+                    .join(','),
                 schema: Schemas.simpleNote
             })
         }
