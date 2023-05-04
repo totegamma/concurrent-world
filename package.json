@@ -4,7 +4,8 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "postinstall": "husky install"
+        "postinstall": "husky install",
+        "dev": "vite dev"
     },
     "dependencies": {
         "@emotion/react": "^11.10.5",
