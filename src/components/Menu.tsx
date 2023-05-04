@@ -73,11 +73,11 @@ export function Menu(props: MenuProps): JSX.Element {
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
-                            <ListItemButton component={Link} to="/profile">
+                            <ListItemButton component={Link} to="/identity">
                                 <ListItemIcon>
                                     <BadgeIcon sx={{ color: 'white' }} />
                                 </ListItemIcon>
-                                <ListItemText primary="Profile" />
+                                <ListItemText primary="Identity" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>

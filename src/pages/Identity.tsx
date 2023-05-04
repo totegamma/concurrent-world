@@ -12,7 +12,7 @@ import { usePersistent } from '../hooks/usePersistent'
 import { Schemas } from '../schemas'
 import { Sign } from '../util'
 
-export function Profile(): JSX.Element {
+export function Identity(): JSX.Element {
     const theme = useTheme()
     const appData = useContext(ApplicationContext)
 
@@ -64,7 +64,7 @@ export function Profile(): JSX.Element {
                 }}
             >
                 <Typography variant="h5" gutterBottom>
-                    Profile
+                    Identity
                 </Typography>
                 <Divider />
                 <Box

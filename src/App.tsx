@@ -27,7 +27,7 @@ import {
     Associations,
     Explorer,
     Notification,
-    Profile,
+    Identity,
     Settings,
     Timeline
 } from './pages'
@@ -310,7 +310,10 @@ function App(): JSX.Element {
                                     path="/notification"
                                     element={<Notification />}
                                 />
-                                <Route path="/profile" element={<Profile />} />
+                                <Route
+                                    path="/identity"
+                                    element={<Identity />}
+                                />
                                 <Route
                                     path="/settings"
                                     element={
