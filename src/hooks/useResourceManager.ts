@@ -1,37 +1,34 @@
-import { useRef } from 'react';
-
+import { useRef } from 'react'
 
 export interface IuseResourceManager<T> {
-    current: {[key: string]: T};
-    get: (key: string) => Promise<T>;
-    register: (key: string, value:T) => void;
-    invalidate: (key: string) => void;
+    current: Record<string, T>
+    get: (key: string) => Promise<T>
+    register: (key: string, value: T) => void
+    invalidate: (key: string) => void
 }
 
-
-export function useResourceManager<T>(resolver: (key: string) => Promise<T>): IuseResourceManager<T> {
-
-    const body = useRef<{[key: string]: T}>({});
+export function useResourceManager<T> (resolver: (key: string) => Promise<T>): IuseResourceManager<T> {
+    const body = useRef<Record<string, T>>({})
 
     const get = async (key: string): Promise<T> => {
         if (!(key in body.current)) {
-            body.current[key] = await resolver(key);
+            body.current[key] = await resolver(key)
         }
-        return body.current[key];
+        return body.current[key]
     }
 
-    const register = (key: string, value: T) => {
-        body.current[key] = value;
+    const register = (key: string, value: T): void => {
+        body.current[key] = value
     }
 
-    const invalidate = (key: string) => {
+    const invalidate = (key: string): void => {
         delete body.current[key]
     }
 
     return {
         current: body.current,
-        get: get,
-        register: register,
-        invalidate: invalidate
+        get,
+        register,
+        invalidate
     }
 }

@@ -1,42 +1,41 @@
 export interface StreamElement {
-    ID: string,
+    ID: string
     Values: {
         id: string
     }
 }
 
 export interface Association {
-    author: string;
-    cdate: string;
-    id: string;
-    payload: string;
-    schema: string;
-    signature: string;
-    target: string;
+    author: string
+    cdate: string
+    id: string
+    payload: string
+    schema: string
+    signature: string
+    target: string
 }
 
 export interface RTMMessage {
-    associations: string;
-    associations_data: Association[];
-    author: string;
-    cdate: string;
-    id: string;
-    payload: string;
-    schema: string;
-    signature: string;
-    streams: string;
+    associations: string
+    associations_data: Association[]
+    author: string
+    cdate: string
+    id: string
+    payload: string
+    schema: string
+    signature: string
+    streams: string
 }
 
 export interface User {
-    pubkey: string;
-    username: string;
-    avatar: string;
-    description: string;
+    pubkey: string
+    username: string
+    avatar: string
+    description: string
 }
 
 export interface ServerEvent {
-    type: string;
-    action: string;
-    body: RTMMessage | Association;
+    type: string
+    action: string
+    body: RTMMessage | Association
 }
-

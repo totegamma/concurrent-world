@@ -2,80 +2,79 @@ export const Themes = {
     red: {
         palette: {
             primary: {
-                main: "#E0576F"
+                main: '#E0576F'
             },
             secondary: {
-                main: "#00bcd4"
+                main: '#00bcd4'
             },
             background: {
-                default: "#C74E64"
+                default: '#C74E64'
             }
         }
     },
     blue: {
         palette: {
             primary: {
-                main: "#0476d9"
+                main: '#0476d9'
             },
             secondary: {
-                main: "#035399"
+                main: '#035399'
             },
             background: {
-                default: "#023059"
+                default: '#023059'
             }
         }
     },
     orange: {
         palette: {
             primary: {
-                main: "#D95204"
+                main: '#D95204'
             },
             secondary: {
-                main: "#730217"
+                main: '#730217'
             },
             background: {
-                default: "#F25C05"
+                default: '#F25C05'
             }
         }
     },
     cafe: {
         palette: {
             primary: {
-                main: "#68474e"
+                main: '#68474e'
             },
             secondary: {
-                main: "#730217"
+                main: '#730217'
             },
             background: {
-                default: "#a99996",
+                default: '#a99996'
             }
         }
     },
     rainyday: {
         palette: {
             primary: {
-                main: "#70868b"
+                main: '#70868b'
             },
             secondary: {
-                main: "#730217"
+                main: '#730217'
             },
             background: {
-                default: "#839fa1"
+                default: '#839fa1'
             }
         }
     },
     oldcomputing: {
         palette: {
             primary: {
-                main: "#939195"
+                main: '#939195'
             },
             secondary: {
-                main: "#730217"
+                main: '#730217'
             },
             background: {
-                default: "#6d6d70"
+                default: '#6d6d70'
             }
         }
     }
 }
-
