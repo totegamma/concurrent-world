@@ -4,13 +4,16 @@ import {
     Typography,
     TextField,
     Button,
+    IconButton,
     useTheme
 } from '@mui/material'
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { ApplicationContext } from '../App'
 import { usePersistent } from '../hooks/usePersistent'
 import { Schemas } from '../schemas'
 import { Sign } from '../util'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 
 export function Identity(): JSX.Element {
     const theme = useTheme()
@@ -20,6 +23,9 @@ export function Identity(): JSX.Element {
         'Username',
         'anonymous'
     )
+
+    const [showPrivateKey, setShowPrivateKey] = useState(false)
+
     const [avatar, setAvatar] = usePersistent<string>('AvatarURL', '')
 
     const updateProfile = (): void => {
@@ -116,8 +122,28 @@ export function Identity(): JSX.Element {
                 <Typography variant="h6" gutterBottom>
                     Privatekey
                 </Typography>
-                <Typography sx={{ wordBreak: 'break-all' }}>
-                    {appData.privatekey}
+                <Typography
+                    sx={{
+                        wordBreak: 'break-all',
+                        display: 'flex',
+                        alignItems: 'center'
+                    }}
+                >
+                    {showPrivateKey
+                        ? appData.privatekey
+                        : '••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••'}
+                    <IconButton
+                        sx={{ ml: 'auto' }}
+                        onClick={() => {
+                            setShowPrivateKey(!showPrivateKey)
+                        }}
+                    >
+                        {!showPrivateKey ? (
+                            <VisibilityIcon />
+                        ) : (
+                            <VisibilityOffIcon />
+                        )}
+                    </IconButton>
                 </Typography>
             </Box>
         </>

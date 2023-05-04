@@ -54,7 +54,7 @@ export function Settings(props: SettingsProp): JSX.Element {
                 <Typography variant="h5" gutterBottom>
                     Settings
                 </Typography>
-                <Divider />
+                <Divider sx={{ mb: 2 }} />
                 <Typography>
                     Your concurrent address: {appData.userAddress}
                 </Typography>
@@ -79,6 +79,7 @@ export function Settings(props: SettingsProp): JSX.Element {
                             label="import private key"
                             variant="outlined"
                             value={draftPrivateKey}
+                            sx={{ flexGrow: 1 }}
                             onChange={(e) => {
                                 setDraftPrivateKey(e.target.value)
                             }}
