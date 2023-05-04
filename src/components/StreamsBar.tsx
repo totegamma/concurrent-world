@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react'
-import { lighten, Paper, IconButton, InputBase, Box, useTheme } from '@mui/material'
+import {
+    lighten,
+    Paper,
+    IconButton,
+    InputBase,
+    Box,
+    useTheme
+} from '@mui/material'
 import ExploreIcon from '@mui/icons-material/Explore'
 import SearchIcon from '@mui/icons-material/Search'
 
@@ -9,7 +16,7 @@ export interface StreamsBarProps {
     reload: () => void
 }
 
-export function StreamsBar (props: StreamsBarProps): JSX.Element {
+export function StreamsBar(props: StreamsBarProps): JSX.Element {
     const theme = useTheme()
     const [streams, setStreams] = useState(props.currentStreams)
 
@@ -21,7 +28,9 @@ export function StreamsBar (props: StreamsBarProps): JSX.Element {
             props.setCurrentStreams(streams)
         }, inputTimeout)
 
-        return () => { clearTimeout(timeout) }
+        return () => {
+            clearTimeout(timeout)
+        }
     }, [streams])
 
     // force local streams to change in case of external input (i.e. sidebar button)
@@ -29,42 +38,53 @@ export function StreamsBar (props: StreamsBarProps): JSX.Element {
         setStreams(props.currentStreams)
     }, [props.currentStreams])
 
-    return <Box sx={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        background: theme.palette.primary.main,
-        padding: '5px'
-    }}>
-        <Paper
-            component="form"
-            elevation={0}
+    return (
+        <Box
             sx={{
-                m: '3px 30px',
-                p: '2px 4px',
                 display: 'flex',
+                justifyContent: 'space-between',
                 alignItems: 'center',
-                width: '100%',
-                height: '32px',
-                borderRadius: '16px',
-                background: lighten(theme.palette.primary.main, 0.3)
-            }}
-            onSubmit={e => {
-                e.preventDefault()
-                // submit logic (enter key) may be added here
+                background: theme.palette.primary.main,
+                padding: '5px'
             }}
         >
-            <IconButton sx={{ p: '10px' }}>
-                <ExploreIcon sx={{ color: 'white' }} />
-            </IconButton>
-            <InputBase
-                sx={{ ml: 1, flex: 1, color: '#fff' }}
-                value={streams}
-                onChange={e => { setStreams(e.target.value) }}
-            />
-            <IconButton sx={{ p: '10px' }} onClick={_ => { props.reload() }}>
-                <SearchIcon sx={{ color: 'white' }} />
-            </IconButton>
-        </Paper>
-    </Box>
+            <Paper
+                component="form"
+                elevation={0}
+                sx={{
+                    m: '3px 30px',
+                    p: '2px 4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    width: '100%',
+                    height: '32px',
+                    borderRadius: '16px',
+                    background: lighten(theme.palette.primary.main, 0.3)
+                }}
+                onSubmit={(e) => {
+                    e.preventDefault()
+                    // submit logic (enter key) may be added here
+                }}
+            >
+                <IconButton sx={{ p: '10px' }}>
+                    <ExploreIcon sx={{ color: 'white' }} />
+                </IconButton>
+                <InputBase
+                    sx={{ ml: 1, flex: 1, color: '#fff' }}
+                    value={streams}
+                    onChange={(e) => {
+                        setStreams(e.target.value)
+                    }}
+                />
+                <IconButton
+                    sx={{ p: '10px' }}
+                    onClick={(_) => {
+                        props.reload()
+                    }}
+                >
+                    <SearchIcon sx={{ color: 'white' }} />
+                </IconButton>
+            </Paper>
+        </Box>
+    )
 }

@@ -41,9 +41,9 @@ export const LoadKey = (privateKey: string): key => {
     }
 }
 
-function toHexString (byteArray: Uint8Array | number[]): string {
+function toHexString(byteArray: Uint8Array | number[]): string {
     return Array.from(byteArray, function (byte) {
-        return ('0' + (byte & 0xFF).toString(16)).slice(-2)
+        return ('0' + (byte & 0xff).toString(16)).slice(-2)
     }).join('')
 }
 

@@ -4,19 +4,19 @@ env:
 extends:
   - plugin:react/recommended
   - standard-with-typescript
+  - prettier
 overrides: []
 parserOptions:
   ecmaVersion: latest
-  sourceType: module
   project:
     - tsconfig.json
+  sourceType: module
 plugins:
   - react
 rules:
-  'react/react-in-jsx-scope': ['off']
-  'indent': ['off']
-  '@typescript-eslint/indent': ['error', 4]
-  '@typescript-eslint/no-unused-vars': ['warn']
-  '@typescript-eslint/no-floating-promises': ['off']
-  '@typescript-eslint/strict-boolean-expressions': ['off']
   '@typescript-eslint/no-dynamic-delete': ['off']
+  '@typescript-eslint/no-floating-promises': ['off']
+  '@typescript-eslint/no-unused-vars': ['warn']
+  '@typescript-eslint/strict-boolean-expressions': ['off']
+  '@typescript-eslint/triple-slash-reference': ['off']
+  'react/react-in-jsx-scope': ['off']

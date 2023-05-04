@@ -1,6 +1,13 @@
 import { useEffect, useState, createContext, useRef, useCallback } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { darken, Box, createTheme, Paper, type Theme, ThemeProvider } from '@mui/material'
+import {
+    darken,
+    Box,
+    createTheme,
+    Paper,
+    type Theme,
+    ThemeProvider
+} from '@mui/material'
 
 import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
@@ -9,8 +16,21 @@ import { useResourceManager } from './hooks/useResourceManager'
 import { Schemas } from './schemas'
 import { Themes } from './themes'
 import { Menu } from './components/Menu'
-import type { RTMMessage, StreamElement, User, ServerEvent, Association } from './model'
-import { Associations, Explorer, Notification, Profile, Settings, Timeline } from './pages'
+import type {
+    RTMMessage,
+    StreamElement,
+    User,
+    ServerEvent,
+    Association
+} from './model'
+import {
+    Associations,
+    Explorer,
+    Notification,
+    Profile,
+    Settings,
+    Timeline
+} from './pages'
 
 import Sound from './resources/Bubble.wav'
 import useSound from 'use-sound'
@@ -29,15 +49,26 @@ export interface appData {
     userAddress: string
 }
 
-function App (): JSX.Element {
+function App(): JSX.Element {
     const [server, setServer] = usePersistent<string>('ServerAddress', '')
     const [pubkey, setPubKey] = usePersistent<string>('PublicKey', '')
     const [prvkey, setPrvKey] = usePersistent<string>('PrivateKey', '')
     const [address, setAddress] = usePersistent<string>('Address', '')
-    const [currentStreams, setCurrentStreams] = usePersistent<string>('currentStream', 'common')
-    const [themeName, setThemeName] = usePersistent<string>('Theme', Object.keys(Themes)[0])
-    const [watchstreams, setWatchStreams] = usePersistent<string[]>('watchStreamList', ['common'])
-    const [theme, setTheme] = useState<Theme>(createTheme((Themes as any)[themeName]))
+    const [currentStreams, setCurrentStreams] = usePersistent<string>(
+        'currentStream',
+        'common'
+    )
+    const [themeName, setThemeName] = usePersistent<string>(
+        'Theme',
+        Object.keys(Themes)[0]
+    )
+    const [watchstreams, setWatchStreams] = usePersistent<string[]>(
+        'watchStreamList',
+        ['common']
+    )
+    const [theme, setTheme] = useState<Theme>(
+        createTheme((Themes as any)[themeName])
+    )
     const [connected, setConnected] = useState<boolean>(false)
     const messages = useObjectList<StreamElement>()
     const currentStreamsRef = useRef<string>(currentStreams)
@@ -49,10 +80,17 @@ function App (): JSX.Element {
     }, [playNotification])
 
     const userDict = useResourceManager<User>(async (key: string) => {
-        const res = await fetch(server + 'characters?author=' + encodeURIComponent(key) + '&schema=' + encodeURIComponent(Schemas.profile), {
-            method: 'GET',
-            headers: {}
-        })
+        const res = await fetch(
+            server +
+                'characters?author=' +
+                encodeURIComponent(key) +
+                '&schema=' +
+                encodeURIComponent(Schemas.profile),
+            {
+                method: 'GET',
+                headers: {}
+            }
+        )
         const data = await res.json()
         if (data.characters.length === 0) {
             return {
@@ -90,10 +128,14 @@ function App (): JSX.Element {
         }
 
         fetch(url, requestOptions)
-            .then(async res => await res.json())
+            .then(async (res) => await res.json())
             .then((data: StreamElement[]) => {
                 messages.clear()
-                data.sort((a, b) => a.ID < b.ID ? -1 : 1).forEach((e: StreamElement) => { messages.push(e) })
+                data.sort((a, b) => (a.ID < b.ID ? -1 : 1)).forEach(
+                    (e: StreamElement) => {
+                        messages.push(e)
+                    }
+                )
             })
     }, [server, currentStreams])
 
@@ -103,12 +145,21 @@ function App (): JSX.Element {
                 const message = event.body as RTMMessage
                 switch (event.action) {
                     case 'create': {
-                        if (messages.current.find(e => e.Values.id === message.id) != null) return
+                        if (
+                            messages.current.find(
+                                (e) => e.Values.id === message.id
+                            ) != null
+                        ) {
+                            return
+                        }
                         const groupA = currentStreamsRef.current.split(',')
                         const groupB = message.streams.split(',')
-                        if (!groupA.some(e => groupB.includes(e))) return
+                        if (!groupA.some((e) => groupB.includes(e))) return
                         messages.push({
-                            ID: new Date(message.cdate).getTime().toString().replace('.', '-'),
+                            ID: new Date(message.cdate)
+                                .getTime()
+                                .toString()
+                                .replace('.', '-'),
                             Values: {
                                 id: message.id
                             }
@@ -188,42 +239,89 @@ function App (): JSX.Element {
 
     return (
         <ThemeProvider theme={theme}>
-            <ApplicationContext.Provider value={{ serverAddress: server, publickey: pubkey, privatekey: prvkey, userAddress: address }}>
+            <ApplicationContext.Provider
+                value={{
+                    serverAddress: server,
+                    publickey: pubkey,
+                    privatekey: prvkey,
+                    userAddress: address
+                }}
+            >
                 <BrowserRouter>
-                    <Box sx={{ display: 'flex', padding: '10px', gap: '10px', background: `linear-gradient(${theme.palette.background.default}, ${darken(theme.palette.background.default, 0.1)})`, height: '100vh' }}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            padding: '10px',
+                            gap: '10px',
+                            background: `linear-gradient(${
+                                theme.palette.background.default
+                            }, ${darken(
+                                theme.palette.background.default,
+                                0.1
+                            )})`,
+                            height: '100vh'
+                        }}
+                    >
                         <Menu
                             streams={watchstreams}
                             setCurrentStreams={setCurrentStreams}
                         />
-                        <Paper sx={{ flexGrow: '1', margin: '10px', display: 'flex', flexFlow: 'column', borderRadius: '20px', overflow: 'hidden', background: 'none' }}>
+                        <Paper
+                            sx={{
+                                flexGrow: '1',
+                                margin: '10px',
+                                display: 'flex',
+                                flexFlow: 'column',
+                                borderRadius: '20px',
+                                overflow: 'hidden',
+                                background: 'none'
+                            }}
+                        >
                             <Routes>
-                                <Route index element={
-                                    <Timeline
-                                        messages={messages}
-                                        messageDict={messageDict}
-                                        userDict={userDict}
-                                        currentStreams={currentStreams}
-                                        setCurrentStreams={setCurrentStreams}
-                                        reload={reload}
-                                    />
-                                } />
-                                <Route path="/associations" element={<Associations/>} />
-                                <Route path="/explorer" element={
-                                    <Explorer
-                                        watchList={watchstreams}
-                                        setWatchList={setWatchStreams}
-                                    />
-                                } />
-                                <Route path="/notification" element={<Notification/>} />
-                                <Route path="/profile" element={<Profile/>} />
-                                <Route path="/settings" element={
-                                    <Settings
-                                        setThemeName={setThemeName}
-                                        setPrvKey={setPrvKey}
-                                        setPubKey={setPubKey}
-                                        setUserAddr={setAddress}
-                                        setServerAddr={setServer}
-                                    />}
+                                <Route
+                                    index
+                                    element={
+                                        <Timeline
+                                            messages={messages}
+                                            messageDict={messageDict}
+                                            userDict={userDict}
+                                            currentStreams={currentStreams}
+                                            setCurrentStreams={
+                                                setCurrentStreams
+                                            }
+                                            reload={reload}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/associations"
+                                    element={<Associations />}
+                                />
+                                <Route
+                                    path="/explorer"
+                                    element={
+                                        <Explorer
+                                            watchList={watchstreams}
+                                            setWatchList={setWatchStreams}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/notification"
+                                    element={<Notification />}
+                                />
+                                <Route path="/profile" element={<Profile />} />
+                                <Route
+                                    path="/settings"
+                                    element={
+                                        <Settings
+                                            setThemeName={setThemeName}
+                                            setPrvKey={setPrvKey}
+                                            setPubKey={setPubKey}
+                                            setUserAddr={setAddress}
+                                            setServerAddr={setServer}
+                                        />
+                                    }
                                 />
                             </Routes>
                         </Paper>

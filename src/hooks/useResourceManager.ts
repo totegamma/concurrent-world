@@ -7,7 +7,9 @@ export interface IuseResourceManager<T> {
     invalidate: (key: string) => void
 }
 
-export function useResourceManager<T> (resolver: (key: string) => Promise<T>): IuseResourceManager<T> {
+export function useResourceManager<T>(
+    resolver: (key: string) => Promise<T>
+): IuseResourceManager<T> {
     const body = useRef<Record<string, T>>({})
 
     const get = async (key: string): Promise<T> => {
