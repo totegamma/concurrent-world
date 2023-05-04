@@ -9,6 +9,7 @@ import {
     Drawer
 } from '@mui/material'
 import StarIcon from '@mui/icons-material/Star'
+import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { Sign } from '../util'
 
@@ -238,7 +239,7 @@ export function Tweet(props: TweetProps): JSX.Element {
                                         favorite(message?.id)
                                     }}
                                 >
-                                    <StarIcon />{' '}
+                                    <StarOutlineIcon />{' '}
                                     <Typography sx={{ size: '16px' }}>
                                         {
                                             message.associations_data.filter(
