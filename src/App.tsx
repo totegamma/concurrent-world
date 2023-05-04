@@ -199,6 +199,7 @@ function App(): JSX.Element {
 
     useEffect(() => {
         if (!server) return
+        if (connected) return
         const ws = new WebSocket(server.replace('http', 'ws') + 'socket')
 
         ws.onopen = (event: any) => {
