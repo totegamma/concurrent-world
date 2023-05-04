@@ -1,8 +1,11 @@
 import {
+    Avatar,
     Box,
+    Button,
     Divider,
     List,
     ListItem,
+    ListItemAvatar,
     ListItemButton,
     ListItemIcon,
     ListItemText,
@@ -13,10 +16,15 @@ import { useContext, useEffect, useState } from 'react'
 import { ApplicationContext } from '../App'
 import StarIcon from '@mui/icons-material/Star'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
+import type { IuseResourceManager } from '../hooks/useResourceManager'
+import type { User } from '../model'
 
 export interface ExplorerProps {
     watchList: string[]
+    followList: string[]
+    setFollowList: (newlist: string[]) => void
     setWatchList: (newlist: string[]) => void
+    userDict: IuseResourceManager<User>
 }
 
 export function Explorer(props: ExplorerProps): JSX.Element {
@@ -24,6 +32,7 @@ export function Explorer(props: ExplorerProps): JSX.Element {
 
     const appData = useContext(ApplicationContext)
     const [streams, setStreams] = useState<string[]>([])
+    const [followList, setFollowList] = useState<User[]>([])
 
     useEffect(() => {
         fetch(appData.serverAddress + 'stream/list').then((data) => {
@@ -33,6 +42,22 @@ export function Explorer(props: ExplorerProps): JSX.Element {
         })
     }, [])
 
+    useEffect(() => {
+        ;(async () => {
+            setFollowList(
+                await Promise.all(
+                    props.followList.map(
+                        async (ccaddress) => await props.userDict.get(ccaddress)
+                    )
+                )
+            )
+        })()
+    }, [props.followList])
+
+    const unfollow = (ccaddress: string): void => {
+        props.setFollowList(props.followList.filter((e) => e !== ccaddress))
+    }
+
     return (
         <Box
             sx={{
@@ -41,7 +66,8 @@ export function Explorer(props: ExplorerProps): JSX.Element {
                 gap: '5px',
                 padding: '20px',
                 background: theme.palette.background.paper,
-                minHeight: '100%'
+                minHeight: '100%',
+                overflowY: 'scroll'
             }}
         >
             <Typography variant="h5" gutterBottom>
@@ -87,6 +113,40 @@ export function Explorer(props: ExplorerProps): JSX.Element {
                         </ListItem>
                     )
                 })}
+            </List>
+            <Typography variant="h6" gutterBottom>
+                followlist
+            </Typography>
+            <List
+                dense
+                sx={{
+                    width: '100%',
+                    maxWidth: 360,
+                    bgcolor: 'background.paper'
+                }}
+            >
+                {followList.map((user) => (
+                    <ListItem
+                        key={user.pubkey}
+                        secondaryAction={
+                            <Button
+                                onClick={() => {
+                                    unfollow(user.pubkey)
+                                }}
+                            >
+                                unfollow
+                            </Button>
+                        }
+                        disablePadding
+                    >
+                        <ListItemButton>
+                            <ListItemAvatar>
+                                <Avatar src={user.avatar} />
+                            </ListItemAvatar>
+                            <ListItemText primary={user.username} />
+                        </ListItemButton>
+                    </ListItem>
+                ))}
             </List>
         </Box>
     )
