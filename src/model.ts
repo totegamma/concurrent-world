@@ -32,6 +32,8 @@ export interface User {
     username: string
     avatar: string
     description: string
+    homestream: string
+    notificationstream: string
 }
 
 export interface ServerEvent {

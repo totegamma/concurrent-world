@@ -1,4 +1,4 @@
-import { useEffect, useState, createContext, useRef, useCallback } from 'react'
+import { useEffect, useState, createContext, useRef } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import {
     darken,
@@ -54,9 +54,9 @@ function App(): JSX.Element {
     const [pubkey, setPubKey] = usePersistent<string>('PublicKey', '')
     const [prvkey, setPrvKey] = usePersistent<string>('PrivateKey', '')
     const [address, setAddress] = usePersistent<string>('Address', '')
-    const [currentStreams, setCurrentStreams] = usePersistent<string>(
-        'currentStream',
-        'common'
+    const [followList, setFollowList] = usePersistent<string[]>(
+        'followList',
+        []
     )
     const [themeName, setThemeName] = usePersistent<string>(
         'Theme',
@@ -71,6 +71,7 @@ function App(): JSX.Element {
     )
     const [connected, setConnected] = useState<boolean>(false)
     const messages = useObjectList<StreamElement>()
+    const [currentStreams, setCurrentStreams] = useState<string>('common')
     const currentStreamsRef = useRef<string>(currentStreams)
 
     const [playNotification] = useSound(Sound)
@@ -97,7 +98,9 @@ function App(): JSX.Element {
                 pubkey: '',
                 username: 'anonymous',
                 avatar: '',
-                description: ''
+                description: '',
+                homestream: '',
+                notificationstream: ''
             }
         }
         const payload = JSON.parse(data.characters[0].payload)
@@ -105,7 +108,9 @@ function App(): JSX.Element {
             pubkey: data.characters[0].author,
             username: payload.username,
             avatar: payload.avatar,
-            description: payload.description
+            description: payload.description,
+            homestream: payload.home,
+            notificationstream: payload.notification
         }
     })
 
@@ -118,26 +123,10 @@ function App(): JSX.Element {
         return data.message
     })
 
-    const reload = useCallback(() => {
-        console.warn('reload!')
-        const url = server + `stream?streams=${currentStreams}`
-
-        const requestOptions = {
-            method: 'GET',
-            headers: {}
-        }
-
-        fetch(url, requestOptions)
-            .then(async (res) => await res.json())
-            .then((data: StreamElement[]) => {
-                messages.clear()
-                data.sort((a, b) => (a.ID < b.ID ? -1 : 1)).forEach(
-                    (e: StreamElement) => {
-                        messages.push(e)
-                    }
-                )
-            })
-    }, [server, currentStreams])
+    const follow = (ccaddress: string): void => {
+        if (followList.includes(ccaddress)) return
+        setFollowList([...followList, ccaddress])
+    }
 
     const handleMessage = (event: ServerEvent): void => {
         switch (event.type) {
@@ -231,10 +220,6 @@ function App(): JSX.Element {
     }, [currentStreams])
 
     useEffect(() => {
-        reload()
-    }, [currentStreams])
-
-    useEffect(() => {
         setTheme(createTheme((Themes as any)[themeName]))
     }, [themeName])
 
@@ -263,10 +248,7 @@ function App(): JSX.Element {
                             height: '100vh'
                         }}
                     >
-                        <Menu
-                            streams={watchstreams}
-                            setCurrentStreams={setCurrentStreams}
-                        />
+                        <Menu streams={watchstreams} />
                         <Paper
                             sx={{
                                 flexGrow: '1',
@@ -286,11 +268,11 @@ function App(): JSX.Element {
                                             messages={messages}
                                             messageDict={messageDict}
                                             userDict={userDict}
-                                            currentStreams={currentStreams}
+                                            follow={follow}
+                                            followList={followList}
                                             setCurrentStreams={
                                                 setCurrentStreams
                                             }
-                                            reload={reload}
                                         />
                                     }
                                 />
@@ -304,6 +286,9 @@ function App(): JSX.Element {
                                         <Explorer
                                             watchList={watchstreams}
                                             setWatchList={setWatchStreams}
+                                            followList={followList}
+                                            setFollowList={setFollowList}
+                                            userDict={userDict}
                                         />
                                     }
                                 />

@@ -20,7 +20,6 @@ import PercentIcon from '@mui/icons-material/Percent'
 
 export interface MenuProps {
     streams: string[]
-    setCurrentStreams: (input: string) => void
 }
 
 export function Menu(props: MenuProps): JSX.Element {
@@ -105,10 +104,7 @@ export function Menu(props: MenuProps): JSX.Element {
                                 <ListItem key={value} disablePadding>
                                     <ListItemButton
                                         component={Link}
-                                        to="/"
-                                        onClick={() => {
-                                            props.setCurrentStreams(value)
-                                        }}
+                                        to={`/#${value}`}
                                     >
                                         <ListItemIcon>
                                             <PercentIcon

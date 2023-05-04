@@ -9,34 +9,27 @@ import {
 } from '@mui/material'
 import ExploreIcon from '@mui/icons-material/Explore'
 import SearchIcon from '@mui/icons-material/Search'
+import {
+    Link,
+    useNavigate,
+    type Location as ReactLocation
+} from 'react-router-dom'
 
 export interface StreamsBarProps {
-    currentStreams: string
-    setCurrentStreams: (streams: string) => void
-    reload: () => void
+    location: ReactLocation
 }
 
 export function StreamsBar(props: StreamsBarProps): JSX.Element {
     const theme = useTheme()
-    const [streams, setStreams] = useState(props.currentStreams)
-
-    // wait 400ms after input before applying streams to prev
-    const inputTimeout = 400
-
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            props.setCurrentStreams(streams)
-        }, inputTimeout)
-
-        return () => {
-            clearTimeout(timeout)
-        }
-    }, [streams])
+    const navigate = useNavigate()
+    const [streams, setStreams] = useState(
+        decodeURIComponent(props.location.hash.replace('#', ''))
+    )
 
     // force local streams to change in case of external input (i.e. sidebar button)
     useEffect(() => {
-        setStreams(props.currentStreams)
-    }, [props.currentStreams])
+        setStreams(decodeURIComponent(props.location.hash.replace('#', '')))
+    }, [props.location.hash])
 
     return (
         <Box
@@ -71,16 +64,21 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                 </IconButton>
                 <InputBase
                     sx={{ ml: 1, flex: 1, color: '#fff' }}
+                    placeholder="following"
                     value={streams}
                     onChange={(e) => {
                         setStreams(e.target.value)
                     }}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            navigate(`/#${streams}`)
+                        }
+                    }}
                 />
                 <IconButton
                     sx={{ p: '10px' }}
-                    onClick={(_) => {
-                        props.reload()
-                    }}
+                    component={Link}
+                    to={`/#${streams}`}
                 >
                     <SearchIcon sx={{ color: 'white' }} />
                 </IconButton>

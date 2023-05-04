@@ -24,6 +24,7 @@ export interface TweetProps {
     message: string
     messageDict: IuseResourceManager<RTMMessage>
     userDict: IuseResourceManager<User>
+    follow: (ccaddress: string) => void
 }
 
 export function Tweet(props: TweetProps): JSX.Element {
@@ -113,7 +114,11 @@ export function Tweet(props: TweetProps): JSX.Element {
             {message != null && (
                 <>
                     <Box sx={{ width: '48px' }}>
-                        <IconButton>
+                        <IconButton
+                            onClick={() => {
+                                props.follow(message.author)
+                            }}
+                        >
                             <Avatar
                                 alt="Profile Picture"
                                 src={user?.avatar}
