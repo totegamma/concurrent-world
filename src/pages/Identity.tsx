@@ -131,7 +131,7 @@ export function Identity(): JSX.Element {
                 >
                     {showPrivateKey
                         ? appData.privatekey
-                        : '••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••'}
+                        : '•••••••••••••••••••••••••••••••••••••••••••••••••'}
                     <IconButton
                         sx={{ ml: 'auto' }}
                         onClick={() => {

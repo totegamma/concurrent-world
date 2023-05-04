@@ -34,6 +34,7 @@ import {
 
 import Sound from './resources/Bubble.wav'
 import useSound from 'use-sound'
+import { MobileMenu } from './components/MobileMenu'
 
 export const ApplicationContext = createContext<appData>({
     serverAddress: '',
@@ -262,72 +263,85 @@ function App(): JSX.Element {
                             height: '100vh'
                         }}
                     >
-                        <Menu
-                            streams={watchstreams}
-                            setCurrentStreams={setCurrentStreams}
-                        />
-                        <Paper
+                        <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                            <Menu
+                                streams={watchstreams}
+                                setCurrentStreams={setCurrentStreams}
+                            />
+                        </Box>
+                        <Box
                             sx={{
-                                flexGrow: '1',
-                                margin: '10px',
                                 display: 'flex',
                                 flexFlow: 'column',
-                                borderRadius: '20px',
-                                overflow: 'hidden',
-                                background: 'none'
+                                width: 1
                             }}
                         >
-                            <Routes>
-                                <Route
-                                    index
-                                    element={
-                                        <Timeline
-                                            messages={messages}
-                                            messageDict={messageDict}
-                                            userDict={userDict}
-                                            currentStreams={currentStreams}
-                                            setCurrentStreams={
-                                                setCurrentStreams
-                                            }
-                                            reload={reload}
-                                        />
-                                    }
-                                />
-                                <Route
-                                    path="/associations"
-                                    element={<Associations />}
-                                />
-                                <Route
-                                    path="/explorer"
-                                    element={
-                                        <Explorer
-                                            watchList={watchstreams}
-                                            setWatchList={setWatchStreams}
-                                        />
-                                    }
-                                />
-                                <Route
-                                    path="/notification"
-                                    element={<Notification />}
-                                />
-                                <Route
-                                    path="/identity"
-                                    element={<Identity />}
-                                />
-                                <Route
-                                    path="/settings"
-                                    element={
-                                        <Settings
-                                            setThemeName={setThemeName}
-                                            setPrvKey={setPrvKey}
-                                            setPubKey={setPubKey}
-                                            setUserAddr={setAddress}
-                                            setServerAddr={setServer}
-                                        />
-                                    }
-                                />
-                            </Routes>
-                        </Paper>
+                            <Paper
+                                sx={{
+                                    flexGrow: '1',
+                                    margin: '10px',
+                                    display: 'flex',
+                                    flexFlow: 'column',
+                                    borderRadius: '20px',
+                                    overflow: 'hidden',
+                                    background: 'none'
+                                }}
+                            >
+                                <Routes>
+                                    <Route
+                                        index
+                                        element={
+                                            <Timeline
+                                                messages={messages}
+                                                messageDict={messageDict}
+                                                userDict={userDict}
+                                                currentStreams={currentStreams}
+                                                setCurrentStreams={
+                                                    setCurrentStreams
+                                                }
+                                                reload={reload}
+                                            />
+                                        }
+                                    />
+                                    <Route
+                                        path="/associations"
+                                        element={<Associations />}
+                                    />
+                                    <Route
+                                        path="/explorer"
+                                        element={
+                                            <Explorer
+                                                watchList={watchstreams}
+                                                setWatchList={setWatchStreams}
+                                            />
+                                        }
+                                    />
+                                    <Route
+                                        path="/notification"
+                                        element={<Notification />}
+                                    />
+                                    <Route
+                                        path="/identity"
+                                        element={<Identity />}
+                                    />
+                                    <Route
+                                        path="/settings"
+                                        element={
+                                            <Settings
+                                                setThemeName={setThemeName}
+                                                setPrvKey={setPrvKey}
+                                                setPubKey={setPubKey}
+                                                setUserAddr={setAddress}
+                                                setServerAddr={setServer}
+                                            />
+                                        }
+                                    />
+                                </Routes>
+                            </Paper>
+                            <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+                                <MobileMenu />
+                            </Box>
+                        </Box>
                     </Box>
                 </BrowserRouter>
             </ApplicationContext.Provider>
