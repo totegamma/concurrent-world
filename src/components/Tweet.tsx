@@ -9,6 +9,7 @@ import {
     Drawer
 } from '@mui/material'
 import StarIcon from '@mui/icons-material/Star'
+import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { Sign } from '../util'
 
@@ -23,6 +24,7 @@ export interface TweetProps {
     message: string
     messageDict: IuseResourceManager<RTMMessage>
     userDict: IuseResourceManager<User>
+    follow: (ccaddress: string) => void
 }
 
 export function Tweet(props: TweetProps): JSX.Element {
@@ -112,7 +114,11 @@ export function Tweet(props: TweetProps): JSX.Element {
             {message != null && (
                 <>
                     <Box sx={{ width: '48px' }}>
-                        <IconButton>
+                        <IconButton
+                            onClick={() => {
+                                props.follow(message.author)
+                            }}
+                        >
                             <Avatar
                                 alt="Profile Picture"
                                 src={user?.avatar}
@@ -238,7 +244,7 @@ export function Tweet(props: TweetProps): JSX.Element {
                                         favorite(message?.id)
                                     }}
                                 >
-                                    <StarIcon />{' '}
+                                    <StarOutlineIcon />{' '}
                                     <Typography sx={{ size: '16px' }}>
                                         {
                                             message.associations_data.filter(

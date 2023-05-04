@@ -23,16 +23,22 @@ export function Identity(): JSX.Element {
         'Username',
         'anonymous'
     )
+    const [avatar, setAvatar] = usePersistent<string>('AvatarURL', '')
+    const [homeStream, SetHomeStream] = usePersistent<string>('homeStream', '')
+    const [notificationStream, SetNotificationStream] = usePersistent<string>(
+        'notificationStream',
+        ''
+    )
 
     const [showPrivateKey, setShowPrivateKey] = useState(false)
-
-    const [avatar, setAvatar] = usePersistent<string>('AvatarURL', '')
 
     const updateProfile = (): void => {
         const payloadObj = {
             username,
             avatar,
-            description: ''
+            description: '',
+            home: homeStream,
+            notification: notificationStream
         }
 
         const payload = JSON.stringify(payloadObj)
@@ -95,6 +101,24 @@ export function Identity(): JSX.Element {
                         value={avatar}
                         onChange={(e) => {
                             setAvatar(e.target.value)
+                        }}
+                    />
+                    <TextField
+                        label="HomeStream"
+                        placeholder="home-username"
+                        variant="outlined"
+                        value={homeStream}
+                        onChange={(e) => {
+                            SetHomeStream(e.target.value)
+                        }}
+                    />
+                    <TextField
+                        label="NotificationStream"
+                        placeholder="notification-username"
+                        variant="outlined"
+                        value={notificationStream}
+                        onChange={(e) => {
+                            SetNotificationStream(e.target.value)
                         }}
                     />
                     <Button

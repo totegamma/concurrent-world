@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback, useContext, useEffect } from 'react'
 import { List, Divider, Box, useTheme } from '@mui/material'
 import { Tweet } from '../components/Tweet'
 import { type RTMMessage, type StreamElement, type User } from '../model'
@@ -6,26 +6,96 @@ import { type IuseResourceManager } from '../hooks/useResourceManager'
 import { type IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'
 import { StreamsBar } from '../components/StreamsBar'
+import { useLocation } from 'react-router-dom'
+import { ApplicationContext } from '../App'
 
 export interface TimelineProps {
     messages: IuseObjectList<StreamElement>
     userDict: IuseResourceManager<User>
     messageDict: IuseResourceManager<RTMMessage>
-    currentStreams: string
-    setCurrentStreams: (streams: string) => void
-    reload: () => void
+    follow: (ccaddress: string) => void
+    followList: string[]
+    setCurrentStreams: (input: string) => void
 }
 
 export function Timeline(props: TimelineProps): JSX.Element {
+    const appData = useContext(ApplicationContext)
     const theme = useTheme()
+
+    const reactlocation = useLocation()
+
+    const reload = useCallback(async () => {
+        console.warn('reload!')
+
+        let homequery = ''
+        if (!reactlocation.hash) {
+            homequery = (
+                await Promise.all(
+                    props.followList.map(
+                        async (ccaddress) =>
+                            (
+                                await props.userDict.get(ccaddress)
+                            ).homestream
+                    )
+                )
+            )
+                .filter((e) => e)
+                .join(',')
+        }
+        const url =
+            appData.serverAddress +
+            `stream?streams=${
+                reactlocation.hash
+                    ? reactlocation.hash.replace('#', '')
+                    : homequery
+            }`
+
+        const requestOptions = {
+            method: 'GET',
+            headers: {}
+        }
+
+        fetch(url, requestOptions)
+            .then(async (res) => await res.json())
+            .then((data: StreamElement[]) => {
+                props.messages.clear()
+                data.sort((a, b) => (a.ID < b.ID ? -1 : 1)).forEach(
+                    (e: StreamElement) => {
+                        props.messages.push(e)
+                    }
+                )
+            })
+    }, [appData.serverAddress, reactlocation.hash])
+
+    useEffect(() => {
+        ;(async () => {
+            reload()
+            let homequery = ''
+            if (!reactlocation.hash) {
+                homequery = (
+                    await Promise.all(
+                        props.followList.map(
+                            async (ccaddress) =>
+                                (
+                                    await props.userDict.get(ccaddress)
+                                ).homestream
+                        )
+                    )
+                )
+                    .filter((e) => e)
+                    .join(',')
+            }
+            props.setCurrentStreams(
+                reactlocation.hash
+                    ? reactlocation.hash.replace('#', '')
+                    : homequery
+            )
+        })()
+    }, [reactlocation.hash])
 
     return (
         <>
-            <StreamsBar
-                currentStreams={props.currentStreams}
-                setCurrentStreams={props.setCurrentStreams}
-                reload={props.reload}
-            />
+            <StreamsBar location={reactlocation} />
             <Box
                 sx={{
                     overflowY: 'auto',
@@ -35,7 +105,9 @@ export function Timeline(props: TimelineProps): JSX.Element {
                 }}
             >
                 <Box>
-                    <Draft currentStreams={props.currentStreams} />
+                    <Draft
+                        currentStreams={reactlocation.hash.replace('#', '')}
+                    />
                 </Box>
                 <Box sx={{ display: 'flex', flex: 1 }}>
                     <List sx={{ flex: 1 }}>
@@ -48,6 +120,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                                         message={e.Values.id}
                                         messageDict={props.messageDict}
                                         userDict={props.userDict}
+                                        follow={props.follow}
                                     />
                                     <Divider
                                         variant="inset"
