@@ -96,10 +96,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
 
     return (
         <>
-            <StreamsBar
-                location={reactlocation}
-                watchstreams={props.watchstreams}
-            />
+            <StreamsBar location={reactlocation} />
             <Box
                 sx={{
                     overflowY: 'auto',

@@ -1,13 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import {
-    lighten,
     Paper,
     IconButton,
     InputBase,
     Box,
     useTheme,
     Autocomplete,
-    TextField
+    Chip
 } from '@mui/material'
 import ExploreIcon from '@mui/icons-material/Explore'
 import SearchIcon from '@mui/icons-material/Search'
@@ -16,11 +15,10 @@ import {
     useNavigate,
     type Location as ReactLocation
 } from 'react-router-dom'
-import { usePersistent } from '../hooks/usePersistent'
+import { ApplicationContext } from '../App'
 
 export interface StreamsBarProps {
     location: ReactLocation
-    watchstreams: string[]
 }
 
 export function StreamsBar(props: StreamsBarProps): JSX.Element {
@@ -30,10 +28,16 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
         decodeURIComponent(props.location.hash.replace('#', ''))
     )
 
-    const [watchstreams, setWatchStreams] = usePersistent<string[]>(
-        'watchStreamList',
-        ['common']
-    )
+    const [allStreams, setAllStreams] = useState<string[]>([])
+    const appData = useContext(ApplicationContext)
+
+    useEffect(() => {
+        fetch(appData.serverAddress + 'stream/list').then((data) => {
+            data.json().then((json) => {
+                setAllStreams(json)
+            })
+        })
+    }, [])
 
     // force local streams to change in case of external input (i.e. sidebar button)
     useEffect(() => {
@@ -77,7 +81,7 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                 <Autocomplete
                     sx={{ width: 1 }}
                     multiple
-                    options={watchstreams}
+                    options={allStreams}
                     onChange={(a, value) => {
                         navigate(`/#${value.join(',')}`)
                     }}
@@ -93,6 +97,17 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                             />
                         )
                     }}
+                    renderTags={(value, getTagProps) =>
+                        value.map((option, index) => (
+                            // disabling ESLint here becase 'key' should exist in {..getTagProps({index})}
+                            // eslint-disable-next-line
+                            <Chip
+                                label={option}
+                                sx={{ color: 'white' }}
+                                {...getTagProps({ index })}
+                            />
+                        ))
+                    }
                 />
                 <IconButton
                     sx={{ p: '10px' }}
