@@ -209,7 +209,7 @@ export function Tweet(props: TweetProps): JSX.Element {
                                         )
                                     }}
                                 >
-                                    {JSON.parse(message.payload).body.replace(
+                                    {JSON.parse(message.payload).body?.replace(
                                         /:\w+:/gi,
                                         (name: string) =>
                                             `<img src="${
