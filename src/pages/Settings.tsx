@@ -48,14 +48,15 @@ export function Settings(props: SettingsProp): JSX.Element {
                     gap: '5px',
                     padding: '20px',
                     background: theme.palette.background.paper,
-                    minHeight: '100%'
+                    minHeight: '100%',
+                    overflowY: 'scroll'
                 }}
             >
                 <Typography variant="h5" gutterBottom>
                     Settings
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
-                <Typography>
+                <Typography sx={{ wordWrap: 'break-word' }}>
                     Your concurrent address: {appData.userAddress}
                 </Typography>
                 <Box
