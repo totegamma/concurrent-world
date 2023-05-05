@@ -76,5 +76,10 @@ export const Themes = {
                 default: '#6d6d70'
             }
         }
+    },
+    typography: {
+        h1: {
+            fontsize: 16
+        }
     }
 }
