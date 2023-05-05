@@ -107,7 +107,8 @@ export function Settings(props: SettingsProp): JSX.Element {
                 <Typography variant="h5">Theme</Typography>
                 <Box
                     sx={{
-                        display: 'grid',
+                        display: { xs: 'flex', md: 'grid' },
+                        flexFlow: 'column',
                         gridTemplateColumns: '1fr 1fr 1fr 1fr',
                         gridAutoRows: '50px',
                         gap: '10px'
