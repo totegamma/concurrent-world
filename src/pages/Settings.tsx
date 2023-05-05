@@ -121,7 +121,10 @@ export function Settings(props: SettingsProp): JSX.Element {
                             variant="contained"
                             sx={{
                                 background: (Themes as any)[e].palette.primary
-                                    .main
+                                    .main,
+                                color:
+                                    (Themes as any)[e].palette.text?.primary ??
+                                    'black'
                             }}
                             onClick={(_) => {
                                 props.setThemeName(e)

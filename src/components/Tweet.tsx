@@ -12,7 +12,8 @@ import {
     Typography,
     Link,
     IconButton,
-    Drawer
+    Drawer,
+    useTheme
 } from '@mui/material'
 import StarIcon from '@mui/icons-material/Star'
 import StarOutlineIcon from '@mui/icons-material/StarOutline'
@@ -41,6 +42,8 @@ export function Tweet(props: TweetProps): JSX.Element {
     const [message, setMessage] = useState<RTMMessage | undefined>()
 
     const appData = useContext(ApplicationContext)
+
+    const theme = useTheme()
 
     const [inspectItem, setInspectItem] = useState<RTMMessage | null>(null)
 
@@ -267,7 +270,10 @@ export function Tweet(props: TweetProps): JSX.Element {
                                 (e) => e.author === appData.userAddress
                             ) != null ? (
                                 <IconButton
-                                    sx={{ p: '0' }}
+                                    sx={{
+                                        p: '0',
+                                        color: theme.palette.text.secondary
+                                    }}
                                     color="primary"
                                     onClick={() => {
                                         unfavorite(
@@ -291,7 +297,10 @@ export function Tweet(props: TweetProps): JSX.Element {
                                 </IconButton>
                             ) : (
                                 <IconButton
-                                    sx={{ p: '0' }}
+                                    sx={{
+                                        p: '0',
+                                        color: theme.palette.text.secondary
+                                    }}
                                     onClick={() => {
                                         favorite(message?.id)
                                     }}
@@ -309,6 +318,10 @@ export function Tweet(props: TweetProps): JSX.Element {
                             <IconButton
                                 onClick={() => {
                                     setInspectItem(message ?? null)
+                                }}
+                                sx={{
+                                    p: '0',
+                                    color: theme.palette.text.secondary
                                 }}
                             >
                                 <MoreHorizIcon />

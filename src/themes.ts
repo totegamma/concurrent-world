@@ -95,5 +95,26 @@ export const Themes = {
                 paper: '#afc8e9'
             }
         }
+    },
+    darkgray: {
+        palette: {
+            primary: {
+                main: '#555'
+            },
+            secondary: {
+                main: '#888'
+            },
+            background: {
+                default: '#333333',
+                paper: '#222'
+            },
+            text: {
+                primary: '#fff',
+                secondary: 'rgba(255, 255, 255, 0.7)',
+                disabled: 'rgba(255, 255, 255, 0.5)',
+                hint: 'rgba(255, 255, 255, 0.5)'
+            },
+            divider: 'rgba(255, 255, 255, 0.2)'
+        }
     }
 }
