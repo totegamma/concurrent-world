@@ -80,10 +80,10 @@ export const Themes = {
     darkgray: {
         palette: {
             primary: {
-                main: '#222222'
+                main: '#555'
             },
             secondary: {
-                main: '#f50057'
+                main: '#888'
             },
             background: {
                 default: '#333333',
