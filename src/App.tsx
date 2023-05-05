@@ -286,15 +286,15 @@ function App(): JSX.Element {
                             display: 'flex',
                             padding: { xs: 0, sm: '10px' },
                             gap: '10px',
-                            background: {
-                                xs: theme.palette.background.default,
-                                md: `linear-gradient(${
+                            background: [
+                                theme.palette.background.default,
+                                `linear-gradient(${
                                     theme.palette.background.default
                                 }, ${darken(
                                     theme.palette.background.default,
                                     0.1
                                 )})`
-                            },
+                            ],
                             height: '100dvh'
                         }}
                     >
@@ -311,10 +311,11 @@ function App(): JSX.Element {
                             <Paper
                                 sx={{
                                     flexGrow: '1',
-                                    margin: '10px',
+                                    margin: { xs: '8px', sm: '10px' },
+                                    mb: { xs: 0, sm: '10px' },
                                     display: 'flex',
                                     flexFlow: 'column',
-                                    borderRadius: '20px',
+                                    borderRadius: { xs: '15px', md: '20px' },
                                     overflow: 'hidden',
                                     background: 'none'
                                 }}
