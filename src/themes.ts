@@ -4,9 +4,6 @@ export const Themes = {
             primary: {
                 main: '#E0576F'
             },
-            secondary: {
-                main: '#00bcd4'
-            },
             background: {
                 default: '#C74E64'
             }
@@ -17,9 +14,6 @@ export const Themes = {
             primary: {
                 main: '#0476d9'
             },
-            secondary: {
-                main: '#035399'
-            },
             background: {
                 default: '#023059'
             }
@@ -28,26 +22,22 @@ export const Themes = {
     orange: {
         palette: {
             primary: {
-                main: '#D95204'
-            },
-            secondary: {
-                main: '#730217'
+                main: '#c52b26'
             },
             background: {
-                default: '#F25C05'
+                default: '#e07d43',
+                paper: '#f8efdd'
             }
         }
     },
     cafe: {
         palette: {
             primary: {
-                main: '#68474e'
-            },
-            secondary: {
-                main: '#730217'
+                main: '#663741'
             },
             background: {
-                default: '#a99996'
+                default: '#a99996',
+                paper: '#f7efea'
             }
         }
     },
@@ -56,11 +46,9 @@ export const Themes = {
             primary: {
                 main: '#70868b'
             },
-            secondary: {
-                main: '#730217'
-            },
             background: {
-                default: '#839fa1'
+                default: '#839fa1',
+                paper: '#ebf3f5'
             }
         }
     },
@@ -69,11 +57,42 @@ export const Themes = {
             primary: {
                 main: '#939195'
             },
-            secondary: {
-                main: '#730217'
+            background: {
+                default: '#6d6d70',
+                paper: '#f0edf1'
+            }
+        }
+    },
+    highcontrast: {
+        palette: {
+            primary: {
+                main: '#2222ee'
             },
             background: {
-                default: '#6d6d70'
+                default: '#000000',
+                paper: '#f0edf1'
+            }
+        }
+    },
+    highcontrast2: {
+        palette: {
+            primary: {
+                main: '#dbb715'
+            },
+            background: {
+                default: '#1e1ea0',
+                paper: '#f0ede7'
+            }
+        }
+    },
+    blue2: {
+        palette: {
+            primary: {
+                main: '#5c7eee'
+            },
+            background: {
+                default: '#151542',
+                paper: '#afc8e9'
             }
         }
     }
