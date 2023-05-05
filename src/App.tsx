@@ -286,13 +286,16 @@ function App(): JSX.Element {
                             display: 'flex',
                             padding: { xs: 0, sm: '10px' },
                             gap: '10px',
-                            background: `linear-gradient(${
-                                theme.palette.background.default
-                            }, ${darken(
-                                theme.palette.background.default,
-                                0.1
-                            )})`,
-                            height: ['-webkit-fill-available', '100vh']
+                            background: {
+                                xs: theme.palette.background.default,
+                                md: `linear-gradient(${
+                                    theme.palette.background.default
+                                }, ${darken(
+                                    theme.palette.background.default,
+                                    0.1
+                                )})`
+                            },
+                            height: '100dvh'
                         }}
                     >
                         <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
