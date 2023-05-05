@@ -16,6 +16,7 @@ export interface TimelineProps {
     follow: (ccaddress: string) => void
     followList: string[]
     setCurrentStreams: (input: string) => void
+    watchstreams: string[]
 }
 
 export function Timeline(props: TimelineProps): JSX.Element {
@@ -95,7 +96,10 @@ export function Timeline(props: TimelineProps): JSX.Element {
 
     return (
         <>
-            <StreamsBar location={reactlocation} />
+            <StreamsBar
+                location={reactlocation}
+                watchstreams={props.watchstreams}
+            />
             <Box
                 sx={{
                     overflowY: 'auto',

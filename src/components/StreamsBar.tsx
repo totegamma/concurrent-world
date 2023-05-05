@@ -5,7 +5,9 @@ import {
     IconButton,
     InputBase,
     Box,
-    useTheme
+    useTheme,
+    Autocomplete,
+    TextField
 } from '@mui/material'
 import ExploreIcon from '@mui/icons-material/Explore'
 import SearchIcon from '@mui/icons-material/Search'
@@ -14,9 +16,11 @@ import {
     useNavigate,
     type Location as ReactLocation
 } from 'react-router-dom'
+import { usePersistent } from '../hooks/usePersistent'
 
 export interface StreamsBarProps {
     location: ReactLocation
+    watchstreams: string[]
 }
 
 export function StreamsBar(props: StreamsBarProps): JSX.Element {
@@ -24,6 +28,11 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
     const navigate = useNavigate()
     const [streams, setStreams] = useState(
         decodeURIComponent(props.location.hash.replace('#', ''))
+    )
+
+    const [watchstreams, setWatchStreams] = usePersistent<string[]>(
+        'watchStreamList',
+        ['common']
     )
 
     // force local streams to change in case of external input (i.e. sidebar button)
@@ -35,12 +44,14 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
         <Box
             sx={{
                 display: 'flex',
+                flexDirection: 'column',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 background: theme.palette.primary.main,
                 padding: '5px'
             }}
         >
+            <Box sx={{ background: 'white' }}></Box>
             <Paper
                 component="form"
                 elevation={0}
@@ -50,9 +61,10 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                     display: 'flex',
                     alignItems: 'center',
                     width: '100%',
-                    height: '32px',
-                    borderRadius: '16px',
-                    background: lighten(theme.palette.primary.main, 0.3)
+                    height: '48px',
+                    borderRadius: '9999px',
+                    // background: lighten(theme.palette.primary.main, 0.3)
+                    background: 'rgba(0,0,0,0)'
                 }}
                 onSubmit={(e) => {
                     e.preventDefault()
@@ -62,17 +74,24 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                 <IconButton sx={{ p: '10px' }}>
                     <ExploreIcon sx={{ color: 'white' }} />
                 </IconButton>
-                <InputBase
-                    sx={{ ml: 1, flex: 1, color: '#fff' }}
-                    placeholder="following"
-                    value={streams}
-                    onChange={(e) => {
-                        setStreams(e.target.value)
+                <Autocomplete
+                    sx={{ width: 1 }}
+                    multiple
+                    options={watchstreams}
+                    onChange={(a, value) => {
+                        navigate(`/#${value.join(',')}`)
                     }}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                            navigate(`/#${streams}`)
-                        }
+                    renderInput={(params) => {
+                        const { InputLabelProps, InputProps, ...rest } = params
+
+                        return (
+                            <InputBase
+                                {...params.InputProps}
+                                {...rest}
+                                sx={{ color: 'white' }}
+                                placeholder="streams"
+                            />
+                        )
                     }}
                 />
                 <IconButton

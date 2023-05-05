@@ -296,10 +296,7 @@ function App(): JSX.Element {
                         }}
                     >
                         <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                            <Menu
-                                streams={watchstreams}
-                                setCurrentStreams={setCurrentStreams}
-                            />
+                            <Menu streams={watchstreams} />
                         </Box>
                         <Box
                             sx={{
@@ -332,6 +329,7 @@ function App(): JSX.Element {
                                                 setCurrentStreams={
                                                     setCurrentStreams
                                                 }
+                                                watchstreams={watchstreams}
                                             />
                                         }
                                     />
