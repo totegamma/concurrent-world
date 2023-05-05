@@ -41,3 +41,7 @@ export interface ServerEvent {
     action: string
     body: RTMMessage | Association
 }
+
+export interface Emoji {
+    publicUrl: string
+}

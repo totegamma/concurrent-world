@@ -21,7 +21,8 @@ import type {
     StreamElement,
     User,
     ServerEvent,
-    Association
+    Association,
+    Emoji
 } from './model'
 import {
     Associations,
@@ -47,7 +48,8 @@ export const ApplicationContext = createContext<appData>({
         description: '',
         homestream: '',
         notificationstream: ''
-    }
+    },
+    emojiDict: {}
 })
 
 export interface appData {
@@ -56,6 +58,7 @@ export interface appData {
     privatekey: string
     userAddress: string
     profile: User
+    emojiDict: Record<string, Emoji>
 }
 
 function App(): JSX.Element {
@@ -97,6 +100,21 @@ function App(): JSX.Element {
     useEffect(() => {
         playNotificationRef.current = playNotification
     }, [playNotification])
+
+    const [emojiDict, setEmojiDict] = useState<Record<string, Emoji>>({})
+    useEffect(() => {
+        fetch(
+            'https://gist.githubusercontent.com/totegamma/0beb41acad70aa4945ad38a6b00a3a1d/raw/8280287c34829b51a5544bec453c1638ecacd5e6/emojis.json'
+        ) // FIXME temporaly hardcoded
+            .then((j) => j.json())
+            .then((data) => {
+                const dict = Object.fromEntries(
+                    data.emojis.map((e: any) => [e.emoji.name, e.emoji])
+                )
+                console.log(dict)
+                setEmojiDict(dict)
+            })
+    }, [])
 
     const userDict = useResourceManager<User>(async (key: string) => {
         const res = await fetch(
@@ -257,6 +275,7 @@ function App(): JSX.Element {
                     publickey: pubkey,
                     privatekey: prvkey,
                     userAddress: address,
+                    emojiDict,
                     profile
                 }}
             >

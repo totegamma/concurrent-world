@@ -18,6 +18,8 @@
         "react-dom": "^18.2.0",
         "react-markdown": "^8.0.7",
         "react-router-dom": "^6.11.0",
+        "rehype-raw": "^6.1.1",
+        "rehype-sanitize": "^5.0.1",
         "remark-gfm": "^3.0.1",
         "use-sound": "^4.0.1"
     },
