@@ -24,8 +24,17 @@ export interface MenuProps {
 
 export function Menu(props: MenuProps): JSX.Element {
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            <Box sx={{ width: '200px', padding: '20px', color: '#fff' }}>
+        <Box sx={{ gap: '15px' }}>
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    width: '200px',
+                    height: '100%',
+                    padding: '20px',
+                    color: '#fff'
+                }}
+            >
                 <Typography variant="h5" gutterBottom>
                     Concurrent
                 </Typography>
@@ -94,10 +103,20 @@ export function Menu(props: MenuProps): JSX.Element {
                     sx={{
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '5px'
+                        gap: '5px',
+                        overflowY: 'auto',
+                        overflowX: 'hidden'
                     }}
                 >
-                    <List dense sx={{ width: '100%', maxWidth: 360 }}>
+                    <List
+                        dense
+                        sx={{
+                            width: '100%',
+                            maxWidth: 360,
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }}
+                    >
                         {props.streams.map((value) => {
                             const labelId = `checkbox-list-secondary-label-${value}`
                             return (
