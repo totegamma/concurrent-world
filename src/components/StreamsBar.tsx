@@ -16,6 +16,7 @@ import {
     type Location as ReactLocation
 } from 'react-router-dom'
 import { ApplicationContext } from '../App'
+import { usePersistent } from '../hooks/usePersistent'
 
 export interface StreamsBarProps {
     location: ReactLocation
@@ -26,6 +27,11 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
     const navigate = useNavigate()
     const [streams, setStreams] = useState(
         decodeURIComponent(props.location.hash.replace('#', ''))
+    )
+
+    const [selectedStreams, setSelectedStreams] = usePersistent<string[]>(
+        'selectedStreams',
+        ['common']
     )
 
     const [allStreams, setAllStreams] = useState<string[]>([])
@@ -42,6 +48,9 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
     // force local streams to change in case of external input (i.e. sidebar button)
     useEffect(() => {
         setStreams(decodeURIComponent(props.location.hash.replace('#', '')))
+        setSelectedStreams(
+            decodeURIComponent(props.location.hash.replace('#', '')).split(',')
+        )
     }, [props.location.hash])
 
     return (
@@ -81,6 +90,7 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                 <Autocomplete
                     sx={{ width: 1 }}
                     multiple
+                    value={selectedStreams[0] !== '' ? selectedStreams : []}
                     options={allStreams}
                     onChange={(a, value) => {
                         navigate(`/#${value.join(',')}`)
