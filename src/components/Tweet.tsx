@@ -212,7 +212,7 @@ export function Tweet(props: TweetProps): JSX.Element {
                                     {JSON.parse(message.payload).body?.replace(
                                         /:\w+:/gi,
                                         (name: string) => {
-                                            const emoji: Emoji =
+                                            const emoji: Emoji | undefined =
                                                 appData.emojiDict[
                                                     name.slice(1, -1)
                                                 ]
