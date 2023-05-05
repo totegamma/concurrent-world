@@ -284,7 +284,7 @@ function App(): JSX.Element {
                     <Box
                         sx={{
                             display: 'flex',
-                            padding: '10px',
+                            padding: { xs: 0, sm: '10px' },
                             gap: '10px',
                             background: `linear-gradient(${
                                 theme.palette.background.default
@@ -292,7 +292,7 @@ function App(): JSX.Element {
                                 theme.palette.background.default,
                                 0.1
                             )})`,
-                            height: '100vh'
+                            height: ['-webkit-fill-available', '100vh']
                         }}
                     >
                         <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
