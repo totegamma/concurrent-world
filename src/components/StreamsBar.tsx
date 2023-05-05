@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import {
-    lighten,
     Paper,
     IconButton,
     InputBase,
     Box,
-    useTheme
+    useTheme,
+    Autocomplete,
+    Chip
 } from '@mui/material'
 import ExploreIcon from '@mui/icons-material/Explore'
 import SearchIcon from '@mui/icons-material/Search'
@@ -14,6 +15,8 @@ import {
     useNavigate,
     type Location as ReactLocation
 } from 'react-router-dom'
+import { ApplicationContext } from '../App'
+import { usePersistent } from '../hooks/usePersistent'
 
 export interface StreamsBarProps {
     location: ReactLocation
@@ -26,21 +29,42 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
         decodeURIComponent(props.location.hash.replace('#', ''))
     )
 
+    const [selectedStreams, setSelectedStreams] = usePersistent<string[]>(
+        'selectedStreams',
+        ['common']
+    )
+
+    const [allStreams, setAllStreams] = useState<string[]>([])
+    const appData = useContext(ApplicationContext)
+
+    useEffect(() => {
+        fetch(appData.serverAddress + 'stream/list').then((data) => {
+            data.json().then((json) => {
+                setAllStreams(json)
+            })
+        })
+    }, [])
+
     // force local streams to change in case of external input (i.e. sidebar button)
     useEffect(() => {
         setStreams(decodeURIComponent(props.location.hash.replace('#', '')))
+        setSelectedStreams(
+            decodeURIComponent(props.location.hash.replace('#', '')).split(',')
+        )
     }, [props.location.hash])
 
     return (
         <Box
             sx={{
                 display: 'flex',
+                flexDirection: 'column',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 background: theme.palette.primary.main,
                 padding: '5px'
             }}
         >
+            <Box sx={{ background: 'white' }}></Box>
             <Paper
                 component="form"
                 elevation={0}
@@ -50,9 +74,10 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                     display: 'flex',
                     alignItems: 'center',
                     width: '100%',
-                    height: '32px',
-                    borderRadius: '16px',
-                    background: lighten(theme.palette.primary.main, 0.3)
+                    height: { xs: '36px', md: '48px' },
+                    borderRadius: '9999px',
+                    // background: lighten(theme.palette.primary.main, 0.3)
+                    background: 'none'
                 }}
                 onSubmit={(e) => {
                     e.preventDefault()
@@ -62,18 +87,37 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                 <IconButton sx={{ p: '10px' }}>
                     <ExploreIcon sx={{ color: 'white' }} />
                 </IconButton>
-                <InputBase
-                    sx={{ ml: 1, flex: 1, color: '#fff' }}
-                    placeholder="following"
-                    value={streams}
-                    onChange={(e) => {
-                        setStreams(e.target.value)
+                <Autocomplete
+                    sx={{ width: 1 }}
+                    multiple
+                    value={selectedStreams[0] !== '' ? selectedStreams : []}
+                    options={allStreams}
+                    onChange={(a, value) => {
+                        navigate(`/#${value.join(',')}`)
                     }}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                            navigate(`/#${streams}`)
-                        }
+                    renderInput={(params) => {
+                        const { InputLabelProps, InputProps, ...rest } = params
+
+                        return (
+                            <InputBase
+                                {...params.InputProps}
+                                {...rest}
+                                sx={{ color: 'white' }}
+                                placeholder="streams"
+                            />
+                        )
                     }}
+                    renderTags={(value, getTagProps) =>
+                        value.map((option, index) => (
+                            // disabling ESLint here becase 'key' should exist in {..getTagProps({index})}
+                            // eslint-disable-next-line
+                            <Chip
+                                label={option}
+                                sx={{ color: 'white' }}
+                                {...getTagProps({ index })}
+                            />
+                        ))
+                    }
                 />
                 <IconButton
                     sx={{ p: '10px' }}

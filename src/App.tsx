@@ -35,6 +35,7 @@ import {
 
 import Sound from './resources/Bubble.wav'
 import useSound from 'use-sound'
+import { MobileMenu } from './components/MobileMenu'
 
 export const ApplicationContext = createContext<appData>({
     serverAddress: '',
@@ -283,83 +284,99 @@ function App(): JSX.Element {
                     <Box
                         sx={{
                             display: 'flex',
-                            padding: '10px',
-                            gap: '10px',
-                            background: `linear-gradient(${
-                                theme.palette.background.default
-                            }, ${darken(
+                            background: [
                                 theme.palette.background.default,
-                                0.1
-                            )})`,
-                            height: '100vh'
+                                `linear-gradient(${
+                                    theme.palette.background.default
+                                }, ${darken(
+                                    theme.palette.background.default,
+                                    0.1
+                                )})`
+                            ],
+                            height: '100dvh'
                         }}
                     >
-                        <Menu streams={watchstreams} />
-                        <Paper
+                        <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                            <Menu streams={watchstreams} />
+                        </Box>
+                        <Box
                             sx={{
-                                flexGrow: '1',
-                                margin: '10px',
                                 display: 'flex',
                                 flexFlow: 'column',
-                                borderRadius: '20px',
-                                overflow: 'hidden',
-                                background: 'none'
+                                width: 1
                             }}
                         >
-                            <Routes>
-                                <Route
-                                    index
-                                    element={
-                                        <Timeline
-                                            messages={messages}
-                                            messageDict={messageDict}
-                                            userDict={userDict}
-                                            follow={follow}
-                                            followList={followList}
-                                            setCurrentStreams={
-                                                setCurrentStreams
-                                            }
-                                        />
-                                    }
-                                />
-                                <Route
-                                    path="/associations"
-                                    element={<Associations />}
-                                />
-                                <Route
-                                    path="/explorer"
-                                    element={
-                                        <Explorer
-                                            watchList={watchstreams}
-                                            setWatchList={setWatchStreams}
-                                            followList={followList}
-                                            setFollowList={setFollowList}
-                                            userDict={userDict}
-                                        />
-                                    }
-                                />
-                                <Route
-                                    path="/notification"
-                                    element={<Notification />}
-                                />
-                                <Route
-                                    path="/identity"
-                                    element={<Identity />}
-                                />
-                                <Route
-                                    path="/settings"
-                                    element={
-                                        <Settings
-                                            setThemeName={setThemeName}
-                                            setPrvKey={setPrvKey}
-                                            setPubKey={setPubKey}
-                                            setUserAddr={setAddress}
-                                            setServerAddr={setServer}
-                                        />
-                                    }
-                                />
-                            </Routes>
-                        </Paper>
+                            <Paper
+                                sx={{
+                                    flexGrow: '1',
+                                    margin: { xs: '8px', sm: '10px' },
+                                    mb: { xs: 0, sm: '10px' },
+                                    display: 'flex',
+                                    flexFlow: 'column',
+                                    borderRadius: { xs: '15px', md: '20px' },
+                                    overflow: 'hidden',
+                                    background: 'none'
+                                }}
+                            >
+                                <Routes>
+                                    <Route
+                                        index
+                                        element={
+                                            <Timeline
+                                                messages={messages}
+                                                messageDict={messageDict}
+                                                userDict={userDict}
+                                                follow={follow}
+                                                followList={followList}
+                                                setCurrentStreams={
+                                                    setCurrentStreams
+                                                }
+                                                watchstreams={watchstreams}
+                                            />
+                                        }
+                                    />
+                                    <Route
+                                        path="/associations"
+                                        element={<Associations />}
+                                    />
+                                    <Route
+                                        path="/explorer"
+                                        element={
+                                            <Explorer
+                                                watchList={watchstreams}
+                                                setWatchList={setWatchStreams}
+                                                followList={followList}
+                                                setFollowList={setFollowList}
+                                                userDict={userDict}
+                                            />
+                                        }
+                                    />
+                                    <Route
+                                        path="/notification"
+                                        element={<Notification />}
+                                    />
+                                    <Route
+                                        path="/identity"
+                                        element={<Identity />}
+                                    />
+                                    <Route
+                                        path="/settings"
+                                        element={
+                                            <Settings
+                                                setThemeName={setThemeName}
+                                                setPrvKey={setPrvKey}
+                                                setPubKey={setPubKey}
+                                                setUserAddr={setAddress}
+                                                setServerAddr={setServer}
+                                            />
+                                        }
+                                    />
+                                </Routes>
+                            </Paper>
+                            <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+                                <MobileMenu />
+                            </Box>
+                        </Box>
                     </Box>
                 </BrowserRouter>
             </ApplicationContext.Provider>
