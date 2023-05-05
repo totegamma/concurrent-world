@@ -44,4 +44,5 @@ export interface ServerEvent {
 
 export interface Emoji {
     publicUrl: string
+    name: string
 }
