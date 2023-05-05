@@ -76,5 +76,26 @@ export const Themes = {
                 default: '#6d6d70'
             }
         }
+    },
+    darkgray: {
+        palette: {
+            primary: {
+                main: '#222222'
+            },
+            secondary: {
+                main: '#f50057'
+            },
+            background: {
+                default: '#333333',
+                paper: '#222'
+            },
+            text: {
+                primary: '#fff',
+                secondary: 'rgba(255, 255, 255, 0.7)',
+                disabled: 'rgba(255, 255, 255, 0.5)',
+                hint: 'rgba(255, 255, 255, 0.5)'
+            },
+            divider: 'rgba(255, 255, 255, 0.2)'
+        }
     }
 }
