@@ -100,9 +100,19 @@ export function Explorer(props: ExplorerProps): JSX.Element {
                             >
                                 <ListItemIcon>
                                     {props.watchList.includes(value) ? (
-                                        <StarIcon />
+                                        <StarIcon
+                                            sx={{
+                                                color: theme.palette.text
+                                                    .primary
+                                            }}
+                                        />
                                     ) : (
-                                        <StarBorderIcon />
+                                        <StarBorderIcon
+                                            sx={{
+                                                color: theme.palette.text
+                                                    .primary
+                                            }}
+                                        />
                                     )}
                                 </ListItemIcon>
                                 <ListItemText
