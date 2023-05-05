@@ -5,7 +5,8 @@
     "type": "module",
     "scripts": {
         "postinstall": "husky install",
-        "dev": "vite dev"
+        "dev": "vite dev",
+        "build": "tsc && vite build"
     },
     "dependencies": {
         "@emotion/react": "^11.10.5",
