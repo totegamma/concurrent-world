@@ -19,6 +19,8 @@ import { type IuseResourceManager } from '../hooks/useResourceManager'
 import { Schemas } from '../schemas'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import rehypeRaw from 'rehype-raw'
+import rehypeSanitize from 'rehype-sanitize'
 
 export interface TweetProps {
     message: string
@@ -192,6 +194,7 @@ export function Tweet(props: TweetProps): JSX.Element {
                                     remarkPlugins={[
                                         [remarkGfm, { singleTilde: false }]
                                     ]}
+                                    rehypePlugins={[rehypeRaw, rehypeSanitize]}
                                     components={{
                                         p: ({ children }) => (
                                             <Typography paragraph>
@@ -206,7 +209,15 @@ export function Tweet(props: TweetProps): JSX.Element {
                                         )
                                     }}
                                 >
-                                    {JSON.parse(message.payload).body}
+                                    {JSON.parse(message.payload).body?.replace(
+                                        /:\w+:/gi,
+                                        (name: string) =>
+                                            `<img src="${
+                                                appData.emojiDict[
+                                                    name.slice(1, -1)
+                                                ]?.publicUrl
+                                            }" height="18px" />`
+                                    )}
                                 </ReactMarkdown>
                             </pre>
                         </Box>
