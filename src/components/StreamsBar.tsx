@@ -77,7 +77,7 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                     height: { xs: '36px', md: '48px' },
                     borderRadius: '9999px',
                     // background: lighten(theme.palette.primary.main, 0.3)
-                    background: 'rgba(0,0,0,0)'
+                    background: 'none'
                 }}
                 onSubmit={(e) => {
                     e.preventDefault()

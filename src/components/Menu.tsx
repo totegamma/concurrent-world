@@ -24,18 +24,18 @@ export interface MenuProps {
 
 export function Menu(props: MenuProps): JSX.Element {
     return (
-        <Box sx={{ gap: '15px' }}>
+        <Box sx={{ gap: '15px', height: '100%' }}>
             <Box
                 sx={{
                     display: 'flex',
                     flexDirection: 'column',
                     width: '200px',
                     height: '100%',
-                    padding: '20px',
+                    pt: '25px',
                     color: '#fff'
                 }}
             >
-                <Typography variant="h5" gutterBottom>
+                <Typography variant="h5" sx={{ pl: '18px' }} gutterBottom>
                     Concurrent
                 </Typography>
                 <Box
@@ -47,52 +47,68 @@ export function Menu(props: MenuProps): JSX.Element {
                 >
                     <List dense sx={{ width: '100%', maxWidth: 360 }}>
                         <ListItem disablePadding>
-                            <ListItemButton component={Link} to="/">
-                                <ListItemIcon>
-                                    <HomeIcon sx={{ color: 'white' }} />
-                                </ListItemIcon>
+                            <ListItemButton
+                                sx={{ gap: 1 }}
+                                component={Link}
+                                to="/"
+                            >
+                                <HomeIcon sx={{ color: 'white' }} />
+
                                 <ListItemText primary="Home" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
-                            <ListItemButton component={Link} to="/notification">
-                                <ListItemIcon>
-                                    <NotificationsIcon
-                                        sx={{ color: 'white' }}
-                                    />
-                                </ListItemIcon>
+                            <ListItemButton
+                                sx={{ gap: 1 }}
+                                component={Link}
+                                to="/notification"
+                            >
+                                <NotificationsIcon sx={{ color: 'white' }} />
+
                                 <ListItemText primary="Notification" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
-                            <ListItemButton component={Link} to="/associations">
-                                <ListItemIcon>
-                                    <MessageIcon sx={{ color: 'white' }} />
-                                </ListItemIcon>
+                            <ListItemButton
+                                sx={{ gap: 1 }}
+                                component={Link}
+                                to="/associations"
+                            >
+                                <MessageIcon sx={{ color: 'white' }} />
+
                                 <ListItemText primary="Associations" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
-                            <ListItemButton component={Link} to="/explorer">
-                                <ListItemIcon>
-                                    <ExploreIcon sx={{ color: 'white' }} />
-                                </ListItemIcon>
+                            <ListItemButton
+                                sx={{ gap: 1 }}
+                                component={Link}
+                                to="/explorer"
+                            >
+                                <ExploreIcon sx={{ color: 'white' }} />
+
                                 <ListItemText primary="Explorer" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
-                            <ListItemButton component={Link} to="/identity">
-                                <ListItemIcon>
-                                    <BadgeIcon sx={{ color: 'white' }} />
-                                </ListItemIcon>
+                            <ListItemButton
+                                sx={{ gap: 1 }}
+                                component={Link}
+                                to="/identity"
+                            >
+                                <BadgeIcon sx={{ color: 'white' }} />
+
                                 <ListItemText primary="Identity" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
-                            <ListItemButton component={Link} to="/settings">
-                                <ListItemIcon>
-                                    <SettingsIcon sx={{ color: 'white' }} />
-                                </ListItemIcon>
+                            <ListItemButton
+                                sx={{ gap: 1 }}
+                                component={Link}
+                                to="/settings"
+                            >
+                                <SettingsIcon sx={{ color: 'white' }} />
+
                                 <ListItemText primary="Settings" />
                             </ListItemButton>
                         </ListItem>
@@ -124,12 +140,9 @@ export function Menu(props: MenuProps): JSX.Element {
                                     <ListItemButton
                                         component={Link}
                                         to={`/#${value}`}
+                                        sx={{ gap: 1 }}
                                     >
-                                        <ListItemIcon>
-                                            <PercentIcon
-                                                sx={{ color: 'white' }}
-                                            />
-                                        </ListItemIcon>
+                                        <PercentIcon sx={{ color: 'white' }} />
                                         <ListItemText
                                             id={labelId}
                                             primary={value}
