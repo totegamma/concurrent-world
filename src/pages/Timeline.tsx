@@ -110,7 +110,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                     />
                 </Box>
                 <Box sx={{ display: 'flex', flex: 1 }}>
-                    <List sx={{ flex: 1 }}>
+                    <List sx={{ flex: 1, width: '100%' }}>
                         {props.messages.current
                             .slice()
                             .reverse()

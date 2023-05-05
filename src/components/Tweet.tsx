@@ -1,4 +1,10 @@
-import { useState, useEffect, useContext } from 'react'
+import {
+    useState,
+    useEffect,
+    useContext,
+    type ImgHTMLAttributes,
+    type DetailedHTMLProps
+} from 'react'
 import {
     ListItem,
     Box,
@@ -21,6 +27,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
 import rehypeSanitize from 'rehype-sanitize'
+import { type ReactMarkdownProps } from 'react-markdown/lib/ast-to-react'
 
 export interface TweetProps {
     message: string
@@ -201,12 +208,38 @@ export function Tweet(props: TweetProps): JSX.Element {
                                                 {children}
                                             </Typography>
                                         ),
-                                        img: (props) => (
-                                            <img
-                                                {...props}
-                                                style={{ maxWidth: '100%' }}
-                                            />
-                                        )
+                                        img: (
+                                            props: Pick<
+                                                DetailedHTMLProps<
+                                                    ImgHTMLAttributes<HTMLImageElement>,
+                                                    HTMLImageElement
+                                                >,
+                                                | 'key'
+                                                | keyof ImgHTMLAttributes<HTMLImageElement>
+                                            > &
+                                                ReactMarkdownProps
+                                        ) => {
+                                            if (
+                                                props.alt?.startsWith('emoji')
+                                            ) {
+                                                return (
+                                                    <img
+                                                        {...props}
+                                                        style={{
+                                                            height: '1.5em',
+                                                            verticalAlign:
+                                                                '-0.5em'
+                                                        }}
+                                                    />
+                                                )
+                                            }
+                                            return (
+                                                <img
+                                                    {...props}
+                                                    style={{ maxWidth: '100%' }}
+                                                />
+                                            )
+                                        }
                                     }}
                                 >
                                     {JSON.parse(message.payload).body?.replace(
@@ -219,9 +252,9 @@ export function Tweet(props: TweetProps): JSX.Element {
                                             if (emoji) {
                                                 return `<img 
                                                     title=":${emoji?.name}:"
-                                                    alt=":${emoji?.name}:"
+                                                    alt="emoji:${emoji?.name}:"
                                                     src="${emoji?.publicUrl}"
-                                                    height="18px" />`
+                                                    />`
                                             }
                                             return `${name}`
                                         }
