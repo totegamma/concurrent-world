@@ -14,7 +14,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { Sign } from '../util'
 
 import { ApplicationContext } from '../App'
-import { type RTMMessage, type User } from '../model'
+import { type Emoji, type RTMMessage, type User } from '../model'
 import { type IuseResourceManager } from '../hooks/useResourceManager'
 import { Schemas } from '../schemas'
 import ReactMarkdown from 'react-markdown'
@@ -211,12 +211,20 @@ export function Tweet(props: TweetProps): JSX.Element {
                                 >
                                     {JSON.parse(message.payload).body?.replace(
                                         /:\w+:/gi,
-                                        (name: string) =>
-                                            `<img src="${
+                                        (name: string) => {
+                                            const emoji: Emoji =
                                                 appData.emojiDict[
                                                     name.slice(1, -1)
-                                                ]?.publicUrl
-                                            }" height="18px" />`
+                                                ]
+                                            if (emoji) {
+                                                return `<img 
+                                                    title=":${emoji?.name}:"
+                                                    alt=":${emoji?.name}:"
+                                                    src="${emoji?.publicUrl}"
+                                                    height="18px" />`
+                                            }
+                                            return `${name}`
+                                        }
                                     )}
                                 </ReactMarkdown>
                             </pre>
