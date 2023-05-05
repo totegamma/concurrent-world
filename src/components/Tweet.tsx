@@ -12,7 +12,8 @@ import {
     Typography,
     Link,
     IconButton,
-    Drawer
+    Drawer,
+    ThemeProvider
 } from '@mui/material'
 import StarIcon from '@mui/icons-material/Star'
 import StarOutlineIcon from '@mui/icons-material/StarOutline'
@@ -28,6 +29,7 @@ import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
 import rehypeSanitize from 'rehype-sanitize'
 import { type ReactMarkdownProps } from 'react-markdown/lib/ast-to-react'
+import { Themes } from '../themes'
 
 export interface TweetProps {
     message: string
@@ -115,7 +117,6 @@ export function Tweet(props: TweetProps): JSX.Element {
                 loadTweet()
             })
     }
-
     return (
         <ListItem
             sx={{ alignItems: 'flex-start', flex: 1, gap: '25px', p: '10px 0' }}
@@ -191,75 +192,120 @@ export function Tweet(props: TweetProps): JSX.Element {
                             <pre
                                 style={{
                                     margin: 0,
+                                    padding: 0,
                                     fontFamily: 'inherit',
                                     wordBreak: 'break-all',
                                     whiteSpace: 'pre-wrap',
                                     overflow: 'hidden'
                                 }}
                             >
-                                <ReactMarkdown
-                                    remarkPlugins={[
-                                        [remarkGfm, { singleTilde: false }]
-                                    ]}
-                                    rehypePlugins={[rehypeRaw, rehypeSanitize]}
-                                    components={{
-                                        p: ({ children }) => (
-                                            <Typography paragraph>
-                                                {children}
-                                            </Typography>
-                                        ),
-                                        img: (
-                                            props: Pick<
-                                                DetailedHTMLProps<
-                                                    ImgHTMLAttributes<HTMLImageElement>,
-                                                    HTMLImageElement
-                                                >,
-                                                | 'key'
-                                                | keyof ImgHTMLAttributes<HTMLImageElement>
-                                            > &
-                                                ReactMarkdownProps
-                                        ) => {
-                                            if (
-                                                props.alt?.startsWith('emoji')
-                                            ) {
+                                <ThemeProvider theme={Themes}>
+                                    <ReactMarkdown
+                                        remarkPlugins={[
+                                            [remarkGfm, { singleTilde: false }]
+                                        ]}
+                                        rehypePlugins={[
+                                            rehypeRaw,
+                                            rehypeSanitize
+                                        ]}
+                                        components={{
+                                            p: ({ children }) => (
+                                                <Typography paragraph>
+                                                    {children}
+                                                </Typography>
+                                            ),
+                                            h1: ({ children }) => (
+                                                <Typography variant="h1">
+                                                    {children}
+                                                </Typography>
+                                            ),
+                                            h2: ({ children }) => (
+                                                <Typography variant="h2">
+                                                    {children}
+                                                </Typography>
+                                            ),
+                                            h3: ({ children }) => (
+                                                <Typography variant="h3">
+                                                    {children}
+                                                </Typography>
+                                            ),
+                                            h4: ({ children }) => (
+                                                <Typography variant="h4">
+                                                    {children}
+                                                </Typography>
+                                            ),
+                                            h5: ({ children }) => (
+                                                <Typography variant="h5">
+                                                    {children}
+                                                </Typography>
+                                            ),
+                                            h6: ({ children }) => (
+                                                <Typography variant="h6">
+                                                    {children}
+                                                </Typography>
+                                            ),
+                                            ul: ({ children }) => (
+                                                <ul>{children}</ul>
+                                            ),
+                                            img: (
+                                                props: Pick<
+                                                    DetailedHTMLProps<
+                                                        ImgHTMLAttributes<HTMLImageElement>,
+                                                        HTMLImageElement
+                                                    >,
+                                                    | 'key'
+                                                    | keyof ImgHTMLAttributes<HTMLImageElement>
+                                                > &
+                                                    ReactMarkdownProps
+                                            ) => {
+                                                if (
+                                                    props.alt?.startsWith(
+                                                        'emoji'
+                                                    )
+                                                ) {
+                                                    return (
+                                                        <img
+                                                            {...props}
+                                                            style={{
+                                                                height: '1.5em',
+                                                                verticalAlign:
+                                                                    '-0.5em'
+                                                            }}
+                                                        />
+                                                    )
+                                                }
                                                 return (
                                                     <img
                                                         {...props}
                                                         style={{
-                                                            height: '1.5em',
-                                                            verticalAlign:
-                                                                '-0.5em'
+                                                            maxWidth: '100%'
                                                         }}
                                                     />
                                                 )
                                             }
-                                            return (
-                                                <img
-                                                    {...props}
-                                                    style={{ maxWidth: '100%' }}
-                                                />
-                                            )
-                                        }
-                                    }}
-                                >
-                                    {JSON.parse(message.payload).body?.replace(
-                                        /:\w+:/gi,
-                                        (name: string) => {
-                                            const emoji: Emoji | undefined =
-                                                appData.emojiDict[
-                                                    name.slice(1, -1)
-                                                ]
-                                            if (emoji) {
-                                                return `<img 
-                                                    title=":${emoji?.name}:"
-                                                    alt="emoji:${emoji?.name}:"
-                                                    src="${emoji?.publicUrl}"
-                                                    />`
+                                        }}
+                                    >
+                                        {JSON.parse(
+                                            message.payload
+                                        ).body?.replace(
+                                            /:\w+:/gi,
+                                            (name: string) => {
+                                                const emoji: Emoji | undefined =
+                                                    appData.emojiDict[
+                                                        name.slice(1, -1)
+                                                    ]
+                                                if (emoji) {
+                                                    return `<img 
+                                                        title=":${emoji?.name}:"
+                                                        alt="emoji:${emoji?.name}:"
+                                                        src="${emoji?.publicUrl}"
+                                                        />`
+                                                }
+                                                return `${name}`
                                             }
-                                            return `${name}`
-                                        }
-                                    )}
-                                </ReactMarkdown>
+                                        )}
+                                    </ReactMarkdown>
+                                </ThemeProvider>
                             </pre>
                         </Box>
                         <Box sx={{ display: 'flex', gap: '10px' }}>
