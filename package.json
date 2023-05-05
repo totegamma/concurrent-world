@@ -49,5 +49,8 @@
             "eslint --fix",
             "prettier --write"
         ]
+    },
+    "volta": {
+        "node": "18.16.0"
     }
 }
