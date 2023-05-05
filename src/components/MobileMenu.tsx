@@ -14,7 +14,7 @@ export function MobileMenu(): JSX.Element {
             <Box
                 sx={{
                     display: 'flex',
-                    height: 40,
+                    height: 60,
                     color: 'white',
                     justifyContent: 'space-around'
                 }}
