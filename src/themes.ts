@@ -14,7 +14,6 @@ export const Themes = {
     },
     blue: {
         palette: {
-            mode: 'dark',
             primary: {
                 main: '#0476d9'
             },
