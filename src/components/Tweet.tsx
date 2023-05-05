@@ -70,12 +70,17 @@ export function Tweet(props: TweetProps): JSX.Element {
         loadTweet()
     }, [props.message])
 
-    const favorite = (messageID: string | undefined): void => {
+    const favorite = async (messageID: string | undefined): Promise<void> => {
         const favoriteScheme = Schemas.like
         if (!messageID) return
         const payloadObj = {}
         const payload = JSON.stringify(payloadObj)
         const signature = Sign(appData.privatekey, payload)
+        const targetAuthor = (await props.messageDict.get(messageID)).author
+        console.log(targetAuthor)
+        const targetStream = (await props.userDict.get(targetAuthor))
+            .notificationstream
+        console.log([targetStream].filter((e) => e))
 
         const requestOptions = {
             method: 'POST',
@@ -85,7 +90,8 @@ export function Tweet(props: TweetProps): JSX.Element {
                 schema: favoriteScheme,
                 target: messageID,
                 payload,
-                signature
+                signature,
+                streams: [targetStream].filter((e) => e)
             })
         }
 
