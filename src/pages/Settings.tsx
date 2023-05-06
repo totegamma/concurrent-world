@@ -170,7 +170,8 @@ export function Settings(props: SettingsProp): JSX.Element {
                                 }}
                                 style={{
                                     border: 'none',
-                                    background: '#fff',
+                                    background: (Themes as any)[e].palette
+                                        .background.paper,
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '10px',
@@ -179,24 +180,36 @@ export function Settings(props: SettingsProp): JSX.Element {
                                 }}
                                 color="info"
                             >
-                                <ConcurrentLogo
-                                    size="40px"
-                                    upperColor={
-                                        (Themes as any)[e].palette.primary.main
-                                    }
-                                    lowerColor={
-                                        (Themes as any)[e].palette.background
-                                            .default
-                                    }
-                                    frameColor={
-                                        (Themes as any)[e].palette.background
-                                            .default
-                                    }
-                                />
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        borderRadius: '100px',
+                                        background:
+                                            (Themes as any)[e].palette.primary
+                                                ?.contrastText ?? '#fff'
+                                    }}
+                                >
+                                    <ConcurrentLogo
+                                        size="40px"
+                                        upperColor={
+                                            (Themes as any)[e].palette.primary
+                                                .main
+                                        }
+                                        lowerColor={
+                                            (Themes as any)[e].palette
+                                                .background.default
+                                        }
+                                        frameColor={
+                                            (Themes as any)[e].palette
+                                                .background.default
+                                        }
+                                    />
+                                </Box>
                                 <Typography
                                     sx={{
-                                        color: (Themes as any)[e].palette
-                                            .primary.main
+                                        color:
+                                            (Themes as any)[e].palette?.text
+                                                ?.primary ?? '#000'
                                     }}
                                     variant="button"
                                 >
