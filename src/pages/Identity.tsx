@@ -72,7 +72,8 @@ export function Identity(): JSX.Element {
                     gap: '5px',
                     padding: '20px',
                     background: theme.palette.background.paper,
-                    minHeight: '100%'
+                    minHeight: '100%',
+                    overflow: 'scroll'
                 }}
             >
                 <Typography variant="h5" gutterBottom>
@@ -163,9 +164,13 @@ export function Identity(): JSX.Element {
                         }}
                     >
                         {!showPrivateKey ? (
-                            <VisibilityIcon />
+                            <VisibilityIcon
+                                sx={{ color: theme.palette.text.primary }}
+                            />
                         ) : (
-                            <VisibilityOffIcon />
+                            <VisibilityOffIcon
+                                sx={{ color: theme.palette.text.primary }}
+                            />
                         )}
                     </IconButton>
                 </Typography>

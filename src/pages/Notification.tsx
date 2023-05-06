@@ -11,7 +11,8 @@ export function Notification(): JSX.Element {
                 gap: '5px',
                 padding: '20px',
                 background: theme.palette.background.paper,
-                minHeight: '100%'
+                minHeight: '100%',
+                overflow: 'scroll'
             }}
         >
             <Typography variant="h5" gutterBottom>

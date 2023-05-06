@@ -4,6 +4,7 @@ import {
     Typography,
     TextField,
     Box,
+    Modal,
     useTheme
 } from '@mui/material'
 import { useContext, useState } from 'react'
@@ -39,8 +40,51 @@ export function Settings(props: SettingsProp): JSX.Element {
         props.setUserAddr(key.ccaddress)
     }
 
+    const [open, setOpen] = useState(false)
+
     return (
         <>
+            <Modal
+                open={open}
+                onClose={() => {
+                    setOpen(false)
+                }}
+            >
+                <Box
+                    sx={{
+                        display: 'flex',
+                        transform: 'translate(-50%, -50%)',
+                        flexDirection: 'column',
+                        gap: '20px',
+                        position: 'absolute',
+                        padding: '20px',
+                        borderRadius: '10px',
+                        top: '50%',
+                        left: '50%',
+                        background: theme.palette.background.paper
+                    }}
+                >
+                    <Typography
+                        component="h2"
+                        sx={{ color: theme.palette.text.primary }}
+                    >
+                        Are you sure?
+                    </Typography>
+                    <Typography sx={{ color: theme.palette.text.primary }}>
+                        秘密鍵のバックアップがないと、アカウントを復元できません。
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => {
+                            regenerateKeys()
+                            setOpen(false)
+                        }}
+                    >
+                        Generate New Key
+                    </Button>
+                </Box>
+            </Modal>
             <Box
                 sx={{
                     display: 'flex',
@@ -48,14 +92,15 @@ export function Settings(props: SettingsProp): JSX.Element {
                     gap: '5px',
                     padding: '20px',
                     background: theme.palette.background.paper,
-                    minHeight: '100%'
+                    minHeight: '100%',
+                    overflowY: 'scroll'
                 }}
             >
                 <Typography variant="h5" gutterBottom>
                     Settings
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
-                <Typography>
+                <Typography sx={{ wordWrap: 'break-word' }}>
                     Your concurrent address: {appData.userAddress}
                 </Typography>
                 <Box
@@ -97,7 +142,7 @@ export function Settings(props: SettingsProp): JSX.Element {
                         color="error"
                         variant="contained"
                         onClick={(_) => {
-                            regenerateKeys()
+                            setOpen(true)
                         }}
                     >
                         Generate New Key
@@ -120,7 +165,10 @@ export function Settings(props: SettingsProp): JSX.Element {
                             variant="contained"
                             sx={{
                                 background: (Themes as any)[e].palette.primary
-                                    .main
+                                    .main,
+                                color:
+                                    (Themes as any)[e].palette.text?.primary ??
+                                    'black'
                             }}
                             onClick={(_) => {
                                 props.setThemeName(e)

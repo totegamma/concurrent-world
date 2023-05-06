@@ -284,15 +284,16 @@ function App(): JSX.Element {
                     <Box
                         sx={{
                             display: 'flex',
-                            padding: '10px',
-                            gap: '10px',
-                            background: `linear-gradient(${
-                                theme.palette.background.default
-                            }, ${darken(
+                            background: [
                                 theme.palette.background.default,
-                                0.1
-                            )})`,
-                            height: '100vh'
+                                `linear-gradient(${
+                                    theme.palette.background.default
+                                }, ${darken(
+                                    theme.palette.background.default,
+                                    0.1
+                                )})`
+                            ],
+                            height: '100dvh'
                         }}
                     >
                         <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
@@ -308,10 +309,11 @@ function App(): JSX.Element {
                             <Paper
                                 sx={{
                                     flexGrow: '1',
-                                    margin: '10px',
+                                    margin: { xs: '8px', sm: '10px' },
+                                    mb: { xs: 0, sm: '10px' },
                                     display: 'flex',
                                     flexFlow: 'column',
-                                    borderRadius: '20px',
+                                    borderRadius: { xs: '15px', md: '20px' },
                                     overflow: 'hidden',
                                     background: 'none'
                                 }}
