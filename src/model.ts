@@ -28,7 +28,7 @@ export interface RTMMessage {
 }
 
 export interface User {
-    pubkey: string
+    ccaddress: string
     username: string
     avatar: string
     description: string

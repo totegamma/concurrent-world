@@ -47,7 +47,7 @@ export const ApplicationContext = createContext<appData>({
     privatekey: '',
     userAddress: '',
     profile: {
-        pubkey: '',
+        ccaddress: '',
         username: '',
         avatar: '',
         description: '',
@@ -96,7 +96,7 @@ function App(): JSX.Element {
     const [playNotification] = useSound(Sound)
     const playNotificationRef = useRef(playNotification)
     const [profile, setProfile] = useState<User>({
-        pubkey: '',
+        ccaddress: '',
         username: 'anonymous',
         avatar: '',
         description: '',
@@ -138,7 +138,7 @@ function App(): JSX.Element {
         const data = await res.json()
         if (data.characters.length === 0) {
             return {
-                pubkey: '',
+                ccaddress: '',
                 username: 'anonymous',
                 avatar: '',
                 description: '',
@@ -148,7 +148,7 @@ function App(): JSX.Element {
         }
         const payload = JSON.parse(data.characters[0].payload)
         return {
-            pubkey: data.characters[0].author,
+            ccaddress: data.characters[0].author,
             username: payload.username,
             avatar: payload.avatar,
             description: payload.description,
