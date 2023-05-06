@@ -69,7 +69,9 @@ export function Tweet(props: TweetProps): JSX.Element {
                             async (id) =>
                                 await appData.streamDict
                                     ?.get(id)
-                                    .then((e) => JSON.parse(e.meta).name)
+                                    .then((e) =>
+                                        e.meta ? JSON.parse(e.meta).name : null
+                                    )
                         )
                 ).then((e) => {
                     setStreams(e.filter((x) => x).join(','))
