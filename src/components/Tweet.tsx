@@ -192,7 +192,6 @@ export function Tweet(props: TweetProps): JSX.Element {
                             <pre
                                 style={{
                                     margin: 0,
-                                    padding: 0,
                                     fontFamily: 'inherit',
                                     wordBreak: 'break-all',
                                     whiteSpace: 'pre-wrap',

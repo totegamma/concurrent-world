@@ -79,7 +79,22 @@ export const Themes = {
     },
     typography: {
         h1: {
-            fontsize: 16
+            fontSize: 32
+        },
+        h2: {
+            fontSize: 24
+        },
+        h3: {
+            fontSize: 19.2
+        },
+        h4: {
+            fontSize: 16
+        },
+        h5: {
+            fontSize: 12.8
+        },
+        h6: {
+            fontSize: 11.2
         }
     }
 }
