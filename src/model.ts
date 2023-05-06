@@ -46,3 +46,15 @@ export interface Emoji {
     publicUrl: string
     name: string
 }
+
+export interface Stream {
+    id: string
+    author: string
+    maintainer: string[]
+    writer: string[]
+    reader: string[]
+    schema: string
+    meta: string
+    signature: string
+    cdate: string
+}
