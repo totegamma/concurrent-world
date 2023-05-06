@@ -25,6 +25,15 @@ npm run dev
 ```
 npm run build
 ```
+
+### schemaファイルの生成
+concurrentはサーバー間でやりとりするオブジェクトのIDと内容をjsonSchemaで担保しています。
+利用するjsonSchemaを`src/schemas.ts`で定義し、以下のコマンドを実行すると外部からjsonSchemaをダウンロードし、typescriptの型定義に変換した上で`src/schemas/`へ格納してくれます。
+
+```
+deno run -A collectSchemas.ts
+```
+
 `dist/`下に成果物が出力されます。
 
 ## Contributing
