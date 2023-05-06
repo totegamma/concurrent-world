@@ -40,6 +40,7 @@ export interface TweetProps {
 export function Tweet(props: TweetProps): JSX.Element {
     const [user, setUser] = useState<User | null>()
     const [message, setMessage] = useState<RTMMessage | undefined>()
+    const [msgstreams, setStreams] = useState<string>('')
 
     const appData = useContext(ApplicationContext)
 
@@ -60,6 +61,21 @@ export function Tweet(props: TweetProps): JSX.Element {
                     .catch((error) => {
                         console.error(error)
                     })
+
+                Promise.all(
+                    msg.streams
+                        .split(',')
+                        .map(
+                            async (id) =>
+                                await appData.streamDict
+                                    ?.get(id)
+                                    .then((e) =>
+                                        e.meta ? JSON.parse(e.meta).name : null
+                                    )
+                        )
+                ).then((e) => {
+                    setStreams(e.filter((x) => x).join(','))
+                })
             })
             .catch((error) => {
                 console.error(error)
@@ -192,7 +208,7 @@ export function Tweet(props: TweetProps): JSX.Element {
                                         color: '#aaa'
                                     }}
                                 >
-                                    %{message.streams.replaceAll(',', ' %')}{' '}
+                                    %{msgstreams.replaceAll(',', ' %')}{' '}
                                 </Typography>
                             </Typography>
                         </Box>
