@@ -170,8 +170,9 @@ export function Settings(props: SettingsProp): JSX.Element {
                                 }}
                                 style={{
                                     border: 'none',
-                                    background: (Themes as any)[e].palette
-                                        .background.paper,
+                                    background:
+                                        (Themes as any)[e].palette.background
+                                            .paper ?? 'white',
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '10px',
