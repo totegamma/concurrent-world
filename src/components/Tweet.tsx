@@ -20,6 +20,8 @@ import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { Sign } from '../util'
 
+import BoringAvatar from 'boring-avatars'
+
 import { ApplicationContext } from '../App'
 import { type Emoji, type RTMMessage, type User } from '../model'
 import { type IuseResourceManager } from '../hooks/useResourceManager'
@@ -153,11 +155,19 @@ export function Tweet(props: TweetProps): JSX.Element {
                                 props.follow(message.author)
                             }}
                         >
-                            <Avatar
-                                alt="Profile Picture"
-                                src={user?.avatar}
-                                sx={{ width: '48px', height: '48px' }}
-                            />
+                            {user?.avatar ? (
+                                <Avatar
+                                    alt="Profile Picture"
+                                    src={user?.avatar}
+                                    sx={{ width: '48px', height: '48px' }}
+                                />
+                            ) : (
+                                <BoringAvatar
+                                    name={message.author}
+                                    variant="beam"
+                                    size={48}
+                                />
+                            )}
                         </IconButton>
                     </Box>
                     <Box
