@@ -5,12 +5,15 @@ import {
     TextField,
     Box,
     Modal,
-    useTheme
+    useTheme,
+    IconButton,
+    Paper
 } from '@mui/material'
 import { useContext, useState } from 'react'
 import { ApplicationContext } from '../App'
 import { Themes } from '../themes'
 import { Keygen, LoadKey } from '../util'
+import { ConcurrentLogo } from '../components/ConcurrentLogo'
 
 export interface SettingsProp {
     setThemeName: (themename: string) => void
@@ -155,27 +158,52 @@ export function Settings(props: SettingsProp): JSX.Element {
                         display: { xs: 'flex', md: 'grid' },
                         flexFlow: 'column',
                         gridTemplateColumns: '1fr 1fr 1fr 1fr',
-                        gridAutoRows: '50px',
+                        gridAutoRows: '1fr',
                         gap: '10px'
                     }}
                 >
                     {Object.keys(Themes).map((e) => (
-                        <Button
-                            key={e}
-                            variant="contained"
-                            sx={{
-                                background: (Themes as any)[e].palette.primary
-                                    .main,
-                                color:
-                                    (Themes as any)[e].palette.text?.primary ??
-                                    'black'
-                            }}
-                            onClick={(_) => {
-                                props.setThemeName(e)
-                            }}
-                        >
-                            {e}
-                        </Button>
+                        <Paper key={e}>
+                            <Button
+                                onClick={(_) => {
+                                    props.setThemeName(e)
+                                }}
+                                style={{
+                                    border: 'none',
+                                    background: '#fff',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '10px',
+                                    width: '100%',
+                                    justifyContent: 'flex-start'
+                                }}
+                                color="info"
+                            >
+                                <ConcurrentLogo
+                                    size="40px"
+                                    upperColor={
+                                        (Themes as any)[e].palette.primary.main
+                                    }
+                                    lowerColor={
+                                        (Themes as any)[e].palette.background
+                                            .default
+                                    }
+                                    frameColor={
+                                        (Themes as any)[e].palette.background
+                                            .default
+                                    }
+                                />
+                                <Typography
+                                    sx={{
+                                        color: (Themes as any)[e].palette
+                                            .primary.main
+                                    }}
+                                    variant="button"
+                                >
+                                    {e}
+                                </Typography>
+                            </Button>
+                        </Paper>
                     ))}
                 </Box>
             </Box>

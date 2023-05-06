@@ -19,6 +19,7 @@ import PercentIcon from '@mui/icons-material/Percent'
 import { useContext, useEffect, useState } from 'react'
 import { ApplicationContext } from '../App'
 import { type Stream } from '../model'
+import { ConcurrentLogo } from './ConcurrentLogo'
 
 export interface MenuProps {
     streams: string[]
@@ -54,9 +55,25 @@ export function Menu(props: MenuProps): JSX.Element {
                     color: '#fff'
                 }}
             >
-                <Typography variant="h5" sx={{ pl: '18px' }} gutterBottom>
-                    Concurrent
-                </Typography>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        gap: '8px',
+                        justifyContent: 'center'
+                    }}
+                >
+                    <Box>
+                        <ConcurrentLogo
+                            size="32px"
+                            upperColor="white"
+                            lowerColor="white"
+                            frameColor="white"
+                        />
+                    </Box>
+                    <Typography variant="h5" gutterBottom>
+                        Concurrent
+                    </Typography>
+                </Box>
                 <Box
                     sx={{
                         display: 'flex',
