@@ -83,7 +83,7 @@ function App(): JSX.Element {
     )
     const [watchstreams, setWatchStreams] = usePersistent<string[]>(
         'watchStreamList',
-        ['common']
+        []
     )
     const [theme, setTheme] = useState<Theme>(
         createTheme((Themes as any)[themeName])
