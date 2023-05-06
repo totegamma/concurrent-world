@@ -164,9 +164,13 @@ export function Identity(): JSX.Element {
                         }}
                     >
                         {!showPrivateKey ? (
-                            <VisibilityIcon />
+                            <VisibilityIcon
+                                sx={{ color: theme.palette.text.primary }}
+                            />
                         ) : (
-                            <VisibilityOffIcon />
+                            <VisibilityOffIcon
+                                sx={{ color: theme.palette.text.primary }}
+                            />
                         )}
                     </IconButton>
                 </Typography>

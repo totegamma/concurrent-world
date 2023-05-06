@@ -45,7 +45,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
         }
         const url =
             appData.serverAddress +
-            `stream?streams=${
+            `stream/recent?streams=${
                 reactlocation.hash
                     ? reactlocation.hash.replace('#', '')
                     : homequery
@@ -60,7 +60,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
             .then(async (res) => await res.json())
             .then((data: StreamElement[]) => {
                 props.messages.clear()
-                data.sort((a, b) => (a.ID < b.ID ? -1 : 1)).forEach(
+                data?.sort((a, b) => (a.ID < b.ID ? -1 : 1)).forEach(
                     (e: StreamElement) => {
                         props.messages.push(e)
                     }

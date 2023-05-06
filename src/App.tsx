@@ -11,7 +11,10 @@ import {
 
 import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
-import { useResourceManager } from './hooks/useResourceManager'
+import {
+    useResourceManager,
+    type IuseResourceManager
+} from './hooks/useResourceManager'
 
 import { Schemas } from './schemas'
 import { Themes } from './themes'
@@ -22,7 +25,8 @@ import type {
     User,
     ServerEvent,
     Association,
-    Emoji
+    Emoji,
+    Stream
 } from './model'
 import {
     Associations,
@@ -50,7 +54,8 @@ export const ApplicationContext = createContext<appData>({
         homestream: '',
         notificationstream: ''
     },
-    emojiDict: {}
+    emojiDict: {},
+    streamDict: undefined
 })
 
 export interface appData {
@@ -60,6 +65,7 @@ export interface appData {
     userAddress: string
     profile: User
     emojiDict: Record<string, Emoji>
+    streamDict?: IuseResourceManager<Stream>
 }
 
 function App(): JSX.Element {
@@ -77,7 +83,7 @@ function App(): JSX.Element {
     )
     const [watchstreams, setWatchStreams] = usePersistent<string[]>(
         'watchStreamList',
-        ['common']
+        []
     )
     const [theme, setTheme] = useState<Theme>(
         createTheme((Themes as any)[themeName])
@@ -158,6 +164,15 @@ function App(): JSX.Element {
         })
         const data = await res.json()
         return data.message
+    })
+
+    const streamDict = useResourceManager<Stream>(async (key: string) => {
+        const res = await fetch(server + `stream?stream=${key}`, {
+            method: 'GET',
+            headers: {}
+        })
+        const data = await res.json()
+        return data
     })
 
     const follow = (ccaddress: string): void => {
@@ -277,7 +292,8 @@ function App(): JSX.Element {
                     privatekey: prvkey,
                     userAddress: address,
                     emojiDict,
-                    profile
+                    profile,
+                    streamDict
                 }}
             >
                 <BrowserRouter>

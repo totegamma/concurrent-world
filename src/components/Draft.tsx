@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react'
-import { TextField, Box, Stack, Button } from '@mui/material'
+import { TextField, Box, Stack, Button, useTheme } from '@mui/material'
 import { Sign } from '../util'
 import { ApplicationContext } from '../App'
 import SendIcon from '@mui/icons-material/Send'
@@ -14,10 +14,13 @@ export function Draft(props: DraftProps): JSX.Element {
 
     const [draft, setDraft] = useState<string>('')
 
+    const theme = useTheme()
+
     const post = (): void => {
         const payloadObj = {
             body: draft
         }
+
         const payload = JSON.stringify(payloadObj)
         const signature = Sign(appData.privatekey, payload)
 
@@ -59,6 +62,16 @@ export function Draft(props: DraftProps): JSX.Element {
                 onChange={(e) => {
                     setDraft(e.target.value)
                 }}
+                sx={{
+                    '& .MuiInputLabel-root': {
+                        color: theme.palette.text.disabled
+                    },
+                    '& .MuiOutlinedInput-root': {
+                        '& > fieldset': {
+                            borderColor: theme.palette.text.disabled
+                        }
+                    }
+                }}
                 onKeyDown={(e: any) => {
                     if (draft.length === 0 || draft.trim().length === 0) return
                     if (e.key === 'Enter' && e.ctrlKey === true) {
@@ -79,6 +92,12 @@ export function Draft(props: DraftProps): JSX.Element {
                     disabled={draft.length === 0 || draft.trim().length === 0}
                     onClick={(_) => {
                         post()
+                    }}
+                    sx={{
+                        '&.Mui-disabled': {
+                            background: theme.palette.divider,
+                            color: theme.palette.text.disabled
+                        }
                     }}
                     endIcon={<SendIcon />}
                 >

@@ -17,6 +17,7 @@ import {
 } from 'react-router-dom'
 import { ApplicationContext } from '../App'
 import { usePersistent } from '../hooks/usePersistent'
+import { type Stream } from '../model'
 
 export interface StreamsBarProps {
     location: ReactLocation
@@ -34,13 +35,25 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
         ['common']
     )
 
-    const [allStreams, setAllStreams] = useState<string[]>([])
+    const [allStreams, setAllStreams] = useState<Stream[]>([])
+    const [streamMapper, setStreamMapper] = useState<Record<string, string>>({})
     const appData = useContext(ApplicationContext)
 
     useEffect(() => {
-        fetch(appData.serverAddress + 'stream/list').then((data) => {
-            data.json().then((json) => {
-                setAllStreams(json)
+        fetch(
+            appData.serverAddress +
+                'stream/list?schema=net.gammalab.concurrent.tbdStreamMeta'
+        ).then((data) => {
+            data.json().then((streams: Stream[]) => {
+                setAllStreams(streams)
+                setStreamMapper(
+                    Object.fromEntries(
+                        streams.map((stream) => [
+                            JSON.parse(stream.meta).name,
+                            stream.id
+                        ])
+                    )
+                )
             })
         })
     }, [])
@@ -48,9 +61,27 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
     // force local streams to change in case of external input (i.e. sidebar button)
     useEffect(() => {
         setStreams(decodeURIComponent(props.location.hash.replace('#', '')))
-        setSelectedStreams(
-            decodeURIComponent(props.location.hash.replace('#', '')).split(',')
-        )
+        ;(async () => {
+            setSelectedStreams(
+                (
+                    await Promise.all(
+                        props.location.hash
+                            .replace('#', '')
+                            .split(',')
+                            .map(
+                                async (id) =>
+                                    await appData.streamDict
+                                        ?.get(id)
+                                        .then((e) =>
+                                            e.meta
+                                                ? JSON.parse(e.meta).name
+                                                : null
+                                        )
+                            )
+                    )
+                ).filter((e) => e) as string[]
+            )
+        })()
     }, [props.location.hash])
 
     return (
@@ -91,9 +122,13 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                     sx={{ width: 1 }}
                     multiple
                     value={selectedStreams[0] !== '' ? selectedStreams : []}
-                    options={allStreams}
-                    onChange={(a, value) => {
-                        navigate(`/#${value.join(',')}`)
+                    options={allStreams.map(
+                        (stream) => JSON.parse(stream.meta).name
+                    )}
+                    onChange={(_, value) => {
+                        navigate(
+                            `/#${value.map((id) => streamMapper[id]).join(',')}`
+                        )
                     }}
                     renderInput={(params) => {
                         const { InputLabelProps, InputProps, ...rest } = params

@@ -12,7 +12,8 @@ import {
     Typography,
     Link,
     IconButton,
-    Drawer
+    Drawer,
+    useTheme
 } from '@mui/material'
 import StarIcon from '@mui/icons-material/Star'
 import StarOutlineIcon from '@mui/icons-material/StarOutline'
@@ -39,8 +40,11 @@ export interface TweetProps {
 export function Tweet(props: TweetProps): JSX.Element {
     const [user, setUser] = useState<User | null>()
     const [message, setMessage] = useState<RTMMessage | undefined>()
+    const [msgstreams, setStreams] = useState<string>('')
 
     const appData = useContext(ApplicationContext)
+
+    const theme = useTheme()
 
     const [inspectItem, setInspectItem] = useState<RTMMessage | null>(null)
 
@@ -57,6 +61,21 @@ export function Tweet(props: TweetProps): JSX.Element {
                     .catch((error) => {
                         console.error(error)
                     })
+
+                Promise.all(
+                    msg.streams
+                        .split(',')
+                        .map(
+                            async (id) =>
+                                await appData.streamDict
+                                    ?.get(id)
+                                    .then((e) =>
+                                        e.meta ? JSON.parse(e.meta).name : null
+                                    )
+                        )
+                ).then((e) => {
+                    setStreams(e.filter((x) => x).join(','))
+                })
             })
             .catch((error) => {
                 console.error(error)
@@ -67,12 +86,17 @@ export function Tweet(props: TweetProps): JSX.Element {
         loadTweet()
     }, [props.message])
 
-    const favorite = (messageID: string | undefined): void => {
+    const favorite = async (messageID: string | undefined): Promise<void> => {
         const favoriteScheme = Schemas.like
         if (!messageID) return
         const payloadObj = {}
         const payload = JSON.stringify(payloadObj)
         const signature = Sign(appData.privatekey, payload)
+        const targetAuthor = (await props.messageDict.get(messageID)).author
+        console.log(targetAuthor)
+        const targetStream = (await props.userDict.get(targetAuthor))
+            .notificationstream
+        console.log([targetStream].filter((e) => e))
 
         const requestOptions = {
             method: 'POST',
@@ -82,7 +106,8 @@ export function Tweet(props: TweetProps): JSX.Element {
                 schema: favoriteScheme,
                 target: messageID,
                 payload,
-                signature
+                signature,
+                streams: [targetStream].filter((e) => e)
             })
         }
 
@@ -183,7 +208,7 @@ export function Tweet(props: TweetProps): JSX.Element {
                                         color: '#aaa'
                                     }}
                                 >
-                                    %{message.streams.replaceAll(',', ' %')}{' '}
+                                    %{msgstreams.replaceAll(',', ' %')}{' '}
                                 </Typography>
                             </Typography>
                         </Box>
@@ -267,7 +292,10 @@ export function Tweet(props: TweetProps): JSX.Element {
                                 (e) => e.author === appData.userAddress
                             ) != null ? (
                                 <IconButton
-                                    sx={{ p: '0' }}
+                                    sx={{
+                                        p: '0',
+                                        color: theme.palette.text.secondary
+                                    }}
                                     color="primary"
                                     onClick={() => {
                                         unfavorite(
@@ -291,7 +319,10 @@ export function Tweet(props: TweetProps): JSX.Element {
                                 </IconButton>
                             ) : (
                                 <IconButton
-                                    sx={{ p: '0' }}
+                                    sx={{
+                                        p: '0',
+                                        color: theme.palette.text.secondary
+                                    }}
                                     onClick={() => {
                                         favorite(message?.id)
                                     }}
@@ -309,6 +340,10 @@ export function Tweet(props: TweetProps): JSX.Element {
                             <IconButton
                                 onClick={() => {
                                     setInspectItem(message ?? null)
+                                }}
+                                sx={{
+                                    p: '0',
+                                    color: theme.palette.text.secondary
                                 }}
                             >
                                 <MoreHorizIcon />
