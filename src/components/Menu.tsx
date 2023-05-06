@@ -165,7 +165,10 @@ export function Menu(props: MenuProps): JSX.Element {
                                         <ListItemText
                                             id={labelId}
                                             primary={
-                                                JSON.parse(stream.meta).name
+                                                stream.meta
+                                                    ? JSON.parse(stream.meta)
+                                                          .name
+                                                    : 'backrooms'
                                             }
                                         />
                                     </ListItemButton>
