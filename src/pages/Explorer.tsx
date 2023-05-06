@@ -198,11 +198,11 @@ export function Explorer(props: ExplorerProps): JSX.Element {
             >
                 {followList.map((user) => (
                     <ListItem
-                        key={user.pubkey}
+                        key={user.ccaddress}
                         secondaryAction={
                             <Button
                                 onClick={() => {
-                                    unfollow(user.pubkey)
+                                    unfollow(user.ccaddress)
                                 }}
                             >
                                 unfollow
