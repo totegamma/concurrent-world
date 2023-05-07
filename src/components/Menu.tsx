@@ -68,15 +68,9 @@ export function Menu(props: MenuProps): JSX.Element {
                     <Box>
                         <ConcurrentLogo
                             size="32px"
-                            upperColor={
-                                theme.palette.background.contrastText ?? '#000'
-                            } // TODO: remove optional
-                            lowerColor={
-                                theme.palette.background.contrastText ?? '#000'
-                            }
-                            frameColor={
-                                theme.palette.background.contrastText ?? '#000'
-                            }
+                            upperColor={theme.palette.background.contrastText}
+                            lowerColor={theme.palette.background.contrastText}
+                            frameColor={theme.palette.background.contrastText}
                         />
                     </Box>
                     <Typography
