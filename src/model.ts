@@ -62,6 +62,7 @@ export interface ServerEvent {
 export interface Emoji {
     publicUrl: string
     name: string
+    aliases: string[]
 }
 
 export interface Stream {
