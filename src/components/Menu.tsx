@@ -5,7 +5,8 @@ import {
     ListItem,
     ListItemButton,
     ListItemText,
-    Typography
+    Typography,
+    useTheme
 } from '@mui/material'
 import { Link } from 'react-router-dom'
 
@@ -28,6 +29,8 @@ export interface MenuProps {
 export function Menu(props: MenuProps): JSX.Element {
     const appData = useContext(ApplicationContext)
     const [watchStreams, setWatchStreams] = useState<Stream[]>([])
+
+    const theme = useTheme()
 
     useEffect(() => {
         ;(async () => {
@@ -65,12 +68,25 @@ export function Menu(props: MenuProps): JSX.Element {
                     <Box>
                         <ConcurrentLogo
                             size="32px"
-                            upperColor="white"
-                            lowerColor="white"
-                            frameColor="white"
+                            upperColor={
+                                (theme.palette.background as any).contrastText
+                            } // TODO: remove as any
+                            lowerColor={
+                                (theme.palette.background as any).contrastText
+                            }
+                            frameColor={
+                                (theme.palette.background as any).contrastText
+                            }
                         />
                     </Box>
-                    <Typography variant="h5" gutterBottom>
+                    <Typography
+                        gutterBottom
+                        sx={{
+                            color: 'background.contrastText',
+                            fontWeight: 600,
+                            fontSize: '22px'
+                        }}
+                    >
                         Concurrent
                     </Typography>
                 </Box>
