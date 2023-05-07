@@ -165,8 +165,6 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
           )
         : ''
 
-    console.log(messagebody)
-
     return (
         <ListItem
             sx={{ alignItems: 'flex-start', flex: 1, gap: '25px', p: '10px 0' }}
