@@ -34,6 +34,7 @@ import {
 import Sound from './resources/Bubble.wav'
 import useSound from 'use-sound'
 import { MobileMenu } from './components/MobileMenu'
+import { QuickSwitcher } from './components/QuickSwitcher'
 
 export const ApplicationContext = createContext<appData>({
     serverAddress: '',
@@ -289,6 +290,10 @@ function App(): JSX.Element {
                     streamDict
                 }}
             >
+                <QuickSwitcher
+                    setThemeName={setThemeName}
+                    userDict={userDict}
+                />
                 <BrowserRouter>
                     <Box
                         sx={{
