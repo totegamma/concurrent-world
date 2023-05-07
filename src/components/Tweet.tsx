@@ -140,7 +140,6 @@ export function Tweet(props: TweetProps): JSX.Element {
                 loadTweet()
             })
     }
-
     return (
         <ListItem
             sx={{ alignItems: 'flex-start', flex: 1, gap: '25px', p: '10px 0' }}
@@ -233,6 +232,39 @@ export function Tweet(props: TweetProps): JSX.Element {
                                                 {children}
                                             </Typography>
                                         ),
+                                        h1: ({ children }) => (
+                                            <Typography variant="h1">
+                                                {children}
+                                            </Typography>
+                                        ),
+                                        h2: ({ children }) => (
+                                            <Typography variant="h2">
+                                                {children}
+                                            </Typography>
+                                        ),
+                                        h3: ({ children }) => (
+                                            <Typography variant="h3">
+                                                {children}
+                                            </Typography>
+                                        ),
+                                        h4: ({ children }) => (
+                                            <Typography variant="h4">
+                                                {children}
+                                            </Typography>
+                                        ),
+                                        h5: ({ children }) => (
+                                            <Typography variant="h5">
+                                                {children}
+                                            </Typography>
+                                        ),
+                                        h6: ({ children }) => (
+                                            <Typography variant="h6">
+                                                {children}
+                                            </Typography>
+                                        ),
+                                        ul: ({ children }) => (
+                                            <ul>{children}</ul>
+                                        ),
                                         img: (
                                             props: Pick<
                                                 DetailedHTMLProps<
@@ -261,7 +293,9 @@ export function Tweet(props: TweetProps): JSX.Element {
                                             return (
                                                 <img
                                                     {...props}
-                                                    style={{ maxWidth: '100%' }}
+                                                    style={{
+                                                        maxWidth: '100%'
+                                                    }}
                                                 />
                                             )
                                         }
