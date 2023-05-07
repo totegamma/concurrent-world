@@ -15,7 +15,7 @@ export function Associations(): JSX.Element {
                 overflow: 'scroll'
             }}
         >
-            <Typography variant="h5" gutterBottom>
+            <Typography variant="h2" gutterBottom>
                 Associations
             </Typography>
             <Divider />

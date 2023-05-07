@@ -110,11 +110,11 @@ export function Explorer(props: ExplorerProps): JSX.Element {
                 overflowY: 'scroll'
             }}
         >
-            <Typography variant="h5" gutterBottom>
+            <Typography variant="h2" gutterBottom>
                 Explorer
             </Typography>
             <Divider />
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h3" gutterBottom>
                 streams
             </Typography>
             <Box sx={{ display: 'flex', gap: '10px' }}>
@@ -185,7 +185,7 @@ export function Explorer(props: ExplorerProps): JSX.Element {
                     )
                 })}
             </List>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h3" gutterBottom>
                 followlist
             </Typography>
             <List

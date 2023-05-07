@@ -76,10 +76,13 @@ export function Identity(): JSX.Element {
                     overflow: 'scroll'
                 }}
             >
-                <Typography variant="h5" gutterBottom>
+                <Typography variant="h2" gutterBottom>
                     Identity
                 </Typography>
                 <Divider />
+                <Typography variant="h3" gutterBottom>
+                    Profile
+                </Typography>
                 <Box
                     sx={{
                         display: 'flex',
@@ -132,19 +135,19 @@ export function Identity(): JSX.Element {
                     </Button>
                 </Box>
                 <Divider />
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h3" gutterBottom>
                     Concurrent Address
                 </Typography>
                 <Typography sx={{ wordBreak: 'break-all' }}>
                     {appData.userAddress}
                 </Typography>
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h3" gutterBottom>
                     Publickey
                 </Typography>
                 <Typography sx={{ wordBreak: 'break-all' }}>
                     {appData.publickey}
                 </Typography>
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h3" gutterBottom>
                     Privatekey
                 </Typography>
                 <Typography

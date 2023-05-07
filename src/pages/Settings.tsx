@@ -107,7 +107,7 @@ export function Settings(props: SettingsProp): JSX.Element {
                     overflowY: 'scroll'
                 }}
             >
-                <Typography variant="h5" gutterBottom>
+                <Typography variant="h2" gutterBottom>
                     Settings
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
@@ -160,7 +160,7 @@ export function Settings(props: SettingsProp): JSX.Element {
                     </Button>
                 </Box>
 
-                <Typography variant="h5">Theme</Typography>
+                <Typography variant="h3">Theme</Typography>
                 <Box
                     sx={{
                         display: { xs: 'flex', md: 'grid' },

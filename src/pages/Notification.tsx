@@ -15,7 +15,7 @@ export function Notification(): JSX.Element {
                 overflow: 'scroll'
             }}
         >
-            <Typography variant="h5" gutterBottom>
+            <Typography variant="h2" gutterBottom>
                 Notification
             </Typography>
             <Divider />
