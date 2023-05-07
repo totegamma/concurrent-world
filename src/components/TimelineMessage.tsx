@@ -31,14 +31,14 @@ import rehypeSanitize from 'rehype-sanitize'
 import { type ReactMarkdownProps } from 'react-markdown/lib/ast-to-react'
 import breaks from 'remark-breaks'
 
-export interface TweetProps {
+export interface TimelineMessageProps {
     message: string
     messageDict: IuseResourceManager<RTMMessage>
     userDict: IuseResourceManager<User>
     follow: (ccaddress: string) => void
 }
 
-export function Tweet(props: TweetProps): JSX.Element {
+export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
     const [user, setUser] = useState<User | null>()
     const [message, setMessage] = useState<RTMMessage | undefined>()
     const [msgstreams, setStreams] = useState<string>('')
