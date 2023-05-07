@@ -106,7 +106,8 @@ export const Themes = {
             },
             background: {
                 default: '#333333',
-                paper: '#222'
+                paper: '#222',
+                contrastText: '#ffffff'
             },
             text: {
                 primary: '#fff',
