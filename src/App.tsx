@@ -313,7 +313,8 @@ function App(): JSX.Element {
                             sx={{
                                 display: 'flex',
                                 flexFlow: 'column',
-                                width: 1
+                                overflow: 'hidden',
+                                flex: 1
                             }}
                         >
                             <Paper

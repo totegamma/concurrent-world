@@ -99,7 +99,9 @@ export function Timeline(props: TimelineProps): JSX.Element {
             <StreamsBar location={reactlocation} />
             <Box
                 sx={{
+                    overflowX: 'hidden',
                     overflowY: 'auto',
+                    width: '100%',
                     padding: '20px',
                     background: theme.palette.background.paper,
                     minHeight: '100%'

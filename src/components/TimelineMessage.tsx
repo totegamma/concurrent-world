@@ -33,6 +33,9 @@ import rehypeSanitize from 'rehype-sanitize'
 import { type ReactMarkdownProps } from 'react-markdown/lib/ast-to-react'
 import breaks from 'remark-breaks'
 
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
+
 export interface TimelineMessageProps {
     message: string
     messageDict: IuseResourceManager<RTMMessage>
@@ -147,6 +150,23 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                 loadTweet()
             })
     }
+
+    const messagebody = message
+        ? JSON.parse(message.payload).body?.replace(
+              /:\w+:/gi,
+              (name: string) => {
+                  const emoji: Emoji | undefined =
+                      appData.emojiDict[name.slice(1, -1)]
+                  if (emoji) {
+                      return genEmojiTag(emoji)
+                  }
+                  return `${name}`
+              }
+          )
+        : ''
+
+    console.log(messagebody)
+
     return (
         <ListItem
             sx={{ alignItems: 'flex-start', flex: 1, gap: '25px', p: '10px 0' }}
@@ -179,7 +199,8 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                             display: 'flex',
                             flex: 1,
                             flexDirection: 'column',
-                            mt: '5px'
+                            mt: '5px',
+                            width: '100%'
                         }}
                     >
                         <Box
@@ -226,6 +247,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                 </Typography>
                             </Typography>
                         </Box>
+
                         <Box sx={{ width: '100%' }}>
                             <ReactMarkdown
                                 remarkPlugins={[
@@ -270,6 +292,37 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                         </Typography>
                                     ),
                                     ul: ({ children }) => <ul>{children}</ul>,
+                                    code: ({ node, children }) => {
+                                        const language = node.position
+                                            ? messagebody
+                                                  .slice(
+                                                      node.position.start
+                                                          .offset,
+                                                      node.position.end.offset
+                                                  )
+                                                  .split('\n')[0]
+                                                  .slice(3)
+                                            : ''
+                                        return (
+                                            <Box
+                                                sx={{
+                                                    overflow: 'hidden',
+                                                    borderRadius: '10px'
+                                                }}
+                                            >
+                                                <SyntaxHighlighter
+                                                    style={materialDark}
+                                                    language={language}
+                                                    PreTag="div"
+                                                >
+                                                    {String(children).replace(
+                                                        /\n$/,
+                                                        ''
+                                                    )}
+                                                </SyntaxHighlighter>
+                                            </Box>
+                                        )
+                                    },
                                     img: (
                                         props: Pick<
                                             DetailedHTMLProps<
@@ -303,17 +356,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                     }
                                 }}
                             >
-                                {JSON.parse(message.payload).body?.replace(
-                                    /:\w+:/gi,
-                                    (name: string) => {
-                                        const emoji: Emoji | undefined =
-                                            appData.emojiDict[name.slice(1, -1)]
-                                        if (emoji) {
-                                            return genEmojiTag(emoji)
-                                        }
-                                        return `${name}`
-                                    }
-                                )}
+                                {messagebody}
                             </ReactMarkdown>
                         </Box>
                         <Box sx={{ display: 'flex', gap: '10px' }}>
