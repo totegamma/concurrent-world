@@ -52,7 +52,7 @@ export function Menu(props: MenuProps): JSX.Element {
                     width: '200px',
                     height: '100%',
                     pt: '25px',
-                    color: '#fff'
+                    color: 'background.contrastText'
                 }}
             >
                 <Box
@@ -88,7 +88,9 @@ export function Menu(props: MenuProps): JSX.Element {
                                 component={Link}
                                 to="/"
                             >
-                                <HomeIcon sx={{ color: 'white' }} />
+                                <HomeIcon
+                                    sx={{ color: 'background.contrastText' }}
+                                />
 
                                 <ListItemText primary="Home" />
                             </ListItemButton>
@@ -99,7 +101,9 @@ export function Menu(props: MenuProps): JSX.Element {
                                 component={Link}
                                 to="/notification"
                             >
-                                <NotificationsIcon sx={{ color: 'white' }} />
+                                <NotificationsIcon
+                                    sx={{ color: 'background.contrastText' }}
+                                />
 
                                 <ListItemText primary="Notification" />
                             </ListItemButton>
@@ -110,7 +114,9 @@ export function Menu(props: MenuProps): JSX.Element {
                                 component={Link}
                                 to="/associations"
                             >
-                                <MessageIcon sx={{ color: 'white' }} />
+                                <MessageIcon
+                                    sx={{ color: 'background.contrastText' }}
+                                />
 
                                 <ListItemText primary="Associations" />
                             </ListItemButton>
@@ -121,7 +127,9 @@ export function Menu(props: MenuProps): JSX.Element {
                                 component={Link}
                                 to="/explorer"
                             >
-                                <ExploreIcon sx={{ color: 'white' }} />
+                                <ExploreIcon
+                                    sx={{ color: 'background.contrastText' }}
+                                />
 
                                 <ListItemText primary="Explorer" />
                             </ListItemButton>
@@ -132,7 +140,9 @@ export function Menu(props: MenuProps): JSX.Element {
                                 component={Link}
                                 to="/identity"
                             >
-                                <BadgeIcon sx={{ color: 'white' }} />
+                                <BadgeIcon
+                                    sx={{ color: 'background.contrastText' }}
+                                />
 
                                 <ListItemText primary="Identity" />
                             </ListItemButton>
@@ -143,7 +153,9 @@ export function Menu(props: MenuProps): JSX.Element {
                                 component={Link}
                                 to="/settings"
                             >
-                                <SettingsIcon sx={{ color: 'white' }} />
+                                <SettingsIcon
+                                    sx={{ color: 'background.contrastText' }}
+                                />
 
                                 <ListItemText primary="Settings" />
                             </ListItemButton>
@@ -178,7 +190,11 @@ export function Menu(props: MenuProps): JSX.Element {
                                         to={`/#${stream.id}`}
                                         sx={{ gap: 1 }}
                                     >
-                                        <PercentIcon sx={{ color: 'white' }} />
+                                        <PercentIcon
+                                            sx={{
+                                                color: 'background.contrastText'
+                                            }}
+                                        />
                                         <ListItemText
                                             id={labelId}
                                             primary={

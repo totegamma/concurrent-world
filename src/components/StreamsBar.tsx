@@ -116,7 +116,7 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                 }}
             >
                 <IconButton sx={{ p: '10px' }}>
-                    <ExploreIcon sx={{ color: 'white' }} />
+                    <ExploreIcon sx={{ color: 'primary.contrastText' }} />
                 </IconButton>
                 <Autocomplete
                     sx={{ width: 1 }}
@@ -137,7 +137,7 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                             <InputBase
                                 {...params.InputProps}
                                 {...rest}
-                                sx={{ color: 'white' }}
+                                sx={{ color: 'primary.contrastText' }}
                                 placeholder="streams"
                             />
                         )
@@ -148,7 +148,7 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                             // eslint-disable-next-line
                             <Chip
                                 label={option}
-                                sx={{ color: 'white' }}
+                                sx={{ color: 'primary.contrastText' }}
                                 {...getTagProps({ index })}
                             />
                         ))
@@ -159,7 +159,7 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                     component={Link}
                     to={`/#${streams}`}
                 >
-                    <SearchIcon sx={{ color: 'white' }} />
+                    <SearchIcon sx={{ color: 'primary.contrastText' }} />
                 </IconButton>
             </Paper>
         </Box>

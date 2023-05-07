@@ -204,7 +204,7 @@ export function Tweet(props: TweetProps): JSX.Element {
                                     sx={{
                                         fontweight: '400',
                                         fontSize: '13px',
-                                        color: '#aaa'
+                                        color: 'text.secondary'
                                     }}
                                 >
                                     %{msgstreams.replaceAll(',', ' %')}{' '}

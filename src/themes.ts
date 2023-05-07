@@ -279,14 +279,16 @@ export const Themes = {
     darkgray: {
         palette: {
             primary: {
-                main: '#555'
+                main: '#555',
+                contrastText: '#ffffff'
             },
             secondary: {
                 main: '#888'
             },
             background: {
                 default: '#333333',
-                paper: '#222'
+                paper: '#222',
+                contrastText: '#ffffff'
             },
             text: {
                 primary: '#fff',
