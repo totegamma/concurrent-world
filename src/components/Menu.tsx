@@ -74,7 +74,6 @@ export function Menu(props: MenuProps): JSX.Element {
                         />
                     </Box>
                     <Typography
-                        gutterBottom
                         sx={{
                             color: 'background.contrastText',
                             fontWeight: 600,
@@ -83,6 +82,9 @@ export function Menu(props: MenuProps): JSX.Element {
                     >
                         Concurrent
                     </Typography>
+                </Box>
+                <Box sx={{ textAlign: 'center', fontWeight: 600 }}>
+                    開発中α版
                 </Box>
                 <Box
                     sx={{
