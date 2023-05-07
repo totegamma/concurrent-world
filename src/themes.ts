@@ -7,6 +7,26 @@ export const Themes = {
             background: {
                 default: '#C74E64'
             }
+        },
+        typography: {
+            h1: {
+                fontSize: 32
+            },
+            h2: {
+                fontSize: 24
+            },
+            h3: {
+                fontSize: 19.2
+            },
+            h4: {
+                fontSize: 16
+            },
+            h5: {
+                fontSize: 12.8
+            },
+            h6: {
+                fontSize: 11.2
+            }
         }
     },
     blue: {
@@ -16,6 +36,26 @@ export const Themes = {
             },
             background: {
                 default: '#023059'
+            }
+        },
+        typography: {
+            h1: {
+                fontSize: 32
+            },
+            h2: {
+                fontSize: 24
+            },
+            h3: {
+                fontSize: 19.2
+            },
+            h4: {
+                fontSize: 16
+            },
+            h5: {
+                fontSize: 12.8
+            },
+            h6: {
+                fontSize: 11.2
             }
         }
     },
@@ -28,6 +68,26 @@ export const Themes = {
                 default: '#e07d43',
                 paper: '#f8efdd'
             }
+        },
+        typography: {
+            h1: {
+                fontSize: 32
+            },
+            h2: {
+                fontSize: 24
+            },
+            h3: {
+                fontSize: 19.2
+            },
+            h4: {
+                fontSize: 16
+            },
+            h5: {
+                fontSize: 12.8
+            },
+            h6: {
+                fontSize: 11.2
+            }
         }
     },
     cafe: {
@@ -38,6 +98,26 @@ export const Themes = {
             background: {
                 default: '#a99996',
                 paper: '#f7efea'
+            }
+        },
+        typography: {
+            h1: {
+                fontSize: 32
+            },
+            h2: {
+                fontSize: 24
+            },
+            h3: {
+                fontSize: 19.2
+            },
+            h4: {
+                fontSize: 16
+            },
+            h5: {
+                fontSize: 12.8
+            },
+            h6: {
+                fontSize: 11.2
             }
         }
     },
@@ -50,6 +130,26 @@ export const Themes = {
                 default: '#839fa1',
                 paper: '#ebf3f5'
             }
+        },
+        typography: {
+            h1: {
+                fontSize: 32
+            },
+            h2: {
+                fontSize: 24
+            },
+            h3: {
+                fontSize: 19.2
+            },
+            h4: {
+                fontSize: 16
+            },
+            h5: {
+                fontSize: 12.8
+            },
+            h6: {
+                fontSize: 11.2
+            }
         }
     },
     oldcomputing: {
@@ -60,6 +160,26 @@ export const Themes = {
             background: {
                 default: '#6d6d70',
                 paper: '#f0edf1'
+            }
+        },
+        typography: {
+            h1: {
+                fontSize: 32
+            },
+            h2: {
+                fontSize: 24
+            },
+            h3: {
+                fontSize: 19.2
+            },
+            h4: {
+                fontSize: 16
+            },
+            h5: {
+                fontSize: 12.8
+            },
+            h6: {
+                fontSize: 11.2
             }
         }
     },
@@ -72,6 +192,26 @@ export const Themes = {
                 default: '#000000',
                 paper: '#f0edf1'
             }
+        },
+        typography: {
+            h1: {
+                fontSize: 32
+            },
+            h2: {
+                fontSize: 24
+            },
+            h3: {
+                fontSize: 19.2
+            },
+            h4: {
+                fontSize: 16
+            },
+            h5: {
+                fontSize: 12.8
+            },
+            h6: {
+                fontSize: 11.2
+            }
         }
     },
     highcontrast2: {
@@ -82,6 +222,26 @@ export const Themes = {
             background: {
                 default: '#1e1ea0',
                 paper: '#f0ede7'
+            }
+        },
+        typography: {
+            h1: {
+                fontSize: 32
+            },
+            h2: {
+                fontSize: 24
+            },
+            h3: {
+                fontSize: 19.2
+            },
+            h4: {
+                fontSize: 16
+            },
+            h5: {
+                fontSize: 12.8
+            },
+            h6: {
+                fontSize: 11.2
             }
         }
     },
@@ -94,19 +254,41 @@ export const Themes = {
                 default: '#151542',
                 paper: '#afc8e9'
             }
+        },
+        typography: {
+            h1: {
+                fontSize: 32
+            },
+            h2: {
+                fontSize: 24
+            },
+            h3: {
+                fontSize: 19.2
+            },
+            h4: {
+                fontSize: 16
+            },
+            h5: {
+                fontSize: 12.8
+            },
+            h6: {
+                fontSize: 11.2
+            }
         }
     },
     darkgray: {
         palette: {
             primary: {
-                main: '#555'
+                main: '#555',
+                contrastText: '#ffffff'
             },
             secondary: {
                 main: '#888'
             },
             background: {
                 default: '#333333',
-                paper: '#222'
+                paper: '#222',
+                contrastText: '#ffffff'
             },
             text: {
                 primary: '#fff',
@@ -115,6 +297,26 @@ export const Themes = {
                 hint: 'rgba(255, 255, 255, 0.5)'
             },
             divider: 'rgba(255, 255, 255, 0.2)'
+        },
+        typography: {
+            h1: {
+                fontSize: 32
+            },
+            h2: {
+                fontSize: 24
+            },
+            h3: {
+                fontSize: 19.2
+            },
+            h4: {
+                fontSize: 16
+            },
+            h5: {
+                fontSize: 12.8
+            },
+            h6: {
+                fontSize: 11.2
+            }
         }
     }
 }

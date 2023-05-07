@@ -5,7 +5,8 @@ import {
     ListItem,
     ListItemButton,
     ListItemText,
-    Typography
+    Typography,
+    useTheme
 } from '@mui/material'
 import { Link } from 'react-router-dom'
 
@@ -28,6 +29,8 @@ export interface MenuProps {
 export function Menu(props: MenuProps): JSX.Element {
     const appData = useContext(ApplicationContext)
     const [watchStreams, setWatchStreams] = useState<Stream[]>([])
+
+    const theme = useTheme()
 
     useEffect(() => {
         ;(async () => {
@@ -52,7 +55,7 @@ export function Menu(props: MenuProps): JSX.Element {
                     width: '200px',
                     height: '100%',
                     pt: '25px',
-                    color: '#fff'
+                    color: 'background.contrastText'
                 }}
             >
                 <Box
@@ -65,12 +68,25 @@ export function Menu(props: MenuProps): JSX.Element {
                     <Box>
                         <ConcurrentLogo
                             size="32px"
-                            upperColor="white"
-                            lowerColor="white"
-                            frameColor="white"
+                            upperColor={
+                                (theme.palette.background as any).contrastText
+                            } // TODO: remove as any
+                            lowerColor={
+                                (theme.palette.background as any).contrastText
+                            }
+                            frameColor={
+                                (theme.palette.background as any).contrastText
+                            }
                         />
                     </Box>
-                    <Typography variant="h5" gutterBottom>
+                    <Typography
+                        gutterBottom
+                        sx={{
+                            color: 'background.contrastText',
+                            fontWeight: 600,
+                            fontSize: '22px'
+                        }}
+                    >
                         Concurrent
                     </Typography>
                 </Box>
@@ -88,7 +104,9 @@ export function Menu(props: MenuProps): JSX.Element {
                                 component={Link}
                                 to="/"
                             >
-                                <HomeIcon sx={{ color: 'white' }} />
+                                <HomeIcon
+                                    sx={{ color: 'background.contrastText' }}
+                                />
 
                                 <ListItemText primary="Home" />
                             </ListItemButton>
@@ -99,7 +117,9 @@ export function Menu(props: MenuProps): JSX.Element {
                                 component={Link}
                                 to="/notification"
                             >
-                                <NotificationsIcon sx={{ color: 'white' }} />
+                                <NotificationsIcon
+                                    sx={{ color: 'background.contrastText' }}
+                                />
 
                                 <ListItemText primary="Notification" />
                             </ListItemButton>
@@ -110,7 +130,9 @@ export function Menu(props: MenuProps): JSX.Element {
                                 component={Link}
                                 to="/associations"
                             >
-                                <MessageIcon sx={{ color: 'white' }} />
+                                <MessageIcon
+                                    sx={{ color: 'background.contrastText' }}
+                                />
 
                                 <ListItemText primary="Associations" />
                             </ListItemButton>
@@ -121,7 +143,9 @@ export function Menu(props: MenuProps): JSX.Element {
                                 component={Link}
                                 to="/explorer"
                             >
-                                <ExploreIcon sx={{ color: 'white' }} />
+                                <ExploreIcon
+                                    sx={{ color: 'background.contrastText' }}
+                                />
 
                                 <ListItemText primary="Explorer" />
                             </ListItemButton>
@@ -132,7 +156,9 @@ export function Menu(props: MenuProps): JSX.Element {
                                 component={Link}
                                 to="/identity"
                             >
-                                <BadgeIcon sx={{ color: 'white' }} />
+                                <BadgeIcon
+                                    sx={{ color: 'background.contrastText' }}
+                                />
 
                                 <ListItemText primary="Identity" />
                             </ListItemButton>
@@ -143,7 +169,9 @@ export function Menu(props: MenuProps): JSX.Element {
                                 component={Link}
                                 to="/settings"
                             >
-                                <SettingsIcon sx={{ color: 'white' }} />
+                                <SettingsIcon
+                                    sx={{ color: 'background.contrastText' }}
+                                />
 
                                 <ListItemText primary="Settings" />
                             </ListItemButton>
@@ -178,7 +206,11 @@ export function Menu(props: MenuProps): JSX.Element {
                                         to={`/#${stream.id}`}
                                         sx={{ gap: 1 }}
                                     >
-                                        <PercentIcon sx={{ color: 'white' }} />
+                                        <PercentIcon
+                                            sx={{
+                                                color: 'background.contrastText'
+                                            }}
+                                        />
                                         <ListItemText
                                             id={labelId}
                                             primary={
