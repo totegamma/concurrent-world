@@ -172,7 +172,7 @@ export function Settings(props: SettingsProp): JSX.Element {
                                     border: 'none',
                                     background:
                                         (Themes as any)[e].palette.background
-                                            .paper ?? 'white',
+                                            ?.paper ?? 'white',
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '10px',

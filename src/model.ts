@@ -79,7 +79,7 @@ export interface Stream {
 interface ConcurrentTypeBackground extends TypeBackground {
     default: string
     paper: string
-    contrastText?: string // TODO: remove this
+    contrastText: string
 }
 
 interface ConcurrentPalette extends Palette {

@@ -1,11 +1,4 @@
 export const Themes = {
-    basic: {
-        palette: {
-            primary: {
-                main: '#FFF'
-            }
-        }
-    },
     red: {
         palette: {
             primary: {

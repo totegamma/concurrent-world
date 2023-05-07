@@ -1,6 +1,13 @@
 import { useEffect, useState, createContext, useRef } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { darken, Box, createTheme, Paper, ThemeProvider } from '@mui/material'
+import {
+    darken,
+    Box,
+    createTheme,
+    Paper,
+    ThemeProvider,
+    Theme
+} from '@mui/material'
 
 import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
@@ -80,7 +87,7 @@ function App(): JSX.Element {
         []
     )
     const [theme, setTheme] = useState<ConcurrentTheme>(
-        createTheme((Themes as any)[themeName])
+        createTheme((Themes as any)[themeName]) as ConcurrentTheme
     )
     const [connected, setConnected] = useState<boolean>(false)
     const messages = useObjectList<StreamElement>()
@@ -274,7 +281,7 @@ function App(): JSX.Element {
     }, [currentStreams])
 
     useEffect(() => {
-        setTheme(createTheme((Themes as any)[themeName]))
+        setTheme(createTheme((Themes as any)[themeName]) as ConcurrentTheme)
     }, [themeName])
 
     return (
