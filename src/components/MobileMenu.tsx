@@ -20,42 +20,42 @@ export function MobileMenu(): JSX.Element {
                 }}
             >
                 <Button
-                    sx={{ color: 'white', width: 1 }}
+                    sx={{ color: 'background.contrastText', width: 1 }}
                     component={NavLink}
                     to="/"
                 >
                     <HomeIcon />
                 </Button>
                 <Button
-                    sx={{ color: 'white', width: 1 }}
+                    sx={{ color: 'background.contrastText', width: 1 }}
                     component={NavLink}
                     to="/notification"
                 >
                     <NotificationsIcon />
                 </Button>
                 <Button
-                    sx={{ color: 'white', width: 1 }}
+                    sx={{ color: 'background.contrastText', width: 1 }}
                     component={NavLink}
                     to="/associations"
                 >
                     <MessageIcon />
                 </Button>
                 <Button
-                    sx={{ color: 'white', width: 1 }}
+                    sx={{ color: 'background.contrastText', width: 1 }}
                     component={NavLink}
                     to="/explorer"
                 >
                     <ExploreIcon />
                 </Button>
                 <Button
-                    sx={{ color: 'white', width: 1 }}
+                    sx={{ color: 'background.contrastText', width: 1 }}
                     component={NavLink}
                     to="/identity"
                 >
                     <BadgeIcon />
                 </Button>
                 <Button
-                    sx={{ color: 'white', width: 1 }}
+                    sx={{ color: 'background.contrastText', width: 1 }}
                     component={NavLink}
                     to="/settings"
                 >
