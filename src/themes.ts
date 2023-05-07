@@ -1,11 +1,19 @@
 export const Themes = {
+    basic: {
+        palette: {
+            primary: {
+                main: '#FFF'
+            }
+        }
+    },
     red: {
         palette: {
             primary: {
                 main: '#E0576F'
             },
             background: {
-                default: '#C74E64'
+                default: '#C74E64',
+                contrastText: '#ffffff'
             }
         }
     },
@@ -15,7 +23,8 @@ export const Themes = {
                 main: '#0476d9'
             },
             background: {
-                default: '#023059'
+                default: '#023059',
+                contrastText: '#ffffff'
             }
         }
     },
@@ -26,7 +35,8 @@ export const Themes = {
             },
             background: {
                 default: '#e07d43',
-                paper: '#f8efdd'
+                paper: '#f8efdd',
+                contrastText: '#ffffff'
             }
         }
     },
@@ -37,7 +47,8 @@ export const Themes = {
             },
             background: {
                 default: '#a99996',
-                paper: '#f7efea'
+                paper: '#f7efea',
+                contrastText: '#ffffff'
             }
         }
     },
@@ -48,7 +59,8 @@ export const Themes = {
             },
             background: {
                 default: '#839fa1',
-                paper: '#ebf3f5'
+                paper: '#ebf3f5',
+                contrastText: '#ffffff'
             }
         }
     },
@@ -59,7 +71,8 @@ export const Themes = {
             },
             background: {
                 default: '#6d6d70',
-                paper: '#f0edf1'
+                paper: '#f0edf1',
+                contrastText: '#ffffff'
             }
         }
     },
@@ -70,7 +83,8 @@ export const Themes = {
             },
             background: {
                 default: '#000000',
-                paper: '#f0edf1'
+                paper: '#f0edf1',
+                contrastText: '#ffffff'
             }
         }
     },
@@ -81,7 +95,8 @@ export const Themes = {
             },
             background: {
                 default: '#1e1ea0',
-                paper: '#f0ede7'
+                paper: '#f0ede7',
+                contrastText: '#ffffff'
             }
         }
     },
@@ -92,21 +107,24 @@ export const Themes = {
             },
             background: {
                 default: '#151542',
-                paper: '#afc8e9'
+                paper: '#afc8e9',
+                contrastText: '#ffffff'
             }
         }
     },
     darkgray: {
         palette: {
             primary: {
-                main: '#555'
+                main: '#555',
+                contrastText: '#ffffff'
             },
             secondary: {
                 main: '#888'
             },
             background: {
                 default: '#333333',
-                paper: '#222'
+                paper: '#222',
+                contrastText: '#ffffff'
             },
             text: {
                 primary: '#fff',
