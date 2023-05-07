@@ -1,13 +1,6 @@
 import { useEffect, useState, createContext, useRef } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import {
-    darken,
-    Box,
-    createTheme,
-    Paper,
-    type Theme,
-    ThemeProvider
-} from '@mui/material'
+import { darken, Box, Paper, ThemeProvider } from '@mui/material'
 
 import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
@@ -17,7 +10,7 @@ import {
 } from './hooks/useResourceManager'
 
 import { Schemas } from './schemas'
-import { Themes } from './themes'
+import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu'
 import type {
     RTMMessage,
@@ -26,7 +19,8 @@ import type {
     ServerEvent,
     Association,
     Emoji,
-    Stream
+    Stream,
+    ConcurrentTheme
 } from './model'
 import {
     Associations,
@@ -47,7 +41,7 @@ export const ApplicationContext = createContext<appData>({
     privatekey: '',
     userAddress: '',
     profile: {
-        pubkey: '',
+        ccaddress: '',
         username: '',
         avatar: '',
         description: '',
@@ -85,8 +79,8 @@ function App(): JSX.Element {
         'watchStreamList',
         []
     )
-    const [theme, setTheme] = useState<Theme>(
-        createTheme((Themes as any)[themeName])
+    const [theme, setTheme] = useState<ConcurrentTheme>(
+        createConcurrentTheme(themeName)
     )
     const [connected, setConnected] = useState<boolean>(false)
     const messages = useObjectList<StreamElement>()
@@ -96,7 +90,7 @@ function App(): JSX.Element {
     const [playNotification] = useSound(Sound)
     const playNotificationRef = useRef(playNotification)
     const [profile, setProfile] = useState<User>({
-        pubkey: '',
+        ccaddress: '',
         username: 'anonymous',
         avatar: '',
         description: '',
@@ -138,7 +132,7 @@ function App(): JSX.Element {
         const data = await res.json()
         if (data.characters.length === 0) {
             return {
-                pubkey: '',
+                ccaddress: '',
                 username: 'anonymous',
                 avatar: '',
                 description: '',
@@ -148,7 +142,7 @@ function App(): JSX.Element {
         }
         const payload = JSON.parse(data.characters[0].payload)
         return {
-            pubkey: data.characters[0].author,
+            ccaddress: data.characters[0].author,
             username: payload.username,
             avatar: payload.avatar,
             description: payload.description,
@@ -280,7 +274,7 @@ function App(): JSX.Element {
     }, [currentStreams])
 
     useEffect(() => {
-        setTheme(createTheme((Themes as any)[themeName]))
+        setTheme(createConcurrentTheme(themeName))
     }, [themeName])
 
     return (

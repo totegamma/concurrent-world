@@ -5,7 +5,8 @@ import {
     ListItem,
     ListItemButton,
     ListItemText,
-    Typography
+    Typography,
+    useTheme
 } from '@mui/material'
 import { Link } from 'react-router-dom'
 
@@ -18,7 +19,8 @@ import NotificationsIcon from '@mui/icons-material/Notifications'
 import PercentIcon from '@mui/icons-material/Percent'
 import { useContext, useEffect, useState } from 'react'
 import { ApplicationContext } from '../App'
-import { type Stream } from '../model'
+import type { ConcurrentTheme, Stream } from '../model'
+import { ConcurrentLogo } from './ConcurrentLogo'
 
 export interface MenuProps {
     streams: string[]
@@ -27,6 +29,8 @@ export interface MenuProps {
 export function Menu(props: MenuProps): JSX.Element {
     const appData = useContext(ApplicationContext)
     const [watchStreams, setWatchStreams] = useState<Stream[]>([])
+
+    const theme = useTheme<ConcurrentTheme>()
 
     useEffect(() => {
         ;(async () => {
@@ -51,12 +55,41 @@ export function Menu(props: MenuProps): JSX.Element {
                     width: '200px',
                     height: '100%',
                     pt: '25px',
-                    color: '#fff'
+                    color: 'background.contrastText'
                 }}
             >
-                <Typography variant="h5" sx={{ pl: '18px' }} gutterBottom>
-                    Concurrent
-                </Typography>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        gap: '8px',
+                        justifyContent: 'center'
+                    }}
+                >
+                    <Box>
+                        <ConcurrentLogo
+                            size="32px"
+                            upperColor={
+                                theme.palette.background.contrastText ?? '#000'
+                            } // TODO: remove optional
+                            lowerColor={
+                                theme.palette.background.contrastText ?? '#000'
+                            }
+                            frameColor={
+                                theme.palette.background.contrastText ?? '#000'
+                            }
+                        />
+                    </Box>
+                    <Typography
+                        gutterBottom
+                        sx={{
+                            color: 'background.contrastText',
+                            fontWeight: 600,
+                            fontSize: '22px'
+                        }}
+                    >
+                        Concurrent
+                    </Typography>
+                </Box>
                 <Box
                     sx={{
                         display: 'flex',
@@ -71,7 +104,9 @@ export function Menu(props: MenuProps): JSX.Element {
                                 component={Link}
                                 to="/"
                             >
-                                <HomeIcon sx={{ color: 'white' }} />
+                                <HomeIcon
+                                    sx={{ color: 'background.contrastText' }}
+                                />
 
                                 <ListItemText primary="Home" />
                             </ListItemButton>
@@ -82,7 +117,9 @@ export function Menu(props: MenuProps): JSX.Element {
                                 component={Link}
                                 to="/notification"
                             >
-                                <NotificationsIcon sx={{ color: 'white' }} />
+                                <NotificationsIcon
+                                    sx={{ color: 'background.contrastText' }}
+                                />
 
                                 <ListItemText primary="Notification" />
                             </ListItemButton>
@@ -93,7 +130,9 @@ export function Menu(props: MenuProps): JSX.Element {
                                 component={Link}
                                 to="/associations"
                             >
-                                <MessageIcon sx={{ color: 'white' }} />
+                                <MessageIcon
+                                    sx={{ color: 'background.contrastText' }}
+                                />
 
                                 <ListItemText primary="Associations" />
                             </ListItemButton>
@@ -104,7 +143,9 @@ export function Menu(props: MenuProps): JSX.Element {
                                 component={Link}
                                 to="/explorer"
                             >
-                                <ExploreIcon sx={{ color: 'white' }} />
+                                <ExploreIcon
+                                    sx={{ color: 'background.contrastText' }}
+                                />
 
                                 <ListItemText primary="Explorer" />
                             </ListItemButton>
@@ -115,7 +156,9 @@ export function Menu(props: MenuProps): JSX.Element {
                                 component={Link}
                                 to="/identity"
                             >
-                                <BadgeIcon sx={{ color: 'white' }} />
+                                <BadgeIcon
+                                    sx={{ color: 'background.contrastText' }}
+                                />
 
                                 <ListItemText primary="Identity" />
                             </ListItemButton>
@@ -126,7 +169,9 @@ export function Menu(props: MenuProps): JSX.Element {
                                 component={Link}
                                 to="/settings"
                             >
-                                <SettingsIcon sx={{ color: 'white' }} />
+                                <SettingsIcon
+                                    sx={{ color: 'background.contrastText' }}
+                                />
 
                                 <ListItemText primary="Settings" />
                             </ListItemButton>
@@ -161,7 +206,11 @@ export function Menu(props: MenuProps): JSX.Element {
                                         to={`/#${stream.id}`}
                                         sx={{ gap: 1 }}
                                     >
-                                        <PercentIcon sx={{ color: 'white' }} />
+                                        <PercentIcon
+                                            sx={{
+                                                color: 'background.contrastText'
+                                            }}
+                                        />
                                         <ListItemText
                                             id={labelId}
                                             primary={

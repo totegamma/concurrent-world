@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect } from 'react'
 import { List, Divider, Box, useTheme } from '@mui/material'
-import { Tweet } from '../components/Tweet'
+import { TimelineMessage } from '../components/TimelineMessage'
 import { type RTMMessage, type StreamElement, type User } from '../model'
 import { type IuseResourceManager } from '../hooks/useResourceManager'
 import { type IuseObjectList } from '../hooks/useObjectList'
@@ -117,7 +117,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                             .reverse()
                             .map((e) => (
                                 <React.Fragment key={e.ID}>
-                                    <Tweet
+                                    <TimelineMessage
                                         message={e.Values.id}
                                         messageDict={props.messageDict}
                                         userDict={props.userDict}

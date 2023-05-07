@@ -1,3 +1,20 @@
+import type {
+    Color,
+    CommonColors,
+    PaletteMode,
+    Theme,
+    TypeBackground
+} from '@mui/material'
+import type {
+    Palette,
+    PaletteAugmentColorOptions,
+    PaletteColor,
+    PaletteTonalOffset,
+    TypeAction,
+    TypeDivider,
+    TypeText
+} from '@mui/material/styles/createPalette'
+
 export interface StreamElement {
     ID: string
     Values: {
@@ -28,7 +45,7 @@ export interface RTMMessage {
 }
 
 export interface User {
-    pubkey: string
+    ccaddress: string
     username: string
     avatar: string
     description: string
@@ -57,4 +74,34 @@ export interface Stream {
     meta: string
     signature: string
     cdate: string
+}
+
+interface ConcurrentTypeBackground extends TypeBackground {
+    default: string
+    paper: string
+    contrastText: string
+}
+
+interface ConcurrentPalette extends Palette {
+    common: CommonColors
+    mode: PaletteMode
+    contrastThreshold: number
+    tonalOffset: PaletteTonalOffset
+    primary: PaletteColor
+    secondary: PaletteColor
+    error: PaletteColor
+    warning: PaletteColor
+    info: PaletteColor
+    success: PaletteColor
+    grey: Color
+    text: TypeText
+    divider: TypeDivider
+    action: TypeAction
+    background: ConcurrentTypeBackground
+    getContrastText: (background: string) => string
+    augmentColor: (options: PaletteAugmentColorOptions) => PaletteColor
+}
+
+export interface ConcurrentTheme extends Theme {
+    palette: ConcurrentPalette
 }

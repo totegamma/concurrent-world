@@ -5,12 +5,15 @@ import {
     TextField,
     Box,
     Modal,
-    useTheme
+    useTheme,
+    Paper
 } from '@mui/material'
-import { useContext, useState } from 'react'
+import { useContext, useMemo, useState } from 'react'
 import { ApplicationContext } from '../App'
-import { Themes } from '../themes'
+import { Themes, createConcurrentTheme } from '../themes'
 import { Keygen, LoadKey } from '../util'
+import { ConcurrentLogo } from '../components/ConcurrentLogo'
+import type { ConcurrentTheme } from '../model'
 
 export interface SettingsProp {
     setThemeName: (themename: string) => void
@@ -39,6 +42,14 @@ export function Settings(props: SettingsProp): JSX.Element {
         props.setPrvKey(key.privatekey)
         props.setUserAddr(key.ccaddress)
     }
+
+    const previewTheme: Record<string, ConcurrentTheme> = useMemo(
+        () =>
+            Object.fromEntries(
+                Object.keys(Themes).map((e) => [e, createConcurrentTheme(e)])
+            ),
+        []
+    )
 
     const [open, setOpen] = useState(false)
 
@@ -96,7 +107,7 @@ export function Settings(props: SettingsProp): JSX.Element {
                     overflowY: 'scroll'
                 }}
             >
-                <Typography variant="h5" gutterBottom>
+                <Typography variant="h2" gutterBottom>
                     Settings
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
@@ -149,33 +160,70 @@ export function Settings(props: SettingsProp): JSX.Element {
                     </Button>
                 </Box>
 
-                <Typography variant="h5">Theme</Typography>
+                <Typography variant="h3">Theme</Typography>
                 <Box
                     sx={{
                         display: { xs: 'flex', md: 'grid' },
                         flexFlow: 'column',
                         gridTemplateColumns: '1fr 1fr 1fr 1fr',
-                        gridAutoRows: '50px',
+                        gridAutoRows: '1fr',
                         gap: '10px'
                     }}
                 >
-                    {Object.keys(Themes).map((e) => (
-                        <Button
-                            key={e}
-                            variant="contained"
-                            sx={{
-                                background: (Themes as any)[e].palette.primary
-                                    .main,
-                                color:
-                                    (Themes as any)[e].palette.text?.primary ??
-                                    'black'
-                            }}
-                            onClick={(_) => {
-                                props.setThemeName(e)
-                            }}
-                        >
-                            {e}
-                        </Button>
+                    {Object.keys(previewTheme).map((e) => (
+                        <Paper key={e}>
+                            <Button
+                                onClick={(_) => {
+                                    props.setThemeName(e)
+                                }}
+                                style={{
+                                    border: 'none',
+                                    background:
+                                        previewTheme[e].palette.background
+                                            .paper,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '10px',
+                                    width: '100%',
+                                    justifyContent: 'flex-start'
+                                }}
+                                color="info"
+                            >
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        borderRadius: '100px',
+                                        background:
+                                            previewTheme[e].palette.primary
+                                                .contrastText
+                                    }}
+                                >
+                                    <ConcurrentLogo
+                                        size="40px"
+                                        upperColor={
+                                            previewTheme[e].palette.primary.main
+                                        }
+                                        lowerColor={
+                                            previewTheme[e].palette.background
+                                                .default
+                                        }
+                                        frameColor={
+                                            previewTheme[e].palette.background
+                                                .default
+                                        }
+                                    />
+                                </Box>
+                                <Typography
+                                    sx={{
+                                        color: previewTheme[e].palette.text
+                                            .primary
+                                    }}
+                                    variant="button"
+                                >
+                                    {e}
+                                </Typography>
+                            </Button>
+                        </Paper>
                     ))}
                 </Box>
             </Box>

@@ -16,7 +16,6 @@ import {
     type Location as ReactLocation
 } from 'react-router-dom'
 import { ApplicationContext } from '../App'
-import { usePersistent } from '../hooks/usePersistent'
 import { type Stream } from '../model'
 
 export interface StreamsBarProps {
@@ -26,16 +25,11 @@ export interface StreamsBarProps {
 export function StreamsBar(props: StreamsBarProps): JSX.Element {
     const theme = useTheme()
     const navigate = useNavigate()
-    const [streams, setStreams] = useState(
-        decodeURIComponent(props.location.hash.replace('#', ''))
-    )
-
-    const [selectedStreams, setSelectedStreams] = usePersistent<string[]>(
-        'selectedStreams',
-        ['common']
-    )
 
     const [allStreams, setAllStreams] = useState<Stream[]>([])
+    const [selectedStreams, setSelectedStreams] = useState<string[]>(
+        decodeURIComponent(props.location.hash.replace('#', '')).split(',')
+    )
     const [streamMapper, setStreamMapper] = useState<Record<string, string>>({})
     const appData = useContext(ApplicationContext)
 
@@ -60,7 +54,6 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
 
     // force local streams to change in case of external input (i.e. sidebar button)
     useEffect(() => {
-        setStreams(decodeURIComponent(props.location.hash.replace('#', '')))
         ;(async () => {
             setSelectedStreams(
                 (
@@ -116,7 +109,7 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                 }}
             >
                 <IconButton sx={{ p: '10px' }}>
-                    <ExploreIcon sx={{ color: 'white' }} />
+                    <ExploreIcon sx={{ color: 'primary.contrastText' }} />
                 </IconButton>
                 <Autocomplete
                     sx={{ width: 1 }}
@@ -137,8 +130,10 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                             <InputBase
                                 {...params.InputProps}
                                 {...rest}
-                                sx={{ color: 'white' }}
-                                placeholder="streams"
+                                sx={{ color: 'primary.contrastText' }}
+                                placeholder={
+                                    props.location.hash ? '' : 'following'
+                                }
                             />
                         )
                     }}
@@ -148,7 +143,7 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                             // eslint-disable-next-line
                             <Chip
                                 label={option}
-                                sx={{ color: 'white' }}
+                                sx={{ color: 'primary.contrastText' }}
                                 {...getTagProps({ index })}
                             />
                         ))
@@ -157,9 +152,9 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                 <IconButton
                     sx={{ p: '10px' }}
                     component={Link}
-                    to={`/#${streams}`}
+                    to={`/#${selectedStreams.join(',')}`}
                 >
-                    <SearchIcon sx={{ color: 'white' }} />
+                    <SearchIcon sx={{ color: 'primary.contrastText' }} />
                 </IconButton>
             </Paper>
         </Box>
