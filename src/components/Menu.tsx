@@ -19,7 +19,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications'
 import PercentIcon from '@mui/icons-material/Percent'
 import { useContext, useEffect, useState } from 'react'
 import { ApplicationContext } from '../App'
-import { type Stream } from '../model'
+import type { ConcurrentTheme, Stream } from '../model'
 import { ConcurrentLogo } from './ConcurrentLogo'
 
 export interface MenuProps {
@@ -30,7 +30,7 @@ export function Menu(props: MenuProps): JSX.Element {
     const appData = useContext(ApplicationContext)
     const [watchStreams, setWatchStreams] = useState<Stream[]>([])
 
-    const theme = useTheme()
+    const theme = useTheme<ConcurrentTheme>()
 
     useEffect(() => {
         ;(async () => {
@@ -69,13 +69,13 @@ export function Menu(props: MenuProps): JSX.Element {
                         <ConcurrentLogo
                             size="32px"
                             upperColor={
-                                (theme.palette.background as any).contrastText
-                            } // TODO: remove as any
+                                theme.palette.background.contrastText ?? '#000'
+                            } // TODO: remove optional
                             lowerColor={
-                                (theme.palette.background as any).contrastText
+                                theme.palette.background.contrastText ?? '#000'
                             }
                             frameColor={
-                                (theme.palette.background as any).contrastText
+                                theme.palette.background.contrastText ?? '#000'
                             }
                         />
                     </Box>
