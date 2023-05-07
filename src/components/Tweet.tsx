@@ -13,7 +13,6 @@ import {
     Link,
     IconButton,
     Drawer,
-    ThemeProvider,
     useTheme
 } from '@mui/material'
 import StarIcon from '@mui/icons-material/Star'
