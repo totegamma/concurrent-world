@@ -4,7 +4,6 @@ import {
     List,
     ListItem,
     ListItemButton,
-    ListItemIcon,
     ListItemText,
     Typography
 } from '@mui/material'
@@ -17,12 +16,33 @@ import ExploreIcon from '@mui/icons-material/Explore'
 import SettingsIcon from '@mui/icons-material/Settings'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import PercentIcon from '@mui/icons-material/Percent'
+import { useContext, useEffect, useState } from 'react'
+import { ApplicationContext } from '../App'
+import { type Stream } from '../model'
+import { ConcurrentLogo } from './ConcurrentLogo'
 
 export interface MenuProps {
     streams: string[]
 }
 
 export function Menu(props: MenuProps): JSX.Element {
+    const appData = useContext(ApplicationContext)
+    const [watchStreams, setWatchStreams] = useState<Stream[]>([])
+
+    useEffect(() => {
+        ;(async () => {
+            setWatchStreams(
+                (
+                    await Promise.all(
+                        props.streams.map(
+                            async (id) => await appData.streamDict?.get(id)
+                        )
+                    )
+                ).filter((e) => e) as Stream[]
+            )
+        })()
+    }, [props.streams])
+
     return (
         <Box sx={{ gap: '15px', height: '100%' }}>
             <Box
@@ -35,9 +55,25 @@ export function Menu(props: MenuProps): JSX.Element {
                     color: '#fff'
                 }}
             >
-                <Typography variant="h5" sx={{ pl: '18px' }} gutterBottom>
-                    Concurrent
-                </Typography>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        gap: '8px',
+                        justifyContent: 'center'
+                    }}
+                >
+                    <Box>
+                        <ConcurrentLogo
+                            size="32px"
+                            upperColor="white"
+                            lowerColor="white"
+                            frameColor="white"
+                        />
+                    </Box>
+                    <Typography variant="h5" gutterBottom>
+                        Concurrent
+                    </Typography>
+                </Box>
                 <Box
                     sx={{
                         display: 'flex',
@@ -133,19 +169,24 @@ export function Menu(props: MenuProps): JSX.Element {
                             flexDirection: 'column'
                         }}
                     >
-                        {props.streams.map((value) => {
-                            const labelId = `checkbox-list-secondary-label-${value}`
+                        {watchStreams.map((stream) => {
+                            const labelId = `checkbox-list-secondary-label-${stream.id}`
                             return (
-                                <ListItem key={value} disablePadding>
+                                <ListItem key={stream.id} disablePadding>
                                     <ListItemButton
                                         component={Link}
-                                        to={`/#${value}`}
+                                        to={`/#${stream.id}`}
                                         sx={{ gap: 1 }}
                                     >
                                         <PercentIcon sx={{ color: 'white' }} />
                                         <ListItemText
                                             id={labelId}
-                                            primary={value}
+                                            primary={
+                                                stream.meta
+                                                    ? JSON.parse(stream.meta)
+                                                          .name
+                                                    : 'backrooms'
+                                            }
                                         />
                                     </ListItemButton>
                                 </ListItem>
