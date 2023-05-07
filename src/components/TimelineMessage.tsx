@@ -40,6 +40,10 @@ export interface TimelineMessageProps {
     follow: (ccaddress: string) => void
 }
 
+const genEmojiTag = (emoji: Emoji): string => {
+    return `<img src="${emoji.publicUrl}" alt="emoji:${emoji.name}:" title=":${emoji?.name}:"/>`
+}
+
 export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
     const [user, setUser] = useState<User | null>()
     const [message, setMessage] = useState<RTMMessage | undefined>()
@@ -305,11 +309,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                         const emoji: Emoji | undefined =
                                             appData.emojiDict[name.slice(1, -1)]
                                         if (emoji) {
-                                            return `<img 
-                                                    title=":${emoji?.name}:"
-                                                    alt="emoji:${emoji?.name}:"
-                                                    src="${emoji?.publicUrl}"
-                                                    />`
+                                            return genEmojiTag(emoji)
                                         }
                                         return `${name}`
                                     }
