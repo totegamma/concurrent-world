@@ -95,7 +95,8 @@ export function Menu(props: MenuProps): JSX.Element {
                     sx={{
                         textAlign: 'center',
                         fontWeight: 400,
-                        fontSize: '12px'
+                        fontSize: '12px',
+                        marginBottom: '10px'
                     }}
                 >
                     buildTime: {buildTime.toLocaleString()}
@@ -104,6 +105,7 @@ export function Menu(props: MenuProps): JSX.Element {
                     <br />
                     sha: {sha.slice(0, 7)}
                 </Box>
+                <Divider />
                 <Box
                     sx={{
                         display: 'flex',
