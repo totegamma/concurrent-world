@@ -127,13 +127,13 @@ export function Menu(props: MenuProps): JSX.Element {
                             <ListItemButton
                                 sx={{ gap: 1 }}
                                 component={Link}
-                                to="/notification"
+                                to="/notifications"
                             >
                                 <NotificationsIcon
                                     sx={{ color: 'background.contrastText' }}
                                 />
 
-                                <ListItemText primary="Notification" />
+                                <ListItemText primary="Notifications" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
