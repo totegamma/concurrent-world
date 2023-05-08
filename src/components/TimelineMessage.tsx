@@ -212,7 +212,8 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                             flex: 1,
                             flexDirection: 'column',
                             mt: '5px',
-                            width: '100%'
+                            width: '100%',
+                            overflow: 'auto'
                         }}
                     >
                         <Box
