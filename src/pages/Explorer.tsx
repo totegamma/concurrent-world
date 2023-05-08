@@ -17,7 +17,6 @@ import { useContext, useEffect, useState } from 'react'
 import { ApplicationContext } from '../App'
 import StarIcon from '@mui/icons-material/Star'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
-import type { IuseResourceManager } from '../hooks/useResourceManager'
 import type { Stream, User } from '../model'
 import { Sign } from '../util'
 
@@ -26,7 +25,6 @@ export interface ExplorerProps {
     followList: string[]
     setFollowList: (newlist: string[]) => void
     setWatchList: (newlist: string[]) => void
-    userDict: IuseResourceManager<User>
 }
 
 export function Explorer(props: ExplorerProps): JSX.Element {
@@ -87,7 +85,8 @@ export function Explorer(props: ExplorerProps): JSX.Element {
             setFollowList(
                 await Promise.all(
                     props.followList.map(
-                        async (ccaddress) => await props.userDict.get(ccaddress)
+                        async (ccaddress) =>
+                            await appData.userDict.get(ccaddress)
                     )
                 )
             )
