@@ -40,13 +40,11 @@ export function Menu(props: MenuProps): JSX.Element {
     useEffect(() => {
         ;(async () => {
             setWatchStreams(
-                (
-                    await Promise.all(
-                        props.streams.map(
-                            async (id) => await appData.streamDict?.get(id)
-                        )
+                await Promise.all(
+                    props.streams.map(
+                        async (id) => await appData.streamDict.get(id)
                     )
-                ).filter((e) => e) as Stream[]
+                )
             )
         })()
     }, [props.streams])

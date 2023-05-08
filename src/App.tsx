@@ -50,7 +50,7 @@ export const ApplicationContext = createContext<appData>({
         notificationstream: ''
     },
     emojiDict: {},
-    streamDict: undefined,
+    streamDict: dummyResourceManager,
     userDict: dummyResourceManager,
     messageDict: dummyResourceManager
 })
@@ -62,7 +62,7 @@ export interface appData {
     userAddress: string
     profile: User
     emojiDict: Record<string, Emoji>
-    streamDict?: IuseResourceManager<Stream>
+    streamDict: IuseResourceManager<Stream>
     userDict: IuseResourceManager<User>
     messageDict: IuseResourceManager<RTMMessage>
 }
