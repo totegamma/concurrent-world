@@ -25,7 +25,7 @@ import { ConcurrentLogo } from './ConcurrentLogo'
 // @ts-expect-error vite dynamic import
 import buildTime from '~build/time'
 // @ts-expect-error vite dynamic import
-import { branch } from '~build/info'
+import { branch, sha } from '~build/info'
 
 export interface MenuProps {
     streams: string[]
@@ -101,6 +101,8 @@ export function Menu(props: MenuProps): JSX.Element {
                     buildTime: {buildTime.toLocaleString()}
                     <br />
                     branch: {branch}
+                    <br />
+                    sha: {sha.slice(0, 7)}
                 </Box>
                 <Box
                     sx={{
