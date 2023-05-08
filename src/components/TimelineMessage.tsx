@@ -24,7 +24,6 @@ import BoringAvatar from 'boring-avatars'
 
 import { ApplicationContext } from '../App'
 import { type Emoji, type RTMMessage, type User } from '../model'
-import { type IuseResourceManager } from '../hooks/useResourceManager'
 import { Schemas } from '../schemas'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -38,8 +37,6 @@ import { materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 export interface TimelineMessageProps {
     message: string
-    messageDict: IuseResourceManager<RTMMessage>
-    userDict: IuseResourceManager<User>
     follow: (ccaddress: string) => void
 }
 
@@ -59,11 +56,11 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
     const [inspectItem, setInspectItem] = useState<RTMMessage | null>(null)
 
     const loadTweet = (): void => {
-        props.messageDict
+        appData.messageDict
             .get(props.message)
             .then((msg) => {
                 setMessage(msg)
-                props.userDict
+                appData.userDict
                     .get(msg.author)
                     .then((user) => {
                         setUser(user)
@@ -102,9 +99,9 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
         const payloadObj = {}
         const payload = JSON.stringify(payloadObj)
         const signature = Sign(appData.privatekey, payload)
-        const targetAuthor = (await props.messageDict.get(messageID)).author
+        const targetAuthor = (await appData.messageDict.get(messageID)).author
         console.log(targetAuthor)
-        const targetStream = (await props.userDict.get(targetAuthor))
+        const targetStream = (await appData.userDict.get(targetAuthor))
             .notificationstream
         console.log([targetStream].filter((e) => e))
 
@@ -124,7 +121,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
         fetch(appData.serverAddress + 'associations', requestOptions)
             .then(async (res) => await res.json())
             .then((_) => {
-                props.messageDict.invalidate(messageID)
+                appData.messageDict.invalidate(messageID)
                 loadTweet()
             })
     }
@@ -146,7 +143,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
         fetch(appData.serverAddress + 'associations', requestOptions)
             .then(async (res) => await res.json())
             .then((_) => {
-                props.messageDict.invalidate(messageID)
+                appData.messageDict.invalidate(messageID)
                 loadTweet()
             })
     }
