@@ -22,6 +22,11 @@ import { ApplicationContext } from '../App'
 import type { ConcurrentTheme, Stream } from '../model'
 import { ConcurrentLogo } from './ConcurrentLogo'
 
+// @ts-expect-error vite dynamic import
+import buildTime from '~build/time'
+// @ts-expect-error vite dynamic import
+import { branch } from '~build/info'
+
 export interface MenuProps {
     streams: string[]
 }
@@ -85,6 +90,17 @@ export function Menu(props: MenuProps): JSX.Element {
                 </Box>
                 <Box sx={{ textAlign: 'center', fontWeight: 600 }}>
                     開発中α版
+                </Box>
+                <Box
+                    sx={{
+                        textAlign: 'center',
+                        fontWeight: 400,
+                        fontSize: '12px'
+                    }}
+                >
+                    buildTime: {buildTime.toLocaleString()}
+                    <br />
+                    branch: {branch}
                 </Box>
                 <Box
                     sx={{
