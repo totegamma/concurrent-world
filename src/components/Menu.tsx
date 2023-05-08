@@ -22,6 +22,11 @@ import { ApplicationContext } from '../App'
 import type { ConcurrentTheme, Stream } from '../model'
 import { ConcurrentLogo } from './ConcurrentLogo'
 
+// @ts-expect-error vite dynamic import
+import buildTime from '~build/time'
+// @ts-expect-error vite dynamic import
+import { branch } from '~build/info'
+
 export interface MenuProps {
     streams: string[]
 }
@@ -88,6 +93,17 @@ export function Menu(props: MenuProps): JSX.Element {
                 </Box>
                 <Box
                     sx={{
+                        textAlign: 'center',
+                        fontWeight: 400,
+                        fontSize: '12px'
+                    }}
+                >
+                    buildTime: {buildTime.toLocaleString()}
+                    <br />
+                    branch: {branch}
+                </Box>
+                <Box
+                    sx={{
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '5px'
@@ -111,13 +127,13 @@ export function Menu(props: MenuProps): JSX.Element {
                             <ListItemButton
                                 sx={{ gap: 1 }}
                                 component={Link}
-                                to="/notification"
+                                to="/notifications"
                             >
                                 <NotificationsIcon
                                     sx={{ color: 'background.contrastText' }}
                                 />
 
-                                <ListItemText primary="Notification" />
+                                <ListItemText primary="Notifications" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
