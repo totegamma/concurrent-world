@@ -75,7 +75,7 @@ function App(): JSX.Element {
         'Theme',
         Object.keys(Themes)[0]
     )
-    const [watchstreams, setWatchStreams] = usePersistent<string[]>(
+    const [watchStreams, setWatchStreams] = usePersistent<string[]>(
         'watchStreamList',
         []
     )
@@ -306,7 +306,7 @@ function App(): JSX.Element {
                         }}
                     >
                         <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                            <Menu streams={watchstreams} />
+                            <Menu streams={watchStreams} />
                         </Box>
                         <Box
                             sx={{
@@ -341,7 +341,7 @@ function App(): JSX.Element {
                                                 setCurrentStreams={
                                                     setCurrentStreams
                                                 }
-                                                watchstreams={watchstreams}
+                                                watchstreams={watchStreams}
                                             />
                                         }
                                     />
@@ -353,7 +353,7 @@ function App(): JSX.Element {
                                         path="/explorer"
                                         element={
                                             <Explorer
-                                                watchList={watchstreams}
+                                                watchList={watchStreams}
                                                 setWatchList={setWatchStreams}
                                                 followList={followList}
                                                 setFollowList={setFollowList}
