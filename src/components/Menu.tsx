@@ -68,19 +68,12 @@ export function Menu(props: MenuProps): JSX.Element {
                     <Box>
                         <ConcurrentLogo
                             size="32px"
-                            upperColor={
-                                theme.palette.background.contrastText ?? '#000'
-                            } // TODO: remove optional
-                            lowerColor={
-                                theme.palette.background.contrastText ?? '#000'
-                            }
-                            frameColor={
-                                theme.palette.background.contrastText ?? '#000'
-                            }
+                            upperColor={theme.palette.background.contrastText}
+                            lowerColor={theme.palette.background.contrastText}
+                            frameColor={theme.palette.background.contrastText}
                         />
                     </Box>
                     <Typography
-                        gutterBottom
                         sx={{
                             color: 'background.contrastText',
                             fontWeight: 600,
@@ -89,6 +82,9 @@ export function Menu(props: MenuProps): JSX.Element {
                     >
                         Concurrent
                     </Typography>
+                </Box>
+                <Box sx={{ textAlign: 'center', fontWeight: 600 }}>
+                    開発中α版
                 </Box>
                 <Box
                     sx={{

@@ -112,7 +112,6 @@ function App(): JSX.Element {
                 const dict = Object.fromEntries(
                     data.emojis.map((e: any) => [e.emoji.name, e.emoji])
                 )
-                console.log(dict)
                 setEmojiDict(dict)
             })
     }, [])
@@ -313,7 +312,8 @@ function App(): JSX.Element {
                             sx={{
                                 display: 'flex',
                                 flexFlow: 'column',
-                                width: 1
+                                overflow: 'hidden',
+                                flex: 1
                             }}
                         >
                             <Paper
