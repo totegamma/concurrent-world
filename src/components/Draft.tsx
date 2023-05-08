@@ -1,18 +1,55 @@
-import { useState, useContext } from 'react'
-import { TextField, Box, Stack, Button, useTheme } from '@mui/material'
+import { useState, useContext, useEffect } from 'react'
+import {
+    TextField,
+    Box,
+    Stack,
+    Button,
+    useTheme,
+    IconButton
+} from '@mui/material'
 import { Sign } from '../util'
 import { ApplicationContext } from '../App'
 import SendIcon from '@mui/icons-material/Send'
 import { Schemas } from '../schemas'
+import Picker from '@emoji-mart/react'
+import data from '@emoji-mart/data'
+import { EmojiEmotions } from '@mui/icons-material'
+// import { EmojiProps } from '@types/emoji-mart'
+
+export interface EmojiProps {
+    shortcodes: string
+}
 
 export interface DraftProps {
     currentStreams: string
+}
+
+export interface Skin {
+    src: string
+}
+
+export interface Emoji {
+    id: string
+    name: string
+    keywords: string[]
+    skins: Skin[]
+}
+
+export interface CustomEmoji {
+    id?: string
+    name?: string
+    emojis?: Emoji[]
+    keywords?: string[] | undefined
 }
 
 export function Draft(props: DraftProps): JSX.Element {
     const appData = useContext(ApplicationContext)
 
     const [draft, setDraft] = useState<string>('')
+
+    const [selectEmoji, setSelectEmoji] = useState<boolean>(false)
+
+    const [customEmoji, setCustomEmoji] = useState<CustomEmoji[]>([])
 
     const theme = useTheme()
 
@@ -51,6 +88,25 @@ export function Draft(props: DraftProps): JSX.Element {
             })
     }
 
+    useEffect(() => {
+        const emojis: CustomEmoji[] = [
+            {
+                id: 'fluffy',
+                name: 'Fluffy Social',
+                emojis: Object.entries(appData.emojiDict).map(
+                    ([key, value]) => ({
+                        id: key,
+                        name: value.name,
+                        keywords: value.aliases,
+                        skins: [{ src: value.publicUrl }]
+                    })
+                )
+            }
+        ]
+
+        setCustomEmoji(emojis)
+    }, [appData.emojiDict])
+
     return (
         <Stack sx={{ position: 'relative' }}>
             <TextField
@@ -79,6 +135,27 @@ export function Draft(props: DraftProps): JSX.Element {
                     }
                 }}
             />
+            {!selectEmoji || (
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: 170,
+                        right: { xs: 10, mb: 90 },
+                        zIndex: 9
+                    }}
+                >
+                    <Picker
+                        data={data}
+                        categories={['fluffy']}
+                        custom={customEmoji}
+                        searchPosition="static"
+                        onEmojiSelect={(emoji: EmojiProps) => {
+                            console.log(typeof emoji)
+                            setDraft(draft + emoji.shortcodes)
+                        }}
+                    />
+                </Box>
+            )}
             <Box
                 sx={{
                     position: 'absolute',
@@ -86,6 +163,14 @@ export function Draft(props: DraftProps): JSX.Element {
                     right: 10
                 }}
             >
+                <IconButton
+                    sx={{ color: theme.palette.text.secondary }}
+                    onClick={() => {
+                        setSelectEmoji(!selectEmoji)
+                    }}
+                >
+                    <EmojiEmotions />
+                </IconButton>
                 <Button
                     color="primary"
                     variant="contained"

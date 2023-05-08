@@ -167,21 +167,38 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
 
     return (
         <ListItem
-            sx={{ alignItems: 'flex-start', flex: 1, gap: '25px', p: '10px 0' }}
+            sx={{
+                alignItems: 'flex-start',
+                flex: 1,
+                gap: '25px',
+                p: '10px 0',
+                wordBreak: 'break-word'
+            }}
         >
             {message != null && (
                 <>
-                    <Box sx={{ width: '48px' }}>
+                    <Box
+                        sx={{
+                            width: { xs: '32px', sm: '48px' }
+                        }}
+                    >
                         <IconButton
                             onClick={() => {
                                 props.follow(message.author)
+                            }}
+                            sx={{
+                                width: { xs: '56px', sm: '64px' },
+                                height: { xs: '56px', sm: '64px' }
                             }}
                         >
                             {user?.avatar ? (
                                 <Avatar
                                     alt="Profile Picture"
                                     src={user?.avatar}
-                                    sx={{ width: '48px', height: '48px' }}
+                                    sx={{
+                                        width: { xs: '40px', sm: '48px' },
+                                        height: { xs: '40px', sm: '48px' }
+                                    }}
                                 />
                             ) : (
                                 <BoringAvatar
@@ -217,7 +234,11 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                 </Typography>
                                 <Typography
                                     component="span"
-                                    sx={{ fontweight: '400', fontSize: '10px' }}
+                                    sx={{
+                                        fontweight: '400',
+                                        fontSize: '10px',
+                                        display: { xs: 'none', sm: 'inline' }
+                                    }}
                                 >
                                     {message.author} ·{' '}
                                 </Typography>

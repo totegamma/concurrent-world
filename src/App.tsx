@@ -25,7 +25,7 @@ import type {
 import {
     Associations,
     Explorer,
-    Notification,
+    Notifications,
     Identity,
     Settings,
     Timeline
@@ -362,8 +362,8 @@ function App(): JSX.Element {
                                         }
                                     />
                                     <Route
-                                        path="/notification"
-                                        element={<Notification />}
+                                        path="/notifications"
+                                        element={<Notifications />}
                                     />
                                     <Route
                                         path="/identity"
