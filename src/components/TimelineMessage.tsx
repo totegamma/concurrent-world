@@ -211,7 +211,11 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                 </Typography>
                                 <Typography
                                     component="span"
-                                    sx={{ fontweight: '400', fontSize: '10px' }}
+                                    sx={{
+                                        fontweight: '400',
+                                        fontSize: '10px',
+                                        display: { xs: 'none', sm: 'inline' }
+                                    }}
                                 >
                                     {message.author} ·{' '}
                                 </Typography>
