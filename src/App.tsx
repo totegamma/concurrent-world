@@ -319,7 +319,7 @@ function App(): JSX.Element {
                             <Paper
                                 sx={{
                                     flexGrow: '1',
-                                    margin: { xs: '8px', sm: '10px' },
+                                    margin: { xs: '4px', sm: '10px' },
                                     mb: { xs: 0, sm: '10px' },
                                     display: 'flex',
                                     flexFlow: 'column',

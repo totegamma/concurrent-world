@@ -102,7 +102,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                     overflowX: 'hidden',
                     overflowY: 'auto',
                     width: '100%',
-                    padding: '20px',
+                    padding: { xs: '8px', sm: '20px' },
                     background: theme.palette.background.paper,
                     minHeight: '100%'
                 }}
