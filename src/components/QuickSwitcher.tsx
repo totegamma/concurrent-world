@@ -1,9 +1,18 @@
-import { Modal, Box, TextField, Paper, ThemeProvider } from '@mui/material'
+import {
+    Modal,
+    Box,
+    TextField,
+    Paper,
+    ThemeProvider,
+    InputAdornment
+} from '@mui/material'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { ApplicationContext } from '../App'
 import { type IuseResourceManager } from '../hooks/useResourceManager'
 import { Themes, createConcurrentTheme } from '../themes'
 import { type ConcurrentTheme, type User } from '../model'
+import SearchIcon from '@mui/icons-material/Search'
+import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 
 export interface QuickSwitcherProps {
     userDict: IuseResourceManager<User>
@@ -60,9 +69,10 @@ export function QuickSwitcher(props: QuickSwitcherProps): JSX.Element {
     // {items.filter(item => item.name.match(draft)).map(item => <div>{item.name}</div>)}
 
     useEffect(() => {
-        document.addEventListener('keyup', (e: any) => {
+        document.addEventListener('keydown', (e: any) => {
             // console.log(e)
-            if (e.key === 'z' && e.ctrlKey === true) {
+            if ((e.key === 'k' || e.key === 'p') && e.ctrlKey === true) {
+                e.preventDefault()
                 setDraft('')
                 setOpenQuickSwitcher(true)
             }
@@ -82,7 +92,7 @@ export function QuickSwitcher(props: QuickSwitcherProps): JSX.Element {
                     setOpenQuickSwitcher(false)
                 }}
             >
-                <Paper
+                <Box
                     sx={{
                         position: 'absolute',
                         top: '50%',
@@ -91,11 +101,11 @@ export function QuickSwitcher(props: QuickSwitcherProps): JSX.Element {
                         width: '60vw',
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '10px',
+                        // gap: '10px',
+                        color: 'text.primary',
                         background: 'none',
                         height: '30vh',
-                        justifyContent: 'end',
-                        overflow: 'hidden'
+                        justifyContent: 'start'
                     }}
                     component="form"
                     onSubmit={(e) => {
@@ -113,6 +123,34 @@ export function QuickSwitcher(props: QuickSwitcherProps): JSX.Element {
                         // console.log(previewTheme)
                     }}
                 >
+                    <TextField
+                        variant="filled"
+                        value={draft}
+                        sx={{
+                            bgcolor: 'background.paper',
+                            color: 'text.primary'
+                        }}
+                        onChange={(e) => {
+                            setDraft(e.target.value)
+                        }}
+                        // onSubmit={e => {console.log('submit')}}
+                        inputRef={(input) => input?.focus()}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    {draft.startsWith('@') ? (
+                                        <AccountCircleIcon
+                                            sx={{ color: 'text.primary' }}
+                                        />
+                                    ) : (
+                                        <SearchIcon
+                                            sx={{ color: 'text.primary' }}
+                                        />
+                                    )}
+                                </InputAdornment>
+                            )
+                        }}
+                    ></TextField>
                     <Box
                         sx={{
                             bgcolor: 'background.paper',
@@ -127,19 +165,7 @@ export function QuickSwitcher(props: QuickSwitcherProps): JSX.Element {
                                 <div key={theme}>{theme}</div>
                             ))}
                     </Box>
-                    <TextField
-                        variant="filled"
-                        value={draft}
-                        sx={{
-                            bgcolor: 'background.paper'
-                        }}
-                        onChange={(e) => {
-                            setDraft(e.target.value)
-                        }}
-                        // onSubmit={e => {console.log('submit')}}
-                        inputRef={(input) => input?.focus()}
-                    ></TextField>
-                </Paper>
+                </Box>
             </Modal>
         </>
     )
