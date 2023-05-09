@@ -75,7 +75,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                         .map(
                             async (id) =>
                                 await appData.streamDict
-                                    ?.get(id)
+                                    .get(id)
                                     .then((e) =>
                                         e.meta ? JSON.parse(e.meta).name : null
                                     )
