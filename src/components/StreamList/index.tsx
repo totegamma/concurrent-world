@@ -7,9 +7,34 @@ import {
 } from '@mui/material'
 import { Link } from 'react-router-dom'
 import PercentIcon from '@mui/icons-material/Percent'
-import { useContext, useEffect, useState } from 'react'
-import { ApplicationContext } from '../App'
-import { type Stream } from '../model'
+import React, { useEffect, useContext, useMemo, useRef, useState } from 'react'
+import { ApplicationContext } from '../../App'
+import { type Stream } from '../../model'
+import { createPortal } from 'react-dom'
+import {
+    Announcements,
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragStartEvent,
+    DragOverlay,
+    DragMoveEvent,
+    DragEndEvent,
+    DragOverEvent,
+    MeasuringStrategy,
+    DropAnimation,
+    Modifier,
+    defaultDropAnimation,
+    UniqueIdentifier
+} from '@dnd-kit/core'
+import {
+    SortableContext,
+    arrayMove,
+    verticalListSortingStrategy
+} from '@dnd-kit/sortable'
 
 interface Props {
     streams: string[]
