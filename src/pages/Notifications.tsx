@@ -1,6 +1,6 @@
 import { Box, Divider, Typography, useTheme } from '@mui/material'
 
-export function Notification(): JSX.Element {
+export function Notifications(): JSX.Element {
     const theme = useTheme()
 
     return (
@@ -16,7 +16,7 @@ export function Notification(): JSX.Element {
             }}
         >
             <Typography variant="h2" gutterBottom>
-                Notification
+                Notifications
             </Typography>
             <Divider />
         </Box>

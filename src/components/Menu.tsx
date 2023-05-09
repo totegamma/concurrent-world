@@ -22,6 +22,13 @@ import { ApplicationContext } from '../App'
 import type { ConcurrentTheme, Stream } from '../model'
 import { ConcurrentLogo } from './ConcurrentLogo'
 
+// @ts-expect-error vite dynamic import
+import buildTime from '~build/time'
+// @ts-expect-error vite dynamic import
+import { branch, sha } from '~build/info'
+
+const branchName = branch || window.location.host.split('.')[0]
+
 export interface MenuProps {
     streams: string[]
 }
@@ -35,13 +42,11 @@ export function Menu(props: MenuProps): JSX.Element {
     useEffect(() => {
         ;(async () => {
             setWatchStreams(
-                (
-                    await Promise.all(
-                        props.streams.map(
-                            async (id) => await appData.streamDict?.get(id)
-                        )
+                await Promise.all(
+                    props.streams.map(
+                        async (id) => await appData.streamDict.get(id)
                     )
-                ).filter((e) => e) as Stream[]
+                )
             )
         })()
     }, [props.streams])
@@ -88,6 +93,21 @@ export function Menu(props: MenuProps): JSX.Element {
                 </Box>
                 <Box
                     sx={{
+                        textAlign: 'center',
+                        fontWeight: 400,
+                        fontSize: '12px',
+                        marginBottom: '10px'
+                    }}
+                >
+                    buildTime: {buildTime.toLocaleString()}
+                    <br />
+                    branch: {branchName}
+                    <br />
+                    sha: {sha.slice(0, 7)}
+                </Box>
+                <Divider />
+                <Box
+                    sx={{
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '5px'
@@ -111,13 +131,13 @@ export function Menu(props: MenuProps): JSX.Element {
                             <ListItemButton
                                 sx={{ gap: 1 }}
                                 component={Link}
-                                to="/notification"
+                                to="/notifications"
                             >
                                 <NotificationsIcon
                                     sx={{ color: 'background.contrastText' }}
                                 />
 
-                                <ListItemText primary="Notification" />
+                                <ListItemText primary="Notifications" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>

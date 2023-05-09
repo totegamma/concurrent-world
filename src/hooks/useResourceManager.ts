@@ -34,3 +34,16 @@ export function useResourceManager<T>(
         invalidate
     }
 }
+
+export const dummyResourceManager: IuseResourceManager<any> = {
+    current: {},
+    get: async () => {
+        throw new Error('ResourceManager not initialized get')
+    },
+    register: (key: string, value: any) => {
+        throw new Error('ResourceManager not initialized register')
+    },
+    invalidate: (key: string) => {
+        throw new Error('ResourceManager not initialized invalidate')
+    }
+}

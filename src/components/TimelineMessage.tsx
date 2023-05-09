@@ -24,7 +24,6 @@ import BoringAvatar from 'boring-avatars'
 
 import { ApplicationContext } from '../App'
 import { type Emoji, type RTMMessage, type User } from '../model'
-import { type IuseResourceManager } from '../hooks/useResourceManager'
 import { Schemas } from '../schemas'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -38,8 +37,6 @@ import { materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 export interface TimelineMessageProps {
     message: string
-    messageDict: IuseResourceManager<RTMMessage>
-    userDict: IuseResourceManager<User>
     follow: (ccaddress: string) => void
 }
 
@@ -59,11 +56,11 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
     const [inspectItem, setInspectItem] = useState<RTMMessage | null>(null)
 
     const loadTweet = (): void => {
-        props.messageDict
+        appData.messageDict
             .get(props.message)
             .then((msg) => {
                 setMessage(msg)
-                props.userDict
+                appData.userDict
                     .get(msg.author)
                     .then((user) => {
                         setUser(user)
@@ -78,7 +75,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                         .map(
                             async (id) =>
                                 await appData.streamDict
-                                    ?.get(id)
+                                    .get(id)
                                     .then((e) =>
                                         e.meta ? JSON.parse(e.meta).name : null
                                     )
@@ -102,9 +99,9 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
         const payloadObj = {}
         const payload = JSON.stringify(payloadObj)
         const signature = Sign(appData.privatekey, payload)
-        const targetAuthor = (await props.messageDict.get(messageID)).author
+        const targetAuthor = (await appData.messageDict.get(messageID)).author
         console.log(targetAuthor)
-        const targetStream = (await props.userDict.get(targetAuthor))
+        const targetStream = (await appData.userDict.get(targetAuthor))
             .notificationstream
         console.log([targetStream].filter((e) => e))
 
@@ -124,7 +121,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
         fetch(appData.serverAddress + 'associations', requestOptions)
             .then(async (res) => await res.json())
             .then((_) => {
-                props.messageDict.invalidate(messageID)
+                appData.messageDict.invalidate(messageID)
                 loadTweet()
             })
     }
@@ -146,7 +143,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
         fetch(appData.serverAddress + 'associations', requestOptions)
             .then(async (res) => await res.json())
             .then((_) => {
-                props.messageDict.invalidate(messageID)
+                appData.messageDict.invalidate(messageID)
                 loadTweet()
             })
     }
@@ -167,21 +164,38 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
 
     return (
         <ListItem
-            sx={{ alignItems: 'flex-start', flex: 1, gap: '25px', p: '10px 0' }}
+            sx={{
+                alignItems: 'flex-start',
+                flex: 1,
+                gap: { xs: '23px', sm: '25px' },
+                p: { xs: '5px 0', sm: '10px 0' },
+                wordBreak: 'break-word'
+            }}
         >
             {message != null && (
                 <>
-                    <Box sx={{ width: '48px' }}>
+                    <Box
+                        sx={{
+                            width: { xs: '32px', sm: '48px' }
+                        }}
+                    >
                         <IconButton
                             onClick={() => {
                                 props.follow(message.author)
+                            }}
+                            sx={{
+                                width: { xs: '56px', sm: '64px' },
+                                height: { xs: '56px', sm: '64px' }
                             }}
                         >
                             {user?.avatar ? (
                                 <Avatar
                                     alt="Profile Picture"
                                     src={user?.avatar}
-                                    sx={{ width: '48px', height: '48px' }}
+                                    sx={{
+                                        width: { xs: '40px', sm: '48px' },
+                                        height: { xs: '40px', sm: '48px' }
+                                    }}
                                 />
                             ) : (
                                 <BoringAvatar
@@ -198,7 +212,8 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                             flex: 1,
                             flexDirection: 'column',
                             mt: '5px',
-                            width: '100%'
+                            width: '100%',
+                            overflow: 'auto'
                         }}
                     >
                         <Box
@@ -217,7 +232,11 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                 </Typography>
                                 <Typography
                                     component="span"
-                                    sx={{ fontweight: '400', fontSize: '10px' }}
+                                    sx={{
+                                        fontweight: '400',
+                                        fontSize: '10px',
+                                        display: { xs: 'none', sm: 'inline' }
+                                    }}
                                 >
                                     {message.author} ·{' '}
                                 </Typography>
@@ -255,7 +274,15 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                 rehypePlugins={[rehypeRaw, rehypeSanitize]}
                                 components={{
                                     p: ({ children }) => (
-                                        <Typography paragraph>
+                                        <Typography
+                                            sx={{
+                                                marginBottom: {
+                                                    xs: '4px',
+                                                    sm: '8px'
+                                                }
+                                            }}
+                                            paragraph
+                                        >
                                             {children}
                                         </Typography>
                                     ),

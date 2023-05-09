@@ -1,8 +1,7 @@
 import React, { useCallback, useContext, useEffect } from 'react'
 import { List, Divider, Box, useTheme } from '@mui/material'
 import { TimelineMessage } from '../components/TimelineMessage'
-import { type RTMMessage, type StreamElement, type User } from '../model'
-import { type IuseResourceManager } from '../hooks/useResourceManager'
+import { type StreamElement } from '../model'
 import { type IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'
 import { StreamsBar } from '../components/StreamsBar'
@@ -11,8 +10,6 @@ import { ApplicationContext } from '../App'
 
 export interface TimelineProps {
     messages: IuseObjectList<StreamElement>
-    userDict: IuseResourceManager<User>
-    messageDict: IuseResourceManager<RTMMessage>
     follow: (ccaddress: string) => void
     followList: string[]
     setCurrentStreams: (input: string) => void
@@ -35,7 +32,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                     props.followList.map(
                         async (ccaddress) =>
                             (
-                                await props.userDict.get(ccaddress)
+                                await appData.userDict.get(ccaddress)
                             ).homestream
                     )
                 )
@@ -78,7 +75,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                         props.followList.map(
                             async (ccaddress) =>
                                 (
-                                    await props.userDict.get(ccaddress)
+                                    await appData.userDict.get(ccaddress)
                                 ).homestream
                         )
                     )
@@ -102,7 +99,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                     overflowX: 'hidden',
                     overflowY: 'auto',
                     width: '100%',
-                    padding: '20px',
+                    padding: { xs: '8px', sm: '20px' },
                     background: theme.palette.background.paper,
                     minHeight: '100%'
                 }}
@@ -121,8 +118,6 @@ export function Timeline(props: TimelineProps): JSX.Element {
                                 <React.Fragment key={e.ID}>
                                     <TimelineMessage
                                         message={e.Values.id}
-                                        messageDict={props.messageDict}
-                                        userDict={props.userDict}
                                         follow={props.follow}
                                     />
                                     <Divider
