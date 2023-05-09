@@ -277,7 +277,6 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                 components={{
                                     p: ({ children }) => (
                                         <Typography
-                                            variant="p"
                                             sx={{
                                                 marginBottom: {
                                                     xs: '4px',
