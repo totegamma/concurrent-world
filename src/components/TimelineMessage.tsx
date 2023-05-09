@@ -167,8 +167,8 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
             sx={{
                 alignItems: 'flex-start',
                 flex: 1,
-                gap: '25px',
-                p: '10px 0',
+                gap: { xs: '23px', sm: '25px' },
+                p: { xs: '5px 0', sm: '10px 0' },
                 wordBreak: 'break-word'
             }}
         >
@@ -274,7 +274,15 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                 rehypePlugins={[rehypeRaw, rehypeSanitize]}
                                 components={{
                                     p: ({ children }) => (
-                                        <Typography paragraph>
+                                        <Typography
+                                            sx={{
+                                                marginBottom: {
+                                                    xs: '4px',
+                                                    sm: '8px'
+                                                }
+                                            }}
+                                            paragraph
+                                        >
                                             {children}
                                         </Typography>
                                     ),
