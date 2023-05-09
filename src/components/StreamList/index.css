@@ -1,0 +1,10 @@
+ul {
+    list-style: none;
+    box-sizing: border-box;
+    height: 100%;
+    padding: 0;
+}
+
+.plus-icon {
+    border-radius: 30px;
+}
