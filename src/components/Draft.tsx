@@ -16,6 +16,7 @@ import data from '@emoji-mart/data'
 import { EmojiEmotions, Splitscreen } from '@mui/icons-material'
 import ReactMarkdown from 'react-markdown'
 import { type ReactMarkdownProps } from 'react-markdown/lib/ast-to-react'
+import { MessageBody } from './MessageBody'
 // import { EmojiProps } from '@types/emoji-mart'
 
 export interface EmojiProps {
@@ -159,7 +160,7 @@ export function Draft(props: DraftProps): JSX.Element {
                         px: 1
                     }}
                 >
-                    <ReactMarkdown>{draft}</ReactMarkdown>
+                    <MessageBody messagebody={draft} />
                 </Box>
             )}
             {!selectEmoji || (
