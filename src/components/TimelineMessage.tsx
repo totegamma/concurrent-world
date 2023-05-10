@@ -13,7 +13,8 @@ import {
     Link,
     IconButton,
     Drawer,
-    useTheme
+    useTheme,
+    Tooltip
 } from '@mui/material'
 import StarIcon from '@mui/icons-material/Star'
 import StarOutlineIcon from '@mui/icons-material/StarOutline'
@@ -48,6 +49,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
     const [user, setUser] = useState<User | null>()
     const [message, setMessage] = useState<RTMMessage | undefined>()
     const [msgstreams, setStreams] = useState<string>('')
+    const [reactUsers, setReactUsers] = useState<User[]>([])
 
     const appData = useContext(ApplicationContext)
 
@@ -92,6 +94,20 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
     useEffect(() => {
         loadTweet()
     }, [props.message])
+
+    useEffect(() => {
+        const fetchUsers = async (): Promise<any> => {
+            const authors =
+                message?.associations_data.map((m) => m.author) ?? []
+            if (authors.length === 0) return
+            const users = await Promise.all(
+                authors.map((a) => appData.userDict.get(a))
+            )
+            setReactUsers(users)
+        }
+
+        fetchUsers()
+    }, [message?.associations_data])
 
     const favorite = async (messageID: string | undefined): Promise<void> => {
         const favoriteScheme = Schemas.like
@@ -385,55 +401,93 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                             </ReactMarkdown>
                         </Box>
                         <Box sx={{ display: 'flex', gap: '10px' }}>
-                            {message.associations_data.find(
-                                (e) => e.author === appData.userAddress
-                            ) != null ? (
-                                <IconButton
-                                    sx={{
-                                        p: '0',
-                                        color: theme.palette.text.secondary
-                                    }}
-                                    color="primary"
-                                    onClick={() => {
-                                        unfavorite(
-                                            message?.id,
-                                            message?.associations_data.find(
-                                                (e) =>
-                                                    e.author ===
-                                                    appData.userAddress
-                                            )?.id
-                                        )
-                                    }}
-                                >
-                                    <StarIcon />{' '}
-                                    <Typography sx={{ size: '16px' }}>
-                                        {
-                                            message.associations_data.filter(
-                                                (e) => e.schema === Schemas.like
-                                            ).length
-                                        }
-                                    </Typography>
-                                </IconButton>
-                            ) : (
-                                <IconButton
-                                    sx={{
-                                        p: '0',
-                                        color: theme.palette.text.secondary
-                                    }}
-                                    onClick={() => {
-                                        favorite(message?.id)
-                                    }}
-                                >
-                                    <StarOutlineIcon />{' '}
-                                    <Typography sx={{ size: '16px' }}>
-                                        {
-                                            message.associations_data.filter(
-                                                (e) => e.schema === Schemas.like
-                                            ).length
-                                        }
-                                    </Typography>
-                                </IconButton>
-                            )}
+                            <Tooltip
+                                title={
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: 1
+                                        }}
+                                    >
+                                        {reactUsers.map((user) => (
+                                            <Box
+                                                key={user.username}
+                                                sx={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 1
+                                                }}
+                                            >
+                                                <Avatar
+                                                    sx={{
+                                                        height: '20px',
+                                                        width: '20px'
+                                                    }}
+                                                    src={user.avatar}
+                                                />
+                                                {user.username}
+                                            </Box>
+                                        ))}
+                                    </Box>
+                                }
+                                placement="top"
+                                disableHoverListener={reactUsers.length === 0}
+                            >
+                                {message.associations_data.find(
+                                    (e) => e.author === appData.userAddress
+                                ) != null ? (
+                                    <IconButton
+                                        sx={{
+                                            p: '0',
+                                            color: theme.palette.text.secondary
+                                        }}
+                                        color="primary"
+                                        onClick={() => {
+                                            unfavorite(
+                                                message?.id,
+                                                message?.associations_data.find(
+                                                    (e) =>
+                                                        e.author ===
+                                                        appData.userAddress
+                                                )?.id
+                                            )
+                                        }}
+                                    >
+                                        <StarIcon />{' '}
+                                        <Typography sx={{ size: '16px' }}>
+                                            {
+                                                message.associations_data.filter(
+                                                    (e) =>
+                                                        e.schema ===
+                                                        Schemas.like
+                                                ).length
+                                            }
+                                        </Typography>
+                                    </IconButton>
+                                ) : (
+                                    <IconButton
+                                        sx={{
+                                            p: '0',
+                                            color: theme.palette.text.secondary
+                                        }}
+                                        onClick={() => {
+                                            favorite(message?.id)
+                                        }}
+                                    >
+                                        <StarOutlineIcon />{' '}
+                                        <Typography sx={{ size: '16px' }}>
+                                            {
+                                                message.associations_data.filter(
+                                                    (e) =>
+                                                        e.schema ===
+                                                        Schemas.like
+                                                ).length
+                                            }
+                                        </Typography>
+                                    </IconButton>
+                                )}
+                            </Tooltip>
                             <IconButton
                                 onClick={() => {
                                     setInspectItem(message ?? null)
