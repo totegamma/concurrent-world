@@ -196,25 +196,24 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
             sx={{
                 alignItems: 'flex-start',
                 flex: 1,
-                gap: { xs: '23px', sm: '25px' },
                 p: { xs: '5px 0', sm: '10px 0' },
                 wordBreak: 'break-word'
             }}
         >
             {message != null && (
                 <>
-                    <Box
-                        sx={{
-                            width: { xs: '32px', sm: '48px' }
-                        }}
-                    >
+                    <Box>
                         <IconButton
                             onClick={() => {
                                 props.follow(message.author)
                             }}
                             sx={{
-                                width: { xs: '56px', sm: '64px' },
-                                height: { xs: '56px', sm: '64px' }
+                                padding: {
+                                    xs: '10px 8px 0 0',
+                                    sm: '0 16px 0 0'
+                                },
+                                width: { xs: '40px', sm: '64px' },
+                                height: { xs: '40px', sm: '64px' }
                             }}
                         >
                             {user?.avatar ? (
@@ -222,8 +221,8 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                     alt="Profile Picture"
                                     src={user?.avatar}
                                     sx={{
-                                        width: { xs: '40px', sm: '48px' },
-                                        height: { xs: '40px', sm: '48px' }
+                                        width: { xs: '32px', sm: '48px' },
+                                        height: { xs: '32px', sm: '48px' }
                                     }}
                                 />
                             ) : (
@@ -255,7 +254,10 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                             <Box>
                                 <Typography
                                     component="span"
-                                    sx={{ fontWeight: '700' }}
+                                    sx={{
+                                        fontWeight: '700',
+                                        fontSize: { xs: '0.9rem', sm: '1rem' }
+                                    }}
                                 >
                                     {user?.username}{' '}
                                 </Typography>
@@ -304,13 +306,17 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                 components={{
                                     p: ({ children }) => (
                                         <Typography
+                                            paragraph
                                             sx={{
+                                                fontSize: {
+                                                    xs: '0.9rem',
+                                                    sm: '1rem'
+                                                },
                                                 marginBottom: {
                                                     xs: '4px',
                                                     sm: '8px'
                                                 }
                                             }}
-                                            paragraph
                                         >
                                             {children}
                                         </Typography>
