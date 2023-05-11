@@ -57,6 +57,8 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
 
     const [inspectItem, setInspectItem] = useState<RTMMessage | null>(null)
 
+    const [hasOwnReaction, setHasOwnReaction] = useState<boolean>(false)
+
     const loadTweet = (): void => {
         appData.messageDict
             .get(props.message)
@@ -98,8 +100,19 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
     useEffect(() => {
         const fetchUsers = async (): Promise<any> => {
             const authors =
-                message?.associations_data.map((m) => m.author) ?? []
-            if (authors.length === 0) return
+                message?.associations_data
+                    .filter((e) => e.schema === Schemas.like)
+                    .map((m) => m.author) ?? []
+
+            if (
+                message?.associations_data.find(
+                    (e) => e.author === appData.userAddress
+                ) != null
+            ) {
+                setHasOwnReaction(true)
+            } else {
+                setHasOwnReaction(false)
+            }
             const users = await Promise.all(
                 authors.map((a) => appData.userDict.get(a))
             )
@@ -412,7 +425,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                     >
                                         {reactUsers.map((user) => (
                                             <Box
-                                                key={user.username}
+                                                key={user.ccaddress}
                                                 sx={{
                                                     display: 'flex',
                                                     alignItems: 'center',
@@ -434,16 +447,14 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                 placement="top"
                                 disableHoverListener={reactUsers.length === 0}
                             >
-                                {message.associations_data.find(
-                                    (e) => e.author === appData.userAddress
-                                ) != null ? (
-                                    <IconButton
-                                        sx={{
-                                            p: '0',
-                                            color: theme.palette.text.secondary
-                                        }}
-                                        color="primary"
-                                        onClick={() => {
+                                <IconButton
+                                    sx={{
+                                        p: '0',
+                                        color: theme.palette.text.secondary
+                                    }}
+                                    color="primary"
+                                    onClick={() => {
+                                        if (hasOwnReaction) {
                                             unfavorite(
                                                 message?.id,
                                                 message?.associations_data.find(
@@ -452,41 +463,24 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                                         appData.userAddress
                                                 )?.id
                                             )
-                                        }}
-                                    >
-                                        <StarIcon />{' '}
-                                        <Typography sx={{ size: '16px' }}>
-                                            {
-                                                message.associations_data.filter(
-                                                    (e) =>
-                                                        e.schema ===
-                                                        Schemas.like
-                                                ).length
-                                            }
-                                        </Typography>
-                                    </IconButton>
-                                ) : (
-                                    <IconButton
-                                        sx={{
-                                            p: '0',
-                                            color: theme.palette.text.secondary
-                                        }}
-                                        onClick={() => {
+                                        } else {
                                             favorite(message?.id)
-                                        }}
-                                    >
-                                        <StarOutlineIcon />{' '}
-                                        <Typography sx={{ size: '16px' }}>
-                                            {
-                                                message.associations_data.filter(
-                                                    (e) =>
-                                                        e.schema ===
-                                                        Schemas.like
-                                                ).length
-                                            }
-                                        </Typography>
-                                    </IconButton>
-                                )}
+                                        }
+                                    }}
+                                >
+                                    {hasOwnReaction ? (
+                                        <StarIcon />
+                                    ) : (
+                                        <StarOutlineIcon />
+                                    )}{' '}
+                                    <Typography sx={{ size: '16px' }}>
+                                        {
+                                            message.associations_data.filter(
+                                                (e) => e.schema === Schemas.like
+                                            ).length
+                                        }
+                                    </Typography>
+                                </IconButton>
                             </Tooltip>
                             <IconButton
                                 onClick={() => {
