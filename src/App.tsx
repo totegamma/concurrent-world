@@ -306,103 +306,101 @@ function App(): JSX.Element {
                     messageDict
                 }}
             >
-                <BrowserRouter>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        background: [
+                            theme.palette.background.default,
+                            `linear-gradient(${
+                                theme.palette.background.default
+                            }, ${darken(
+                                theme.palette.background.default,
+                                0.1
+                            )})`
+                        ],
+                        height: '100dvh'
+                    }}
+                >
+                    <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                        <Menu streams={watchstreams} />
+                    </Box>
                     <Box
                         sx={{
                             display: 'flex',
-                            background: [
-                                theme.palette.background.default,
-                                `linear-gradient(${
-                                    theme.palette.background.default
-                                }, ${darken(
-                                    theme.palette.background.default,
-                                    0.1
-                                )})`
-                            ],
-                            height: '100dvh'
+                            flexFlow: 'column',
+                            overflow: 'hidden',
+                            flex: 1
                         }}
                     >
-                        <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                            <Menu streams={watchstreams} />
-                        </Box>
-                        <Box
+                        <Paper
                             sx={{
+                                flexGrow: '1',
+                                margin: { xs: '4px', sm: '10px' },
+                                mb: { xs: 0, sm: '10px' },
                                 display: 'flex',
                                 flexFlow: 'column',
+                                borderRadius: { xs: '15px', md: '20px' },
                                 overflow: 'hidden',
-                                flex: 1
+                                background: 'none'
                             }}
                         >
-                            <Paper
-                                sx={{
-                                    flexGrow: '1',
-                                    margin: { xs: '4px', sm: '10px' },
-                                    mb: { xs: 0, sm: '10px' },
-                                    display: 'flex',
-                                    flexFlow: 'column',
-                                    borderRadius: { xs: '15px', md: '20px' },
-                                    overflow: 'hidden',
-                                    background: 'none'
-                                }}
-                            >
-                                <Routes>
-                                    <Route
-                                        index
-                                        element={
-                                            <Timeline
-                                                messages={messages}
-                                                follow={follow}
-                                                followList={followList}
-                                                setCurrentStreams={
-                                                    setCurrentStreams
-                                                }
-                                                watchstreams={watchstreams}
-                                            />
-                                        }
-                                    />
-                                    <Route
-                                        path="/associations"
-                                        element={<Associations />}
-                                    />
-                                    <Route
-                                        path="/explorer"
-                                        element={
-                                            <Explorer
-                                                watchList={watchstreams}
-                                                setWatchList={setWatchStreams}
-                                                followList={followList}
-                                                setFollowList={setFollowList}
-                                            />
-                                        }
-                                    />
-                                    <Route
-                                        path="/notifications"
-                                        element={<Notifications />}
-                                    />
-                                    <Route
-                                        path="/identity"
-                                        element={<Identity />}
-                                    />
-                                    <Route
-                                        path="/settings"
-                                        element={
-                                            <Settings
-                                                setThemeName={setThemeName}
-                                                setPrvKey={setPrvKey}
-                                                setPubKey={setPubKey}
-                                                setUserAddr={setAddress}
-                                                setServerAddr={setServer}
-                                            />
-                                        }
-                                    />
-                                </Routes>
-                            </Paper>
-                            <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
-                                <MobileMenu />
-                            </Box>
+                            <Routes>
+                                <Route
+                                    index
+                                    element={
+                                        <Timeline
+                                            messages={messages}
+                                            follow={follow}
+                                            followList={followList}
+                                            setCurrentStreams={
+                                                setCurrentStreams
+                                            }
+                                            watchstreams={watchstreams}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/associations"
+                                    element={<Associations />}
+                                />
+                                <Route
+                                    path="/explorer"
+                                    element={
+                                        <Explorer
+                                            watchList={watchstreams}
+                                            setWatchList={setWatchStreams}
+                                            followList={followList}
+                                            setFollowList={setFollowList}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/notifications"
+                                    element={<Notifications />}
+                                />
+                                <Route
+                                    path="/identity"
+                                    element={<Identity />}
+                                />
+                                <Route
+                                    path="/settings"
+                                    element={
+                                        <Settings
+                                            setThemeName={setThemeName}
+                                            setPrvKey={setPrvKey}
+                                            setPubKey={setPubKey}
+                                            setUserAddr={setAddress}
+                                            setServerAddr={setServer}
+                                        />
+                                    }
+                                />
+                            </Routes>
+                        </Paper>
+                        <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+                            <MobileMenu />
                         </Box>
                     </Box>
-                </BrowserRouter>
+                </Box>
             </ApplicationContext.Provider>
         </ThemeProvider>
     )
