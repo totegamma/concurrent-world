@@ -63,7 +63,7 @@ export function Draft(props: DraftProps): JSX.Element {
 
         const requestOptions = {
             method: 'POST',
-            headers: {},
+            headers: { 'content-type': 'application/json' },
             body: JSON.stringify({
                 author: appData.userAddress,
                 payload,
