@@ -46,7 +46,7 @@ export function Identity(): JSX.Element {
 
         const requestOptions = {
             method: 'PUT',
-            headers: {},
+            headers: { 'content-type': 'application/json' },
             body: JSON.stringify({
                 author: appData.userAddress,
                 schema: Schemas.profile,

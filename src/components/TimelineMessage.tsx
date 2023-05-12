@@ -136,7 +136,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
 
         const requestOptions = {
             method: 'POST',
-            headers: {},
+            headers: { 'content-type': 'application/json' },
             body: JSON.stringify({
                 author: appData.userAddress,
                 schema: favoriteScheme,
@@ -163,7 +163,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
         if (!unfavorite) return
         const requestOptions = {
             method: 'DELETE',
-            headers: {},
+            headers: { 'content-type': 'application/json' },
             body: JSON.stringify({
                 id: deletekey
             })
