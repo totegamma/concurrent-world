@@ -1,16 +1,6 @@
-import {
-    Box,
-    Divider,
-    Typography,
-    TextField,
-    Button,
-    IconButton,
-    useTheme
-} from '@mui/material'
-import { useContext, useEffect, useState } from 'react'
+import { Box, Divider, Typography, IconButton, useTheme } from '@mui/material'
+import { useContext, useState } from 'react'
 import { ApplicationContext } from '../App'
-import { Schemas } from '../schemas'
-import { Sign } from '../util'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import { ProfileEditor } from '../components/ProfileEditor'
@@ -18,7 +8,6 @@ import { ProfileEditor } from '../components/ProfileEditor'
 export function Identity(): JSX.Element {
     const theme = useTheme()
     const appData = useContext(ApplicationContext)
-
     const [showPrivateKey, setShowPrivateKey] = useState(false)
 
     return (
@@ -38,8 +27,25 @@ export function Identity(): JSX.Element {
                     Identity
                 </Typography>
                 <Divider />
-                <ProfileEditor />
+                <ProfileEditor
+                    initial={appData.profile}
+                    userAddress={appData.userAddress}
+                    privatekey={appData.privatekey}
+                    serverAddress={appData.serverAddress}
+                />
                 <Divider />
+                <Typography variant="h3" gutterBottom>
+                    Home Stream
+                </Typography>
+                <Typography sx={{ wordBreak: 'break-all' }}>
+                    {appData.profile.homestream}
+                </Typography>
+                <Typography variant="h3" gutterBottom>
+                    Notification Stream
+                </Typography>
+                <Typography sx={{ wordBreak: 'break-all' }}>
+                    {appData.profile.notificationstream}
+                </Typography>
                 <Typography variant="h3" gutterBottom>
                     Concurrent Address
                 </Typography>

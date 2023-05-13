@@ -1,52 +1,113 @@
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
-import { useContext, useEffect, useState } from 'react'
-import { ApplicationContext } from '../App'
+import { useState } from 'react'
 import { Sign } from '../util'
 import { Schemas } from '../schemas'
 import Button from '@mui/material/Button'
+import type { Stream, User } from '../model'
 
-export function ProfileEditor(): JSX.Element {
-    const appData = useContext(ApplicationContext)
-    const [username, setUsername] = useState<string>('anonymous')
-    const [avatar, setAvatar] = useState<string>('')
-    const [homeStream, SetHomeStream] = useState<string>('')
-    const [notificationStream, SetNotificationStream] = useState<string>('')
+interface ProfileEditorProps {
+    initial: User
+    userAddress: string
+    privatekey: string
+    serverAddress: string
+}
 
-    useEffect(() => {
-        appData.userDict.get(appData.userAddress).then((e) => {
-            setUsername(e.username)
-            setAvatar(e.avatar)
-            SetHomeStream(e.homestream)
-            SetNotificationStream(e.notificationstream)
-        })
-    }, [])
+export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
+    const [username, setUsername] = useState<string>(
+        props.initial.username ?? ''
+    )
+    const [avatar, setAvatar] = useState<string>(props.initial.avatar ?? '')
 
-    const updateProfile = (): void => {
+    const updateProfile = async (): Promise<void> => {
+        let homeStreamID = props.initial.homestream
+        if (homeStreamID === undefined || homeStreamID === '') {
+            const payloadObj = {
+                username: username + '-home'
+            }
+
+            const payload = JSON.stringify(payloadObj)
+            const signature = Sign(props.privatekey, payload)
+
+            const requestOptions = {
+                method: 'PUT',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({
+                    author: props.userAddress,
+                    maintainer: [props.userAddress],
+                    writer: [props.userAddress],
+                    reader: [],
+                    schema: 'net.gammalab.concurrent.tbdStreamHomeMeta',
+                    meta: payload,
+                    signature
+                })
+            }
+
+            homeStreamID = (
+                await fetch(
+                    props.serverAddress + 'stream',
+                    requestOptions
+                ).then(async (res) => (await res.json()) as Stream)
+            ).id
+        }
+        console.log('home', homeStreamID)
+
+        let notificationStreamID = props.initial.notificationstream
+        if (notificationStreamID === undefined || notificationStreamID === '') {
+            const payloadObj = {
+                username: username + '-notification'
+            }
+
+            const payload = JSON.stringify(payloadObj)
+            const signature = Sign(props.privatekey, payload)
+
+            const requestOptions = {
+                method: 'PUT',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({
+                    author: props.userAddress,
+                    maintainer: [props.userAddress],
+                    writer: [],
+                    reader: [props.userAddress],
+                    schema: 'net.gammalab.concurrent.tbdStreamNotificationMeta',
+                    meta: payload,
+                    signature
+                })
+            }
+
+            notificationStreamID = (
+                await fetch(
+                    props.serverAddress + 'stream',
+                    requestOptions
+                ).then(async (res) => (await res.json()) as Stream)
+            ).id
+        }
+        console.log('notification', notificationStreamID)
+
         const payloadObj = {
             username,
             avatar,
             description: '',
-            home: homeStream,
-            notification: notificationStream
+            home: homeStreamID,
+            notification: notificationStreamID
         }
 
         const payload = JSON.stringify(payloadObj)
-        const signature = Sign(appData.privatekey, payload)
+        const signature = Sign(props.privatekey, payload)
 
         const requestOptions = {
             method: 'PUT',
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify({
-                author: appData.userAddress,
+                author: props.userAddress,
                 schema: Schemas.profile,
                 payload,
                 signature
             })
         }
 
-        fetch(appData.serverAddress + 'characters', requestOptions)
+        fetch(props.serverAddress + 'characters', requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 console.log(data)

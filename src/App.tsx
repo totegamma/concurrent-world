@@ -251,6 +251,7 @@ function App(): JSX.Element {
             const profile = await userDict.get(address)
             setProfile(profile)
             profileRef.current = profile
+            console.log('profile loaded!', profile)
         })()
     }, [])
 

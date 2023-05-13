@@ -11,11 +11,11 @@ import { LangJa } from '../utils/lang-ja'
 import { useNavigate } from 'react-router-dom'
 import TextField from '@mui/material/TextField'
 import Divider from '@mui/material/Divider'
+import { ProfileEditor } from './ProfileEditor'
 
 export function Registration(): JSX.Element {
     const navigate = useNavigate()
     const [activeStep, setActiveStep] = useState(0)
-    const [skipped, setSkipped] = useState(new Set<number>())
     const [mnemonicTest, setMnemonicTest] = useState<string>('')
 
     const entrophy = useMemo(() => randomBytes(16), [])
@@ -23,28 +23,28 @@ export function Registration(): JSX.Element {
         () => Mnemonic.fromEntropy(entrophy, null, LangJa.wordlist()),
         []
     )
+    const wallet = useMemo(
+        () =>
+            HDNodeWallet.fromPhrase(
+                mnemonic.phrase,
+                undefined,
+                undefined,
+                LangJa.wordlist()
+            ),
+        []
+    )
+    const userAddress = 'CC' + wallet.address.slice(2)
+    const privateKey = wallet.privateKey.slice(2)
     const [server, setServer] = useState<string>('')
 
     const setupAccount = (): void => {
-        const wallet = HDNodeWallet.fromPhrase(
-            mnemonicTest,
-            undefined,
-            undefined,
-            LangJa.wordlist()
-        ) // TODO: move to utils
         localStorage.setItem('ServerAddress', JSON.stringify(server))
         localStorage.setItem(
             'PublicKey',
             JSON.stringify(wallet.publicKey.slice(2))
         )
-        localStorage.setItem(
-            'PrivateKey',
-            JSON.stringify(wallet.privateKey.slice(2))
-        )
-        localStorage.setItem(
-            'Address',
-            JSON.stringify('CC' + wallet.address.slice(2))
-        )
+        localStorage.setItem('PrivateKey', JSON.stringify(privateKey))
+        localStorage.setItem('Address', JSON.stringify(userAddress))
         navigate('/')
     }
 
@@ -119,71 +119,52 @@ export function Registration(): JSX.Element {
     const step4 = (
         <>
             <Typography variant="h2">プロフィールの作成</Typography>
-            ここで名前・アイコン・自己紹介を設定します。後ででも大丈夫です。
-            ここでプロフィールを設定する画面はまだ作ってません
+            ここで名前・アイコン・自己紹介を設定します。
+            <ProfileEditor
+                initial={{
+                    ccaddress: '',
+                    username: '',
+                    avatar: '',
+                    homestream: '',
+                    notificationstream: '',
+                    description: ''
+                }}
+                userAddress={userAddress}
+                privatekey={privateKey}
+                serverAddress={server}
+            />
         </>
     )
 
     const steps = [
         {
             title: 'はじめよう！',
-            component: step0,
-            optional: false
+            component: step0
         },
         {
             title: '秘密鍵とアドレスの生成',
-            component: step1,
-            optional: false
+            component: step1
         },
         {
             title: '復活の呪文の確認',
-            component: step2,
-            optional: false
+            component: step2
         },
         {
             title: 'ホストサーバーの選択',
-            component: step3,
-            optional: false
+            component: step3
         },
         {
             title: 'プロフィールの作成',
-            component: step4,
-            optional: true
+            component: step4
         }
     ]
 
-    const isStepSkipped = (step: number): boolean => {
-        return skipped.has(step)
-    }
-
     const handleNext = (): void => {
-        let newSkipped = skipped
-        if (isStepSkipped(activeStep)) {
-            newSkipped = new Set(newSkipped.values())
-            newSkipped.delete(activeStep)
-        }
-
         setActiveStep((prevActiveStep) => prevActiveStep + 1)
-        setSkipped(newSkipped)
     }
 
     const handleBack = (): void => {
         setActiveStep((prevActiveStep) => prevActiveStep - 1)
-    }
-
-    const handleSkip = (): void => {
-        if (!steps[activeStep].optional) {
-            // You probably want to guard against something like this,
-            // it should never occur unless someone's actively trying to break something.
-            throw new Error("You can't skip a step that isn't optional.")
-        }
-
-        setActiveStep((prevActiveStep) => prevActiveStep + 1)
-        setSkipped((prevSkipped) => {
-            const newSkipped = new Set(prevSkipped.values())
-            newSkipped.add(activeStep)
-            return newSkipped
-        })
     }
 
     return (
@@ -207,14 +188,6 @@ export function Registration(): JSX.Element {
                     const labelProps: {
                         optional?: React.ReactNode
                     } = {}
-                    if (step.optional) {
-                        labelProps.optional = (
-                            <Typography variant="caption">Optional</Typography>
-                        )
-                    }
-                    if (isStepSkipped(index)) {
-                        stepProps.completed = false
-                    }
                     return (
                         <Step key={step.title} {...stepProps}>
                             <StepLabel {...labelProps}>{step.title}</StepLabel>
@@ -259,15 +232,6 @@ export function Registration(): JSX.Element {
                             Back
                         </Button>
                         <Box sx={{ flex: '1 1 auto' }} />
-                        {steps[activeStep].optional && (
-                            <Button
-                                color="inherit"
-                                onClick={handleSkip}
-                                sx={{ mr: 1 }}
-                            >
-                                Skip
-                            </Button>
-                        )}
                         <Button variant="contained" onClick={handleNext}>
                             {activeStep === steps.length - 1
                                 ? 'Finish'
