@@ -8,17 +8,45 @@ import Paper from '@mui/material/Paper'
 import { useMemo, useState } from 'react'
 import { Mnemonic, randomBytes, HDNodeWallet } from 'ethers'
 import { LangJa } from '../utils/lang-ja'
+import { useNavigate } from 'react-router-dom'
+import TextField from '@mui/material/TextField'
+import Divider from '@mui/material/Divider'
 
 export function Registration(): JSX.Element {
+    const navigate = useNavigate()
     const [activeStep, setActiveStep] = useState(0)
     const [skipped, setSkipped] = useState(new Set<number>())
+    const [mnemonicTest, setMnemonicTest] = useState<string>('')
 
     const entrophy = useMemo(() => randomBytes(16), [])
     const mnemonic = useMemo(
         () => Mnemonic.fromEntropy(entrophy, null, LangJa.wordlist()),
         []
     )
-    const wallet = useMemo(() => HDNodeWallet.fromMnemonic(mnemonic), [])
+    const [server, setServer] = useState<string>('')
+
+    const setupAccount = (): void => {
+        const wallet = HDNodeWallet.fromPhrase(
+            mnemonicTest,
+            undefined,
+            undefined,
+            LangJa.wordlist()
+        ) // TODO: move to utils
+        localStorage.setItem('ServerAddress', JSON.stringify(server))
+        localStorage.setItem(
+            'PublicKey',
+            JSON.stringify(wallet.publicKey.slice(2))
+        )
+        localStorage.setItem(
+            'PrivateKey',
+            JSON.stringify(wallet.privateKey.slice(2))
+        )
+        localStorage.setItem(
+            'Address',
+            JSON.stringify('CC' + wallet.address.slice(2))
+        )
+        navigate('/')
+    }
 
     const step0 = (
         <>
@@ -52,7 +80,19 @@ export function Registration(): JSX.Element {
     const step2 = (
         <>
             <Typography variant="h2">「ふっかつのじゅもん」の入力</Typography>
-            ちゃんとメモが正しく取れているかを確認します。
+            <TextField
+                placeholder="12個の単語からなる呪文"
+                value={mnemonicTest}
+                onChange={(e) => {
+                    setMnemonicTest(e.target.value)
+                }}
+                sx={{
+                    width: '100%'
+                }}
+            />
+            {mnemonic.phrase === mnemonicTest
+                ? '一致しています'
+                : '一致していません'}
         </>
     )
     const step3 = (
@@ -60,12 +100,27 @@ export function Registration(): JSX.Element {
             <Typography variant="h2">ホストサーバーの選択</Typography>
             あなたのメッセージを保存・配信してくれるホストサーバーを探しましょう。
             どのホストサーバーを選択しても、だれとでもつながる事ができます。
+            <Typography variant="h3">リストから選択</Typography>
+            公開ホスト検索は未実装です
+            <Divider>または</Divider>
+            <Typography variant="h3">URLから直接入力</Typography>
+            <TextField
+                placeholder="https://example.tld/"
+                value={server}
+                onChange={(e) => {
+                    setServer(e.target.value)
+                }}
+                sx={{
+                    width: '100%'
+                }}
+            />
         </>
     )
     const step4 = (
         <>
             <Typography variant="h2">プロフィールの作成</Typography>
             ここで名前・アイコン・自己紹介を設定します。後ででも大丈夫です。
+            ここでプロフィールを設定する画面はまだ作ってません
         </>
     )
 
@@ -131,10 +186,6 @@ export function Registration(): JSX.Element {
         })
     }
 
-    const handleReset = (): void => {
-        setActiveStep(0)
-    }
-
     return (
         <Paper
             sx={{
@@ -184,7 +235,9 @@ export function Registration(): JSX.Element {
                         }}
                     >
                         <Box sx={{ flex: '1 1 auto' }} />
-                        <Button onClick={handleReset}>Reset</Button>
+                        <Button variant="contained" onClick={setupAccount}>
+                            GO!
+                        </Button>
                     </Box>
                 </>
             ) : (
@@ -215,7 +268,7 @@ export function Registration(): JSX.Element {
                                 Skip
                             </Button>
                         )}
-                        <Button onClick={handleNext}>
+                        <Button variant="contained" onClick={handleNext}>
                             {activeStep === steps.length - 1
                                 ? 'Finish'
                                 : 'Next'}
