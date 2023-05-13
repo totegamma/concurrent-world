@@ -194,14 +194,21 @@ export function Settings(props: SettingsProp): JSX.Element {
                                         display: 'flex',
                                         borderRadius: '100px',
                                         background:
-                                            previewTheme[e].palette.primary
+                                            previewTheme[e].palette.background
                                                 .contrastText
                                     }}
                                 >
                                     <ConcurrentLogo
                                         size="40px"
                                         upperColor={
-                                            previewTheme[e].palette.primary.main
+                                            previewTheme[e].palette.primary
+                                                .main ===
+                                            previewTheme[e].palette.background
+                                                .contrastText
+                                                ? previewTheme[e].palette
+                                                      .background.default
+                                                : previewTheme[e].palette
+                                                      .primary.main
                                         }
                                         lowerColor={
                                             previewTheme[e].palette.background
