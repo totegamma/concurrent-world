@@ -142,7 +142,11 @@ export function Registration(): JSX.Element {
                 height: '600px',
                 p: '20px',
                 display: 'flex',
-                flexDirection: 'column'
+                flexDirection: 'column',
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)'
             }}
         >
             <Typography>Concurrentアカウントセットアップウィザード</Typography>

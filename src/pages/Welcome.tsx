@@ -1,10 +1,14 @@
 import Box from '@mui/material/Box'
 import { createConcurrentTheme } from '../themes'
-import { Button, ThemeProvider, Typography, darken } from '@mui/material'
+import { Button, Modal, ThemeProvider, Typography, darken } from '@mui/material'
 import { ConcurrentLogo } from '../components/ConcurrentLogo'
+import { useState } from 'react'
+import { Registration } from '../components/Registration'
 
 export function Welcome(): JSX.Element {
     const theme = createConcurrentTheme('blue2')
+
+    const [open, setOpen] = useState(false)
 
     return (
         <ThemeProvider theme={theme}>
@@ -54,10 +58,28 @@ export function Welcome(): JSX.Element {
                     世界は一つ、環境は無数。
                 </Typography>
                 <Box sx={{ display: 'flex', gap: '30px' }}>
-                    <Button variant="contained">新しくはじめる</Button>{' '}
+                    <Button
+                        variant="contained"
+                        onClick={(): void => {
+                            setOpen(true)
+                        }}
+                    >
+                        新しくはじめる
+                    </Button>{' '}
                     <Button variant="contained">アカウントインポート</Button>
                 </Box>
             </Box>
+
+            <Modal
+                open={open}
+                onClose={(): void => {
+                    setOpen(false)
+                }}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Registration />
+            </Modal>
         </ThemeProvider>
     )
 }
