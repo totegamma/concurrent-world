@@ -5,15 +5,11 @@ import StepLabel from '@mui/material/StepLabel'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import Paper from '@mui/material/Paper'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { createConcurrentTheme } from '../themes'
 import { ThemeProvider, darken } from '@mui/material'
-
-const steps = [
-    '秘密鍵とアドレスの生成',
-    'ホストサーバーの選択',
-    'プロフィールの作成'
-]
+import { Mnemonic, randomBytes, HDNodeWallet } from 'ethers'
+import { LangJa } from '../utils/lang-ja'
 
 export function Welcome(): JSX.Element {
     const [activeStep, setActiveStep] = useState(0)
@@ -21,9 +17,89 @@ export function Welcome(): JSX.Element {
 
     const theme = createConcurrentTheme('redmond')
 
-    const isStepOptional = (step: number): boolean => {
-        return step === 2
-    }
+    const entrophy = useMemo(() => randomBytes(16), [])
+    const mnemonic = useMemo(
+        () => Mnemonic.fromEntropy(entrophy, null, LangJa.wordlist()),
+        []
+    )
+    const wallet = useMemo(() => HDNodeWallet.fromMnemonic(mnemonic), [])
+
+    const step0 = (
+        <>
+            <Typography variant="h2">
+                Concurrentアカウントを作成しましょう！
+            </Typography>
+            まずは、背後にだれもいないことを確認してください。
+            次の画面で、重要な秘密のフレーズを出力します。
+        </>
+    )
+    const step1 = (
+        <Box sx={{ display: 'flex', gap: '15px', flexDirection: 'column' }}>
+            <Typography variant="h2">あなたの「ふっかつのじゅもん」</Typography>
+            <Typography>
+                <b>{mnemonic.phrase}</b>
+            </Typography>
+            <Typography>
+                ふっかつのじゅもんは、あなたが再ログインしたいとき、別の端末からログインしたいときに必要な呪文です。
+            </Typography>
+            <Typography>
+                <b>絶対に紛失しないように</b>そして、
+                <b>絶対に誰にも知られないように</b>してください。
+            </Typography>
+            <Typography>
+                紛失すると、二度とあなたのアカウントにアクセスできなくなります。
+                また、他人に知られると、あなたのアカウントがハッカーとの共有アカウントになってしまいます。
+            </Typography>
+            <Typography>メモを取りましたか？</Typography>
+        </Box>
+    )
+    const step2 = (
+        <>
+            <Typography variant="h2">「ふっかつのじゅもん」の入力</Typography>
+            ちゃんとメモが正しく取れているかを確認します。
+        </>
+    )
+    const step3 = (
+        <>
+            <Typography variant="h2">ホストサーバーの選択</Typography>
+            あなたのメッセージを保存・配信してくれるホストサーバーを探しましょう。
+            どのホストサーバーを選択しても、だれとでもつながる事ができます。
+        </>
+    )
+    const step4 = (
+        <>
+            <Typography variant="h2">プロフィールの作成</Typography>
+            ここで名前・アイコン・自己紹介を設定します。後ででも大丈夫です。
+        </>
+    )
+
+    const steps = [
+        {
+            title: 'はじめよう！',
+            component: step0,
+            optional: false
+        },
+        {
+            title: '秘密鍵とアドレスの生成',
+            component: step1,
+            optional: false
+        },
+        {
+            title: '復活の呪文の確認',
+            component: step2,
+            optional: false
+        },
+        {
+            title: 'ホストサーバーの選択',
+            component: step3,
+            optional: false
+        },
+        {
+            title: 'プロフィールの作成',
+            component: step4,
+            optional: true
+        }
+    ]
 
     const isStepSkipped = (step: number): boolean => {
         return skipped.has(step)
@@ -45,7 +121,7 @@ export function Welcome(): JSX.Element {
     }
 
     const handleSkip = (): void => {
-        if (!isStepOptional(activeStep)) {
+        if (!steps[activeStep].optional) {
             // You probably want to guard against something like this,
             // it should never occur unless someone's actively trying to break something.
             throw new Error("You can't skip a step that isn't optional.")
@@ -80,15 +156,25 @@ export function Welcome(): JSX.Element {
                     ]
                 }}
             >
-                <Paper sx={{ width: '60vw', height: '600px', p: '20px' }}>
-                    <Typography>ようこそ</Typography>
+                <Paper
+                    sx={{
+                        width: '60vw',
+                        height: '600px',
+                        p: '20px',
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }}
+                >
+                    <Typography>
+                        Concurrentアカウントセットアップウィザード
+                    </Typography>
                     <Stepper activeStep={activeStep}>
-                        {steps.map((label, index) => {
+                        {steps.map((step, index) => {
                             const stepProps: { completed?: boolean } = {}
                             const labelProps: {
                                 optional?: React.ReactNode
                             } = {}
-                            if (isStepOptional(index)) {
+                            if (step.optional) {
                                 labelProps.optional = (
                                     <Typography variant="caption">
                                         Optional
@@ -99,9 +185,9 @@ export function Welcome(): JSX.Element {
                                 stepProps.completed = false
                             }
                             return (
-                                <Step key={label} {...stepProps}>
+                                <Step key={step.title} {...stepProps}>
                                     <StepLabel {...labelProps}>
-                                        {label}
+                                        {step.title}
                                     </StepLabel>
                                 </Step>
                             )
@@ -110,7 +196,7 @@ export function Welcome(): JSX.Element {
                     {activeStep === steps.length ? (
                         <>
                             <Typography sx={{ mt: 2, mb: 1 }}>
-                                All steps completed - you&apos;re finished
+                                これで完了です！始めましょう！
                             </Typography>
                             <Box
                                 sx={{
@@ -125,9 +211,9 @@ export function Welcome(): JSX.Element {
                         </>
                     ) : (
                         <>
-                            <Typography sx={{ mt: 2, mb: 1 }}>
-                                Step {activeStep + 1}
-                            </Typography>
+                            <Box sx={{ flex: 1 }}>
+                                {steps[activeStep].component}
+                            </Box>
                             <Box
                                 sx={{
                                     display: 'flex',
@@ -144,7 +230,7 @@ export function Welcome(): JSX.Element {
                                     Back
                                 </Button>
                                 <Box sx={{ flex: '1 1 auto' }} />
-                                {isStepOptional(activeStep) && (
+                                {steps[activeStep].optional && (
                                     <Button
                                         color="inherit"
                                         onClick={handleSkip}
