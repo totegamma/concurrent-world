@@ -4,11 +4,13 @@ import { Button, Modal, ThemeProvider, Typography, darken } from '@mui/material'
 import { ConcurrentLogo } from '../components/ConcurrentLogo'
 import { useState } from 'react'
 import { Registration } from '../components/Registration'
+import { AccountImport } from '../components/AccountImport'
 
 export function Welcome(): JSX.Element {
     const theme = createConcurrentTheme('blue2')
 
-    const [open, setOpen] = useState(false)
+    const [registrationOpen, setRegistrationOpen] = useState(false)
+    const [importOpen, setImportOpen] = useState(false)
 
     return (
         <ThemeProvider theme={theme}>
@@ -61,24 +63,41 @@ export function Welcome(): JSX.Element {
                     <Button
                         variant="contained"
                         onClick={(): void => {
-                            setOpen(true)
+                            setRegistrationOpen(true)
                         }}
                     >
                         新しくはじめる
-                    </Button>{' '}
-                    <Button variant="contained">アカウントインポート</Button>
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={(): void => {
+                            setImportOpen(true)
+                        }}
+                    >
+                        アカウントインポート
+                    </Button>
                 </Box>
             </Box>
 
             <Modal
-                open={open}
+                open={registrationOpen}
                 onClose={(): void => {
-                    setOpen(false)
+                    setRegistrationOpen(false)
                 }}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
                 <Registration />
+            </Modal>
+            <Modal
+                open={importOpen}
+                onClose={(): void => {
+                    setImportOpen(false)
+                }}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <AccountImport />
             </Modal>
         </ThemeProvider>
     )
