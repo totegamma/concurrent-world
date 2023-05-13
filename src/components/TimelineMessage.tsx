@@ -13,7 +13,8 @@ import {
     Link,
     IconButton,
     Drawer,
-    useTheme
+    useTheme,
+    Tooltip
 } from '@mui/material'
 import StarIcon from '@mui/icons-material/Star'
 import StarOutlineIcon from '@mui/icons-material/StarOutline'
@@ -24,7 +25,6 @@ import BoringAvatar from 'boring-avatars'
 
 import { ApplicationContext } from '../App'
 import { type Emoji, type RTMMessage, type User } from '../model'
-import { type IuseResourceManager } from '../hooks/useResourceManager'
 import { Schemas } from '../schemas'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -38,8 +38,6 @@ import { materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 export interface TimelineMessageProps {
     message: string
-    messageDict: IuseResourceManager<RTMMessage>
-    userDict: IuseResourceManager<User>
     follow: (ccaddress: string) => void
 }
 
@@ -51,6 +49,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
     const [user, setUser] = useState<User | null>()
     const [message, setMessage] = useState<RTMMessage | undefined>()
     const [msgstreams, setStreams] = useState<string>('')
+    const [reactUsers, setReactUsers] = useState<User[]>([])
 
     const appData = useContext(ApplicationContext)
 
@@ -58,12 +57,14 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
 
     const [inspectItem, setInspectItem] = useState<RTMMessage | null>(null)
 
+    const [hasOwnReaction, setHasOwnReaction] = useState<boolean>(false)
+
     const loadTweet = (): void => {
-        props.messageDict
+        appData.messageDict
             .get(props.message)
             .then((msg) => {
                 setMessage(msg)
-                props.userDict
+                appData.userDict
                     .get(msg.author)
                     .then((user) => {
                         setUser(user)
@@ -78,7 +79,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                         .map(
                             async (id) =>
                                 await appData.streamDict
-                                    ?.get(id)
+                                    .get(id)
                                     .then((e) =>
                                         e.meta ? JSON.parse(e.meta).name : null
                                     )
@@ -96,21 +97,46 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
         loadTweet()
     }, [props.message])
 
+    useEffect(() => {
+        const fetchUsers = async (): Promise<any> => {
+            const authors =
+                message?.associations_data
+                    .filter((e) => e.schema === Schemas.like)
+                    .map((m) => m.author) ?? []
+
+            if (
+                message?.associations_data.find(
+                    (e) => e.author === appData.userAddress
+                ) != null
+            ) {
+                setHasOwnReaction(true)
+            } else {
+                setHasOwnReaction(false)
+            }
+            const users = await Promise.all(
+                authors.map((a) => appData.userDict.get(a))
+            )
+            setReactUsers(users)
+        }
+
+        fetchUsers()
+    }, [message?.associations_data])
+
     const favorite = async (messageID: string | undefined): Promise<void> => {
         const favoriteScheme = Schemas.like
         if (!messageID) return
         const payloadObj = {}
         const payload = JSON.stringify(payloadObj)
         const signature = Sign(appData.privatekey, payload)
-        const targetAuthor = (await props.messageDict.get(messageID)).author
+        const targetAuthor = (await appData.messageDict.get(messageID)).author
         console.log(targetAuthor)
-        const targetStream = (await props.userDict.get(targetAuthor))
+        const targetStream = (await appData.userDict.get(targetAuthor))
             .notificationstream
         console.log([targetStream].filter((e) => e))
 
         const requestOptions = {
             method: 'POST',
-            headers: {},
+            headers: { 'content-type': 'application/json' },
             body: JSON.stringify({
                 author: appData.userAddress,
                 schema: favoriteScheme,
@@ -124,7 +150,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
         fetch(appData.serverAddress + 'associations', requestOptions)
             .then(async (res) => await res.json())
             .then((_) => {
-                props.messageDict.invalidate(messageID)
+                appData.messageDict.invalidate(messageID)
                 loadTweet()
             })
     }
@@ -137,7 +163,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
         if (!unfavorite) return
         const requestOptions = {
             method: 'DELETE',
-            headers: {},
+            headers: { 'content-type': 'application/json' },
             body: JSON.stringify({
                 id: deletekey
             })
@@ -146,7 +172,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
         fetch(appData.serverAddress + 'associations', requestOptions)
             .then(async (res) => await res.json())
             .then((_) => {
-                props.messageDict.invalidate(messageID)
+                appData.messageDict.invalidate(messageID)
                 loadTweet()
             })
     }
@@ -170,25 +196,24 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
             sx={{
                 alignItems: 'flex-start',
                 flex: 1,
-                gap: '25px',
-                p: '10px 0',
+                p: { xs: '5px 0', sm: '10px 0' },
                 wordBreak: 'break-word'
             }}
         >
             {message != null && (
                 <>
-                    <Box
-                        sx={{
-                            width: { xs: '32px', sm: '48px' }
-                        }}
-                    >
+                    <Box>
                         <IconButton
                             onClick={() => {
                                 props.follow(message.author)
                             }}
                             sx={{
-                                width: { xs: '56px', sm: '64px' },
-                                height: { xs: '56px', sm: '64px' }
+                                padding: {
+                                    xs: '10px 8px 0 0',
+                                    sm: '0 16px 0 0'
+                                },
+                                width: { xs: '40px', sm: '64px' },
+                                height: { xs: '40px', sm: '64px' }
                             }}
                         >
                             {user?.avatar ? (
@@ -196,8 +221,8 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                     alt="Profile Picture"
                                     src={user?.avatar}
                                     sx={{
-                                        width: { xs: '40px', sm: '48px' },
-                                        height: { xs: '40px', sm: '48px' }
+                                        width: { xs: '32px', sm: '48px' },
+                                        height: { xs: '32px', sm: '48px' }
                                     }}
                                 />
                             ) : (
@@ -215,7 +240,8 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                             flex: 1,
                             flexDirection: 'column',
                             mt: '5px',
-                            width: '100%'
+                            width: '100%',
+                            overflow: 'auto'
                         }}
                     >
                         <Box
@@ -228,7 +254,10 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                             <Box>
                                 <Typography
                                     component="span"
-                                    sx={{ fontWeight: '700' }}
+                                    sx={{
+                                        fontWeight: '700',
+                                        fontSize: { xs: '0.9rem', sm: '1rem' }
+                                    }}
                                 >
                                     {user?.username}{' '}
                                 </Typography>
@@ -276,7 +305,19 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                 rehypePlugins={[rehypeRaw, rehypeSanitize]}
                                 components={{
                                     p: ({ children }) => (
-                                        <Typography paragraph>
+                                        <Typography
+                                            paragraph
+                                            sx={{
+                                                fontSize: {
+                                                    xs: '0.9rem',
+                                                    sm: '1rem'
+                                                },
+                                                marginBottom: {
+                                                    xs: '4px',
+                                                    sm: '8px'
+                                                }
+                                            }}
+                                        >
                                             {children}
                                         </Typography>
                                     ),
@@ -379,9 +420,39 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                             </ReactMarkdown>
                         </Box>
                         <Box sx={{ display: 'flex', gap: '10px' }}>
-                            {message.associations_data.find(
-                                (e) => e.author === appData.userAddress
-                            ) != null ? (
+                            <Tooltip
+                                title={
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: 1
+                                        }}
+                                    >
+                                        {reactUsers.map((user) => (
+                                            <Box
+                                                key={user.ccaddress}
+                                                sx={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 1
+                                                }}
+                                            >
+                                                <Avatar
+                                                    sx={{
+                                                        height: '20px',
+                                                        width: '20px'
+                                                    }}
+                                                    src={user.avatar}
+                                                />
+                                                {user.username}
+                                            </Box>
+                                        ))}
+                                    </Box>
+                                }
+                                placement="top"
+                                disableHoverListener={reactUsers.length === 0}
+                            >
                                 <IconButton
                                     sx={{
                                         p: '0',
@@ -389,17 +460,25 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                     }}
                                     color="primary"
                                     onClick={() => {
-                                        unfavorite(
-                                            message?.id,
-                                            message?.associations_data.find(
-                                                (e) =>
-                                                    e.author ===
-                                                    appData.userAddress
-                                            )?.id
-                                        )
+                                        if (hasOwnReaction) {
+                                            unfavorite(
+                                                message?.id,
+                                                message?.associations_data.find(
+                                                    (e) =>
+                                                        e.author ===
+                                                        appData.userAddress
+                                                )?.id
+                                            )
+                                        } else {
+                                            favorite(message?.id)
+                                        }
                                     }}
                                 >
-                                    <StarIcon />{' '}
+                                    {hasOwnReaction ? (
+                                        <StarIcon />
+                                    ) : (
+                                        <StarOutlineIcon />
+                                    )}{' '}
                                     <Typography sx={{ size: '16px' }}>
                                         {
                                             message.associations_data.filter(
@@ -408,26 +487,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                         }
                                     </Typography>
                                 </IconButton>
-                            ) : (
-                                <IconButton
-                                    sx={{
-                                        p: '0',
-                                        color: theme.palette.text.secondary
-                                    }}
-                                    onClick={() => {
-                                        favorite(message?.id)
-                                    }}
-                                >
-                                    <StarOutlineIcon />{' '}
-                                    <Typography sx={{ size: '16px' }}>
-                                        {
-                                            message.associations_data.filter(
-                                                (e) => e.schema === Schemas.like
-                                            ).length
-                                        }
-                                    </Typography>
-                                </IconButton>
-                            )}
+                            </Tooltip>
                             <IconButton
                                 onClick={() => {
                                     setInspectItem(message ?? null)

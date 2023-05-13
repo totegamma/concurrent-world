@@ -25,15 +25,32 @@ import { ConcurrentLogo } from './ConcurrentLogo'
 // @ts-expect-error vite dynamic import
 import buildTime from '~build/time'
 // @ts-expect-error vite dynamic import
-import { branch } from '~build/info'
+import { branch, sha } from '~build/info'
 import { StreamList } from './StreamList'
+
+const branchName = branch || window.location.host.split('.')[0]
 
 export interface MenuProps {
     streams: string[]
 }
 
 export function Menu(props: MenuProps): JSX.Element {
+    const appData = useContext(ApplicationContext)
+    const [watchStreams, setWatchStreams] = useState<Stream[]>([])
+
     const theme = useTheme<ConcurrentTheme>()
+
+    useEffect(() => {
+        ;(async () => {
+            setWatchStreams(
+                await Promise.all(
+                    props.streams.map(
+                        async (id) => await appData.streamDict.get(id)
+                    )
+                )
+            )
+        })()
+    }, [props.streams])
 
     return (
         <Box sx={{ gap: '15px', height: '100%' }}>
@@ -79,13 +96,17 @@ export function Menu(props: MenuProps): JSX.Element {
                     sx={{
                         textAlign: 'center',
                         fontWeight: 400,
-                        fontSize: '12px'
+                        fontSize: '12px',
+                        marginBottom: '10px'
                     }}
                 >
                     buildTime: {buildTime.toLocaleString()}
                     <br />
-                    branch: {branch}
+                    branch: {branchName}
+                    <br />
+                    sha: {sha.slice(0, 7)}
                 </Box>
+                <Divider />
                 <Box
                     sx={{
                         display: 'flex',

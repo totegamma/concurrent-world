@@ -122,7 +122,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
             text: {
                 primary: '#363636',
                 secondary: 'rgba(58, 35, 32, 0.8)',
-                disabled: 'rgba(255, 255, 255, 0.6)'
+                disabled: 'rgba(164, 164, 164, 0.6)'
             },
             divider: 'rgba(255, 255, 255, 0.421)'
         }

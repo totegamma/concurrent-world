@@ -1,4 +1,4 @@
-import { useEffect, useState, createContext, useRef } from 'react'
+import { useEffect, useState, useCallback, createContext, useRef } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider } from '@mui/material'
 
@@ -6,6 +6,7 @@ import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
 import {
     useResourceManager,
+    dummyResourceManager,
     type IuseResourceManager
 } from './hooks/useResourceManager'
 
@@ -49,7 +50,9 @@ export const ApplicationContext = createContext<appData>({
         notificationstream: ''
     },
     emojiDict: {},
-    streamDict: undefined
+    streamDict: dummyResourceManager,
+    userDict: dummyResourceManager,
+    messageDict: dummyResourceManager
 })
 
 export interface appData {
@@ -59,7 +62,9 @@ export interface appData {
     userAddress: string
     profile: User
     emojiDict: Record<string, Emoji>
-    streamDict?: IuseResourceManager<Stream>
+    streamDict: IuseResourceManager<Stream>
+    userDict: IuseResourceManager<User>
+    messageDict: IuseResourceManager<RTMMessage>
 }
 
 function App(): JSX.Element {
@@ -75,7 +80,7 @@ function App(): JSX.Element {
         'Theme',
         Object.keys(Themes)[0]
     )
-    const [watchStreams, setWatchStreams] = usePersistent<string[]>(
+    const [watchstreams, setWatchStreams] = usePersistent<string[]>(
         'watchStreamList',
         []
     )
@@ -116,48 +121,58 @@ function App(): JSX.Element {
             })
     }, [])
 
-    const userDict = useResourceManager<User>(async (key: string) => {
-        const res = await fetch(
-            server +
-                'characters?author=' +
-                encodeURIComponent(key) +
-                '&schema=' +
-                encodeURIComponent(Schemas.profile),
-            {
-                method: 'GET',
-                headers: {}
-            }
+    const userDict = useResourceManager<User>(
+        useCallback(
+            async (key: string) => {
+                const res = await fetch(
+                    server +
+                        'characters?author=' +
+                        encodeURIComponent(key) +
+                        '&schema=' +
+                        encodeURIComponent(Schemas.profile),
+                    {
+                        method: 'GET',
+                        headers: {}
+                    }
+                )
+                const data = await res.json()
+                if (data.characters.length === 0) {
+                    return {
+                        ccaddress: '',
+                        username: 'anonymous',
+                        avatar: '',
+                        description: '',
+                        homestream: '',
+                        notificationstream: ''
+                    }
+                }
+                const payload = JSON.parse(data.characters[0].payload)
+                return {
+                    ccaddress: data.characters[0].author,
+                    username: payload.username,
+                    avatar: payload.avatar,
+                    description: payload.description,
+                    homestream: payload.home,
+                    notificationstream: payload.notification
+                }
+            },
+            [server]
         )
-        const data = await res.json()
-        if (data.characters.length === 0) {
-            return {
-                ccaddress: '',
-                username: 'anonymous',
-                avatar: '',
-                description: '',
-                homestream: '',
-                notificationstream: ''
-            }
-        }
-        const payload = JSON.parse(data.characters[0].payload)
-        return {
-            ccaddress: data.characters[0].author,
-            username: payload.username,
-            avatar: payload.avatar,
-            description: payload.description,
-            homestream: payload.home,
-            notificationstream: payload.notification
-        }
-    })
+    )
 
-    const messageDict = useResourceManager<RTMMessage>(async (key: string) => {
-        const res = await fetch(server + `messages/${key}`, {
-            method: 'GET',
-            headers: {}
-        })
-        const data = await res.json()
-        return data.message
-    })
+    const messageDict = useResourceManager<RTMMessage>(
+        useCallback(
+            async (key: string) => {
+                const res = await fetch(server + `messages/${key}`, {
+                    method: 'GET',
+                    headers: {}
+                })
+                const data = await res.json()
+                return data.message
+            },
+            [server]
+        )
+    )
 
     const streamDict = useResourceManager<Stream>(async (key: string) => {
         const res = await fetch(server + `stream?stream=${key}`, {
@@ -236,6 +251,7 @@ function App(): JSX.Element {
             const profile = await userDict.get(address)
             setProfile(profile)
             profileRef.current = profile
+            console.log('profile loaded!', profile)
         })()
     }, [])
 
@@ -286,109 +302,106 @@ function App(): JSX.Element {
                     userAddress: address,
                     emojiDict,
                     profile,
-                    streamDict
+                    streamDict,
+                    userDict,
+                    messageDict
                 }}
             >
-                <BrowserRouter>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        background: [
+                            theme.palette.background.default,
+                            `linear-gradient(${
+                                theme.palette.background.default
+                            }, ${darken(
+                                theme.palette.background.default,
+                                0.1
+                            )})`
+                        ],
+                        height: '100dvh'
+                    }}
+                >
+                    <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                        <Menu streams={watchstreams} />
+                    </Box>
                     <Box
                         sx={{
                             display: 'flex',
-                            background: [
-                                theme.palette.background.default,
-                                `linear-gradient(${
-                                    theme.palette.background.default
-                                }, ${darken(
-                                    theme.palette.background.default,
-                                    0.1
-                                )})`
-                            ],
-                            height: '100dvh'
+                            flexFlow: 'column',
+                            overflow: 'hidden',
+                            flex: 1
                         }}
                     >
-                        <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                            <Menu streams={watchStreams} />
-                        </Box>
-                        <Box
+                        <Paper
                             sx={{
+                                flexGrow: '1',
+                                margin: { xs: '4px', sm: '10px' },
+                                mb: { xs: 0, sm: '10px' },
                                 display: 'flex',
                                 flexFlow: 'column',
+                                borderRadius: { xs: '15px', md: '20px' },
                                 overflow: 'hidden',
-                                flex: 1
+                                background: 'none'
                             }}
                         >
-                            <Paper
-                                sx={{
-                                    flexGrow: '1',
-                                    margin: { xs: '8px', sm: '10px' },
-                                    mb: { xs: 0, sm: '10px' },
-                                    display: 'flex',
-                                    flexFlow: 'column',
-                                    borderRadius: { xs: '15px', md: '20px' },
-                                    overflow: 'hidden',
-                                    background: 'none'
-                                }}
-                            >
-                                <Routes>
-                                    <Route
-                                        index
-                                        element={
-                                            <Timeline
-                                                messages={messages}
-                                                messageDict={messageDict}
-                                                userDict={userDict}
-                                                follow={follow}
-                                                followList={followList}
-                                                setCurrentStreams={
-                                                    setCurrentStreams
-                                                }
-                                                watchstreams={watchStreams}
-                                            />
-                                        }
-                                    />
-                                    <Route
-                                        path="/associations"
-                                        element={<Associations />}
-                                    />
-                                    <Route
-                                        path="/explorer"
-                                        element={
-                                            <Explorer
-                                                watchList={watchStreams}
-                                                setWatchList={setWatchStreams}
-                                                followList={followList}
-                                                setFollowList={setFollowList}
-                                                userDict={userDict}
-                                            />
-                                        }
-                                    />
-                                    <Route
-                                        path="/notifications"
-                                        element={<Notifications />}
-                                    />
-                                    <Route
-                                        path="/identity"
-                                        element={<Identity />}
-                                    />
-                                    <Route
-                                        path="/settings"
-                                        element={
-                                            <Settings
-                                                setThemeName={setThemeName}
-                                                setPrvKey={setPrvKey}
-                                                setPubKey={setPubKey}
-                                                setUserAddr={setAddress}
-                                                setServerAddr={setServer}
-                                            />
-                                        }
-                                    />
-                                </Routes>
-                            </Paper>
-                            <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
-                                <MobileMenu />
-                            </Box>
+                            <Routes>
+                                <Route
+                                    index
+                                    element={
+                                        <Timeline
+                                            messages={messages}
+                                            follow={follow}
+                                            followList={followList}
+                                            setCurrentStreams={
+                                                setCurrentStreams
+                                            }
+                                            watchstreams={watchstreams}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/associations"
+                                    element={<Associations />}
+                                />
+                                <Route
+                                    path="/explorer"
+                                    element={
+                                        <Explorer
+                                            watchList={watchstreams}
+                                            setWatchList={setWatchStreams}
+                                            followList={followList}
+                                            setFollowList={setFollowList}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/notifications"
+                                    element={<Notifications />}
+                                />
+                                <Route
+                                    path="/identity"
+                                    element={<Identity />}
+                                />
+                                <Route
+                                    path="/settings"
+                                    element={
+                                        <Settings
+                                            setThemeName={setThemeName}
+                                            setPrvKey={setPrvKey}
+                                            setPubKey={setPubKey}
+                                            setUserAddr={setAddress}
+                                            setServerAddr={setServer}
+                                        />
+                                    }
+                                />
+                            </Routes>
+                        </Paper>
+                        <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+                            <MobileMenu />
                         </Box>
                     </Box>
-                </BrowserRouter>
+                </Box>
             </ApplicationContext.Provider>
         </ThemeProvider>
     )

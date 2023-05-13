@@ -64,7 +64,7 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                             .map(
                                 async (id) =>
                                     await appData.streamDict
-                                        ?.get(id)
+                                        .get(id)
                                         .then((e) =>
                                             e.meta
                                                 ? JSON.parse(e.meta).name
