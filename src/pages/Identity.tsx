@@ -1,67 +1,14 @@
-import {
-    Box,
-    Divider,
-    Typography,
-    TextField,
-    Button,
-    IconButton,
-    useTheme
-} from '@mui/material'
+import { Box, Divider, Typography, IconButton, useTheme } from '@mui/material'
 import { useContext, useState } from 'react'
 import { ApplicationContext } from '../App'
-import { usePersistent } from '../hooks/usePersistent'
-import { Schemas } from '../schemas'
-import { Sign } from '../util'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
+import { ProfileEditor } from '../components/ProfileEditor'
 
 export function Identity(): JSX.Element {
     const theme = useTheme()
     const appData = useContext(ApplicationContext)
-
-    const [username, setUsername] = usePersistent<string>(
-        'Username',
-        'anonymous'
-    )
-    const [avatar, setAvatar] = usePersistent<string>('AvatarURL', '')
-    const [homeStream, SetHomeStream] = usePersistent<string>('homeStream', '')
-    const [notificationStream, SetNotificationStream] = usePersistent<string>(
-        'notificationStream',
-        ''
-    )
-
     const [showPrivateKey, setShowPrivateKey] = useState(false)
-
-    const updateProfile = (): void => {
-        const payloadObj = {
-            username,
-            avatar,
-            description: '',
-            home: homeStream,
-            notification: notificationStream
-        }
-
-        const payload = JSON.stringify(payloadObj)
-        const signature = Sign(appData.privatekey, payload)
-
-        const requestOptions = {
-            method: 'PUT',
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({
-                author: appData.userAddress,
-                schema: Schemas.profile,
-                payload,
-                signature
-            })
-        }
-
-        fetch(appData.serverAddress + 'characters', requestOptions)
-            .then(async (res) => await res.json())
-            .then((data) => {
-                console.log(data)
-                // reload();
-            })
-    }
 
     return (
         <>
@@ -80,61 +27,25 @@ export function Identity(): JSX.Element {
                     Identity
                 </Typography>
                 <Divider />
-                <Typography variant="h3" gutterBottom>
-                    Profile
-                </Typography>
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        padding: '15px',
-                        gap: '5px'
-                    }}
-                >
-                    <TextField
-                        label="username"
-                        variant="outlined"
-                        value={username}
-                        onChange={(e) => {
-                            setUsername(e.target.value)
-                        }}
-                    />
-                    <TextField
-                        label="avatarURL"
-                        variant="outlined"
-                        value={avatar}
-                        onChange={(e) => {
-                            setAvatar(e.target.value)
-                        }}
-                    />
-                    <TextField
-                        label="HomeStream"
-                        placeholder="home-username"
-                        variant="outlined"
-                        value={homeStream}
-                        onChange={(e) => {
-                            SetHomeStream(e.target.value)
-                        }}
-                    />
-                    <TextField
-                        label="NotificationStream"
-                        placeholder="notification-username"
-                        variant="outlined"
-                        value={notificationStream}
-                        onChange={(e) => {
-                            SetNotificationStream(e.target.value)
-                        }}
-                    />
-                    <Button
-                        variant="contained"
-                        onClick={(_) => {
-                            updateProfile()
-                        }}
-                    >
-                        Update
-                    </Button>
-                </Box>
+                <ProfileEditor
+                    initial={appData.profile}
+                    userAddress={appData.userAddress}
+                    privatekey={appData.privatekey}
+                    serverAddress={appData.serverAddress}
+                />
                 <Divider />
+                <Typography variant="h3" gutterBottom>
+                    Home Stream
+                </Typography>
+                <Typography sx={{ wordBreak: 'break-all' }}>
+                    {appData.profile.homestream}
+                </Typography>
+                <Typography variant="h3" gutterBottom>
+                    Notification Stream
+                </Typography>
+                <Typography sx={{ wordBreak: 'break-all' }}>
+                    {appData.profile.notificationstream}
+                </Typography>
                 <Typography variant="h3" gutterBottom>
                     Concurrent Address
                 </Typography>

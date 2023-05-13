@@ -11,9 +11,9 @@ import {
 import { useContext, useMemo, useState } from 'react'
 import { ApplicationContext } from '../App'
 import { Themes, createConcurrentTheme } from '../themes'
-import { Keygen, LoadKey } from '../util'
 import { ConcurrentLogo } from '../components/ConcurrentLogo'
 import type { ConcurrentTheme } from '../model'
+import { useNavigate } from 'react-router-dom'
 
 export interface SettingsProp {
     setThemeName: (themename: string) => void
@@ -26,22 +26,7 @@ export interface SettingsProp {
 export function Settings(props: SettingsProp): JSX.Element {
     const theme = useTheme()
     const appData = useContext(ApplicationContext)
-
-    const [draftPrivateKey, setDraftPrivateKey] = useState<string>('')
-
-    const regenerateKeys = (): void => {
-        const key = Keygen()
-        props.setPubKey(key.publickey)
-        props.setPrvKey(key.privatekey)
-        props.setUserAddr(key.ccaddress)
-    }
-
-    const importKeys = (): void => {
-        const key = LoadKey(draftPrivateKey)
-        props.setPubKey(key.publickey)
-        props.setPrvKey(key.privatekey)
-        props.setUserAddr(key.ccaddress)
-    }
+    const navigate = useNavigate()
 
     const previewTheme: Record<string, ConcurrentTheme> = useMemo(
         () =>
@@ -51,14 +36,20 @@ export function Settings(props: SettingsProp): JSX.Element {
         []
     )
 
-    const [open, setOpen] = useState(false)
+    const logout = (): void => {
+        for (const key in localStorage) {
+            localStorage.removeItem(key)
+        }
+    }
+
+    const [openLogoutModal, setOpenLogoutModal] = useState(false)
 
     return (
         <>
             <Modal
-                open={open}
+                open={openLogoutModal}
                 onClose={() => {
-                    setOpen(false)
+                    setOpenLogoutModal(false)
                 }}
             >
                 <Box
@@ -88,11 +79,12 @@ export function Settings(props: SettingsProp): JSX.Element {
                         variant="contained"
                         color="error"
                         onClick={() => {
-                            regenerateKeys()
-                            setOpen(false)
+                            logout()
+                            setOpenLogoutModal(false)
+                            navigate('/welcome')
                         }}
                     >
-                        Generate New Key
+                        Logout
                     </Button>
                 </Box>
             </Modal>
@@ -111,127 +103,126 @@ export function Settings(props: SettingsProp): JSX.Element {
                     Settings
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
-                <Typography sx={{ wordWrap: 'break-word' }}>
-                    Your concurrent address: {appData.userAddress}
-                </Typography>
                 <Box
                     sx={{
                         display: 'flex',
                         flexDirection: 'column',
-                        padding: '15px',
-                        gap: '5px'
+                        gap: '30px'
                     }}
                 >
-                    <TextField
-                        label="server"
-                        variant="outlined"
-                        value={appData.serverAddress}
-                        onChange={(e) => {
-                            props.setServerAddr(e.target.value)
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '5px'
                         }}
-                    />
-                    <Box sx={{ display: 'flex', gap: '10px' }}>
+                    >
+                        <Typography variant="h3">Basic</Typography>
                         <TextField
-                            label="import private key"
+                            label="server"
                             variant="outlined"
-                            value={draftPrivateKey}
-                            sx={{ flexGrow: 1 }}
+                            value={appData.serverAddress}
                             onChange={(e) => {
-                                setDraftPrivateKey(e.target.value)
+                                props.setServerAddr(e.target.value)
                             }}
                         />
                         <Button
                             variant="contained"
                             onClick={(_) => {
-                                importKeys()
+                                window.location.reload()
                             }}
                         >
-                            Import
+                            Force Reload
                         </Button>
                     </Box>
-                    <Button
-                        color="error"
-                        variant="contained"
-                        onClick={(_) => {
-                            setOpen(true)
+
+                    <Box>
+                        <Typography variant="h3">Theme</Typography>
+                        <Box
+                            sx={{
+                                display: { xs: 'flex', md: 'grid' },
+                                flexFlow: 'column',
+                                gridTemplateColumns: '1fr 1fr 1fr 1fr',
+                                gridAutoRows: '1fr',
+                                gap: '10px'
+                            }}
+                        >
+                            {Object.keys(previewTheme).map((e) => (
+                                <Paper key={e}>
+                                    <Button
+                                        onClick={(_) => {
+                                            props.setThemeName(e)
+                                        }}
+                                        style={{
+                                            border: 'none',
+                                            background:
+                                                previewTheme[e].palette
+                                                    .background.paper,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '10px',
+                                            width: '100%',
+                                            justifyContent: 'flex-start'
+                                        }}
+                                        color="info"
+                                    >
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                borderRadius: '100px',
+                                                background:
+                                                    previewTheme[e].palette
+                                                        .primary.contrastText
+                                            }}
+                                        >
+                                            <ConcurrentLogo
+                                                size="40px"
+                                                upperColor={
+                                                    previewTheme[e].palette
+                                                        .primary.main
+                                                }
+                                                lowerColor={
+                                                    previewTheme[e].palette
+                                                        .background.default
+                                                }
+                                                frameColor={
+                                                    previewTheme[e].palette
+                                                        .background.default
+                                                }
+                                            />
+                                        </Box>
+                                        <Typography
+                                            sx={{
+                                                color: previewTheme[e].palette
+                                                    .text.primary
+                                            }}
+                                            variant="button"
+                                        >
+                                            {e}
+                                        </Typography>
+                                    </Button>
+                                </Paper>
+                            ))}
+                        </Box>
+                    </Box>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '5px'
                         }}
                     >
-                        Generate New Key
-                    </Button>
-                </Box>
-
-                <Typography variant="h3">Theme</Typography>
-                <Box
-                    sx={{
-                        display: { xs: 'flex', md: 'grid' },
-                        flexFlow: 'column',
-                        gridTemplateColumns: '1fr 1fr 1fr 1fr',
-                        gridAutoRows: '1fr',
-                        gap: '10px'
-                    }}
-                >
-                    {Object.keys(previewTheme).map((e) => (
-                        <Paper key={e}>
-                            <Button
-                                onClick={(_) => {
-                                    props.setThemeName(e)
-                                }}
-                                style={{
-                                    border: 'none',
-                                    background:
-                                        previewTheme[e].palette.background
-                                            .paper,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '10px',
-                                    width: '100%',
-                                    justifyContent: 'flex-start'
-                                }}
-                                color="info"
-                            >
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        borderRadius: '100px',
-                                        background:
-                                            previewTheme[e].palette.background
-                                                .contrastText
-                                    }}
-                                >
-                                    <ConcurrentLogo
-                                        size="40px"
-                                        upperColor={
-                                            previewTheme[e].palette.primary
-                                                .main ===
-                                            previewTheme[e].palette.background
-                                                .contrastText
-                                                ? previewTheme[e].palette
-                                                      .background.default
-                                                : previewTheme[e].palette
-                                                      .primary.main
-                                        }
-                                        lowerColor={
-                                            previewTheme[e].palette.background
-                                                .default
-                                        }
-                                        frameColor={
-                                            previewTheme[e].palette.background
-                                                .default
-                                        }
-                                    />
-                                </Box>
-                                <Typography
-                                    sx={{
-                                        color: previewTheme[e].palette.text
-                                            .primary
-                                    }}
-                                    variant="button"
-                                >
-                                    {e}
-                                </Typography>
-                            </Button>
-                        </Paper>
-                    ))}
+                        <Typography variant="h3">DangerZone</Typography>
+                        <Button
+                            color="error"
+                            variant="contained"
+                            onClick={(_) => {
+                                setOpenLogoutModal(true)
+                            }}
+                        >
+                            Logout
+                        </Button>
+                    </Box>
                 </Box>
             </Box>
         </>
