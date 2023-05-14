@@ -1,12 +1,5 @@
 import { useState, useContext, useEffect } from 'react'
-import {
-    TextField,
-    Box,
-    Stack,
-    Button,
-    useTheme,
-    IconButton
-} from '@mui/material'
+import { TextField, Box, Button, useTheme, IconButton } from '@mui/material'
 import { Sign } from '../util'
 import { ApplicationContext } from '../App'
 import SendIcon from '@mui/icons-material/Send'
@@ -14,10 +7,7 @@ import { Schemas } from '../schemas'
 import Picker from '@emoji-mart/react'
 import data from '@emoji-mart/data'
 import { EmojiEmotions, Splitscreen } from '@mui/icons-material'
-import ReactMarkdown from 'react-markdown'
-import { type ReactMarkdownProps } from 'react-markdown/lib/ast-to-react'
-import { MessageBody } from './MessageBody'
-// import { EmojiProps } from '@types/emoji-mart'
+import { MarkdownRenderer } from './MarkdownRenderer'
 
 export interface EmojiProps {
     shortcodes: string
@@ -160,7 +150,7 @@ export function Draft(props: DraftProps): JSX.Element {
                         px: 1
                     }}
                 >
-                    <MessageBody messagebody={draft} />
+                    <MarkdownRenderer messagebody={draft} />
                 </Box>
             )}
             {!selectEmoji || (
