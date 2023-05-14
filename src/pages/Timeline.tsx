@@ -109,8 +109,10 @@ export function Timeline(props: TimelineProps): JSX.Element {
         fetch(url, requestOptions)
             .then(async (res) => await res.json())
             .then((data: StreamElement[]) => {
-                const idtable = props.messages.current.map((e) => e.ID)
-                const newdata = data.filter((e) => !idtable.includes(e.ID))
+                const idtable = props.messages.current.map((e) => e.Values.id)
+                const newdata = data.filter(
+                    (e) => !idtable.includes(e.Values.id)
+                )
                 if (newdata.length > 0) props.messages.concat(newdata)
                 else setHasMoreData(false)
             })
@@ -174,7 +176,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                             getScrollParent={() => scrollParentRef.current}
                         >
                             {props.messages.current.map((e) => (
-                                <React.Fragment key={e.ID}>
+                                <React.Fragment key={e.Values.id}>
                                     <TimelineMessage
                                         message={e.Values.id}
                                         follow={props.follow}
