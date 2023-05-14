@@ -1,5 +1,11 @@
-import React, { useCallback, useContext, useEffect } from 'react'
-import { List, Divider, Box, useTheme } from '@mui/material'
+import React, {
+    type FC,
+    useCallback,
+    useContext,
+    useEffect,
+    useRef
+} from 'react'
+import { Box, useTheme } from '@mui/material'
 import { TimelineMessage } from '../components/TimelineMessage'
 import { type StreamElement } from '../model'
 import { type IuseObjectList } from '../hooks/useObjectList'
@@ -7,6 +13,26 @@ import { Draft } from '../components/Draft'
 import { StreamsBar } from '../components/StreamsBar'
 import { useLocation } from 'react-router-dom'
 import { ApplicationContext } from '../App'
+import {
+    InfiniteLoader as _InfiniteLoader,
+    List as _List,
+    CellMeasurer as _CellMeasurer,
+    CellMeasurerCache,
+    AutoSizer as _AutoSizer,
+    type AutoSizerProps,
+    type ListProps,
+    type InfiniteLoaderProps,
+    type CellMeasurerProps
+} from 'react-virtualized'
+
+// WORKAROUND: https://github.com/bvaughn/react-virtualized/issues/1739
+export const VList = _List as unknown as FC<ListProps> & _List
+export const AutoSizer = _AutoSizer as unknown as FC<AutoSizerProps> &
+    _AutoSizer
+export const InfiniteLoader =
+    _InfiniteLoader as unknown as FC<InfiniteLoaderProps> & _InfiniteLoader
+export const CellMeasurer = _CellMeasurer as unknown as FC<CellMeasurerProps> &
+    _CellMeasurer
 
 export interface TimelineProps {
     messages: IuseObjectList<StreamElement>
@@ -19,6 +45,7 @@ export interface TimelineProps {
 export function Timeline(props: TimelineProps): JSX.Element {
     const appData = useContext(ApplicationContext)
     const theme = useTheme()
+    const cache = useRef(new CellMeasurerCache({ fixedWidth: true }))
 
     const reactlocation = useLocation()
 
@@ -91,17 +118,38 @@ export function Timeline(props: TimelineProps): JSX.Element {
         })()
     }, [reactlocation.hash])
 
+    const rowRenderer = ({ index, key, parent, style }: any): JSX.Element => {
+        return (
+            <CellMeasurer
+                cache={cache.current}
+                columnIndex={0}
+                key={key}
+                rowIndex={index}
+                parent={parent}
+                defaultHeight={105}
+            >
+                {({ measure }) => (
+                    <div style={style}>
+                        <TimelineMessage
+                            message={props.messages.current[index].Values.id}
+                            follow={props.follow}
+                            measure={measure}
+                            style={style}
+                        />
+                    </div>
+                )}
+            </CellMeasurer>
+        )
+    }
+
     return (
         <>
             <StreamsBar location={reactlocation} />
             <Box
                 sx={{
-                    overflowX: 'hidden',
-                    overflowY: 'auto',
-                    width: '100%',
                     padding: { xs: '8px', sm: '20px' },
                     background: theme.palette.background.paper,
-                    minHeight: '100%'
+                    flex: '1 1 auto'
                 }}
             >
                 <Box>
@@ -109,26 +157,32 @@ export function Timeline(props: TimelineProps): JSX.Element {
                         currentStreams={reactlocation.hash.replace('#', '')}
                     />
                 </Box>
-                <Box sx={{ display: 'flex', flex: 1 }}>
-                    <List sx={{ flex: 1, width: '100%' }}>
-                        {props.messages.current
-                            .slice()
-                            .reverse()
-                            .map((e) => (
-                                <React.Fragment key={e.ID}>
-                                    <TimelineMessage
-                                        message={e.Values.id}
-                                        follow={props.follow}
-                                    />
-                                    <Divider
-                                        variant="inset"
-                                        component="li"
-                                        sx={{ margin: '0 5px' }}
-                                    />
-                                </React.Fragment>
-                            ))}
-                    </List>
-                </Box>
+                <AutoSizer>
+                    {({ width, height }) => (
+                        <InfiniteLoader
+                            isRowLoaded={({ index }) => {
+                                return !!props.messages.current[index]
+                            }}
+                            loadMoreRows={async (): Promise<void> => {}}
+                            rowCount={props.messages.current.length}
+                        >
+                            {({ onRowsRendered, registerChild }) => (
+                                <VList
+                                    height={height}
+                                    rowCount={props.messages.current.length}
+                                    rowHeight={cache.current.rowHeight}
+                                    rowRenderer={rowRenderer}
+                                    onRowsRendered={onRowsRendered}
+                                    width={width}
+                                    deferredMeasurementCache={cache.current}
+                                    ref={(el: any) => {
+                                        registerChild(el)
+                                    }}
+                                />
+                            )}
+                        </InfiniteLoader>
+                    )}
+                </AutoSizer>
             </Box>
         </>
     )

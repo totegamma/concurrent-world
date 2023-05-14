@@ -25,6 +25,8 @@ import { MarkdownRenderer } from './MarkdownRenderer'
 export interface TimelineMessageProps {
     message: string
     follow: (ccaddress: string) => void
+    measure: any
+    style: any
 }
 
 export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
@@ -74,6 +76,10 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                 console.error(error)
             })
     }
+
+    useEffect(() => {
+        props.measure()
+    }, [user, message])
 
     useEffect(() => {
         loadTweet()
@@ -265,6 +271,8 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                         </Box>
                         <MarkdownRenderer
                             messagebody={JSON.parse(message.payload).body}
+                            measure={props.measure}
+                            style={props.style}
                         />
                         <Box sx={{ display: 'flex', gap: '10px' }}>
                             <Tooltip

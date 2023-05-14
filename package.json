@@ -17,6 +17,7 @@
         "@mui/material": "^5.11.7",
         "@types/emoji-mart": "^3.0.9",
         "@types/react-syntax-highlighter": "^15.5.6",
+        "@types/react-virtualized": "^9.21.21",
         "boring-avatars": "^1.7.0",
         "elliptic": "^6.5.4",
         "emoji-mart": "^5.5.2",

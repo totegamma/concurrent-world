@@ -18,6 +18,8 @@ import { ApplicationContext } from '../App'
 
 export interface MarkdownRendererProps {
     messagebody: string
+    measure?: any
+    style?: any
 }
 
 export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
@@ -105,7 +107,7 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                         )
                     },
                     img: (
-                        props: Pick<
+                        imgprops: Pick<
                             DetailedHTMLProps<
                                 ImgHTMLAttributes<HTMLImageElement>,
                                 HTMLImageElement
@@ -114,23 +116,25 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                         > &
                             ReactMarkdownProps
                     ) => {
-                        if (props.alt?.startsWith('emoji')) {
+                        if (imgprops.alt?.startsWith('emoji')) {
                             return (
                                 <img
-                                    {...props}
+                                    {...imgprops}
                                     style={{
                                         height: '1.5em',
                                         verticalAlign: '-0.5em'
                                     }}
+                                    onLoad={props.measure}
                                 />
                             )
                         }
                         return (
                             <img
-                                {...props}
+                                {...imgprops}
                                 style={{
                                     maxWidth: '100%'
                                 }}
+                                onLoad={props.measure}
                             />
                         )
                     }
