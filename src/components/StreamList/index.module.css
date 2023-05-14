@@ -9,12 +9,14 @@ ul {
     border-radius: 30px;
 }
 
-.app {
+.tree {
     height: 100%;
+    padding-left: 8px;
 }
 
 .treeRoot {
     height: 100%;
+    margin-top: auto;
 }
 
 .draggingSource {

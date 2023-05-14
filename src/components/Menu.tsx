@@ -30,11 +30,7 @@ import { StreamList } from './StreamList'
 
 const branchName = branch || window.location.host.split('.')[0]
 
-export interface MenuProps {
-    streams: string[]
-}
-
-export function Menu(props: MenuProps): JSX.Element {
+export function Menu(): JSX.Element {
     const theme = useTheme<ConcurrentTheme>()
     return (
         <Box sx={{ gap: '15px', height: '100%' }}>
@@ -180,7 +176,7 @@ export function Menu(props: MenuProps): JSX.Element {
                     </List>
                 </Box>
                 <Divider />
-                <StreamList streams={props.streams} />
+                <StreamList />
             </Box>
         </Box>
     )

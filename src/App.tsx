@@ -52,7 +52,8 @@ export const ApplicationContext = createContext<appData>({
     emojiDict: {},
     streamDict: dummyResourceManager,
     userDict: dummyResourceManager,
-    messageDict: dummyResourceManager
+    messageDict: dummyResourceManager,
+    watchStreams: []
 })
 
 export interface appData {
@@ -65,6 +66,7 @@ export interface appData {
     streamDict: IuseResourceManager<Stream>
     userDict: IuseResourceManager<User>
     messageDict: IuseResourceManager<RTMMessage>
+    watchStreams: string[]
 }
 
 function App(): JSX.Element {
@@ -304,7 +306,8 @@ function App(): JSX.Element {
                     profile,
                     streamDict,
                     userDict,
-                    messageDict
+                    messageDict,
+                    watchStreams
                 }}
             >
                 <Box

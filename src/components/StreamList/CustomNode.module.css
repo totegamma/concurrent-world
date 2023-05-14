@@ -3,8 +3,7 @@
     display: grid;
     grid-template-columns: auto auto 1fr auto;
     height: 32px;
-    padding-inline-end: 8px;
-    border-bottom: solid 1px #eee;
+    width: 100%;
 }
 
 .expandIconWrapper {
@@ -19,10 +18,34 @@
     transform: rotate(0deg);
 }
 
+.folderIcons {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    font-size: 0;
+    height: 24px;
+}
+
+.editingContainer {
+    display: flex;
+    overflow: auto;
+}
+
+.editingContainer input {
+    overflow: hidden;
+}
+
 .expandIconWrapper.isOpen {
     transform: rotate(90deg);
 }
 
 .labelGridItem {
-    padding-inline-start: 8px;
+    min-width: 0;
+}
+
+.streamName {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
 }

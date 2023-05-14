@@ -12,6 +12,9 @@ import {
     Box,
     CssBaseline,
     IconButton,
+    ListItem,
+    ListItemButton,
+    ListItemText,
     ThemeProvider,
     Typography,
     useTheme
@@ -23,99 +26,126 @@ import { Placeholder } from './Placeholder'
 import { ApplicationContext } from '../../App'
 import { usePersistent } from '../../hooks/usePersistent'
 
-interface Props {
-    streams: string[]
-}
-
-const initialData = [
-    {
-        id: 1,
-        parent: 0,
-        droppable: true,
-        text: 'Folder 1'
-    },
-    {
-        id: 2,
-        parent: 1,
-        text: 'File 1-1'
-    },
-    {
-        id: 3,
-        parent: 1,
-        text: 'File 1-2'
-    },
-    {
-        id: 4,
-        parent: 0,
-        droppable: true,
-        text: 'Folder 2'
-    },
-    {
-        id: 5,
-        parent: 4,
-        droppable: true,
-        text: 'Folder 2-1'
-    },
-    {
-        id: 6,
-        parent: 5,
-        text: 'File 2-1-1'
-    }
-]
+import { v4 as uuidv4 } from 'uuid'
+import PercentIcon from '@mui/icons-material/Percent'
+import * as stream from 'stream'
+import { Link } from 'react-router-dom'
 
 export interface WatchStream {
-    id: number
+    id: number | string
     parent: number
     droppable: boolean
     text: string
     data: Stream | undefined
 }
 
-export function StreamList(props: Props): JSX.Element {
+export function StreamList(): JSX.Element {
     const appData = useContext(ApplicationContext)
     const theme = useTheme<ConcurrentTheme>()
-    const [watchStreams, setWatchStreams] = useState<Stream[]>([])
     const [watchStreamTree, setWatchStreamTree] = usePersistent<WatchStream[]>(
         'watchStreamTree',
         []
     )
-    const [treeData, setTreeData] = useState<WatchStream[]>([])
 
     useEffect(() => {
         ;(async () => {
             const streams = await Promise.all(
-                props.streams.map(
+                appData.watchStreams.map(
                     async (id) => await appData.streamDict.get(id)
                 )
             )
-
-            setWatchStreams(streams)
-            setWatchStreamTree(
-                streams.map((stream, index) => ({
-                    id: index,
-                    parent: 0,
-                    droppable: false,
-                    text: JSON.parse(stream.meta).name || 'Unknown',
-                    data: stream
-                }))
-            )
-            setTreeData(watchStreamTree)
+            if (watchStreamTree.length === 0) {
+                // init watch stream tree
+                console.log('init watch stream tree')
+                setWatchStreamTree(
+                    streams.map((stream, index) => ({
+                        id: stream.id,
+                        parent: 0,
+                        droppable: false,
+                        text: JSON.parse(stream.meta).name || 'Unknown',
+                        data: stream
+                    }))
+                )
+            } else {
+                // update watch stream three
+                console.log('update watch stream tree')
+                // when a stream is deleted, remove it from the tree
+                const newTree = watchStreamTree.filter((node) => {
+                    if (node.data === undefined) {
+                        return true
+                    }
+                    return appData.watchStreams.includes(node.data.id)
+                })
+                // when a stream is added, add it to the tree
+                streams.forEach((stream) => {
+                    if (stream === undefined) {
+                        return
+                    }
+                    if (
+                        !watchStreamTree.some(
+                            (node) => node.data?.id === stream.id
+                        )
+                    ) {
+                        newTree.push({
+                            id: stream.id,
+                            parent: 0,
+                            droppable: false,
+                            text: JSON.parse(stream.meta).name || 'Unknown',
+                            data: stream
+                        })
+                    }
+                })
+                setWatchStreamTree(newTree)
+            }
         })()
-    }, [props.streams])
+    }, [appData.watchStreams])
+
+    const addFolder = (): void => {
+        setWatchStreamTree([
+            ...watchStreamTree,
+            {
+                id: uuidv4(),
+                parent: 0,
+                droppable: true,
+                text: 'New Folder',
+                data: undefined
+            }
+        ])
+    }
 
     const handleDrop = (newTreeData: any): void => {
-        setTreeData(newTreeData)
+        setWatchStreamTree(newTreeData)
+        console.log(newTreeData)
     }
 
     return (
         <>
-            <Box display={'flex'} flexDirection={'row'}>
-                <Typography flex={1}>Streams</Typography>
+            <Box
+                display={'flex'}
+                flexDirection={'row'}
+                gap={'8px'}
+                sx={{ paddingLeft: '16px', paddingTop: '8px' }}
+            >
+                <PercentIcon
+                    sx={{
+                        color: 'background.contrastText'
+                    }}
+                />
+                <Typography
+                    flex={1}
+                    fontSize={'0.875rem'}
+                    justifyContent={'center'}
+                    marginY={'3px'}
+                >
+                    Streams
+                </Typography>
+
                 <IconButton
                     sx={{ color: 'background.contrastText' }}
                     aria-label="add to shopping cart"
                     className={'plus-icon'}
                     size={'small'}
+                    onClick={addFolder}
                 >
                     <CreateNewFolder fontSize={'small'} />
                 </IconButton>
@@ -126,9 +156,9 @@ export function StreamList(props: Props): JSX.Element {
                     backend={MultiBackend}
                     options={getBackendOptions()}
                 >
-                    <div className={styles.app}>
+                    <div className={styles.tree}>
                         <Tree
-                            tree={treeData}
+                            tree={watchStreamTree}
                             rootId={0}
                             render={(node, { depth, isOpen, onToggle }) => (
                                 <CustomNode
@@ -136,6 +166,8 @@ export function StreamList(props: Props): JSX.Element {
                                     depth={depth}
                                     isOpen={isOpen}
                                     onToggle={onToggle}
+                                    tree={watchStreamTree}
+                                    setWatchStreamTree={setWatchStreamTree}
                                 />
                             )}
                             dragPreviewRender={(monitorProps) => (
