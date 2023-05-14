@@ -170,6 +170,7 @@ export function Draft(props: DraftProps): JSX.Element {
                         onEmojiSelect={(emoji: EmojiProps) => {
                             console.log(typeof emoji)
                             setDraft(draft + emoji.shortcodes)
+                            setSelectEmoji(false)
                         }}
                     />
                 </Box>
