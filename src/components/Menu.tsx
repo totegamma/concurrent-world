@@ -35,23 +35,7 @@ export interface MenuProps {
 }
 
 export function Menu(props: MenuProps): JSX.Element {
-    const appData = useContext(ApplicationContext)
-    const [watchStreams, setWatchStreams] = useState<Stream[]>([])
-
     const theme = useTheme<ConcurrentTheme>()
-
-    useEffect(() => {
-        ;(async () => {
-            setWatchStreams(
-                await Promise.all(
-                    props.streams.map(
-                        async (id) => await appData.streamDict.get(id)
-                    )
-                )
-            )
-        })()
-    }, [props.streams])
-
     return (
         <Box sx={{ gap: '15px', height: '100%' }}>
             <Box

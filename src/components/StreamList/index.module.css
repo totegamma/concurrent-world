@@ -1,0 +1,30 @@
+ul {
+    list-style: none;
+    box-sizing: border-box;
+    height: 100%;
+    padding: 0;
+}
+
+.plus-icon {
+    border-radius: 30px;
+}
+
+.app {
+    height: 100%;
+}
+
+.treeRoot {
+    height: 100%;
+}
+
+.draggingSource {
+    opacity: 0.3;
+}
+
+.placeholderContainer {
+    position: relative;
+}
+
+.dropTarget {
+    background-color: #e8f0fe;
+}

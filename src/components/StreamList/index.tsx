@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {
     DndProvider,
     getBackendOptions,
@@ -7,9 +7,22 @@ import {
 } from '@minoru/react-dnd-treeview'
 import { CreateNewFolder } from '@mui/icons-material'
 
-import './index.css'
-import { Box, IconButton, Typography, useTheme } from '@mui/material'
-import type { ConcurrentTheme } from '../../model'
+import styles from './index.module.css'
+import {
+    Box,
+    CssBaseline,
+    IconButton,
+    ThemeProvider,
+    Typography,
+    useTheme
+} from '@mui/material'
+import type { Stream, ConcurrentTheme } from '../../model'
+import { CustomNode } from './CustomNode'
+import { CustomDragPreview } from './CustomDragPreview'
+import { Placeholder } from './Placeholder'
+import { ApplicationContext } from '../../App'
+import { usePersistent } from '../../hooks/usePersistent'
+
 interface Props {
     streams: string[]
 }
@@ -50,10 +63,46 @@ const initialData = [
     }
 ]
 
-export function StreamList(props: Props): JSX.Element {
-    const theme = useTheme<ConcurrentTheme>()
+export interface WatchStream {
+    id: number
+    parent: number
+    droppable: boolean
+    text: string
+    data: Stream | undefined
+}
 
-    const [treeData, setTreeData] = useState<any>(initialData)
+export function StreamList(props: Props): JSX.Element {
+    const appData = useContext(ApplicationContext)
+    const theme = useTheme<ConcurrentTheme>()
+    const [watchStreams, setWatchStreams] = useState<Stream[]>([])
+    const [watchStreamTree, setWatchStreamTree] = usePersistent<WatchStream[]>(
+        'watchStreamTree',
+        []
+    )
+    const [treeData, setTreeData] = useState<WatchStream[]>([])
+
+    useEffect(() => {
+        ;(async () => {
+            const streams = await Promise.all(
+                props.streams.map(
+                    async (id) => await appData.streamDict.get(id)
+                )
+            )
+
+            setWatchStreams(streams)
+            setWatchStreamTree(
+                streams.map((stream, index) => ({
+                    id: index,
+                    parent: 0,
+                    droppable: false,
+                    text: JSON.parse(stream.meta).name || 'Unknown',
+                    data: stream
+                }))
+            )
+            setTreeData(watchStreamTree)
+        })()
+    }, [props.streams])
+
     const handleDrop = (newTreeData: any): void => {
         setTreeData(newTreeData)
     }
@@ -66,95 +115,58 @@ export function StreamList(props: Props): JSX.Element {
                     sx={{ color: 'background.contrastText' }}
                     aria-label="add to shopping cart"
                     className={'plus-icon'}
+                    size={'small'}
                 >
-                    <CreateNewFolder />
+                    <CreateNewFolder fontSize={'small'} />
                 </IconButton>
             </Box>
-            <DndProvider backend={MultiBackend} options={getBackendOptions()}>
-                <Tree
-                    tree={treeData}
-                    rootId={0}
-                    onDrop={handleDrop}
-                    render={(node, { depth, isOpen, onToggle }) => (
-                        <div style={{ marginLeft: depth * 10 }}>
-                            {node.droppable && (
-                                <span onClick={onToggle}>
-                                    {isOpen ? '▼' : '▶︎'}
-                                </span>
+            <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <DndProvider
+                    backend={MultiBackend}
+                    options={getBackendOptions()}
+                >
+                    <div className={styles.app}>
+                        <Tree
+                            tree={treeData}
+                            rootId={0}
+                            render={(node, { depth, isOpen, onToggle }) => (
+                                <CustomNode
+                                    node={node}
+                                    depth={depth}
+                                    isOpen={isOpen}
+                                    onToggle={onToggle}
+                                />
                             )}
-                            {node.text}
-                        </div>
-                    )}
-                />
-            </DndProvider>
+                            dragPreviewRender={(monitorProps) => (
+                                <CustomDragPreview
+                                    monitorProps={monitorProps}
+                                />
+                            )}
+                            onDrop={handleDrop}
+                            classes={{
+                                root: styles.treeRoot,
+                                draggingSource: styles.draggingSource,
+                                placeholder: styles.placeholderContainer
+                            }}
+                            sort={false}
+                            insertDroppableFirst={false}
+                            canDrop={(
+                                tree,
+                                { dragSource, dropTargetId, dropTarget }
+                            ) => {
+                                if (dragSource?.parent === dropTargetId) {
+                                    return true
+                                }
+                            }}
+                            dropTargetOffset={5}
+                            placeholderRender={(node, { depth }) => (
+                                <Placeholder node={node} depth={depth} />
+                            )}
+                        />
+                    </div>
+                </DndProvider>
+            </ThemeProvider>
         </>
     )
 }
-
-// export function StreamList(props: Props): JSX.Element {
-//     const appData = useContext(ApplicationContext)
-//     const [watchStreams, setWatchStreams] = useState<Stream[]>([])
-//
-//     useEffect(() => {
-//         ;(async () => {
-//             setWatchStreams(
-//                 (
-//                     await Promise.all(
-//                         props.streams.map(
-//                             async (id) => await appData.streamDict?.get(id)
-//                         )
-//                     )
-//                 ).filter((e) => e) as Stream[]
-//             )
-//         })()
-//     }, [props.streams])
-//
-//     return (
-//         <Box
-//             sx={{
-//                 display: 'flex',
-//                 flexDirection: 'column',
-//                 gap: '5px',
-//                 overflowY: 'auto',
-//                 overflowX: 'hidden'
-//             }}
-//         >
-//             <List
-//                 dense
-//                 sx={{
-//                     width: '100%',
-//                     maxWidth: 360,
-//                     display: 'flex',
-//                     flexDirection: 'column'
-//                 }}
-//             >
-//                 {watchStreams.map((stream) => {
-//                     const labelId = `checkbox-list-secondary-label-${stream.id}`
-//                     return (
-//                         <ListItem key={stream.id} disablePadding>
-//                             <ListItemButton
-//                                 component={Link}
-//                                 to={`/#${stream.id}`}
-//                                 sx={{ gap: 1 }}
-//                             >
-//                                 <PercentIcon
-//                                     sx={{
-//                                         color: 'background.contrastText'
-//                                     }}
-//                                 />
-//                                 <ListItemText
-//                                     id={labelId}
-//                                     primary={
-//                                         stream.meta
-//                                             ? JSON.parse(stream.meta).name
-//                                             : 'backrooms'
-//                                     }
-//                                 />
-//                             </ListItemButton>
-//                         </ListItem>
-//                     )
-//                 })}
-//             </List>
-//         </Box>
-//     )
-// }
