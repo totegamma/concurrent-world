@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext, useCallback } from 'react'
 import {
     ListItem,
     Box,
@@ -6,9 +6,9 @@ import {
     Typography,
     Link,
     IconButton,
-    Drawer,
     useTheme,
-    Tooltip
+    Tooltip,
+    Skeleton
 } from '@mui/material'
 import StarIcon from '@mui/icons-material/Star'
 import StarOutlineIcon from '@mui/icons-material/StarOutline'
@@ -25,6 +25,7 @@ import { MarkdownRenderer } from './MarkdownRenderer'
 export interface TimelineMessageProps {
     message: string
     follow: (ccaddress: string) => void
+    setInspectItem: (message: RTMMessage) => void
 }
 
 export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
@@ -37,11 +38,9 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
 
     const theme = useTheme()
 
-    const [inspectItem, setInspectItem] = useState<RTMMessage | null>(null)
-
     const [hasOwnReaction, setHasOwnReaction] = useState<boolean>(false)
 
-    const loadTweet = (): void => {
+    const loadTweet = useCallback((): void => {
         appData.messageDict
             .get(props.message)
             .then((msg) => {
@@ -73,7 +72,12 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
             .catch((error) => {
                 console.error(error)
             })
-    }
+    }, [
+        appData.messageDict,
+        props.message,
+        appData.userDict,
+        appData.streamDict
+    ])
 
     useEffect(() => {
         loadTweet()
@@ -104,59 +108,91 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
         fetchUsers()
     }, [message?.associations_data])
 
-    const favorite = async (messageID: string | undefined): Promise<void> => {
-        const favoriteScheme = Schemas.like
-        if (!messageID) return
-        const payloadObj = {}
-        const payload = JSON.stringify(payloadObj)
-        const signature = Sign(appData.privatekey, payload)
-        const targetAuthor = (await appData.messageDict.get(messageID)).author
-        console.log(targetAuthor)
-        const targetStream = (await appData.userDict.get(targetAuthor))
-            .notificationstream
-        console.log([targetStream].filter((e) => e))
+    const favorite = useCallback(
+        async (messageID: string | undefined): Promise<void> => {
+            const favoriteScheme = Schemas.like
+            if (!messageID) return
+            const payloadObj = {}
+            const payload = JSON.stringify(payloadObj)
+            const signature = Sign(appData.privatekey, payload)
+            const targetAuthor = (await appData.messageDict.get(messageID))
+                .author
+            console.log(targetAuthor)
+            const targetStream = (await appData.userDict.get(targetAuthor))
+                .notificationstream
+            console.log([targetStream].filter((e) => e))
 
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({
-                author: appData.userAddress,
-                schema: favoriteScheme,
-                target: messageID,
-                payload,
-                signature,
-                streams: [targetStream].filter((e) => e)
-            })
-        }
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({
+                    author: appData.userAddress,
+                    schema: favoriteScheme,
+                    target: messageID,
+                    payload,
+                    signature,
+                    streams: [targetStream].filter((e) => e)
+                })
+            }
 
-        fetch(appData.serverAddress + 'associations', requestOptions)
-            .then(async (res) => await res.json())
-            .then((_) => {
-                appData.messageDict.invalidate(messageID)
-                loadTweet()
-            })
-    }
+            fetch(appData.serverAddress + 'associations', requestOptions)
+                .then(async (res) => await res.json())
+                .then((_) => {
+                    appData.messageDict.invalidate(messageID)
+                    loadTweet()
+                })
+        },
+        [appData.serverAddress, appData.messageDict, appData.userAddress]
+    )
 
-    const unfavorite = (
-        messageID: string | undefined,
-        deletekey: string | undefined
-    ): void => {
-        if (!messageID) return
-        if (!unfavorite) return
-        const requestOptions = {
-            method: 'DELETE',
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({
-                id: deletekey
-            })
-        }
+    const unfavorite = useCallback(
+        (
+            messageID: string | undefined,
+            deletekey: string | undefined
+        ): void => {
+            if (!messageID) return
+            if (!unfavorite) return
+            const requestOptions = {
+                method: 'DELETE',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({
+                    id: deletekey
+                })
+            }
 
-        fetch(appData.serverAddress + 'associations', requestOptions)
-            .then(async (res) => await res.json())
-            .then((_) => {
-                appData.messageDict.invalidate(messageID)
-                loadTweet()
-            })
+            fetch(appData.serverAddress + 'associations', requestOptions)
+                .then(async (res) => await res.json())
+                .then((_) => {
+                    appData.messageDict.invalidate(messageID)
+                    loadTweet()
+                })
+        },
+        [appData.serverAddress, appData.messageDict]
+    )
+
+    if (!message) {
+        return (
+            <ListItem
+                sx={{
+                    alignItems: 'flex-start',
+                    flex: 1,
+                    p: { xs: '5px 0', sm: '10px 0' },
+                    height: 105,
+                    gap: '10px'
+                }}
+            >
+                <Skeleton
+                    animation="wave"
+                    variant="circular"
+                    width={40}
+                    height={40}
+                />
+                <Box sx={{ flex: 1 }}>
+                    <Skeleton animation="wave" />
+                    <Skeleton animation="wave" height={80} />
+                </Box>
+            </ListItem>
+        )
     }
 
     return (
@@ -168,7 +204,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                 wordBreak: 'break-word'
             }}
         >
-            {message && JSON.parse(message.payload).body && (
+            {JSON.parse(message.payload).body && (
                 <>
                     <Box>
                         <IconButton
@@ -309,15 +345,15 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                     onClick={() => {
                                         if (hasOwnReaction) {
                                             unfavorite(
-                                                message?.id,
-                                                message?.associations_data.find(
+                                                message.id,
+                                                message.associations_data.find(
                                                     (e) =>
                                                         e.author ===
                                                         appData.userAddress
                                                 )?.id
                                             )
                                         } else {
-                                            favorite(message?.id)
+                                            favorite(message.id)
                                         }
                                     }}
                                 >
@@ -337,7 +373,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                             </Tooltip>
                             <IconButton
                                 onClick={() => {
-                                    setInspectItem(message ?? null)
+                                    props.setInspectItem(message ?? null)
                                 }}
                                 sx={{
                                     p: '0',
@@ -347,65 +383,6 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                 <MoreHorizIcon />
                             </IconButton>
                         </Box>
-                        <Drawer
-                            anchor={'right'}
-                            open={inspectItem != null}
-                            onClose={() => {
-                                setInspectItem(null)
-                            }}
-                            PaperProps={{
-                                sx: {
-                                    width: '40vw',
-                                    borderRadius: '20px 0 0 20px',
-                                    overflow: 'hidden',
-                                    padding: '20px'
-                                }
-                            }}
-                        >
-                            <Box
-                                sx={{
-                                    margin: 0,
-                                    wordBreak: 'break-all',
-                                    whiteSpace: 'pre-wrap',
-                                    fontSize: '13px'
-                                }}
-                            >
-                                <Typography>ID: {inspectItem?.id}</Typography>
-                                <Typography>
-                                    Author: {inspectItem?.author}
-                                </Typography>
-                                <Typography>
-                                    Schema: {inspectItem?.schema}
-                                </Typography>
-                                <Typography>
-                                    Signature: {inspectItem?.signature}
-                                </Typography>
-                                <Typography>
-                                    Created: {inspectItem?.cdate}
-                                </Typography>
-                                <Typography>Payload:</Typography>
-                                <pre style={{ overflowX: 'scroll' }}>
-                                    {JSON.stringify(
-                                        JSON.parse(
-                                            inspectItem?.payload ?? 'null'
-                                        ),
-                                        null,
-                                        4
-                                    ).replaceAll('\\n', '\n')}
-                                </pre>
-                                <Typography>
-                                    Associations: {inspectItem?.associations}
-                                </Typography>
-                                <Typography>AssociationsData:</Typography>
-                                <pre style={{ overflowX: 'scroll' }}>
-                                    {JSON.stringify(
-                                        inspectItem?.associations_data,
-                                        null,
-                                        4
-                                    )}
-                                </pre>
-                            </Box>
-                        </Drawer>
                     </Box>
                 </>
             )}

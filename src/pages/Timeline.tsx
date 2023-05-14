@@ -5,9 +5,9 @@ import React, {
     useRef,
     useState
 } from 'react'
-import { List, Divider, Box, useTheme } from '@mui/material'
+import { List, Divider, Box, useTheme, Drawer, Typography } from '@mui/material'
 import { TimelineMessage } from '../components/TimelineMessage'
-import { type StreamElement } from '../model'
+import type { RTMMessage, StreamElement } from '../model'
 import { type IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'
 import { StreamsBar } from '../components/StreamsBar'
@@ -30,6 +30,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
     const reactlocation = useLocation()
     const scrollParentRef = useRef<HTMLDivElement>(null)
     const [hasMoreData, setHasMoreData] = useState<boolean>(false)
+    const [inspectItem, setInspectItem] = useState<RTMMessage | null>(null)
 
     const reload = useCallback(async () => {
         console.warn('reload!')
@@ -65,9 +66,8 @@ export function Timeline(props: TimelineProps): JSX.Element {
         fetch(url, requestOptions)
             .then(async (res) => await res.json())
             .then((data: StreamElement[]) => {
-                props.messages.clear()
                 const newdata = data?.sort((a, b) => (a.ID > b.ID ? -1 : 1))
-                props.messages.concat(newdata)
+                props.messages.set(newdata)
             })
         setHasMoreData(true)
     }, [appData.serverAddress, reactlocation.hash])
@@ -180,6 +180,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                                     <TimelineMessage
                                         message={e.Values.id}
                                         follow={props.follow}
+                                        setInspectItem={setInspectItem}
                                     />
                                     <Divider
                                         variant="inset"
@@ -192,6 +193,55 @@ export function Timeline(props: TimelineProps): JSX.Element {
                     </List>
                 </Box>
             </Box>
+            <Drawer
+                anchor={'right'}
+                open={inspectItem != null}
+                onClose={() => {
+                    setInspectItem(null)
+                }}
+                PaperProps={{
+                    sx: {
+                        width: '40vw',
+                        borderRadius: '20px 0 0 20px',
+                        overflow: 'hidden',
+                        padding: '20px'
+                    }
+                }}
+            >
+                <Box
+                    sx={{
+                        margin: 0,
+                        wordBreak: 'break-all',
+                        whiteSpace: 'pre-wrap',
+                        fontSize: '13px'
+                    }}
+                >
+                    <Typography>ID: {inspectItem?.id}</Typography>
+                    <Typography>Author: {inspectItem?.author}</Typography>
+                    <Typography>Schema: {inspectItem?.schema}</Typography>
+                    <Typography>Signature: {inspectItem?.signature}</Typography>
+                    <Typography>Created: {inspectItem?.cdate}</Typography>
+                    <Typography>Payload:</Typography>
+                    <pre style={{ overflowX: 'scroll' }}>
+                        {JSON.stringify(
+                            JSON.parse(inspectItem?.payload ?? 'null'),
+                            null,
+                            4
+                        ).replaceAll('\\n', '\n')}
+                    </pre>
+                    <Typography>
+                        Associations: {inspectItem?.associations}
+                    </Typography>
+                    <Typography>AssociationsData:</Typography>
+                    <pre style={{ overflowX: 'scroll' }}>
+                        {JSON.stringify(
+                            inspectItem?.associations_data,
+                            null,
+                            4
+                        )}
+                    </pre>
+                </Box>
+            </Drawer>
         </>
     )
 }
