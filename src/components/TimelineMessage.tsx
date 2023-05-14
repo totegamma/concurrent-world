@@ -168,7 +168,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                 wordBreak: 'break-word'
             }}
         >
-            {message != null && (
+            {message && JSON.parse(message.payload).body && (
                 <>
                     <Box>
                         <IconButton

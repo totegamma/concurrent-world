@@ -1,4 +1,10 @@
-import React, { useCallback, useContext, useEffect, useRef } from 'react'
+import React, {
+    useCallback,
+    useContext,
+    useEffect,
+    useRef,
+    useState
+} from 'react'
 import { List, Divider, Box, useTheme } from '@mui/material'
 import { TimelineMessage } from '../components/TimelineMessage'
 import { type StreamElement } from '../model'
@@ -23,6 +29,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
 
     const reactlocation = useLocation()
     const scrollParentRef = useRef<HTMLDivElement>(null)
+    const [hasMoreData, setHasMoreData] = useState<boolean>(false)
 
     const reload = useCallback(async () => {
         console.warn('reload!')
@@ -59,12 +66,10 @@ export function Timeline(props: TimelineProps): JSX.Element {
             .then(async (res) => await res.json())
             .then((data: StreamElement[]) => {
                 props.messages.clear()
-                data?.sort((a, b) => (a.ID > b.ID ? -1 : 1)).forEach(
-                    (e: StreamElement) => {
-                        props.messages.push(e)
-                    }
-                )
+                const newdata = data?.sort((a, b) => (a.ID > b.ID ? -1 : 1))
+                props.messages.concat(newdata)
             })
+        setHasMoreData(true)
     }, [appData.serverAddress, reactlocation.hash])
 
     const loadMore = useCallback(async () => {
@@ -104,7 +109,10 @@ export function Timeline(props: TimelineProps): JSX.Element {
         fetch(url, requestOptions)
             .then(async (res) => await res.json())
             .then((data: StreamElement[]) => {
-                props.messages.concat(data)
+                const idtable = props.messages.current.map((e) => e.ID)
+                const newdata = data.filter((e) => !idtable.includes(e.ID))
+                if (newdata.length > 0) props.messages.concat(newdata)
+                else setHasMoreData(false)
             })
     }, [props.messages.current, reactlocation.hash])
 
@@ -132,6 +140,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                     : homequery
             )
         })()
+        scrollParentRef.current?.scroll({ top: 0 })
     }, [reactlocation.hash])
 
     return (
@@ -159,7 +168,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                             loadMore={() => {
                                 loadMore()
                             }}
-                            hasMore={true}
+                            hasMore={hasMoreData}
                             loader={<>Loading...</>}
                             useWindow={false}
                             getScrollParent={() => scrollParentRef.current}

@@ -204,7 +204,7 @@ function App(): JSX.Element {
                         const groupA = currentStreamsRef.current.split(',')
                         const groupB = message.streams.split(',')
                         if (!groupA.some((e) => groupB.includes(e))) return
-                        messages.push({
+                        messages.pushFront({
                             ID: new Date(message.cdate)
                                 .getTime()
                                 .toString()
