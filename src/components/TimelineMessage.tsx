@@ -18,17 +18,13 @@ import { Sign } from '../util'
 import BoringAvatar from 'boring-avatars'
 
 import { ApplicationContext } from '../App'
-import { type Emoji, type RTMMessage, type User } from '../model'
+import { type RTMMessage, type User } from '../model'
 import { Schemas } from '../schemas'
-import { MessageBody } from './MessageBody'
+import { MarkdownRenderer } from './MarkdownRenderer'
 
 export interface TimelineMessageProps {
     message: string
     follow: (ccaddress: string) => void
-}
-
-const genEmojiTag = (emoji: Emoji): string => {
-    return `<img src="${emoji.publicUrl}" alt="emoji:${emoji.name}:" title=":${emoji?.name}:"/>`
 }
 
 export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
@@ -163,20 +159,6 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
             })
     }
 
-    const messagebody = message
-        ? JSON.parse(message.payload).body?.replace(
-              /:\w+:/gi,
-              (name: string) => {
-                  const emoji: Emoji | undefined =
-                      appData.emojiDict[name.slice(1, -1)]
-                  if (emoji) {
-                      return genEmojiTag(emoji)
-                  }
-                  return `${name}`
-              }
-          )
-        : ''
-
     return (
         <ListItem
             sx={{
@@ -281,7 +263,9 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                 </Typography>
                             </Typography>
                         </Box>
-                        <MessageBody messagebody={messagebody} />
+                        <MarkdownRenderer
+                            messagebody={JSON.parse(message.payload).body}
+                        />
                         <Box sx={{ display: 'flex', gap: '10px' }}>
                             <Tooltip
                                 title={

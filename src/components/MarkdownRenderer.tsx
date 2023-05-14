@@ -1,4 +1,8 @@
-import { type ImgHTMLAttributes, type DetailedHTMLProps } from 'react'
+import {
+    type ImgHTMLAttributes,
+    type DetailedHTMLProps,
+    useContext
+} from 'react'
 import { Box, Typography } from '@mui/material'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -9,12 +13,28 @@ import breaks from 'remark-breaks'
 
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import type { Emoji } from '../model'
+import { ApplicationContext } from '../App'
 
-export interface MessageBodyProps {
+export interface MarkdownRendererProps {
     messagebody: string
 }
 
-export function MessageBody(props: MessageBodyProps): JSX.Element {
+export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
+    const appData = useContext(ApplicationContext)
+
+    const genEmojiTag = (emoji: Emoji): string => {
+        return `<img src="${emoji.publicUrl}" alt="emoji:${emoji.name}:" title=":${emoji?.name}:"/>`
+    }
+
+    const messagebody = props.messagebody.replace(/:\w+:/gi, (name: string) => {
+        const emoji: Emoji | undefined = appData.emojiDict[name.slice(1, -1)]
+        if (emoji) {
+            return genEmojiTag(emoji)
+        }
+        return `${name}`
+    })
+
     return (
         <Box sx={{ width: '100%' }}>
             <ReactMarkdown
@@ -24,6 +44,10 @@ export function MessageBody(props: MessageBodyProps): JSX.Element {
                     p: ({ children }) => (
                         <Typography
                             sx={{
+                                fontSize: {
+                                    xs: '0.9rem',
+                                    sm: '1rem'
+                                },
                                 marginBottom: {
                                     xs: '4px',
                                     sm: '8px'
@@ -112,7 +136,7 @@ export function MessageBody(props: MessageBodyProps): JSX.Element {
                     }
                 }}
             >
-                {props.messagebody}
+                {messagebody}
             </ReactMarkdown>
         </Box>
     )
