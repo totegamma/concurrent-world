@@ -356,7 +356,6 @@ function App(): JSX.Element {
                                             setCurrentStreams={
                                                 setCurrentStreams
                                             }
-                                            watchstreams={watchStreams}
                                         />
                                     }
                                 />
