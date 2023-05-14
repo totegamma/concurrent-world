@@ -1,4 +1,10 @@
-import React, { useCallback, useContext, useEffect } from 'react'
+import React, {
+    useCallback,
+    useContext,
+    useEffect,
+    useRef,
+    useState
+} from 'react'
 import { List, Divider, Box, useTheme } from '@mui/material'
 import { TimelineMessage } from '../components/TimelineMessage'
 import { type StreamElement } from '../model'
@@ -7,6 +13,7 @@ import { Draft } from '../components/Draft'
 import { StreamsBar } from '../components/StreamsBar'
 import { useLocation } from 'react-router-dom'
 import { ApplicationContext } from '../App'
+import InfiniteScroll from 'react-infinite-scroller'
 
 export interface TimelineProps {
     messages: IuseObjectList<StreamElement>
@@ -20,6 +27,8 @@ export function Timeline(props: TimelineProps): JSX.Element {
     const theme = useTheme()
 
     const reactlocation = useLocation()
+    const scrollParentRef = useRef<HTMLDivElement>(null)
+    const [hasMoreData, setHasMoreData] = useState<boolean>(false)
 
     const reload = useCallback(async () => {
         console.warn('reload!')
@@ -56,13 +65,57 @@ export function Timeline(props: TimelineProps): JSX.Element {
             .then(async (res) => await res.json())
             .then((data: StreamElement[]) => {
                 props.messages.clear()
-                data?.sort((a, b) => (a.ID < b.ID ? -1 : 1)).forEach(
-                    (e: StreamElement) => {
-                        props.messages.push(e)
-                    }
-                )
+                const newdata = data?.sort((a, b) => (a.ID > b.ID ? -1 : 1))
+                props.messages.concat(newdata)
             })
+        setHasMoreData(true)
     }, [appData.serverAddress, reactlocation.hash])
+
+    const loadMore = useCallback(async () => {
+        console.log('load more!!!')
+        if (!props.messages.current[props.messages.current.length - 1]?.ID)
+            return
+        let homequery = ''
+        if (!reactlocation.hash) {
+            homequery = (
+                await Promise.all(
+                    props.followList.map(
+                        async (ccaddress) =>
+                            (
+                                await appData.userDict.get(ccaddress)
+                            ).homestream
+                    )
+                )
+            )
+                .filter((e) => e)
+                .join(',')
+        }
+        const url =
+            appData.serverAddress +
+            `stream/range?streams=${
+                reactlocation.hash
+                    ? reactlocation.hash.replace('#', '')
+                    : homequery
+            }&until=${
+                props.messages.current[props.messages.current.length - 1].ID
+            }`
+
+        const requestOptions = {
+            method: 'GET',
+            headers: {}
+        }
+
+        fetch(url, requestOptions)
+            .then(async (res) => await res.json())
+            .then((data: StreamElement[]) => {
+                const idtable = props.messages.current.map((e) => e.Values.id)
+                const newdata = data.filter(
+                    (e) => !idtable.includes(e.Values.id)
+                )
+                if (newdata.length > 0) props.messages.concat(newdata)
+                else setHasMoreData(false)
+            })
+    }, [props.messages.current, reactlocation.hash])
 
     useEffect(() => {
         ;(async () => {
@@ -88,6 +141,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                     : homequery
             )
         })()
+        scrollParentRef.current?.scroll({ top: 0 })
     }, [reactlocation.hash])
 
     return (
@@ -102,6 +156,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                     background: theme.palette.background.paper,
                     minHeight: '100%'
                 }}
+                ref={scrollParentRef}
             >
                 <Box>
                     <Draft
@@ -110,11 +165,17 @@ export function Timeline(props: TimelineProps): JSX.Element {
                 </Box>
                 <Box sx={{ display: 'flex', flex: 1 }}>
                     <List sx={{ flex: 1, width: '100%' }}>
-                        {props.messages.current
-                            .slice()
-                            .reverse()
-                            .map((e) => (
-                                <React.Fragment key={e.ID}>
+                        <InfiniteScroll
+                            loadMore={() => {
+                                loadMore()
+                            }}
+                            hasMore={hasMoreData}
+                            loader={<>Loading...</>}
+                            useWindow={false}
+                            getScrollParent={() => scrollParentRef.current}
+                        >
+                            {props.messages.current.map((e) => (
+                                <React.Fragment key={e.Values.id}>
                                     <TimelineMessage
                                         message={e.Values.id}
                                         follow={props.follow}
@@ -126,6 +187,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                                     />
                                 </React.Fragment>
                             ))}
+                        </InfiniteScroll>
                     </List>
                 </Box>
             </Box>

@@ -1,20 +1,13 @@
 import { useState, useContext, useEffect } from 'react'
-import {
-    TextField,
-    Box,
-    Stack,
-    Button,
-    useTheme,
-    IconButton
-} from '@mui/material'
+import { TextField, Box, Button, useTheme, IconButton } from '@mui/material'
 import { Sign } from '../util'
 import { ApplicationContext } from '../App'
 import SendIcon from '@mui/icons-material/Send'
 import { Schemas } from '../schemas'
 import Picker from '@emoji-mart/react'
 import data from '@emoji-mart/data'
-import { EmojiEmotions } from '@mui/icons-material'
-// import { EmojiProps } from '@types/emoji-mart'
+import { EmojiEmotions, Splitscreen } from '@mui/icons-material'
+import { MarkdownRenderer } from './MarkdownRenderer'
 
 export interface EmojiProps {
     shortcodes: string
@@ -50,6 +43,8 @@ export function Draft(props: DraftProps): JSX.Element {
     const [selectEmoji, setSelectEmoji] = useState<boolean>(false)
 
     const [customEmoji, setCustomEmoji] = useState<CustomEmoji[]>([])
+
+    const [openPreview, setOpenPreview] = useState<boolean>(false)
 
     const theme = useTheme()
 
@@ -108,7 +103,15 @@ export function Draft(props: DraftProps): JSX.Element {
     }, [appData.emojiDict])
 
     return (
-        <Stack sx={{ position: 'relative' }}>
+        <Box
+            sx={{
+                position: 'relative',
+                display: 'flex',
+                flexDirection: { xs: 'column', md: 'row' },
+                alignItems: 'stretch',
+                gap: '2px'
+            }}
+        >
             <TextField
                 multiline
                 rows={6}
@@ -126,7 +129,8 @@ export function Draft(props: DraftProps): JSX.Element {
                         '& > fieldset': {
                             borderColor: theme.palette.text.disabled
                         }
-                    }
+                    },
+                    width: 1
                 }}
                 onKeyDown={(e: any) => {
                     if (draft.length === 0 || draft.trim().length === 0) return
@@ -135,6 +139,20 @@ export function Draft(props: DraftProps): JSX.Element {
                     }
                 }}
             />
+            {!openPreview || (
+                <Box
+                    sx={{
+                        width: 1,
+                        height: '171px',
+                        border: 1,
+                        borderRadius: '4px',
+                        overflow: 'scroll',
+                        px: 1
+                    }}
+                >
+                    <MarkdownRenderer messagebody={draft} />
+                </Box>
+            )}
             {!selectEmoji || (
                 <Box
                     sx={{
@@ -152,6 +170,7 @@ export function Draft(props: DraftProps): JSX.Element {
                         onEmojiSelect={(emoji: EmojiProps) => {
                             console.log(typeof emoji)
                             setDraft(draft + emoji.shortcodes)
+                            setSelectEmoji(false)
                         }}
                     />
                 </Box>
@@ -163,6 +182,14 @@ export function Draft(props: DraftProps): JSX.Element {
                     right: 10
                 }}
             >
+                <IconButton
+                    sx={{ color: theme.palette.text.secondary }}
+                    onClick={() => {
+                        setOpenPreview(!openPreview)
+                    }}
+                >
+                    <Splitscreen sx={{ transform: 'rotate(90deg)' }} />
+                </IconButton>
                 <IconButton
                     sx={{ color: theme.palette.text.secondary }}
                     onClick={() => {
@@ -189,6 +216,6 @@ export function Draft(props: DraftProps): JSX.Element {
                     Send
                 </Button>
             </Box>
-        </Stack>
+        </Box>
     )
 }

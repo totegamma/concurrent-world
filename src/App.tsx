@@ -206,7 +206,7 @@ function App(): JSX.Element {
                         const groupA = currentStreamsRef.current.split(',')
                         const groupB = message.streams.split(',')
                         if (!groupA.some((e) => groupB.includes(e))) return
-                        messages.push({
+                        messages.pushFront({
                             ID: new Date(message.cdate)
                                 .getTime()
                                 .toString()
@@ -291,7 +291,18 @@ function App(): JSX.Element {
     }, [currentStreams])
 
     useEffect(() => {
-        setTheme(createConcurrentTheme(themeName))
+        const newtheme = createConcurrentTheme(themeName)
+        setTheme(newtheme)
+        let themeColorMetaTag = document.querySelector(
+            'meta[name="theme-color"]'
+        )
+        if (!themeColorMetaTag) {
+            themeColorMetaTag = document.createElement('meta')
+            ;(themeColorMetaTag as any).name = 'theme-color'
+            document.head.appendChild(themeColorMetaTag)
+        }
+        ;(themeColorMetaTag as any).content =
+            newtheme.palette.background.default
     }, [themeName])
 
     return (

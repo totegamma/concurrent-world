@@ -1,10 +1,4 @@
-import {
-    useState,
-    useEffect,
-    useContext,
-    type ImgHTMLAttributes,
-    type DetailedHTMLProps
-} from 'react'
+import { useState, useEffect, useContext } from 'react'
 import {
     ListItem,
     Box,
@@ -24,25 +18,13 @@ import { Sign } from '../util'
 import BoringAvatar from 'boring-avatars'
 
 import { ApplicationContext } from '../App'
-import { type Emoji, type RTMMessage, type User } from '../model'
+import { type RTMMessage, type User } from '../model'
 import { Schemas } from '../schemas'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import rehypeRaw from 'rehype-raw'
-import rehypeSanitize from 'rehype-sanitize'
-import { type ReactMarkdownProps } from 'react-markdown/lib/ast-to-react'
-import breaks from 'remark-breaks'
-
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { MarkdownRenderer } from './MarkdownRenderer'
 
 export interface TimelineMessageProps {
     message: string
     follow: (ccaddress: string) => void
-}
-
-const genEmojiTag = (emoji: Emoji): string => {
-    return `<img src="${emoji.publicUrl}" alt="emoji:${emoji.name}:" title=":${emoji?.name}:"/>`
 }
 
 export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
@@ -177,20 +159,6 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
             })
     }
 
-    const messagebody = message
-        ? JSON.parse(message.payload).body?.replace(
-              /:\w+:/gi,
-              (name: string) => {
-                  const emoji: Emoji | undefined =
-                      appData.emojiDict[name.slice(1, -1)]
-                  if (emoji) {
-                      return genEmojiTag(emoji)
-                  }
-                  return `${name}`
-              }
-          )
-        : ''
-
     return (
         <ListItem
             sx={{
@@ -200,7 +168,7 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                 wordBreak: 'break-word'
             }}
         >
-            {message != null && (
+            {message && JSON.parse(message.payload).body && (
                 <>
                     <Box>
                         <IconButton
@@ -295,130 +263,9 @@ export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
                                 </Typography>
                             </Typography>
                         </Box>
-
-                        <Box sx={{ width: '100%' }}>
-                            <ReactMarkdown
-                                remarkPlugins={[
-                                    breaks,
-                                    [remarkGfm, { singleTilde: false }]
-                                ]}
-                                rehypePlugins={[rehypeRaw, rehypeSanitize]}
-                                components={{
-                                    p: ({ children }) => (
-                                        <Typography
-                                            paragraph
-                                            sx={{
-                                                fontSize: {
-                                                    xs: '0.9rem',
-                                                    sm: '1rem'
-                                                },
-                                                marginBottom: {
-                                                    xs: '4px',
-                                                    sm: '8px'
-                                                }
-                                            }}
-                                        >
-                                            {children}
-                                        </Typography>
-                                    ),
-                                    h1: ({ children }) => (
-                                        <Typography variant="h1">
-                                            {children}
-                                        </Typography>
-                                    ),
-                                    h2: ({ children }) => (
-                                        <Typography variant="h2">
-                                            {children}
-                                        </Typography>
-                                    ),
-                                    h3: ({ children }) => (
-                                        <Typography variant="h3">
-                                            {children}
-                                        </Typography>
-                                    ),
-                                    h4: ({ children }) => (
-                                        <Typography variant="h4">
-                                            {children}
-                                        </Typography>
-                                    ),
-                                    h5: ({ children }) => (
-                                        <Typography variant="h5">
-                                            {children}
-                                        </Typography>
-                                    ),
-                                    h6: ({ children }) => (
-                                        <Typography variant="h6">
-                                            {children}
-                                        </Typography>
-                                    ),
-                                    ul: ({ children }) => <ul>{children}</ul>,
-                                    code: ({ node, children }) => {
-                                        const language = node.position
-                                            ? messagebody
-                                                  .slice(
-                                                      node.position.start
-                                                          .offset,
-                                                      node.position.end.offset
-                                                  )
-                                                  .split('\n')[0]
-                                                  .slice(3)
-                                            : ''
-                                        return (
-                                            <Box
-                                                sx={{
-                                                    overflow: 'hidden',
-                                                    borderRadius: '10px'
-                                                }}
-                                            >
-                                                <SyntaxHighlighter
-                                                    style={materialDark}
-                                                    language={language}
-                                                    PreTag="div"
-                                                >
-                                                    {String(children).replace(
-                                                        /\n$/,
-                                                        ''
-                                                    )}
-                                                </SyntaxHighlighter>
-                                            </Box>
-                                        )
-                                    },
-                                    img: (
-                                        props: Pick<
-                                            DetailedHTMLProps<
-                                                ImgHTMLAttributes<HTMLImageElement>,
-                                                HTMLImageElement
-                                            >,
-                                            | 'key'
-                                            | keyof ImgHTMLAttributes<HTMLImageElement>
-                                        > &
-                                            ReactMarkdownProps
-                                    ) => {
-                                        if (props.alt?.startsWith('emoji')) {
-                                            return (
-                                                <img
-                                                    {...props}
-                                                    style={{
-                                                        height: '1.5em',
-                                                        verticalAlign: '-0.5em'
-                                                    }}
-                                                />
-                                            )
-                                        }
-                                        return (
-                                            <img
-                                                {...props}
-                                                style={{
-                                                    maxWidth: '100%'
-                                                }}
-                                            />
-                                        )
-                                    }
-                                }}
-                            >
-                                {messagebody}
-                            </ReactMarkdown>
-                        </Box>
+                        <MarkdownRenderer
+                            messagebody={JSON.parse(message.payload).body}
+                        />
                         <Box sx={{ display: 'flex', gap: '10px' }}>
                             <Tooltip
                                 title={
