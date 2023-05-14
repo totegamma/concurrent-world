@@ -2,6 +2,7 @@ import { useReducer } from 'react'
 
 export interface IuseObjectList<T> {
     current: T[]
+    set: (e: T[]) => void
     pushFront: (e: T) => void
     pushBack: (e: T) => void
     concat: (e: T[]) => void
@@ -11,7 +12,7 @@ export interface IuseObjectList<T> {
 
 interface objectListAction<T> {
     // FIXME: これもっと賢い型の定義方法あったよね？
-    type: 'push_front' | 'push_back' | 'concat' | 'update' | 'clear'
+    type: 'set' | 'push_front' | 'push_back' | 'concat' | 'update' | 'clear'
     argT?: T
     argTarr?: T[]
     argTcall?: (e: T[]) => T[]
@@ -21,6 +22,9 @@ export function useObjectList<T>(): IuseObjectList<T> {
     const [current, dispatch] = useReducer(
         (old: T[], action: objectListAction<T>): T[] => {
             switch (action.type) {
+                case 'set':
+                    if (action.argTarr) return [...action.argTarr]
+                    else return old
                 case 'push_front':
                     if (action.argT) return [action.argT, ...old]
                     else return old
@@ -39,6 +43,13 @@ export function useObjectList<T>(): IuseObjectList<T> {
         },
         []
     )
+
+    const set = (e: T[]): void => {
+        dispatch({
+            type: 'set',
+            argTarr: e
+        })
+    }
 
     const pushFront = (e: T): void => {
         dispatch({
@@ -75,6 +86,7 @@ export function useObjectList<T>(): IuseObjectList<T> {
     }
 
     return {
+        set,
         current,
         pushFront,
         pushBack,
