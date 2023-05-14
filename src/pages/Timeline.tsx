@@ -33,8 +33,6 @@ export function Timeline(props: TimelineProps): JSX.Element {
     const [inspectItem, setInspectItem] = useState<RTMMessage | null>(null)
 
     const reload = useCallback(async () => {
-        console.warn('reload!')
-
         let homequery = ''
         if (!reactlocation.hash) {
             homequery = (
@@ -68,12 +66,12 @@ export function Timeline(props: TimelineProps): JSX.Element {
             .then((data: StreamElement[]) => {
                 const newdata = data?.sort((a, b) => (a.ID > b.ID ? -1 : 1))
                 props.messages.set(newdata)
+                setHasMoreData(true)
             })
-        setHasMoreData(true)
     }, [appData.serverAddress, reactlocation.hash])
 
     const loadMore = useCallback(async () => {
-        console.log('load more!!!')
+        const last = props.messages.current
         if (!props.messages.current[props.messages.current.length - 1]?.ID)
             return
         let homequery = ''
@@ -109,6 +107,10 @@ export function Timeline(props: TimelineProps): JSX.Element {
         fetch(url, requestOptions)
             .then(async (res) => await res.json())
             .then((data: StreamElement[]) => {
+                if (last !== props.messages.current) {
+                    console.log('timeline changed!!!')
+                    return
+                }
                 const idtable = props.messages.current.map((e) => e.Values.id)
                 const newdata = data.filter(
                     (e) => !idtable.includes(e.Values.id)
