@@ -13,7 +13,7 @@ import {
 import StarIcon from '@mui/icons-material/Star'
 import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
-import { Sign } from '../util'
+import { Sign, humanReadableTimeDiff } from '../util'
 
 import BoringAvatar from 'boring-avatars'
 
@@ -275,22 +275,123 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                                             }
                                         }}
                                     >
-                                        {message.author} ·{' '}
+                                        {message.author}
                                     </Typography>
-                                    <Link
-                                        component="button"
-                                        underline="hover"
-                                        color="inherit"
-                                    >
-                                        {new Date(
-                                            message.cdate
-                                        ).toLocaleString()}
-                                    </Link>
                                 </Box>
-                                <Typography
-                                    component="span"
-                                    sx={{ fontWeight: '400' }}
+                                <Link
+                                    component="button"
+                                    underline="hover"
+                                    color="inherit"
                                 >
+                                    {humanReadableTimeDiff(
+                                        new Date(message.cdate)
+                                    )}
+                                </Link>
+                            </Box>
+                            <MarkdownRenderer
+                                messagebody={JSON.parse(message.payload).body}
+                            />
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    gap: '10px',
+                                    justifyContent: 'space-between'
+                                }}
+                            >
+                                <Box>
+                                    {' '}
+                                    {/* left */}
+                                    <Tooltip
+                                        title={
+                                            <Box
+                                                sx={{
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    gap: 1
+                                                }}
+                                            >
+                                                {reactUsers.map((user) => (
+                                                    <Box
+                                                        key={user.ccaddress}
+                                                        sx={{
+                                                            display: 'flex',
+                                                            alignItems:
+                                                                'center',
+                                                            gap: 1
+                                                        }}
+                                                    >
+                                                        <Avatar
+                                                            sx={{
+                                                                height: '20px',
+                                                                width: '20px'
+                                                            }}
+                                                            src={user.avatar}
+                                                        />
+                                                        {user.username}
+                                                    </Box>
+                                                ))}
+                                            </Box>
+                                        }
+                                        placement="top"
+                                        disableHoverListener={
+                                            reactUsers.length === 0
+                                        }
+                                    >
+                                        <IconButton
+                                            sx={{
+                                                p: '0',
+                                                color: theme.palette.text
+                                                    .secondary
+                                            }}
+                                            color="primary"
+                                            onClick={() => {
+                                                if (hasOwnReaction) {
+                                                    unfavorite(
+                                                        message.id,
+                                                        message.associations_data.find(
+                                                            (e) =>
+                                                                e.author ===
+                                                                props.userAddress
+                                                        )?.id
+                                                    )
+                                                } else {
+                                                    favorite(message.id)
+                                                }
+                                            }}
+                                        >
+                                            {hasOwnReaction ? (
+                                                <StarIcon />
+                                            ) : (
+                                                <StarOutlineIcon />
+                                            )}{' '}
+                                            <Typography sx={{ size: '16px' }}>
+                                                {
+                                                    message.associations_data.filter(
+                                                        (e) =>
+                                                            e.schema ===
+                                                            Schemas.like
+                                                    ).length
+                                                }
+                                            </Typography>
+                                        </IconButton>
+                                    </Tooltip>
+                                    <IconButton
+                                        onClick={() => {
+                                            props.setInspectItem(
+                                                message ?? null
+                                            )
+                                        }}
+                                        sx={{
+                                            p: '0',
+                                            color: theme.palette.text.secondary
+                                        }}
+                                    >
+                                        <MoreHorizIcon />
+                                    </IconButton>
+                                </Box>
+                                <Box>
+                                    {' '}
+                                    {/* right */}
                                     <Typography
                                         component="span"
                                         sx={{
@@ -301,95 +402,7 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                                     >
                                         %{msgstreams.replaceAll(',', ' %')}{' '}
                                     </Typography>
-                                </Typography>
-                            </Box>
-                            <MarkdownRenderer
-                                messagebody={JSON.parse(message.payload).body}
-                            />
-                            <Box sx={{ display: 'flex', gap: '10px' }}>
-                                <Tooltip
-                                    title={
-                                        <Box
-                                            sx={{
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                gap: 1
-                                            }}
-                                        >
-                                            {reactUsers.map((user) => (
-                                                <Box
-                                                    key={user.ccaddress}
-                                                    sx={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: 1
-                                                    }}
-                                                >
-                                                    <Avatar
-                                                        sx={{
-                                                            height: '20px',
-                                                            width: '20px'
-                                                        }}
-                                                        src={user.avatar}
-                                                    />
-                                                    {user.username}
-                                                </Box>
-                                            ))}
-                                        </Box>
-                                    }
-                                    placement="top"
-                                    disableHoverListener={
-                                        reactUsers.length === 0
-                                    }
-                                >
-                                    <IconButton
-                                        sx={{
-                                            p: '0',
-                                            color: theme.palette.text.secondary
-                                        }}
-                                        color="primary"
-                                        onClick={() => {
-                                            if (hasOwnReaction) {
-                                                unfavorite(
-                                                    message.id,
-                                                    message.associations_data.find(
-                                                        (e) =>
-                                                            e.author ===
-                                                            props.userAddress
-                                                    )?.id
-                                                )
-                                            } else {
-                                                favorite(message.id)
-                                            }
-                                        }}
-                                    >
-                                        {hasOwnReaction ? (
-                                            <StarIcon />
-                                        ) : (
-                                            <StarOutlineIcon />
-                                        )}{' '}
-                                        <Typography sx={{ size: '16px' }}>
-                                            {
-                                                message.associations_data.filter(
-                                                    (e) =>
-                                                        e.schema ===
-                                                        Schemas.like
-                                                ).length
-                                            }
-                                        </Typography>
-                                    </IconButton>
-                                </Tooltip>
-                                <IconButton
-                                    onClick={() => {
-                                        props.setInspectItem(message ?? null)
-                                    }}
-                                    sx={{
-                                        p: '0',
-                                        color: theme.palette.text.secondary
-                                    }}
-                                >
-                                    <MoreHorizIcon />
-                                </IconButton>
+                                </Box>
                             </Box>
                         </Box>
                     </>
