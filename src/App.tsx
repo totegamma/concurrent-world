@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, createContext, useRef } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider } from '@mui/material'
+import useWebSocket from 'react-use-websocket'
 
 import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
@@ -15,7 +16,7 @@ import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu'
 import type {
     RTMMessage,
-    StreamElement,
+    StreamElementDated,
     User,
     ServerEvent,
     Association,
@@ -87,8 +88,7 @@ function App(): JSX.Element {
     const [theme, setTheme] = useState<ConcurrentTheme>(
         createConcurrentTheme(themeName)
     )
-    const [connected, setConnected] = useState<boolean>(false)
-    const messages = useObjectList<StreamElement>()
+    const messages = useObjectList<StreamElementDated>()
     const [currentStreams, setCurrentStreams] = useState<string>('common')
     const currentStreamsRef = useRef<string>(currentStreams)
 
@@ -204,6 +204,7 @@ function App(): JSX.Element {
                         const groupA = currentStreamsRef.current.split(',')
                         const groupB = message.streams.split(',')
                         if (!groupA.some((e) => groupB.includes(e))) return
+                        const current = new Date().getTime()
                         messages.pushFront({
                             ID: new Date(message.cdate)
                                 .getTime()
@@ -211,7 +212,8 @@ function App(): JSX.Element {
                                 .replace('.', '-'),
                             Values: {
                                 id: message.id
-                            }
+                            },
+                            LastUpdated: current
                         })
                         playNotificationRef.current()
                         break
@@ -226,14 +228,28 @@ function App(): JSX.Element {
                 const association = event.body as Association
                 console.log(event)
                 switch (event.action) {
-                    case 'create':
+                    case 'create': {
                         messageDict.invalidate(association.target)
-                        // FIXME we have to notify to tweet component
+                        const target = messages.current.find(
+                            (e) => e.Values.id === association.target
+                        )
+                        if (target) {
+                            target.LastUpdated = new Date().getTime()
+                            messages.update((e) => [...e])
+                        }
                         break
-                    case 'delete':
+                    }
+                    case 'delete': {
                         messageDict.invalidate(association.target)
-                        // FIXME we have to notify to tweet component
+                        const target = messages.current.find(
+                            (e) => e.Values.id === association.target
+                        )
+                        if (target) {
+                            target.LastUpdated = new Date().getTime()
+                            messages.update((e) => [...e])
+                        }
                         break
+                    }
                     default:
                         console.log('unknown message action', event)
                         break
@@ -255,34 +271,13 @@ function App(): JSX.Element {
         })()
     }, [])
 
+    const { lastMessage } = useWebSocket(
+        server.replace('http', 'ws') + 'socket'
+    )
+
     useEffect(() => {
-        if (!server) return
-        if (connected) return
-        const ws = new WebSocket(server.replace('http', 'ws') + 'socket')
-
-        ws.onopen = (event: any) => {
-            console.log('ws open')
-            console.info(event)
-            setConnected(true)
-        }
-
-        ws.onmessage = (event: any) => {
-            const body = JSON.parse(event.data)
-            handleMessage(body)
-        }
-
-        ws.onerror = (event: any) => {
-            console.log('ws error')
-            console.error(event)
-            setConnected(false)
-        }
-
-        ws.onclose = (event: any) => {
-            console.log('ws closed')
-            console.warn(event)
-            setConnected(false)
-        }
-    }, [])
+        if (lastMessage) handleMessage(JSON.parse(lastMessage.data))
+    }, [lastMessage])
 
     useEffect(() => {
         currentStreamsRef.current = currentStreams
