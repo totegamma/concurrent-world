@@ -22,6 +22,10 @@ export interface StreamElement {
     }
 }
 
+export interface StreamElementDated extends StreamElement {
+    LastUpdated: number
+}
+
 export interface Association {
     author: string
     cdate: string

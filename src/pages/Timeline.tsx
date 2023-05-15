@@ -7,7 +7,7 @@ import React, {
 } from 'react'
 import { List, Divider, Box, useTheme, Drawer, Typography } from '@mui/material'
 import { TimelineMessage } from '../components/TimelineMessage'
-import type { RTMMessage, StreamElement } from '../model'
+import type { RTMMessage, StreamElement, StreamElementDated } from '../model'
 import { type IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'
 import { StreamsBar } from '../components/StreamsBar'
@@ -16,7 +16,7 @@ import { ApplicationContext } from '../App'
 import InfiniteScroll from 'react-infinite-scroller'
 
 export interface TimelineProps {
-    messages: IuseObjectList<StreamElement>
+    messages: IuseObjectList<StreamElementDated>
     follow: (ccaddress: string) => void
     followList: string[]
     setCurrentStreams: (input: string) => void
@@ -65,7 +65,11 @@ export function Timeline(props: TimelineProps): JSX.Element {
             .then(async (res) => await res.json())
             .then((data: StreamElement[]) => {
                 const newdata = data?.sort((a, b) => (a.ID > b.ID ? -1 : 1))
-                props.messages.set(newdata)
+                const current = new Date().getTime()
+                const dated = newdata.map((e) => {
+                    return { ...e, LastUpdated: current }
+                })
+                props.messages.set(dated)
                 setHasMoreData(true)
             })
     }, [appData.serverAddress, reactlocation.hash])
@@ -115,8 +119,13 @@ export function Timeline(props: TimelineProps): JSX.Element {
                 const newdata = data.filter(
                     (e) => !idtable.includes(e.Values.id)
                 )
-                if (newdata.length > 0) props.messages.concat(newdata)
-                else setHasMoreData(false)
+                if (newdata.length > 0) {
+                    const current = new Date().getTime()
+                    const dated = newdata.map((e) => {
+                        return { ...e, LastUpdated: current }
+                    })
+                    props.messages.concat(dated)
+                } else setHasMoreData(false)
             })
     }, [props.messages.current, reactlocation.hash])
 
@@ -181,8 +190,15 @@ export function Timeline(props: TimelineProps): JSX.Element {
                                 <React.Fragment key={e.Values.id}>
                                     <TimelineMessage
                                         message={e.Values.id}
-                                        follow={props.follow}
+                                        lastUpdated={e.LastUpdated}
                                         setInspectItem={setInspectItem}
+                                        follow={props.follow}
+                                        messageDict={appData.messageDict}
+                                        userDict={appData.userDict}
+                                        streamDict={appData.streamDict}
+                                        userAddress={appData.userAddress}
+                                        privatekey={appData.privatekey}
+                                        serverAddress={appData.serverAddress}
                                     />
                                     <Divider
                                         variant="inset"

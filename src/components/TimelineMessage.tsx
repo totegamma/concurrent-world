@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useCallback } from 'react'
+import { useState, useEffect, useCallback, memo } from 'react'
 import {
     ListItem,
     Box,
@@ -17,375 +17,385 @@ import { Sign } from '../util'
 
 import BoringAvatar from 'boring-avatars'
 
-import { ApplicationContext } from '../App'
-import { type RTMMessage, type User } from '../model'
+import type { Stream, RTMMessage, User } from '../model'
 import { Schemas } from '../schemas'
 import { MarkdownRenderer } from './MarkdownRenderer'
+import { type IuseResourceManager } from '../hooks/useResourceManager'
 
 export interface TimelineMessageProps {
     message: string
+    lastUpdated: number
     follow: (ccaddress: string) => void
     setInspectItem: (message: RTMMessage) => void
+    messageDict: IuseResourceManager<RTMMessage>
+    userDict: IuseResourceManager<User>
+    streamDict: IuseResourceManager<Stream>
+    userAddress: string
+    privatekey: string
+    serverAddress: string
 }
 
-export function TimelineMessage(props: TimelineMessageProps): JSX.Element {
-    const [user, setUser] = useState<User | null>()
-    const [message, setMessage] = useState<RTMMessage | undefined>()
-    const [msgstreams, setStreams] = useState<string>('')
-    const [reactUsers, setReactUsers] = useState<User[]>([])
+export const TimelineMessage = memo<TimelineMessageProps>(
+    (props: TimelineMessageProps): JSX.Element => {
+        const [user, setUser] = useState<User | null>()
+        const [message, setMessage] = useState<RTMMessage | undefined>()
+        const [msgstreams, setStreams] = useState<string>('')
+        const [reactUsers, setReactUsers] = useState<User[]>([])
 
-    const appData = useContext(ApplicationContext)
+        const theme = useTheme()
 
-    const theme = useTheme()
+        const [hasOwnReaction, setHasOwnReaction] = useState<boolean>(false)
 
-    const [hasOwnReaction, setHasOwnReaction] = useState<boolean>(false)
+        useEffect(() => {
+            props.messageDict
+                .get(props.message)
+                .then((msg) => {
+                    setMessage(msg)
+                    props.userDict
+                        .get(msg.author)
+                        .then((user) => {
+                            setUser(user)
+                        })
+                        .catch((error) => {
+                            console.error(error)
+                        })
 
-    const loadTweet = useCallback((): void => {
-        appData.messageDict
-            .get(props.message)
-            .then((msg) => {
-                setMessage(msg)
-                appData.userDict
-                    .get(msg.author)
-                    .then((user) => {
-                        setUser(user)
+                    Promise.all(
+                        msg.streams
+                            .split(',')
+                            .map(
+                                async (id) =>
+                                    await props.streamDict
+                                        .get(id)
+                                        .then((e) =>
+                                            e.meta
+                                                ? JSON.parse(e.meta).name
+                                                : null
+                                        )
+                            )
+                    ).then((e) => {
+                        setStreams(e.filter((x) => x).join(','))
                     })
-                    .catch((error) => {
-                        console.error(error)
-                    })
-
-                Promise.all(
-                    msg.streams
-                        .split(',')
-                        .map(
-                            async (id) =>
-                                await appData.streamDict
-                                    .get(id)
-                                    .then((e) =>
-                                        e.meta ? JSON.parse(e.meta).name : null
-                                    )
-                        )
-                ).then((e) => {
-                    setStreams(e.filter((x) => x).join(','))
                 })
-            })
-            .catch((error) => {
-                console.error(error)
-            })
-    }, [
-        appData.messageDict,
-        props.message,
-        appData.userDict,
-        appData.streamDict
-    ])
+                .catch((error) => {
+                    console.error(error)
+                })
+        }, [props.message, props.lastUpdated])
 
-    useEffect(() => {
-        loadTweet()
-    }, [props.message])
+        useEffect(() => {
+            const fetchUsers = async (): Promise<any> => {
+                const authors =
+                    message?.associations_data
+                        .filter((e) => e.schema === Schemas.like)
+                        .map((m) => m.author) ?? []
 
-    useEffect(() => {
-        const fetchUsers = async (): Promise<any> => {
-            const authors =
-                message?.associations_data
-                    .filter((e) => e.schema === Schemas.like)
-                    .map((m) => m.author) ?? []
-
-            if (
-                message?.associations_data.find(
-                    (e) => e.author === appData.userAddress
-                ) != null
-            ) {
-                setHasOwnReaction(true)
-            } else {
-                setHasOwnReaction(false)
+                if (
+                    message?.associations_data.find(
+                        (e) => e.author === props.userAddress
+                    ) != null
+                ) {
+                    setHasOwnReaction(true)
+                } else {
+                    setHasOwnReaction(false)
+                }
+                const users = await Promise.all(
+                    authors.map((a) => props.userDict.get(a))
+                )
+                setReactUsers(users)
             }
-            const users = await Promise.all(
-                authors.map((a) => appData.userDict.get(a))
+
+            fetchUsers()
+        }, [message?.associations_data])
+
+        const favorite = useCallback(
+            async (messageID: string | undefined): Promise<void> => {
+                const favoriteScheme = Schemas.like
+                if (!messageID) return
+                const payloadObj = {}
+                const payload = JSON.stringify(payloadObj)
+                const signature = Sign(props.privatekey, payload)
+                const targetAuthor = (await props.messageDict.get(messageID))
+                    .author
+                const targetStream = (await props.userDict.get(targetAuthor))
+                    .notificationstream
+
+                const requestOptions = {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify({
+                        author: props.userAddress,
+                        schema: favoriteScheme,
+                        target: messageID,
+                        payload,
+                        signature,
+                        streams: [targetStream].filter((e) => e)
+                    })
+                }
+
+                fetch(props.serverAddress + 'associations', requestOptions)
+                    .then(async (res) => await res.json())
+                    .then((_) => {
+                        props.messageDict.invalidate(messageID)
+                    })
+            },
+            [props.serverAddress, props.userAddress]
+        )
+
+        const unfavorite = useCallback(
+            (
+                messageID: string | undefined,
+                deletekey: string | undefined
+            ): void => {
+                if (!messageID) return
+                if (!unfavorite) return
+                const requestOptions = {
+                    method: 'DELETE',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify({
+                        id: deletekey
+                    })
+                }
+
+                fetch(props.serverAddress + 'associations', requestOptions)
+                    .then(async (res) => await res.json())
+                    .then((_) => {
+                        props.messageDict.invalidate(messageID)
+                    })
+            },
+            [props.serverAddress]
+        )
+
+        if (!message) {
+            return (
+                <ListItem
+                    sx={{
+                        alignItems: 'flex-start',
+                        flex: 1,
+                        p: { xs: '5px 0', sm: '10px 0' },
+                        height: 105,
+                        gap: '10px'
+                    }}
+                >
+                    <Skeleton
+                        animation="wave"
+                        variant="circular"
+                        width={40}
+                        height={40}
+                    />
+                    <Box sx={{ flex: 1 }}>
+                        <Skeleton animation="wave" />
+                        <Skeleton animation="wave" height={80} />
+                    </Box>
+                </ListItem>
             )
-            setReactUsers(users)
         }
 
-        fetchUsers()
-    }, [message?.associations_data])
-
-    const favorite = useCallback(
-        async (messageID: string | undefined): Promise<void> => {
-            const favoriteScheme = Schemas.like
-            if (!messageID) return
-            const payloadObj = {}
-            const payload = JSON.stringify(payloadObj)
-            const signature = Sign(appData.privatekey, payload)
-            const targetAuthor = (await appData.messageDict.get(messageID))
-                .author
-            console.log(targetAuthor)
-            const targetStream = (await appData.userDict.get(targetAuthor))
-                .notificationstream
-            console.log([targetStream].filter((e) => e))
-
-            const requestOptions = {
-                method: 'POST',
-                headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({
-                    author: appData.userAddress,
-                    schema: favoriteScheme,
-                    target: messageID,
-                    payload,
-                    signature,
-                    streams: [targetStream].filter((e) => e)
-                })
-            }
-
-            fetch(appData.serverAddress + 'associations', requestOptions)
-                .then(async (res) => await res.json())
-                .then((_) => {
-                    appData.messageDict.invalidate(messageID)
-                    loadTweet()
-                })
-        },
-        [appData.serverAddress, appData.messageDict, appData.userAddress]
-    )
-
-    const unfavorite = useCallback(
-        (
-            messageID: string | undefined,
-            deletekey: string | undefined
-        ): void => {
-            if (!messageID) return
-            if (!unfavorite) return
-            const requestOptions = {
-                method: 'DELETE',
-                headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({
-                    id: deletekey
-                })
-            }
-
-            fetch(appData.serverAddress + 'associations', requestOptions)
-                .then(async (res) => await res.json())
-                .then((_) => {
-                    appData.messageDict.invalidate(messageID)
-                    loadTweet()
-                })
-        },
-        [appData.serverAddress, appData.messageDict]
-    )
-
-    if (!message) {
         return (
             <ListItem
                 sx={{
                     alignItems: 'flex-start',
                     flex: 1,
                     p: { xs: '5px 0', sm: '10px 0' },
-                    height: 105,
-                    gap: '10px'
+                    wordBreak: 'break-word'
                 }}
             >
-                <Skeleton
-                    animation="wave"
-                    variant="circular"
-                    width={40}
-                    height={40}
-                />
-                <Box sx={{ flex: 1 }}>
-                    <Skeleton animation="wave" />
-                    <Skeleton animation="wave" height={80} />
-                </Box>
-            </ListItem>
-        )
-    }
-
-    return (
-        <ListItem
-            sx={{
-                alignItems: 'flex-start',
-                flex: 1,
-                p: { xs: '5px 0', sm: '10px 0' },
-                wordBreak: 'break-word'
-            }}
-        >
-            {JSON.parse(message.payload).body && (
-                <>
-                    <Box>
-                        <IconButton
-                            onClick={() => {
-                                props.follow(message.author)
-                            }}
-                            sx={{
-                                padding: {
-                                    xs: '10px 8px 0 0',
-                                    sm: '0 16px 0 0'
-                                },
-                                width: { xs: '40px', sm: '64px' },
-                                height: { xs: '40px', sm: '64px' }
-                            }}
-                        >
-                            {user?.avatar ? (
-                                <Avatar
-                                    alt="Profile Picture"
-                                    src={user?.avatar}
-                                    sx={{
-                                        width: { xs: '32px', sm: '48px' },
-                                        height: { xs: '32px', sm: '48px' }
-                                    }}
-                                />
-                            ) : (
-                                <BoringAvatar
-                                    name={message.author}
-                                    variant="beam"
-                                    size={48}
-                                />
-                            )}
-                        </IconButton>
-                    </Box>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flex: 1,
-                            flexDirection: 'column',
-                            mt: '5px',
-                            width: '100%',
-                            overflow: 'auto'
-                        }}
-                    >
+                {JSON.parse(message.payload).body && (
+                    <>
+                        <Box>
+                            <IconButton
+                                onClick={() => {
+                                    props.follow(message.author)
+                                }}
+                                sx={{
+                                    padding: {
+                                        xs: '10px 8px 0 0',
+                                        sm: '0 16px 0 0'
+                                    },
+                                    width: { xs: '40px', sm: '64px' },
+                                    height: { xs: '40px', sm: '64px' }
+                                }}
+                            >
+                                {user?.avatar ? (
+                                    <Avatar
+                                        alt="Profile Picture"
+                                        src={user?.avatar}
+                                        sx={{
+                                            width: { xs: '32px', sm: '48px' },
+                                            height: { xs: '32px', sm: '48px' }
+                                        }}
+                                    />
+                                ) : (
+                                    <BoringAvatar
+                                        name={message.author}
+                                        variant="beam"
+                                        size={48}
+                                    />
+                                )}
+                            </IconButton>
+                        </Box>
                         <Box
                             sx={{
                                 display: 'flex',
-                                alignItems: 'baseline',
-                                justifyContent: 'space-between'
+                                flex: 1,
+                                flexDirection: 'column',
+                                mt: '5px',
+                                width: '100%',
+                                overflow: 'auto'
                             }}
                         >
-                            <Box>
-                                <Typography
-                                    component="span"
-                                    sx={{
-                                        fontWeight: '700',
-                                        fontSize: { xs: '0.9rem', sm: '1rem' }
-                                    }}
-                                >
-                                    {user?.username}{' '}
-                                </Typography>
-                                <Typography
-                                    component="span"
-                                    sx={{
-                                        fontweight: '400',
-                                        fontSize: '10px',
-                                        display: { xs: 'none', sm: 'inline' }
-                                    }}
-                                >
-                                    {message.author} ·{' '}
-                                </Typography>
-                                <Link
-                                    component="button"
-                                    underline="hover"
-                                    color="inherit"
-                                >
-                                    {new Date(message.cdate).toLocaleString()}
-                                </Link>
-                            </Box>
-                            <Typography
-                                component="span"
-                                sx={{ fontWeight: '400' }}
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'baseline',
+                                    justifyContent: 'space-between'
+                                }}
                             >
-                                <Typography
-                                    component="span"
-                                    sx={{
-                                        fontweight: '400',
-                                        fontSize: '13px',
-                                        color: 'text.secondary'
-                                    }}
-                                >
-                                    %{msgstreams.replaceAll(',', ' %')}{' '}
-                                </Typography>
-                            </Typography>
-                        </Box>
-                        <MarkdownRenderer
-                            messagebody={JSON.parse(message.payload).body}
-                        />
-                        <Box sx={{ display: 'flex', gap: '10px' }}>
-                            <Tooltip
-                                title={
-                                    <Box
+                                <Box>
+                                    <Typography
+                                        component="span"
                                         sx={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            gap: 1
+                                            fontWeight: '700',
+                                            fontSize: {
+                                                xs: '0.9rem',
+                                                sm: '1rem'
+                                            }
                                         }}
                                     >
-                                        {reactUsers.map((user) => (
-                                            <Box
-                                                key={user.ccaddress}
-                                                sx={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: 1
-                                                }}
-                                            >
-                                                <Avatar
+                                        {user?.username}{' '}
+                                    </Typography>
+                                    <Typography
+                                        component="span"
+                                        sx={{
+                                            fontweight: '400',
+                                            fontSize: '10px',
+                                            display: {
+                                                xs: 'none',
+                                                sm: 'inline'
+                                            }
+                                        }}
+                                    >
+                                        {message.author} ·{' '}
+                                    </Typography>
+                                    <Link
+                                        component="button"
+                                        underline="hover"
+                                        color="inherit"
+                                    >
+                                        {new Date(
+                                            message.cdate
+                                        ).toLocaleString()}
+                                    </Link>
+                                </Box>
+                                <Typography
+                                    component="span"
+                                    sx={{ fontWeight: '400' }}
+                                >
+                                    <Typography
+                                        component="span"
+                                        sx={{
+                                            fontweight: '400',
+                                            fontSize: '13px',
+                                            color: 'text.secondary'
+                                        }}
+                                    >
+                                        %{msgstreams.replaceAll(',', ' %')}{' '}
+                                    </Typography>
+                                </Typography>
+                            </Box>
+                            <MarkdownRenderer
+                                messagebody={JSON.parse(message.payload).body}
+                            />
+                            <Box sx={{ display: 'flex', gap: '10px' }}>
+                                <Tooltip
+                                    title={
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                gap: 1
+                                            }}
+                                        >
+                                            {reactUsers.map((user) => (
+                                                <Box
+                                                    key={user.ccaddress}
                                                     sx={{
-                                                        height: '20px',
-                                                        width: '20px'
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: 1
                                                     }}
-                                                    src={user.avatar}
-                                                />
-                                                {user.username}
-                                            </Box>
-                                        ))}
-                                    </Box>
-                                }
-                                placement="top"
-                                disableHoverListener={reactUsers.length === 0}
-                            >
+                                                >
+                                                    <Avatar
+                                                        sx={{
+                                                            height: '20px',
+                                                            width: '20px'
+                                                        }}
+                                                        src={user.avatar}
+                                                    />
+                                                    {user.username}
+                                                </Box>
+                                            ))}
+                                        </Box>
+                                    }
+                                    placement="top"
+                                    disableHoverListener={
+                                        reactUsers.length === 0
+                                    }
+                                >
+                                    <IconButton
+                                        sx={{
+                                            p: '0',
+                                            color: theme.palette.text.secondary
+                                        }}
+                                        color="primary"
+                                        onClick={() => {
+                                            if (hasOwnReaction) {
+                                                unfavorite(
+                                                    message.id,
+                                                    message.associations_data.find(
+                                                        (e) =>
+                                                            e.author ===
+                                                            props.userAddress
+                                                    )?.id
+                                                )
+                                            } else {
+                                                favorite(message.id)
+                                            }
+                                        }}
+                                    >
+                                        {hasOwnReaction ? (
+                                            <StarIcon />
+                                        ) : (
+                                            <StarOutlineIcon />
+                                        )}{' '}
+                                        <Typography sx={{ size: '16px' }}>
+                                            {
+                                                message.associations_data.filter(
+                                                    (e) =>
+                                                        e.schema ===
+                                                        Schemas.like
+                                                ).length
+                                            }
+                                        </Typography>
+                                    </IconButton>
+                                </Tooltip>
                                 <IconButton
+                                    onClick={() => {
+                                        props.setInspectItem(message ?? null)
+                                    }}
                                     sx={{
                                         p: '0',
                                         color: theme.palette.text.secondary
                                     }}
-                                    color="primary"
-                                    onClick={() => {
-                                        if (hasOwnReaction) {
-                                            unfavorite(
-                                                message.id,
-                                                message.associations_data.find(
-                                                    (e) =>
-                                                        e.author ===
-                                                        appData.userAddress
-                                                )?.id
-                                            )
-                                        } else {
-                                            favorite(message.id)
-                                        }
-                                    }}
                                 >
-                                    {hasOwnReaction ? (
-                                        <StarIcon />
-                                    ) : (
-                                        <StarOutlineIcon />
-                                    )}{' '}
-                                    <Typography sx={{ size: '16px' }}>
-                                        {
-                                            message.associations_data.filter(
-                                                (e) => e.schema === Schemas.like
-                                            ).length
-                                        }
-                                    </Typography>
+                                    <MoreHorizIcon />
                                 </IconButton>
-                            </Tooltip>
-                            <IconButton
-                                onClick={() => {
-                                    props.setInspectItem(message ?? null)
-                                }}
-                                sx={{
-                                    p: '0',
-                                    color: theme.palette.text.secondary
-                                }}
-                            >
-                                <MoreHorizIcon />
-                            </IconButton>
+                            </Box>
                         </Box>
-                    </Box>
-                </>
-            )}
-        </ListItem>
-    )
-}
+                    </>
+                )}
+            </ListItem>
+        )
+    }
+)
+
+TimelineMessage.displayName = 'TimelineMessage'

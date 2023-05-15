@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, createContext, useRef } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider } from '@mui/material'
+import useWebSocket from 'react-use-websocket'
 
 import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
@@ -15,7 +16,7 @@ import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu'
 import type {
     RTMMessage,
-    StreamElement,
+    StreamElementDated,
     User,
     ServerEvent,
     Association,
@@ -87,10 +88,13 @@ function App(): JSX.Element {
     const [theme, setTheme] = useState<ConcurrentTheme>(
         createConcurrentTheme(themeName)
     )
-    const [connected, setConnected] = useState<boolean>(false)
-    const messages = useObjectList<StreamElement>()
+    const messages = useObjectList<StreamElementDated>()
     const [currentStreams, setCurrentStreams] = useState<string>('common')
     const currentStreamsRef = useRef<string>(currentStreams)
+
+    const { lastMessage } = useWebSocket(
+        server.replace('http', 'ws') + 'socket'
+    )
 
     const [playNotification] = useSound(Sound)
     const playNotificationRef = useRef(playNotification)
@@ -183,12 +187,25 @@ function App(): JSX.Element {
         return data
     })
 
-    const follow = (ccaddress: string): void => {
-        if (followList.includes(ccaddress)) return
-        setFollowList([...followList, ccaddress])
-    }
+    const follow = useCallback(
+        (ccaddress: string): void => {
+            if (followList.includes(ccaddress)) return
+            setFollowList([...followList, ccaddress])
+        },
+        [followList, setFollowList]
+    )
 
-    const handleMessage = (event: ServerEvent): void => {
+    useEffect(() => {
+        userDict.get(address).then((profile) => {
+            setProfile(profile)
+            profileRef.current = profile
+        })
+    }, [address])
+
+    useEffect(() => {
+        if (!lastMessage) return
+        const event: ServerEvent = JSON.parse(lastMessage.data)
+        if (!event) return
         switch (event.type) {
             case 'message': {
                 const message = event.body as RTMMessage
@@ -204,6 +221,7 @@ function App(): JSX.Element {
                         const groupA = currentStreamsRef.current.split(',')
                         const groupB = message.streams.split(',')
                         if (!groupA.some((e) => groupB.includes(e))) return
+                        const current = new Date().getTime()
                         messages.pushFront({
                             ID: new Date(message.cdate)
                                 .getTime()
@@ -211,7 +229,8 @@ function App(): JSX.Element {
                                 .replace('.', '-'),
                             Values: {
                                 id: message.id
-                            }
+                            },
+                            LastUpdated: current
                         })
                         playNotificationRef.current()
                         break
@@ -226,14 +245,28 @@ function App(): JSX.Element {
                 const association = event.body as Association
                 console.log(event)
                 switch (event.action) {
-                    case 'create':
+                    case 'create': {
                         messageDict.invalidate(association.target)
-                        // FIXME we have to notify to tweet component
+                        const target = messages.current.find(
+                            (e) => e.Values.id === association.target
+                        )
+                        if (target) {
+                            target.LastUpdated = new Date().getTime()
+                            messages.update((e) => [...e])
+                        }
                         break
-                    case 'delete':
+                    }
+                    case 'delete': {
                         messageDict.invalidate(association.target)
-                        // FIXME we have to notify to tweet component
+                        const target = messages.current.find(
+                            (e) => e.Values.id === association.target
+                        )
+                        if (target) {
+                            target.LastUpdated = new Date().getTime()
+                            messages.update((e) => [...e])
+                        }
                         break
+                    }
                     default:
                         console.log('unknown message action', event)
                         break
@@ -244,45 +277,7 @@ function App(): JSX.Element {
                 console.log('unknown event', event)
                 break
         }
-    }
-
-    useEffect(() => {
-        ;(async () => {
-            const profile = await userDict.get(address)
-            setProfile(profile)
-            profileRef.current = profile
-            console.log('profile loaded!', profile)
-        })()
-    }, [])
-
-    useEffect(() => {
-        if (!server) return
-        if (connected) return
-        const ws = new WebSocket(server.replace('http', 'ws') + 'socket')
-
-        ws.onopen = (event: any) => {
-            console.log('ws open')
-            console.info(event)
-            setConnected(true)
-        }
-
-        ws.onmessage = (event: any) => {
-            const body = JSON.parse(event.data)
-            handleMessage(body)
-        }
-
-        ws.onerror = (event: any) => {
-            console.log('ws error')
-            console.error(event)
-            setConnected(false)
-        }
-
-        ws.onclose = (event: any) => {
-            console.log('ws closed')
-            console.warn(event)
-            setConnected(false)
-        }
-    }, [])
+    }, [lastMessage])
 
     useEffect(() => {
         currentStreamsRef.current = currentStreams
@@ -291,16 +286,15 @@ function App(): JSX.Element {
     useEffect(() => {
         const newtheme = createConcurrentTheme(themeName)
         setTheme(newtheme)
-        let themeColorMetaTag = document.querySelector(
+        let themeColorMetaTag: HTMLMetaElement = document.querySelector(
             'meta[name="theme-color"]'
-        )
+        ) as HTMLMetaElement
         if (!themeColorMetaTag) {
             themeColorMetaTag = document.createElement('meta')
-            ;(themeColorMetaTag as any).name = 'theme-color'
+            themeColorMetaTag.name = 'theme-color'
             document.head.appendChild(themeColorMetaTag)
         }
-        ;(themeColorMetaTag as any).content =
-            newtheme.palette.background.default
+        themeColorMetaTag.content = newtheme.palette.background.default
     }, [themeName])
 
     return (
