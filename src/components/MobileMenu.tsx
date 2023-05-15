@@ -16,7 +16,8 @@ export function MobileMenu(): JSX.Element {
                     display: 'flex',
                     height: 60,
                     color: 'white',
-                    justifyContent: 'space-around'
+                    justifyContent: 'space-around',
+                    paddingBottom: 'env(safe-area-inset-bottom)'
                 }}
             >
                 <Button
