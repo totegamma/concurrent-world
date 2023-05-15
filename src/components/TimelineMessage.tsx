@@ -25,6 +25,7 @@ import { type IuseResourceManager } from '../hooks/useResourceManager'
 export interface TimelineMessageProps {
     message: string
     lastUpdated: number
+    follow: (ccaddress: string) => void
     setInspectItem: (message: RTMMessage) => void
     messageDict: IuseResourceManager<RTMMessage>
     userDict: IuseResourceManager<User>
@@ -208,6 +209,9 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                     <>
                         <Box>
                             <IconButton
+                                onClick={() => {
+                                    props.follow(message.author)
+                                }}
                                 sx={{
                                     padding: {
                                         xs: '10px 8px 0 0',

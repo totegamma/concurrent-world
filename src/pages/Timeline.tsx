@@ -192,6 +192,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                                         message={e.Values.id}
                                         lastUpdated={e.LastUpdated}
                                         setInspectItem={setInspectItem}
+                                        follow={props.follow}
                                         messageDict={appData.messageDict}
                                         userDict={appData.userDict}
                                         streamDict={appData.streamDict}
