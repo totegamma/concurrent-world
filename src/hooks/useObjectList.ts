@@ -1,4 +1,4 @@
-import { useReducer } from 'react'
+import { useCallback, useMemo, useReducer } from 'react'
 
 export interface IuseObjectList<T> {
     current: T[]
@@ -44,54 +44,57 @@ export function useObjectList<T>(): IuseObjectList<T> {
         []
     )
 
-    const set = (e: T[]): void => {
+    const set = useCallback((e: T[]): void => {
         dispatch({
             type: 'set',
             argTarr: e
         })
-    }
+    }, [])
 
-    const pushFront = (e: T): void => {
+    const pushFront = useCallback((e: T): void => {
         dispatch({
             type: 'push_front',
             argT: e
         })
-    }
+    }, [])
 
-    const pushBack = (e: T): void => {
+    const pushBack = useCallback((e: T): void => {
         dispatch({
             type: 'push_back',
             argT: e
         })
-    }
+    }, [])
 
-    const concat = (e: T[]): void => {
+    const concat = useCallback((e: T[]): void => {
         dispatch({
             type: 'concat',
             argTarr: e
         })
-    }
+    }, [])
 
-    const update = (updater: (e: T[]) => T[]): void => {
+    const update = useCallback((updater: (e: T[]) => T[]): void => {
         dispatch({
             type: 'update',
             argTcall: updater
         })
-    }
+    }, [])
 
-    const clear = (): void => {
+    const clear = useCallback((): void => {
         dispatch({
             type: 'clear'
         })
-    }
+    }, [])
 
-    return {
-        set,
-        current,
-        pushFront,
-        pushBack,
-        concat,
-        update,
-        clear
-    }
+    return useMemo(
+        () => ({
+            current,
+            set,
+            pushFront,
+            pushBack,
+            concat,
+            update,
+            clear
+        }),
+        [set, current, pushFront, pushBack, concat, update, clear]
+    )
 }
