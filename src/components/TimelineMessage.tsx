@@ -46,7 +46,7 @@ export const TimelineMessage = memo<TimelineMessageProps>(
 
         const [hasOwnReaction, setHasOwnReaction] = useState<boolean>(false)
 
-        const loadTweet = useCallback((): void => {
+        useEffect(() => {
             props.messageDict
                 .get(props.message)
                 .then((msg) => {
@@ -80,10 +80,6 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                 .catch((error) => {
                     console.error(error)
                 })
-        }, [props.message])
-
-        useEffect(() => {
-            loadTweet()
         }, [props.message, props.lastUpdated])
 
         useEffect(() => {
@@ -140,7 +136,6 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                     .then(async (res) => await res.json())
                     .then((_) => {
                         props.messageDict.invalidate(messageID)
-                        loadTweet()
                     })
             },
             [props.serverAddress, props.userAddress]
@@ -165,7 +160,6 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                     .then(async (res) => await res.json())
                     .then((_) => {
                         props.messageDict.invalidate(messageID)
-                        loadTweet()
                     })
             },
             [props.serverAddress]
