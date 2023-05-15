@@ -201,36 +201,37 @@ export const TimelineMessage = memo<TimelineMessageProps>(
             >
                 {JSON.parse(message.payload).body && (
                     <>
-                        <Box>
+                        <Box
+                            sx={{
+                                padding: {
+                                    xs: '10px 8px 0 0',
+                                    sm: '8px 10px 0 0'
+                                }
+                            }}
+                        >
                             <IconButton
                                 onClick={() => {
                                     props.follow(message.author)
                                 }}
                                 sx={{
-                                    padding: {
-                                        xs: '10px 8px 0 0',
-                                        sm: '0 16px 0 0'
-                                    },
-                                    width: { xs: '40px', sm: '64px' },
-                                    height: { xs: '40px', sm: '64px' }
+                                    width: { xs: '38px', sm: '48px' },
+                                    height: { xs: '38px', sm: '48px' }
                                 }}
                             >
-                                {user?.avatar ? (
-                                    <Avatar
-                                        alt="Profile Picture"
-                                        src={user?.avatar}
-                                        sx={{
-                                            width: { xs: '32px', sm: '48px' },
-                                            height: { xs: '32px', sm: '48px' }
-                                        }}
-                                    />
-                                ) : (
+                                <Avatar
+                                    alt="Profile Picture"
+                                    src={user?.avatar}
+                                    sx={{
+                                        width: { xs: '38px', sm: '48px' },
+                                        height: { xs: '38px', sm: '48px' }
+                                    }}
+                                >
                                     <BoringAvatar
                                         name={message.author}
                                         variant="beam"
                                         size={48}
                                     />
-                                )}
+                                </Avatar>
                             </IconButton>
                         </Box>
                         <Box
