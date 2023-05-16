@@ -69,6 +69,12 @@ export function NavigatorSettings(props: NavigatorSettingsProps): JSX.Element {
             </Tabs>
             {tab === 0 && (
                 <Box>
+                    <Typography variant="h3">ストリーム</Typography>
+                    <StreamPicker
+                        selected={followStreams}
+                        setSelected={setFollowStreams}
+                    />
+                    <Divider />
                     <Typography variant="h3">ユーザー</Typography>
                     <List
                         dense
@@ -76,7 +82,8 @@ export function NavigatorSettings(props: NavigatorSettingsProps): JSX.Element {
                             width: '100%',
                             maxWidth: 360,
                             maxHeight: '300px',
-                            bgcolor: 'background.paper'
+                            bgcolor: 'background.paper',
+                            overflow: 'scroll'
                         }}
                     >
                         {followList.map((user) => (
@@ -102,12 +109,6 @@ export function NavigatorSettings(props: NavigatorSettingsProps): JSX.Element {
                             </ListItem>
                         ))}
                     </List>
-                    <Divider />
-                    <Typography variant="h3">ストリーム</Typography>
-                    <StreamPicker
-                        selected={followStreams}
-                        setSelected={setFollowStreams}
-                    />
                 </Box>
             )}
             {tab === 1 && (
