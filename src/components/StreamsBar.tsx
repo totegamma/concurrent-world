@@ -6,7 +6,8 @@ import {
     Box,
     useTheme,
     Autocomplete,
-    Chip
+    Chip,
+    Modal
 } from '@mui/material'
 import ExploreIcon from '@mui/icons-material/Explore'
 import SearchIcon from '@mui/icons-material/Search'
@@ -17,6 +18,7 @@ import {
 } from 'react-router-dom'
 import { ApplicationContext } from '../App'
 import { type Stream } from '../model'
+import { NavigatorSettings } from './NavigatorSettings'
 
 export interface StreamsBarProps {
     location: ReactLocation
@@ -32,6 +34,8 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
     )
     const [streamMapper, setStreamMapper] = useState<Record<string, string>>({})
     const appData = useContext(ApplicationContext)
+
+    const [settingsOpen, setSettignsOpen] = useState<boolean>(false)
 
     useEffect(() => {
         fetch(
@@ -108,7 +112,12 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                     // submit logic (enter key) may be added here
                 }}
             >
-                <IconButton sx={{ p: '10px' }}>
+                <IconButton
+                    sx={{ p: '10px' }}
+                    onClick={() => {
+                        setSettignsOpen(true)
+                    }}
+                >
                     <ExploreIcon sx={{ color: 'primary.contrastText' }} />
                 </IconButton>
                 <Autocomplete
@@ -157,6 +166,27 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                     <SearchIcon sx={{ color: 'primary.contrastText' }} />
                 </IconButton>
             </Paper>
+            <Modal
+                open={settingsOpen}
+                onClose={() => {
+                    setSettignsOpen(false)
+                }}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute' as 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: 400,
+                        p: '20px'
+                    }}
+                >
+                    <NavigatorSettings />
+                </Paper>
+            </Modal>
         </Box>
     )
 }
