@@ -5,6 +5,7 @@ import { ApplicationContext } from '../App'
 export interface StreamPickerProps {
     selected: string[]
     setSelected: (selected: string[]) => void
+    color?: string
 }
 
 interface StreamOption {
@@ -45,16 +46,13 @@ export function StreamPicker(props: StreamPickerProps): JSX.Element {
         )
     }, [props.selected])
 
-    useEffect(() => {
-        console.log(allStreams)
-    }, [allStreams])
-
     return (
         <Box
             sx={{
-                backgroundColor: 'primary.main',
+                backgroundColor: props.color ?? 'primary.main',
                 padding: '5px',
-                borderRadius: '20px'
+                borderRadius: '20px',
+                flex: '1'
             }}
         >
             <Autocomplete
@@ -85,7 +83,7 @@ export function StreamPicker(props: StreamPickerProps): JSX.Element {
                         // eslint-disable-next-line
                         <Chip
                             label={option.label}
-                            sx={{ color: 'primary.contrastText' }}
+                            sx={{ color: 'text.default' }}
                             {...getTagProps({ index })}
                         />
                     ))

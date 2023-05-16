@@ -5,7 +5,8 @@ import {
     Button,
     useTheme,
     IconButton,
-    Divider
+    Divider,
+    Typography
 } from '@mui/material'
 import { Sign } from '../util'
 import { ApplicationContext } from '../App'
@@ -145,8 +146,17 @@ export function Draft(props: DraftProps): JSX.Element {
             }}
         >
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Box sx={{ width: '30%' }}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        ml: '8px',
+                        flex: 1
+                    }}
+                >
+                    <Typography>send to:</Typography>
                     <StreamPicker
+                        color="none"
                         selected={messageDestStreams}
                         setSelected={setMessageDestStreams}
                     />
