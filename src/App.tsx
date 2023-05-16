@@ -358,6 +358,7 @@ function App(): JSX.Element {
                                             messages={messages}
                                             follow={follow}
                                             followList={followList}
+                                            setFollowList={setFollowList}
                                             setCurrentStreams={
                                                 setCurrentStreams
                                             }
@@ -375,8 +376,6 @@ function App(): JSX.Element {
                                         <Explorer
                                             watchList={watchstreams}
                                             setWatchList={setWatchStreams}
-                                            followList={followList}
-                                            setFollowList={setFollowList}
                                         />
                                     }
                                 />

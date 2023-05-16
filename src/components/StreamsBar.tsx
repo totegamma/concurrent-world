@@ -22,6 +22,8 @@ import { NavigatorSettings } from './NavigatorSettings'
 
 export interface StreamsBarProps {
     location: ReactLocation
+    followList: string[]
+    setFollowList: (newlist: string[]) => void
 }
 
 export function StreamsBar(props: StreamsBarProps): JSX.Element {
@@ -184,7 +186,10 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                         p: '20px'
                     }}
                 >
-                    <NavigatorSettings />
+                    <NavigatorSettings
+                        followList={props.followList}
+                        setFollowList={props.setFollowList}
+                    />
                 </Paper>
             </Modal>
         </Box>

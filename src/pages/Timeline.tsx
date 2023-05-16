@@ -19,6 +19,7 @@ export interface TimelineProps {
     messages: IuseObjectList<StreamElementDated>
     follow: (ccaddress: string) => void
     followList: string[]
+    setFollowList: (newlist: string[]) => void
     setCurrentStreams: (input: string) => void
     watchstreams: string[]
 }
@@ -158,7 +159,11 @@ export function Timeline(props: TimelineProps): JSX.Element {
 
     return (
         <>
-            <StreamsBar location={reactlocation} />
+            <StreamsBar
+                location={reactlocation}
+                followList={props.followList}
+                setFollowList={props.setFollowList}
+            />
             <Box
                 sx={{
                     overflowX: 'hidden',
