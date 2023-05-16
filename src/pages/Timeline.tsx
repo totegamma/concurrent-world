@@ -21,7 +21,7 @@ export interface TimelineProps {
     follow: (ccaddress: string) => void
     followList: string[]
     setFollowList: (newlist: string[]) => void
-    setCurrentStreams: (input: string) => void
+    setCurrentStreams: (input: string[]) => void
     watchstreams: string[]
 }
 
@@ -138,7 +138,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
     useEffect(() => {
         ;(async () => {
             reload()
-            let homequery = ''
+            let homequery: string[] = []
             if (!reactlocation.hash) {
                 homequery = (
                     await Promise.all(
@@ -149,14 +149,13 @@ export function Timeline(props: TimelineProps): JSX.Element {
                                 ).homestream
                         )
                     )
-                )
-                    .filter((e) => e)
-                    .join(',')
+                ).filter((e) => e)
             }
             props.setCurrentStreams(
-                reactlocation.hash
-                    ? reactlocation.hash.replace('#', '')
+                (reactlocation.hash
+                    ? reactlocation.hash.replace('#', '').split(',')
                     : homequery
+                ).concat(followStreams)
             )
         })()
         scrollParentRef.current?.scroll({ top: 0 })
