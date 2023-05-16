@@ -35,7 +35,7 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
     const [streamMapper, setStreamMapper] = useState<Record<string, string>>({})
     const appData = useContext(ApplicationContext)
 
-    const [settingsOpen, setSettignsOpen] = useState<boolean>(true)
+    const [settingsOpen, setSettignsOpen] = useState<boolean>(false)
 
     useEffect(() => {
         fetch(
