@@ -27,20 +27,27 @@ export function StreamPicker(props: StreamPickerProps): JSX.Element {
                         id: e.id
                     }
                 })
+                .filter((e) => e.label)
         )
     }, [appData.streamDict.body])
 
     useEffect(() => {
-        Promise.all(
-            props.selected.map((e) =>
-                appData.streamDict.get(e).then((f) => {
-                    return { label: JSON.parse(f.meta).name, id: f.id }
-                })
-            )
-        ).then((e) => {
-            setSelectedStreams(e)
-        })
+        Promise.all(props.selected.map((e) => appData.streamDict.get(e))).then(
+            (a) => {
+                setSelectedStreams(
+                    a
+                        .filter((e) => e.meta)
+                        .map((e) => {
+                            return { label: JSON.parse(e.meta).name, id: e.id }
+                        })
+                )
+            }
+        )
     }, [props.selected])
+
+    useEffect(() => {
+        console.log(allStreams)
+    }, [allStreams])
 
     return (
         <Box
@@ -54,7 +61,9 @@ export function StreamPicker(props: StreamPickerProps): JSX.Element {
                 sx={{ width: 1 }}
                 multiple
                 value={selectedStreams}
-                options={allStreams}
+                options={allStreams.filter(
+                    (e) => !props.selected.includes(e.id)
+                )}
                 onChange={(_, value) => {
                     props.setSelected(value.map((e) => e.id))
                 }}

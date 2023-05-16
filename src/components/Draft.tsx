@@ -1,13 +1,24 @@
 import { useState, useContext, useEffect } from 'react'
-import { TextField, Box, Button, useTheme, IconButton } from '@mui/material'
+import {
+    InputBase,
+    Box,
+    Button,
+    useTheme,
+    IconButton,
+    Divider
+} from '@mui/material'
 import { Sign } from '../util'
 import { ApplicationContext } from '../App'
 import SendIcon from '@mui/icons-material/Send'
+import HomeIcon from '@mui/icons-material/Home'
 import { Schemas } from '../schemas'
 import Picker from '@emoji-mart/react'
 import data from '@emoji-mart/data'
 import { EmojiEmotions, Splitscreen } from '@mui/icons-material'
 import { MarkdownRenderer } from './MarkdownRenderer'
+import { StreamPicker } from './StreamPicker'
+import { useLocation } from 'react-router-dom'
+import { usePersistent } from '../hooks/usePersistent'
 
 export interface EmojiProps {
     shortcodes: string
@@ -37,16 +48,32 @@ export interface CustomEmoji {
 
 export function Draft(props: DraftProps): JSX.Element {
     const appData = useContext(ApplicationContext)
+    const theme = useTheme()
 
     const [draft, setDraft] = useState<string>('')
-
     const [selectEmoji, setSelectEmoji] = useState<boolean>(false)
-
     const [customEmoji, setCustomEmoji] = useState<CustomEmoji[]>([])
-
     const [openPreview, setOpenPreview] = useState<boolean>(false)
+    const [messageDestStreams, setMessageDestStreams] = useState<string[]>([])
 
-    const theme = useTheme()
+    const reactlocation = useLocation()
+
+    const [defaultPostHome] = usePersistent<string[]>('defaultPostHome', [])
+    const [defaultPostNonHome] = usePersistent<string[]>(
+        'defaultPostNonHome',
+        []
+    )
+
+    const [postHome, setPostHome] = useState<boolean>(true)
+
+    useEffect(() => {
+        setMessageDestStreams([
+            ...new Set([
+                ...(reactlocation.hash ? defaultPostNonHome : defaultPostHome),
+                ...props.currentStreams.split(',')
+            ])
+        ])
+    }, [reactlocation.hash])
 
     const post = (): void => {
         const payloadObj = {
@@ -66,7 +93,8 @@ export function Draft(props: DraftProps): JSX.Element {
                 streams: [
                     ...new Set([
                         ...props.currentStreams.split(','),
-                        appData.profile.homestream
+                        ...messageDestStreams,
+                        ...(postHome ? [appData.profile.homestream] : [])
                     ])
                 ]
                     .filter((e) => e)
@@ -107,57 +135,80 @@ export function Draft(props: DraftProps): JSX.Element {
             sx={{
                 position: 'relative',
                 display: 'flex',
-                flexDirection: { xs: 'column', md: 'row' },
+                flexDirection: 'column',
                 alignItems: 'stretch',
-                gap: '2px'
+                gap: '2px',
+                border: '2px solid',
+                borderRadius: '5px',
+                borderColor: 'text.disabled',
+                p: '5px'
             }}
         >
-            <TextField
-                multiline
-                rows={6}
-                label="message"
-                variant="outlined"
-                value={draft}
-                onChange={(e) => {
-                    setDraft(e.target.value)
-                }}
-                sx={{
-                    '& .MuiInputLabel-root': {
-                        color: theme.palette.text.disabled
-                    },
-                    '& .MuiOutlinedInput-root': {
-                        '& > fieldset': {
-                            borderColor: theme.palette.text.disabled
-                        }
-                    },
-                    width: 1
-                }}
-                onKeyDown={(e: any) => {
-                    if (draft.length === 0 || draft.trim().length === 0) return
-                    if (e.key === 'Enter' && e.ctrlKey === true) {
-                        post()
-                    }
-                }}
-            />
-            {!openPreview || (
-                <Box
-                    sx={{
-                        width: 1,
-                        height: '171px',
-                        border: 1,
-                        borderRadius: '4px',
-                        overflow: 'scroll',
-                        px: 1
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Box sx={{ width: '30%' }}>
+                    <StreamPicker
+                        selected={messageDestStreams}
+                        setSelected={setMessageDestStreams}
+                    />
+                </Box>
+                <IconButton
+                    onClick={() => {
+                        setPostHome(!postHome)
                     }}
                 >
-                    <MarkdownRenderer messagebody={draft} />
-                </Box>
-            )}
+                    <HomeIcon color={postHome ? 'primary' : 'disabled'} />
+                </IconButton>
+            </Box>
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: { xs: 'column', md: 'row' }
+                }}
+            >
+                <InputBase
+                    multiline
+                    rows={6}
+                    value={draft}
+                    onChange={(e) => {
+                        setDraft(e.target.value)
+                    }}
+                    placeholder="今、なにしてる？"
+                    sx={{
+                        width: 1,
+                        padding: '5px'
+                    }}
+                    onKeyDown={(e: any) => {
+                        if (draft.length === 0 || draft.trim().length === 0)
+                            return
+                        if (
+                            e.key === 'Enter' &&
+                            (e.ctrlKey === true || e.metaKey === true)
+                        ) {
+                            post()
+                        }
+                    }}
+                />
+                {!openPreview || (
+                    <>
+                        <Divider orientation="vertical" />
+                        <Box
+                            sx={{
+                                width: 1,
+                                height: '171px',
+                                overflow: 'scroll',
+                                px: 1
+                            }}
+                        >
+                            <MarkdownRenderer messagebody={draft} />
+                        </Box>
+                    </>
+                )}
+            </Box>
             {!selectEmoji || (
                 <Box
                     sx={{
                         position: 'absolute',
-                        top: 170,
+                        top: 250,
                         right: { xs: 10, mb: 90 },
                         zIndex: 9
                     }}
@@ -177,9 +228,8 @@ export function Draft(props: DraftProps): JSX.Element {
             )}
             <Box
                 sx={{
-                    position: 'absolute',
-                    bottom: 10,
-                    right: 10
+                    display: 'flex',
+                    justifyContent: 'flex-end'
                 }}
             >
                 <IconButton

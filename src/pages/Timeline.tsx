@@ -14,6 +14,7 @@ import { StreamsBar } from '../components/StreamsBar'
 import { useLocation } from 'react-router-dom'
 import { ApplicationContext } from '../App'
 import InfiniteScroll from 'react-infinite-scroller'
+import { usePersistent } from '../hooks/usePersistent'
 
 export interface TimelineProps {
     messages: IuseObjectList<StreamElementDated>
@@ -33,6 +34,8 @@ export function Timeline(props: TimelineProps): JSX.Element {
     const [hasMoreData, setHasMoreData] = useState<boolean>(false)
     const [inspectItem, setInspectItem] = useState<RTMMessage | null>(null)
 
+    const [followStreams] = usePersistent<string[]>('followStreams', [])
+
     const reload = useCallback(async () => {
         let homequery = ''
         if (!reactlocation.hash) {
@@ -47,6 +50,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                 )
             )
                 .filter((e) => e)
+                .concat(followStreams)
                 .join(',')
         }
         const url =
@@ -92,6 +96,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                 )
             )
                 .filter((e) => e)
+                .concat(followStreams)
                 .join(',')
         }
         const url =
@@ -243,6 +248,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                     <Typography>Author: {inspectItem?.author}</Typography>
                     <Typography>Schema: {inspectItem?.schema}</Typography>
                     <Typography>Signature: {inspectItem?.signature}</Typography>
+                    <Typography>Streams: {inspectItem?.streams}</Typography>
                     <Typography>Created: {inspectItem?.cdate}</Typography>
                     <Typography>Payload:</Typography>
                     <pre style={{ overflowX: 'scroll' }}>
