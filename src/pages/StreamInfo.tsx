@@ -71,7 +71,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
         Promise.all(
             props.followList.map((ccaddress) => appData.userDict.get(ccaddress))
         ).then((e) => {
-            setFollowList(e)
+            setFollowList(e.filter((e) => e.ccaddress))
         })
     }, [props.followList])
 

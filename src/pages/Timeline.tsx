@@ -191,7 +191,11 @@ export function Timeline(props: TimelineProps): JSX.Element {
                                 loadMore()
                             }}
                             hasMore={hasMoreData}
-                            loader={<>Loading...</>}
+                            loader={
+                                <React.Fragment key={0}>
+                                    Loading...
+                                </React.Fragment>
+                            }
                             useWindow={false}
                             getScrollParent={() => scrollParentRef.current}
                         >

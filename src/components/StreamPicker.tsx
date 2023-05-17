@@ -15,11 +15,11 @@ interface StreamOption {
 
 export function StreamPicker(props: StreamPickerProps): JSX.Element {
     const appData = useContext(ApplicationContext)
-    const [allStreams, setAllStreams] = useState<StreamOption[]>([])
+    const [options, setOptions] = useState<StreamOption[]>([])
     const [selectedStreams, setSelectedStreams] = useState<StreamOption[]>([])
 
     useEffect(() => {
-        setAllStreams(
+        setOptions(
             Object.values(appData.streamDict.body.current)
                 .filter((e) => e.meta)
                 .map((e) => {
@@ -55,12 +55,12 @@ export function StreamPicker(props: StreamPickerProps): JSX.Element {
             }}
         >
             <Autocomplete
+                filterSelectedOptions
                 sx={{ width: 1 }}
                 multiple
                 value={selectedStreams}
-                options={allStreams.filter(
-                    (e) => !props.selected.includes(e.id)
-                )}
+                options={options}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 onChange={(_, value) => {
                     props.setSelected(value.map((e) => e.id))
                 }}
