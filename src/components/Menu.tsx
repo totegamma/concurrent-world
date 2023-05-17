@@ -16,7 +16,6 @@ import MessageIcon from '@mui/icons-material/Message'
 import ExploreIcon from '@mui/icons-material/Explore'
 import SettingsIcon from '@mui/icons-material/Settings'
 import NotificationsIcon from '@mui/icons-material/Notifications'
-import PercentIcon from '@mui/icons-material/Percent'
 import { useContext, useEffect, useState } from 'react'
 import { ApplicationContext } from '../App'
 import type { ConcurrentTheme, Stream } from '../model'
@@ -26,6 +25,7 @@ import { ConcurrentLogo } from './ConcurrentLogo'
 import buildTime from '~build/time'
 // @ts-expect-error vite dynamic import
 import { branch, sha } from '~build/info'
+import { StreamList } from './StreamList'
 
 const branchName = branch || window.location.host.split('.')[0]
 
@@ -217,54 +217,7 @@ export function Menu(props: MenuProps): JSX.Element {
                         <Divider />
                     </>
                 )}
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '5px',
-                        overflowY: 'auto',
-                        overflowX: 'hidden'
-                    }}
-                >
-                    <List
-                        dense
-                        sx={{
-                            width: '100%',
-                            maxWidth: 360,
-                            display: 'flex',
-                            flexDirection: 'column'
-                        }}
-                    >
-                        {watchStreams.map((stream) => {
-                            const labelId = `checkbox-list-secondary-label-${stream.id}`
-                            return (
-                                <ListItem key={stream.id} disablePadding>
-                                    <ListItemButton
-                                        component={Link}
-                                        to={`/#${stream.id}`}
-                                        sx={{ gap: 1 }}
-                                        onClick={props.onClick}
-                                    >
-                                        <PercentIcon
-                                            sx={{
-                                                color: 'background.contrastText'
-                                            }}
-                                        />
-                                        <ListItemText
-                                            id={labelId}
-                                            primary={
-                                                stream.meta
-                                                    ? JSON.parse(stream.meta)
-                                                          .name
-                                                    : 'backrooms'
-                                            }
-                                        />
-                                    </ListItemButton>
-                                </ListItem>
-                            )
-                        })}
-                    </List>
-                </Box>
+                <StreamList onClick={props.onClick} />
             </Box>
         </Box>
     )

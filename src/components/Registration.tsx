@@ -13,7 +13,8 @@ import TextField from '@mui/material/TextField'
 import Divider from '@mui/material/Divider'
 import { ProfileEditor } from './ProfileEditor'
 import { MobileStepper } from '@mui/material'
-import { KeyboardArrowLeft, KeyboardArrowRight } from '@mui/icons-material'
+import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
+import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
 
 export function Registration(): JSX.Element {
     const navigate = useNavigate()

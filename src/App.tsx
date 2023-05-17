@@ -55,7 +55,8 @@ export const ApplicationContext = createContext<appData>({
     streamDict: dummyResourceManager,
     userDict: dummyResourceManager,
     messageDict: dummyResourceManager,
-    websocketState: -1
+    websocketState: -1,
+    watchStreams: []
 })
 
 export interface appData {
@@ -69,6 +70,7 @@ export interface appData {
     userDict: IuseResourceManager<User>
     messageDict: IuseResourceManager<RTMMessage>
     websocketState: ReadyState
+    watchStreams: string[]
 }
 
 function App(): JSX.Element {
@@ -84,7 +86,7 @@ function App(): JSX.Element {
         'Theme',
         Object.keys(Themes)[0]
     )
-    const [watchstreams, setWatchStreams] = usePersistent<string[]>(
+    const [watchStreams, setWatchStreams] = usePersistent<string[]>(
         'watchStreamList',
         []
     )
@@ -315,7 +317,8 @@ function App(): JSX.Element {
                     streamDict,
                     userDict,
                     messageDict,
-                    websocketState: readyState
+                    websocketState: readyState,
+                    watchStreams
                 }}
             >
                 <Box
@@ -338,7 +341,7 @@ function App(): JSX.Element {
                             display: { xs: 'none', sm: 'block', width: '200px' }
                         }}
                     >
-                        <Menu streams={watchstreams} />
+                        <Menu streams={watchStreams} />
                     </Box>
                     <Box
                         sx={{
@@ -385,7 +388,7 @@ function App(): JSX.Element {
                                     path="/explorer"
                                     element={
                                         <Explorer
-                                            watchList={watchstreams}
+                                            watchList={watchStreams}
                                             setWatchList={setWatchStreams}
                                         />
                                     }
@@ -443,7 +446,7 @@ function App(): JSX.Element {
                     }}
                 >
                     <Menu
-                        streams={watchstreams}
+                        streams={watchStreams}
                         onClick={() => {
                             setMobileMenuOpen(false)
                         }}
