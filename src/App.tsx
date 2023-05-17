@@ -442,7 +442,13 @@ function App(): JSX.Element {
                         }
                     }}
                 >
-                    <Menu streams={watchstreams} />
+                    <Menu
+                        streams={watchstreams}
+                        onClick={() => {
+                            setMobileMenuOpen(false)
+                        }}
+                        hideMenu
+                    />
                 </Drawer>
             </ApplicationContext.Provider>
         </ThemeProvider>
