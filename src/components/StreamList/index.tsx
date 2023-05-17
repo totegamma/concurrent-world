@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect } from 'react'
 import {
     DndProvider,
     getBackendOptions,
@@ -33,7 +33,11 @@ export interface WatchStream {
     data: Stream | undefined
 }
 
-export function StreamList(): JSX.Element {
+interface StreamListProps {
+    onClick?: () => void
+}
+
+export function StreamList(props: StreamListProps): JSX.Element {
     const appData = useContext(ApplicationContext)
     const theme = useTheme<ConcurrentTheme>()
     const [watchStreamTree, setWatchStreamTree] = usePersistent<WatchStream[]>(
@@ -162,6 +166,7 @@ export function StreamList(): JSX.Element {
                                     onToggle={onToggle}
                                     tree={watchStreamTree}
                                     setWatchStreamTree={setWatchStreamTree}
+                                    onClick={props.onClick}
                                 />
                             )}
                             dragPreviewRender={(monitorProps) => (

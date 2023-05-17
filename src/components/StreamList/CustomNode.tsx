@@ -21,6 +21,7 @@ interface CustomNodeProps {
     onToggle: (id: string | number) => void
     tree: WatchStream[]
     setWatchStreamTree: (watchStreamTree: any) => void
+    onClick?: () => void
 }
 
 export const CustomNode = (props: CustomNodeProps): JSX.Element => {
@@ -69,6 +70,7 @@ export const CustomNode = (props: CustomNodeProps): JSX.Element => {
         if (!props.node.data) return
         e.stopPropagation()
         navigate(`/#${props.node.id}`)
+        props.onClick?.()
     }
 
     const isSelected = (): boolean => {

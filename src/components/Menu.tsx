@@ -16,7 +16,6 @@ import MessageIcon from '@mui/icons-material/Message'
 import ExploreIcon from '@mui/icons-material/Explore'
 import SettingsIcon from '@mui/icons-material/Settings'
 import NotificationsIcon from '@mui/icons-material/Notifications'
-import PercentIcon from '@mui/icons-material/Percent'
 import { useContext, useEffect, useState } from 'react'
 import { ApplicationContext } from '../App'
 import type { ConcurrentTheme, Stream } from '../model'
@@ -218,7 +217,7 @@ export function Menu(props: MenuProps): JSX.Element {
                         <Divider />
                     </>
                 )}
-                <StreamList />
+                <StreamList onClick={props.onClick} />
             </Box>
         </Box>
     )
