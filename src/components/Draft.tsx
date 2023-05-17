@@ -150,11 +150,9 @@ export function Draft(props: DraftProps): JSX.Element {
                     sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        ml: '8px',
                         flex: 1
                     }}
                 >
-                    <Typography>send to:</Typography>
                     <StreamPicker
                         color="none"
                         selected={messageDestStreams}

@@ -36,6 +36,7 @@ import {
 import Sound from './resources/Bubble.wav'
 import useSound from 'use-sound'
 import { MobileMenu } from './components/MobileMenu'
+import { StreamInfo } from './pages/StreamInfo'
 
 export const ApplicationContext = createContext<appData>({
     serverAddress: '',
@@ -353,11 +354,9 @@ function App(): JSX.Element {
                                             messages={messages}
                                             follow={follow}
                                             followList={followList}
-                                            setFollowList={setFollowList}
                                             setCurrentStreams={
                                                 setCurrentStreams
                                             }
-                                            watchstreams={watchstreams}
                                         />
                                     }
                                 />
@@ -391,6 +390,15 @@ function App(): JSX.Element {
                                             setPubKey={setPubKey}
                                             setUserAddr={setAddress}
                                             setServerAddr={setServer}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/streaminfo"
+                                    element={
+                                        <StreamInfo
+                                            followList={followList}
+                                            setFollowList={setFollowList}
                                         />
                                     }
                                 />

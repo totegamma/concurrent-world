@@ -82,7 +82,7 @@ export function TimelineHeader(props: TimelineHeaderProps): JSX.Element {
                 <IconButton
                     sx={{ p: '10px' }}
                     component={Link}
-                    to={`/info/${props.location.hash}`}
+                    to={`/streaminfo${props.location.hash}`}
                 >
                     <InfoIcon sx={{ color: 'primary.contrastText' }} />
                 </IconButton>
