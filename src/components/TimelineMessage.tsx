@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, memo } from 'react'
 import {
     ListItem,
     Box,
-    Avatar,
     Typography,
     Link,
     IconButton,
@@ -15,12 +14,11 @@ import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { Sign, humanReadableTimeDiff } from '../util'
 
-import BoringAvatar from 'boring-avatars'
-
 import type { Stream, RTMMessage, User } from '../model'
 import { Schemas } from '../schemas'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import { type IuseResourceManager } from '../hooks/useResourceManager'
+import { CCAvatar } from './CCAvatar'
 
 export interface TimelineMessageProps {
     message: string
@@ -218,20 +216,15 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                                     height: { xs: '38px', sm: '48px' }
                                 }}
                             >
-                                <Avatar
-                                    alt="Profile Picture"
-                                    src={user?.avatar}
+                                <CCAvatar
+                                    alt={user?.username}
+                                    avatarURL={user?.avatar}
+                                    identiconSource={message.author}
                                     sx={{
                                         width: { xs: '38px', sm: '48px' },
                                         height: { xs: '38px', sm: '48px' }
                                     }}
-                                >
-                                    <BoringAvatar
-                                        name={message.author}
-                                        variant="beam"
-                                        size={48}
-                                    />
-                                </Avatar>
+                                />
                             </IconButton>
                         </Box>
                         <Box
@@ -319,12 +312,17 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                                                             gap: 1
                                                         }}
                                                     >
-                                                        <Avatar
+                                                        <CCAvatar
                                                             sx={{
                                                                 height: '20px',
                                                                 width: '20px'
                                                             }}
-                                                            src={user.avatar}
+                                                            avatarURL={
+                                                                user.avatar
+                                                            }
+                                                            identiconSource={
+                                                                user.ccaddress
+                                                            }
                                                         />
                                                         {user.username}
                                                     </Box>

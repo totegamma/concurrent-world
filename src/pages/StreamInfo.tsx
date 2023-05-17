@@ -10,7 +10,6 @@ import {
     Button,
     ListItemButton,
     ListItemAvatar,
-    Avatar,
     ListItemText
 } from '@mui/material'
 import { StreamPicker } from '../components/StreamPicker'
@@ -18,6 +17,7 @@ import { usePersistent } from '../hooks/usePersistent'
 import type { User } from '../model'
 import { ApplicationContext } from '../App'
 import { useLocation } from 'react-router-dom'
+import { CCAvatar } from '../components/CCAvatar'
 
 export interface StreamInfoProps {
     followList: string[]
@@ -140,7 +140,12 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                                     >
                                         <ListItemButton>
                                             <ListItemAvatar>
-                                                <Avatar src={user.avatar} />
+                                                <CCAvatar
+                                                    avatarURL={user.avatar}
+                                                    identiconSource={
+                                                        user.ccaddress
+                                                    }
+                                                />
                                             </ListItemAvatar>
                                             <ListItemText
                                                 primary={user.username}
