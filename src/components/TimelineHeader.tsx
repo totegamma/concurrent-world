@@ -52,18 +52,16 @@ export function TimelineHeader(props: TimelineHeaderProps): JSX.Element {
             <Box sx={{ background: 'white' }}></Box>
             <Box
                 sx={{
-                    m: '3px 30px',
-                    p: '2px 4px',
+                    p: { xs: '', sm: '2px 2px 2px 16px' },
                     display: 'flex',
                     alignItems: 'center',
                     width: '100%',
-                    height: '36px',
                     borderRadius: '9999px',
                     background: 'none'
                 }}
             >
                 <IconButton
-                    sx={{ p: '10px', display: { xs: 'inherit', sm: 'none' } }}
+                    sx={{ p: '8px', display: { xs: 'inherit', sm: 'none' } }}
                     onClick={() => {
                         props.setMobileMenuOpen(true)
                     }}
@@ -78,8 +76,9 @@ export function TimelineHeader(props: TimelineHeaderProps): JSX.Element {
                 <Button
                     sx={{
                         width: 1,
-                        justifyContent: 'flex-start',
-                        color: 'primary.contrastText'
+                        justifyContent: { xs: 'flex-left', xl: 'flex-start' },
+                        color: 'primary.contrastText',
+                        p: { xs: '0', xl: '8px 0 8 4px' }
                     }}
                     onClick={() => {
                         props.scrollParentRef.current?.scroll({
@@ -92,7 +91,7 @@ export function TimelineHeader(props: TimelineHeaderProps): JSX.Element {
                     <b>{title}</b>
                 </Button>
                 <IconButton
-                    sx={{ p: '10px' }}
+                    sx={{ p: '8px' }}
                     component={Link}
                     to={`/streaminfo${props.location.hash}`}
                 >

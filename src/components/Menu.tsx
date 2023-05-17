@@ -57,7 +57,6 @@ export function Menu(props: MenuProps): JSX.Element {
                 sx={{
                     display: 'flex',
                     flexDirection: 'column',
-                    width: '200px',
                     height: '100%',
                     pt: '25px',
                     color: 'background.contrastText'

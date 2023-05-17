@@ -50,7 +50,6 @@ export function StreamPicker(props: StreamPickerProps): JSX.Element {
         <Box
             sx={{
                 backgroundColor: props.color ?? 'primary.main',
-                padding: '5px',
                 borderRadius: '20px',
                 flex: '1'
             }}

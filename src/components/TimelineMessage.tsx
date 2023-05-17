@@ -171,7 +171,7 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                     sx={{
                         alignItems: 'flex-start',
                         flex: 1,
-                        p: { xs: '5px 0', sm: '10px 0' },
+                        p: { xs: '7px 0', sm: '10px 0' },
                         height: 105,
                         gap: '10px'
                     }}
@@ -195,7 +195,7 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                 sx={{
                     alignItems: 'flex-start',
                     flex: 1,
-                    p: { xs: '5px 0', sm: '10px 0' },
+                    p: { xs: '7px 0', sm: '10px 0' },
                     wordBreak: 'break-word'
                 }}
             >
@@ -204,7 +204,7 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                         <Box
                             sx={{
                                 padding: {
-                                    xs: '10px 8px 0 0',
+                                    xs: '5px 8px 0 0',
                                     sm: '8px 10px 0 0'
                                 }
                             }}
@@ -239,7 +239,6 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                                 display: 'flex',
                                 flex: 1,
                                 flexDirection: 'column',
-                                mt: '5px',
                                 width: '100%',
                                 overflow: 'auto'
                             }}

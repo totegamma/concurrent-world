@@ -116,7 +116,7 @@ function App(): JSX.Element {
     const [emojiDict, setEmojiDict] = useState<Record<string, Emoji>>({})
     useEffect(() => {
         fetch(
-            'https://gist.githubusercontent.com/totegamma/0beb41acad70aa4945ad38a6b00a3a1d/raw/8280287c34829b51a5544bec453c1638ecacd5e6/emojis.json'
+            'https://gist.githubusercontent.com/totegamma/0beb41acad70aa4945ad38a6b00a3a1d/raw/emojis.json'
         ) // FIXME temporaly hardcoded
             .then((j) => j.json())
             .then((data) => {
@@ -325,7 +325,11 @@ function App(): JSX.Element {
                         height: '100dvh'
                     }}
                 >
-                    <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                    <Box
+                        sx={{
+                            display: { xs: 'none', sm: 'block', width: '200px' }
+                        }}
+                    >
                         <Menu streams={watchstreams} />
                     </Box>
                     <Box
@@ -422,22 +426,15 @@ function App(): JSX.Element {
                     }}
                     PaperProps={{
                         sx: {
-                            width: '50vw',
+                            width: '200px',
+                            padding: '0 5px 0 0',
                             borderRadius: '0 20px 20px 0',
                             overflow: 'hidden',
-                            padding: '0 20px',
                             backgroundColor: 'background.default'
                         }
                     }}
                 >
-                    <Box
-                        sx={{
-                            backgroundColor: 'background.default',
-                            padding: 0
-                        }}
-                    >
-                        <Menu streams={watchstreams} />
-                    </Box>
+                    <Menu streams={watchstreams} />
                 </Drawer>
             </ApplicationContext.Provider>
         </ThemeProvider>

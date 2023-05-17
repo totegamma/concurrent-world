@@ -172,7 +172,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                     overflowX: 'hidden',
                     overflowY: 'auto',
                     width: '100%',
-                    padding: { xs: '8px', sm: '20px' },
+                    padding: { xs: '8px', sm: '8px 16px' },
                     background: theme.palette.background.paper,
                     minHeight: '100%'
                 }}
@@ -185,6 +185,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                 </Box>
                 <Box sx={{ display: 'flex', flex: 1 }}>
                     <List sx={{ flex: 1, width: '100%' }}>
+                        <Divider />
                         <InfiniteScroll
                             loadMore={() => {
                                 loadMore()

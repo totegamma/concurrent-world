@@ -138,11 +138,7 @@ export function Draft(props: DraftProps): JSX.Element {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'stretch',
-                gap: '2px',
-                border: '2px solid',
-                borderRadius: '5px',
-                borderColor: 'text.disabled',
-                p: '5px'
+                borderColor: 'text.disabled'
             }}
         >
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -175,7 +171,8 @@ export function Draft(props: DraftProps): JSX.Element {
             >
                 <InputBase
                     multiline
-                    rows={6}
+                    minRows={3}
+                    maxRows={6}
                     value={draft}
                     onChange={(e) => {
                         setDraft(e.target.value)
@@ -183,7 +180,7 @@ export function Draft(props: DraftProps): JSX.Element {
                     placeholder="今、なにしてる？"
                     sx={{
                         width: 1,
-                        padding: '5px'
+                        padding: '0'
                     }}
                     onKeyDown={(e: any) => {
                         if (draft.length === 0 || draft.trim().length === 0)
@@ -241,7 +238,9 @@ export function Draft(props: DraftProps): JSX.Element {
                 }}
             >
                 <IconButton
-                    sx={{ color: theme.palette.text.secondary }}
+                    sx={{
+                        color: theme.palette.text.secondary
+                    }}
                     onClick={() => {
                         setOpenPreview(!openPreview)
                     }}
@@ -249,7 +248,9 @@ export function Draft(props: DraftProps): JSX.Element {
                     <Splitscreen sx={{ transform: 'rotate(90deg)' }} />
                 </IconButton>
                 <IconButton
-                    sx={{ color: theme.palette.text.secondary }}
+                    sx={{
+                        color: theme.palette.text.secondary
+                    }}
                     onClick={() => {
                         setSelectEmoji(!selectEmoji)
                     }}
@@ -264,9 +265,12 @@ export function Draft(props: DraftProps): JSX.Element {
                         post()
                     }}
                     sx={{
+                        padding: '4px 16px',
+                        margin: '4px 0 4px 8px',
                         '&.Mui-disabled': {
                             background: theme.palette.divider,
-                            color: theme.palette.text.disabled
+                            color: theme.palette.text.disabled,
+                            margin: '4px 0 4px 8px'
                         }
                     }}
                     endIcon={<SendIcon />}
