@@ -18,6 +18,19 @@
     transform: rotate(0deg);
 }
 
+.expandIconWrapperText {
+    align-items: center;
+    font-size: 0;
+    cursor: pointer;
+    display: flex;
+    height: 24px;
+    justify-content: center;
+    width: 12px;
+    transition: transform linear 0.1s;
+    transform: rotate(0deg);
+}
+
+
 .folderIcons {
     display: flex;
     flex-direction: row-reverse;

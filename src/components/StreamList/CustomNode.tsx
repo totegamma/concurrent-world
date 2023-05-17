@@ -9,8 +9,10 @@ import styles from './CustomNode.module.css'
 import type { NodeModel } from '@minoru/react-dnd-treeview'
 import type { Stream } from '../../model'
 import type { WatchStream } from './index'
-import { Link, useNavigate } from 'react-router-dom'
-import { ListItemButton } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
+import { styled } from '@mui/material/styles'
+
+const CustomNodeText = styled('div')(({ theme }) => ({}))
 
 interface CustomNodeProps {
     node: NodeModel<Stream>
@@ -22,7 +24,7 @@ interface CustomNodeProps {
 }
 
 export const CustomNode = (props: CustomNodeProps): JSX.Element => {
-    const indent = props.depth * 24
+    const indent = props.depth * 12
 
     const [isHovering, setIsHovering] = useState<boolean>(false)
     const [isEditing, setIsEditing] = useState<boolean>(false)
@@ -69,8 +71,50 @@ export const CustomNode = (props: CustomNodeProps): JSX.Element => {
         navigate(`/#${props.node.id}`)
     }
 
+    const isSelected = (): boolean => {
+        if (!props.node.data) return false
+        return window.location.hash === `#${props.node.id}`
+    }
+
+    const selectedStyle = isSelected()
+        ? {
+              color: 'background.default',
+              backgroundColor: 'background.contrastText',
+              borderRadius: '5px',
+              paddingLeft: '7.5px'
+          }
+        : {
+              color: 'background.contrastText',
+              backgroundColor: 'background.default',
+              paddingLeft: '7.5px'
+          }
+
+    if (props.node.data) {
+        return (
+            <div
+                className={`tree-node ${styles.root}`}
+                style={{ paddingInlineStart: indent }}
+            >
+                <div
+                    className={`${styles.expandIconWrapperText} `}
+                    onClick={handleToggle}
+                ></div>
+                <CustomNodeText
+                    className={styles.labelGridItem}
+                    onClick={handleToggle}
+                    sx={selectedStyle}
+                >
+                    <div
+                        className={styles.streamName}
+                        onClick={handleNavigate}
+                    >{`${props.node.text}`}</div>
+                </CustomNodeText>
+            </div>
+        )
+    }
+
     return (
-        <ListItemButton
+        <div
             className={`tree-node ${styles.root}`}
             style={{ paddingInlineStart: indent }}
             onMouseEnter={() => {
@@ -110,18 +154,10 @@ export const CustomNode = (props: CustomNodeProps): JSX.Element => {
             )}
             {!isEditing && (
                 <div className={styles.labelGridItem} onClick={handleToggle}>
-                    {props.node.data && (
-                        <div
-                            className={styles.streamName}
-                            onClick={handleNavigate}
-                        >{`${props.node.text}`}</div>
-                    )}
-                    {!props.node.data && (
-                        <Typography
-                            variant="body1"
-                            className={styles.folderName}
-                        >{`${props.node.text}`}</Typography>
-                    )}
+                    <Typography
+                        variant="body1"
+                        className={styles.folderName}
+                    >{`${props.node.text}`}</Typography>
                 </div>
             )}
             {!isEditing && props.node.droppable && isHovering && (
@@ -134,6 +170,6 @@ export const CustomNode = (props: CustomNodeProps): JSX.Element => {
                     <EditIcon onClick={handleEdit} fontSize={'small'} />
                 </div>
             )}
-        </ListItemButton>
+        </div>
     )
 }
