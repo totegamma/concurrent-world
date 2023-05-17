@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, createContext, useRef } from 'react'
 import { Routes, Route } from 'react-router-dom'
-import { darken, Box, Paper, ThemeProvider } from '@mui/material'
+import { darken, Box, Paper, ThemeProvider, Drawer } from '@mui/material'
 import useWebSocket from 'react-use-websocket'
 
 import { usePersistent } from './hooks/usePersistent'
@@ -91,6 +91,8 @@ function App(): JSX.Element {
     )
     const messages = useObjectList<StreamElementDated>()
     const [currentStreams, setCurrentStreams] = useState<string[]>([])
+
+    const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
 
     const { lastMessage } = useWebSocket(
         server.replace('http', 'ws') + 'socket'
@@ -357,6 +359,9 @@ function App(): JSX.Element {
                                             setCurrentStreams={
                                                 setCurrentStreams
                                             }
+                                            setMobileMenuOpen={
+                                                setMobileMenuOpen
+                                            }
                                         />
                                     }
                                 />
@@ -409,6 +414,30 @@ function App(): JSX.Element {
                         </Box>
                     </Box>
                 </Box>
+                <Drawer
+                    anchor={'left'}
+                    open={mobileMenuOpen}
+                    onClose={() => {
+                        setMobileMenuOpen(false)
+                    }}
+                    PaperProps={{
+                        sx: {
+                            width: '50vw',
+                            borderRadius: '0 20px 20px 0',
+                            overflow: 'hidden',
+                            padding: '20px'
+                        }
+                    }}
+                >
+                    <Box
+                        sx={{
+                            backgroundColor: 'background.default',
+                            padding: 0
+                        }}
+                    >
+                        <Menu streams={watchstreams} />
+                    </Box>
+                </Drawer>
             </ApplicationContext.Provider>
         </ThemeProvider>
     )

@@ -21,6 +21,7 @@ export interface TimelineProps {
     follow: (ccaddress: string) => void
     followList: string[]
     setCurrentStreams: (input: string[]) => void
+    setMobileMenuOpen: (state: boolean) => void
 }
 
 export function Timeline(props: TimelineProps): JSX.Element {
@@ -161,7 +162,11 @@ export function Timeline(props: TimelineProps): JSX.Element {
 
     return (
         <>
-            <TimelineHeader location={reactlocation} />
+            <TimelineHeader
+                location={reactlocation}
+                setMobileMenuOpen={props.setMobileMenuOpen}
+                scrollParentRef={scrollParentRef}
+            />
             <Box
                 sx={{
                     overflowX: 'hidden',
