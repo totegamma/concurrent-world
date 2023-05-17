@@ -425,7 +425,8 @@ function App(): JSX.Element {
                             width: '50vw',
                             borderRadius: '0 20px 20px 0',
                             overflow: 'hidden',
-                            padding: '20px'
+                            padding: '0 20px',
+                            backgroundColor: 'background.default'
                         }
                     }}
                 >
