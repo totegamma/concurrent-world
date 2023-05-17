@@ -212,7 +212,7 @@ export function Draft(props: DraftProps): JSX.Element {
                 <Box
                     sx={{
                         position: 'absolute',
-                        top: 250,
+                        top: 150,
                         right: { xs: 10, mb: 90 },
                         zIndex: 9
                     }}
