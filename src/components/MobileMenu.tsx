@@ -14,9 +14,10 @@ export function MobileMenu(): JSX.Element {
             <Box
                 sx={{
                     display: 'flex',
-                    height: 60,
+                    height: 49,
                     color: 'white',
-                    justifyContent: 'space-around'
+                    justifyContent: 'space-around',
+                    marginBottom: 'env(safe-area-inset-bottom)'
                 }}
             >
                 <Button
@@ -29,7 +30,7 @@ export function MobileMenu(): JSX.Element {
                 <Button
                     sx={{ color: 'background.contrastText', width: 1 }}
                     component={NavLink}
-                    to="/notification"
+                    to="/notifications"
                 >
                     <NotificationsIcon />
                 </Button>

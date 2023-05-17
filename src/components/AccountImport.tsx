@@ -52,9 +52,9 @@ export function AccountImport(): JSX.Element {
     return (
         <Paper
             sx={{
-                width: '60vw',
-                height: '600px',
-                p: '20px',
+                width: { xs: '90vw', md: '60vw' },
+                height: { xs: '90vh', md: '600px' },
+                p: '10px',
                 display: 'flex',
                 flexDirection: 'column',
                 position: 'absolute',

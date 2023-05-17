@@ -30,15 +30,41 @@ import { StreamList } from './StreamList'
 
 const branchName = branch || window.location.host.split('.')[0]
 
-export function Menu(): JSX.Element {
+export interface MenuProps {
+    streams: string[]
+    hideMenu?: boolean
+    onClick?: () => void
+}
+
+export function Menu(props: MenuProps): JSX.Element {
+    const appData = useContext(ApplicationContext)
+    const [watchStreams, setWatchStreams] = useState<Stream[]>([])
+
     const theme = useTheme<ConcurrentTheme>()
+
+    useEffect(() => {
+        ;(async () => {
+            setWatchStreams(
+                await Promise.all(
+                    props.streams.map(
+                        async (id) => await appData.streamDict.get(id)
+                    )
+                )
+            )
+        })()
+    }, [props.streams])
+
+    const iconColor =
+        appData.websocketState === 1
+            ? theme.palette.background.contrastText
+            : theme.palette.text.disabled
+
     return (
         <Box sx={{ gap: '15px', height: '100%' }}>
             <Box
                 sx={{
                     display: 'flex',
                     flexDirection: 'column',
-                    width: '200px',
                     height: '100%',
                     pt: '25px',
                     color: 'background.contrastText'
@@ -54,9 +80,9 @@ export function Menu(): JSX.Element {
                     <Box>
                         <ConcurrentLogo
                             size="32px"
-                            upperColor={theme.palette.background.contrastText}
-                            lowerColor={theme.palette.background.contrastText}
-                            frameColor={theme.palette.background.contrastText}
+                            upperColor={iconColor}
+                            lowerColor={iconColor}
+                            frameColor={iconColor}
                         />
                     </Box>
                     <Typography
@@ -87,94 +113,111 @@ export function Menu(): JSX.Element {
                     sha: {sha.slice(0, 7)}
                 </Box>
                 <Divider />
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '5px'
-                    }}
-                >
-                    <List dense sx={{ width: '100%', maxWidth: 360 }}>
-                        <ListItem disablePadding>
-                            <ListItemButton
-                                sx={{ gap: 1 }}
-                                component={Link}
-                                to="/"
-                            >
-                                <HomeIcon
-                                    sx={{ color: 'background.contrastText' }}
-                                />
+                {!props.hideMenu && (
+                    <>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '5px'
+                            }}
+                        >
+                            <List dense sx={{ width: '100%', maxWidth: 360 }}>
+                                <ListItem disablePadding>
+                                    <ListItemButton
+                                        sx={{ gap: 1 }}
+                                        component={Link}
+                                        to="/"
+                                    >
+                                        <HomeIcon
+                                            sx={{
+                                                color: 'background.contrastText'
+                                            }}
+                                        />
 
-                                <ListItemText primary="Home" />
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton
-                                sx={{ gap: 1 }}
-                                component={Link}
-                                to="/notifications"
-                            >
-                                <NotificationsIcon
-                                    sx={{ color: 'background.contrastText' }}
-                                />
+                                        <ListItemText primary="Home" />
+                                    </ListItemButton>
+                                </ListItem>
+                                <ListItem disablePadding>
+                                    <ListItemButton
+                                        sx={{ gap: 1 }}
+                                        component={Link}
+                                        to="/notifications"
+                                    >
+                                        <NotificationsIcon
+                                            sx={{
+                                                color: 'background.contrastText'
+                                            }}
+                                        />
 
-                                <ListItemText primary="Notifications" />
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton
-                                sx={{ gap: 1 }}
-                                component={Link}
-                                to="/associations"
-                            >
-                                <MessageIcon
-                                    sx={{ color: 'background.contrastText' }}
-                                />
+                                        <ListItemText primary="Notifications" />
+                                    </ListItemButton>
+                                </ListItem>
+                                <ListItem disablePadding>
+                                    <ListItemButton
+                                        sx={{ gap: 1 }}
+                                        component={Link}
+                                        to="/associations"
+                                    >
+                                        <MessageIcon
+                                            sx={{
+                                                color: 'background.contrastText'
+                                            }}
+                                        />
 
-                                <ListItemText primary="Associations" />
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton
-                                sx={{ gap: 1 }}
-                                component={Link}
-                                to="/explorer"
-                            >
-                                <ExploreIcon
-                                    sx={{ color: 'background.contrastText' }}
-                                />
+                                        <ListItemText primary="Associations" />
+                                    </ListItemButton>
+                                </ListItem>
+                                <ListItem disablePadding>
+                                    <ListItemButton
+                                        sx={{ gap: 1 }}
+                                        component={Link}
+                                        to="/explorer"
+                                    >
+                                        <ExploreIcon
+                                            sx={{
+                                                color: 'background.contrastText'
+                                            }}
+                                        />
 
-                                <ListItemText primary="Explorer" />
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton
-                                sx={{ gap: 1 }}
-                                component={Link}
-                                to="/identity"
-                            >
-                                <BadgeIcon
-                                    sx={{ color: 'background.contrastText' }}
-                                />
+                                        <ListItemText primary="Explorer" />
+                                    </ListItemButton>
+                                </ListItem>
+                                <ListItem disablePadding>
+                                    <ListItemButton
+                                        sx={{ gap: 1 }}
+                                        component={Link}
+                                        to="/identity"
+                                    >
+                                        <BadgeIcon
+                                            sx={{
+                                                color: 'background.contrastText'
+                                            }}
+                                        />
 
-                                <ListItemText primary="Identity" />
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton
-                                sx={{ gap: 1 }}
-                                component={Link}
-                                to="/settings"
-                            >
-                                <SettingsIcon
-                                    sx={{ color: 'background.contrastText' }}
-                                />
+                                        <ListItemText primary="Identity" />
+                                    </ListItemButton>
+                                </ListItem>
+                                <ListItem disablePadding>
+                                    <ListItemButton
+                                        sx={{ gap: 1 }}
+                                        component={Link}
+                                        to="/settings"
+                                    >
+                                        <SettingsIcon
+                                            sx={{
+                                                color: 'background.contrastText'
+                                            }}
+                                        />
 
-                                <ListItemText primary="Settings" />
-                            </ListItemButton>
-                        </ListItem>
-                    </List>
-                </Box>
+                                        <ListItemText primary="Settings" />
+                                    </ListItemButton>
+                                </ListItem>
+                            </List>
+                        </Box>
+                        <Divider />
+                    </>
+                )}
                 <Divider />
                 <StreamList />
             </Box>

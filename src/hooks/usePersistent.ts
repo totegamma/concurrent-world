@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 function parseJsonSafely(input: string): any {
     let parsed: any = null
     try {
@@ -17,10 +17,10 @@ export function usePersistent<T>(
         parseJsonSafely(localStorage.getItem(key) ?? 'null') ?? init
     )
 
-    const update = (newValue: T): void => {
+    const update = useCallback((newValue: T): void => {
         setValue(newValue)
         localStorage.setItem(key, JSON.stringify(newValue))
-    }
+    }, [])
 
     return [value, update]
 }
