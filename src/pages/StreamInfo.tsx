@@ -69,9 +69,22 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
 
     useEffect(() => {
         Promise.all(
-            props.followList.map((ccaddress) => appData.userDict.get(ccaddress))
+            props.followList.map((ccaddress) =>
+                appData.userDict.get(ccaddress).then((e) =>
+                    e.avatar
+                        ? e
+                        : {
+                              ccaddress,
+                              username: 'anonymous',
+                              avatar: '',
+                              description: '',
+                              homestream: '',
+                              notificationstream: ''
+                          }
+                )
+            )
         ).then((e) => {
-            setFollowList(e.filter((e) => e.ccaddress))
+            setFollowList(e)
         })
     }, [props.followList])
 

@@ -97,7 +97,20 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                     setHasOwnReaction(false)
                 }
                 const users = await Promise.all(
-                    authors.map((a) => props.userDict.get(a))
+                    authors.map((a) =>
+                        props.userDict.get(a).then((e) =>
+                            e.ccaddress
+                                ? e
+                                : {
+                                      ccaddress: a,
+                                      username: 'anonymous',
+                                      avatar: '',
+                                      description: '',
+                                      homestream: '',
+                                      notificationstream: ''
+                                  }
+                        )
+                    )
                 )
                 setReactUsers(users)
             }
@@ -323,6 +336,7 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                                                             identiconSource={
                                                                 user.ccaddress
                                                             }
+                                                            alt={user.ccaddress}
                                                         />
                                                         {user.username}
                                                     </Box>
