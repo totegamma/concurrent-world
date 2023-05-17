@@ -30,7 +30,7 @@ export function MobileMenu(): JSX.Element {
                 <Button
                     sx={{ color: 'background.contrastText', width: 1 }}
                     component={NavLink}
-                    to="/notification"
+                    to="/notifications"
                 >
                     <NotificationsIcon />
                 </Button>

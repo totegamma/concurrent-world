@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, createContext, useRef } from 'react'
 import { Routes, Route } from 'react-router-dom'
-import { darken, Box, Paper, ThemeProvider } from '@mui/material'
-import useWebSocket from 'react-use-websocket'
+import { darken, Box, Paper, ThemeProvider, Drawer } from '@mui/material'
+import useWebSocket, { type ReadyState } from 'react-use-websocket'
 
 import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
@@ -36,6 +36,7 @@ import {
 import Sound from './resources/Bubble.wav'
 import useSound from 'use-sound'
 import { MobileMenu } from './components/MobileMenu'
+import { StreamInfo } from './pages/StreamInfo'
 
 export const ApplicationContext = createContext<appData>({
     serverAddress: '',
@@ -53,7 +54,8 @@ export const ApplicationContext = createContext<appData>({
     emojiDict: {},
     streamDict: dummyResourceManager,
     userDict: dummyResourceManager,
-    messageDict: dummyResourceManager
+    messageDict: dummyResourceManager,
+    websocketState: -1
 })
 
 export interface appData {
@@ -66,6 +68,7 @@ export interface appData {
     streamDict: IuseResourceManager<Stream>
     userDict: IuseResourceManager<User>
     messageDict: IuseResourceManager<RTMMessage>
+    websocketState: ReadyState
 }
 
 function App(): JSX.Element {
@@ -89,11 +92,17 @@ function App(): JSX.Element {
         createConcurrentTheme(themeName)
     )
     const messages = useObjectList<StreamElementDated>()
-    const [currentStreams, setCurrentStreams] = useState<string>('common')
-    const currentStreamsRef = useRef<string>(currentStreams)
+    const [currentStreams, setCurrentStreams] = useState<string[]>([])
 
-    const { lastMessage } = useWebSocket(
-        server.replace('http', 'ws') + 'socket'
+    const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
+
+    const { lastMessage, readyState } = useWebSocket(
+        server.replace('http', 'ws') + 'socket',
+        {
+            shouldReconnect: (_) => true,
+            reconnectInterval: (attempt) =>
+                Math.min(Math.pow(2, attempt) * 1000, 10000)
+        }
     )
 
     const [playNotification] = useSound(Sound)
@@ -114,7 +123,7 @@ function App(): JSX.Element {
     const [emojiDict, setEmojiDict] = useState<Record<string, Emoji>>({})
     useEffect(() => {
         fetch(
-            'https://gist.githubusercontent.com/totegamma/0beb41acad70aa4945ad38a6b00a3a1d/raw/8280287c34829b51a5544bec453c1638ecacd5e6/emojis.json'
+            'https://gist.githubusercontent.com/totegamma/0beb41acad70aa4945ad38a6b00a3a1d/raw/emojis.json'
         ) // FIXME temporaly hardcoded
             .then((j) => j.json())
             .then((data) => {
@@ -218,7 +227,7 @@ function App(): JSX.Element {
                         ) {
                             return
                         }
-                        const groupA = currentStreamsRef.current.split(',')
+                        const groupA = currentStreams
                         const groupB = message.streams.split(',')
                         if (!groupA.some((e) => groupB.includes(e))) return
                         const current = new Date().getTime()
@@ -280,10 +289,6 @@ function App(): JSX.Element {
     }, [lastMessage])
 
     useEffect(() => {
-        currentStreamsRef.current = currentStreams
-    }, [currentStreams])
-
-    useEffect(() => {
         const newtheme = createConcurrentTheme(themeName)
         setTheme(newtheme)
         let themeColorMetaTag: HTMLMetaElement = document.querySelector(
@@ -309,7 +314,8 @@ function App(): JSX.Element {
                     profile,
                     streamDict,
                     userDict,
-                    messageDict
+                    messageDict,
+                    websocketState: readyState
                 }}
             >
                 <Box
@@ -327,7 +333,11 @@ function App(): JSX.Element {
                         height: '100dvh'
                     }}
                 >
-                    <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                    <Box
+                        sx={{
+                            display: { xs: 'none', sm: 'block', width: '200px' }
+                        }}
+                    >
                         <Menu streams={watchstreams} />
                     </Box>
                     <Box
@@ -361,7 +371,9 @@ function App(): JSX.Element {
                                             setCurrentStreams={
                                                 setCurrentStreams
                                             }
-                                            watchstreams={watchstreams}
+                                            setMobileMenuOpen={
+                                                setMobileMenuOpen
+                                            }
                                         />
                                     }
                                 />
@@ -375,8 +387,6 @@ function App(): JSX.Element {
                                         <Explorer
                                             watchList={watchstreams}
                                             setWatchList={setWatchStreams}
-                                            followList={followList}
-                                            setFollowList={setFollowList}
                                         />
                                     }
                                 />
@@ -400,6 +410,15 @@ function App(): JSX.Element {
                                         />
                                     }
                                 />
+                                <Route
+                                    path="/streaminfo"
+                                    element={
+                                        <StreamInfo
+                                            followList={followList}
+                                            setFollowList={setFollowList}
+                                        />
+                                    }
+                                />
                             </Routes>
                         </Paper>
                         <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
@@ -407,6 +426,30 @@ function App(): JSX.Element {
                         </Box>
                     </Box>
                 </Box>
+                <Drawer
+                    anchor={'left'}
+                    open={mobileMenuOpen}
+                    onClose={() => {
+                        setMobileMenuOpen(false)
+                    }}
+                    PaperProps={{
+                        sx: {
+                            width: '200px',
+                            padding: '0 5px 0 0',
+                            borderRadius: '0 20px 20px 0',
+                            overflow: 'hidden',
+                            backgroundColor: 'background.default'
+                        }
+                    }}
+                >
+                    <Menu
+                        streams={watchstreams}
+                        onClick={() => {
+                            setMobileMenuOpen(false)
+                        }}
+                        hideMenu
+                    />
+                </Drawer>
             </ApplicationContext.Provider>
         </ThemeProvider>
     )

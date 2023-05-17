@@ -12,6 +12,7 @@ interface ProfileEditorProps {
     userAddress: string
     privatekey: string
     serverAddress: string
+    onSubmit?: () => void
 }
 
 export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
@@ -111,7 +112,7 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
             .then(async (res) => await res.json())
             .then((data) => {
                 console.log(data)
-                // reload();
+                props.onSubmit?.()
             })
     }
 

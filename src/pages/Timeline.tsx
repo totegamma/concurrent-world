@@ -10,17 +10,18 @@ import { TimelineMessage } from '../components/TimelineMessage'
 import type { RTMMessage, StreamElement, StreamElementDated } from '../model'
 import { type IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'
-import { StreamsBar } from '../components/StreamsBar'
 import { useLocation } from 'react-router-dom'
 import { ApplicationContext } from '../App'
 import InfiniteScroll from 'react-infinite-scroller'
+import { usePersistent } from '../hooks/usePersistent'
+import { TimelineHeader } from '../components/TimelineHeader'
 
 export interface TimelineProps {
     messages: IuseObjectList<StreamElementDated>
     follow: (ccaddress: string) => void
     followList: string[]
-    setCurrentStreams: (input: string) => void
-    watchstreams: string[]
+    setCurrentStreams: (input: string[]) => void
+    setMobileMenuOpen: (state: boolean) => void
 }
 
 export function Timeline(props: TimelineProps): JSX.Element {
@@ -31,6 +32,8 @@ export function Timeline(props: TimelineProps): JSX.Element {
     const scrollParentRef = useRef<HTMLDivElement>(null)
     const [hasMoreData, setHasMoreData] = useState<boolean>(false)
     const [inspectItem, setInspectItem] = useState<RTMMessage | null>(null)
+
+    const [followStreams] = usePersistent<string[]>('followStreams', [])
 
     const reload = useCallback(async () => {
         let homequery = ''
@@ -46,6 +49,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                 )
             )
                 .filter((e) => e)
+                .concat(followStreams)
                 .join(',')
         }
         const url =
@@ -91,6 +95,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                 )
             )
                 .filter((e) => e)
+                .concat(followStreams)
                 .join(',')
         }
         const url =
@@ -132,7 +137,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
     useEffect(() => {
         ;(async () => {
             reload()
-            let homequery = ''
+            let homequery: string[] = []
             if (!reactlocation.hash) {
                 homequery = (
                     await Promise.all(
@@ -143,14 +148,13 @@ export function Timeline(props: TimelineProps): JSX.Element {
                                 ).homestream
                         )
                     )
-                )
-                    .filter((e) => e)
-                    .join(',')
+                ).filter((e) => e)
             }
             props.setCurrentStreams(
-                reactlocation.hash
-                    ? reactlocation.hash.replace('#', '')
+                (reactlocation.hash
+                    ? reactlocation.hash.replace('#', '').split(',')
                     : homequery
+                ).concat(followStreams)
             )
         })()
         scrollParentRef.current?.scroll({ top: 0 })
@@ -158,13 +162,17 @@ export function Timeline(props: TimelineProps): JSX.Element {
 
     return (
         <>
-            <StreamsBar location={reactlocation} />
+            <TimelineHeader
+                location={reactlocation}
+                setMobileMenuOpen={props.setMobileMenuOpen}
+                scrollParentRef={scrollParentRef}
+            />
             <Box
                 sx={{
                     overflowX: 'hidden',
                     overflowY: 'auto',
                     width: '100%',
-                    padding: { xs: '8px', sm: '20px' },
+                    padding: { xs: '8px', sm: '8px 16px' },
                     background: theme.palette.background.paper,
                     minHeight: '100%'
                 }}
@@ -175,41 +183,56 @@ export function Timeline(props: TimelineProps): JSX.Element {
                         currentStreams={reactlocation.hash.replace('#', '')}
                     />
                 </Box>
-                <Box sx={{ display: 'flex', flex: 1 }}>
-                    <List sx={{ flex: 1, width: '100%' }}>
-                        <InfiniteScroll
-                            loadMore={() => {
-                                loadMore()
-                            }}
-                            hasMore={hasMoreData}
-                            loader={<>Loading...</>}
-                            useWindow={false}
-                            getScrollParent={() => scrollParentRef.current}
-                        >
-                            {props.messages.current.map((e) => (
-                                <React.Fragment key={e.Values.id}>
-                                    <TimelineMessage
-                                        message={e.Values.id}
-                                        lastUpdated={e.LastUpdated}
-                                        setInspectItem={setInspectItem}
-                                        follow={props.follow}
-                                        messageDict={appData.messageDict}
-                                        userDict={appData.userDict}
-                                        streamDict={appData.streamDict}
-                                        userAddress={appData.userAddress}
-                                        privatekey={appData.privatekey}
-                                        serverAddress={appData.serverAddress}
-                                    />
-                                    <Divider
-                                        variant="inset"
-                                        component="li"
-                                        sx={{ margin: '0 5px' }}
-                                    />
-                                </React.Fragment>
-                            ))}
-                        </InfiniteScroll>
-                    </List>
-                </Box>
+                {(reactlocation.hash === '' || reactlocation.hash === '#') &&
+                followStreams.length === 0 &&
+                props.followList.length === 0 ? (
+                    <Box>
+                        まだ誰も、どのストリームもフォローしていません。右上のiボタンを押してみましょう。
+                    </Box>
+                ) : (
+                    <Box sx={{ display: 'flex', flex: 1 }}>
+                        <List sx={{ flex: 1, width: '100%' }}>
+                            <Divider />
+                            <InfiniteScroll
+                                loadMore={() => {
+                                    loadMore()
+                                }}
+                                hasMore={hasMoreData}
+                                loader={
+                                    <React.Fragment key={0}>
+                                        Loading...
+                                    </React.Fragment>
+                                }
+                                useWindow={false}
+                                getScrollParent={() => scrollParentRef.current}
+                            >
+                                {props.messages.current.map((e) => (
+                                    <React.Fragment key={e.Values.id}>
+                                        <TimelineMessage
+                                            message={e.Values.id}
+                                            lastUpdated={e.LastUpdated}
+                                            setInspectItem={setInspectItem}
+                                            follow={props.follow}
+                                            messageDict={appData.messageDict}
+                                            userDict={appData.userDict}
+                                            streamDict={appData.streamDict}
+                                            userAddress={appData.userAddress}
+                                            privatekey={appData.privatekey}
+                                            serverAddress={
+                                                appData.serverAddress
+                                            }
+                                        />
+                                        <Divider
+                                            variant="inset"
+                                            component="li"
+                                            sx={{ margin: '0 5px' }}
+                                        />
+                                    </React.Fragment>
+                                ))}
+                            </InfiniteScroll>
+                        </List>
+                    </Box>
+                )}
             </Box>
             <Drawer
                 anchor={'right'}
@@ -238,6 +261,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                     <Typography>Author: {inspectItem?.author}</Typography>
                     <Typography>Schema: {inspectItem?.schema}</Typography>
                     <Typography>Signature: {inspectItem?.signature}</Typography>
+                    <Typography>Streams: {inspectItem?.streams}</Typography>
                     <Typography>Created: {inspectItem?.cdate}</Typography>
                     <Typography>Payload:</Typography>
                     <pre style={{ overflowX: 'scroll' }}>

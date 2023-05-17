@@ -5,18 +5,21 @@ import StepLabel from '@mui/material/StepLabel'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import Paper from '@mui/material/Paper'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Mnemonic, randomBytes, HDNodeWallet } from 'ethers'
 import { LangJa } from '../utils/lang-ja'
 import { useNavigate } from 'react-router-dom'
 import TextField from '@mui/material/TextField'
 import Divider from '@mui/material/Divider'
 import { ProfileEditor } from './ProfileEditor'
+import { MobileStepper } from '@mui/material'
+import { KeyboardArrowLeft, KeyboardArrowRight } from '@mui/icons-material'
 
 export function Registration(): JSX.Element {
     const navigate = useNavigate()
     const [activeStep, setActiveStep] = useState(0)
     const [mnemonicTest, setMnemonicTest] = useState<string>('')
+    const [profileSubmitted, setProfileSubmitted] = useState<boolean>(false)
 
     const entrophy = useMemo(() => randomBytes(16), [])
     const mnemonic = useMemo(
@@ -132,6 +135,9 @@ export function Registration(): JSX.Element {
                 userAddress={userAddress}
                 privatekey={privateKey}
                 serverAddress={server}
+                onSubmit={() => {
+                    setProfileSubmitted(true)
+                }}
             />
         </>
     )
@@ -159,6 +165,10 @@ export function Registration(): JSX.Element {
         }
     ]
 
+    const [stepOK, setStepOK] = useState<boolean[]>(
+        new Array(steps.length).fill(false)
+    )
+
     const handleNext = (): void => {
         setActiveStep((prevActiveStep) => prevActiveStep + 1)
     }
@@ -167,23 +177,40 @@ export function Registration(): JSX.Element {
         setActiveStep((prevActiveStep) => prevActiveStep - 1)
     }
 
+    useEffect(() => {
+        setStepOK([
+            true,
+            true,
+            mnemonic.phrase === mnemonicTest,
+            (server.startsWith('http://') || server.startsWith('https://')) &&
+                server.endsWith('/'),
+            profileSubmitted
+        ])
+    }, [mnemonicTest, server, profileSubmitted])
+
     return (
         <Paper
             sx={{
-                width: '60vw',
-                height: '600px',
-                p: '20px',
+                width: { xs: '90vw', md: '60vw' },
+                height: { xs: '90vh', md: '600px' },
+                p: '10px',
                 display: 'flex',
                 flexDirection: 'column',
                 position: 'absolute',
                 top: '50%',
                 left: '50%',
-                transform: 'translate(-50%, -50%)'
+                transform: 'translate(-50%, -50%)',
+                overflow: 'hidden'
             }}
         >
             <Typography>Concurrentアカウントセットアップウィザード</Typography>
-            <Stepper activeStep={activeStep}>
-                {steps.map((step, index) => {
+            <Stepper /* for Desktop */
+                sx={{
+                    display: { xs: 'none', md: 'flex' }
+                }}
+                activeStep={activeStep}
+            >
+                {steps.map((step, _) => {
                     const stepProps: { completed?: boolean } = {}
                     const labelProps: {
                         optional?: React.ReactNode
@@ -195,6 +222,22 @@ export function Registration(): JSX.Element {
                     )
                 })}
             </Stepper>
+            {activeStep < steps.length && (
+                <Paper /* for Mobile */
+                    square
+                    elevation={0}
+                    sx={{
+                        alignItems: 'center',
+                        height: 50,
+                        display: { xs: 'flex', md: 'none' },
+                        pl: 2,
+                        backgroundColor: 'background.default'
+                    }}
+                >
+                    <Typography>{steps[activeStep].title}</Typography>
+                </Paper>
+            )}
+
             {activeStep === steps.length ? (
                 <>
                     <Typography sx={{ mt: 2, mb: 1 }}>
@@ -202,7 +245,7 @@ export function Registration(): JSX.Element {
                     </Typography>
                     <Box
                         sx={{
-                            display: 'flex',
+                            display: { xs: 'none', md: 'flex' },
                             flexDirection: 'row',
                             pt: 2
                         }}
@@ -215,10 +258,12 @@ export function Registration(): JSX.Element {
                 </>
             ) : (
                 <>
-                    <Box sx={{ flex: 1 }}>{steps[activeStep].component}</Box>
+                    <Box sx={{ flex: 1, overflowY: 'auto' }}>
+                        {steps[activeStep].component}
+                    </Box>
                     <Box
                         sx={{
-                            display: 'flex',
+                            display: { xs: 'none', md: 'flex' },
                             flexDirection: 'row',
                             pt: 2
                         }}
@@ -232,7 +277,11 @@ export function Registration(): JSX.Element {
                             Back
                         </Button>
                         <Box sx={{ flex: '1 1 auto' }} />
-                        <Button variant="contained" onClick={handleNext}>
+                        <Button
+                            variant="contained"
+                            onClick={handleNext}
+                            disabled={!stepOK[activeStep]}
+                        >
                             {activeStep === steps.length - 1
                                 ? 'Finish'
                                 : 'Next'}
@@ -240,6 +289,41 @@ export function Registration(): JSX.Element {
                     </Box>
                 </>
             )}
+            <MobileStepper
+                sx={{
+                    display: { xs: 'flex', md: 'none' }
+                }}
+                variant="text"
+                steps={steps.length}
+                position="static"
+                activeStep={activeStep}
+                nextButton={
+                    activeStep === steps.length ? (
+                        <Button variant="contained" onClick={setupAccount}>
+                            GO!
+                        </Button>
+                    ) : (
+                        <Button
+                            size="small"
+                            onClick={handleNext}
+                            disabled={!stepOK[activeStep]}
+                        >
+                            Next
+                            <KeyboardArrowRight />
+                        </Button>
+                    )
+                }
+                backButton={
+                    <Button
+                        size="small"
+                        onClick={handleBack}
+                        disabled={activeStep === 0}
+                    >
+                        <KeyboardArrowLeft />
+                        Back
+                    </Button>
+                }
+            />
         </Paper>
     )
 }

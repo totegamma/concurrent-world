@@ -1,11 +1,9 @@
 import {
-    Avatar,
     Box,
     Button,
     Divider,
     List,
     ListItem,
-    ListItemAvatar,
     ListItemButton,
     ListItemIcon,
     ListItemText,
@@ -17,13 +15,11 @@ import { useContext, useEffect, useState } from 'react'
 import { ApplicationContext } from '../App'
 import StarIcon from '@mui/icons-material/Star'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
-import type { Stream, User } from '../model'
+import type { Stream } from '../model'
 import { Sign } from '../util'
 
 export interface ExplorerProps {
     watchList: string[]
-    followList: string[]
-    setFollowList: (newlist: string[]) => void
     setWatchList: (newlist: string[]) => void
 }
 
@@ -32,7 +28,6 @@ export function Explorer(props: ExplorerProps): JSX.Element {
 
     const appData = useContext(ApplicationContext)
     const [streams, setStreams] = useState<Stream[]>([])
-    const [followList, setFollowList] = useState<User[]>([])
     const [newStreamName, setNewStreamName] = useState<string>('')
 
     const loadStreams = (): void => {
@@ -79,23 +74,6 @@ export function Explorer(props: ExplorerProps): JSX.Element {
     useEffect(() => {
         loadStreams()
     }, [])
-
-    useEffect(() => {
-        ;(async () => {
-            setFollowList(
-                await Promise.all(
-                    props.followList.map(
-                        async (ccaddress) =>
-                            await appData.userDict.get(ccaddress)
-                    )
-                )
-            )
-        })()
-    }, [props.followList])
-
-    const unfollow = (ccaddress: string): void => {
-        props.setFollowList(props.followList.filter((e) => e !== ccaddress))
-    }
 
     return (
         <Box
@@ -183,40 +161,6 @@ export function Explorer(props: ExplorerProps): JSX.Element {
                         </ListItem>
                     )
                 })}
-            </List>
-            <Typography variant="h3" gutterBottom>
-                followlist
-            </Typography>
-            <List
-                dense
-                sx={{
-                    width: '100%',
-                    maxWidth: 360,
-                    bgcolor: 'background.paper'
-                }}
-            >
-                {followList.map((user) => (
-                    <ListItem
-                        key={user.ccaddress}
-                        secondaryAction={
-                            <Button
-                                onClick={() => {
-                                    unfollow(user.ccaddress)
-                                }}
-                            >
-                                unfollow
-                            </Button>
-                        }
-                        disablePadding
-                    >
-                        <ListItemButton>
-                            <ListItemAvatar>
-                                <Avatar src={user.avatar} />
-                            </ListItemAvatar>
-                            <ListItemText primary={user.username} />
-                        </ListItemButton>
-                    </ListItem>
-                ))}
             </List>
         </Box>
     )
