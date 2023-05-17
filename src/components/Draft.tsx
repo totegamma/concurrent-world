@@ -5,8 +5,7 @@ import {
     Button,
     useTheme,
     IconButton,
-    Divider,
-    Typography
+    Divider
 } from '@mui/material'
 import { Sign } from '../util'
 import { ApplicationContext } from '../App'
@@ -193,7 +192,7 @@ export function Draft(props: DraftProps): JSX.Element {
                         }
                     }}
                 />
-                {!openPreview || (
+                {openPreview && (
                     <>
                         <Divider orientation="vertical" />
                         <Box
@@ -209,7 +208,7 @@ export function Draft(props: DraftProps): JSX.Element {
                     </>
                 )}
             </Box>
-            {!selectEmoji || (
+            {selectEmoji && (
                 <Box
                     sx={{
                         position: 'absolute',
