@@ -218,7 +218,6 @@ export function Menu(props: MenuProps): JSX.Element {
                         <Divider />
                     </>
                 )}
-                <Divider />
                 <StreamList />
             </Box>
         </Box>
