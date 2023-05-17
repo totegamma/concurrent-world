@@ -8,7 +8,7 @@ import { AccountImport } from '../components/AccountImport'
 import { usePersistent } from '../hooks/usePersistent'
 import type { ConcurrentTheme } from '../model'
 
-export function Welcome(): JSX.Element {
+export default function Welcome(): JSX.Element {
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue2')
     const [theme, setTheme] = useState<ConcurrentTheme>(
         createConcurrentTheme(themeName)
