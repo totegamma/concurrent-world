@@ -10,19 +10,17 @@ import { TimelineMessage } from '../components/TimelineMessage'
 import type { RTMMessage, StreamElement, StreamElementDated } from '../model'
 import { type IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'
-import { StreamsBar } from '../components/StreamsBar'
 import { useLocation } from 'react-router-dom'
 import { ApplicationContext } from '../App'
 import InfiniteScroll from 'react-infinite-scroller'
 import { usePersistent } from '../hooks/usePersistent'
+import { TimelineHeader } from '../components/TimelineHeader'
 
 export interface TimelineProps {
     messages: IuseObjectList<StreamElementDated>
     follow: (ccaddress: string) => void
     followList: string[]
-    setFollowList: (newlist: string[]) => void
     setCurrentStreams: (input: string[]) => void
-    watchstreams: string[]
 }
 
 export function Timeline(props: TimelineProps): JSX.Element {
@@ -163,11 +161,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
 
     return (
         <>
-            <StreamsBar
-                location={reactlocation}
-                followList={props.followList}
-                setFollowList={props.setFollowList}
-            />
+            <TimelineHeader location={reactlocation} />
             <Box
                 sx={{
                     overflowX: 'hidden',

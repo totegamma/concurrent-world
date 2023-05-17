@@ -5,13 +5,11 @@ import InfoIcon from '@mui/icons-material/Info'
 import { Link, type Location as ReactLocation } from 'react-router-dom'
 import { ApplicationContext } from '../App'
 
-export interface StreamsBarProps {
+export interface TimelineHeaderProps {
     location: ReactLocation
-    followList: string[]
-    setFollowList: (newlist: string[]) => void
 }
 
-export function StreamsBar(props: StreamsBarProps): JSX.Element {
+export function TimelineHeader(props: TimelineHeaderProps): JSX.Element {
     const appData = useContext(ApplicationContext)
     const theme = useTheme()
 
@@ -28,7 +26,6 @@ export function StreamsBar(props: StreamsBarProps): JSX.Element {
                 .split(',')
                 .map((e) => appData.streamDict.get(e))
         ).then((a) => {
-            console.log(a)
             setTitle(
                 a
                     .map((e) => e.meta)
