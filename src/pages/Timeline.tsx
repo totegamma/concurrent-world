@@ -183,46 +183,56 @@ export function Timeline(props: TimelineProps): JSX.Element {
                         currentStreams={reactlocation.hash.replace('#', '')}
                     />
                 </Box>
-                <Box sx={{ display: 'flex', flex: 1 }}>
-                    <List sx={{ flex: 1, width: '100%' }}>
-                        <Divider />
-                        <InfiniteScroll
-                            loadMore={() => {
-                                loadMore()
-                            }}
-                            hasMore={hasMoreData}
-                            loader={
-                                <React.Fragment key={0}>
-                                    Loading...
-                                </React.Fragment>
-                            }
-                            useWindow={false}
-                            getScrollParent={() => scrollParentRef.current}
-                        >
-                            {props.messages.current.map((e) => (
-                                <React.Fragment key={e.Values.id}>
-                                    <TimelineMessage
-                                        message={e.Values.id}
-                                        lastUpdated={e.LastUpdated}
-                                        setInspectItem={setInspectItem}
-                                        follow={props.follow}
-                                        messageDict={appData.messageDict}
-                                        userDict={appData.userDict}
-                                        streamDict={appData.streamDict}
-                                        userAddress={appData.userAddress}
-                                        privatekey={appData.privatekey}
-                                        serverAddress={appData.serverAddress}
-                                    />
-                                    <Divider
-                                        variant="inset"
-                                        component="li"
-                                        sx={{ margin: '0 5px' }}
-                                    />
-                                </React.Fragment>
-                            ))}
-                        </InfiniteScroll>
-                    </List>
-                </Box>
+                {(reactlocation.hash === '' || reactlocation.hash === '#') &&
+                followStreams.length === 0 &&
+                props.followList.length === 0 ? (
+                    <Box>
+                        まだ誰も、どのストリームもフォローしていません。右上のiボタンを押してみましょう。
+                    </Box>
+                ) : (
+                    <Box sx={{ display: 'flex', flex: 1 }}>
+                        <List sx={{ flex: 1, width: '100%' }}>
+                            <Divider />
+                            <InfiniteScroll
+                                loadMore={() => {
+                                    loadMore()
+                                }}
+                                hasMore={hasMoreData}
+                                loader={
+                                    <React.Fragment key={0}>
+                                        Loading...
+                                    </React.Fragment>
+                                }
+                                useWindow={false}
+                                getScrollParent={() => scrollParentRef.current}
+                            >
+                                {props.messages.current.map((e) => (
+                                    <React.Fragment key={e.Values.id}>
+                                        <TimelineMessage
+                                            message={e.Values.id}
+                                            lastUpdated={e.LastUpdated}
+                                            setInspectItem={setInspectItem}
+                                            follow={props.follow}
+                                            messageDict={appData.messageDict}
+                                            userDict={appData.userDict}
+                                            streamDict={appData.streamDict}
+                                            userAddress={appData.userAddress}
+                                            privatekey={appData.privatekey}
+                                            serverAddress={
+                                                appData.serverAddress
+                                            }
+                                        />
+                                        <Divider
+                                            variant="inset"
+                                            component="li"
+                                            sx={{ margin: '0 5px' }}
+                                        />
+                                    </React.Fragment>
+                                ))}
+                            </InfiniteScroll>
+                        </List>
+                    </Box>
+                )}
             </Box>
             <Drawer
                 anchor={'right'}

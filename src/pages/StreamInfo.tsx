@@ -98,6 +98,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                 <>
                     <Typography variant="h2">Navigator Settings</Typography>
                     <Divider />
+                    ストリームをフォローするためには、まずExplorerタブでフォロー候補のストリームをお気に入り登録する必要があります。
                     <Tabs
                         value={tab}
                         onChange={(_, index) => {
@@ -169,6 +170,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                                 selected={defaultPostNonHome}
                                 setSelected={setDefaultPostNonHome}
                             />
+                            <Divider />
                         </Box>
                     )}
                 </>
