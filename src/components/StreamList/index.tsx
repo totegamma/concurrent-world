@@ -28,9 +28,6 @@ import { usePersistent } from '../../hooks/usePersistent'
 
 import { v4 as uuidv4 } from 'uuid'
 import PercentIcon from '@mui/icons-material/Percent'
-import * as stream from 'stream'
-import { Link } from 'react-router-dom'
-
 export interface WatchStream {
     id: number | string
     parent: number

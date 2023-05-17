@@ -70,7 +70,7 @@ export const CustomNode = (props: CustomNodeProps): JSX.Element => {
     }
 
     return (
-        <div
+        <ListItemButton
             className={`tree-node ${styles.root}`}
             style={{ paddingInlineStart: indent }}
             onMouseEnter={() => {
@@ -111,11 +111,10 @@ export const CustomNode = (props: CustomNodeProps): JSX.Element => {
             {!isEditing && (
                 <div className={styles.labelGridItem} onClick={handleToggle}>
                     {props.node.data && (
-                        <ListItemButton
+                        <div
                             className={styles.streamName}
-                            sx={{ padding: '0px' }}
                             onClick={handleNavigate}
-                        >{`${props.node.text}`}</ListItemButton>
+                        >{`${props.node.text}`}</div>
                     )}
                     {!props.node.data && (
                         <Typography
@@ -135,6 +134,6 @@ export const CustomNode = (props: CustomNodeProps): JSX.Element => {
                     <EditIcon onClick={handleEdit} fontSize={'small'} />
                 </div>
             )}
-        </div>
+        </ListItemButton>
     )
 }

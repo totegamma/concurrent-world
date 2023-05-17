@@ -1,6 +1,6 @@
 .root {
     align-items: center;
-    display: grid;
+    display: flex;
     grid-template-columns: auto auto 1fr auto;
     height: 32px;
     width: 100%;
@@ -41,6 +41,7 @@
 
 .labelGridItem {
     min-width: 0;
+    flex: 1;
 }
 
 .streamName {
