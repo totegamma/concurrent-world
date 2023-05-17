@@ -22,7 +22,6 @@ export interface TimelineProps {
     followList: string[]
     setCurrentStreams: (input: string[]) => void
     setMobileMenuOpen: (state: boolean) => void
-    setCurrentStreams: (input: string) => void
 }
 
 export function Timeline(props: TimelineProps): JSX.Element {

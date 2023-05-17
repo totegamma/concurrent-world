@@ -5,7 +5,7 @@ import {
     MultiBackend,
     Tree
 } from '@minoru/react-dnd-treeview'
-import { CreateNewFolder } from '@mui/icons-material'
+import CreateNewFolder from '@mui/icons-material/CreateNewFolder'
 
 import styles from './index.module.css'
 import {
