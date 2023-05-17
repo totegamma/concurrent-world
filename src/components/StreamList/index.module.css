@@ -12,6 +12,7 @@ ul {
 .tree {
     height: 100%;
     padding-left: 8px;
+    padding-top: 10px;
 }
 
 .treeRoot {
