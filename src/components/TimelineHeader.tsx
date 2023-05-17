@@ -39,6 +39,11 @@ export function TimelineHeader(props: TimelineHeaderProps): JSX.Element {
         })
     }, [props.location.hash])
 
+    const iconColor =
+        appData.websocketState === 1
+            ? theme.palette.background.contrastText
+            : theme.palette.text.disabled
+
     return (
         <Box
             sx={{
@@ -68,9 +73,9 @@ export function TimelineHeader(props: TimelineHeaderProps): JSX.Element {
                 >
                     <ConcurrentLogo
                         size="25px"
-                        upperColor={theme.palette.background.contrastText}
-                        lowerColor={theme.palette.background.contrastText}
-                        frameColor={theme.palette.background.contrastText}
+                        upperColor={iconColor}
+                        lowerColor={iconColor}
+                        frameColor={iconColor}
                     />
                 </IconButton>
                 <Button

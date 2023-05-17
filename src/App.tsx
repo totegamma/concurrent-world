@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, createContext, useRef } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider, Drawer } from '@mui/material'
-import useWebSocket from 'react-use-websocket'
+import useWebSocket, { type ReadyState } from 'react-use-websocket'
 
 import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
@@ -54,7 +54,8 @@ export const ApplicationContext = createContext<appData>({
     emojiDict: {},
     streamDict: dummyResourceManager,
     userDict: dummyResourceManager,
-    messageDict: dummyResourceManager
+    messageDict: dummyResourceManager,
+    websocketState: -1
 })
 
 export interface appData {
@@ -67,6 +68,7 @@ export interface appData {
     streamDict: IuseResourceManager<Stream>
     userDict: IuseResourceManager<User>
     messageDict: IuseResourceManager<RTMMessage>
+    websocketState: ReadyState
 }
 
 function App(): JSX.Element {
@@ -94,8 +96,13 @@ function App(): JSX.Element {
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
 
-    const { lastMessage } = useWebSocket(
-        server.replace('http', 'ws') + 'socket'
+    const { lastMessage, readyState } = useWebSocket(
+        server.replace('http', 'ws') + 'socket',
+        {
+            shouldReconnect: (_) => true,
+            reconnectInterval: (attempt) =>
+                Math.min(Math.pow(2, attempt) * 1000, 10000)
+        }
     )
 
     const [playNotification] = useSound(Sound)
@@ -307,7 +314,8 @@ function App(): JSX.Element {
                     profile,
                     streamDict,
                     userDict,
-                    messageDict
+                    messageDict,
+                    websocketState: readyState
                 }}
             >
                 <Box

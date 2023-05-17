@@ -51,6 +51,11 @@ export function Menu(props: MenuProps): JSX.Element {
         })()
     }, [props.streams])
 
+    const iconColor =
+        appData.websocketState === 1
+            ? theme.palette.background.contrastText
+            : theme.palette.text.disabled
+
     return (
         <Box sx={{ gap: '15px', height: '100%' }}>
             <Box
@@ -72,9 +77,9 @@ export function Menu(props: MenuProps): JSX.Element {
                     <Box>
                         <ConcurrentLogo
                             size="32px"
-                            upperColor={theme.palette.background.contrastText}
-                            lowerColor={theme.palette.background.contrastText}
-                            frameColor={theme.palette.background.contrastText}
+                            upperColor={iconColor}
+                            lowerColor={iconColor}
+                            frameColor={iconColor}
                         />
                     </Box>
                     <Typography
