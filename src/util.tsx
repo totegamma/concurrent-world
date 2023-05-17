@@ -56,3 +56,30 @@ interface key {
 export type DeepPartial<T> = {
     [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P]
 }
+
+export const humanReadableTimeDiff = (time: Date): string => {
+    const current = new Date()
+    const msPerMinute = 60 * 1000
+    const msPerHour = msPerMinute * 60
+    const msPerDay = msPerHour * 24
+
+    const elapsed = current.getTime() - time.getTime()
+
+    if (elapsed < msPerMinute) {
+        return `${Math.round(elapsed / 1000)}秒前`
+    } else if (elapsed < msPerHour) {
+        return `${Math.round(elapsed / msPerMinute)}分前`
+    } else if (elapsed < msPerDay) {
+        return `${Math.round(elapsed / msPerHour)}時間前`
+    } else {
+        return (
+            (current.getFullYear() === time.getFullYear()
+                ? ''
+                : `${time.getFullYear()}年 `) +
+            `${String(time.getMonth() + 1).padStart(2, '0')}月` +
+            `${String(time.getDate()).padStart(2, '0')}日 ` +
+            `${String(time.getHours()).padStart(2, '0')}時` +
+            `${String(time.getMinutes()).padStart(2, '0')}分`
+        )
+    }
+}

@@ -1,7 +1,7 @@
-import { useRef } from 'react'
+import { type MutableRefObject, useCallback, useRef, useMemo } from 'react'
 
 export interface IuseResourceManager<T> {
-    current: Record<string, T>
+    body: MutableRefObject<Record<string, T>>
     get: (key: string) => Promise<T>
     register: (key: string, value: T) => void
     invalidate: (key: string) => void
@@ -12,31 +12,34 @@ export function useResourceManager<T>(
 ): IuseResourceManager<T> {
     const body = useRef<Record<string, T>>({})
 
-    const get = async (key: string): Promise<T> => {
+    const get = useCallback(async (key: string): Promise<T> => {
         if (!(key in body.current)) {
             body.current[key] = await resolver(key)
         }
         return body.current[key]
-    }
+    }, [])
 
-    const register = (key: string, value: T): void => {
+    const register = useCallback((key: string, value: T): void => {
         body.current[key] = value
-    }
+    }, [])
 
-    const invalidate = (key: string): void => {
+    const invalidate = useCallback((key: string): void => {
         delete body.current[key]
-    }
+    }, [])
 
-    return {
-        current: body.current,
-        get,
-        register,
-        invalidate
-    }
+    return useMemo(
+        () => ({
+            body,
+            get,
+            register,
+            invalidate
+        }),
+        [body, get, register, invalidate]
+    )
 }
 
 export const dummyResourceManager: IuseResourceManager<any> = {
-    current: {},
+    body: undefined as any,
     get: async () => {
         throw new Error('ResourceManager not initialized get')
     },

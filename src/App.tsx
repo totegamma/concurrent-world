@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, createContext, useRef } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { darken, Box, Paper, ThemeProvider } from '@mui/material'
+import { Routes, Route } from 'react-router-dom'
+import { darken, Box, Paper, ThemeProvider, Drawer } from '@mui/material'
+import useWebSocket, { type ReadyState } from 'react-use-websocket'
 
 import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
@@ -15,7 +16,7 @@ import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu'
 import type {
     RTMMessage,
-    StreamElement,
+    StreamElementDated,
     User,
     ServerEvent,
     Association,
@@ -35,6 +36,7 @@ import {
 import Sound from './resources/Bubble.wav'
 import useSound from 'use-sound'
 import { MobileMenu } from './components/MobileMenu'
+import { StreamInfo } from './pages/StreamInfo'
 
 export const ApplicationContext = createContext<appData>({
     serverAddress: '',
@@ -52,7 +54,8 @@ export const ApplicationContext = createContext<appData>({
     emojiDict: {},
     streamDict: dummyResourceManager,
     userDict: dummyResourceManager,
-    messageDict: dummyResourceManager
+    messageDict: dummyResourceManager,
+    websocketState: -1
 })
 
 export interface appData {
@@ -65,6 +68,7 @@ export interface appData {
     streamDict: IuseResourceManager<Stream>
     userDict: IuseResourceManager<User>
     messageDict: IuseResourceManager<RTMMessage>
+    websocketState: ReadyState
 }
 
 function App(): JSX.Element {
@@ -87,10 +91,19 @@ function App(): JSX.Element {
     const [theme, setTheme] = useState<ConcurrentTheme>(
         createConcurrentTheme(themeName)
     )
-    const [connected, setConnected] = useState<boolean>(false)
-    const messages = useObjectList<StreamElement>()
-    const [currentStreams, setCurrentStreams] = useState<string>('common')
-    const currentStreamsRef = useRef<string>(currentStreams)
+    const messages = useObjectList<StreamElementDated>()
+    const [currentStreams, setCurrentStreams] = useState<string[]>([])
+
+    const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
+
+    const { lastMessage, readyState } = useWebSocket(
+        server.replace('http', 'ws') + 'socket',
+        {
+            shouldReconnect: (_) => true,
+            reconnectInterval: (attempt) =>
+                Math.min(Math.pow(2, attempt) * 1000, 10000)
+        }
+    )
 
     const [playNotification] = useSound(Sound)
     const playNotificationRef = useRef(playNotification)
@@ -110,7 +123,7 @@ function App(): JSX.Element {
     const [emojiDict, setEmojiDict] = useState<Record<string, Emoji>>({})
     useEffect(() => {
         fetch(
-            'https://gist.githubusercontent.com/totegamma/0beb41acad70aa4945ad38a6b00a3a1d/raw/8280287c34829b51a5544bec453c1638ecacd5e6/emojis.json'
+            'https://gist.githubusercontent.com/totegamma/0beb41acad70aa4945ad38a6b00a3a1d/raw/emojis.json'
         ) // FIXME temporaly hardcoded
             .then((j) => j.json())
             .then((data) => {
@@ -183,12 +196,25 @@ function App(): JSX.Element {
         return data
     })
 
-    const follow = (ccaddress: string): void => {
-        if (followList.includes(ccaddress)) return
-        setFollowList([...followList, ccaddress])
-    }
+    const follow = useCallback(
+        (ccaddress: string): void => {
+            if (followList.includes(ccaddress)) return
+            setFollowList([...followList, ccaddress])
+        },
+        [followList, setFollowList]
+    )
 
-    const handleMessage = (event: ServerEvent): void => {
+    useEffect(() => {
+        userDict.get(address).then((profile) => {
+            setProfile(profile)
+            profileRef.current = profile
+        })
+    }, [address])
+
+    useEffect(() => {
+        if (!lastMessage) return
+        const event: ServerEvent = JSON.parse(lastMessage.data)
+        if (!event) return
         switch (event.type) {
             case 'message': {
                 const message = event.body as RTMMessage
@@ -201,17 +227,19 @@ function App(): JSX.Element {
                         ) {
                             return
                         }
-                        const groupA = currentStreamsRef.current.split(',')
+                        const groupA = currentStreams
                         const groupB = message.streams.split(',')
                         if (!groupA.some((e) => groupB.includes(e))) return
-                        messages.push({
+                        const current = new Date().getTime()
+                        messages.pushFront({
                             ID: new Date(message.cdate)
                                 .getTime()
                                 .toString()
                                 .replace('.', '-'),
                             Values: {
                                 id: message.id
-                            }
+                            },
+                            LastUpdated: current
                         })
                         playNotificationRef.current()
                         break
@@ -226,14 +254,28 @@ function App(): JSX.Element {
                 const association = event.body as Association
                 console.log(event)
                 switch (event.action) {
-                    case 'create':
+                    case 'create': {
                         messageDict.invalidate(association.target)
-                        // FIXME we have to notify to tweet component
+                        const target = messages.current.find(
+                            (e) => e.Values.id === association.target
+                        )
+                        if (target) {
+                            target.LastUpdated = new Date().getTime()
+                            messages.update((e) => [...e])
+                        }
                         break
-                    case 'delete':
+                    }
+                    case 'delete': {
                         messageDict.invalidate(association.target)
-                        // FIXME we have to notify to tweet component
+                        const target = messages.current.find(
+                            (e) => e.Values.id === association.target
+                        )
+                        if (target) {
+                            target.LastUpdated = new Date().getTime()
+                            messages.update((e) => [...e])
+                        }
                         break
+                    }
                     default:
                         console.log('unknown message action', event)
                         break
@@ -244,51 +286,20 @@ function App(): JSX.Element {
                 console.log('unknown event', event)
                 break
         }
-    }
+    }, [lastMessage])
 
     useEffect(() => {
-        ;(async () => {
-            const profile = await userDict.get(address)
-            setProfile(profile)
-            profileRef.current = profile
-        })()
-    }, [])
-
-    useEffect(() => {
-        if (!server) return
-        if (connected) return
-        const ws = new WebSocket(server.replace('http', 'ws') + 'socket')
-
-        ws.onopen = (event: any) => {
-            console.log('ws open')
-            console.info(event)
-            setConnected(true)
+        const newtheme = createConcurrentTheme(themeName)
+        setTheme(newtheme)
+        let themeColorMetaTag: HTMLMetaElement = document.querySelector(
+            'meta[name="theme-color"]'
+        ) as HTMLMetaElement
+        if (!themeColorMetaTag) {
+            themeColorMetaTag = document.createElement('meta')
+            themeColorMetaTag.name = 'theme-color'
+            document.head.appendChild(themeColorMetaTag)
         }
-
-        ws.onmessage = (event: any) => {
-            const body = JSON.parse(event.data)
-            handleMessage(body)
-        }
-
-        ws.onerror = (event: any) => {
-            console.log('ws error')
-            console.error(event)
-            setConnected(false)
-        }
-
-        ws.onclose = (event: any) => {
-            console.log('ws closed')
-            console.warn(event)
-            setConnected(false)
-        }
-    }, [])
-
-    useEffect(() => {
-        currentStreamsRef.current = currentStreams
-    }, [currentStreams])
-
-    useEffect(() => {
-        setTheme(createConcurrentTheme(themeName))
+        themeColorMetaTag.content = newtheme.palette.background.default
     }, [themeName])
 
     return (
@@ -303,106 +314,142 @@ function App(): JSX.Element {
                     profile,
                     streamDict,
                     userDict,
-                    messageDict
+                    messageDict,
+                    websocketState: readyState
                 }}
             >
-                <BrowserRouter>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        background: [
+                            theme.palette.background.default,
+                            `linear-gradient(${
+                                theme.palette.background.default
+                            }, ${darken(
+                                theme.palette.background.default,
+                                0.1
+                            )})`
+                        ],
+                        height: '100dvh'
+                    }}
+                >
+                    <Box
+                        sx={{
+                            display: { xs: 'none', sm: 'block', width: '200px' }
+                        }}
+                    >
+                        <Menu streams={watchstreams} />
+                    </Box>
                     <Box
                         sx={{
                             display: 'flex',
-                            background: [
-                                theme.palette.background.default,
-                                `linear-gradient(${
-                                    theme.palette.background.default
-                                }, ${darken(
-                                    theme.palette.background.default,
-                                    0.1
-                                )})`
-                            ],
-                            height: '100dvh'
+                            flexFlow: 'column',
+                            overflow: 'hidden',
+                            flex: 1
                         }}
                     >
-                        <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                            <Menu streams={watchstreams} />
-                        </Box>
-                        <Box
+                        <Paper
                             sx={{
+                                flexGrow: '1',
+                                margin: { xs: '4px', sm: '10px' },
+                                mb: { xs: 0, sm: '10px' },
                                 display: 'flex',
                                 flexFlow: 'column',
+                                borderRadius: { xs: '15px', md: '20px' },
                                 overflow: 'hidden',
-                                flex: 1
+                                background: 'none'
                             }}
                         >
-                            <Paper
-                                sx={{
-                                    flexGrow: '1',
-                                    margin: { xs: '8px', sm: '10px' },
-                                    mb: { xs: 0, sm: '10px' },
-                                    display: 'flex',
-                                    flexFlow: 'column',
-                                    borderRadius: { xs: '15px', md: '20px' },
-                                    overflow: 'hidden',
-                                    background: 'none'
-                                }}
-                            >
-                                <Routes>
-                                    <Route
-                                        index
-                                        element={
-                                            <Timeline
-                                                messages={messages}
-                                                follow={follow}
-                                                followList={followList}
-                                                setCurrentStreams={
-                                                    setCurrentStreams
-                                                }
-                                                watchstreams={watchstreams}
-                                            />
-                                        }
-                                    />
-                                    <Route
-                                        path="/associations"
-                                        element={<Associations />}
-                                    />
-                                    <Route
-                                        path="/explorer"
-                                        element={
-                                            <Explorer
-                                                watchList={watchstreams}
-                                                setWatchList={setWatchStreams}
-                                                followList={followList}
-                                                setFollowList={setFollowList}
-                                            />
-                                        }
-                                    />
-                                    <Route
-                                        path="/notifications"
-                                        element={<Notifications />}
-                                    />
-                                    <Route
-                                        path="/identity"
-                                        element={<Identity />}
-                                    />
-                                    <Route
-                                        path="/settings"
-                                        element={
-                                            <Settings
-                                                setThemeName={setThemeName}
-                                                setPrvKey={setPrvKey}
-                                                setPubKey={setPubKey}
-                                                setUserAddr={setAddress}
-                                                setServerAddr={setServer}
-                                            />
-                                        }
-                                    />
-                                </Routes>
-                            </Paper>
-                            <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
-                                <MobileMenu />
-                            </Box>
+                            <Routes>
+                                <Route
+                                    index
+                                    element={
+                                        <Timeline
+                                            messages={messages}
+                                            follow={follow}
+                                            followList={followList}
+                                            setCurrentStreams={
+                                                setCurrentStreams
+                                            }
+                                            setMobileMenuOpen={
+                                                setMobileMenuOpen
+                                            }
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/associations"
+                                    element={<Associations />}
+                                />
+                                <Route
+                                    path="/explorer"
+                                    element={
+                                        <Explorer
+                                            watchList={watchstreams}
+                                            setWatchList={setWatchStreams}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/notifications"
+                                    element={<Notifications />}
+                                />
+                                <Route
+                                    path="/identity"
+                                    element={<Identity />}
+                                />
+                                <Route
+                                    path="/settings"
+                                    element={
+                                        <Settings
+                                            setThemeName={setThemeName}
+                                            setPrvKey={setPrvKey}
+                                            setPubKey={setPubKey}
+                                            setUserAddr={setAddress}
+                                            setServerAddr={setServer}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/streaminfo"
+                                    element={
+                                        <StreamInfo
+                                            followList={followList}
+                                            setFollowList={setFollowList}
+                                        />
+                                    }
+                                />
+                            </Routes>
+                        </Paper>
+                        <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+                            <MobileMenu />
                         </Box>
                     </Box>
-                </BrowserRouter>
+                </Box>
+                <Drawer
+                    anchor={'left'}
+                    open={mobileMenuOpen}
+                    onClose={() => {
+                        setMobileMenuOpen(false)
+                    }}
+                    PaperProps={{
+                        sx: {
+                            width: '200px',
+                            padding: '0 5px 0 0',
+                            borderRadius: '0 20px 20px 0',
+                            overflow: 'hidden',
+                            backgroundColor: 'background.default'
+                        }
+                    }}
+                >
+                    <Menu
+                        streams={watchstreams}
+                        onClick={() => {
+                            setMobileMenuOpen(false)
+                        }}
+                        hideMenu
+                    />
+                </Drawer>
             </ApplicationContext.Provider>
         </ThemeProvider>
     )
