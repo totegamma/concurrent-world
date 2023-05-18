@@ -7,7 +7,7 @@ import { Box, Typography } from '@mui/material'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
-import rehypeSanitize from 'rehype-sanitize'
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 import { type ReactMarkdownProps } from 'react-markdown/lib/ast-to-react'
 import breaks from 'remark-breaks'
 
@@ -18,6 +18,19 @@ import { ApplicationContext } from '../App'
 
 export interface MarkdownRendererProps {
     messagebody: string
+}
+
+const sanitizeOption = {
+    ...defaultSchema,
+    tagNames: [...(defaultSchema.tagNames ?? []), 'marquee'],
+    attributes: {
+        ...defaultSchema.attributes,
+        marquee: [
+            ...(defaultSchema.attributes?.marquee ?? []),
+            'direction',
+            'behavior'
+        ]
+    }
 }
 
 export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
@@ -39,7 +52,7 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
         <Box sx={{ width: '100%' }}>
             <ReactMarkdown
                 remarkPlugins={[breaks, [remarkGfm, { singleTilde: false }]]}
-                rehypePlugins={[rehypeRaw, rehypeSanitize]}
+                rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeOption]]}
                 components={{
                     p: ({ children }) => (
                         <Typography
