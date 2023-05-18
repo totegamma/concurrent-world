@@ -35,9 +35,10 @@ export const ImgurSettings = (): JSX.Element => {
                     label="ClientId"
                     variant="outlined"
                     fullWidth={true}
+                    sx={sx}
                     defaultValue={appData.imgurSettings.clientId}
                     inputRef={clientIdRef}
-                    sx={sx}
+                    type="password"
                 />
                 <TextField
                     label="ClientSecret"
