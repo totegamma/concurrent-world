@@ -14,7 +14,8 @@ import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { Sign, humanReadableTimeDiff } from '../util'
 
-import type { Stream, RTMMessage, User } from '../model'
+import type { Stream, Message, ProfileWithAddress } from '../model'
+import type { Profile } from '../schemas/profile'
 import { Schemas } from '../schemas'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import { type IuseResourceManager } from '../hooks/useResourceManager'
@@ -24,9 +25,9 @@ export interface TimelineMessageProps {
     message: string
     lastUpdated: number
     follow: (ccaddress: string) => void
-    setInspectItem: (message: RTMMessage) => void
-    messageDict: IuseResourceManager<RTMMessage>
-    userDict: IuseResourceManager<User>
+    setInspectItem: (message: Message) => void
+    messageDict: IuseResourceManager<Message>
+    userDict: IuseResourceManager<Profile>
     streamDict: IuseResourceManager<Stream>
     userAddress: string
     privatekey: string
@@ -35,10 +36,10 @@ export interface TimelineMessageProps {
 
 export const TimelineMessage = memo<TimelineMessageProps>(
     (props: TimelineMessageProps): JSX.Element => {
-        const [user, setUser] = useState<User | null>()
-        const [message, setMessage] = useState<RTMMessage | undefined>()
-        const [msgstreams, setStreams] = useState<string>('')
-        const [reactUsers, setReactUsers] = useState<User[]>([])
+        const [user, setUser] = useState<Profile>({})
+        const [message, setMessage] = useState<Message | undefined>()
+        const [msgstreams, setStreams] = useState<string[]>([])
+        const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
 
         const theme = useTheme()
 
@@ -72,7 +73,7 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                                         )
                             )
                     ).then((e) => {
-                        setStreams(e.filter((x) => x).join(','))
+                        setStreams(e.filter((x) => x))
                     })
                 })
                 .catch((error) => {
@@ -97,19 +98,13 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                     setHasOwnReaction(false)
                 }
                 const users = await Promise.all(
-                    authors.map((a) =>
-                        props.userDict.get(a).then((e) =>
-                            e.ccaddress
-                                ? e
-                                : {
-                                      ccaddress: a,
-                                      username: 'anonymous',
-                                      avatar: '',
-                                      description: '',
-                                      homestream: '',
-                                      notificationstream: ''
-                                  }
-                        )
+                    authors.map((ccaddress) =>
+                        props.userDict.get(ccaddress).then((e) => {
+                            return {
+                                ccaddress,
+                                ...e
+                            }
+                        })
                     )
                 )
                 setReactUsers(users)
@@ -128,7 +123,7 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                 const targetAuthor = (await props.messageDict.get(messageID))
                     .author
                 const targetStream = (await props.userDict.get(targetAuthor))
-                    .notificationstream
+                    .notificationStream
 
                 const requestOptions = {
                     method: 'POST',
@@ -230,8 +225,8 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                                 }}
                             >
                                 <CCAvatar
-                                    alt={user?.username}
-                                    avatarURL={user?.avatar}
+                                    alt={user.username}
+                                    avatarURL={user.avatar}
                                     identiconSource={message.author}
                                     sx={{
                                         width: { xs: '38px', sm: '48px' },
@@ -256,7 +251,13 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                                     justifyContent: 'space-between'
                                 }}
                             >
-                                <Box>
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'baseline',
+                                        gap: '5px'
+                                    }}
+                                >
                                     <Typography
                                         component="span"
                                         sx={{
@@ -267,7 +268,7 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                                             }
                                         }}
                                     >
-                                        {user?.username}{' '}
+                                        {user.username ?? 'anonymous'}
                                     </Typography>
                                     <Typography
                                         component="span"
@@ -411,7 +412,17 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                                             color: 'text.secondary'
                                         }}
                                     >
-                                        %{msgstreams.replaceAll(',', ' %')}{' '}
+                                        {msgstreams
+                                            .map(
+                                                (e) =>
+                                                    `%${
+                                                        e.length < 12
+                                                            ? e
+                                                            : e.slice(0, 9) +
+                                                              '...'
+                                                    }`
+                                            )
+                                            .join(' ')}
                                     </Typography>
                                 </Box>
                             </Box>

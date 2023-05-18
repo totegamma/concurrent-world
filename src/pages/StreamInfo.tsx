@@ -14,7 +14,7 @@ import {
 } from '@mui/material'
 import { StreamPicker } from '../components/StreamPicker'
 import { usePersistent } from '../hooks/usePersistent'
-import type { User } from '../model'
+import type { ProfileWithAddress } from '../model'
 import { ApplicationContext } from '../App'
 import { useLocation } from 'react-router-dom'
 import { CCAvatar } from '../components/CCAvatar'
@@ -65,23 +65,17 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
         })
     }, [reactlocation.hash])
 
-    const [followList, setFollowList] = useState<User[]>([])
+    const [followList, setFollowList] = useState<ProfileWithAddress[]>([])
 
     useEffect(() => {
         Promise.all(
             props.followList.map((ccaddress) =>
-                appData.userDict.get(ccaddress).then((e) =>
-                    e.avatar
-                        ? e
-                        : {
-                              ccaddress,
-                              username: 'anonymous',
-                              avatar: '',
-                              description: '',
-                              homestream: '',
-                              notificationstream: ''
-                          }
-                )
+                appData.userDict.get(ccaddress).then((e) => {
+                    return {
+                        ccaddress,
+                        ...e
+                    }
+                })
             )
         ).then((e) => {
             setFollowList(e)

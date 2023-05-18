@@ -95,7 +95,7 @@ export function Draft(props: DraftProps): JSX.Element {
                     ...new Set([
                         ...props.currentStreams.split(','),
                         ...messageDestStreams,
-                        ...(postHome ? [appData.profile.homestream] : [])
+                        ...(postHome ? [appData.profile.homeStream] : [])
                     ])
                 ]
                     .filter((e) => e)

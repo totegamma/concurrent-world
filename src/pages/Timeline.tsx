@@ -7,7 +7,7 @@ import React, {
 } from 'react'
 import { List, Divider, Box, useTheme, Drawer, Typography } from '@mui/material'
 import { TimelineMessage } from '../components/TimelineMessage'
-import type { RTMMessage, StreamElement, StreamElementDated } from '../model'
+import type { Message, StreamElement, StreamElementDated } from '../model'
 import { type IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'
 import { useLocation } from 'react-router-dom'
@@ -31,7 +31,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
     const reactlocation = useLocation()
     const scrollParentRef = useRef<HTMLDivElement>(null)
     const [hasMoreData, setHasMoreData] = useState<boolean>(false)
-    const [inspectItem, setInspectItem] = useState<RTMMessage | null>(null)
+    const [inspectItem, setInspectItem] = useState<Message | null>(null)
 
     const [followStreams] = usePersistent<string[]>('followStreams', [])
 
@@ -44,7 +44,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                         async (ccaddress) =>
                             (
                                 await appData.userDict.get(ccaddress)
-                            ).homestream
+                            ).homeStream
                     )
                 )
             )
@@ -90,7 +90,7 @@ export function Timeline(props: TimelineProps): JSX.Element {
                         async (ccaddress) =>
                             (
                                 await appData.userDict.get(ccaddress)
-                            ).homestream
+                            ).homeStream
                     )
                 )
             )
@@ -145,10 +145,10 @@ export function Timeline(props: TimelineProps): JSX.Element {
                             async (ccaddress) =>
                                 (
                                     await appData.userDict.get(ccaddress)
-                                ).homestream
+                                ).homeStream
                         )
                     )
-                ).filter((e) => e)
+                ).filter((e) => e) as string[]
             }
             props.setCurrentStreams(
                 (reactlocation.hash
