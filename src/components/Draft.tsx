@@ -1,4 +1,10 @@
-import React, { useState, useContext, useEffect, SyntheticEvent } from 'react'
+import React, {
+    useState,
+    useContext,
+    useEffect,
+    SyntheticEvent,
+    useRef
+} from 'react'
 import {
     InputBase,
     Box,
@@ -16,6 +22,7 @@ import Picker from '@emoji-mart/react'
 import data from '@emoji-mart/data'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 import Splitscreen from '@mui/icons-material/Splitscreen'
+import ImageIcon from '@mui/icons-material/Image'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import { StreamPicker } from './StreamPicker'
 import { useLocation } from 'react-router-dom'
@@ -58,6 +65,7 @@ export function Draft(props: DraftProps): JSX.Element {
     const [messageDestStreams, setMessageDestStreams] = useState<string[]>([])
 
     const reactlocation = useLocation()
+    const inputRef = useRef<HTMLInputElement>(null)
 
     const [defaultPostHome] = usePersistent<string[]>('defaultPostHome', [])
     const [defaultPostNonHome] = usePersistent<string[]>(
@@ -143,7 +151,7 @@ export function Draft(props: DraftProps): JSX.Element {
             },
             body: JSON.stringify({
                 type: 'base64',
-                image: base64Data.replace('data:image/png;base64,', '')
+                image: base64Data.replace(/^data:image\/[a-zA-Z]*;base64,/, '')
             })
         })
         return (await result.json()).data.link
@@ -169,6 +177,32 @@ export function Draft(props: DraftProps): JSX.Element {
                 }
                 reader.readAsDataURL(imageFile)
             }
+        }
+    }
+
+    const onFileInputChange = async (event: any): Promise<void> => {
+        const file = event.target.files[0]
+        if (!file) return
+        const URLObj = window.URL || window.webkitURL
+        const imgSrc = URLObj.createObjectURL(file)
+        console.log(file, imgSrc)
+        const reader = new FileReader()
+        reader.onload = async (event) => {
+            const base64Text = event
+            if (!base64Text.target) return
+            console.log(event)
+            const result = await uploadToImgur(
+                base64Text.target.result as string
+            )
+            if (!result) return
+            setDraft(draft + `![image](${result})`)
+        }
+        reader.readAsDataURL(file)
+    }
+
+    const onFileUploadClick = (): void => {
+        if (inputRef.current) {
+            inputRef.current.click()
         }
     }
 
@@ -279,6 +313,23 @@ export function Draft(props: DraftProps): JSX.Element {
                     justifyContent: 'flex-end'
                 }}
             >
+                <IconButton
+                    sx={{
+                        color: theme.palette.text.secondary
+                    }}
+                    onClick={onFileUploadClick}
+                >
+                    <ImageIcon />
+                    <input
+                        hidden
+                        ref={inputRef}
+                        type="file"
+                        onChange={(e) => {
+                            onFileInputChange(e)
+                        }}
+                        accept={'.png, .jpg, .jpeg, .gif'}
+                    />
+                </IconButton>
                 <IconButton
                     sx={{
                         color: theme.palette.text.secondary
