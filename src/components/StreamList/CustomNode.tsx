@@ -87,7 +87,6 @@ export const CustomNode = (props: CustomNodeProps): JSX.Element => {
           }
         : {
               color: 'background.contrastText',
-              backgroundColor: 'background.default',
               paddingLeft: '7.5px'
           }
 
