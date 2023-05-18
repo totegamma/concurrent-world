@@ -5,10 +5,11 @@ import { useState } from 'react'
 import { Sign } from '../util'
 import { Schemas } from '../schemas'
 import Button from '@mui/material/Button'
-import type { Stream, User } from '../model'
+import type { Stream } from '../model'
+import type { Profile } from '../schemas/profile'
 
 interface ProfileEditorProps {
-    initial: User
+    initial: Profile
     userAddress: string
     privatekey: string
     serverAddress: string
@@ -22,7 +23,7 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
     const [avatar, setAvatar] = useState<string>(props.initial.avatar ?? '')
 
     const updateProfile = async (): Promise<void> => {
-        let homeStreamID = props.initial.homestream
+        let homeStreamID = props.initial.homeStream
         if (homeStreamID === undefined || homeStreamID === '') {
             const payloadObj = {
                 username: username + '-home'
@@ -54,7 +55,7 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
         }
         console.log('home', homeStreamID)
 
-        let notificationStreamID = props.initial.notificationstream
+        let notificationStreamID = props.initial.notificationStream
         if (notificationStreamID === undefined || notificationStreamID === '') {
             const payloadObj = {
                 username: username + '-notification'

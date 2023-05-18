@@ -15,6 +15,8 @@ import type {
     TypeText
 } from '@mui/material/styles/createPalette'
 
+import type { Profile } from './schemas/profile'
+
 export interface StreamElement {
     ID: string
     Values: {
@@ -36,7 +38,7 @@ export interface Association {
     target: string
 }
 
-export interface RTMMessage {
+export interface Message {
     associations: string
     associations_data: Association[]
     author: string
@@ -48,25 +50,20 @@ export interface RTMMessage {
     streams: string
 }
 
-export interface User {
-    ccaddress: string
-    username: string
-    avatar: string
-    description: string
-    homestream: string
-    notificationstream: string
-}
-
 export interface ServerEvent {
     type: string
     action: string
-    body: RTMMessage | Association
+    body: Message | Association
 }
 
 export interface Emoji {
     publicUrl: string
     name: string
     aliases: string[]
+}
+
+export interface ProfileWithAddress extends Profile {
+    ccaddress: string
 }
 
 export interface Stream {

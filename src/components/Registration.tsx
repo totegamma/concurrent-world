@@ -126,11 +126,10 @@ export function Registration(): JSX.Element {
             ここで名前・アイコン・自己紹介を設定します。
             <ProfileEditor
                 initial={{
-                    ccaddress: '',
                     username: '',
                     avatar: '',
-                    homestream: '',
-                    notificationstream: '',
+                    homeStream: '',
+                    notificationStream: '',
                     description: ''
                 }}
                 userAddress={userAddress}

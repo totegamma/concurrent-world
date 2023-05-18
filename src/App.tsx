@@ -15,9 +15,8 @@ import { Schemas } from './schemas'
 import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu'
 import type {
-    RTMMessage,
+    Message,
     StreamElementDated,
-    User,
     ServerEvent,
     Association,
     Emoji,
@@ -33,6 +32,8 @@ import {
     Timeline
 } from './pages'
 
+import type { Profile } from './schemas/profile'
+
 import Sound from './resources/Bubble.wav'
 import useSound from 'use-sound'
 import { MobileMenu } from './components/MobileMenu'
@@ -44,12 +45,11 @@ export const ApplicationContext = createContext<appData>({
     privatekey: '',
     userAddress: '',
     profile: {
-        ccaddress: '',
         username: '',
         avatar: '',
         description: '',
-        homestream: '',
-        notificationstream: ''
+        homeStream: '',
+        notificationStream: ''
     },
     emojiDict: {},
     streamDict: dummyResourceManager,
@@ -64,11 +64,11 @@ export interface appData {
     publickey: string
     privatekey: string
     userAddress: string
-    profile: User
+    profile: Profile
     emojiDict: Record<string, Emoji>
     streamDict: IuseResourceManager<Stream>
-    userDict: IuseResourceManager<User>
-    messageDict: IuseResourceManager<RTMMessage>
+    userDict: IuseResourceManager<Profile>
+    messageDict: IuseResourceManager<Message>
     websocketState: ReadyState
     watchStreams: string[]
 }
@@ -109,15 +109,14 @@ function App(): JSX.Element {
 
     const [playNotification] = useSound(Sound)
     const playNotificationRef = useRef(playNotification)
-    const [profile, setProfile] = useState<User>({
-        ccaddress: '',
+    const [profile, setProfile] = useState<Profile>({
         username: 'anonymous',
         avatar: '',
         description: '',
-        homestream: '',
-        notificationstream: ''
+        homeStream: '',
+        notificationStream: ''
     })
-    const profileRef = useRef<User>(profile)
+    const profileRef = useRef<Profile>(profile)
     useEffect(() => {
         playNotificationRef.current = playNotification
     }, [playNotification])
@@ -136,9 +135,9 @@ function App(): JSX.Element {
             })
     }, [])
 
-    const userDict = useResourceManager<User>(
+    const userDict = useResourceManager<Profile>(
         useCallback(
-            async (key: string) => {
+            async (key: string): Promise<Profile> => {
                 const res = await fetch(
                     server +
                         'characters?author=' +
@@ -152,30 +151,16 @@ function App(): JSX.Element {
                 )
                 const data = await res.json()
                 if (data.characters.length === 0) {
-                    return {
-                        ccaddress: '',
-                        username: 'anonymous',
-                        avatar: '',
-                        description: '',
-                        homestream: '',
-                        notificationstream: ''
-                    }
+                    return {}
                 }
                 const payload = JSON.parse(data.characters[0].payload)
-                return {
-                    ccaddress: data.characters[0].author,
-                    username: payload.username,
-                    avatar: payload.avatar,
-                    description: payload.description,
-                    homestream: payload.home,
-                    notificationstream: payload.notification
-                }
+                return payload
             },
             [server]
         )
     )
 
-    const messageDict = useResourceManager<RTMMessage>(
+    const messageDict = useResourceManager<Message>(
         useCallback(
             async (key: string) => {
                 const res = await fetch(server + `messages/${key}`, {
@@ -219,7 +204,7 @@ function App(): JSX.Element {
         if (!event) return
         switch (event.type) {
             case 'message': {
-                const message = event.body as RTMMessage
+                const message = event.body as Message
                 switch (event.action) {
                     case 'create': {
                         if (
