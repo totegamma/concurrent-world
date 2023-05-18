@@ -4,7 +4,8 @@ import { ApplicationContext } from '../../../App'
 
 const sx: SxProps = {
     marginX: '20px',
-    marginTop: '10px'
+    marginTop: '10px',
+    maxWidth: '500px'
 }
 
 export const ImgurSettings = (): JSX.Element => {
@@ -29,26 +30,34 @@ export const ImgurSettings = (): JSX.Element => {
     }
     return (
         <>
-            <Box sx={{ maxWidth: '400px' }}>
+            <Box>
                 <Typography variant="h3">ImgurSetting</Typography>
-                <TextField
-                    label="ClientId"
-                    variant="outlined"
-                    fullWidth={true}
-                    sx={sx}
-                    defaultValue={appData.imgurSettings.clientId}
-                    inputRef={clientIdRef}
-                    type="password"
-                />
-                <TextField
-                    label="ClientSecret"
-                    variant="outlined"
-                    fullWidth={true}
-                    sx={sx}
-                    defaultValue={appData.imgurSettings.clientSecret}
-                    inputRef={clientSecretRef}
-                    type="password"
-                />
+                <Typography>
+                    Imgurに登録した後、
+                    <a href={'https://api.imgur.com/oauth2/addclient'}>ここ</a>
+                    でアプリケーションを作成してください。「OAuth 2
+                    authorization without a callback URL」で大丈夫です
+                </Typography>
+                <Box>
+                    <TextField
+                        label="ClientId"
+                        variant="outlined"
+                        fullWidth={true}
+                        sx={sx}
+                        defaultValue={appData.imgurSettings.clientId}
+                        inputRef={clientIdRef}
+                        type="password"
+                    />
+                    <TextField
+                        label="ClientSecret"
+                        variant="outlined"
+                        fullWidth={true}
+                        sx={sx}
+                        defaultValue={appData.imgurSettings.clientSecret}
+                        inputRef={clientSecretRef}
+                        type="password"
+                    />
+                </Box>
                 <Button sx={sx} variant="contained" onClick={handleSave}>
                     {buttonText}
                 </Button>
