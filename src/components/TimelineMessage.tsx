@@ -303,8 +303,7 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                                     justifyContent: 'space-between'
                                 }}
                             >
-                                <Box>
-                                    {' '}
+                                <Box sx={{ display: 'flex' }}>
                                     {/* left */}
                                     <Tooltip
                                         title={
@@ -348,33 +347,35 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                                             reactUsers.length === 0
                                         }
                                     >
-                                        <IconButton
-                                            sx={{
-                                                p: '0',
-                                                color: theme.palette.text
-                                                    .secondary
-                                            }}
-                                            color="primary"
-                                            onClick={() => {
-                                                if (hasOwnReaction) {
-                                                    unfavorite(
-                                                        message.id,
-                                                        message.associations_data.find(
-                                                            (e) =>
-                                                                e.author ===
-                                                                props.userAddress
-                                                        )?.id
-                                                    )
-                                                } else {
-                                                    favorite(message.id)
-                                                }
-                                            }}
-                                        >
-                                            {hasOwnReaction ? (
-                                                <StarIcon />
-                                            ) : (
-                                                <StarOutlineIcon />
-                                            )}{' '}
+                                        <Box sx={{ display: 'flex' }}>
+                                            <IconButton
+                                                sx={{
+                                                    p: '0',
+                                                    color: theme.palette.text
+                                                        .secondary
+                                                }}
+                                                color="primary"
+                                                onClick={() => {
+                                                    if (hasOwnReaction) {
+                                                        unfavorite(
+                                                            message.id,
+                                                            message.associations_data.find(
+                                                                (e) =>
+                                                                    e.author ===
+                                                                    props.userAddress
+                                                            )?.id
+                                                        )
+                                                    } else {
+                                                        favorite(message.id)
+                                                    }
+                                                }}
+                                            >
+                                                {hasOwnReaction ? (
+                                                    <StarIcon />
+                                                ) : (
+                                                    <StarOutlineIcon />
+                                                )}
+                                            </IconButton>
                                             <Typography sx={{ size: '16px' }}>
                                                 {
                                                     message.associations_data.filter(
@@ -384,7 +385,7 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                                                     ).length
                                                 }
                                             </Typography>
-                                        </IconButton>
+                                        </Box>
                                     </Tooltip>
                                     <IconButton
                                         onClick={() => {
@@ -401,7 +402,6 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                                     </IconButton>
                                 </Box>
                                 <Box>
-                                    {' '}
                                     {/* right */}
                                     <Typography
                                         component="span"
