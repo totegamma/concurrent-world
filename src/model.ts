@@ -78,6 +78,11 @@ export interface Stream {
     cdate: string
 }
 
+export interface ImgurSettings {
+    clientId: string
+    clientSecret: string
+}
+
 interface ConcurrentTypeBackground extends TypeBackground {
     default: string
     paper: string

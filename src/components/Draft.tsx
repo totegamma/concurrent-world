@@ -1,4 +1,10 @@
-import { useState, useContext, useEffect } from 'react'
+import React, {
+    useState,
+    useContext,
+    useEffect,
+    SyntheticEvent,
+    useRef
+} from 'react'
 import {
     InputBase,
     Box,
@@ -16,6 +22,7 @@ import Picker from '@emoji-mart/react'
 import data from '@emoji-mart/data'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 import Splitscreen from '@mui/icons-material/Splitscreen'
+import ImageIcon from '@mui/icons-material/Image'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import { StreamPicker } from './StreamPicker'
 import { useLocation } from 'react-router-dom'
@@ -58,6 +65,7 @@ export function Draft(props: DraftProps): JSX.Element {
     const [messageDestStreams, setMessageDestStreams] = useState<string[]>([])
 
     const reactlocation = useLocation()
+    const inputRef = useRef<HTMLInputElement>(null)
 
     const [defaultPostHome] = usePersistent<string[]>('defaultPostHome', [])
     const [defaultPostNonHome] = usePersistent<string[]>(
@@ -76,6 +84,24 @@ export function Draft(props: DraftProps): JSX.Element {
         ])
     }, [reactlocation.hash])
 
+    useEffect(() => {
+        const emojis: CustomEmoji[] = [
+            {
+                id: 'fluffy',
+                name: 'Fluffy Social',
+                emojis: Object.entries(appData.emojiDict).map(
+                    ([key, value]) => ({
+                        id: key,
+                        name: value.name,
+                        keywords: value.aliases,
+                        skins: [{ src: value.publicUrl }]
+                    })
+                )
+            }
+        ]
+
+        setCustomEmoji(emojis)
+    }, [appData.emojiDict])
     const post = (): void => {
         const payloadObj = {
             body: draft
@@ -112,24 +138,73 @@ export function Draft(props: DraftProps): JSX.Element {
             })
     }
 
-    useEffect(() => {
-        const emojis: CustomEmoji[] = [
-            {
-                id: 'fluffy',
-                name: 'Fluffy Social',
-                emojis: Object.entries(appData.emojiDict).map(
-                    ([key, value]) => ({
-                        id: key,
-                        name: value.name,
-                        keywords: value.aliases,
-                        skins: [{ src: value.publicUrl }]
-                    })
-                )
-            }
-        ]
+    const uploadToImgur = async (base64Data: string): Promise<string> => {
+        const url = 'https://api.imgur.com/3/image'
 
-        setCustomEmoji(emojis)
-    }, [appData.emojiDict])
+        if (!appData.imgurSettings.clientId) return ''
+
+        const result = await fetch(url, {
+            method: 'POST',
+            headers: {
+                Authorization: `Client-ID ${appData.imgurSettings.clientId}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                type: 'base64',
+                image: base64Data.replace(/^data:image\/[a-zA-Z]*;base64,/, '')
+            })
+        })
+        return (await result.json()).data.link
+    }
+
+    const handlePasteImage = (event: any): void => {
+        const isImage = event.clipboardData?.items[0].type?.includes('image')
+        if (isImage) {
+            const imageFile = event.clipboardData?.items[0].getAsFile()
+            if (imageFile) {
+                const URLObj = window.URL || window.webkitURL
+                const imgSrc = URLObj.createObjectURL(imageFile)
+                console.log(imageFile, imgSrc)
+                const reader = new FileReader()
+                reader.onload = async (event) => {
+                    const base64Text = event
+                    if (!base64Text.target) return
+                    const result = await uploadToImgur(
+                        base64Text.target.result as string
+                    )
+                    if (!result) return
+                    setDraft(draft + `![image](${result})`)
+                }
+                reader.readAsDataURL(imageFile)
+            }
+        }
+    }
+
+    const onFileInputChange = async (event: any): Promise<void> => {
+        const file = event.target.files[0]
+        if (!file) return
+        const URLObj = window.URL || window.webkitURL
+        const imgSrc = URLObj.createObjectURL(file)
+        console.log(file, imgSrc)
+        const reader = new FileReader()
+        reader.onload = async (event) => {
+            const base64Text = event
+            if (!base64Text.target) return
+            console.log(event)
+            const result = await uploadToImgur(
+                base64Text.target.result as string
+            )
+            if (!result) return
+            setDraft(draft + `![image](${result})`)
+        }
+        reader.readAsDataURL(file)
+    }
+
+    const onFileUploadClick = (): void => {
+        if (inputRef.current) {
+            inputRef.current.click()
+        }
+    }
 
     return (
         <Box
@@ -177,6 +252,7 @@ export function Draft(props: DraftProps): JSX.Element {
                     onChange={(e) => {
                         setDraft(e.target.value)
                     }}
+                    onPaste={handlePasteImage}
                     placeholder="今、なにしてる？"
                     sx={{
                         width: 1,
@@ -237,6 +313,23 @@ export function Draft(props: DraftProps): JSX.Element {
                     justifyContent: 'flex-end'
                 }}
             >
+                <IconButton
+                    sx={{
+                        color: theme.palette.text.secondary
+                    }}
+                    onClick={onFileUploadClick}
+                >
+                    <ImageIcon />
+                    <input
+                        hidden
+                        ref={inputRef}
+                        type="file"
+                        onChange={(e) => {
+                            onFileInputChange(e)
+                        }}
+                        accept={'.png, .jpg, .jpeg, .gif'}
+                    />
+                </IconButton>
                 <IconButton
                     sx={{
                         color: theme.palette.text.secondary

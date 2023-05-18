@@ -21,7 +21,8 @@ import type {
     Association,
     Emoji,
     Stream,
-    ConcurrentTheme
+    ConcurrentTheme,
+    ImgurSettings
 } from './model'
 import {
     Associations,
@@ -56,7 +57,12 @@ export const ApplicationContext = createContext<appData>({
     userDict: dummyResourceManager,
     messageDict: dummyResourceManager,
     websocketState: -1,
-    watchStreams: []
+    watchStreams: [],
+    imgurSettings: {
+        clientId: '',
+        clientSecret: ''
+    },
+    setImgurSettings: (settings: ImgurSettings) => {}
 })
 
 export interface appData {
@@ -71,6 +77,8 @@ export interface appData {
     messageDict: IuseResourceManager<Message>
     websocketState: ReadyState
     watchStreams: string[]
+    imgurSettings: ImgurSettings
+    setImgurSettings: (settings: ImgurSettings) => void
 }
 
 function App(): JSX.Element {
@@ -89,6 +97,13 @@ function App(): JSX.Element {
     const [watchStreams, setWatchStreams] = usePersistent<string[]>(
         'watchStreamList',
         []
+    )
+    const [imgurSettings, setImgurSettings] = usePersistent<ImgurSettings>(
+        'imgurSettings',
+        {
+            clientId: '',
+            clientSecret: ''
+        }
     )
     const [theme, setTheme] = useState<ConcurrentTheme>(
         createConcurrentTheme(themeName)
@@ -303,7 +318,9 @@ function App(): JSX.Element {
                     userDict,
                     messageDict,
                     websocketState: readyState,
-                    watchStreams
+                    watchStreams,
+                    imgurSettings,
+                    setImgurSettings
                 }}
             >
                 <Box
