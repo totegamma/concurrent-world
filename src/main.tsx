@@ -14,19 +14,20 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <ErrorBoundary fallback={<EmergencyKit />}>
         <CssBaseline />
         <BrowserRouter>
-            <Suspense fallback={<>loading...</>} />
-            <Routes>
-                <Route path="/welcome" element={<Welcome />} />
-                <Route
-                    path="*"
-                    element={
-                        <LoginGuard
-                            component={<AppPage />}
-                            redirect="/welcome"
-                        />
-                    }
-                />
-            </Routes>
+            <Suspense fallback={<>loading...</>}>
+                <Routes>
+                    <Route path="/welcome" element={<Welcome />} />
+                    <Route
+                        path="*"
+                        element={
+                            <LoginGuard
+                                component={<AppPage />}
+                                redirect="/welcome"
+                            />
+                        }
+                    />
+                </Routes>
+            </Suspense>
         </BrowserRouter>
     </ErrorBoundary>
 )
