@@ -14,6 +14,6 @@ jobs:
           node-version: 18.x
       - name: npm install, build, and test
         run: |
-          npm install
+          npm ci
           npm run postinstall
           npm run build
