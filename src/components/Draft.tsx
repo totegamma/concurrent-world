@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react'
+import React, { useState, useContext, useEffect, SyntheticEvent } from 'react'
 import {
     InputBase,
     Box,
@@ -76,6 +76,24 @@ export function Draft(props: DraftProps): JSX.Element {
         ])
     }, [reactlocation.hash])
 
+    useEffect(() => {
+        const emojis: CustomEmoji[] = [
+            {
+                id: 'fluffy',
+                name: 'Fluffy Social',
+                emojis: Object.entries(appData.emojiDict).map(
+                    ([key, value]) => ({
+                        id: key,
+                        name: value.name,
+                        keywords: value.aliases,
+                        skins: [{ src: value.publicUrl }]
+                    })
+                )
+            }
+        ]
+
+        setCustomEmoji(emojis)
+    }, [appData.emojiDict])
     const post = (): void => {
         const payloadObj = {
             body: draft
@@ -112,24 +130,47 @@ export function Draft(props: DraftProps): JSX.Element {
             })
     }
 
-    useEffect(() => {
-        const emojis: CustomEmoji[] = [
-            {
-                id: 'fluffy',
-                name: 'Fluffy Social',
-                emojis: Object.entries(appData.emojiDict).map(
-                    ([key, value]) => ({
-                        id: key,
-                        name: value.name,
-                        keywords: value.aliases,
-                        skins: [{ src: value.publicUrl }]
-                    })
-                )
-            }
-        ]
+    const uploadToImgur = async (base64Data: string): Promise<string> => {
+        const url = 'https://api.imgur.com/3/image'
 
-        setCustomEmoji(emojis)
-    }, [appData.emojiDict])
+        if (!appData.imgurSettings.clientId) return ''
+
+        const result = await fetch(url, {
+            method: 'POST',
+            headers: {
+                Authorization: `Client-ID ${appData.imgurSettings.clientId}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                type: 'base64',
+                image: base64Data.replace('data:image/png;base64,', '')
+            })
+        })
+        return (await result.json()).data.link
+    }
+
+    const handlePasteImage = (event: any): void => {
+        const isImage = event.clipboardData?.items[0].type?.includes('image')
+        if (isImage) {
+            const imageFile = event.clipboardData?.items[0].getAsFile()
+            if (imageFile) {
+                const URLObj = window.URL || window.webkitURL
+                const imgSrc = URLObj.createObjectURL(imageFile)
+                console.log(imageFile, imgSrc)
+                const reader = new FileReader()
+                reader.onload = async (event) => {
+                    const base64Text = event
+                    if (!base64Text.target) return
+                    const result = await uploadToImgur(
+                        base64Text.target.result as string
+                    )
+                    if (!result) return
+                    setDraft(draft + `![image](${result})`)
+                }
+                reader.readAsDataURL(imageFile)
+            }
+        }
+    }
 
     return (
         <Box
@@ -177,6 +218,7 @@ export function Draft(props: DraftProps): JSX.Element {
                     onChange={(e) => {
                         setDraft(e.target.value)
                     }}
+                    onPaste={handlePasteImage}
                     placeholder="今、なにしてる？"
                     sx={{
                         width: 1,

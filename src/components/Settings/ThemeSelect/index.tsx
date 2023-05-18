@@ -1,8 +1,8 @@
 import { Box, Button, Paper, Typography } from '@mui/material'
-import { ConcurrentLogo } from '../ConcurrentLogo'
-import type { ConcurrentTheme } from '../../model'
+import { ConcurrentLogo } from '../../ConcurrentLogo'
+import type { ConcurrentTheme } from '../../../model'
 import { useMemo } from 'react'
-import { createConcurrentTheme, Themes } from '../../themes'
+import { createConcurrentTheme, Themes } from '../../../themes'
 
 export interface ThemeSelectProp {
     setThemeName: (themeName: string) => void

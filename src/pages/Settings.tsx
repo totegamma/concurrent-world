@@ -8,8 +8,9 @@ import {
 } from '@mui/material'
 import { useContext } from 'react'
 import { ApplicationContext } from '../App'
-import { LogoutButton } from '../components/LogoutButton'
-import { ThemeSelect } from '../components/ThemeSelect'
+import { LogoutButton } from '../components/Settings/LogoutButton'
+import { ThemeSelect } from '../components/Settings/ThemeSelect'
+import { ImgurSettings } from '../components/Settings/Imgur'
 
 export interface SettingsProp {
     setThemeName: (themeName: string) => void
@@ -74,7 +75,7 @@ export function Settings(props: SettingsProp): JSX.Element {
                     </Box>
 
                     <ThemeSelect setThemeName={props.setThemeName} />
-
+                    <ImgurSettings />
                     <Box
                         sx={{
                             display: 'flex',
