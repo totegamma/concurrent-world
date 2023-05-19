@@ -1,10 +1,4 @@
-import React, {
-    useState,
-    useContext,
-    useEffect,
-    SyntheticEvent,
-    useRef
-} from 'react'
+import React, { useState, useContext, useEffect, useRef, memo } from 'react'
 import {
     InputBase,
     Box,
@@ -54,7 +48,7 @@ export interface CustomEmoji {
     keywords?: string[] | undefined
 }
 
-export function Draft(props: DraftProps): JSX.Element {
+export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const appData = useContext(ApplicationContext)
     const theme = useTheme()
 
@@ -373,4 +367,5 @@ export function Draft(props: DraftProps): JSX.Element {
             </Box>
         </Box>
     )
-}
+})
+Draft.displayName = 'Draft'

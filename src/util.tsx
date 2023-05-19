@@ -6,7 +6,6 @@ export const Sign = (privatekey: string, payload: string): string => {
     const keyPair = ellipsis.keyFromPrivate(privatekey)
     const messageHash = keccak256(new TextEncoder().encode(payload)).slice(2)
     const signature = keyPair.sign(messageHash, 'hex', { canonical: true })
-    console.log(signature)
     const r = toHexString(signature.r.toArray())
     const s = toHexString(signature.s.toArray())
     const v = signature.recoveryParam === 0 ? '00' : '01'
