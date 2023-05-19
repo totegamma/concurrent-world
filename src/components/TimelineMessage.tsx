@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, memo } from 'react'
+import { useState, useEffect, useCallback, memo, useContext } from 'react'
 import {
     ListItem,
     Box,
@@ -14,29 +14,24 @@ import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { Sign } from '../util'
 
-import type { Stream, Message, ProfileWithAddress } from '../model'
+import type { Message, ProfileWithAddress } from '../model'
 import type { Profile } from '../schemas/profile'
 import { Schemas } from '../schemas'
 import { MarkdownRenderer } from './MarkdownRenderer'
-import { type IuseResourceManager } from '../hooks/useResourceManager'
 import { CCAvatar } from './CCAvatar'
 import { TimeDiff } from './TimeDiff'
+import { ApplicationContext } from '../App'
 
-export interface TimelineMessageProps {
+export interface TimelineMessageappData {
     message: string
     lastUpdated: number
     follow: (ccaddress: string) => void
     setInspectItem: (message: Message) => void
-    messageDict: IuseResourceManager<Message>
-    userDict: IuseResourceManager<Profile>
-    streamDict: IuseResourceManager<Stream>
-    userAddress: string
-    privatekey: string
-    serverAddress: string
 }
 
-export const TimelineMessage = memo<TimelineMessageProps>(
-    (props: TimelineMessageProps): JSX.Element => {
+export const TimelineMessage = memo<TimelineMessageappData>(
+    (props: TimelineMessageappData): JSX.Element => {
+        const appData = useContext(ApplicationContext)
         const [user, setUser] = useState<Profile>({})
         const [message, setMessage] = useState<Message | undefined>()
         const [msgstreams, setStreams] = useState<string[]>([])
@@ -47,11 +42,11 @@ export const TimelineMessage = memo<TimelineMessageProps>(
         const [hasOwnReaction, setHasOwnReaction] = useState<boolean>(false)
 
         useEffect(() => {
-            props.messageDict
+            appData.messageDict
                 .get(props.message)
                 .then((msg) => {
                     setMessage(msg)
-                    props.userDict
+                    appData.userDict
                         .get(msg.author)
                         .then((user) => {
                             setUser(user)
@@ -65,7 +60,7 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                             .split(',')
                             .map(
                                 async (id) =>
-                                    await props.streamDict
+                                    await appData.streamDict
                                         .get(id)
                                         .then((e) =>
                                             e.meta
@@ -91,7 +86,7 @@ export const TimelineMessage = memo<TimelineMessageProps>(
 
                 if (
                     message?.associations_data.find(
-                        (e) => e.author === props.userAddress
+                        (e) => e.author === appData.userAddress
                     ) != null
                 ) {
                     setHasOwnReaction(true)
@@ -100,7 +95,7 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                 }
                 const users = await Promise.all(
                     authors.map((ccaddress) =>
-                        props.userDict.get(ccaddress).then((e) => {
+                        appData.userDict.get(ccaddress).then((e) => {
                             return {
                                 ccaddress,
                                 ...e
@@ -120,17 +115,17 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                 if (!messageID) return
                 const payloadObj = {}
                 const payload = JSON.stringify(payloadObj)
-                const signature = Sign(props.privatekey, payload)
-                const targetAuthor = (await props.messageDict.get(messageID))
+                const signature = Sign(appData.privatekey, payload)
+                const targetAuthor = (await appData.messageDict.get(messageID))
                     .author
-                const targetStream = (await props.userDict.get(targetAuthor))
+                const targetStream = (await appData.userDict.get(targetAuthor))
                     .notificationStream
 
                 const requestOptions = {
                     method: 'POST',
                     headers: { 'content-type': 'application/json' },
                     body: JSON.stringify({
-                        author: props.userAddress,
+                        author: appData.userAddress,
                         schema: favoriteScheme,
                         target: messageID,
                         payload,
@@ -139,13 +134,13 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                     })
                 }
 
-                fetch(props.serverAddress + 'associations', requestOptions)
+                fetch(appData.serverAddress + 'associations', requestOptions)
                     .then(async (res) => await res.json())
                     .then((_) => {
-                        props.messageDict.invalidate(messageID)
+                        appData.messageDict.invalidate(messageID)
                     })
             },
-            [props.serverAddress, props.userAddress]
+            [appData.serverAddress, appData.userAddress]
         )
 
         const unfavorite = useCallback(
@@ -163,13 +158,13 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                     })
                 }
 
-                fetch(props.serverAddress + 'associations', requestOptions)
+                fetch(appData.serverAddress + 'associations', requestOptions)
                     .then(async (res) => await res.json())
                     .then((_) => {
-                        props.messageDict.invalidate(messageID)
+                        appData.messageDict.invalidate(messageID)
                     })
             },
-            [props.serverAddress]
+            [appData.serverAddress]
         )
 
         if (!message) {
@@ -362,7 +357,7 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                                                             message.associations_data.find(
                                                                 (e) =>
                                                                     e.author ===
-                                                                    props.userAddress
+                                                                    appData.userAddress
                                                             )?.id
                                                         )
                                                     } else {

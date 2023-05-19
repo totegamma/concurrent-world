@@ -220,18 +220,6 @@ export const Timeline = memo<TimelineProps>(
                                                 lastUpdated={e.LastUpdated}
                                                 setInspectItem={setInspectItem}
                                                 follow={props.follow}
-                                                messageDict={
-                                                    appData.messageDict
-                                                }
-                                                userDict={appData.userDict}
-                                                streamDict={appData.streamDict}
-                                                userAddress={
-                                                    appData.userAddress
-                                                }
-                                                privatekey={appData.privatekey}
-                                                serverAddress={
-                                                    appData.serverAddress
-                                                }
                                             />
                                             <Divider
                                                 variant="inset"
