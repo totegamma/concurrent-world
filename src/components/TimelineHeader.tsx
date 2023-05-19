@@ -66,7 +66,10 @@ export function TimelineHeader(props: TimelineHeaderProps): JSX.Element {
                 }}
             >
                 <IconButton
-                    sx={{ p: '8px', display: { xs: 'inherit', sm: 'none' } }}
+                    sx={{
+                        p: '8px',
+                        visibility: { xs: 'inherit', sm: 'hidden' }
+                    }}
                     onClick={() => {
                         props.setMobileMenuOpen(true)
                     }}
@@ -81,9 +84,10 @@ export function TimelineHeader(props: TimelineHeaderProps): JSX.Element {
                 <Button
                     sx={{
                         width: 1,
-                        justifyContent: { xs: 'flex-left', xl: 'flex-start' },
+                        justifyContent: 'flex-left',
                         color: 'primary.contrastText',
-                        p: { xs: '0', xl: '8px 0 8 4px' }
+                        p: '0',
+                        m: '-2px -2px -2px -16px'
                     }}
                     onClick={() => {
                         props.scrollParentRef.current?.scroll({
