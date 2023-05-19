@@ -148,7 +148,6 @@ function App(): JSX.Element {
     const [clock, setClock] = useState<Date>(new Date())
     useEffect(() => {
         const timer = setInterval(() => {
-            console.log('tick')
             setClock(new Date())
         }, 5000)
         return () => {
