@@ -1,4 +1,11 @@
-import { useEffect, useState, useCallback, createContext, useRef } from 'react'
+import {
+    useEffect,
+    useState,
+    useCallback,
+    createContext,
+    useRef,
+    useMemo
+} from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider, Drawer } from '@mui/material'
 import useWebSocket, { type ReadyState } from 'react-use-websocket'
@@ -81,6 +88,8 @@ export interface appData {
     setImgurSettings: (settings: ImgurSettings) => void
 }
 
+export const ClockContext = createContext<Date>(new Date())
+
 function App(): JSX.Element {
     const [server, setServer] = usePersistent<string>('ServerAddress', '')
     const [pubkey, setPubKey] = usePersistent<string>('PublicKey', '')
@@ -135,6 +144,17 @@ function App(): JSX.Element {
     useEffect(() => {
         playNotificationRef.current = playNotification
     }, [playNotification])
+
+    const [clock, setClock] = useState<Date>(new Date())
+    useEffect(() => {
+        const timer = setInterval(() => {
+            console.log('tick')
+            setClock(new Date())
+        }, 5000)
+        return () => {
+            clearInterval(timer)
+        }
+    }, [setClock])
 
     const [emojiDict, setEmojiDict] = useState<Record<string, Emoji>>({})
     useEffect(() => {
@@ -306,41 +326,53 @@ function App(): JSX.Element {
 
     return (
         <ThemeProvider theme={theme}>
-            <ApplicationContext.Provider
-                value={{
-                    serverAddress: server,
-                    publickey: pubkey,
-                    privatekey: prvkey,
-                    userAddress: address,
-                    emojiDict,
-                    profile,
-                    streamDict,
-                    userDict,
-                    messageDict,
-                    websocketState: readyState,
-                    watchStreams,
-                    imgurSettings,
-                    setImgurSettings
-                }}
-            >
-                <Box
-                    sx={{
-                        background: [
-                            theme.palette.background.default,
-                            `linear-gradient(${
-                                theme.palette.background.default
-                            }, ${darken(
-                                theme.palette.background.default,
-                                0.1
-                            )})`
-                        ]
-                    }}
+            <ClockContext.Provider value={clock}>
+                <ApplicationContext.Provider
+                    value={useMemo(() => {
+                        return {
+                            serverAddress: server,
+                            publickey: pubkey,
+                            privatekey: prvkey,
+                            userAddress: address,
+                            emojiDict,
+                            profile,
+                            streamDict,
+                            userDict,
+                            messageDict,
+                            websocketState: readyState,
+                            watchStreams,
+                            imgurSettings,
+                            setImgurSettings
+                        }
+                    }, [
+                        server,
+                        pubkey,
+                        address,
+                        emojiDict,
+                        profile,
+                        streamDict,
+                        userDict,
+                        messageDict,
+                        readyState,
+                        watchStreams,
+                        imgurSettings,
+                        setImgurSettings
+                    ])}
                 >
                     <Box
                         sx={{
                             display: 'flex',
                             maxWidth: '1280px',
                             margin: 'auto',
+                            background: [
+                                theme.palette.background.default,
+                                `linear-gradient(${
+                                    theme.palette.background.default
+                                }, ${darken(
+                                    theme.palette.background.default,
+                                    0.1
+                                )})`
+                            ],
                             height: '100dvh'
                         }}
                     >
@@ -441,32 +473,32 @@ function App(): JSX.Element {
                             </Box>
                         </Box>
                     </Box>
-                </Box>
-                <Drawer
-                    anchor={'left'}
-                    open={mobileMenuOpen}
-                    onClose={() => {
-                        setMobileMenuOpen(false)
-                    }}
-                    PaperProps={{
-                        sx: {
-                            width: '200px',
-                            padding: '0 5px 0 0',
-                            borderRadius: '0 20px 20px 0',
-                            overflow: 'hidden',
-                            backgroundColor: 'background.default'
-                        }
-                    }}
-                >
-                    <Menu
-                        streams={watchStreams}
-                        onClick={() => {
+                    <Drawer
+                        anchor={'left'}
+                        open={mobileMenuOpen}
+                        onClose={() => {
                             setMobileMenuOpen(false)
                         }}
-                        hideMenu
-                    />
-                </Drawer>
-            </ApplicationContext.Provider>
+                        PaperProps={{
+                            sx: {
+                                width: '200px',
+                                padding: '0 5px 0 0',
+                                borderRadius: '0 20px 20px 0',
+                                overflow: 'hidden',
+                                backgroundColor: 'background.default'
+                            }
+                        }}
+                    >
+                        <Menu
+                            streams={watchStreams}
+                            onClick={() => {
+                                setMobileMenuOpen(false)
+                            }}
+                            hideMenu
+                        />
+                    </Drawer>
+                </ApplicationContext.Provider>
+            </ClockContext.Provider>
         </ThemeProvider>
     )
 }

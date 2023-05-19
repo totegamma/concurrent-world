@@ -16,7 +16,7 @@ import MessageIcon from '@mui/icons-material/Message'
 import ExploreIcon from '@mui/icons-material/Explore'
 import SettingsIcon from '@mui/icons-material/Settings'
 import NotificationsIcon from '@mui/icons-material/Notifications'
-import { useContext, useEffect, useState } from 'react'
+import { memo, useContext, useEffect, useState } from 'react'
 import { ApplicationContext } from '../App'
 import type { ConcurrentTheme, Stream } from '../model'
 import { ConcurrentLogo } from './ConcurrentLogo'
@@ -35,7 +35,7 @@ export interface MenuProps {
     onClick?: () => void
 }
 
-export function Menu(props: MenuProps): JSX.Element {
+export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
     const appData = useContext(ApplicationContext)
     const [watchStreams, setWatchStreams] = useState<Stream[]>([])
 
@@ -221,4 +221,6 @@ export function Menu(props: MenuProps): JSX.Element {
             </Box>
         </Box>
     )
-}
+})
+
+Menu.displayName = 'Menu'

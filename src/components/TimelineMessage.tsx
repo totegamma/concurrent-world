@@ -12,7 +12,7 @@ import {
 import StarIcon from '@mui/icons-material/Star'
 import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
-import { Sign, humanReadableTimeDiff } from '../util'
+import { Sign } from '../util'
 
 import type { Stream, Message, ProfileWithAddress } from '../model'
 import type { Profile } from '../schemas/profile'
@@ -20,6 +20,7 @@ import { Schemas } from '../schemas'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import { type IuseResourceManager } from '../hooks/useResourceManager'
 import { CCAvatar } from './CCAvatar'
+import { TimeDiff } from './TimeDiff'
 
 export interface TimelineMessageProps {
     message: string
@@ -289,9 +290,7 @@ export const TimelineMessage = memo<TimelineMessageProps>(
                                     underline="hover"
                                     color="inherit"
                                 >
-                                    {humanReadableTimeDiff(
-                                        new Date(message.cdate)
-                                    )}
+                                    <TimeDiff date={new Date(message.cdate)} />
                                 </Link>
                             </Box>
                             <MarkdownRenderer
