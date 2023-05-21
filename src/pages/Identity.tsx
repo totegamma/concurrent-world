@@ -53,12 +53,6 @@ export function Identity(): JSX.Element {
                     {appData.userAddress}
                 </Typography>
                 <Typography variant="h3" gutterBottom>
-                    Publickey
-                </Typography>
-                <Typography sx={{ wordBreak: 'break-all' }}>
-                    {appData.publickey}
-                </Typography>
-                <Typography variant="h3" gutterBottom>
                     Privatekey
                 </Typography>
                 <Typography

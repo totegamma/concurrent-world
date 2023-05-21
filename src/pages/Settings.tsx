@@ -15,9 +15,6 @@ import { ImgurSettings } from '../components/Settings/Imgur'
 export interface SettingsProp {
     setThemeName: (themeName: string) => void
     setServerAddr: (serverAddr: string) => void
-    setUserAddr: (userAddr: string) => void
-    setPubKey: (key: string) => void
-    setPrvKey: (key: string) => void
 }
 
 export function Settings(props: SettingsProp): JSX.Element {

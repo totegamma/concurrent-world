@@ -52,7 +52,6 @@ import ConcurrentApiClient from './apiservice'
 
 export const ApplicationContext = createContext<appData>({
     serverAddress: '',
-    publickey: '',
     privatekey: '',
     userAddress: '',
     profile: undefined,
@@ -70,7 +69,6 @@ export const ApplicationContext = createContext<appData>({
 
 export interface appData {
     serverAddress: string
-    publickey: string
     privatekey: string
     userAddress: string
     profile: Character<Profile> | undefined
@@ -87,9 +85,8 @@ export const ClockContext = createContext<Date>(new Date())
 
 function App(): JSX.Element {
     const [server, setServer] = usePersistent<string>('ServerAddress', '')
-    const [pubkey, setPubKey] = usePersistent<string>('PublicKey', '')
-    const [prvkey, setPrvKey] = usePersistent<string>('PrivateKey', '')
-    const [address, setAddress] = usePersistent<string>('Address', '')
+    const [prvkey] = usePersistent<string>('PrivateKey', '')
+    const [address] = usePersistent<string>('Address', '')
     const [api, initializeApi] = useState<ConcurrentApiClient>()
     useEffect(() => {
         const api = new ConcurrentApiClient(server, address, prvkey)
@@ -300,7 +297,6 @@ function App(): JSX.Element {
     const applicationContext = useMemo(() => {
         return {
             serverAddress: server,
-            publickey: pubkey,
             privatekey: prvkey,
             userAddress: address,
             emojiDict,
@@ -314,7 +310,6 @@ function App(): JSX.Element {
         }
     }, [
         server,
-        pubkey,
         address,
         emojiDict,
         profile,
@@ -431,9 +426,6 @@ function App(): JSX.Element {
                                             element={
                                                 <Settings
                                                     setThemeName={setThemeName}
-                                                    setPrvKey={setPrvKey}
-                                                    setPubKey={setPubKey}
-                                                    setUserAddr={setAddress}
                                                     setServerAddr={setServer}
                                                 />
                                             }
