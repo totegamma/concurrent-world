@@ -276,9 +276,9 @@ function App(): JSX.Element {
                 console.log(event)
                 switch (event.action) {
                     case 'create': {
-                        messageDict.invalidate(association.target)
+                        messageDict.invalidate(association.targetID)
                         const target = messages.current.find(
-                            (e) => e.Values.id === association.target
+                            (e) => e.Values.id === association.targetID
                         )
                         if (target) {
                             target.LastUpdated = new Date().getTime()
@@ -287,9 +287,9 @@ function App(): JSX.Element {
                         break
                     }
                     case 'delete': {
-                        messageDict.invalidate(association.target)
+                        messageDict.invalidate(association.targetID)
                         const target = messages.current.find(
-                            (e) => e.Values.id === association.target
+                            (e) => e.Values.id === association.targetID
                         )
                         if (target) {
                             target.LastUpdated = new Date().getTime()

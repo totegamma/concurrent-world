@@ -127,7 +127,8 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                     body: JSON.stringify({
                         author: appData.userAddress,
                         schema: favoriteScheme,
-                        target: messageID,
+                        targetID: messageID,
+                        targetType: 'messages',
                         payload,
                         signature,
                         streams: [targetStream].filter((e) => e)

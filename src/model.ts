@@ -35,7 +35,8 @@ export interface Association {
     payload: string
     schema: string
     signature: string
-    target: string
+    targetID: string
+    targetType: string
 }
 
 export interface Message {
