@@ -81,7 +81,7 @@ export interface appData {
     emojiDict: Record<string, Emoji>
     streamDict: IuseResourceManager<Stream>
     userDict: IuseResourceManager<Profile>
-    messageDict: IuseResourceManager<Message>
+    messageDict: IuseResourceManager<Message<any>>
     websocketState: ReadyState
     watchStreams: string[]
     imgurSettings: ImgurSettings
@@ -194,7 +194,7 @@ function App(): JSX.Element {
         )
     )
 
-    const messageDict = useResourceManager<Message>(
+    const messageDict = useResourceManager<Message<any>>(
         useCallback(
             async (key: string) => {
                 const res = await fetch(server + `messages/${key}`, {
@@ -202,7 +202,10 @@ function App(): JSX.Element {
                     headers: {}
                 })
                 const data = await res.json()
-                return data.message
+                return {
+                    ...data,
+                    payload: JSON.parse(data.payload ?? 'null')
+                }
             },
             [server]
         )
@@ -238,7 +241,7 @@ function App(): JSX.Element {
         if (!event) return
         switch (event.type) {
             case 'message': {
-                const message = event.body as Message
+                const message = event.body as Message<any>
                 switch (event.action) {
                     case 'create': {
                         if (
@@ -249,7 +252,7 @@ function App(): JSX.Element {
                             return
                         }
                         const groupA = currentStreams
-                        const groupB = message.streams.split(',')
+                        const groupB = message.streams
                         if (!groupA.some((e) => groupB.includes(e))) return
                         const current = new Date().getTime()
                         messages.pushFront({

@@ -26,14 +26,14 @@ export interface TimelineMessageappData {
     message: string
     lastUpdated: number
     follow: (ccaddress: string) => void
-    setInspectItem: (message: Message) => void
+    setInspectItem: (message: Message<any>) => void
 }
 
 export const TimelineMessage = memo<TimelineMessageappData>(
     (props: TimelineMessageappData): JSX.Element => {
         const appData = useContext(ApplicationContext)
         const [user, setUser] = useState<Profile>({})
-        const [message, setMessage] = useState<Message | undefined>()
+        const [message, setMessage] = useState<Message<any> | undefined>()
         const [msgstreams, setStreams] = useState<string[]>([])
         const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
 
@@ -56,18 +56,14 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                         })
 
                     Promise.all(
-                        msg.streams
-                            .split(',')
-                            .map(
-                                async (id) =>
-                                    await appData.streamDict
-                                        .get(id)
-                                        .then((e) =>
-                                            e.meta
-                                                ? JSON.parse(e.meta).name
-                                                : null
-                                        )
-                            )
+                        msg.streams.map(
+                            async (id) =>
+                                await appData.streamDict
+                                    .get(id)
+                                    .then((e) =>
+                                        e.meta ? JSON.parse(e.meta).name : null
+                                    )
+                        )
                     ).then((e) => {
                         setStreams(e.filter((x) => x))
                     })
@@ -168,7 +164,7 @@ export const TimelineMessage = memo<TimelineMessageappData>(
             [appData.serverAddress]
         )
 
-        if (!message) {
+        if (!message?.payload?.body) {
             return (
                 <ListItem
                     sx={{
@@ -202,7 +198,7 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                     wordBreak: 'break-word'
                 }}
             >
-                {JSON.parse(message.payload).body && (
+                {message?.payload?.body && (
                     <>
                         <Box
                             sx={{
@@ -290,7 +286,7 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                                 </Link>
                             </Box>
                             <MarkdownRenderer
-                                messagebody={JSON.parse(message.payload).body}
+                                messagebody={message.payload.body.body}
                             />
                             <Box
                                 sx={{

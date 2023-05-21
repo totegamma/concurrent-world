@@ -33,7 +33,9 @@ export const Timeline = memo<TimelineProps>(
         const reactlocation = useLocation()
         const scrollParentRef = useRef<HTMLDivElement>(null)
         const [hasMoreData, setHasMoreData] = useState<boolean>(false)
-        const [inspectItem, setInspectItem] = useState<Message | null>(null)
+        const [inspectItem, setInspectItem] = useState<Message<any> | null>(
+            null
+        )
 
         const [followStreams] = usePersistent<string[]>('followStreams', [])
 
@@ -267,10 +269,10 @@ export const Timeline = memo<TimelineProps>(
                         <Typography>Payload:</Typography>
                         <pre style={{ overflowX: 'scroll' }}>
                             {JSON.stringify(
-                                JSON.parse(inspectItem?.payload ?? 'null'),
+                                inspectItem?.payload ?? 'null',
                                 null,
                                 4
-                            ).replaceAll('\\n', '\n')}
+                            )?.replaceAll('\\n', '\n')}
                         </pre>
                         <Typography>Associations:</Typography>
                         <pre style={{ overflowX: 'scroll' }}>

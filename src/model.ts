@@ -28,6 +28,15 @@ export interface StreamElementDated extends StreamElement {
     LastUpdated: number
 }
 
+export interface SignedObject<T> {
+    signer: string
+    type: string
+    schema: string
+    body: T
+    meta: any
+    signedAt: string
+}
+
 export interface Association {
     author: string
     cdate: string
@@ -39,21 +48,27 @@ export interface Association {
     targetType: string
 }
 
-export interface Message {
+export interface MessagePostRequest {
+    signedObject: string
+    signature: string
+    streams: string[]
+}
+
+export interface Message<T> {
     associations: Association[]
     author: string
     cdate: string
     id: string
-    payload: string
+    payload: SignedObject<T>
     schema: string
     signature: string
-    streams: string
+    streams: string[]
 }
 
 export interface ServerEvent {
     type: string
     action: string
-    body: Message | Association
+    body: Message<any> | Association
 }
 
 export interface Emoji {

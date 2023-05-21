@@ -21,6 +21,12 @@ import { MarkdownRenderer } from './MarkdownRenderer'
 import { StreamPicker } from './StreamPicker'
 import { useLocation } from 'react-router-dom'
 import { usePersistent } from '../hooks/usePersistent'
+import type { SimpleNote } from '../schemas/simpleNote'
+import type { MessagePostRequest, SignedObject } from '../model'
+
+// @ts-expect-error vite dynamic import
+import { branch, sha } from '~build/info'
+const branchName = branch || window.location.host.split('.')[0]
 
 export interface EmojiProps {
     shortcodes: string
@@ -97,31 +103,40 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         setCustomEmoji(emojis)
     }, [appData.emojiDict])
     const post = (): void => {
-        const payloadObj = {
-            body: draft
+        const signObject: SignedObject<SimpleNote> = {
+            signer: appData.userAddress,
+            type: 'Message',
+            schema: Schemas.simpleNote,
+            body: {
+                body: draft
+            },
+            meta: {
+                client: `concurrent-web ${branchName as string}-${
+                    sha as string
+                }`
+            },
+            signedAt: new Date().toISOString()
         }
 
-        const payload = JSON.stringify(payloadObj)
-        const signature = Sign(appData.privatekey, payload)
+        const signedObject = JSON.stringify(signObject)
+        const signature = Sign(appData.privatekey, signedObject)
+
+        const request: MessagePostRequest = {
+            signedObject,
+            signature,
+            streams: [
+                ...new Set([
+                    ...props.currentStreams.split(','),
+                    ...messageDestStreams,
+                    ...(postHome ? [appData.profile.homeStream] : [])
+                ])
+            ].filter((e) => e) as string[]
+        }
 
         const requestOptions = {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({
-                author: appData.userAddress,
-                payload,
-                signature,
-                streams: [
-                    ...new Set([
-                        ...props.currentStreams.split(','),
-                        ...messageDestStreams,
-                        ...(postHome ? [appData.profile.homeStream] : [])
-                    ])
-                ]
-                    .filter((e) => e)
-                    .join(','),
-                schema: Schemas.simpleNote
-            })
+            body: JSON.stringify(request)
         }
 
         fetch(appData.serverAddress + 'messages', requestOptions)
