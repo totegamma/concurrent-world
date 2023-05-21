@@ -15,6 +15,8 @@ import { ProfileEditor } from './ProfileEditor'
 import { MobileStepper } from '@mui/material'
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
+import ConcurrentApiClient from '../apiservice'
+import ApiProvider from '../context/api'
 
 export function Registration(): JSX.Element {
     const navigate = useNavigate()
@@ -40,6 +42,12 @@ export function Registration(): JSX.Element {
     const userAddress = 'CC' + wallet.address.slice(2)
     const privateKey = wallet.privateKey.slice(2)
     const [server, setServer] = useState<string>('')
+
+    const [api, initializeApi] = useState<ConcurrentApiClient>()
+    useEffect(() => {
+        const api = new ConcurrentApiClient(server, userAddress, privateKey)
+        initializeApi(api)
+    }, [server, userAddress, privateKey])
 
     const setupAccount = (): void => {
         localStorage.setItem('ServerAddress', JSON.stringify(server))
@@ -125,13 +133,6 @@ export function Registration(): JSX.Element {
             <Typography variant="h2">プロフィールの作成</Typography>
             ここで名前・アイコン・自己紹介を設定します。
             <ProfileEditor
-                initial={{
-                    username: '',
-                    avatar: '',
-                    homeStream: '',
-                    notificationStream: '',
-                    description: ''
-                }}
                 userAddress={userAddress}
                 privatekey={privateKey}
                 serverAddress={server}
@@ -189,141 +190,147 @@ export function Registration(): JSX.Element {
     }, [mnemonicTest, server, profileSubmitted])
 
     return (
-        <Paper
-            sx={{
-                width: { xs: '90vw', md: '60vw' },
-                height: { xs: '90vh', md: '600px' },
-                p: '10px',
-                display: 'flex',
-                flexDirection: 'column',
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                overflow: 'hidden'
-            }}
-        >
-            <Typography>Concurrentアカウントセットアップウィザード</Typography>
-            <Stepper /* for Desktop */
+        <ApiProvider api={api}>
+            <Paper
                 sx={{
-                    display: { xs: 'none', md: 'flex' }
+                    width: { xs: '90vw', md: '60vw' },
+                    height: { xs: '90vh', md: '600px' },
+                    p: '10px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    overflow: 'hidden'
                 }}
-                activeStep={activeStep}
             >
-                {steps.map((step, _) => {
-                    const stepProps: { completed?: boolean } = {}
-                    const labelProps: {
-                        optional?: React.ReactNode
-                    } = {}
-                    return (
-                        <Step key={step.title} {...stepProps}>
-                            <StepLabel {...labelProps}>{step.title}</StepLabel>
-                        </Step>
-                    )
-                })}
-            </Stepper>
-            {activeStep < steps.length && (
-                <Paper /* for Mobile */
-                    square
-                    elevation={0}
+                <Typography>
+                    Concurrentアカウントセットアップウィザード
+                </Typography>
+                <Stepper /* for Desktop */
                     sx={{
-                        alignItems: 'center',
-                        height: 50,
-                        display: { xs: 'flex', md: 'none' },
-                        pl: 2,
-                        backgroundColor: 'background.default'
+                        display: { xs: 'none', md: 'flex' }
                     }}
+                    activeStep={activeStep}
                 >
-                    <Typography>{steps[activeStep].title}</Typography>
-                </Paper>
-            )}
+                    {steps.map((step, _) => {
+                        const stepProps: { completed?: boolean } = {}
+                        const labelProps: {
+                            optional?: React.ReactNode
+                        } = {}
+                        return (
+                            <Step key={step.title} {...stepProps}>
+                                <StepLabel {...labelProps}>
+                                    {step.title}
+                                </StepLabel>
+                            </Step>
+                        )
+                    })}
+                </Stepper>
+                {activeStep < steps.length && (
+                    <Paper /* for Mobile */
+                        square
+                        elevation={0}
+                        sx={{
+                            alignItems: 'center',
+                            height: 50,
+                            display: { xs: 'flex', md: 'none' },
+                            pl: 2,
+                            backgroundColor: 'background.default'
+                        }}
+                    >
+                        <Typography>{steps[activeStep].title}</Typography>
+                    </Paper>
+                )}
 
-            {activeStep === steps.length ? (
-                <>
-                    <Typography sx={{ mt: 2, mb: 1 }}>
-                        これで完了です！始めましょう！
-                    </Typography>
-                    <Box
-                        sx={{
-                            display: { xs: 'none', md: 'flex' },
-                            flexDirection: 'row',
-                            pt: 2
-                        }}
-                    >
-                        <Box sx={{ flex: '1 1 auto' }} />
-                        <Button variant="contained" onClick={setupAccount}>
-                            GO!
-                        </Button>
-                    </Box>
-                </>
-            ) : (
-                <>
-                    <Box sx={{ flex: 1, overflowY: 'auto' }}>
-                        {steps[activeStep].component}
-                    </Box>
-                    <Box
-                        sx={{
-                            display: { xs: 'none', md: 'flex' },
-                            flexDirection: 'row',
-                            pt: 2
-                        }}
-                    >
-                        <Button
-                            color="inherit"
-                            disabled={activeStep === 0}
-                            onClick={handleBack}
-                            sx={{ mr: 1 }}
+                {activeStep === steps.length ? (
+                    <>
+                        <Typography sx={{ mt: 2, mb: 1 }}>
+                            これで完了です！始めましょう！
+                        </Typography>
+                        <Box
+                            sx={{
+                                display: { xs: 'none', md: 'flex' },
+                                flexDirection: 'row',
+                                pt: 2
+                            }}
                         >
-                            Back
-                        </Button>
-                        <Box sx={{ flex: '1 1 auto' }} />
-                        <Button
-                            variant="contained"
-                            onClick={handleNext}
-                            disabled={!stepOK[activeStep]}
+                            <Box sx={{ flex: '1 1 auto' }} />
+                            <Button variant="contained" onClick={setupAccount}>
+                                GO!
+                            </Button>
+                        </Box>
+                    </>
+                ) : (
+                    <>
+                        <Box sx={{ flex: 1, overflowY: 'auto' }}>
+                            {steps[activeStep].component}
+                        </Box>
+                        <Box
+                            sx={{
+                                display: { xs: 'none', md: 'flex' },
+                                flexDirection: 'row',
+                                pt: 2
+                            }}
                         >
-                            {activeStep === steps.length - 1
-                                ? 'Finish'
-                                : 'Next'}
-                        </Button>
-                    </Box>
-                </>
-            )}
-            <MobileStepper
-                sx={{
-                    display: { xs: 'flex', md: 'none' }
-                }}
-                variant="text"
-                steps={steps.length}
-                position="static"
-                activeStep={activeStep}
-                nextButton={
-                    activeStep === steps.length ? (
-                        <Button variant="contained" onClick={setupAccount}>
-                            GO!
-                        </Button>
-                    ) : (
+                            <Button
+                                color="inherit"
+                                disabled={activeStep === 0}
+                                onClick={handleBack}
+                                sx={{ mr: 1 }}
+                            >
+                                Back
+                            </Button>
+                            <Box sx={{ flex: '1 1 auto' }} />
+                            <Button
+                                variant="contained"
+                                onClick={handleNext}
+                                disabled={!stepOK[activeStep]}
+                            >
+                                {activeStep === steps.length - 1
+                                    ? 'Finish'
+                                    : 'Next'}
+                            </Button>
+                        </Box>
+                    </>
+                )}
+                <MobileStepper
+                    sx={{
+                        display: { xs: 'flex', md: 'none' }
+                    }}
+                    variant="text"
+                    steps={steps.length}
+                    position="static"
+                    activeStep={activeStep}
+                    nextButton={
+                        activeStep === steps.length ? (
+                            <Button variant="contained" onClick={setupAccount}>
+                                GO!
+                            </Button>
+                        ) : (
+                            <Button
+                                size="small"
+                                onClick={handleNext}
+                                disabled={!stepOK[activeStep]}
+                            >
+                                Next
+                                <KeyboardArrowRight />
+                            </Button>
+                        )
+                    }
+                    backButton={
                         <Button
                             size="small"
-                            onClick={handleNext}
-                            disabled={!stepOK[activeStep]}
+                            onClick={handleBack}
+                            disabled={activeStep === 0}
                         >
-                            Next
-                            <KeyboardArrowRight />
+                            <KeyboardArrowLeft />
+                            Back
                         </Button>
-                    )
-                }
-                backButton={
-                    <Button
-                        size="small"
-                        onClick={handleBack}
-                        disabled={activeStep === 0}
-                    >
-                        <KeyboardArrowLeft />
-                        Back
-                    </Button>
-                }
-            />
-        </Paper>
+                    }
+                />
+            </Paper>
+        </ApiProvider>
     )
 }

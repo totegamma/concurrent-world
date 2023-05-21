@@ -16,9 +16,9 @@ import MessageIcon from '@mui/icons-material/Message'
 import ExploreIcon from '@mui/icons-material/Explore'
 import SettingsIcon from '@mui/icons-material/Settings'
 import NotificationsIcon from '@mui/icons-material/Notifications'
-import { memo, useContext, useEffect, useState } from 'react'
+import { memo, useContext } from 'react'
 import { ApplicationContext } from '../App'
-import type { ConcurrentTheme, Stream } from '../model'
+import type { ConcurrentTheme } from '../model'
 import { ConcurrentLogo } from './ConcurrentLogo'
 
 // @ts-expect-error vite dynamic import
@@ -37,21 +37,8 @@ export interface MenuProps {
 
 export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
     const appData = useContext(ApplicationContext)
-    const [watchStreams, setWatchStreams] = useState<Stream[]>([])
 
     const theme = useTheme<ConcurrentTheme>()
-
-    useEffect(() => {
-        ;(async () => {
-            setWatchStreams(
-                await Promise.all(
-                    props.streams.map(
-                        async (id) => await appData.streamDict.get(id)
-                    )
-                )
-            )
-        })()
-    }, [props.streams])
 
     const iconColor =
         appData.websocketState === 1

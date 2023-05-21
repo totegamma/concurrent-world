@@ -18,6 +18,8 @@ import type { ProfileWithAddress } from '../model'
 import { ApplicationContext } from '../App'
 import { useLocation } from 'react-router-dom'
 import { CCAvatar } from '../components/CCAvatar'
+import { useApi } from '../context/api'
+import { Schemas } from '../schemas'
 
 export interface StreamInfoProps {
     followList: string[]
@@ -25,6 +27,7 @@ export interface StreamInfoProps {
 }
 
 export function StreamInfo(props: StreamInfoProps): JSX.Element {
+    const api = useApi()
     const appData = useContext(ApplicationContext)
     const reactlocation = useLocation()
     const [tab, setTab] = useState(0)
@@ -71,10 +74,10 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
     useEffect(() => {
         Promise.all(
             props.followList.map((ccaddress) =>
-                appData.userDict.get(ccaddress).then((e) => {
+                api.readCharacter(ccaddress, Schemas.profile).then((e) => {
                     return {
                         ccaddress,
-                        ...e
+                        ...e?.payload.body
                     }
                 })
             )

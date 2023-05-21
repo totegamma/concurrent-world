@@ -16,6 +16,8 @@ import { ApplicationContext } from '../App'
 import InfiniteScroll from 'react-infinite-scroller'
 import { usePersistent } from '../hooks/usePersistent'
 import { TimelineHeader } from '../components/TimelineHeader'
+import { useApi } from '../context/api'
+import { Schemas } from '../schemas'
 
 export interface TimelineProps {
     messages: IuseObjectList<StreamElementDated>
@@ -27,6 +29,7 @@ export interface TimelineProps {
 
 export const Timeline = memo<TimelineProps>(
     (props: TimelineProps): JSX.Element => {
+        const api = useApi()
         const appData = useContext(ApplicationContext)
         const theme = useTheme()
 
@@ -47,8 +50,11 @@ export const Timeline = memo<TimelineProps>(
                         props.followList.map(
                             async (ccaddress) =>
                                 (
-                                    await appData.userDict.get(ccaddress)
-                                ).homeStream
+                                    await api.readCharacter(
+                                        ccaddress,
+                                        Schemas.profile
+                                    )
+                                )?.payload.body.homeStream
                         )
                     )
                 )
@@ -93,8 +99,11 @@ export const Timeline = memo<TimelineProps>(
                         props.followList.map(
                             async (ccaddress) =>
                                 (
-                                    await appData.userDict.get(ccaddress)
-                                ).homeStream
+                                    await api.readCharacter(
+                                        ccaddress,
+                                        Schemas.profile
+                                    )
+                                )?.payload.body.homeStream
                         )
                     )
                 )
@@ -150,8 +159,11 @@ export const Timeline = memo<TimelineProps>(
                             props.followList.map(
                                 async (ccaddress) =>
                                     (
-                                        await appData.userDict.get(ccaddress)
-                                    ).homeStream
+                                        await api.readCharacter(
+                                            ccaddress,
+                                            Schemas.profile
+                                        )
+                                    )?.payload.body.homeStream
                             )
                         )
                     ).filter((e) => e) as string[]

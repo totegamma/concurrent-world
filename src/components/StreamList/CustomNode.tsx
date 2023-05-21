@@ -15,7 +15,7 @@ import { styled } from '@mui/material/styles'
 const CustomNodeText = styled('div')(({ theme }) => ({}))
 
 interface CustomNodeProps {
-    node: NodeModel<Stream>
+    node: NodeModel<Stream<any>>
     depth: number
     isOpen: boolean
     onToggle: (id: string | number) => void

@@ -11,16 +11,11 @@ import {
     Typography,
     useTheme
 } from '@mui/material'
-import { useContext, useEffect, useState } from 'react'
-import { ApplicationContext } from '../App'
+import { useEffect, useState } from 'react'
 import StarIcon from '@mui/icons-material/Star'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import type { Stream } from '../model'
-import { Sign } from '../util'
-
-// @ts-expect-error vite dynamic import
-import { branch, sha } from '~build/info'
-const branchName = branch || window.location.host.split('.')[0]
+import { useApi } from '../context/api'
 
 export interface ExplorerProps {
     watchList: string[]
@@ -28,63 +23,26 @@ export interface ExplorerProps {
 }
 
 export function Explorer(props: ExplorerProps): JSX.Element {
+    const api = useApi()
     const theme = useTheme()
 
-    const appData = useContext(ApplicationContext)
     const [streams, setStreams] = useState<Array<Stream<any>>>([])
     const [newStreamName, setNewStreamName] = useState<string>('')
 
     const loadStreams = (): void => {
-        fetch(
-            appData.serverAddress +
-                'stream/list?schema=net.gammalab.concurrent.tbdStreamMeta'
-        ).then((data) => {
-            data.json().then((arr) => {
-                setStreams(
-                    arr.map((e: any) => {
-                        return { ...e, payload: JSON.parse(e.payload) }
-                    })
-                )
-            })
-        })
+        api.getStreamListBySchema('net.gammalab.concurrent.tbdStreamMeta').then(
+            (e) => {
+                setStreams(e)
+            }
+        )
     }
 
     const createNewStream = (name: string): void => {
-        const signObject = {
-            signer: appData.userAddress,
-            type: 'Stream',
-            schema: 'net.gammalab.concurrent.tbdStreamMeta',
-            body: {
-                name
-            },
-            meta: {
-                client: `concurrent-web ${branchName as string}-${
-                    sha as string
-                }`
-            },
-            signedAt: new Date().toISOString(),
-            maintainer: [],
-            writer: [],
-            reader: []
-        }
-
-        const signedObject = JSON.stringify(signObject)
-        const signature = Sign(appData.privatekey, signedObject)
-
-        const requestOptions = {
-            method: 'PUT',
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({
-                signedObject,
-                signature
-            })
-        }
-
-        fetch(appData.serverAddress + 'stream', requestOptions)
-            .then(async (res) => await res.json())
-            .then((data) => {
-                loadStreams()
-            })
+        api.createStream('net.gammalab.concurrent.tbdStreamMeta', {
+            name
+        }).then((_) => {
+            loadStreams()
+        })
     }
 
     useEffect(() => {

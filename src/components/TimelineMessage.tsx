@@ -12,19 +12,16 @@ import {
 import StarIcon from '@mui/icons-material/Star'
 import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
-import { Sign } from '../util'
 
-import type { Message, ProfileWithAddress, SignedObject } from '../model'
+import type { Character, Message, ProfileWithAddress } from '../model'
 import type { Profile } from '../schemas/profile'
 import { Schemas } from '../schemas'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import { CCAvatar } from './CCAvatar'
 import { TimeDiff } from './TimeDiff'
 import { ApplicationContext } from '../App'
-// @ts-expect-error vite dynamic import
-import { branch, sha } from '~build/info'
 import type { Like } from '../schemas/like'
-const branchName = branch || window.location.host.split('.')[0]
+import { useApi } from '../context/api'
 
 export interface TimelineMessageappData {
     message: string
@@ -35,8 +32,9 @@ export interface TimelineMessageappData {
 
 export const TimelineMessage = memo<TimelineMessageappData>(
     (props: TimelineMessageappData): JSX.Element => {
+        const api = useApi()
         const appData = useContext(ApplicationContext)
-        const [user, setUser] = useState<Profile>({})
+        const [author, setAuthor] = useState<Character<Profile> | undefined>()
         const [message, setMessage] = useState<Message<any> | undefined>()
         const [msgstreams, setStreams] = useState<string[]>([])
         const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
@@ -50,10 +48,9 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                 .get(props.message)
                 .then((msg) => {
                     setMessage(msg)
-                    appData.userDict
-                        .get(msg.author)
-                        .then((user) => {
-                            setUser(user)
+                    api.readCharacter(msg.author, Schemas.profile)
+                        .then((author) => {
+                            setAuthor(author)
                         })
                         .catch((error) => {
                             console.error(error)
@@ -93,12 +90,14 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                 }
                 const users = await Promise.all(
                     authors.map((ccaddress) =>
-                        appData.userDict.get(ccaddress).then((e) => {
-                            return {
-                                ccaddress,
-                                ...e
-                            }
-                        })
+                        api
+                            .readCharacter(ccaddress, Schemas.profile)
+                            .then((e) => {
+                                return {
+                                    ccaddress,
+                                    ...e?.payload.body
+                                }
+                            })
                     )
                 )
                 setReactUsers(users)
@@ -113,42 +112,20 @@ export const TimelineMessage = memo<TimelineMessageappData>(
 
                 const targetAuthor = (await appData.messageDict.get(messageID))
                     .author
-                const targetStream = (await appData.userDict.get(targetAuthor))
-                    .notificationStream
+                const targetStream = [
+                    (await api.readCharacter(targetAuthor, Schemas.profile))
+                        ?.payload.body.notificationStream
+                ].filter((e) => e) as string[]
 
-                const signObject: SignedObject<Like> = {
-                    signer: appData.userAddress,
-                    type: 'Message',
-                    schema: Schemas.like,
-                    body: {},
-                    meta: {
-                        client: `concurrent-web ${branchName as string}-${
-                            sha as string
-                        }`
-                    },
-                    signedAt: new Date().toISOString(),
-                    target: messageID
-                }
-
-                const signedObject = JSON.stringify(signObject)
-                const signature = Sign(appData.privatekey, signedObject)
-
-                const requestOptions = {
-                    method: 'POST',
-                    headers: { 'content-type': 'application/json' },
-                    body: JSON.stringify({
-                        targetType: 'messages',
-                        signedObject,
-                        signature,
-                        streams: [targetStream].filter((e) => e)
-                    })
-                }
-
-                fetch(appData.serverAddress + 'associations', requestOptions)
-                    .then(async (res) => await res.json())
-                    .then((_) => {
-                        appData.messageDict.invalidate(messageID)
-                    })
+                api.createAssociation<Like>(
+                    Schemas.like,
+                    {},
+                    messageID,
+                    'messages',
+                    targetStream
+                ).then((_) => {
+                    appData.messageDict.invalidate(messageID)
+                })
             },
             [appData.serverAddress, appData.userAddress]
         )
@@ -159,20 +136,10 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                 deletekey: string | undefined
             ): void => {
                 if (!messageID) return
-                if (!unfavorite) return
-                const requestOptions = {
-                    method: 'DELETE',
-                    headers: { 'content-type': 'application/json' },
-                    body: JSON.stringify({
-                        id: deletekey
-                    })
-                }
-
-                fetch(appData.serverAddress + 'associations', requestOptions)
-                    .then(async (res) => await res.json())
-                    .then((_) => {
-                        appData.messageDict.invalidate(messageID)
-                    })
+                if (!deletekey) return
+                api.deleteAssociation(deletekey).then((_) => {
+                    appData.messageDict.invalidate(messageID)
+                })
             },
             [appData.serverAddress]
         )
@@ -231,8 +198,8 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                                 }}
                             >
                                 <CCAvatar
-                                    alt={user.username}
-                                    avatarURL={user.avatar}
+                                    alt={author?.payload.body.username}
+                                    avatarURL={author?.payload.body.avatar}
                                     identiconSource={message.author}
                                     sx={{
                                         width: { xs: '38px', sm: '48px' },
@@ -274,7 +241,8 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                                             }
                                         }}
                                     >
-                                        {user.username ?? 'anonymous'}
+                                        {author?.payload.body.username ??
+                                            'anonymous'}
                                     </Typography>
                                     <Typography
                                         component="span"
@@ -342,7 +310,8 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                                                             }
                                                             alt={user.ccaddress}
                                                         />
-                                                        {user.username}
+                                                        {user.username ??
+                                                            'anonymous'}
                                                     </Box>
                                                 ))}
                                             </Box>

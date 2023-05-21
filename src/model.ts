@@ -66,6 +66,16 @@ export interface Message<T> {
     streams: string[]
 }
 
+export interface Character<T> {
+    associations: Association[]
+    author: string
+    schema: string
+    id: string
+    payload: SignedObject<T>
+    signature: string
+    cdate: string
+}
+
 export interface ServerEvent {
     type: string
     action: string
@@ -79,6 +89,7 @@ export interface Emoji {
 }
 
 export interface ProfileWithAddress extends Profile {
+    // TODO: deprecate
     ccaddress: string
 }
 

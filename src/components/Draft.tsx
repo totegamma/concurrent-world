@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useRef, memo } from 'react'
+import { useState, useContext, useEffect, useRef, memo } from 'react'
 import {
     InputBase,
     Box,
@@ -7,7 +7,6 @@ import {
     IconButton,
     Divider
 } from '@mui/material'
-import { Sign } from '../util'
 import { ApplicationContext } from '../App'
 import SendIcon from '@mui/icons-material/Send'
 import HomeIcon from '@mui/icons-material/Home'
@@ -22,11 +21,7 @@ import { StreamPicker } from './StreamPicker'
 import { useLocation } from 'react-router-dom'
 import { usePersistent } from '../hooks/usePersistent'
 import type { SimpleNote } from '../schemas/simpleNote'
-import type { MessagePostRequest, SignedObject } from '../model'
-
-// @ts-expect-error vite dynamic import
-import { branch, sha } from '~build/info'
-const branchName = branch || window.location.host.split('.')[0]
+import { useApi } from '../context/api'
 
 export interface EmojiProps {
     shortcodes: string
@@ -56,6 +51,7 @@ export interface CustomEmoji {
 
 export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const appData = useContext(ApplicationContext)
+    const api = useApi()
     const theme = useTheme()
 
     const [draft, setDraft] = useState<string>('')
@@ -102,49 +98,24 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
 
         setCustomEmoji(emojis)
     }, [appData.emojiDict])
+
     const post = (): void => {
-        const signObject: SignedObject<SimpleNote> = {
-            signer: appData.userAddress,
-            type: 'Message',
-            schema: Schemas.simpleNote,
-            body: {
-                body: draft
-            },
-            meta: {
-                client: `concurrent-web ${branchName as string}-${
-                    sha as string
-                }`
-            },
-            signedAt: new Date().toISOString()
+        const streams = [
+            ...new Set([
+                ...props.currentStreams.split(','),
+                ...messageDestStreams,
+                ...(postHome ? [appData.profile?.payload.body.homeStream] : [])
+            ])
+        ].filter((e) => e) as string[]
+        const body = {
+            body: draft
         }
 
-        const signedObject = JSON.stringify(signObject)
-        const signature = Sign(appData.privatekey, signedObject)
-
-        const request: MessagePostRequest = {
-            signedObject,
-            signature,
-            streams: [
-                ...new Set([
-                    ...props.currentStreams.split(','),
-                    ...messageDestStreams,
-                    ...(postHome ? [appData.profile.homeStream] : [])
-                ])
-            ].filter((e) => e) as string[]
-        }
-
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify(request)
-        }
-
-        fetch(appData.serverAddress + 'messages', requestOptions)
-            .then(async (res) => await res.json())
-            .then((data) => {
-                console.log(data)
+        api.createMessage<SimpleNote>(Schemas.simpleNote, body, streams).then(
+            (_) => {
                 setDraft('')
-            })
+            }
+        )
     }
 
     const uploadToImgur = async (base64Data: string): Promise<string> => {

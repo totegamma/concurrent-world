@@ -29,7 +29,8 @@ import type {
     Emoji,
     Stream,
     ConcurrentTheme,
-    ImgurSettings
+    ImgurSettings,
+    Character
 } from './model'
 import {
     Associations,
@@ -46,22 +47,17 @@ import Sound from './resources/Bubble.wav'
 import useSound from 'use-sound'
 import { MobileMenu } from './components/MobileMenu'
 import { StreamInfo } from './pages/StreamInfo'
+import ApiProvider from './context/api'
+import ConcurrentApiClient from './apiservice'
 
 export const ApplicationContext = createContext<appData>({
     serverAddress: '',
     publickey: '',
     privatekey: '',
     userAddress: '',
-    profile: {
-        username: '',
-        avatar: '',
-        description: '',
-        homeStream: '',
-        notificationStream: ''
-    },
+    profile: undefined,
     emojiDict: {},
     streamDict: dummyResourceManager,
-    userDict: dummyResourceManager,
     messageDict: dummyResourceManager,
     websocketState: -1,
     watchStreams: [],
@@ -77,10 +73,9 @@ export interface appData {
     publickey: string
     privatekey: string
     userAddress: string
-    profile: Profile
+    profile: Character<Profile> | undefined
     emojiDict: Record<string, Emoji>
-    streamDict: IuseResourceManager<Stream>
-    userDict: IuseResourceManager<Profile>
+    streamDict: IuseResourceManager<Stream<any>>
     messageDict: IuseResourceManager<Message<any>>
     websocketState: ReadyState
     watchStreams: string[]
@@ -95,6 +90,12 @@ function App(): JSX.Element {
     const [pubkey, setPubKey] = usePersistent<string>('PublicKey', '')
     const [prvkey, setPrvKey] = usePersistent<string>('PrivateKey', '')
     const [address, setAddress] = usePersistent<string>('Address', '')
+    const [api, initializeApi] = useState<ConcurrentApiClient>()
+    useEffect(() => {
+        const api = new ConcurrentApiClient(server, address, prvkey)
+        initializeApi(api)
+    }, [server, address, prvkey])
+
     const [followList, setFollowList] = usePersistent<string[]>(
         'followList',
         []
@@ -133,14 +134,7 @@ function App(): JSX.Element {
 
     const [playNotification] = useSound(Sound)
     const playNotificationRef = useRef(playNotification)
-    const [profile, setProfile] = useState<Profile>({
-        username: 'anonymous',
-        avatar: '',
-        description: '',
-        homeStream: '',
-        notificationStream: ''
-    })
-    const profileRef = useRef<Profile>(profile)
+    const [profile, setProfile] = useState<Character<Profile>>()
     useEffect(() => {
         playNotificationRef.current = playNotification
     }, [playNotification])
@@ -168,31 +162,6 @@ function App(): JSX.Element {
                 setEmojiDict(dict)
             })
     }, [])
-
-    const userDict = useResourceManager<Profile>(
-        useCallback(
-            async (key: string): Promise<Profile> => {
-                const res = await fetch(
-                    server +
-                        'characters?author=' +
-                        encodeURIComponent(key) +
-                        '&schema=' +
-                        encodeURIComponent(Schemas.profile),
-                    {
-                        method: 'GET',
-                        headers: {}
-                    }
-                )
-                const data = await res.json()
-                if (data.characters.length === 0) {
-                    return {}
-                }
-                const payload = JSON.parse(data.characters[0].payload)
-                return payload
-            },
-            [server]
-        )
-    )
 
     const messageDict = useResourceManager<Message<any>>(
         useCallback(
@@ -232,11 +201,10 @@ function App(): JSX.Element {
     )
 
     useEffect(() => {
-        userDict.get(address).then((profile) => {
+        api?.readCharacter(address, Schemas.profile).then((profile) => {
             setProfile(profile)
-            profileRef.current = profile
         })
-    }, [address])
+    }, [address, api])
 
     useEffect(() => {
         if (!lastMessage) return
@@ -329,180 +297,195 @@ function App(): JSX.Element {
         themeColorMetaTag.content = newtheme.palette.background.default
     }, [themeName])
 
+    const applicationContext = useMemo(() => {
+        return {
+            serverAddress: server,
+            publickey: pubkey,
+            privatekey: prvkey,
+            userAddress: address,
+            emojiDict,
+            profile,
+            streamDict,
+            messageDict,
+            websocketState: readyState,
+            watchStreams,
+            imgurSettings,
+            setImgurSettings
+        }
+    }, [
+        server,
+        pubkey,
+        address,
+        emojiDict,
+        profile,
+        streamDict,
+        messageDict,
+        readyState,
+        watchStreams,
+        imgurSettings,
+        setImgurSettings
+    ])
+
+    if (!api) {
+        return <>building api service...</>
+    }
+
     return (
         <ThemeProvider theme={theme}>
             <ClockContext.Provider value={clock}>
-                <ApplicationContext.Provider
-                    value={useMemo(() => {
-                        return {
-                            serverAddress: server,
-                            publickey: pubkey,
-                            privatekey: prvkey,
-                            userAddress: address,
-                            emojiDict,
-                            profile,
-                            streamDict,
-                            userDict,
-                            messageDict,
-                            websocketState: readyState,
-                            watchStreams,
-                            imgurSettings,
-                            setImgurSettings
-                        }
-                    }, [
-                        server,
-                        pubkey,
-                        address,
-                        emojiDict,
-                        profile,
-                        streamDict,
-                        userDict,
-                        messageDict,
-                        readyState,
-                        watchStreams,
-                        imgurSettings,
-                        setImgurSettings
-                    ])}
-                >
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            maxWidth: '1280px',
-                            margin: 'auto',
-                            background: [
-                                theme.palette.background.default,
-                                `linear-gradient(${
-                                    theme.palette.background.default
-                                }, ${darken(
-                                    theme.palette.background.default,
-                                    0.1
-                                )})`
-                            ],
-                            height: '100dvh'
-                        }}
-                    >
-                        <Box
-                            sx={{
-                                display: {
-                                    xs: 'none',
-                                    sm: 'block',
-                                    width: '200px'
-                                }
-                            }}
-                        >
-                            <Menu streams={watchStreams} />
-                        </Box>
+                <ApiProvider api={api}>
+                    <ApplicationContext.Provider value={applicationContext}>
                         <Box
                             sx={{
                                 display: 'flex',
-                                flexFlow: 'column',
-                                overflow: 'hidden',
-                                flex: 1
+                                maxWidth: '1280px',
+                                margin: 'auto',
+                                background: [
+                                    theme.palette.background.default,
+                                    `linear-gradient(${
+                                        theme.palette.background.default
+                                    }, ${darken(
+                                        theme.palette.background.default,
+                                        0.1
+                                    )})`
+                                ],
+                                height: '100dvh'
                             }}
                         >
-                            <Paper
+                            <Box
                                 sx={{
-                                    flexGrow: '1',
-                                    margin: { xs: '4px', sm: '10px' },
-                                    mb: { xs: 0, sm: '10px' },
-                                    display: 'flex',
-                                    flexFlow: 'column',
-                                    borderRadius: { xs: '15px', md: '20px' },
-                                    overflow: 'hidden',
-                                    background: 'none'
+                                    display: {
+                                        xs: 'none',
+                                        sm: 'block',
+                                        width: '200px'
+                                    }
                                 }}
                             >
-                                <Routes>
-                                    <Route
-                                        index
-                                        element={
-                                            <Timeline
-                                                messages={messages}
-                                                follow={follow}
-                                                followList={followList}
-                                                setCurrentStreams={
-                                                    setCurrentStreams
-                                                }
-                                                setMobileMenuOpen={
-                                                    setMobileMenuOpen
-                                                }
-                                            />
-                                        }
-                                    />
-                                    <Route
-                                        path="/associations"
-                                        element={<Associations />}
-                                    />
-                                    <Route
-                                        path="/explorer"
-                                        element={
-                                            <Explorer
-                                                watchList={watchStreams}
-                                                setWatchList={setWatchStreams}
-                                            />
-                                        }
-                                    />
-                                    <Route
-                                        path="/notifications"
-                                        element={<Notifications />}
-                                    />
-                                    <Route
-                                        path="/identity"
-                                        element={<Identity />}
-                                    />
-                                    <Route
-                                        path="/settings"
-                                        element={
-                                            <Settings
-                                                setThemeName={setThemeName}
-                                                setPrvKey={setPrvKey}
-                                                setPubKey={setPubKey}
-                                                setUserAddr={setAddress}
-                                                setServerAddr={setServer}
-                                            />
-                                        }
-                                    />
-                                    <Route
-                                        path="/streaminfo"
-                                        element={
-                                            <StreamInfo
-                                                followList={followList}
-                                                setFollowList={setFollowList}
-                                            />
-                                        }
-                                    />
-                                </Routes>
-                            </Paper>
-                            <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
-                                <MobileMenu />
+                                <Menu streams={watchStreams} />
+                            </Box>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexFlow: 'column',
+                                    overflow: 'hidden',
+                                    flex: 1
+                                }}
+                            >
+                                <Paper
+                                    sx={{
+                                        flexGrow: '1',
+                                        margin: { xs: '4px', sm: '10px' },
+                                        mb: { xs: 0, sm: '10px' },
+                                        display: 'flex',
+                                        flexFlow: 'column',
+                                        borderRadius: {
+                                            xs: '15px',
+                                            md: '20px'
+                                        },
+                                        overflow: 'hidden',
+                                        background: 'none'
+                                    }}
+                                >
+                                    <Routes>
+                                        <Route
+                                            index
+                                            element={
+                                                <Timeline
+                                                    messages={messages}
+                                                    follow={follow}
+                                                    followList={followList}
+                                                    setCurrentStreams={
+                                                        setCurrentStreams
+                                                    }
+                                                    setMobileMenuOpen={
+                                                        setMobileMenuOpen
+                                                    }
+                                                />
+                                            }
+                                        />
+                                        <Route
+                                            path="/associations"
+                                            element={<Associations />}
+                                        />
+                                        <Route
+                                            path="/explorer"
+                                            element={
+                                                <Explorer
+                                                    watchList={watchStreams}
+                                                    setWatchList={
+                                                        setWatchStreams
+                                                    }
+                                                />
+                                            }
+                                        />
+                                        <Route
+                                            path="/notifications"
+                                            element={<Notifications />}
+                                        />
+                                        <Route
+                                            path="/identity"
+                                            element={<Identity />}
+                                        />
+                                        <Route
+                                            path="/settings"
+                                            element={
+                                                <Settings
+                                                    setThemeName={setThemeName}
+                                                    setPrvKey={setPrvKey}
+                                                    setPubKey={setPubKey}
+                                                    setUserAddr={setAddress}
+                                                    setServerAddr={setServer}
+                                                />
+                                            }
+                                        />
+                                        <Route
+                                            path="/streaminfo"
+                                            element={
+                                                <StreamInfo
+                                                    followList={followList}
+                                                    setFollowList={
+                                                        setFollowList
+                                                    }
+                                                />
+                                            }
+                                        />
+                                    </Routes>
+                                </Paper>
+                                <Box
+                                    sx={{
+                                        display: { xs: 'block', sm: 'none' }
+                                    }}
+                                >
+                                    <MobileMenu />
+                                </Box>
                             </Box>
                         </Box>
-                    </Box>
-                    <Drawer
-                        anchor={'left'}
-                        open={mobileMenuOpen}
-                        onClose={() => {
-                            setMobileMenuOpen(false)
-                        }}
-                        PaperProps={{
-                            sx: {
-                                width: '200px',
-                                padding: '0 5px 0 0',
-                                borderRadius: '0 20px 20px 0',
-                                overflow: 'hidden',
-                                backgroundColor: 'background.default'
-                            }
-                        }}
-                    >
-                        <Menu
-                            streams={watchStreams}
-                            onClick={() => {
+                        <Drawer
+                            anchor={'left'}
+                            open={mobileMenuOpen}
+                            onClose={() => {
                                 setMobileMenuOpen(false)
                             }}
-                            hideMenu
-                        />
-                    </Drawer>
-                </ApplicationContext.Provider>
+                            PaperProps={{
+                                sx: {
+                                    width: '200px',
+                                    padding: '0 5px 0 0',
+                                    borderRadius: '0 20px 20px 0',
+                                    overflow: 'hidden',
+                                    backgroundColor: 'background.default'
+                                }
+                            }}
+                        >
+                            <Menu
+                                streams={watchStreams}
+                                onClick={() => {
+                                    setMobileMenuOpen(false)
+                                }}
+                                hideMenu
+                            />
+                        </Drawer>
+                    </ApplicationContext.Provider>
+                </ApiProvider>
             </ClockContext.Provider>
         </ThemeProvider>
     )
