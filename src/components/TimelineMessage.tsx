@@ -80,12 +80,12 @@ export const TimelineMessage = memo<TimelineMessageappData>(
         useEffect(() => {
             const fetchUsers = async (): Promise<any> => {
                 const authors =
-                    message?.associations_data
+                    message?.associations
                         .filter((e) => e.schema === Schemas.like)
                         .map((m) => m.author) ?? []
 
                 if (
-                    message?.associations_data.find(
+                    message?.associations.find(
                         (e) => e.author === appData.userAddress
                     ) != null
                 ) {
@@ -107,7 +107,7 @@ export const TimelineMessage = memo<TimelineMessageappData>(
             }
 
             fetchUsers()
-        }, [message?.associations_data])
+        }, [message?.associations])
 
         const favorite = useCallback(
             async (messageID: string | undefined): Promise<void> => {
@@ -354,7 +354,7 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                                                     if (hasOwnReaction) {
                                                         unfavorite(
                                                             message.id,
-                                                            message.associations_data.find(
+                                                            message.associations.find(
                                                                 (e) =>
                                                                     e.author ===
                                                                     appData.userAddress
@@ -373,7 +373,7 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                                             </IconButton>
                                             <Typography sx={{ size: '16px' }}>
                                                 {
-                                                    message.associations_data.filter(
+                                                    message.associations.filter(
                                                         (e) =>
                                                             e.schema ===
                                                             Schemas.like

@@ -272,16 +272,9 @@ export const Timeline = memo<TimelineProps>(
                                 4
                             ).replaceAll('\\n', '\n')}
                         </pre>
-                        <Typography>
-                            Associations: {inspectItem?.associations}
-                        </Typography>
-                        <Typography>AssociationsData:</Typography>
+                        <Typography>Associations:</Typography>
                         <pre style={{ overflowX: 'scroll' }}>
-                            {JSON.stringify(
-                                inspectItem?.associations_data,
-                                null,
-                                4
-                            )}
+                            {JSON.stringify(inspectItem?.associations, null, 4)}
                         </pre>
                     </Box>
                 </Drawer>

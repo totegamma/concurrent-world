@@ -39,8 +39,7 @@ export interface Association {
 }
 
 export interface Message {
-    associations: string
-    associations_data: Association[]
+    associations: Association[]
     author: string
     cdate: string
     id: string
