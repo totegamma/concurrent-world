@@ -50,7 +50,7 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
                 await fetch(
                     props.serverAddress + 'stream',
                     requestOptions
-                ).then(async (res) => (await res.json()) as Stream)
+                ).then(async (res) => (await res.json()) as Stream<any>)
             ).id
         }
         console.log('home', homeStreamID)
@@ -82,7 +82,7 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
                 await fetch(
                     props.serverAddress + 'stream',
                     requestOptions
-                ).then(async (res) => (await res.json()) as Stream)
+                ).then(async (res) => (await res.json()) as Stream<any>)
             ).id
         }
         console.log('notification', notificationStreamID)

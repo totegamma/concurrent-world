@@ -14,13 +14,17 @@ import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { Sign } from '../util'
 
-import type { Message, ProfileWithAddress } from '../model'
+import type { Message, ProfileWithAddress, SignedObject } from '../model'
 import type { Profile } from '../schemas/profile'
 import { Schemas } from '../schemas'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import { CCAvatar } from './CCAvatar'
 import { TimeDiff } from './TimeDiff'
 import { ApplicationContext } from '../App'
+// @ts-expect-error vite dynamic import
+import { branch, sha } from '~build/info'
+import type { Like } from '../schemas/like'
+const branchName = branch || window.location.host.split('.')[0]
 
 export interface TimelineMessageappData {
     message: string
@@ -60,9 +64,7 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                             async (id) =>
                                 await appData.streamDict
                                     .get(id)
-                                    .then((e) =>
-                                        e.meta ? JSON.parse(e.meta).name : null
-                                    )
+                                    .then((e) => e.payload.body.name)
                         )
                     ).then((e) => {
                         setStreams(e.filter((x) => x))
@@ -107,25 +109,36 @@ export const TimelineMessage = memo<TimelineMessageappData>(
 
         const favorite = useCallback(
             async (messageID: string | undefined): Promise<void> => {
-                const favoriteScheme = Schemas.like
                 if (!messageID) return
-                const payloadObj = {}
-                const payload = JSON.stringify(payloadObj)
-                const signature = Sign(appData.privatekey, payload)
+
                 const targetAuthor = (await appData.messageDict.get(messageID))
                     .author
                 const targetStream = (await appData.userDict.get(targetAuthor))
                     .notificationStream
 
+                const signObject: SignedObject<Like> = {
+                    signer: appData.userAddress,
+                    type: 'Message',
+                    schema: Schemas.like,
+                    body: {},
+                    meta: {
+                        client: `concurrent-web ${branchName as string}-${
+                            sha as string
+                        }`
+                    },
+                    signedAt: new Date().toISOString(),
+                    target: messageID
+                }
+
+                const signedObject = JSON.stringify(signObject)
+                const signature = Sign(appData.privatekey, signedObject)
+
                 const requestOptions = {
                     method: 'POST',
                     headers: { 'content-type': 'application/json' },
                     body: JSON.stringify({
-                        author: appData.userAddress,
-                        schema: favoriteScheme,
-                        targetID: messageID,
                         targetType: 'messages',
-                        payload,
+                        signedObject,
                         signature,
                         streams: [targetStream].filter((e) => e)
                     })

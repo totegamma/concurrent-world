@@ -45,6 +45,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
     const [title, setTitle] = useState<string>('')
 
     useEffect(() => {
+        console.log(reactlocation.hash)
         if (!reactlocation.hash || reactlocation.hash === '#') {
             setTitle('Home')
             return
@@ -55,11 +56,11 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                 .split(',')
                 .map((e) => appData.streamDict.get(e))
         ).then((a) => {
+            console.log(a)
             setTitle(
                 a
-                    .map((e) => e.meta)
+                    .map((e) => e.payload.body.name)
                     .filter((e) => e)
-                    .map((e) => JSON.parse(e).name)
                     .join(', ')
             )
         })

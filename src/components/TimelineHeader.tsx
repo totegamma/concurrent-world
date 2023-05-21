@@ -32,9 +32,8 @@ export const TimelineHeader = memo<TimelineHeaderProps>(
             ).then((a) => {
                 setTitle(
                     a
-                        .map((e) => e.meta)
+                        .map((e) => e.payload.body.name)
                         .filter((e) => e)
-                        .map((e) => JSON.parse(e).name)
                         .join(', ')
                 )
             })

@@ -211,12 +211,15 @@ function App(): JSX.Element {
         )
     )
 
-    const streamDict = useResourceManager<Stream>(async (key: string) => {
+    const streamDict = useResourceManager<Stream<any>>(async (key: string) => {
         const res = await fetch(server + `stream?stream=${key}`, {
             method: 'GET',
             headers: {}
         })
         const data = await res.json()
+        if (data.payload) {
+            data.payload = JSON.parse(data.payload)
+        }
         return data
     })
 

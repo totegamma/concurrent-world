@@ -18,6 +18,10 @@ import StarBorderIcon from '@mui/icons-material/StarBorder'
 import type { Stream } from '../model'
 import { Sign } from '../util'
 
+// @ts-expect-error vite dynamic import
+import { branch, sha } from '~build/info'
+const branchName = branch || window.location.host.split('.')[0]
+
 export interface ExplorerProps {
     watchList: string[]
     setWatchList: (newlist: string[]) => void
@@ -27,7 +31,7 @@ export function Explorer(props: ExplorerProps): JSX.Element {
     const theme = useTheme()
 
     const appData = useContext(ApplicationContext)
-    const [streams, setStreams] = useState<Stream[]>([])
+    const [streams, setStreams] = useState<Array<Stream<any>>>([])
     const [newStreamName, setNewStreamName] = useState<string>('')
 
     const loadStreams = (): void => {
@@ -35,30 +39,43 @@ export function Explorer(props: ExplorerProps): JSX.Element {
             appData.serverAddress +
                 'stream/list?schema=net.gammalab.concurrent.tbdStreamMeta'
         ).then((data) => {
-            data.json().then((json) => {
-                setStreams(json)
+            data.json().then((arr) => {
+                setStreams(
+                    arr.map((e: any) => {
+                        return { ...e, payload: JSON.parse(e.payload) }
+                    })
+                )
             })
         })
     }
 
     const createNewStream = (name: string): void => {
-        const payloadObj = {
-            name
+        const signObject = {
+            signer: appData.userAddress,
+            type: 'Stream',
+            schema: 'net.gammalab.concurrent.tbdStreamMeta',
+            body: {
+                name
+            },
+            meta: {
+                client: `concurrent-web ${branchName as string}-${
+                    sha as string
+                }`
+            },
+            signedAt: new Date().toISOString(),
+            maintainer: [],
+            writer: [],
+            reader: []
         }
 
-        const payload = JSON.stringify(payloadObj)
-        const signature = Sign(appData.privatekey, payload)
+        const signedObject = JSON.stringify(signObject)
+        const signature = Sign(appData.privatekey, signedObject)
 
         const requestOptions = {
             method: 'PUT',
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify({
-                author: appData.userAddress,
-                maintainer: [],
-                writer: [],
-                reader: [],
-                schema: 'net.gammalab.concurrent.tbdStreamMeta',
-                meta: payload,
+                signedObject,
                 signature
             })
         }
@@ -66,7 +83,6 @@ export function Explorer(props: ExplorerProps): JSX.Element {
         fetch(appData.serverAddress + 'stream', requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
-                console.log(data)
                 loadStreams()
             })
     }
@@ -154,7 +170,7 @@ export function Explorer(props: ExplorerProps): JSX.Element {
                                 <ListItemText
                                     id={labelId}
                                     primary={`%${
-                                        JSON.parse(value.meta).name as string
+                                        value.payload.body.name as string
                                     }`}
                                 />
                             </ListItemButton>

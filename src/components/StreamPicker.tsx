@@ -21,10 +21,10 @@ export function StreamPicker(props: StreamPickerProps): JSX.Element {
     useEffect(() => {
         setOptions(
             Object.values(appData.streamDict.body.current)
-                .filter((e) => e.meta)
+                .filter((e) => e.payload)
                 .map((e) => {
                     return {
-                        label: JSON.parse(e.meta).name as string,
+                        label: e.payload.body.name,
                         id: e.id
                     }
                 })
@@ -37,9 +37,9 @@ export function StreamPicker(props: StreamPickerProps): JSX.Element {
             (a) => {
                 setSelectedStreams(
                     a
-                        .filter((e) => e.meta)
+                        .filter((e) => e.payload)
                         .map((e) => {
-                            return { label: JSON.parse(e.meta).name, id: e.id }
+                            return { label: e.payload.body.name, id: e.id }
                         })
                 )
             }

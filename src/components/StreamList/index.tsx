@@ -30,7 +30,7 @@ export interface WatchStream {
     parent: number
     droppable: boolean
     text: string
-    data: Stream | undefined
+    data: Stream<any> | undefined
 }
 
 interface StreamListProps {
@@ -60,7 +60,7 @@ export function StreamList(props: StreamListProps): JSX.Element {
                         id: stream.id,
                         parent: 0,
                         droppable: false,
-                        text: JSON.parse(stream.meta).name || 'Unknown',
+                        text: stream.payload.body.name || 'Unknown',
                         data: stream
                     }))
                 )
@@ -88,7 +88,7 @@ export function StreamList(props: StreamListProps): JSX.Element {
                             id: stream.id,
                             parent: 0,
                             droppable: false,
-                            text: JSON.parse(stream.meta).name || 'Unknown',
+                            text: stream.payload.body.name || 'Unknown',
                             data: stream
                         })
                     }

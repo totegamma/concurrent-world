@@ -35,6 +35,7 @@ export interface SignedObject<T> {
     body: T
     meta: any
     signedAt: string
+    target?: string
 }
 
 export interface Association {
@@ -81,14 +82,14 @@ export interface ProfileWithAddress extends Profile {
     ccaddress: string
 }
 
-export interface Stream {
+export interface Stream<T> {
     id: string
     author: string
     maintainer: string[]
     writer: string[]
     reader: string[]
     schema: string
-    meta: string
+    payload: T
     signature: string
     cdate: string
 }
