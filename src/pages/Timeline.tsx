@@ -35,7 +35,7 @@ export const Timeline = memo<TimelineProps>(
 
         const reload = useCallback(async () => {
             if (!api.host) return
-            let homequery = ''
+            let homequery = []
             if (!reactlocation.hash) {
                 homequery = (
                     await Promise.all(
@@ -52,30 +52,20 @@ export const Timeline = memo<TimelineProps>(
                 )
                     .filter((e) => e)
                     .concat(followStreams)
-                    .join(',')
             }
-            const url = `https://${api.host.fqdn}/stream/recent?streams=${
-                reactlocation.hash
-                    ? reactlocation.hash.replace('#', '')
-                    : homequery
-            }`
+            const query = reactlocation.hash
+                ? reactlocation.hash.replace('#', '').split(',')
+                : homequery
 
-            const requestOptions = {
-                method: 'GET',
-                headers: {}
-            }
-
-            fetch(url, requestOptions)
-                .then(async (res) => await res.json())
-                .then((data: StreamElement[]) => {
-                    const newdata = data?.sort((a, b) => (a.ID > b.ID ? -1 : 1))
-                    const current = new Date().getTime()
-                    const dated = newdata.map((e) => {
-                        return { ...e, LastUpdated: current }
-                    })
-                    props.messages.set(dated)
-                    setHasMoreData(true)
+            api.readStreamRecent(query).then((data: StreamElement[]) => {
+                const newdata = data?.sort((a, b) => (a.ID > b.ID ? -1 : 1))
+                const current = new Date().getTime()
+                const dated = newdata.map((e) => {
+                    return { ...e, LastUpdated: current }
                 })
+                props.messages.set(dated)
+                setHasMoreData(true)
+            })
         }, [reactlocation.hash])
 
         const loadMore = useCallback(async () => {

@@ -3,7 +3,8 @@ import type {
     MessagePostRequest,
     SignedObject,
     Character,
-    Host
+    Host,
+    StreamElement
 } from './model'
 
 // @ts-expect-error vite dynamic import
@@ -281,6 +282,36 @@ export default class ConcurrentApiClient {
         stream.payload = JSON.parse(stream.payload)
         this.characterCache[id] = stream
         return stream
+    }
+
+    async readStreamRecent(streams: string[]): Promise<StreamElement[]> {
+        if (!this.host) throw new Error()
+        const plan: Record<string, string[]> = {}
+        for (const stream of streams) {
+            const id = stream.split('@')[0]
+            const host = stream.split('@')[1] ?? this.host.fqdn
+            plan[host] = [...(plan[host] ? plan[host] : []), id]
+        }
+        console.log(plan)
+
+        const requestOptions = {
+            method: 'GET',
+            headers: {}
+        }
+
+        let result: StreamElement[] = []
+        for (const host of Object.keys(plan)) {
+            if (!host) {
+                console.warn('invalid query')
+                continue
+            }
+            const response = await fetch(
+                `https://${host}/stream/recent?streams=${plan[host].join(',')}`,
+                requestOptions
+            ).then(async (res) => await res.json())
+            result = [...result, ...response]
+        }
+        return result
     }
 
     // Host
