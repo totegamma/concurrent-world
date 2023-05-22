@@ -1,11 +1,4 @@
-import React, {
-    memo,
-    useCallback,
-    useContext,
-    useEffect,
-    useRef,
-    useState
-} from 'react'
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { List, Divider, Box, useTheme, Drawer, Typography } from '@mui/material'
 import { TimelineMessage } from '../components/TimelineMessage'
 import type { Message, StreamElement, StreamElementDated } from '../model'

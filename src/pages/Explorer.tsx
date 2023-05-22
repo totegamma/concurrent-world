@@ -28,23 +28,26 @@ export function Explorer(props: ExplorerProps): JSX.Element {
     const api = useApi()
     const theme = useTheme()
 
-    const [hosts, setHosts] = useState<Host[]>([])
-    const [currentHost, setCurrentHost] = useState<string>()
+    const [hosts, setHosts] = useState<Host[]>([
+        ...(api.host ? [api.host] : [])
+    ])
+    const [currentHost, setCurrentHost] = useState<string>(api.host?.fqdn ?? '')
     const [streams, setStreams] = useState<Array<Stream<any>>>([])
     const [newStreamName, setNewStreamName] = useState<string>('')
 
     const loadHosts = (): void => {
         api.getKnownHosts().then((e) => {
-            setHosts(e)
+            setHosts([...(api.host ? [api.host] : []), ...e])
         })
     }
 
     const loadStreams = (): void => {
-        api.getStreamListBySchema('net.gammalab.concurrent.tbdStreamMeta').then(
-            (e) => {
-                setStreams(e)
-            }
-        )
+        api.getStreamListBySchema(
+            'net.gammalab.concurrent.tbdStreamMeta',
+            currentHost
+        ).then((e) => {
+            setStreams(e)
+        })
     }
 
     const createNewStream = (name: string): void => {
@@ -60,7 +63,11 @@ export function Explorer(props: ExplorerProps): JSX.Element {
         loadStreams()
     }, [])
 
-    useEffect(() => {}, [currentHost])
+    useEffect(() => {
+        loadStreams()
+    }, [currentHost])
+
+    if (!api.host) return <>loading...</>
 
     return (
         <Box
@@ -83,6 +90,7 @@ export function Explorer(props: ExplorerProps): JSX.Element {
                 onChange={(e) => {
                     setCurrentHost(e.target.value)
                 }}
+                defaultValue={api.host.fqdn}
             >
                 {hosts.map((e) => (
                     <MenuItem key={e.fqdn} value={e.fqdn}>

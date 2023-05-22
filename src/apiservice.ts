@@ -245,10 +245,13 @@ export default class ConcurrentApiClient {
             })
     }
 
-    async getStreamListBySchema(schema: string): Promise<Array<Stream<any>>> {
+    async getStreamListBySchema(
+        schema: string,
+        remote?: string
+    ): Promise<Array<Stream<any>>> {
         if (!this.host) throw new Error()
         return await fetch(
-            `https://${this.host.fqdn}/stream/list?schema=${schema}`
+            `https://${remote ?? this.host.fqdn}/stream/list?schema=${schema}`
         ).then(async (data) => {
             return await data.json().then((arr) => {
                 return arr.map((e: any) => {
