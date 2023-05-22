@@ -113,7 +113,7 @@ function App(): JSX.Element {
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
 
     const { lastMessage, readyState } = useWebSocket(
-        `wss://${host.fqdn}/socket`,
+        `wss://${host.fqdn}/api/v1/socket`,
         {
             shouldReconnect: (_) => true,
             reconnectInterval: (attempt) =>
@@ -156,7 +156,7 @@ function App(): JSX.Element {
         useCallback(
             async (key: string) => {
                 const res = await fetch(
-                    `https://${host.fqdn}/messages/${key}`,
+                    `https://${host.fqdn}/api/v1/messages/${key}`,
                     {
                         method: 'GET',
                         headers: {}

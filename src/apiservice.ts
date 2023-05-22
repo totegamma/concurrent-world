@@ -12,6 +12,8 @@ import { branch, sha } from '~build/info'
 import { Sign } from './util'
 const branchName = branch || window.location.host.split('.')[0]
 
+const apiPath = '/api/v1'
+
 export default class ConcurrentApiClient {
     host: Host | undefined
     userAddress: string
@@ -62,7 +64,10 @@ export default class ConcurrentApiClient {
             body: JSON.stringify(request)
         }
 
-        return await fetch(`https://${this.host.fqdn}/messages`, requestOptions)
+        return await fetch(
+            `https://${this.host.fqdn}${apiPath}/messages`,
+            requestOptions
+        )
             .then(async (res) => await res.json())
             .then((data) => {
                 return data
@@ -107,7 +112,7 @@ export default class ConcurrentApiClient {
         }
 
         return await fetch(
-            `https://${this.host.fqdn}/associations`,
+            `https://${this.host.fqdn}${apiPath}/associations`,
             requestOptions
         )
             .then(async (res) => await res.json())
@@ -127,7 +132,7 @@ export default class ConcurrentApiClient {
         }
 
         return await fetch(
-            `https://${this.host.fqdn}/associations`,
+            `https://${this.host.fqdn}${apiPath}/associations`,
             requestOptions
         )
             .then(async (res) => await res.json())
@@ -172,7 +177,7 @@ export default class ConcurrentApiClient {
         }
 
         return await fetch(
-            `https://${this.host.fqdn}/characters`,
+            `https://${this.host.fqdn}${apiPath}/characters`,
             requestOptions
         )
             .then(async (res) => await res.json())
@@ -192,7 +197,9 @@ export default class ConcurrentApiClient {
         const res = await fetch(
             `https://${
                 this.host.fqdn
-            }/characters?author=${author}&schema=${encodeURIComponent(schema)}`,
+            }${apiPath}/characters?author=${author}&schema=${encodeURIComponent(
+                schema
+            )}`,
             {
                 method: 'GET',
                 headers: {}
@@ -239,7 +246,10 @@ export default class ConcurrentApiClient {
             })
         }
 
-        return await fetch(`https://${this.host.fqdn}/stream`, requestOptions)
+        return await fetch(
+            `https://${this.host.fqdn}${apiPath}/stream`,
+            requestOptions
+        )
             .then(async (res) => await res.json())
             .then((data) => {
                 return data
@@ -252,7 +262,9 @@ export default class ConcurrentApiClient {
     ): Promise<Array<Stream<any>>> {
         if (!this.host) throw new Error()
         return await fetch(
-            `https://${remote ?? this.host.fqdn}/stream/list?schema=${schema}`
+            `https://${
+                remote ?? this.host.fqdn
+            }${apiPath}/stream/list?schema=${schema}`
         ).then(async (data) => {
             return await data.json().then((arr) => {
                 return arr.map((e: any) => {
@@ -268,11 +280,14 @@ export default class ConcurrentApiClient {
             return this.streamCache[id]
         }
         const key = id.split('@')[0]
-        const host = id.split('@')[1]
-        const res = await fetch(`https://${host}/stream?stream=${key}`, {
-            method: 'GET',
-            headers: {}
-        })
+        const host = id.split('@')[1] ?? this.host.fqdn
+        const res = await fetch(
+            `https://${host}${apiPath}/stream?stream=${key}`,
+            {
+                method: 'GET',
+                headers: {}
+            }
+        )
         const data = await res.json()
         if (!data.payload) {
             return undefined
@@ -306,7 +321,9 @@ export default class ConcurrentApiClient {
                 continue
             }
             const response = await fetch(
-                `https://${host}/stream/recent?streams=${plan[host].join(',')}`,
+                `https://${host}${apiPath}/stream/recent?streams=${plan[
+                    host
+                ].join(',')}`,
                 requestOptions
             ).then(async (res) => await res.json())
             result = [...result, ...response]
@@ -318,15 +335,17 @@ export default class ConcurrentApiClient {
     async getHostProfile(remote?: string): Promise<Host> {
         const fqdn = remote ?? this.host?.fqdn
         if (!fqdn) throw new Error()
-        return await fetch(`https://${fqdn}/host`).then(async (data) => {
-            return await data.json()
-        })
+        return await fetch(`https://${fqdn}${apiPath}/host`).then(
+            async (data) => {
+                return await data.json()
+            }
+        )
     }
 
     async getKnownHosts(remote?: string): Promise<Host[]> {
         if (!this.host) throw new Error()
         return await fetch(
-            `https://${remote ?? this.host.fqdn}/host/list`
+            `https://${remote ?? this.host.fqdn}${apiPath}/host/list`
         ).then(async (data) => {
             return await data.json()
         })
