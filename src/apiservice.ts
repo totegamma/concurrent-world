@@ -2,7 +2,8 @@ import type {
     Stream,
     MessagePostRequest,
     SignedObject,
-    Character
+    Character,
+    Host
 } from './model'
 
 // @ts-expect-error vite dynamic import
@@ -239,6 +240,17 @@ export default class ConcurrentApiClient {
                         return { ...e, payload: JSON.parse(e.payload) }
                     })
                 })
+            }
+        )
+    }
+
+    // Host
+    async getHosts(fqdn?: string): Promise<Host[]> {
+        const local = this.endpoint.replace('https://', '').replace('/', '')
+        console.log(local)
+        return await fetch(`https://${fqdn ?? local}/host/list`).then(
+            async (data) => {
+                return await data.json()
             }
         )
     }

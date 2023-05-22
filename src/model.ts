@@ -93,6 +93,14 @@ export interface ProfileWithAddress extends Profile {
     ccaddress: string
 }
 
+export interface Host {
+    fqdn: string
+    ccaddr: string
+    role: string
+    pubkey: string
+    cdate: Date
+}
+
 export interface Stream<T> {
     id: string
     author: string

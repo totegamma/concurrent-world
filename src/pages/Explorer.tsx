@@ -7,6 +7,8 @@ import {
     ListItemButton,
     ListItemIcon,
     ListItemText,
+    MenuItem,
+    Select,
     TextField,
     Typography,
     useTheme
@@ -14,7 +16,7 @@ import {
 import { useEffect, useState } from 'react'
 import StarIcon from '@mui/icons-material/Star'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
-import type { Stream } from '../model'
+import type { Host, Stream } from '../model'
 import { useApi } from '../context/api'
 
 export interface ExplorerProps {
@@ -26,8 +28,16 @@ export function Explorer(props: ExplorerProps): JSX.Element {
     const api = useApi()
     const theme = useTheme()
 
+    const [hosts, setHosts] = useState<Host[]>([])
+    const [currentHost, setCurrentHost] = useState<string>()
     const [streams, setStreams] = useState<Array<Stream<any>>>([])
     const [newStreamName, setNewStreamName] = useState<string>('')
+
+    const loadHosts = (): void => {
+        api.getHosts().then((e) => {
+            setHosts(e)
+        })
+    }
 
     const loadStreams = (): void => {
         api.getStreamListBySchema('net.gammalab.concurrent.tbdStreamMeta').then(
@@ -46,8 +56,11 @@ export function Explorer(props: ExplorerProps): JSX.Element {
     }
 
     useEffect(() => {
+        loadHosts()
         loadStreams()
     }, [])
+
+    useEffect(() => {}, [currentHost])
 
     return (
         <Box
@@ -64,6 +77,19 @@ export function Explorer(props: ExplorerProps): JSX.Element {
             <Typography variant="h2" gutterBottom>
                 Explorer
             </Typography>
+            <Select
+                value={currentHost}
+                label="Host"
+                onChange={(e) => {
+                    setCurrentHost(e.target.value)
+                }}
+            >
+                {hosts.map((e) => (
+                    <MenuItem key={e.fqdn} value={e.fqdn}>
+                        {e.fqdn}
+                    </MenuItem>
+                ))}
+            </Select>
             <Divider />
             <Typography variant="h3" gutterBottom>
                 streams
