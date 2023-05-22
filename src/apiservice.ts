@@ -16,8 +16,8 @@ export default class ConcurrentApiClient {
     userAddress: string
     privatekey: string
 
-    // characterCache: Record<string, Record<string, Character<any>>> = {}
     characterCache: Record<string, Character<any>> = {}
+    streamCache: Record<string, Stream<any>> = {}
 
     constructor(userAddress: string, privatekey: string, host?: Host) {
         this.host = host
@@ -259,6 +259,28 @@ export default class ConcurrentApiClient {
                 })
             })
         })
+    }
+
+    async readStream(id: string): Promise<Stream<any> | undefined> {
+        if (!this.host) throw new Error()
+        if (this.streamCache[id]) {
+            return this.streamCache[id]
+        }
+        const key = id.split('@')[0]
+        const host = id.split('@')[1]
+        const res = await fetch(`https://${host}/stream?stream=${key}`, {
+            method: 'GET',
+            headers: {}
+        })
+        const data = await res.json()
+        if (!data.payload) {
+            return undefined
+        }
+        const stream = data
+        stream.id = id
+        stream.payload = JSON.parse(stream.payload)
+        this.characterCache[id] = stream
+        return stream
     }
 
     // Host

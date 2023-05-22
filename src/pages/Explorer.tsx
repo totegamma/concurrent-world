@@ -128,22 +128,30 @@ export function Explorer(props: ExplorerProps): JSX.Element {
                         <ListItem key={value.id} disablePadding>
                             <ListItemButton
                                 onClick={() => {
-                                    if (props.watchList.includes(value.id)) {
+                                    if (
+                                        props.watchList.includes(
+                                            `${value.id}@${currentHost}`
+                                        )
+                                    ) {
                                         props.setWatchList(
                                             props.watchList.filter(
-                                                (e) => e !== value.id
+                                                (e) =>
+                                                    e !==
+                                                    `${value.id}@${currentHost}`
                                             )
                                         )
                                     } else {
                                         props.setWatchList([
                                             ...props.watchList,
-                                            value.id
+                                            `${value.id}@${currentHost}`
                                         ])
                                     }
                                 }}
                             >
                                 <ListItemIcon>
-                                    {props.watchList.includes(value.id) ? (
+                                    {props.watchList.includes(
+                                        `${value.id}@${currentHost}`
+                                    ) ? (
                                         <StarIcon
                                             sx={{
                                                 color: theme.palette.text

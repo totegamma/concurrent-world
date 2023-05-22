@@ -59,9 +59,9 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                     Promise.all(
                         msg.streams.map(
                             async (id) =>
-                                await appData.streamDict
-                                    .get(id)
-                                    .then((e) => e.payload.body.name)
+                                await api
+                                    .readStream(id)
+                                    .then((e) => e?.payload.body.name)
                         )
                     ).then((e) => {
                         setStreams(e.filter((x) => x))

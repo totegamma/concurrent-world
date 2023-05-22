@@ -1,10 +1,11 @@
 import { type RefObject, useContext, useEffect, useState, memo } from 'react'
-import { Paper, IconButton, Box, useTheme, Button } from '@mui/material'
+import { IconButton, Box, useTheme, Button } from '@mui/material'
 import InfoIcon from '@mui/icons-material/Info'
 import { Link, type Location as ReactLocation } from 'react-router-dom'
 import { ApplicationContext } from '../App'
 import { ConcurrentLogo } from './ConcurrentLogo'
 import type { ConcurrentTheme } from '../model'
+import { useApi } from '../context/api'
 
 export interface TimelineHeaderProps {
     location: ReactLocation
@@ -14,6 +15,7 @@ export interface TimelineHeaderProps {
 
 export const TimelineHeader = memo<TimelineHeaderProps>(
     (props: TimelineHeaderProps): JSX.Element => {
+        const api = useApi()
         const appData = useContext(ApplicationContext)
         const theme = useTheme<ConcurrentTheme>()
 
@@ -28,11 +30,11 @@ export const TimelineHeader = memo<TimelineHeaderProps>(
                 props.location.hash
                     .replace('#', '')
                     .split(',')
-                    .map((e) => appData.streamDict.get(e))
+                    .map((e) => api.readStream(e))
             ).then((a) => {
                 setTitle(
                     a
-                        .map((e) => e.payload.body.name)
+                        .map((e) => e?.payload.body.name)
                         .filter((e) => e)
                         .join(', ')
                 )

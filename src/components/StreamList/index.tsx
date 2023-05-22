@@ -25,6 +25,7 @@ import { usePersistent } from '../../hooks/usePersistent'
 
 import { v4 as uuidv4 } from 'uuid'
 import PercentIcon from '@mui/icons-material/Percent'
+import { useApi } from '../../context/api'
 export interface WatchStream {
     id: number | string
     parent: number
@@ -38,6 +39,7 @@ interface StreamListProps {
 }
 
 export function StreamList(props: StreamListProps): JSX.Element {
+    const api = useApi()
     const appData = useContext(ApplicationContext)
     const theme = useTheme<ConcurrentTheme>()
     const [watchStreamTree, setWatchStreamTree] = usePersistent<WatchStream[]>(
@@ -48,21 +50,21 @@ export function StreamList(props: StreamListProps): JSX.Element {
     useEffect(() => {
         ;(async () => {
             const streams = await Promise.all(
-                appData.watchStreams.map(
-                    async (id) => await appData.streamDict.get(id)
-                )
+                appData.watchStreams.map(async (id) => await api.readStream(id))
             )
             if (watchStreamTree.length === 0) {
                 // init watch stream tree
                 console.log('init watch stream tree')
                 setWatchStreamTree(
-                    streams.map((stream, index) => ({
-                        id: stream.id,
-                        parent: 0,
-                        droppable: false,
-                        text: stream.payload.body.name || 'Unknown',
-                        data: stream
-                    }))
+                    streams
+                        .map((stream, _) => ({
+                            id: stream?.id,
+                            parent: 0,
+                            droppable: false,
+                            text: stream?.payload.body.name || 'Unknown',
+                            data: stream
+                        }))
+                        .filter((e) => e.id) as WatchStream[]
                 )
             } else {
                 // update watch stream three

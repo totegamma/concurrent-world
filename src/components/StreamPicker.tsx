@@ -1,6 +1,6 @@
 import { Autocomplete, Box, Chip, InputBase } from '@mui/material'
-import { useContext, useEffect, useState } from 'react'
-import { ApplicationContext } from '../App'
+import { useEffect, useState } from 'react'
+import { useApi } from '../context/api'
 
 export interface StreamPickerProps {
     selected: string[]
@@ -14,13 +14,13 @@ interface StreamOption {
 }
 
 export function StreamPicker(props: StreamPickerProps): JSX.Element {
-    const appData = useContext(ApplicationContext)
+    const api = useApi()
     const [options, setOptions] = useState<StreamOption[]>([])
     const [selectedStreams, setSelectedStreams] = useState<StreamOption[]>([])
 
     useEffect(() => {
         setOptions(
-            Object.values(appData.streamDict.body.current)
+            Object.values(api.streamCache)
                 .filter((e) => e.payload)
                 .map((e) => {
                     return {
@@ -30,20 +30,18 @@ export function StreamPicker(props: StreamPickerProps): JSX.Element {
                 })
                 .filter((e) => e.label)
         )
-    }, [appData.streamDict.body])
+    }, [])
 
     useEffect(() => {
-        Promise.all(props.selected.map((e) => appData.streamDict.get(e))).then(
-            (a) => {
-                setSelectedStreams(
-                    a
-                        .filter((e) => e.payload)
-                        .map((e) => {
-                            return { label: e.payload.body.name, id: e.id }
-                        })
-                )
-            }
-        )
+        Promise.all(props.selected.map((e) => api.readStream(e))).then((a) => {
+            setSelectedStreams(
+                a
+                    .filter((e) => e?.payload)
+                    .map((e) => {
+                        return { label: e?.payload.body.name, id: e?.id }
+                    }) as StreamOption[]
+            )
+        })
     }, [props.selected])
 
     return (

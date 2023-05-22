@@ -28,7 +28,6 @@ export interface StreamInfoProps {
 
 export function StreamInfo(props: StreamInfoProps): JSX.Element {
     const api = useApi()
-    const appData = useContext(ApplicationContext)
     const reactlocation = useLocation()
     const [tab, setTab] = useState(0)
 
@@ -57,12 +56,12 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
             reactlocation.hash
                 .replace('#', '')
                 .split(',')
-                .map((e) => appData.streamDict.get(e))
+                .map((e) => api.readStream(e))
         ).then((a) => {
             console.log(a)
             setTitle(
                 a
-                    .map((e) => e.payload.body.name)
+                    .map((e) => e?.payload.body.name)
                     .filter((e) => e)
                     .join(', ')
             )

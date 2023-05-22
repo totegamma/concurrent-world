@@ -27,7 +27,6 @@ import type {
     ServerEvent,
     Association,
     Emoji,
-    Stream,
     ConcurrentTheme,
     ImgurSettings,
     Character,
@@ -54,7 +53,6 @@ import ConcurrentApiClient from './apiservice'
 export const ApplicationContext = createContext<appData>({
     profile: undefined,
     emojiDict: {},
-    streamDict: dummyResourceManager,
     messageDict: dummyResourceManager,
     websocketState: -1,
     watchStreams: [],
@@ -68,7 +66,6 @@ export const ApplicationContext = createContext<appData>({
 export interface appData {
     profile: Character<Profile> | undefined
     emojiDict: Record<string, Emoji>
-    streamDict: IuseResourceManager<Stream<any>>
     messageDict: IuseResourceManager<Message<any>>
     websocketState: ReadyState
     watchStreams: string[]
@@ -174,18 +171,6 @@ function App(): JSX.Element {
             [host]
         )
     )
-
-    const streamDict = useResourceManager<Stream<any>>(async (key: string) => {
-        const res = await fetch(`https://${host.fqdn}/stream?stream=${key}`, {
-            method: 'GET',
-            headers: {}
-        })
-        const data = await res.json()
-        if (data.payload) {
-            data.payload = JSON.parse(data.payload)
-        }
-        return data
-    })
 
     const follow = useCallback(
         (ccaddress: string): void => {
@@ -296,7 +281,6 @@ function App(): JSX.Element {
         return {
             emojiDict,
             profile,
-            streamDict,
             messageDict,
             websocketState: readyState,
             watchStreams,
@@ -306,7 +290,6 @@ function App(): JSX.Element {
     }, [
         emojiDict,
         profile,
-        streamDict,
         messageDict,
         readyState,
         watchStreams,
