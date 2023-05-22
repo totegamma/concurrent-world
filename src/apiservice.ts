@@ -12,15 +12,15 @@ import { Sign } from './util'
 const branchName = branch || window.location.host.split('.')[0]
 
 export default class ConcurrentApiClient {
-    endpoint: string
+    host: Host | undefined
     userAddress: string
     privatekey: string
 
     // characterCache: Record<string, Record<string, Character<any>>> = {}
     characterCache: Record<string, Character<any>> = {}
 
-    constructor(endpoint: string, userAddress: string, privatekey: string) {
-        this.endpoint = endpoint
+    constructor(userAddress: string, privatekey: string, host?: Host) {
+        this.host = host
         this.userAddress = userAddress
         this.privatekey = privatekey
         console.log('oOoOoOoOoO API SERVICE CREATED OoOoOoOoOo')
@@ -32,6 +32,7 @@ export default class ConcurrentApiClient {
         body: T,
         streams: string[]
     ): Promise<any> {
+        if (!this.host) throw new Error()
         const signObject: SignedObject<T> = {
             signer: this.userAddress,
             type: 'Message',
@@ -60,7 +61,7 @@ export default class ConcurrentApiClient {
             body: JSON.stringify(request)
         }
 
-        return await fetch(this.endpoint + 'messages', requestOptions)
+        return await fetch(`https://${this.host.fqdn}/messages`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 return data
@@ -75,6 +76,7 @@ export default class ConcurrentApiClient {
         targetType: string,
         streams: string[]
     ): Promise<any> {
+        if (!this.host) throw new Error()
         const signObject: SignedObject<T> = {
             signer: this.userAddress,
             type: 'Association',
@@ -103,7 +105,10 @@ export default class ConcurrentApiClient {
             })
         }
 
-        return await fetch(this.endpoint + 'associations', requestOptions)
+        return await fetch(
+            `https://${this.host.fqdn}/associations`,
+            requestOptions
+        )
             .then(async (res) => await res.json())
             .then((data) => {
                 return data
@@ -111,6 +116,7 @@ export default class ConcurrentApiClient {
     }
 
     async deleteAssociation(target: string): Promise<any> {
+        if (!this.host) throw new Error()
         const requestOptions = {
             method: 'DELETE',
             headers: { 'content-type': 'application/json' },
@@ -119,7 +125,10 @@ export default class ConcurrentApiClient {
             })
         }
 
-        return await fetch(this.endpoint + 'associations', requestOptions)
+        return await fetch(
+            `https://${this.host.fqdn}/associations`,
+            requestOptions
+        )
             .then(async (res) => await res.json())
             .then((data) => {
                 return data
@@ -132,6 +141,7 @@ export default class ConcurrentApiClient {
         body: T,
         id?: string
     ): Promise<any> {
+        if (!this.host) throw new Error()
         const signObject: SignedObject<T> = {
             signer: this.userAddress,
             type: 'Character',
@@ -160,7 +170,10 @@ export default class ConcurrentApiClient {
             body: JSON.stringify(request)
         }
 
-        return await fetch(this.endpoint + 'characters', requestOptions)
+        return await fetch(
+            `https://${this.host.fqdn}/characters`,
+            requestOptions
+        )
             .then(async (res) => await res.json())
             .then((data) => {
                 return data
@@ -171,15 +184,14 @@ export default class ConcurrentApiClient {
         author: string,
         schema: string
     ): Promise<Character<any> | undefined> {
+        if (!this.host) throw new Error()
         if (this.characterCache[author + schema]) {
             return this.characterCache[author + schema]
         }
         const res = await fetch(
-            this.endpoint +
-                'characters?author=' +
-                author +
-                '&schema=' +
-                encodeURIComponent(schema),
+            `https://${
+                this.host.fqdn
+            }/characters?author=${author}&schema=${encodeURIComponent(schema)}`,
             {
                 method: 'GET',
                 headers: {}
@@ -197,6 +209,7 @@ export default class ConcurrentApiClient {
 
     // Stream
     async createStream(schema: string, body: any): Promise<any> {
+        if (!this.host) throw new Error()
         const signObject = {
             signer: this.userAddress,
             type: 'Stream',
@@ -225,7 +238,7 @@ export default class ConcurrentApiClient {
             })
         }
 
-        return await fetch(this.endpoint + 'stream', requestOptions)
+        return await fetch(`https://${this.host.fqdn}/stream`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 return data
@@ -233,25 +246,33 @@ export default class ConcurrentApiClient {
     }
 
     async getStreamListBySchema(schema: string): Promise<Array<Stream<any>>> {
-        return await fetch(`${this.endpoint}stream/list?schema=${schema}`).then(
-            async (data) => {
-                return await data.json().then((arr) => {
-                    return arr.map((e: any) => {
-                        return { ...e, payload: JSON.parse(e.payload) }
-                    })
+        if (!this.host) throw new Error()
+        return await fetch(
+            `https://${this.host.fqdn}/stream/list?schema=${schema}`
+        ).then(async (data) => {
+            return await data.json().then((arr) => {
+                return arr.map((e: any) => {
+                    return { ...e, payload: JSON.parse(e.payload) }
                 })
-            }
-        )
+            })
+        })
     }
 
     // Host
-    async getHosts(fqdn?: string): Promise<Host[]> {
-        const local = this.endpoint.replace('https://', '').replace('/', '')
-        console.log(local)
-        return await fetch(`https://${fqdn ?? local}/host/list`).then(
-            async (data) => {
-                return await data.json()
-            }
-        )
+    async getHostProfile(remote?: string): Promise<Host> {
+        const fqdn = remote ?? this.host?.fqdn
+        if (!fqdn) throw new Error()
+        return await fetch(`https://${fqdn}/host`).then(async (data) => {
+            return await data.json()
+        })
+    }
+
+    async getKnownHosts(remote?: string): Promise<Host[]> {
+        if (!this.host) throw new Error()
+        return await fetch(
+            `https://${remote ?? this.host.fqdn}/host/list`
+        ).then(async (data) => {
+            return await data.json()
+        })
     }
 }

@@ -17,6 +17,7 @@ import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
 import ConcurrentApiClient from '../apiservice'
 import ApiProvider from '../context/api'
+import type { Host } from '../model'
 
 export function Registration(): JSX.Element {
     const navigate = useNavigate()
@@ -42,15 +43,25 @@ export function Registration(): JSX.Element {
     const userAddress = 'CC' + wallet.address.slice(2)
     const privateKey = wallet.privateKey.slice(2)
     const [server, setServer] = useState<string>('')
+    const [host, setHost] = useState<Host>()
 
     const [api, initializeApi] = useState<ConcurrentApiClient>()
     useEffect(() => {
-        const api = new ConcurrentApiClient(server, userAddress, privateKey)
+        const api = new ConcurrentApiClient(userAddress, privateKey, host)
         initializeApi(api)
-    }, [server, userAddress, privateKey])
+    }, [host, userAddress, privateKey])
+
+    useEffect(() => {
+        if (!api) return
+        const fqdn = server.replace('https://', '').replace('/', '')
+        api.getHostProfile(fqdn).then((e) => {
+            setHost(e)
+        })
+        console.log(fqdn)
+    }, [server])
 
     const setupAccount = (): void => {
-        localStorage.setItem('ServerAddress', JSON.stringify(server))
+        localStorage.setItem('Host', JSON.stringify(host))
         localStorage.setItem(
             'PublicKey',
             JSON.stringify(wallet.publicKey.slice(2))
@@ -133,9 +144,6 @@ export function Registration(): JSX.Element {
             <Typography variant="h2">プロフィールの作成</Typography>
             ここで名前・アイコン・自己紹介を設定します。
             <ProfileEditor
-                userAddress={userAddress}
-                privatekey={privateKey}
-                serverAddress={server}
                 onSubmit={() => {
                     setProfileSubmitted(true)
                 }}
@@ -183,11 +191,12 @@ export function Registration(): JSX.Element {
             true,
             true,
             mnemonic.phrase === mnemonicTest,
-            (server.startsWith('http://') || server.startsWith('https://')) &&
-                server.endsWith('/'),
+            !!host,
             profileSubmitted
         ])
-    }, [mnemonicTest, server, profileSubmitted])
+    }, [mnemonicTest, host, profileSubmitted])
+
+    if (!api) return <>api constructing...</>
 
     return (
         <ApiProvider api={api}>

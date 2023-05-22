@@ -30,7 +30,8 @@ import type {
     Stream,
     ConcurrentTheme,
     ImgurSettings,
-    Character
+    Character,
+    Host
 } from './model'
 import {
     Associations,
@@ -51,9 +52,6 @@ import ApiProvider from './context/api'
 import ConcurrentApiClient from './apiservice'
 
 export const ApplicationContext = createContext<appData>({
-    serverAddress: '',
-    privatekey: '',
-    userAddress: '',
     profile: undefined,
     emojiDict: {},
     streamDict: dummyResourceManager,
@@ -68,9 +66,6 @@ export const ApplicationContext = createContext<appData>({
 })
 
 export interface appData {
-    serverAddress: string
-    privatekey: string
-    userAddress: string
     profile: Character<Profile> | undefined
     emojiDict: Record<string, Emoji>
     streamDict: IuseResourceManager<Stream<any>>
@@ -84,14 +79,14 @@ export interface appData {
 export const ClockContext = createContext<Date>(new Date())
 
 function App(): JSX.Element {
-    const [server, setServer] = usePersistent<string>('ServerAddress', '')
+    const [host] = usePersistent<Host>('Host', null as any)
     const [prvkey] = usePersistent<string>('PrivateKey', '')
     const [address] = usePersistent<string>('Address', '')
     const [api, initializeApi] = useState<ConcurrentApiClient>()
     useEffect(() => {
-        const api = new ConcurrentApiClient(server, address, prvkey)
+        const api = new ConcurrentApiClient(address, prvkey, host)
         initializeApi(api)
-    }, [server, address, prvkey])
+    }, [host, address, prvkey])
 
     const [followList, setFollowList] = usePersistent<string[]>(
         'followList',
@@ -121,7 +116,7 @@ function App(): JSX.Element {
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
 
     const { lastMessage, readyState } = useWebSocket(
-        server.replace('http', 'ws') + 'socket',
+        `wss://${host.fqdn}/socket`,
         {
             shouldReconnect: (_) => true,
             reconnectInterval: (attempt) =>
@@ -163,22 +158,25 @@ function App(): JSX.Element {
     const messageDict = useResourceManager<Message<any>>(
         useCallback(
             async (key: string) => {
-                const res = await fetch(server + `messages/${key}`, {
-                    method: 'GET',
-                    headers: {}
-                })
+                const res = await fetch(
+                    `https://${host.fqdn}/messages/${key}`,
+                    {
+                        method: 'GET',
+                        headers: {}
+                    }
+                )
                 const data = await res.json()
                 return {
                     ...data,
                     payload: JSON.parse(data.payload ?? 'null')
                 }
             },
-            [server]
+            [host]
         )
     )
 
     const streamDict = useResourceManager<Stream<any>>(async (key: string) => {
-        const res = await fetch(server + `stream?stream=${key}`, {
+        const res = await fetch(`https://${host.fqdn}/stream?stream=${key}`, {
             method: 'GET',
             headers: {}
         })
@@ -296,9 +294,6 @@ function App(): JSX.Element {
 
     const applicationContext = useMemo(() => {
         return {
-            serverAddress: server,
-            privatekey: prvkey,
-            userAddress: address,
             emojiDict,
             profile,
             streamDict,
@@ -309,8 +304,6 @@ function App(): JSX.Element {
             setImgurSettings
         }
     }, [
-        server,
-        address,
         emojiDict,
         profile,
         streamDict,
@@ -426,7 +419,6 @@ function App(): JSX.Element {
                                             element={
                                                 <Settings
                                                     setThemeName={setThemeName}
-                                                    setServerAddr={setServer}
                                                 />
                                             }
                                         />

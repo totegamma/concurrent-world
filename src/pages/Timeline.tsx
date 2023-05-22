@@ -12,7 +12,6 @@ import type { Message, StreamElement, StreamElementDated } from '../model'
 import { type IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'
 import { useLocation } from 'react-router-dom'
-import { ApplicationContext } from '../App'
 import InfiniteScroll from 'react-infinite-scroller'
 import { usePersistent } from '../hooks/usePersistent'
 import { TimelineHeader } from '../components/TimelineHeader'
@@ -30,7 +29,6 @@ export interface TimelineProps {
 export const Timeline = memo<TimelineProps>(
     (props: TimelineProps): JSX.Element => {
         const api = useApi()
-        const appData = useContext(ApplicationContext)
         const theme = useTheme()
 
         const reactlocation = useLocation()
@@ -43,6 +41,7 @@ export const Timeline = memo<TimelineProps>(
         const [followStreams] = usePersistent<string[]>('followStreams', [])
 
         const reload = useCallback(async () => {
+            if (!api.host) return
             let homequery = ''
             if (!reactlocation.hash) {
                 homequery = (
@@ -62,13 +61,11 @@ export const Timeline = memo<TimelineProps>(
                     .concat(followStreams)
                     .join(',')
             }
-            const url =
-                appData.serverAddress +
-                `stream/recent?streams=${
-                    reactlocation.hash
-                        ? reactlocation.hash.replace('#', '')
-                        : homequery
-                }`
+            const url = `https://${api.host.fqdn}/stream/recent?streams=${
+                reactlocation.hash
+                    ? reactlocation.hash.replace('#', '')
+                    : homequery
+            }`
 
             const requestOptions = {
                 method: 'GET',
@@ -86,9 +83,10 @@ export const Timeline = memo<TimelineProps>(
                     props.messages.set(dated)
                     setHasMoreData(true)
                 })
-        }, [appData.serverAddress, reactlocation.hash])
+        }, [reactlocation.hash])
 
         const loadMore = useCallback(async () => {
+            if (!api.host) return
             const last = props.messages.current
             if (!props.messages.current[props.messages.current.length - 1]?.ID)
                 return
@@ -111,15 +109,13 @@ export const Timeline = memo<TimelineProps>(
                     .concat(followStreams)
                     .join(',')
             }
-            const url =
-                appData.serverAddress +
-                `stream/range?streams=${
-                    reactlocation.hash
-                        ? reactlocation.hash.replace('#', '')
-                        : homequery
-                }&until=${
-                    props.messages.current[props.messages.current.length - 1].ID
-                }`
+            const url = `https://${api.host.fqdn}/stream/range?streams=${
+                reactlocation.hash
+                    ? reactlocation.hash.replace('#', '')
+                    : homequery
+            }&until=${
+                props.messages.current[props.messages.current.length - 1].ID
+            }`
 
             const requestOptions = {
                 method: 'GET',

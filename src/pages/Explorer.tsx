@@ -34,7 +34,7 @@ export function Explorer(props: ExplorerProps): JSX.Element {
     const [newStreamName, setNewStreamName] = useState<string>('')
 
     const loadHosts = (): void => {
-        api.getHosts().then((e) => {
+        api.getKnownHosts().then((e) => {
             setHosts(e)
         })
     }

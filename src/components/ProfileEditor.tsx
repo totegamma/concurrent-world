@@ -10,9 +10,6 @@ import type { Character } from '../model'
 
 interface ProfileEditorProps {
     initial?: Character<Profile>
-    userAddress: string
-    privatekey: string
-    serverAddress: string
     onSubmit?: () => void
 }
 

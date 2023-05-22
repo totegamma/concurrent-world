@@ -81,7 +81,7 @@ export const TimelineMessage = memo<TimelineMessageappData>(
 
                 if (
                     message?.associations.find(
-                        (e) => e.author === appData.userAddress
+                        (e) => e.author === api.userAddress
                     ) != null
                 ) {
                     setHasOwnReaction(true)
@@ -127,7 +127,7 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                     appData.messageDict.invalidate(messageID)
                 })
             },
-            [appData.serverAddress, appData.userAddress]
+            []
         )
 
         const unfavorite = useCallback(
@@ -141,7 +141,7 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                     appData.messageDict.invalidate(messageID)
                 })
             },
-            [appData.serverAddress]
+            []
         )
 
         if (!message?.payload?.body) {
@@ -336,7 +336,7 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                                                             message.associations.find(
                                                                 (e) =>
                                                                     e.author ===
-                                                                    appData.userAddress
+                                                                    api.userAddress
                                                             )?.id
                                                         )
                                                     } else {

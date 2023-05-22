@@ -4,8 +4,10 @@ import { ApplicationContext } from '../App'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import { ProfileEditor } from '../components/ProfileEditor'
+import { useApi } from '../context/api'
 
 export function Identity(): JSX.Element {
+    const api = useApi()
     const theme = useTheme()
     const appData = useContext(ApplicationContext)
     const [showPrivateKey, setShowPrivateKey] = useState(false)
@@ -27,13 +29,14 @@ export function Identity(): JSX.Element {
                     Identity
                 </Typography>
                 <Divider />
-                <ProfileEditor
-                    initial={appData.profile}
-                    userAddress={appData.userAddress}
-                    privatekey={appData.privatekey}
-                    serverAddress={appData.serverAddress}
-                />
+                <ProfileEditor initial={appData.profile} />
                 <Divider />
+                <Typography variant="h3" gutterBottom>
+                    Host
+                </Typography>
+                <Typography sx={{ wordBreak: 'break-all' }}>
+                    {api.host?.fqdn}
+                </Typography>
                 <Typography variant="h3" gutterBottom>
                     Home Stream
                 </Typography>
@@ -50,7 +53,7 @@ export function Identity(): JSX.Element {
                     Concurrent Address
                 </Typography>
                 <Typography sx={{ wordBreak: 'break-all' }}>
-                    {appData.userAddress}
+                    {api.userAddress}
                 </Typography>
                 <Typography variant="h3" gutterBottom>
                     Privatekey
@@ -63,7 +66,7 @@ export function Identity(): JSX.Element {
                     }}
                 >
                     {showPrivateKey
-                        ? appData.privatekey
+                        ? api.privatekey
                         : '•••••••••••••••••••••••••••••••••••••••••••••••••'}
                     <IconButton
                         sx={{ ml: 'auto' }}
