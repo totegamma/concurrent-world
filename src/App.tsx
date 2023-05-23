@@ -12,17 +12,11 @@ import useWebSocket, { type ReadyState } from 'react-use-websocket'
 
 import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
-import {
-    useResourceManager,
-    dummyResourceManager,
-    type IuseResourceManager
-} from './hooks/useResourceManager'
 
 import { Schemas } from './schemas'
 import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu'
 import type {
-    Message,
     StreamElementDated,
     ServerEvent,
     Association,
@@ -30,7 +24,8 @@ import type {
     ConcurrentTheme,
     ImgurSettings,
     Character,
-    Host
+    Host,
+    StreamedMessage
 } from './model'
 import {
     Associations,
@@ -53,7 +48,6 @@ import ConcurrentApiClient from './apiservice'
 export const ApplicationContext = createContext<appData>({
     profile: undefined,
     emojiDict: {},
-    messageDict: dummyResourceManager,
     websocketState: -1,
     watchStreams: [],
     imgurSettings: {
@@ -66,7 +60,6 @@ export const ApplicationContext = createContext<appData>({
 export interface appData {
     profile: Character<Profile> | undefined
     emojiDict: Record<string, Emoji>
-    messageDict: IuseResourceManager<Message<any>>
     websocketState: ReadyState
     watchStreams: string[]
     imgurSettings: ImgurSettings
@@ -152,26 +145,6 @@ function App(): JSX.Element {
             })
     }, [])
 
-    const messageDict = useResourceManager<Message<any>>(
-        useCallback(
-            async (key: string) => {
-                const res = await fetch(
-                    `https://${host.fqdn}/api/v1/messages/${key}`,
-                    {
-                        method: 'GET',
-                        headers: {}
-                    }
-                )
-                const data = await res.json()
-                return {
-                    ...data,
-                    payload: JSON.parse(data.payload ?? 'null')
-                }
-            },
-            [host]
-        )
-    )
-
     const follow = useCallback(
         (ccaddress: string): void => {
             if (followList.includes(ccaddress)) return
@@ -192,13 +165,13 @@ function App(): JSX.Element {
         if (!event) return
         switch (event.type) {
             case 'message': {
-                const message = event.body as Message<any>
+                const message = event.body as StreamedMessage<any>
                 switch (event.action) {
                     case 'create': {
+                        // TODO: cache message
                         if (
-                            messages.current.find(
-                                (e) => e.Values.id === message.id
-                            ) != null
+                            messages.current.find((e) => e.id === message.id) !=
+                            null
                         ) {
                             return
                         }
@@ -207,13 +180,13 @@ function App(): JSX.Element {
                         if (!groupA.some((e) => groupB.includes(e))) return
                         const current = new Date().getTime()
                         messages.pushFront({
-                            ID: new Date(message.cdate)
+                            timestamp: new Date(message.cdate)
                                 .getTime()
                                 .toString()
                                 .replace('.', '-'),
-                            Values: {
-                                id: message.id
-                            },
+                            id: message.id,
+                            author: message.author,
+                            currenthost: message.host,
                             LastUpdated: current
                         })
                         playNotificationRef.current()
@@ -230,9 +203,9 @@ function App(): JSX.Element {
                 console.log(event)
                 switch (event.action) {
                     case 'create': {
-                        messageDict.invalidate(association.targetID)
+                        api?.invalidateMessage(association.targetID)
                         const target = messages.current.find(
-                            (e) => e.Values.id === association.targetID
+                            (e) => e.id === association.targetID
                         )
                         if (target) {
                             target.LastUpdated = new Date().getTime()
@@ -241,9 +214,9 @@ function App(): JSX.Element {
                         break
                     }
                     case 'delete': {
-                        messageDict.invalidate(association.targetID)
+                        api?.invalidateMessage(association.targetID)
                         const target = messages.current.find(
-                            (e) => e.Values.id === association.targetID
+                            (e) => e.id === association.targetID
                         )
                         if (target) {
                             target.LastUpdated = new Date().getTime()
@@ -281,7 +254,6 @@ function App(): JSX.Element {
         return {
             emojiDict,
             profile,
-            messageDict,
             websocketState: readyState,
             watchStreams,
             imgurSettings,
@@ -290,7 +262,6 @@ function App(): JSX.Element {
     }, [
         emojiDict,
         profile,
-        messageDict,
         readyState,
         watchStreams,
         imgurSettings,

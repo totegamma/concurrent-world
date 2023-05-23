@@ -58,9 +58,8 @@ export const Timeline = memo<TimelineProps>(
                 : homequery
 
             api.readStreamRecent(query).then((data: StreamElement[]) => {
-                const newdata = data?.sort((a, b) => (a.ID > b.ID ? -1 : 1))
                 const current = new Date().getTime()
-                const dated = newdata.map((e) => {
+                const dated = data.map((e) => {
                     return { ...e, LastUpdated: current }
                 })
                 props.messages.set(dated)
@@ -71,7 +70,10 @@ export const Timeline = memo<TimelineProps>(
         const loadMore = useCallback(async () => {
             if (!api.host) return
             const last = props.messages.current
-            if (!props.messages.current[props.messages.current.length - 1]?.ID)
+            if (
+                !props.messages.current[props.messages.current.length - 1]
+                    ?.timestamp
+            )
                 return
             let homequery = ''
             if (!reactlocation.hash) {
@@ -92,12 +94,13 @@ export const Timeline = memo<TimelineProps>(
                     .concat(followStreams)
                     .join(',')
             }
-            const url = `https://${api.host.fqdn}/stream/range?streams=${
+            const url = `https://${api.host.fqdn}/api/v1/stream/range?streams=${
                 reactlocation.hash
                     ? reactlocation.hash.replace('#', '')
                     : homequery
             }&until=${
-                props.messages.current[props.messages.current.length - 1].ID
+                props.messages.current[props.messages.current.length - 1]
+                    .timestamp
             }`
 
             const requestOptions = {
@@ -112,12 +115,8 @@ export const Timeline = memo<TimelineProps>(
                         console.log('timeline changed!!!')
                         return
                     }
-                    const idtable = props.messages.current.map(
-                        (e) => e.Values.id
-                    )
-                    const newdata = data.filter(
-                        (e) => !idtable.includes(e.Values.id)
-                    )
+                    const idtable = props.messages.current.map((e) => e.id)
+                    const newdata = data.filter((e) => !idtable.includes(e.id))
                     if (newdata.length > 0) {
                         const current = new Date().getTime()
                         const dated = newdata.map((e) => {
@@ -207,10 +206,9 @@ export const Timeline = memo<TimelineProps>(
                                     }
                                 >
                                     {props.messages.current.map((e) => (
-                                        <React.Fragment key={e.Values.id}>
+                                        <React.Fragment key={e.id}>
                                             <TimelineMessage
-                                                message={e.Values.id}
-                                                lastUpdated={e.LastUpdated}
+                                                message={e}
                                                 setInspectItem={setInspectItem}
                                                 follow={props.follow}
                                             />

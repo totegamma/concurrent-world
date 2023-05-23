@@ -13,19 +13,22 @@ import StarIcon from '@mui/icons-material/Star'
 import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 
-import type { Character, Message, ProfileWithAddress } from '../model'
+import type {
+    Character,
+    Message,
+    ProfileWithAddress,
+    StreamElementDated
+} from '../model'
 import type { Profile } from '../schemas/profile'
 import { Schemas } from '../schemas'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import { CCAvatar } from './CCAvatar'
 import { TimeDiff } from './TimeDiff'
-import { ApplicationContext } from '../App'
 import type { Like } from '../schemas/like'
 import { useApi } from '../context/api'
 
 export interface TimelineMessageappData {
-    message: string
-    lastUpdated: number
+    message: StreamElementDated
     follow: (ccaddress: string) => void
     setInspectItem: (message: Message<any>) => void
 }
@@ -33,7 +36,6 @@ export interface TimelineMessageappData {
 export const TimelineMessage = memo<TimelineMessageappData>(
     (props: TimelineMessageappData): JSX.Element => {
         const api = useApi()
-        const appData = useContext(ApplicationContext)
         const [author, setAuthor] = useState<Character<Profile> | undefined>()
         const [message, setMessage] = useState<Message<any> | undefined>()
         const [msgstreams, setStreams] = useState<string[]>([])
@@ -44,18 +46,10 @@ export const TimelineMessage = memo<TimelineMessageappData>(
         const [hasOwnReaction, setHasOwnReaction] = useState<boolean>(false)
 
         useEffect(() => {
-            appData.messageDict
-                .get(props.message)
+            api.fetchMessage(props.message.id, props.message.currenthost)
                 .then((msg) => {
+                    if (!msg) return
                     setMessage(msg)
-                    api.readCharacter(msg.author, Schemas.profile)
-                        .then((author) => {
-                            setAuthor(author)
-                        })
-                        .catch((error) => {
-                            console.error(error)
-                        })
-
                     Promise.all(
                         msg.streams.map(
                             async (id) =>
@@ -70,7 +64,15 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                 .catch((error) => {
                     console.error(error)
                 })
-        }, [props.message, props.lastUpdated])
+
+            api.readCharacter(props.message.author, Schemas.profile)
+                .then((author) => {
+                    setAuthor(author)
+                })
+                .catch((error) => {
+                    console.error(error)
+                })
+        }, [props.message, props.message.LastUpdated])
 
         useEffect(() => {
             const fetchUsers = async (): Promise<any> => {
@@ -106,39 +108,28 @@ export const TimelineMessage = memo<TimelineMessageappData>(
             fetchUsers()
         }, [message?.associations])
 
-        const favorite = useCallback(
-            async (messageID: string | undefined): Promise<void> => {
-                if (!messageID) return
+        const favorite = useCallback(async (): Promise<void> => {
+            const targetStream = [
+                (await api.readCharacter(props.message.author, Schemas.profile))
+                    ?.payload.body.notificationStream
+            ].filter((e) => e) as string[]
 
-                const targetAuthor = (await appData.messageDict.get(messageID))
-                    .author
-                const targetStream = [
-                    (await api.readCharacter(targetAuthor, Schemas.profile))
-                        ?.payload.body.notificationStream
-                ].filter((e) => e) as string[]
-
-                api.createAssociation<Like>(
-                    Schemas.like,
-                    {},
-                    messageID,
-                    'messages',
-                    targetStream
-                ).then((_) => {
-                    appData.messageDict.invalidate(messageID)
-                })
-            },
-            []
-        )
+            api.createAssociation<Like>(
+                Schemas.like,
+                {},
+                props.message.id,
+                'messages',
+                targetStream
+            ).then((_) => {
+                api.invalidateMessage(props.message.id)
+            })
+        }, [])
 
         const unfavorite = useCallback(
-            (
-                messageID: string | undefined,
-                deletekey: string | undefined
-            ): void => {
-                if (!messageID) return
+            (deletekey: string | undefined): void => {
                 if (!deletekey) return
                 api.deleteAssociation(deletekey).then((_) => {
-                    appData.messageDict.invalidate(messageID)
+                    api.invalidateMessage(props.message.id)
                 })
             },
             []
@@ -332,7 +323,6 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                                                 onClick={() => {
                                                     if (hasOwnReaction) {
                                                         unfavorite(
-                                                            message.id,
                                                             message.associations.find(
                                                                 (e) =>
                                                                     e.author ===
@@ -340,7 +330,7 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                                                             )?.id
                                                         )
                                                     } else {
-                                                        favorite(message.id)
+                                                        favorite()
                                                     }
                                                 }}
                                             >

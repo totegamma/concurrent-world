@@ -4,7 +4,8 @@ import type {
     SignedObject,
     Character,
     Host,
-    StreamElement
+    StreamElement,
+    Message
 } from './model'
 
 // @ts-expect-error vite dynamic import
@@ -19,6 +20,7 @@ export default class ConcurrentApiClient {
     userAddress: string
     privatekey: string
 
+    messageCache: Record<string, Message<any>> = {}
     characterCache: Record<string, Character<any>> = {}
     streamCache: Record<string, Stream<any>> = {}
 
@@ -72,6 +74,38 @@ export default class ConcurrentApiClient {
             .then((data) => {
                 return data
             })
+    }
+
+    async fetchMessage(
+        id: string,
+        host: string = ''
+    ): Promise<Message<any> | undefined> {
+        if (!this.host) throw new Error()
+        if (this.messageCache[id]) {
+            return this.messageCache[id]
+        }
+        const messageHost = !host ? this.host.fqdn : host
+        console.log('request', id, messageHost)
+        const res = await fetch(
+            `https://${messageHost}${apiPath}/messages/${id}`,
+            {
+                method: 'GET',
+                headers: {}
+            }
+        )
+        const data = await res.json()
+        console.log(data)
+        if (!data.payload) {
+            return undefined
+        }
+        const message = data
+        message.payload = JSON.parse(message.payload)
+        this.messageCache[id] = message
+        return message
+    }
+
+    invalidateMessage(target: string): void {
+        delete this.messageCache[target]
     }
 
     // Association

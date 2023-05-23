@@ -18,10 +18,10 @@ import type {
 import type { Profile } from './schemas/profile'
 
 export interface StreamElement {
-    ID: string
-    Values: {
-        id: string
-    }
+    timestamp: string
+    id: string
+    author: string
+    currenthost: string
 }
 
 export interface StreamElementDated extends StreamElement {
@@ -79,7 +79,11 @@ export interface Character<T> {
 export interface ServerEvent {
     type: string
     action: string
-    body: Message<any> | Association
+    body: StreamedMessage<any> | Association
+}
+
+export interface StreamedMessage<T> extends Message<T> {
+    host: string
 }
 
 export interface Emoji {
