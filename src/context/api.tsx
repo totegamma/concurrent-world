@@ -9,11 +9,7 @@ export interface ApiProviderProps {
 }
 
 export default function ApiProvider(props: ApiProviderProps): JSX.Element {
-    return (
-        <ApiContext.Provider value={props.api}>
-            {props.children}
-        </ApiContext.Provider>
-    )
+    return <ApiContext.Provider value={props.api}>{props.children}</ApiContext.Provider>
 }
 
 export function useApi(): ConcurrentApiClient {

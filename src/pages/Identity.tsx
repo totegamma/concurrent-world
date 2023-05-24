@@ -34,15 +34,11 @@ export function Identity(): JSX.Element {
                 <Typography variant="h3" gutterBottom>
                     Host
                 </Typography>
-                <Typography sx={{ wordBreak: 'break-all' }}>
-                    {api.host?.fqdn}
-                </Typography>
+                <Typography sx={{ wordBreak: 'break-all' }}>{api.host?.fqdn}</Typography>
                 <Typography variant="h3" gutterBottom>
                     Home Stream
                 </Typography>
-                <Typography sx={{ wordBreak: 'break-all' }}>
-                    {appData.profile?.payload.body.homeStream}
-                </Typography>
+                <Typography sx={{ wordBreak: 'break-all' }}>{appData.profile?.payload.body.homeStream}</Typography>
                 <Typography variant="h3" gutterBottom>
                     Notification Stream
                 </Typography>
@@ -52,9 +48,7 @@ export function Identity(): JSX.Element {
                 <Typography variant="h3" gutterBottom>
                     Concurrent Address
                 </Typography>
-                <Typography sx={{ wordBreak: 'break-all' }}>
-                    {api.userAddress}
-                </Typography>
+                <Typography sx={{ wordBreak: 'break-all' }}>{api.userAddress}</Typography>
                 <Typography variant="h3" gutterBottom>
                     Privatekey
                 </Typography>
@@ -65,9 +59,7 @@ export function Identity(): JSX.Element {
                         alignItems: 'center'
                     }}
                 >
-                    {showPrivateKey
-                        ? api.privatekey
-                        : '•••••••••••••••••••••••••••••••••••••••••••••••••'}
+                    {showPrivateKey ? api.privatekey : '•••••••••••••••••••••••••••••••••••••••••••••••••'}
                     <IconButton
                         sx={{ ml: 'auto' }}
                         onClick={() => {
@@ -75,13 +67,9 @@ export function Identity(): JSX.Element {
                         }}
                     >
                         {!showPrivateKey ? (
-                            <VisibilityIcon
-                                sx={{ color: theme.palette.text.primary }}
-                            />
+                            <VisibilityIcon sx={{ color: theme.palette.text.primary }} />
                         ) : (
-                            <VisibilityOffIcon
-                                sx={{ color: theme.palette.text.primary }}
-                            />
+                            <VisibilityOffIcon sx={{ color: theme.palette.text.primary }} />
                         )}
                     </IconButton>
                 </Typography>

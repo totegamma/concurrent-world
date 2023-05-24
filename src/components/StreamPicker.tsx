@@ -21,9 +21,7 @@ export function StreamPicker(props: StreamPickerProps): JSX.Element {
     const [selectedStreams, setSelectedStreams] = useState<StreamOption[]>([])
 
     useEffect(() => {
-        Promise.all(
-            followService.bookmarkingStreams.map((e) => api.readStream(e))
-        ).then((a) => {
+        Promise.all(followService.bookmarkingStreams.map((e) => api.readStream(e))).then((a) => {
             setOptions(
                 a
                     .filter((e) => e?.payload)
@@ -83,11 +81,7 @@ export function StreamPicker(props: StreamPickerProps): JSX.Element {
                     value.map((option, index) => (
                         // disabling ESLint here becase 'key' should exist in {..getTagProps({index})}
                         // eslint-disable-next-line
-                        <Chip
-                            label={option.label}
-                            sx={{ color: 'text.default' }}
-                            {...getTagProps({ index })}
-                        />
+                        <Chip label={option.label} sx={{ color: 'text.default' }} {...getTagProps({ index })} />
                     ))
                 }
             />

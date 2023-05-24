@@ -1,12 +1,5 @@
 import { useState, useContext, useEffect, useRef, memo } from 'react'
-import {
-    InputBase,
-    Box,
-    Button,
-    useTheme,
-    IconButton,
-    Divider
-} from '@mui/material'
+import { InputBase, Box, Button, useTheme, IconButton, Divider } from '@mui/material'
 import { ApplicationContext } from '../App'
 import SendIcon from '@mui/icons-material/Send'
 import HomeIcon from '@mui/icons-material/Home'
@@ -64,10 +57,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const inputRef = useRef<HTMLInputElement>(null)
 
     const [defaultPostHome] = usePersistent<string[]>('defaultPostHome', [])
-    const [defaultPostNonHome] = usePersistent<string[]>(
-        'defaultPostNonHome',
-        []
-    )
+    const [defaultPostNonHome] = usePersistent<string[]>('defaultPostNonHome', [])
 
     const [postHome, setPostHome] = useState<boolean>(true)
 
@@ -85,14 +75,12 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             {
                 id: 'fluffy',
                 name: 'Fluffy Social',
-                emojis: Object.entries(appData.emojiDict).map(
-                    ([key, value]) => ({
-                        id: key,
-                        name: value.name,
-                        keywords: value.aliases,
-                        skins: [{ src: value.publicUrl }]
-                    })
-                )
+                emojis: Object.entries(appData.emojiDict).map(([key, value]) => ({
+                    id: key,
+                    name: value.name,
+                    keywords: value.aliases,
+                    skins: [{ src: value.publicUrl }]
+                }))
             }
         ]
 
@@ -111,11 +99,9 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             body: draft
         }
 
-        api.createMessage<SimpleNote>(Schemas.simpleNote, body, streams).then(
-            (_) => {
-                setDraft('')
-            }
-        )
+        api.createMessage<SimpleNote>(Schemas.simpleNote, body, streams).then((_) => {
+            setDraft('')
+        })
     }
 
     const uploadToImgur = async (base64Data: string): Promise<string> => {
@@ -149,9 +135,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 reader.onload = async (event) => {
                     const base64Text = event
                     if (!base64Text.target) return
-                    const result = await uploadToImgur(
-                        base64Text.target.result as string
-                    )
+                    const result = await uploadToImgur(base64Text.target.result as string)
                     if (!result) return
                     setDraft(draft + `![image](${result})`)
                 }
@@ -171,9 +155,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             const base64Text = event
             if (!base64Text.target) return
             console.log(event)
-            const result = await uploadToImgur(
-                base64Text.target.result as string
-            )
+            const result = await uploadToImgur(base64Text.target.result as string)
             if (!result) return
             setDraft(draft + `![image](${result})`)
         }
@@ -204,11 +186,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         flex: 1
                     }}
                 >
-                    <StreamPicker
-                        color="none"
-                        selected={messageDestStreams}
-                        setSelected={setMessageDestStreams}
-                    />
+                    <StreamPicker color="none" selected={messageDestStreams} setSelected={setMessageDestStreams} />
                 </Box>
                 <IconButton
                     onClick={() => {
@@ -239,12 +217,8 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         padding: '0'
                     }}
                     onKeyDown={(e: any) => {
-                        if (draft.length === 0 || draft.trim().length === 0)
-                            return
-                        if (
-                            e.key === 'Enter' &&
-                            (e.ctrlKey === true || e.metaKey === true)
-                        ) {
+                        if (draft.length === 0 || draft.trim().length === 0) return
+                        if (e.key === 'Enter' && (e.ctrlKey === true || e.metaKey === true)) {
                             post()
                         }
                     }}

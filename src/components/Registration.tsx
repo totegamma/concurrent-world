@@ -26,20 +26,8 @@ export function Registration(): JSX.Element {
     const [profileSubmitted, setProfileSubmitted] = useState<boolean>(false)
 
     const entrophy = useMemo(() => randomBytes(16), [])
-    const mnemonic = useMemo(
-        () => Mnemonic.fromEntropy(entrophy, null, LangJa.wordlist()),
-        []
-    )
-    const wallet = useMemo(
-        () =>
-            HDNodeWallet.fromPhrase(
-                mnemonic.phrase,
-                undefined,
-                undefined,
-                LangJa.wordlist()
-            ),
-        []
-    )
+    const mnemonic = useMemo(() => Mnemonic.fromEntropy(entrophy, null, LangJa.wordlist()), [])
+    const wallet = useMemo(() => HDNodeWallet.fromPhrase(mnemonic.phrase, undefined, undefined, LangJa.wordlist()), [])
     const userAddress = 'CC' + wallet.address.slice(2)
     const privateKey = wallet.privateKey.slice(2)
     const [server, setServer] = useState<string>('')
@@ -62,10 +50,7 @@ export function Registration(): JSX.Element {
 
     const setupAccount = (): void => {
         localStorage.setItem('Host', JSON.stringify(host))
-        localStorage.setItem(
-            'PublicKey',
-            JSON.stringify(wallet.publicKey.slice(2))
-        )
+        localStorage.setItem('PublicKey', JSON.stringify(wallet.publicKey.slice(2)))
         localStorage.setItem('PrivateKey', JSON.stringify(privateKey))
         localStorage.setItem('Address', JSON.stringify(userAddress))
         navigate('/')
@@ -73,11 +58,8 @@ export function Registration(): JSX.Element {
 
     const step0 = (
         <>
-            <Typography variant="h2">
-                Concurrentアカウントを作成しましょう！
-            </Typography>
-            まずは、背後にだれもいないことを確認してください。
-            次の画面で、重要な秘密のフレーズを出力します。
+            <Typography variant="h2">Concurrentアカウントを作成しましょう！</Typography>
+            まずは、背後にだれもいないことを確認してください。 次の画面で、重要な秘密のフレーズを出力します。
         </>
     )
     const step1 = (
@@ -113,9 +95,7 @@ export function Registration(): JSX.Element {
                     width: '100%'
                 }}
             />
-            {mnemonic.phrase === mnemonicTest
-                ? '一致しています'
-                : '一致していません'}
+            {mnemonic.phrase === mnemonicTest ? '一致しています' : '一致していません'}
         </>
     )
     const step3 = (
@@ -174,9 +154,7 @@ export function Registration(): JSX.Element {
         }
     ]
 
-    const [stepOK, setStepOK] = useState<boolean[]>(
-        new Array(steps.length).fill(false)
-    )
+    const [stepOK, setStepOK] = useState<boolean[]>(new Array(steps.length).fill(false))
 
     const handleNext = (): void => {
         setActiveStep((prevActiveStep) => prevActiveStep + 1)
@@ -187,13 +165,7 @@ export function Registration(): JSX.Element {
     }
 
     useEffect(() => {
-        setStepOK([
-            true,
-            true,
-            mnemonic.phrase === mnemonicTest,
-            !!host,
-            profileSubmitted
-        ])
+        setStepOK([true, true, mnemonic.phrase === mnemonicTest, !!host, profileSubmitted])
     }, [mnemonicTest, host, profileSubmitted])
 
     if (!api) return <>api constructing...</>
@@ -214,9 +186,7 @@ export function Registration(): JSX.Element {
                     overflow: 'hidden'
                 }}
             >
-                <Typography>
-                    Concurrentアカウントセットアップウィザード
-                </Typography>
+                <Typography>Concurrentアカウントセットアップウィザード</Typography>
                 <Stepper /* for Desktop */
                     sx={{
                         display: { xs: 'none', md: 'flex' }
@@ -230,9 +200,7 @@ export function Registration(): JSX.Element {
                         } = {}
                         return (
                             <Step key={step.title} {...stepProps}>
-                                <StepLabel {...labelProps}>
-                                    {step.title}
-                                </StepLabel>
+                                <StepLabel {...labelProps}>{step.title}</StepLabel>
                             </Step>
                         )
                     })}
@@ -255,9 +223,7 @@ export function Registration(): JSX.Element {
 
                 {activeStep === steps.length ? (
                     <>
-                        <Typography sx={{ mt: 2, mb: 1 }}>
-                            これで完了です！始めましょう！
-                        </Typography>
+                        <Typography sx={{ mt: 2, mb: 1 }}>これで完了です！始めましょう！</Typography>
                         <Box
                             sx={{
                                 display: { xs: 'none', md: 'flex' },
@@ -273,9 +239,7 @@ export function Registration(): JSX.Element {
                     </>
                 ) : (
                     <>
-                        <Box sx={{ flex: 1, overflowY: 'auto' }}>
-                            {steps[activeStep].component}
-                        </Box>
+                        <Box sx={{ flex: 1, overflowY: 'auto' }}>{steps[activeStep].component}</Box>
                         <Box
                             sx={{
                                 display: { xs: 'none', md: 'flex' },
@@ -283,23 +247,12 @@ export function Registration(): JSX.Element {
                                 pt: 2
                             }}
                         >
-                            <Button
-                                color="inherit"
-                                disabled={activeStep === 0}
-                                onClick={handleBack}
-                                sx={{ mr: 1 }}
-                            >
+                            <Button color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
                                 Back
                             </Button>
                             <Box sx={{ flex: '1 1 auto' }} />
-                            <Button
-                                variant="contained"
-                                onClick={handleNext}
-                                disabled={!stepOK[activeStep]}
-                            >
-                                {activeStep === steps.length - 1
-                                    ? 'Finish'
-                                    : 'Next'}
+                            <Button variant="contained" onClick={handleNext} disabled={!stepOK[activeStep]}>
+                                {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                             </Button>
                         </Box>
                     </>
@@ -318,22 +271,14 @@ export function Registration(): JSX.Element {
                                 GO!
                             </Button>
                         ) : (
-                            <Button
-                                size="small"
-                                onClick={handleNext}
-                                disabled={!stepOK[activeStep]}
-                            >
+                            <Button size="small" onClick={handleNext} disabled={!stepOK[activeStep]}>
                                 Next
                                 <KeyboardArrowRight />
                             </Button>
                         )
                     }
                     backButton={
-                        <Button
-                            size="small"
-                            onClick={handleBack}
-                            disabled={activeStep === 0}
-                        >
+                        <Button size="small" onClick={handleBack} disabled={activeStep === 0}>
                             <KeyboardArrowLeft />
                             Back
                         </Button>

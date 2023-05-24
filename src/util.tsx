@@ -72,9 +72,7 @@ export const humanReadableTimeDiff = (time: Date): string => {
         return `${Math.round(elapsed / msPerHour)}時間前`
     } else {
         return (
-            (current.getFullYear() === time.getFullYear()
-                ? ''
-                : `${time.getFullYear()}年 `) +
+            (current.getFullYear() === time.getFullYear() ? '' : `${time.getFullYear()}年 `) +
             `${String(time.getMonth() + 1).padStart(2, '0')}月` +
             `${String(time.getDate()).padStart(2, '0')}日 ` +
             `${String(time.getHours()).padStart(2, '0')}時` +

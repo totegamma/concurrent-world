@@ -1,13 +1,4 @@
-import {
-    Box,
-    Divider,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemText,
-    Typography,
-    useTheme
-} from '@mui/material'
+import { Box, Divider, List, ListItem, ListItemButton, ListItemText, Typography, useTheme } from '@mui/material'
 import { Link } from 'react-router-dom'
 
 import HomeIcon from '@mui/icons-material/Home'
@@ -39,10 +30,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
 
     const theme = useTheme<ConcurrentTheme>()
 
-    const iconColor =
-        appData.websocketState === 1
-            ? theme.palette.background.contrastText
-            : theme.palette.text.disabled
+    const iconColor = appData.websocketState === 1 ? theme.palette.background.contrastText : theme.palette.text.disabled
 
     return (
         <Box sx={{ gap: '15px', height: '100%' }}>
@@ -80,9 +68,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         Concurrent
                     </Typography>
                 </Box>
-                <Box sx={{ textAlign: 'center', fontWeight: 600 }}>
-                    開発中α版
-                </Box>
+                <Box sx={{ textAlign: 'center', fontWeight: 600 }}>開発中α版</Box>
                 <Box
                     sx={{
                         textAlign: 'center',
@@ -109,11 +95,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         >
                             <List dense sx={{ width: '100%', maxWidth: 360 }}>
                                 <ListItem disablePadding>
-                                    <ListItemButton
-                                        sx={{ gap: 1 }}
-                                        component={Link}
-                                        to="/"
-                                    >
+                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/">
                                         <HomeIcon
                                             sx={{
                                                 color: 'background.contrastText'
@@ -124,11 +106,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                     </ListItemButton>
                                 </ListItem>
                                 <ListItem disablePadding>
-                                    <ListItemButton
-                                        sx={{ gap: 1 }}
-                                        component={Link}
-                                        to="/notifications"
-                                    >
+                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/notifications">
                                         <NotificationsIcon
                                             sx={{
                                                 color: 'background.contrastText'
@@ -139,11 +117,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                     </ListItemButton>
                                 </ListItem>
                                 <ListItem disablePadding>
-                                    <ListItemButton
-                                        sx={{ gap: 1 }}
-                                        component={Link}
-                                        to="/associations"
-                                    >
+                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/associations">
                                         <MessageIcon
                                             sx={{
                                                 color: 'background.contrastText'
@@ -154,11 +128,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                     </ListItemButton>
                                 </ListItem>
                                 <ListItem disablePadding>
-                                    <ListItemButton
-                                        sx={{ gap: 1 }}
-                                        component={Link}
-                                        to="/explorer"
-                                    >
+                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/explorer">
                                         <ExploreIcon
                                             sx={{
                                                 color: 'background.contrastText'
@@ -169,11 +139,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                     </ListItemButton>
                                 </ListItem>
                                 <ListItem disablePadding>
-                                    <ListItemButton
-                                        sx={{ gap: 1 }}
-                                        component={Link}
-                                        to="/identity"
-                                    >
+                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/identity">
                                         <BadgeIcon
                                             sx={{
                                                 color: 'background.contrastText'
@@ -184,11 +150,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                     </ListItemButton>
                                 </ListItem>
                                 <ListItem disablePadding>
-                                    <ListItemButton
-                                        sx={{ gap: 1 }}
-                                        component={Link}
-                                        to="/settings"
-                                    >
+                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/settings">
                                         <SettingsIcon
                                             sx={{
                                                 color: 'background.contrastText'

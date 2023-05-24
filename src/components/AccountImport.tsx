@@ -26,25 +26,11 @@ export function AccountImport(): JSX.Element {
             localStorage.setItem('Address', JSON.stringify(key.ccaddress))
             navigate('/')
         } else {
-            const wallet = HDNodeWallet.fromPhrase(
-                mnemonic,
-                undefined,
-                undefined,
-                LangJa.wordlist()
-            ) // TODO: move to utils
+            const wallet = HDNodeWallet.fromPhrase(mnemonic, undefined, undefined, LangJa.wordlist()) // TODO: move to utils
             localStorage.setItem('ServerAddress', JSON.stringify(server))
-            localStorage.setItem(
-                'PublicKey',
-                JSON.stringify(wallet.publicKey.slice(2))
-            )
-            localStorage.setItem(
-                'PrivateKey',
-                JSON.stringify(wallet.privateKey.slice(2))
-            )
-            localStorage.setItem(
-                'Address',
-                JSON.stringify('CC' + wallet.address.slice(2))
-            )
+            localStorage.setItem('PublicKey', JSON.stringify(wallet.publicKey.slice(2)))
+            localStorage.setItem('PrivateKey', JSON.stringify(wallet.privateKey.slice(2)))
+            localStorage.setItem('Address', JSON.stringify('CC' + wallet.address.slice(2)))
         }
         navigate('/')
     }

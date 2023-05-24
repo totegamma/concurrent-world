@@ -23,18 +23,9 @@ interface FollowProviderProps {
 }
 
 export const FollowProvider = (props: FollowProviderProps): JSX.Element => {
-    const [followingUsers, setFollowingUsers] = usePersistent<string[]>(
-        'followingUsers',
-        []
-    )
-    const [followingStreams, setFollowingStreams] = usePersistent<string[]>(
-        'followingStreams',
-        []
-    )
-    const [bookmarkingStreams, setBookmarkingStreams] = usePersistent<string[]>(
-        'bookmarkingStreams',
-        []
-    )
+    const [followingUsers, setFollowingUsers] = usePersistent<string[]>('followingUsers', [])
+    const [followingStreams, setFollowingStreams] = usePersistent<string[]>('followingStreams', [])
+    const [bookmarkingStreams, setBookmarkingStreams] = usePersistent<string[]>('bookmarkingStreams', [])
 
     const followUser = (ccaddr: string): void => {
         if (followingUsers.includes(ccaddr)) return
@@ -51,9 +42,7 @@ export const FollowProvider = (props: FollowProviderProps): JSX.Element => {
     }
 
     const unfollowStream = (streamID: string): void => {
-        setFollowingStreams(
-            followingStreams.filter((e: string) => e !== streamID)
-        )
+        setFollowingStreams(followingStreams.filter((e: string) => e !== streamID))
     }
 
     const bookmarkStream = (streamID: string): void => {
@@ -62,9 +51,7 @@ export const FollowProvider = (props: FollowProviderProps): JSX.Element => {
     }
 
     const unbookmarkStream = (streamID: string): void => {
-        setBookmarkingStreams(
-            bookmarkingStreams.filter((e: string) => e !== streamID)
-        )
+        setBookmarkingStreams(bookmarkingStreams.filter((e: string) => e !== streamID))
     }
 
     return (

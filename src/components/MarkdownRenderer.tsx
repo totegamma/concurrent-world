@@ -1,8 +1,4 @@
-import {
-    type ImgHTMLAttributes,
-    type DetailedHTMLProps,
-    useContext
-} from 'react'
+import { type ImgHTMLAttributes, type DetailedHTMLProps, useContext } from 'react'
 import { Box, Typography } from '@mui/material'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -25,11 +21,7 @@ const sanitizeOption = {
     tagNames: [...(defaultSchema.tagNames ?? []), 'marquee'],
     attributes: {
         ...defaultSchema.attributes,
-        marquee: [
-            ...(defaultSchema.attributes?.marquee ?? []),
-            'direction',
-            'behavior'
-        ]
+        marquee: [...(defaultSchema.attributes?.marquee ?? []), 'direction', 'behavior']
     }
 }
 
@@ -71,32 +63,17 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                             {children}
                         </Typography>
                     ),
-                    h1: ({ children }) => (
-                        <Typography variant="h1">{children}</Typography>
-                    ),
-                    h2: ({ children }) => (
-                        <Typography variant="h2">{children}</Typography>
-                    ),
-                    h3: ({ children }) => (
-                        <Typography variant="h3">{children}</Typography>
-                    ),
-                    h4: ({ children }) => (
-                        <Typography variant="h4">{children}</Typography>
-                    ),
-                    h5: ({ children }) => (
-                        <Typography variant="h5">{children}</Typography>
-                    ),
-                    h6: ({ children }) => (
-                        <Typography variant="h6">{children}</Typography>
-                    ),
+                    h1: ({ children }) => <Typography variant="h1">{children}</Typography>,
+                    h2: ({ children }) => <Typography variant="h2">{children}</Typography>,
+                    h3: ({ children }) => <Typography variant="h3">{children}</Typography>,
+                    h4: ({ children }) => <Typography variant="h4">{children}</Typography>,
+                    h5: ({ children }) => <Typography variant="h5">{children}</Typography>,
+                    h6: ({ children }) => <Typography variant="h6">{children}</Typography>,
                     ul: ({ children }) => <ul>{children}</ul>,
                     code: ({ node, children }) => {
                         const language = node.position
                             ? props.messagebody
-                                  .slice(
-                                      node.position.start.offset,
-                                      node.position.end.offset
-                                  )
+                                  .slice(node.position.start.offset, node.position.end.offset)
                                   .split('\n')[0]
                                   .slice(3)
                             : ''
@@ -107,11 +84,7 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                                     borderRadius: '10px'
                                 }}
                             >
-                                <SyntaxHighlighter
-                                    style={materialDark}
-                                    language={language}
-                                    PreTag="div"
-                                >
+                                <SyntaxHighlighter style={materialDark} language={language} PreTag="div">
                                     {String(children).replace(/\n$/, '')}
                                 </SyntaxHighlighter>
                             </Box>
@@ -119,10 +92,7 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                     },
                     img: (
                         props: Pick<
-                            DetailedHTMLProps<
-                                ImgHTMLAttributes<HTMLImageElement>,
-                                HTMLImageElement
-                            >,
+                            DetailedHTMLProps<ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>,
                             'key' | keyof ImgHTMLAttributes<HTMLImageElement>
                         > &
                             ReactMarkdownProps

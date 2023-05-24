@@ -27,14 +27,8 @@ export function StreamInfo(): JSX.Element {
     const reactlocation = useLocation()
     const [tab, setTab] = useState(0)
 
-    const [defaultPostHome, setDefaultPostHome] = usePersistent<string[]>(
-        'defaultPostHome',
-        []
-    )
-    const [defaultPostNonHome, setDefaultPostNonHome] = usePersistent<string[]>(
-        'defaultPostNonHome',
-        []
-    )
+    const [defaultPostHome, setDefaultPostHome] = usePersistent<string[]>('defaultPostHome', [])
+    const [defaultPostNonHome, setDefaultPostNonHome] = usePersistent<string[]>('defaultPostNonHome', [])
 
     const [title, setTitle] = useState<string>('')
 
@@ -113,10 +107,7 @@ export function StreamInfo(): JSX.Element {
                     {tab === 0 && (
                         <Box>
                             <Typography variant="h3">ストリーム</Typography>
-                            <StreamPicker
-                                selected={follow.followingStreams}
-                                setSelected={follow.setFollowingStreams}
-                            />
+                            <StreamPicker selected={follow.followingStreams} setSelected={follow.setFollowingStreams} />
                             <Divider />
                             <Typography variant="h3">ユーザー</Typography>
                             <List
@@ -143,16 +134,9 @@ export function StreamInfo(): JSX.Element {
                                     >
                                         <ListItemButton>
                                             <ListItemAvatar>
-                                                <CCAvatar
-                                                    avatarURL={user.avatar}
-                                                    identiconSource={
-                                                        user.ccaddress
-                                                    }
-                                                />
+                                                <CCAvatar avatarURL={user.avatar} identiconSource={user.ccaddress} />
                                             </ListItemAvatar>
-                                            <ListItemText
-                                                primary={user.username}
-                                            />
+                                            <ListItemText primary={user.username} />
                                         </ListItemButton>
                                     </ListItem>
                                 ))}
@@ -162,16 +146,10 @@ export function StreamInfo(): JSX.Element {
                     {tab === 1 && (
                         <Box>
                             <Typography variant="h3">ホーム</Typography>
-                            <StreamPicker
-                                selected={defaultPostHome}
-                                setSelected={setDefaultPostHome}
-                            />
+                            <StreamPicker selected={defaultPostHome} setSelected={setDefaultPostHome} />
                             <Divider />
                             <Typography variant="h3">ホーム以外</Typography>
-                            <StreamPicker
-                                selected={defaultPostNonHome}
-                                setSelected={setDefaultPostNonHome}
-                            />
+                            <StreamPicker selected={defaultPostNonHome} setSelected={setDefaultPostNonHome} />
                             <Divider />
                         </Box>
                     )}

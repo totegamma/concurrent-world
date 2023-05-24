@@ -12,13 +12,7 @@ export const LoginGuard = (props: Props): JSX.Element => {
     const address = localStorage.getItem('Address') ?? ''
 
     if (host === '' || pubkey === '' || prvkey === '' || address === '')
-        return (
-            <Navigate
-                to={props.redirect}
-                state={{ from: useLocation() }}
-                replace={false}
-            />
-        )
+        return <Navigate to={props.redirect} state={{ from: useLocation() }} replace={false} />
 
     return <>{props.component}</>
 }

@@ -15,31 +15,20 @@ interface ProfileEditorProps {
 
 export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
     const api = useApi()
-    const [username, setUsername] = useState<string>(
-        props.initial?.payload.body.username ?? ''
-    )
-    const [avatar, setAvatar] = useState<string>(
-        props.initial?.payload.body.avatar ?? ''
-    )
+    const [username, setUsername] = useState<string>(props.initial?.payload.body.username ?? '')
+    const [avatar, setAvatar] = useState<string>(props.initial?.payload.body.avatar ?? '')
 
     const updateProfile = async (): Promise<void> => {
         let homeStreamID = props.initial?.payload.body.homeStream
         if (homeStreamID === undefined || homeStreamID === '') {
-            const res = await api.createStream(
-                'net.gammalab.concurrent.tbdStreamHomeMeta',
-                username + '-home'
-            )
+            const res = await api.createStream('net.gammalab.concurrent.tbdStreamHomeMeta', username + '-home')
             homeStreamID = res.id
         }
         console.log('home', homeStreamID)
 
-        let notificationStreamID =
-            props.initial?.payload.body.notificationStream
+        let notificationStreamID = props.initial?.payload.body.notificationStream
         if (notificationStreamID === undefined || notificationStreamID === '') {
-            const res = await api.createStream(
-                'net.gammalab.concurrent.tbdStreamHomeMeta',
-                username + '-notification'
-            )
+            const res = await api.createStream('net.gammalab.concurrent.tbdStreamHomeMeta', username + '-notification')
             notificationStreamID = res.id
         }
         console.log('notification', notificationStreamID)

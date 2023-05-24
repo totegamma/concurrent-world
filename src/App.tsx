@@ -20,14 +20,7 @@ import type {
     Host,
     StreamedMessage
 } from './model'
-import {
-    Associations,
-    Explorer,
-    Notifications,
-    Identity,
-    Settings,
-    TimelinePage
-} from './pages'
+import { Associations, Explorer, Notifications, Identity, Settings, TimelinePage } from './pages'
 
 import type { Profile } from './schemas/profile'
 
@@ -70,34 +63,22 @@ function App(): JSX.Element {
         initializeApi(api)
     }, [host, address, prvkey])
 
-    const [themeName, setThemeName] = usePersistent<string>(
-        'Theme',
-        Object.keys(Themes)[0]
-    )
+    const [themeName, setThemeName] = usePersistent<string>('Theme', Object.keys(Themes)[0])
 
-    const [imgurSettings, setImgurSettings] = usePersistent<ImgurSettings>(
-        'imgurSettings',
-        {
-            clientId: '',
-            clientSecret: ''
-        }
-    )
-    const [theme, setTheme] = useState<ConcurrentTheme>(
-        createConcurrentTheme(themeName)
-    )
+    const [imgurSettings, setImgurSettings] = usePersistent<ImgurSettings>('imgurSettings', {
+        clientId: '',
+        clientSecret: ''
+    })
+    const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
     const messages = useObjectList<StreamElementDated>()
     const [currentStreams, setCurrentStreams] = useState<string[]>([])
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
 
-    const { lastMessage, readyState } = useWebSocket(
-        `wss://${host.fqdn}/api/v1/socket`,
-        {
-            shouldReconnect: (_) => true,
-            reconnectInterval: (attempt) =>
-                Math.min(Math.pow(2, attempt) * 1000, 10000)
-        }
-    )
+    const { lastMessage, readyState } = useWebSocket(`wss://${host.fqdn}/api/v1/socket`, {
+        shouldReconnect: (_) => true,
+        reconnectInterval: (attempt) => Math.min(Math.pow(2, attempt) * 1000, 10000)
+    })
 
     const [playNotification] = useSound(Sound)
     const playNotificationRef = useRef(playNotification)
@@ -118,14 +99,10 @@ function App(): JSX.Element {
 
     const [emojiDict, setEmojiDict] = useState<Record<string, Emoji>>({})
     useEffect(() => {
-        fetch(
-            'https://gist.githubusercontent.com/totegamma/0beb41acad70aa4945ad38a6b00a3a1d/raw/emojis.json'
-        ) // FIXME temporaly hardcoded
+        fetch('https://gist.githubusercontent.com/totegamma/0beb41acad70aa4945ad38a6b00a3a1d/raw/emojis.json') // FIXME temporaly hardcoded
             .then((j) => j.json())
             .then((data) => {
-                const dict = Object.fromEntries(
-                    data.emojis.map((e: any) => [e.emoji.name, e.emoji])
-                )
+                const dict = Object.fromEntries(data.emojis.map((e: any) => [e.emoji.name, e.emoji]))
                 setEmojiDict(dict)
             })
     }, [])
@@ -146,10 +123,7 @@ function App(): JSX.Element {
                 switch (event.action) {
                     case 'create': {
                         // TODO: cache message
-                        if (
-                            messages.current.find((e) => e.id === message.id) !=
-                            null
-                        ) {
+                        if (messages.current.find((e) => e.id === message.id) != null) {
                             return
                         }
                         const groupA = currentStreams
@@ -157,10 +131,7 @@ function App(): JSX.Element {
                         if (!groupA.some((e) => groupB.includes(e))) return
                         const current = new Date().getTime()
                         messages.pushFront({
-                            timestamp: new Date(message.cdate)
-                                .getTime()
-                                .toString()
-                                .replace('.', '-'),
+                            timestamp: new Date(message.cdate).getTime().toString().replace('.', '-'),
                             id: message.id,
                             author: message.author,
                             currenthost: message.host,
@@ -181,9 +152,7 @@ function App(): JSX.Element {
                 switch (event.action) {
                     case 'create': {
                         api?.invalidateMessage(association.targetID)
-                        const target = messages.current.find(
-                            (e) => e.id === association.targetID
-                        )
+                        const target = messages.current.find((e) => e.id === association.targetID)
                         if (target) {
                             target.LastUpdated = new Date().getTime()
                             messages.update((e) => [...e])
@@ -192,9 +161,7 @@ function App(): JSX.Element {
                     }
                     case 'delete': {
                         api?.invalidateMessage(association.targetID)
-                        const target = messages.current.find(
-                            (e) => e.id === association.targetID
-                        )
+                        const target = messages.current.find((e) => e.id === association.targetID)
                         if (target) {
                             target.LastUpdated = new Date().getTime()
                             messages.update((e) => [...e])
@@ -216,9 +183,7 @@ function App(): JSX.Element {
     useEffect(() => {
         const newtheme = createConcurrentTheme(themeName)
         setTheme(newtheme)
-        let themeColorMetaTag: HTMLMetaElement = document.querySelector(
-            'meta[name="theme-color"]'
-        ) as HTMLMetaElement
+        let themeColorMetaTag: HTMLMetaElement = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement
         if (!themeColorMetaTag) {
             themeColorMetaTag = document.createElement('meta')
             themeColorMetaTag.name = 'theme-color'
@@ -253,9 +218,7 @@ function App(): JSX.Element {
                                     justifyContent: 'center',
                                     background: [
                                         theme.palette.background.default,
-                                        `linear-gradient(${
-                                            theme.palette.background.default
-                                        }, ${darken(
+                                        `linear-gradient(${theme.palette.background.default}, ${darken(
                                             theme.palette.background.default,
                                             0.1
                                         )})`
@@ -314,48 +277,21 @@ function App(): JSX.Element {
                                                     element={
                                                         <TimelinePage
                                                             messages={messages}
-                                                            currentStreams={
-                                                                currentStreams
-                                                            }
-                                                            setCurrentStreams={
-                                                                setCurrentStreams
-                                                            }
-                                                            setMobileMenuOpen={
-                                                                setMobileMenuOpen
-                                                            }
+                                                            currentStreams={currentStreams}
+                                                            setCurrentStreams={setCurrentStreams}
+                                                            setMobileMenuOpen={setMobileMenuOpen}
                                                         />
                                                     }
                                                 />
-                                                <Route
-                                                    path="/associations"
-                                                    element={<Associations />}
-                                                />
-                                                <Route
-                                                    path="/explorer"
-                                                    element={<Explorer />}
-                                                />
-                                                <Route
-                                                    path="/notifications"
-                                                    element={<Notifications />}
-                                                />
-                                                <Route
-                                                    path="/identity"
-                                                    element={<Identity />}
-                                                />
+                                                <Route path="/associations" element={<Associations />} />
+                                                <Route path="/explorer" element={<Explorer />} />
+                                                <Route path="/notifications" element={<Notifications />} />
+                                                <Route path="/identity" element={<Identity />} />
                                                 <Route
                                                     path="/settings"
-                                                    element={
-                                                        <Settings
-                                                            setThemeName={
-                                                                setThemeName
-                                                            }
-                                                        />
-                                                    }
+                                                    element={<Settings setThemeName={setThemeName} />}
                                                 />
-                                                <Route
-                                                    path="/streaminfo"
-                                                    element={<StreamInfo />}
-                                                />
+                                                <Route path="/streaminfo" element={<StreamInfo />} />
                                             </Routes>
                                         </Paper>
                                         <Box

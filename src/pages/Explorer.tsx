@@ -25,9 +25,7 @@ export function Explorer(): JSX.Element {
     const theme = useTheme()
     const follow = useFollow()
 
-    const [hosts, setHosts] = useState<Host[]>([
-        ...(api.host ? [api.host] : [])
-    ])
+    const [hosts, setHosts] = useState<Host[]>([...(api.host ? [api.host] : [])])
     const [currentHost, setCurrentHost] = useState<string>(api.host?.fqdn ?? '')
     const [streams, setStreams] = useState<Array<Stream<any>>>([])
     const [newStreamName, setNewStreamName] = useState<string>('')
@@ -39,10 +37,7 @@ export function Explorer(): JSX.Element {
     }
 
     const loadStreams = (): void => {
-        api.getStreamListBySchema(
-            'net.gammalab.concurrent.tbdStreamMeta',
-            currentHost
-        ).then((e) => {
+        api.getStreamListBySchema('net.gammalab.concurrent.tbdStreamMeta', currentHost).then((e) => {
             setStreams(e)
         })
     }
@@ -125,46 +120,29 @@ export function Explorer(): JSX.Element {
                         <ListItem key={value.id} disablePadding>
                             <ListItemButton
                                 onClick={() => {
-                                    if (
-                                        follow.bookmarkingStreams.includes(
-                                            `${value.id}@${currentHost}`
-                                        )
-                                    ) {
-                                        follow.unbookmarkStream(
-                                            `${value.id}@${currentHost}`
-                                        )
+                                    if (follow.bookmarkingStreams.includes(`${value.id}@${currentHost}`)) {
+                                        follow.unbookmarkStream(`${value.id}@${currentHost}`)
                                     } else {
-                                        follow.bookmarkStream(
-                                            `${value.id}@${currentHost}`
-                                        )
+                                        follow.bookmarkStream(`${value.id}@${currentHost}`)
                                     }
                                 }}
                             >
                                 <ListItemIcon>
-                                    {follow.bookmarkingStreams.includes(
-                                        `${value.id}@${currentHost}`
-                                    ) ? (
+                                    {follow.bookmarkingStreams.includes(`${value.id}@${currentHost}`) ? (
                                         <StarIcon
                                             sx={{
-                                                color: theme.palette.text
-                                                    .primary
+                                                color: theme.palette.text.primary
                                             }}
                                         />
                                     ) : (
                                         <StarBorderIcon
                                             sx={{
-                                                color: theme.palette.text
-                                                    .primary
+                                                color: theme.palette.text.primary
                                             }}
                                         />
                                     )}
                                 </ListItemIcon>
-                                <ListItemText
-                                    id={labelId}
-                                    primary={`%${
-                                        value.payload.body.name as string
-                                    }`}
-                                />
+                                <ListItemText id={labelId} primary={`%${value.payload.body.name as string}`} />
                             </ListItemButton>
                         </ListItem>
                     )
