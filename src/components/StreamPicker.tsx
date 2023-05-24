@@ -1,6 +1,7 @@
 import { Autocomplete, Box, Chip, InputBase } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useApi } from '../context/api'
+import { useFollow } from '../context/FollowContext'
 
 export interface StreamPickerProps {
     selected: string[]
@@ -15,21 +16,25 @@ interface StreamOption {
 
 export function StreamPicker(props: StreamPickerProps): JSX.Element {
     const api = useApi()
+    const followService = useFollow()
     const [options, setOptions] = useState<StreamOption[]>([])
     const [selectedStreams, setSelectedStreams] = useState<StreamOption[]>([])
 
     useEffect(() => {
-        setOptions(
-            Object.values(api.streamCache)
-                .filter((e) => e.payload)
-                .map((e) => {
-                    return {
-                        label: e.payload.body.name,
-                        id: e.id
-                    }
-                })
-                .filter((e) => e.label)
-        )
+        Promise.all(
+            followService.bookmarkingStreams.map((e) => api.readStream(e))
+        ).then((a) => {
+            setOptions(
+                a
+                    .filter((e) => e?.payload)
+                    .map((e) => {
+                        return {
+                            label: e!.payload.body.name,
+                            id: e!.id
+                        }
+                    })
+            )
+        })
     }, [])
 
     useEffect(() => {
@@ -38,8 +43,8 @@ export function StreamPicker(props: StreamPickerProps): JSX.Element {
                 a
                     .filter((e) => e?.payload)
                     .map((e) => {
-                        return { label: e?.payload.body.name, id: e?.id }
-                    }) as StreamOption[]
+                        return { label: e!.payload.body.name, id: e!.id }
+                    })
             )
         })
     }, [props.selected])

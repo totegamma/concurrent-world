@@ -30,7 +30,6 @@ import { StreamList } from './StreamList'
 const branchName = branch || window.location.host.split('.')[0]
 
 export interface MenuProps {
-    streams: string[]
     hideMenu?: boolean
     onClick?: () => void
 }

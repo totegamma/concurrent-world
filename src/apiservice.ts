@@ -85,7 +85,6 @@ export default class ConcurrentApiClient {
             return this.messageCache[id]
         }
         const messageHost = !host ? this.host.fqdn : host
-        console.log('request', id, messageHost)
         const res = await fetch(
             `https://${messageHost}${apiPath}/messages/${id}`,
             {
@@ -94,7 +93,6 @@ export default class ConcurrentApiClient {
             }
         )
         const data = await res.json()
-        console.log(data)
         if (!data.payload) {
             return undefined
         }

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import { useEffect } from 'react'
 import {
     DndProvider,
     getBackendOptions,
@@ -20,12 +20,12 @@ import type { Stream, ConcurrentTheme } from '../../model'
 import { CustomNode } from './CustomNode'
 import { CustomDragPreview } from './CustomDragPreview'
 import { Placeholder } from './Placeholder'
-import { ApplicationContext } from '../../App'
 import { usePersistent } from '../../hooks/usePersistent'
 
 import { v4 as uuidv4 } from 'uuid'
 import PercentIcon from '@mui/icons-material/Percent'
 import { useApi } from '../../context/api'
+import { useFollow } from '../../context/FollowContext'
 export interface WatchStream {
     id: number | string
     parent: number
@@ -40,7 +40,7 @@ interface StreamListProps {
 
 export function StreamList(props: StreamListProps): JSX.Element {
     const api = useApi()
-    const appData = useContext(ApplicationContext)
+    const follow = useFollow()
     const theme = useTheme<ConcurrentTheme>()
     const [watchStreamTree, setWatchStreamTree] = usePersistent<WatchStream[]>(
         'watchStreamTree',
@@ -50,7 +50,9 @@ export function StreamList(props: StreamListProps): JSX.Element {
     useEffect(() => {
         ;(async () => {
             const streams = await Promise.all(
-                appData.watchStreams.map(async (id) => await api.readStream(id))
+                follow.bookmarkingStreams.map(
+                    async (id) => await api.readStream(id)
+                )
             )
             if (watchStreamTree.length === 0) {
                 // init watch stream tree
@@ -74,7 +76,7 @@ export function StreamList(props: StreamListProps): JSX.Element {
                     if (node.data === undefined) {
                         return true
                     }
-                    return appData.watchStreams.includes(node.data.id)
+                    return follow.bookmarkingStreams.includes(node.data.id)
                 })
                 // when a stream is added, add it to the tree
                 streams.forEach((stream) => {
@@ -98,7 +100,7 @@ export function StreamList(props: StreamListProps): JSX.Element {
                 setWatchStreamTree(newTree)
             }
         })()
-    }, [appData.watchStreams])
+    }, [follow.bookmarkingStreams])
 
     const addFolder = (): void => {
         setWatchStreamTree([

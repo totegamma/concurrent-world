@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
     Divider,
     Tabs,
@@ -15,26 +15,18 @@ import {
 import { StreamPicker } from '../components/StreamPicker'
 import { usePersistent } from '../hooks/usePersistent'
 import type { ProfileWithAddress } from '../model'
-import { ApplicationContext } from '../App'
 import { useLocation } from 'react-router-dom'
 import { CCAvatar } from '../components/CCAvatar'
 import { useApi } from '../context/api'
 import { Schemas } from '../schemas'
+import { useFollow } from '../context/FollowContext'
 
-export interface StreamInfoProps {
-    followList: string[]
-    setFollowList: (newlist: string[]) => void
-}
-
-export function StreamInfo(props: StreamInfoProps): JSX.Element {
+export function StreamInfo(): JSX.Element {
     const api = useApi()
+    const follow = useFollow()
     const reactlocation = useLocation()
     const [tab, setTab] = useState(0)
 
-    const [followStreams, setFollowStreams] = usePersistent<string[]>(
-        'followStreams',
-        []
-    )
     const [defaultPostHome, setDefaultPostHome] = usePersistent<string[]>(
         'defaultPostHome',
         []
@@ -72,7 +64,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
 
     useEffect(() => {
         Promise.all(
-            props.followList.map((ccaddress) =>
+            follow.followingUsers.map((ccaddress: string) =>
                 api.readCharacter(ccaddress, Schemas.profile).then((e) => {
                     return {
                         ccaddress,
@@ -83,10 +75,10 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
         ).then((e) => {
             setFollowList(e)
         })
-    }, [props.followList])
+    }, [follow.followingUsers])
 
     const unfollow = (ccaddress: string): void => {
-        props.setFollowList(props.followList.filter((e) => e !== ccaddress))
+        follow.unfollowUser(ccaddress)
     }
 
     return (
@@ -122,8 +114,8 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                         <Box>
                             <Typography variant="h3">ストリーム</Typography>
                             <StreamPicker
-                                selected={followStreams}
-                                setSelected={setFollowStreams}
+                                selected={follow.followingStreams}
+                                setSelected={follow.setFollowingStreams}
                             />
                             <Divider />
                             <Typography variant="h3">ユーザー</Typography>

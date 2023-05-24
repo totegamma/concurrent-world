@@ -6,15 +6,13 @@ import { type IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'
 import { useLocation } from 'react-router-dom'
 import InfiniteScroll from 'react-infinite-scroller'
-import { usePersistent } from '../hooks/usePersistent'
 import { TimelineHeader } from '../components/TimelineHeader'
 import { useApi } from '../context/api'
 import { Schemas } from '../schemas'
+import { useFollow } from '../context/FollowContext'
 
 export interface TimelineProps {
     messages: IuseObjectList<StreamElementDated>
-    follow: (ccaddress: string) => void
-    followList: string[]
     setCurrentStreams: (input: string[]) => void
     setMobileMenuOpen: (state: boolean) => void
 }
@@ -22,6 +20,7 @@ export interface TimelineProps {
 export const Timeline = memo<TimelineProps>(
     (props: TimelineProps): JSX.Element => {
         const api = useApi()
+        const follow = useFollow()
         const theme = useTheme()
 
         const reactlocation = useLocation()
@@ -31,16 +30,14 @@ export const Timeline = memo<TimelineProps>(
             null
         )
 
-        const [followStreams] = usePersistent<string[]>('followStreams', [])
-
         const reload = useCallback(async () => {
             if (!api.host) return
             let homequery = []
             if (!reactlocation.hash) {
                 homequery = (
                     await Promise.all(
-                        props.followList.map(
-                            async (ccaddress) =>
+                        follow.followingUsers.map(
+                            async (ccaddress: string) =>
                                 (
                                     await api.readCharacter(
                                         ccaddress,
@@ -50,8 +47,8 @@ export const Timeline = memo<TimelineProps>(
                         )
                     )
                 )
-                    .filter((e) => e)
-                    .concat(followStreams)
+                    .filter((e: any) => e)
+                    .concat(follow.followingStreams)
             }
             const query = reactlocation.hash
                 ? reactlocation.hash.replace('#', '').split(',')
@@ -79,8 +76,8 @@ export const Timeline = memo<TimelineProps>(
             if (!reactlocation.hash) {
                 homequery = (
                     await Promise.all(
-                        props.followList.map(
-                            async (ccaddress) =>
+                        follow.followingUsers.map(
+                            async (ccaddress: string) =>
                                 (
                                     await api.readCharacter(
                                         ccaddress,
@@ -90,8 +87,8 @@ export const Timeline = memo<TimelineProps>(
                         )
                     )
                 )
-                    .filter((e) => e)
-                    .concat(followStreams)
+                    .filter((e: any) => e)
+                    .concat(follow.followingStreams)
                     .join(',')
             }
             const url = `https://${api.host.fqdn}/api/v1/stream/range?streams=${
@@ -134,8 +131,8 @@ export const Timeline = memo<TimelineProps>(
                 if (!reactlocation.hash) {
                     homequery = (
                         await Promise.all(
-                            props.followList.map(
-                                async (ccaddress) =>
+                            follow.followingUsers.map(
+                                async (ccaddress: string) =>
                                     (
                                         await api.readCharacter(
                                             ccaddress,
@@ -144,13 +141,13 @@ export const Timeline = memo<TimelineProps>(
                                     )?.payload.body.homeStream
                             )
                         )
-                    ).filter((e) => e) as string[]
+                    ).filter((e: any) => e) as string[]
                 }
                 props.setCurrentStreams(
                     (reactlocation.hash
                         ? reactlocation.hash.replace('#', '').split(',')
                         : homequery
-                    ).concat(followStreams)
+                    ).concat(follow.followingStreams)
                 )
             })()
             scrollParentRef.current?.scroll({ top: 0 })
@@ -181,8 +178,8 @@ export const Timeline = memo<TimelineProps>(
                     </Box>
                     {(reactlocation.hash === '' ||
                         reactlocation.hash === '#') &&
-                    followStreams.length === 0 &&
-                    props.followList.length === 0 ? (
+                    follow.followingStreams.length === 0 &&
+                    follow.followingUsers.length === 0 ? (
                         <Box>
                             まだ誰も、どのストリームもフォローしていません。右上のiボタンを押してみましょう。
                         </Box>
@@ -210,7 +207,7 @@ export const Timeline = memo<TimelineProps>(
                                             <TimelineMessage
                                                 message={e}
                                                 setInspectItem={setInspectItem}
-                                                follow={props.follow}
+                                                follow={follow.followUser}
                                                 lastUpdated={e.LastUpdated}
                                             />
                                             <Divider

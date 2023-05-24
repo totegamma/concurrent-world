@@ -18,15 +18,12 @@ import StarIcon from '@mui/icons-material/Star'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import type { Host, Stream } from '../model'
 import { useApi } from '../context/api'
+import { useFollow } from '../context/FollowContext'
 
-export interface ExplorerProps {
-    watchList: string[]
-    setWatchList: (newlist: string[]) => void
-}
-
-export function Explorer(props: ExplorerProps): JSX.Element {
+export function Explorer(): JSX.Element {
     const api = useApi()
     const theme = useTheme()
+    const follow = useFollow()
 
     const [hosts, setHosts] = useState<Host[]>([
         ...(api.host ? [api.host] : [])
@@ -129,27 +126,22 @@ export function Explorer(props: ExplorerProps): JSX.Element {
                             <ListItemButton
                                 onClick={() => {
                                     if (
-                                        props.watchList.includes(
+                                        follow.bookmarkingStreams.includes(
                                             `${value.id}@${currentHost}`
                                         )
                                     ) {
-                                        props.setWatchList(
-                                            props.watchList.filter(
-                                                (e) =>
-                                                    e !==
-                                                    `${value.id}@${currentHost}`
-                                            )
+                                        follow.unbookmarkStream(
+                                            `${value.id}@${currentHost}`
                                         )
                                     } else {
-                                        props.setWatchList([
-                                            ...props.watchList,
+                                        follow.bookmarkStream(
                                             `${value.id}@${currentHost}`
-                                        ])
+                                        )
                                     }
                                 }}
                             >
                                 <ListItemIcon>
-                                    {props.watchList.includes(
+                                    {follow.bookmarkingStreams.includes(
                                         `${value.id}@${currentHost}`
                                     ) ? (
                                         <StarIcon
