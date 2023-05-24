@@ -17,7 +17,7 @@ import type {
     Character,
     Message,
     ProfileWithAddress,
-    StreamElementDated
+    StreamElement
 } from '../model'
 import type { Profile } from '../schemas/profile'
 import { Schemas } from '../schemas'
@@ -28,9 +28,10 @@ import type { Like } from '../schemas/like'
 import { useApi } from '../context/api'
 
 export interface TimelineMessageappData {
-    message: StreamElementDated
+    message: StreamElement
     follow: (ccaddress: string) => void
     setInspectItem: (message: Message<any>) => void
+    lastUpdated: number
 }
 
 export const TimelineMessage = memo<TimelineMessageappData>(
@@ -76,7 +77,7 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                 .catch((error) => {
                     console.error(error)
                 })
-        }, [props.message, props.message.LastUpdated])
+        }, [props.message, props.lastUpdated])
 
         useEffect(() => {
             const fetchUsers = async (): Promise<any> => {

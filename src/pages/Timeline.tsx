@@ -211,6 +211,7 @@ export const Timeline = memo<TimelineProps>(
                                                 message={e}
                                                 setInspectItem={setInspectItem}
                                                 follow={props.follow}
+                                                lastUpdated={e.LastUpdated}
                                             />
                                             <Divider
                                                 variant="inset"
