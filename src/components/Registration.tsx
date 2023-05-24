@@ -8,7 +8,7 @@ import Paper from '@mui/material/Paper'
 import { useEffect, useMemo, useState } from 'react'
 import { Mnemonic, randomBytes, HDNodeWallet } from 'ethers'
 import { LangJa } from '../utils/lang-ja'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import TextField from '@mui/material/TextField'
 import Divider from '@mui/material/Divider'
 import { ProfileEditor } from './ProfileEditor'
@@ -32,6 +32,7 @@ export function Registration(): JSX.Element {
     const privateKey = wallet.privateKey.slice(2)
     const [server, setServer] = useState<string>('')
     const [host, setHost] = useState<Host>()
+    const [entityFound, setEntityFound] = useState<boolean>(false)
 
     const [api, initializeApi] = useState<ConcurrentApiClient>()
     useEffect(() => {
@@ -54,6 +55,13 @@ export function Registration(): JSX.Element {
         localStorage.setItem('PrivateKey', JSON.stringify(privateKey))
         localStorage.setItem('Address', JSON.stringify(userAddress))
         navigate('/')
+    }
+
+    const checkRegistration = async (): Promise<void> => {
+        console.log('check!!!')
+        const entity = await api?.readEntity(userAddress)
+        console.log(entity)
+        setEntityFound(!!entity && entity.ccaddr !== '')
     }
 
     const step0 = (
@@ -107,16 +115,35 @@ export function Registration(): JSX.Element {
             公開ホスト検索は未実装です
             <Divider>または</Divider>
             <Typography variant="h3">URLから直接入力</Typography>
-            <TextField
-                placeholder="https://example.tld/"
-                value={server}
-                onChange={(e) => {
-                    setServer(e.target.value)
+            <Box sx={{ display: 'flex', gap: '10px' }}>
+                <TextField
+                    placeholder="https://example.tld/"
+                    value={server}
+                    onChange={(e) => {
+                        setServer(e.target.value)
+                    }}
+                    sx={{
+                        width: '100%'
+                    }}
+                />
+                <Button
+                    variant="contained"
+                    component={Link}
+                    to={'http://' + (host?.fqdn ?? '') + '/register?ccaddr=' + userAddress}
+                    target="_blank"
+                    disabled={!host}
+                >
+                    Go
+                </Button>
+            </Box>
+            <Button
+                variant="contained"
+                onClick={() => {
+                    checkRegistration()
                 }}
-                sx={{
-                    width: '100%'
-                }}
-            />
+            >
+                Check
+            </Button>
         </>
     )
     const step4 = (
@@ -165,8 +192,8 @@ export function Registration(): JSX.Element {
     }
 
     useEffect(() => {
-        setStepOK([true, true, mnemonic.phrase === mnemonicTest, !!host, profileSubmitted])
-    }, [mnemonicTest, host, profileSubmitted])
+        setStepOK([true, true, mnemonic.phrase === mnemonicTest, entityFound, profileSubmitted])
+    }, [mnemonicTest, entityFound, profileSubmitted])
 
     if (!api) return <>api constructing...</>
 

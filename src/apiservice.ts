@@ -1,13 +1,4 @@
-import type {
-    Stream,
-    MessagePostRequest,
-    SignedObject,
-    Character,
-    Host,
-    StreamElement,
-    Message,
-    Entity
-} from './model'
+import type { Stream, MessagePostRequest, SignedObject, Character, Host, StreamElement, Message, Entity } from './model'
 
 // @ts-expect-error vite dynamic import
 import { branch, sha } from '~build/info'
@@ -34,11 +25,7 @@ export default class ConcurrentApiClient {
     }
 
     // Message
-    async createMessage<T>(
-        schema: string,
-        body: T,
-        streams: string[]
-    ): Promise<any> {
+    async createMessage<T>(schema: string, body: T, streams: string[]): Promise<any> {
         if (!this.host) throw new Error()
         const signObject: SignedObject<T> = {
             signer: this.userAddress,
@@ -46,9 +33,7 @@ export default class ConcurrentApiClient {
             schema,
             body,
             meta: {
-                client: `concurrent-web ${branchName as string}-${
-                    sha as string
-                }`
+                client: `concurrent-web ${branchName as string}-${sha as string}`
             },
             signedAt: new Date().toISOString()
         }
@@ -68,32 +53,23 @@ export default class ConcurrentApiClient {
             body: JSON.stringify(request)
         }
 
-        return await fetch(
-            `https://${this.host.fqdn}${apiPath}/messages`,
-            requestOptions
-        )
+        return await fetch(`https://${this.host.fqdn}${apiPath}/messages`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 return data
             })
     }
 
-    async fetchMessage(
-        id: string,
-        host: string = ''
-    ): Promise<Message<any> | undefined> {
+    async fetchMessage(id: string, host: string = ''): Promise<Message<any> | undefined> {
         if (!this.host) throw new Error()
         if (this.messageCache[id]) {
             return this.messageCache[id]
         }
         const messageHost = !host ? this.host.fqdn : host
-        const res = await fetch(
-            `https://${messageHost}${apiPath}/messages/${id}`,
-            {
-                method: 'GET',
-                headers: {}
-            }
-        )
+        const res = await fetch(`https://${messageHost}${apiPath}/messages/${id}`, {
+            method: 'GET',
+            headers: {}
+        })
         const data = await res.json()
         if (!data.payload) {
             return undefined
@@ -125,9 +101,7 @@ export default class ConcurrentApiClient {
             schema,
             body,
             meta: {
-                client: `concurrent-web ${branchName as string}-${
-                    sha as string
-                }`
+                client: `concurrent-web ${branchName as string}-${sha as string}`
             },
             signedAt: new Date().toISOString(),
             target
@@ -147,10 +121,7 @@ export default class ConcurrentApiClient {
             })
         }
 
-        return await fetch(
-            `https://${targetHost}${apiPath}/associations`,
-            requestOptions
-        )
+        return await fetch(`https://${targetHost}${apiPath}/associations`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 return data
@@ -168,10 +139,7 @@ export default class ConcurrentApiClient {
             })
         }
 
-        return await fetch(
-            `https://${targetHost}${apiPath}/associations`,
-            requestOptions
-        )
+        return await fetch(`https://${targetHost}${apiPath}/associations`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 return data
@@ -179,11 +147,7 @@ export default class ConcurrentApiClient {
     }
 
     // Character
-    async upsertCharacter<T>(
-        schema: string,
-        body: T,
-        id?: string
-    ): Promise<any> {
+    async upsertCharacter<T>(schema: string, body: T, id?: string): Promise<any> {
         if (!this.host) throw new Error()
         const signObject: SignedObject<T> = {
             signer: this.userAddress,
@@ -191,9 +155,7 @@ export default class ConcurrentApiClient {
             schema,
             body,
             meta: {
-                client: `concurrent-web ${branchName as string}-${
-                    sha as string
-                }`
+                client: `concurrent-web ${branchName as string}-${sha as string}`
             },
             signedAt: new Date().toISOString()
         }
@@ -213,21 +175,14 @@ export default class ConcurrentApiClient {
             body: JSON.stringify(request)
         }
 
-        return await fetch(
-            `https://${this.host.fqdn}${apiPath}/characters`,
-            requestOptions
-        )
+        return await fetch(`https://${this.host.fqdn}${apiPath}/characters`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 return data
             })
     }
 
-    async readCharacter(
-        author: string,
-        schema: string,
-        host: string = ''
-    ): Promise<Character<any> | undefined> {
+    async readCharacter(author: string, schema: string, host: string = ''): Promise<Character<any> | undefined> {
         if (!this.host) throw new Error()
         if (this.characterCache[author + schema]) {
             return this.characterCache[author + schema]
@@ -237,13 +192,10 @@ export default class ConcurrentApiClient {
             const entity = await this.readEntity(author)
             console.log('resolved entity:', entity)
             characterHost = entity?.host ?? this.host.fqdn
-            if (!characterHost || characterHost === '')
-                characterHost = this.host.fqdn
+            if (!characterHost || characterHost === '') characterHost = this.host.fqdn
         }
         const res = await fetch(
-            `https://${characterHost}${apiPath}/characters?author=${author}&schema=${encodeURIComponent(
-                schema
-            )}`,
+            `https://${characterHost}${apiPath}/characters?author=${author}&schema=${encodeURIComponent(schema)}`,
             {
                 method: 'GET',
                 headers: {}
@@ -268,9 +220,7 @@ export default class ConcurrentApiClient {
             schema,
             body,
             meta: {
-                client: `concurrent-web ${branchName as string}-${
-                    sha as string
-                }`
+                client: `concurrent-web ${branchName as string}-${sha as string}`
             },
             signedAt: new Date().toISOString(),
             maintainer: [],
@@ -290,32 +240,24 @@ export default class ConcurrentApiClient {
             })
         }
 
-        return await fetch(
-            `https://${this.host.fqdn}${apiPath}/stream`,
-            requestOptions
-        )
+        return await fetch(`https://${this.host.fqdn}${apiPath}/stream`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 return data
             })
     }
 
-    async getStreamListBySchema(
-        schema: string,
-        remote?: string
-    ): Promise<Array<Stream<any>>> {
+    async getStreamListBySchema(schema: string, remote?: string): Promise<Array<Stream<any>>> {
         if (!this.host) throw new Error()
-        return await fetch(
-            `https://${
-                remote ?? this.host.fqdn
-            }${apiPath}/stream/list?schema=${schema}`
-        ).then(async (data) => {
-            return await data.json().then((arr) => {
-                return arr.map((e: any) => {
-                    return { ...e, payload: JSON.parse(e.payload) }
+        return await fetch(`https://${remote ?? this.host.fqdn}${apiPath}/stream/list?schema=${schema}`).then(
+            async (data) => {
+                return await data.json().then((arr) => {
+                    return arr.map((e: any) => {
+                        return { ...e, payload: JSON.parse(e.payload) }
+                    })
                 })
-            })
-        })
+            }
+        )
     }
 
     async readStream(id: string): Promise<Stream<any> | undefined> {
@@ -325,13 +267,10 @@ export default class ConcurrentApiClient {
         }
         const key = id.split('@')[0]
         const host = id.split('@')[1] ?? this.host.fqdn
-        const res = await fetch(
-            `https://${host}${apiPath}/stream?stream=${key}`,
-            {
-                method: 'GET',
-                headers: {}
-            }
-        )
+        const res = await fetch(`https://${host}${apiPath}/stream?stream=${key}`, {
+            method: 'GET',
+            headers: {}
+        })
         const data = await res.json()
         if (!data.payload) {
             return undefined
@@ -365,9 +304,7 @@ export default class ConcurrentApiClient {
                 continue
             }
             const response = await fetch(
-                `https://${host}${apiPath}/stream/recent?streams=${plan[
-                    host
-                ].join(',')}`,
+                `https://${host}${apiPath}/stream/recent?streams=${plan[host].join(',')}`,
                 requestOptions
             ).then(async (res) => await res.json())
             result = [...result, ...response]
@@ -375,11 +312,7 @@ export default class ConcurrentApiClient {
         return result
     }
 
-    async readStreamRanged(
-        streams: string[],
-        until?: string,
-        since?: string
-    ): Promise<StreamElement[]> {
+    async readStreamRanged(streams: string[], until?: string, since?: string): Promise<StreamElement[]> {
         if (!this.host) throw new Error()
         const plan: Record<string, string[]> = {}
         for (const stream of streams) {
@@ -404,9 +337,7 @@ export default class ConcurrentApiClient {
                 continue
             }
             const response = await fetch(
-                `https://${host}${apiPath}/stream/range?streams=${plan[
-                    host
-                ].join(',')}${sinceQuery}${untilQuery}`,
+                `https://${host}${apiPath}/stream/range?streams=${plan[host].join(',')}${sinceQuery}${untilQuery}`,
                 requestOptions
             ).then(async (res) => await res.json())
             result = [...result, ...response]
@@ -418,18 +349,14 @@ export default class ConcurrentApiClient {
     async getHostProfile(remote?: string): Promise<Host> {
         const fqdn = remote ?? this.host?.fqdn
         if (!fqdn) throw new Error()
-        return await fetch(`https://${fqdn}${apiPath}/host`).then(
-            async (data) => {
-                return await data.json()
-            }
-        )
+        return await fetch(`https://${fqdn}${apiPath}/host`).then(async (data) => {
+            return await data.json()
+        })
     }
 
     async getKnownHosts(remote?: string): Promise<Host[]> {
         if (!this.host) throw new Error()
-        return await fetch(
-            `https://${remote ?? this.host.fqdn}${apiPath}/host/list`
-        ).then(async (data) => {
+        return await fetch(`https://${remote ?? this.host.fqdn}${apiPath}/host/list`).then(async (data) => {
             return await data.json()
         })
     }
@@ -440,15 +367,12 @@ export default class ConcurrentApiClient {
         if (this.entityCache[ccaddr]) {
             return this.entityCache[ccaddr]
         }
-        const res = await fetch(
-            `https://${this.host.fqdn}${apiPath}/entity/${ccaddr}`,
-            {
-                method: 'GET',
-                headers: {}
-            }
-        )
+        const res = await fetch(`https://${this.host.fqdn}${apiPath}/entity/${ccaddr}`, {
+            method: 'GET',
+            headers: {}
+        })
         const entity = await res.json()
-        if (!entity) {
+        if (!entity || entity.ccaddr === '') {
             return undefined
         }
         this.entityCache[ccaddr] = entity
