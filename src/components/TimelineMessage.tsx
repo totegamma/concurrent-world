@@ -26,17 +26,17 @@ import { CCAvatar } from './CCAvatar'
 import { TimeDiff } from './TimeDiff'
 import type { Like } from '../schemas/like'
 import { useApi } from '../context/api'
+import { useFollow } from '../context/FollowContext'
 
 export interface TimelineMessageappData {
     message: StreamElement
-    follow: (ccaddress: string) => void
-    setInspectItem: (message: Message<any>) => void
     lastUpdated: number
 }
 
 export const TimelineMessage = memo<TimelineMessageappData>(
     (props: TimelineMessageappData): JSX.Element => {
         const api = useApi()
+        const followService = useFollow()
         const [author, setAuthor] = useState<Character<Profile> | undefined>()
         const [message, setMessage] = useState<Message<any> | undefined>()
         const [msgstreams, setStreams] = useState<string[]>([])
@@ -189,12 +189,14 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                             }}
                         >
                             <IconButton
-                                onClick={() => {
-                                    props.follow(message.author)
-                                }}
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
                                     height: { xs: '38px', sm: '48px' }
+                                }}
+                                onClick={() => {
+                                    followService.followUser(
+                                        props.message.author
+                                    )
                                 }}
                             >
                                 <CCAvatar
@@ -361,11 +363,6 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                                         </Box>
                                     </Tooltip>
                                     <IconButton
-                                        onClick={() => {
-                                            props.setInspectItem(
-                                                message ?? null
-                                            )
-                                        }}
                                         sx={{
                                             p: '0',
                                             color: theme.palette.text.secondary

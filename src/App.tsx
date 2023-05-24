@@ -314,6 +314,9 @@ function App(): JSX.Element {
                                                     element={
                                                         <TimelinePage
                                                             messages={messages}
+                                                            currentStreams={
+                                                                currentStreams
+                                                            }
                                                             setCurrentStreams={
                                                                 setCurrentStreams
                                                             }

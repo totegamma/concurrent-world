@@ -366,6 +366,45 @@ export default class ConcurrentApiClient {
         return result
     }
 
+    async readStreamRanged(
+        streams: string[],
+        until?: string,
+        since?: string
+    ): Promise<StreamElement[]> {
+        if (!this.host) throw new Error()
+        const plan: Record<string, string[]> = {}
+        for (const stream of streams) {
+            const id = stream.split('@')[0]
+            const host = stream.split('@')[1] ?? this.host.fqdn
+            plan[host] = [...(plan[host] ? plan[host] : []), id]
+        }
+        console.log(plan)
+
+        const requestOptions = {
+            method: 'GET',
+            headers: {}
+        }
+
+        const sinceQuery = !since ? '' : `&since=${since}`
+        const untilQuery = !until ? '' : `&until=${until}`
+
+        let result: StreamElement[] = []
+        for (const host of Object.keys(plan)) {
+            if (!host) {
+                console.warn('invalid query')
+                continue
+            }
+            const response = await fetch(
+                `https://${host}${apiPath}/stream/range?streams=${plan[
+                    host
+                ].join(',')}${sinceQuery}${untilQuery}`,
+                requestOptions
+            ).then(async (res) => await res.json())
+            result = [...result, ...response]
+        }
+        return result
+    }
+
     // Host
     async getHostProfile(remote?: string): Promise<Host> {
         const fqdn = remote ?? this.host?.fqdn
