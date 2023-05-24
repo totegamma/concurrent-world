@@ -45,11 +45,11 @@ export interface SignedObject<T> {
     target?: string
 }
 
-export interface Association {
+export interface Association<T> {
     author: string
     cdate: string
     id: string
-    payload: string
+    payload: T
     schema: string
     signature: string
     targetID: string
@@ -63,7 +63,7 @@ export interface MessagePostRequest {
 }
 
 export interface Message<T> {
-    associations: Association[]
+    associations: Array<Association<any>>
     author: string
     cdate: string
     id: string
@@ -74,7 +74,7 @@ export interface Message<T> {
 }
 
 export interface Character<T> {
-    associations: Association[]
+    associations: Array<Association<any>>
     author: string
     schema: string
     id: string
@@ -86,7 +86,7 @@ export interface Character<T> {
 export interface ServerEvent {
     type: string
     action: string
-    body: StreamedMessage<any> | Association
+    body: StreamedMessage<any> | Association<any>
 }
 
 export interface StreamedMessage<T> extends Message<T> {

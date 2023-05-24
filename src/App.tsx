@@ -176,7 +176,7 @@ function App(): JSX.Element {
                 break
             }
             case 'association': {
-                const association = event.body as Association
+                const association = event.body as Association<any>
                 console.log(event)
                 switch (event.action) {
                     case 'create': {

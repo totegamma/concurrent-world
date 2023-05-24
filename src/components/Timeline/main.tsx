@@ -7,7 +7,7 @@ import React, {
     useState
 } from 'react'
 import InfiniteScroll from 'react-infinite-scroller'
-import { TimelineMessage } from '../TimelineMessage'
+import { MessageFrame } from './MessageFrame'
 import type { IuseObjectList } from '../../hooks/useObjectList'
 import type { StreamElement, StreamElementDated } from '../../model'
 import { useApi } from '../../context/api'
@@ -82,7 +82,7 @@ export const Timeline = memo<TimelineProps>(
                 >
                     {props.timeline.current.map((e) => (
                         <React.Fragment key={e.id}>
-                            <TimelineMessage
+                            <MessageFrame
                                 message={e}
                                 lastUpdated={e.LastUpdated}
                             />

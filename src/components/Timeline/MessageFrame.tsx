@@ -15,30 +15,30 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 
 import type {
     Character,
-    Message,
+    Message as CCMessage,
     ProfileWithAddress,
     StreamElement
-} from '../model'
-import type { Profile } from '../schemas/profile'
-import { Schemas } from '../schemas'
-import { MarkdownRenderer } from './MarkdownRenderer'
-import { CCAvatar } from './CCAvatar'
-import { TimeDiff } from './TimeDiff'
-import type { Like } from '../schemas/like'
-import { useApi } from '../context/api'
-import { useFollow } from '../context/FollowContext'
+} from '../../model'
+import type { Profile } from '../../schemas/profile'
+import { Schemas } from '../../schemas'
+import { CCAvatar } from '../CCAvatar'
+import { TimeDiff } from '../TimeDiff'
+import type { Like } from '../../schemas/like'
+import { useApi } from '../../context/api'
+import { useFollow } from '../../context/FollowContext'
+import { Multiplexer } from './Multiplexer'
 
-export interface TimelineMessageappData {
+export interface MessageFrameProp {
     message: StreamElement
     lastUpdated: number
 }
 
-export const TimelineMessage = memo<TimelineMessageappData>(
-    (props: TimelineMessageappData): JSX.Element => {
+export const MessageFrame = memo<MessageFrameProp>(
+    (props: MessageFrameProp): JSX.Element => {
         const api = useApi()
         const followService = useFollow()
         const [author, setAuthor] = useState<Character<Profile> | undefined>()
-        const [message, setMessage] = useState<Message<any> | undefined>()
+        const [message, setMessage] = useState<CCMessage<any> | undefined>()
         const [msgstreams, setStreams] = useState<string[]>([])
         const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
 
@@ -268,9 +268,7 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                                     <TimeDiff date={new Date(message.cdate)} />
                                 </Link>
                             </Box>
-                            <MarkdownRenderer
-                                messagebody={message.payload.body.body}
-                            />
+                            <Multiplexer body={message} />
                             <Box
                                 sx={{
                                     display: 'flex',
@@ -403,4 +401,4 @@ export const TimelineMessage = memo<TimelineMessageappData>(
     }
 )
 
-TimelineMessage.displayName = 'TimelineMessage'
+MessageFrame.displayName = 'MessageFrame'
