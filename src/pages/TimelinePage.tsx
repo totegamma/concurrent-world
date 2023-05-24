@@ -9,7 +9,7 @@ import { useApi } from '../context/api'
 import { Schemas } from '../schemas'
 import { useFollow } from '../context/FollowContext'
 import { Timeline } from '../components/Timeline/main'
-import type { Profile } from '../schemas/profile'
+import type { Userstreams } from '../schemas/userstreams'
 
 export interface TimelinePageProps {
     messages: IuseObjectList<StreamElementDated>
@@ -36,9 +36,9 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                     await Promise.all(
                         followService.followingUsers.map(async (ccaddress: string) => {
                             const entity = await api.readEntity(ccaddress)
-                            const character: Character<Profile> | undefined = await api.readCharacter(
+                            const character: Character<Userstreams> | undefined = await api.readCharacter(
                                 ccaddress,
-                                Schemas.profile,
+                                Schemas.userstreams,
                                 entity?.host
                             )
 

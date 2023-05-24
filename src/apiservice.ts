@@ -3,6 +3,8 @@ import type { Stream, MessagePostRequest, SignedObject, Character, Host, StreamE
 // @ts-expect-error vite dynamic import
 import { branch, sha } from '~build/info'
 import { Sign } from './util'
+import { Schemas } from './schemas'
+import { type Userstreams } from './schemas/userstreams'
 const branchName = branch || window.location.host.split('.')[0]
 
 const apiPath = '/api/v1'
@@ -377,5 +379,36 @@ export default class ConcurrentApiClient {
         }
         this.entityCache[ccaddr] = entity
         return entity
+    }
+
+    // Utils
+    async setupUserstreams(): Promise<void> {
+        const userstreams = await this.readCharacter(this.userAddress, Schemas.userstreams)
+        if (userstreams) return
+        const res0 = await this.createStream('net.gammalab.concurrent.tbdStreamHomeMeta', this.userAddress + '-home')
+        const homeStream = res0.id
+        console.log('home', homeStream)
+
+        const res1 = await this.createStream(
+            'net.gammalab.concurrent.tbdStreamHomeMeta',
+            this.userAddress + '-notification'
+        )
+        const notificationStream = res1.id
+        console.log('notification', notificationStream)
+
+        const res2 = await this.createStream(
+            'net.gammalab.concurrent.tbdStreamHomeMeta',
+            this.userAddress + '-association'
+        )
+        const associationStream = res2.id
+        console.log('notification', associationStream)
+
+        this.upsertCharacter<Userstreams>(Schemas.userstreams, {
+            homeStream,
+            notificationStream,
+            associationStream
+        }).then((data) => {
+            console.log(data)
+        })
     }
 }

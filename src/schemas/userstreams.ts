@@ -5,8 +5,8 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-export interface Profile {
-    username?: string
-    avatar?: string
-    description?: string
+export interface Userstreams {
+    homeStream?: string
+    notificationStream?: string
+    associationStream?: string
 }

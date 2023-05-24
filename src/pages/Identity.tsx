@@ -38,12 +38,12 @@ export function Identity(): JSX.Element {
                 <Typography variant="h3" gutterBottom>
                     Home Stream
                 </Typography>
-                <Typography sx={{ wordBreak: 'break-all' }}>{appData.profile?.payload.body.homeStream}</Typography>
+                <Typography sx={{ wordBreak: 'break-all' }}>{appData.userstreams?.payload.body.homeStream}</Typography>
                 <Typography variant="h3" gutterBottom>
                     Notification Stream
                 </Typography>
                 <Typography sx={{ wordBreak: 'break-all' }}>
-                    {appData.profile?.payload.body.notificationStream}
+                    {appData.userstreams?.payload.body.notificationStream}
                 </Typography>
                 <Typography variant="h3" gutterBottom>
                     Concurrent Address

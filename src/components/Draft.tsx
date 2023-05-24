@@ -92,7 +92,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             ...new Set([
                 ...props.currentStreams.split(','),
                 ...messageDestStreams,
-                ...(postHome ? [appData.profile?.payload.body.homeStream] : [])
+                ...(postHome ? [appData.userstreams?.payload.body.homeStream] : [])
             ])
         ].filter((e) => e) as string[]
         const body = {

@@ -19,28 +19,12 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
     const [avatar, setAvatar] = useState<string>(props.initial?.payload.body.avatar ?? '')
 
     const updateProfile = async (): Promise<void> => {
-        let homeStreamID = props.initial?.payload.body.homeStream
-        if (homeStreamID === undefined || homeStreamID === '') {
-            const res = await api.createStream('net.gammalab.concurrent.tbdStreamHomeMeta', username + '-home')
-            homeStreamID = res.id
-        }
-        console.log('home', homeStreamID)
-
-        let notificationStreamID = props.initial?.payload.body.notificationStream
-        if (notificationStreamID === undefined || notificationStreamID === '') {
-            const res = await api.createStream('net.gammalab.concurrent.tbdStreamHomeMeta', username + '-notification')
-            notificationStreamID = res.id
-        }
-        console.log('notification', notificationStreamID)
-
         api.upsertCharacter<Profile>(
             Schemas.profile,
             {
                 username,
                 avatar,
-                description: '',
-                homeStream: homeStreamID,
-                notificationStream: notificationStreamID
+                description: ''
             },
             props.initial?.id
         ).then((data) => {

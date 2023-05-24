@@ -22,8 +22,6 @@ import type {
 } from './model'
 import { Associations, Explorer, Notifications, Identity, Settings, TimelinePage } from './pages'
 
-import type { Profile } from './schemas/profile'
-
 import Sound from './resources/Bubble.wav'
 import useSound from 'use-sound'
 import { MobileMenu } from './components/MobileMenu'
@@ -31,9 +29,12 @@ import { StreamInfo } from './pages/StreamInfo'
 import ApiProvider from './context/api'
 import ConcurrentApiClient from './apiservice'
 import { FollowProvider } from './context/FollowContext'
+import type { Profile } from './schemas/profile'
+import type { Userstreams } from './schemas/userstreams'
 
 export const ApplicationContext = createContext<appData>({
     profile: undefined,
+    userstreams: undefined,
     emojiDict: {},
     websocketState: -1,
     imgurSettings: {
@@ -45,6 +46,7 @@ export const ApplicationContext = createContext<appData>({
 
 export interface appData {
     profile: Character<Profile> | undefined
+    userstreams: Character<Userstreams> | undefined
     emojiDict: Record<string, Emoji>
     websocketState: ReadyState
     imgurSettings: ImgurSettings
@@ -83,6 +85,7 @@ function App(): JSX.Element {
     const [playNotification] = useSound(Sound)
     const playNotificationRef = useRef(playNotification)
     const [profile, setProfile] = useState<Character<Profile>>()
+    const [userstreams, setUserstreams] = useState<Character<Userstreams>>()
     useEffect(() => {
         playNotificationRef.current = playNotification
     }, [playNotification])
@@ -110,6 +113,9 @@ function App(): JSX.Element {
     useEffect(() => {
         api?.readCharacter(address, Schemas.profile).then((profile) => {
             setProfile(profile)
+        })
+        api?.readCharacter(address, Schemas.userstreams).then((userstreams) => {
+            setUserstreams(userstreams)
         })
     }, [address, api])
 
@@ -196,11 +202,12 @@ function App(): JSX.Element {
         return {
             emojiDict,
             profile,
+            userstreams,
             websocketState: readyState,
             imgurSettings,
             setImgurSettings
         }
-    }, [emojiDict, profile, readyState, imgurSettings, setImgurSettings])
+    }, [emojiDict, profile, userstreams, readyState, imgurSettings, setImgurSettings])
 
     if (!api) {
         return <>building api service...</>

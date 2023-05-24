@@ -152,7 +152,9 @@ export function Registration(): JSX.Element {
             ここで名前・アイコン・自己紹介を設定します。
             <ProfileEditor
                 onSubmit={() => {
-                    setProfileSubmitted(true)
+                    api?.setupUserstreams().then(() => {
+                        setProfileSubmitted(true)
+                    })
                 }}
             />
         </>
