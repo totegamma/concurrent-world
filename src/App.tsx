@@ -26,7 +26,7 @@ import {
     Notifications,
     Identity,
     Settings,
-    Timeline
+    TimelinePage
 } from './pages'
 
 import type { Profile } from './schemas/profile'
@@ -312,7 +312,7 @@ function App(): JSX.Element {
                                                 <Route
                                                     index
                                                     element={
-                                                        <Timeline
+                                                        <TimelinePage
                                                             messages={messages}
                                                             setCurrentStreams={
                                                                 setCurrentStreams

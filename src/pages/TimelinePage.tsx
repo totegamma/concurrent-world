@@ -11,14 +11,14 @@ import { useApi } from '../context/api'
 import { Schemas } from '../schemas'
 import { useFollow } from '../context/FollowContext'
 
-export interface TimelineProps {
+export interface TimelinePageProps {
     messages: IuseObjectList<StreamElementDated>
     setCurrentStreams: (input: string[]) => void
     setMobileMenuOpen: (state: boolean) => void
 }
 
-export const Timeline = memo<TimelineProps>(
-    (props: TimelineProps): JSX.Element => {
+export const TimelinePage = memo<TimelinePageProps>(
+    (props: TimelinePageProps): JSX.Element => {
         const api = useApi()
         const follow = useFollow()
         const theme = useTheme()
@@ -271,4 +271,4 @@ export const Timeline = memo<TimelineProps>(
         )
     }
 )
-Timeline.displayName = 'Timeline'
+TimelinePage.displayName = 'TimelinePage'
