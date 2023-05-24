@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef, useState } from 'react'
 import { Box, useTheme, Drawer, Typography } from '@mui/material'
-import type { Message, StreamElementDated } from '../model'
+import type { Character, Message, StreamElementDated } from '../model'
 import { type IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'
 import { useLocation } from 'react-router-dom'
@@ -9,6 +9,7 @@ import { useApi } from '../context/api'
 import { Schemas } from '../schemas'
 import { useFollow } from '../context/FollowContext'
 import { Timeline } from '../components/Timeline/main'
+import type { Profile } from '../schemas/profile'
 
 export interface TimelinePageProps {
     messages: IuseObjectList<StreamElementDated>
@@ -37,16 +38,31 @@ export const TimelinePage = memo<TimelinePageProps>(
                     homequery = (
                         await Promise.all(
                             followService.followingUsers.map(
-                                async (ccaddress: string) =>
-                                    (
-                                        await api.readCharacter(
-                                            ccaddress,
-                                            Schemas.profile
-                                        )
-                                    )?.payload.body.homeStream
+                                async (ccaddress: string) => {
+                                    const entity = await api.readEntity(
+                                        ccaddress
+                                    )
+                                    const character:
+                                        | Character<Profile>
+                                        | undefined = await api.readCharacter(
+                                        ccaddress,
+                                        Schemas.profile,
+                                        entity?.host
+                                    )
+
+                                    if (!character?.payload.body.homeStream)
+                                        return undefined
+
+                                    let streamID: string =
+                                        character.payload.body.homeStream
+                                    if (entity?.host && entity.host !== '') {
+                                        streamID += `@${entity.host}`
+                                    }
+                                    return streamID
+                                }
                             )
                         )
-                    ).filter((e: any) => e) as string[]
+                    ).filter((e) => e) as string[]
                 }
                 props.setCurrentStreams(
                     reactlocation.hash

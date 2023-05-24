@@ -5,7 +5,8 @@ import type {
     Character,
     Host,
     StreamElement,
-    Message
+    Message,
+    Entity
 } from './model'
 
 // @ts-expect-error vite dynamic import
@@ -20,6 +21,7 @@ export default class ConcurrentApiClient {
     userAddress: string
     privatekey: string
 
+    entityCache: Record<string, Entity> = {}
     messageCache: Record<string, Message<any>> = {}
     characterCache: Record<string, Character<any>> = {}
     streamCache: Record<string, Stream<any>> = {}
@@ -230,7 +232,14 @@ export default class ConcurrentApiClient {
         if (this.characterCache[author + schema]) {
             return this.characterCache[author + schema]
         }
-        const characterHost = !host ? this.host.fqdn : host
+        let characterHost = host
+        if (characterHost === '') {
+            const entity = await this.readEntity(author)
+            console.log('resolved entity:', entity)
+            characterHost = entity?.host ?? this.host.fqdn
+            if (!characterHost || characterHost === '')
+                characterHost = this.host.fqdn
+        }
         const res = await fetch(
             `https://${characterHost}${apiPath}/characters?author=${author}&schema=${encodeURIComponent(
                 schema
@@ -423,5 +432,26 @@ export default class ConcurrentApiClient {
         ).then(async (data) => {
             return await data.json()
         })
+    }
+
+    // Entity
+    async readEntity(ccaddr: string): Promise<Entity | undefined> {
+        if (!this.host) throw new Error()
+        if (this.entityCache[ccaddr]) {
+            return this.entityCache[ccaddr]
+        }
+        const res = await fetch(
+            `https://${this.host.fqdn}${apiPath}/entity/${ccaddr}`,
+            {
+                method: 'GET',
+                headers: {}
+            }
+        )
+        const entity = await res.json()
+        if (!entity) {
+            return undefined
+        }
+        this.entityCache[ccaddr] = entity
+        return entity
     }
 }

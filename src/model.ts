@@ -28,6 +28,13 @@ export interface StreamElementDated extends StreamElement {
     LastUpdated: number
 }
 
+export interface Entity {
+    ccaddr: string
+    role: string
+    host: string
+    cdate: string
+}
+
 export interface SignedObject<T> {
     signer: string
     type: string
