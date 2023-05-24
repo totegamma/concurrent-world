@@ -12,18 +12,18 @@ Concurren-webは分散マイクロブログ基盤である[Concurrent](https://g
 
 ## Getting Started
 ### 前準備
-nodeとnpmがインストールされている必要があります。
+nodeとpnpmがインストールされている必要があります。
 ```
-npm i
+pnpm i
 ```
 
 ### devビルド
 ```
-npm run dev
+pnpm dev
 ```
 ### 本番ビルド
 ```
-npm run build
+pnpm build
 ```
 
 ### schemaファイルの生成
