@@ -114,9 +114,11 @@ export default class ConcurrentApiClient {
         body: T,
         target: string,
         targetType: string,
-        streams: string[]
+        streams: string[],
+        host: string = ''
     ): Promise<any> {
         if (!this.host) throw new Error()
+        const targetHost = !host ? this.host.fqdn : host
         const signObject: SignedObject<T> = {
             signer: this.userAddress,
             type: 'Association',
@@ -146,7 +148,7 @@ export default class ConcurrentApiClient {
         }
 
         return await fetch(
-            `https://${this.host.fqdn}${apiPath}/associations`,
+            `https://${targetHost}${apiPath}/associations`,
             requestOptions
         )
             .then(async (res) => await res.json())
@@ -155,8 +157,9 @@ export default class ConcurrentApiClient {
             })
     }
 
-    async deleteAssociation(target: string): Promise<any> {
+    async deleteAssociation(target: string, host: string = ''): Promise<any> {
         if (!this.host) throw new Error()
+        const targetHost = !host ? this.host.fqdn : host
         const requestOptions = {
             method: 'DELETE',
             headers: { 'content-type': 'application/json' },
@@ -166,7 +169,7 @@ export default class ConcurrentApiClient {
         }
 
         return await fetch(
-            `https://${this.host.fqdn}${apiPath}/associations`,
+            `https://${targetHost}${apiPath}/associations`,
             requestOptions
         )
             .then(async (res) => await res.json())
@@ -222,16 +225,16 @@ export default class ConcurrentApiClient {
 
     async readCharacter(
         author: string,
-        schema: string
+        schema: string,
+        host: string = ''
     ): Promise<Character<any> | undefined> {
         if (!this.host) throw new Error()
         if (this.characterCache[author + schema]) {
             return this.characterCache[author + schema]
         }
+        const characterHost = !host ? this.host.fqdn : host
         const res = await fetch(
-            `https://${
-                this.host.fqdn
-            }${apiPath}/characters?author=${author}&schema=${encodeURIComponent(
+            `https://${characterHost}${apiPath}/characters?author=${author}&schema=${encodeURIComponent(
                 schema
             )}`,
             {

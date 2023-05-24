@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, memo, useContext } from 'react'
+import { useState, useEffect, useCallback, memo } from 'react'
 import {
     ListItem,
     Box,
@@ -65,7 +65,11 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                     console.error(error)
                 })
 
-            api.readCharacter(props.message.author, Schemas.profile)
+            api.readCharacter(
+                props.message.author,
+                Schemas.profile,
+                props.message.currenthost
+            )
                 .then((author) => {
                     setAuthor(author)
                 })
@@ -119,7 +123,8 @@ export const TimelineMessage = memo<TimelineMessageappData>(
                 {},
                 props.message.id,
                 'messages',
-                targetStream
+                targetStream,
+                props.message.currenthost
             ).then((_) => {
                 api.invalidateMessage(props.message.id)
             })
@@ -128,7 +133,10 @@ export const TimelineMessage = memo<TimelineMessageappData>(
         const unfavorite = useCallback(
             (deletekey: string | undefined): void => {
                 if (!deletekey) return
-                api.deleteAssociation(deletekey).then((_) => {
+                api.deleteAssociation(
+                    deletekey,
+                    props.message.currenthost
+                ).then((_) => {
                     api.invalidateMessage(props.message.id)
                 })
             },
