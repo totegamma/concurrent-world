@@ -1,6 +1,6 @@
 import type { Message } from '../model'
 import { Box, Drawer, Typography } from '@mui/material'
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useMemo, useState } from 'react'
 
 interface InspectorState {
     inspectingItem: Message<any> | null
@@ -18,10 +18,12 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
 
     return (
         <InspectorContext.Provider
-            value={{
-                inspectingItem,
-                inspectItem
-            }}
+            value={useMemo(() => {
+                return {
+                    inspectingItem,
+                    inspectItem
+                }
+            }, [])}
         >
             {props.children}
             <Drawer

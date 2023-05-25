@@ -1,5 +1,5 @@
 import { Autocomplete, Box, Chip, InputBase } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { useApi } from '../context/api'
 import { useFollow } from '../context/FollowContext'
 
@@ -14,7 +14,7 @@ interface StreamOption {
     id: string
 }
 
-export function StreamPicker(props: StreamPickerProps): JSX.Element {
+export const StreamPicker = memo<StreamPickerProps>((props: StreamPickerProps): JSX.Element => {
     const api = useApi()
     const followService = useFollow()
     const [options, setOptions] = useState<StreamOption[]>([])
@@ -87,4 +87,5 @@ export function StreamPicker(props: StreamPickerProps): JSX.Element {
             />
         </Box>
     )
-}
+})
+StreamPicker.displayName = 'StreamPicker'

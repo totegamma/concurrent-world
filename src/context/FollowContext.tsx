@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react'
+import { createContext, useCallback, useContext, useMemo } from 'react'
 import { usePersistent } from '../hooks/usePersistent'
 
 interface FollowState {
@@ -27,36 +27,67 @@ export const FollowProvider = (props: FollowProviderProps): JSX.Element => {
     const [followingStreams, setFollowingStreams] = usePersistent<string[]>('followingStreams', [])
     const [bookmarkingStreams, setBookmarkingStreams] = usePersistent<string[]>('bookmarkingStreams', [])
 
-    const followUser = (ccaddr: string): void => {
-        if (followingUsers.includes(ccaddr)) return
-        setFollowingUsers([...followingUsers, ccaddr])
-    }
+    const followUser = useCallback(
+        (ccaddr: string): void => {
+            if (followingUsers.includes(ccaddr)) return
+            setFollowingUsers([...followingUsers, ccaddr])
+        },
+        [followingUsers, setFollowingUsers]
+    )
 
-    const unfollowUser = (ccaddr: string): void => {
-        setFollowingUsers(followingUsers.filter((e: string) => e !== ccaddr))
-    }
+    const unfollowUser = useCallback(
+        (ccaddr: string): void => {
+            setFollowingUsers(followingUsers.filter((e: string) => e !== ccaddr))
+        },
+        [followingUsers, setFollowingUsers]
+    )
 
-    const followStream = (streamID: string): void => {
-        if (followingStreams.includes(streamID)) return
-        setFollowingStreams([...followingStreams, streamID])
-    }
+    const followStream = useCallback(
+        (streamID: string): void => {
+            if (followingStreams.includes(streamID)) return
+            setFollowingStreams([...followingStreams, streamID])
+        },
+        [followingStreams, setFollowingStreams]
+    )
 
-    const unfollowStream = (streamID: string): void => {
-        setFollowingStreams(followingStreams.filter((e: string) => e !== streamID))
-    }
+    const unfollowStream = useCallback(
+        (streamID: string): void => {
+            setFollowingStreams(followingStreams.filter((e: string) => e !== streamID))
+        },
+        [followingStreams, setFollowingStreams]
+    )
 
-    const bookmarkStream = (streamID: string): void => {
-        if (bookmarkingStreams.includes(streamID)) return
-        setBookmarkingStreams([...bookmarkingStreams, streamID])
-    }
+    const bookmarkStream = useCallback(
+        (streamID: string): void => {
+            if (bookmarkingStreams.includes(streamID)) return
+            setBookmarkingStreams([...bookmarkingStreams, streamID])
+        },
+        [bookmarkingStreams, setBookmarkingStreams]
+    )
 
-    const unbookmarkStream = (streamID: string): void => {
-        setBookmarkingStreams(bookmarkingStreams.filter((e: string) => e !== streamID))
-    }
+    const unbookmarkStream = useCallback(
+        (streamID: string): void => {
+            setBookmarkingStreams(bookmarkingStreams.filter((e: string) => e !== streamID))
+        },
+        [bookmarkingStreams, setBookmarkingStreams]
+    )
 
     return (
         <FollowContext.Provider
-            value={{
+            value={useMemo(() => {
+                return {
+                    followingUsers,
+                    setFollowingStreams,
+                    followUser,
+                    unfollowUser,
+                    followingStreams,
+                    followStream,
+                    unfollowStream,
+                    bookmarkingStreams,
+                    bookmarkStream,
+                    unbookmarkStream
+                }
+            }, [
                 followingUsers,
                 setFollowingStreams,
                 followUser,
@@ -67,7 +98,7 @@ export const FollowProvider = (props: FollowProviderProps): JSX.Element => {
                 bookmarkingStreams,
                 bookmarkStream,
                 unbookmarkStream
-            }}
+            ])}
         >
             {props.children}
         </FollowContext.Provider>
