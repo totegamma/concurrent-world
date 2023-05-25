@@ -1,15 +1,13 @@
 import { memo, useEffect, useRef, useState } from 'react'
 import { Box, useTheme, Drawer, Typography } from '@mui/material'
-import type { Character, Message, StreamElementDated } from '../model'
+import type { Message, StreamElementDated } from '../model'
 import { type IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'
 import { useLocation } from 'react-router-dom'
 import { TimelineHeader } from '../components/TimelineHeader'
 import { useApi } from '../context/api'
-import { Schemas } from '../schemas'
 import { useFollow } from '../context/FollowContext'
 import { Timeline } from '../components/Timeline/main'
-import type { Userstreams } from '../schemas/userstreams'
 
 export interface TimelinePageProps {
     messages: IuseObjectList<StreamElementDated>
