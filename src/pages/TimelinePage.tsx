@@ -1,6 +1,6 @@
-import { memo, useEffect, useRef, useState } from 'react'
-import { Box, useTheme, Drawer, Typography } from '@mui/material'
-import type { Message, StreamElementDated } from '../model'
+import { memo, useEffect, useRef } from 'react'
+import { Box, useTheme } from '@mui/material'
+import type { StreamElementDated } from '../model'
 import { type IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'
 import { useLocation } from 'react-router-dom'
@@ -8,6 +8,7 @@ import { TimelineHeader } from '../components/TimelineHeader'
 import { useApi } from '../context/api'
 import { useFollow } from '../context/FollowContext'
 import { Timeline } from '../components/Timeline/main'
+import { InspectorProvider } from '../context/Inspector'
 
 export interface TimelinePageProps {
     messages: IuseObjectList<StreamElementDated>
@@ -23,7 +24,6 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
 
     const reactlocation = useLocation()
     const scrollParentRef = useRef<HTMLDivElement>(null)
-    const [inspectItem, setInspectItem] = useState<Message<any> | null>(null)
 
     useEffect(() => {
         ;(async () => {
@@ -42,7 +42,7 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
     }, [reactlocation.hash])
 
     return (
-        <>
+        <InspectorProvider>
             <TimelineHeader
                 location={reactlocation}
                 setMobileMenuOpen={props.setMobileMenuOpen}
@@ -76,44 +76,7 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                     </Box>
                 )}
             </Box>
-            <Drawer
-                anchor={'right'}
-                open={inspectItem != null}
-                onClose={() => {
-                    setInspectItem(null)
-                }}
-                PaperProps={{
-                    sx: {
-                        width: '40vw',
-                        borderRadius: '20px 0 0 20px',
-                        overflow: 'hidden',
-                        padding: '20px'
-                    }
-                }}
-            >
-                <Box
-                    sx={{
-                        margin: 0,
-                        wordBreak: 'break-all',
-                        whiteSpace: 'pre-wrap',
-                        fontSize: '13px'
-                    }}
-                >
-                    <Typography>ID: {inspectItem?.id}</Typography>
-                    <Typography>Author: {inspectItem?.author}</Typography>
-                    <Typography>Schema: {inspectItem?.schema}</Typography>
-                    <Typography>Signature: {inspectItem?.signature}</Typography>
-                    <Typography>Streams: {inspectItem?.streams}</Typography>
-                    <Typography>Created: {inspectItem?.cdate}</Typography>
-                    <Typography>Payload:</Typography>
-                    <pre style={{ overflowX: 'scroll' }}>
-                        {JSON.stringify(inspectItem?.payload ?? 'null', null, 4)?.replaceAll('\\n', '\n')}
-                    </pre>
-                    <Typography>Associations:</Typography>
-                    <pre style={{ overflowX: 'scroll' }}>{JSON.stringify(inspectItem?.associations, null, 4)}</pre>
-                </Box>
-            </Drawer>
-        </>
+        </InspectorProvider>
     )
 })
 TimelinePage.displayName = 'TimelinePage'

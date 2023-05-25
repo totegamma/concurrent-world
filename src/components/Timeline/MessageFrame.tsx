@@ -13,6 +13,7 @@ import type { Like } from '../../schemas/like'
 import { useApi } from '../../context/api'
 import { useFollow } from '../../context/FollowContext'
 import { Multiplexer } from './Multiplexer'
+import { useInspector } from '../../context/Inspector'
 
 export interface MessageFrameProp {
     message: StreamElement
@@ -21,6 +22,7 @@ export interface MessageFrameProp {
 
 export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JSX.Element => {
     const api = useApi()
+    const inspector = useInspector()
     const followService = useFollow()
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [message, setMessage] = useState<CCMessage<any> | undefined>()
@@ -290,6 +292,9 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                                     sx={{
                                         p: '0',
                                         color: theme.palette.text.secondary
+                                    }}
+                                    onClick={() => {
+                                        inspector.inspectItem(message)
                                     }}
                                 >
                                     <MoreHorizIcon />
