@@ -75,7 +75,11 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                             {children}
                         </blockquote>
                     ),
-                    a: ({ children, href }) => <Link href={href}>{children}</Link>,
+                    a: ({ children, href }) => (
+                        <Link href={href} target="_blank">
+                            {children}
+                        </Link>
+                    ),
                     code: ({ node, children, inline }) => {
                         const language = node.position
                             ? props.messagebody
