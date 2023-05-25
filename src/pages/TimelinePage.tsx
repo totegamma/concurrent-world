@@ -29,31 +29,16 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
 
     useEffect(() => {
         ;(async () => {
-            let homequery: string[] = [...followService.followingStreams]
-            console.log('followingUsers', followService.followingUsers)
             if (!reactlocation.hash) {
-                homequery = (
-                    await Promise.all(
-                        followService.followingUsers.map(async (ccaddress: string) => {
-                            const entity = await api.readEntity(ccaddress)
-                            const character: Character<Userstreams> | undefined = await api.readCharacter(
-                                ccaddress,
-                                Schemas.userstreams,
-                                entity?.host
-                            )
-
-                            if (!character?.payload.body.homeStream) return undefined
-
-                            let streamID: string = character.payload.body.homeStream
-                            if (entity?.host && entity.host !== '') {
-                                streamID += `@${entity.host}`
-                            }
-                            return streamID
-                        })
-                    )
-                ).filter((e) => e) as string[]
+                // home
+                props.setCurrentStreams([
+                    ...followService.followingStreams,
+                    ...(await api.getUserHomeStreams(followService.followingUsers))
+                ])
+            } else {
+                // non-home
+                props.setCurrentStreams(reactlocation.hash.replace('#', '').split(','))
             }
-            props.setCurrentStreams(reactlocation.hash ? reactlocation.hash.replace('#', '').split(',') : homequery)
         })()
         scrollParentRef.current?.scroll({ top: 0 })
     }, [reactlocation.hash])

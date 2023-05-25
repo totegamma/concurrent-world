@@ -4,34 +4,57 @@ import Divider from '@mui/material/Divider'
 import Paper from '@mui/material/Paper'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { LoadKey } from '../util'
 import { useNavigate } from 'react-router-dom'
 import { HDNodeWallet } from 'ethers'
 import { LangJa } from '../utils/lang-ja'
+import ConcurrentApiClient from '../apiservice'
+import type { Host } from '../model'
 
 export function AccountImport(): JSX.Element {
     const navigate = useNavigate()
     const [mnemonic, setMnemonic] = useState<string>('')
     const [secret, setSecret] = useState<string>('')
     const [server, setServer] = useState<string>('')
+    const [host, setHost] = useState<Host>()
+    const [entityFound, setEntityFound] = useState<boolean>(false)
+    const [api, initializeApi] = useState<ConcurrentApiClient>()
 
-    const accountImport = (): void => {
-        // TODO: add validation
+    useEffect(() => {
         if (mnemonic === '') {
             const key = LoadKey(secret)
-            localStorage.setItem('ServerAddress', JSON.stringify(server))
-            localStorage.setItem('PublicKey', JSON.stringify(key.publickey))
-            localStorage.setItem('PrivateKey', JSON.stringify(key.privatekey))
-            localStorage.setItem('Address', JSON.stringify(key.ccaddress))
-            navigate('/')
+            if (!key) return
+            const api = new ConcurrentApiClient(key.ccaddress, key.privatekey, host)
+            initializeApi(api)
         } else {
             const wallet = HDNodeWallet.fromPhrase(mnemonic, undefined, undefined, LangJa.wordlist()) // TODO: move to utils
-            localStorage.setItem('ServerAddress', JSON.stringify(server))
-            localStorage.setItem('PublicKey', JSON.stringify(wallet.publicKey.slice(2)))
-            localStorage.setItem('PrivateKey', JSON.stringify(wallet.privateKey.slice(2)))
-            localStorage.setItem('Address', JSON.stringify('CC' + wallet.address.slice(2)))
+            const api = new ConcurrentApiClient('CC' + wallet.address.slice(2), wallet.privateKey.slice(2), host)
+            initializeApi(api)
         }
+    }, [mnemonic, secret, host])
+
+    useEffect(() => {
+        if (!api) return
+        const fqdn = server.replace('https://', '').replace('/', '')
+        api.getHostProfile(fqdn).then((e: any) => {
+            setHost(e)
+        })
+        console.log(fqdn)
+    }, [server])
+
+    useEffect(() => {
+        console.log('check!!!')
+        api?.readEntity(api.userAddress).then((entity) => {
+            setEntityFound(!!entity && entity.ccaddr !== '')
+        })
+    }, [api])
+
+    const accountImport = (): void => {
+        if (!api) return
+        localStorage.setItem('Host', JSON.stringify(host))
+        localStorage.setItem('PrivateKey', JSON.stringify(api.privatekey))
+        localStorage.setItem('Address', JSON.stringify(api.userAddress))
         navigate('/')
     }
 
@@ -79,7 +102,7 @@ export function AccountImport(): JSX.Element {
                     setServer(e.target.value)
                 }}
             />
-            <Button variant="contained" onClick={accountImport}>
+            <Button disabled={!entityFound} variant="contained" onClick={accountImport}>
                 インポート
             </Button>
         </Paper>

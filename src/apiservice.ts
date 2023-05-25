@@ -382,6 +382,30 @@ export default class ConcurrentApiClient {
     }
 
     // Utils
+
+    async getUserHomeStreams(users: string[]): Promise<string[]> {
+        return (
+            await Promise.all(
+                users.map(async (ccaddress: string) => {
+                    const entity = await this.readEntity(ccaddress)
+                    const character: Character<Userstreams> | undefined = await this.readCharacter(
+                        ccaddress,
+                        Schemas.userstreams,
+                        entity?.host
+                    )
+
+                    if (!character?.payload.body.homeStream) return undefined
+
+                    let streamID: string = character.payload.body.homeStream
+                    if (entity?.host && entity.host !== '') {
+                        streamID += `@${entity.host}`
+                    }
+                    return streamID
+                })
+            )
+        ).filter((e) => e) as string[]
+    }
+
     async setupUserstreams(): Promise<void> {
         const userstreams = await this.readCharacter(this.userAddress, Schemas.userstreams)
         if (userstreams) return
