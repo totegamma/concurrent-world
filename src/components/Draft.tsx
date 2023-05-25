@@ -1,13 +1,5 @@
-import React, { useState, useContext, useEffect, useRef, memo } from 'react'
-import {
-    InputBase,
-    Box,
-    Button,
-    useTheme,
-    IconButton,
-    Divider
-} from '@mui/material'
-import { Sign } from '../util'
+import { useState, useContext, useEffect, useRef, memo } from 'react'
+import { InputBase, Box, Button, useTheme, IconButton, Divider } from '@mui/material'
 import { ApplicationContext } from '../App'
 import SendIcon from '@mui/icons-material/Send'
 import HomeIcon from '@mui/icons-material/Home'
@@ -21,6 +13,8 @@ import { MarkdownRenderer } from './MarkdownRenderer'
 import { StreamPicker } from './StreamPicker'
 import { useLocation } from 'react-router-dom'
 import { usePersistent } from '../hooks/usePersistent'
+import type { SimpleNote } from '../schemas/simpleNote'
+import { useApi } from '../context/api'
 
 export interface EmojiProps {
     shortcodes: string
@@ -50,6 +44,7 @@ export interface CustomEmoji {
 
 export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const appData = useContext(ApplicationContext)
+    const api = useApi()
     const theme = useTheme()
 
     const [draft, setDraft] = useState<string>('')
@@ -62,10 +57,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const inputRef = useRef<HTMLInputElement>(null)
 
     const [defaultPostHome] = usePersistent<string[]>('defaultPostHome', [])
-    const [defaultPostNonHome] = usePersistent<string[]>(
-        'defaultPostNonHome',
-        []
-    )
+    const [defaultPostNonHome] = usePersistent<string[]>('defaultPostNonHome', [])
 
     const [postHome, setPostHome] = useState<boolean>(true)
 
@@ -83,53 +75,33 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             {
                 id: 'fluffy',
                 name: 'Fluffy Social',
-                emojis: Object.entries(appData.emojiDict).map(
-                    ([key, value]) => ({
-                        id: key,
-                        name: value.name,
-                        keywords: value.aliases,
-                        skins: [{ src: value.publicUrl }]
-                    })
-                )
+                emojis: Object.entries(appData.emojiDict).map(([key, value]) => ({
+                    id: key,
+                    name: value.name,
+                    keywords: value.aliases,
+                    skins: [{ src: value.publicUrl }]
+                }))
             }
         ]
 
         setCustomEmoji(emojis)
     }, [appData.emojiDict])
+
     const post = (): void => {
-        const payloadObj = {
+        const streams = [
+            ...new Set([
+                ...props.currentStreams.split(','),
+                ...messageDestStreams,
+                ...(postHome ? [appData.userstreams?.payload.body.homeStream] : [])
+            ])
+        ].filter((e) => e) as string[]
+        const body = {
             body: draft
         }
 
-        const payload = JSON.stringify(payloadObj)
-        const signature = Sign(appData.privatekey, payload)
-
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({
-                author: appData.userAddress,
-                payload,
-                signature,
-                streams: [
-                    ...new Set([
-                        ...props.currentStreams.split(','),
-                        ...messageDestStreams,
-                        ...(postHome ? [appData.profile.homeStream] : [])
-                    ])
-                ]
-                    .filter((e) => e)
-                    .join(','),
-                schema: Schemas.simpleNote
-            })
-        }
-
-        fetch(appData.serverAddress + 'messages', requestOptions)
-            .then(async (res) => await res.json())
-            .then((data) => {
-                console.log(data)
-                setDraft('')
-            })
+        api.createMessage<SimpleNote>(Schemas.simpleNote, body, streams).then((_) => {
+            setDraft('')
+        })
     }
 
     const uploadToImgur = async (base64Data: string): Promise<string> => {
@@ -163,9 +135,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 reader.onload = async (event) => {
                     const base64Text = event
                     if (!base64Text.target) return
-                    const result = await uploadToImgur(
-                        base64Text.target.result as string
-                    )
+                    const result = await uploadToImgur(base64Text.target.result as string)
                     if (!result) return
                     setDraft(draft + `![image](${result})`)
                 }
@@ -185,9 +155,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             const base64Text = event
             if (!base64Text.target) return
             console.log(event)
-            const result = await uploadToImgur(
-                base64Text.target.result as string
-            )
+            const result = await uploadToImgur(base64Text.target.result as string)
             if (!result) return
             setDraft(draft + `![image](${result})`)
         }
@@ -218,11 +186,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         flex: 1
                     }}
                 >
-                    <StreamPicker
-                        color="none"
-                        selected={messageDestStreams}
-                        setSelected={setMessageDestStreams}
-                    />
+                    <StreamPicker color="none" selected={messageDestStreams} setSelected={setMessageDestStreams} />
                 </Box>
                 <IconButton
                     onClick={() => {
@@ -253,12 +217,8 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         padding: '0'
                     }}
                     onKeyDown={(e: any) => {
-                        if (draft.length === 0 || draft.trim().length === 0)
-                            return
-                        if (
-                            e.key === 'Enter' &&
-                            (e.ctrlKey === true || e.metaKey === true)
-                        ) {
+                        if (draft.length === 0 || draft.trim().length === 0) return
+                        if (e.key === 'Enter' && (e.ctrlKey === true || e.metaKey === true)) {
                             post()
                         }
                     }}

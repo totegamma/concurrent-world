@@ -10,9 +10,7 @@ import type { ConcurrentTheme } from '../model'
 
 export default function Welcome(): JSX.Element {
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue2')
-    const [theme, setTheme] = useState<ConcurrentTheme>(
-        createConcurrentTheme(themeName)
-    )
+    const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
     const [registrationOpen, setRegistrationOpen] = useState(false)
     const [importOpen, setImportOpen] = useState(false)
 
@@ -37,9 +35,10 @@ export default function Welcome(): JSX.Element {
                     flexDirection: 'column',
                     background: [
                         theme.palette.background.default,
-                        `linear-gradient(${
-                            theme.palette.background.default
-                        }, ${darken(theme.palette.background.default, 0.1)})`
+                        `linear-gradient(${theme.palette.background.default}, ${darken(
+                            theme.palette.background.default,
+                            0.1
+                        )})`
                     ]
                 }}
             >
@@ -67,15 +66,9 @@ export default function Welcome(): JSX.Element {
                         <Box>
                             <ConcurrentLogo
                                 size="64px"
-                                upperColor={
-                                    theme.palette.background.contrastText
-                                }
-                                lowerColor={
-                                    theme.palette.background.contrastText
-                                }
-                                frameColor={
-                                    theme.palette.background.contrastText
-                                }
+                                upperColor={theme.palette.background.contrastText}
+                                lowerColor={theme.palette.background.contrastText}
+                                frameColor={theme.palette.background.contrastText}
                             />
                         </Box>
                         <Typography

@@ -18,42 +18,79 @@ import type {
 import type { Profile } from './schemas/profile'
 
 export interface StreamElement {
-    ID: string
-    Values: {
-        id: string
-    }
+    timestamp: string
+    id: string
+    author: string
+    currenthost: string
 }
 
 export interface StreamElementDated extends StreamElement {
     LastUpdated: number
 }
 
-export interface Association {
-    author: string
+export interface Entity {
+    ccaddr: string
+    role: string
+    host: string
     cdate: string
-    id: string
-    payload: string
-    schema: string
-    signature: string
-    target: string
 }
 
-export interface Message {
-    associations: string
-    associations_data: Association[]
+export interface SignedObject<T> {
+    signer: string
+    type: string
+    schema: string
+    body: T
+    meta: any
+    signedAt: string
+    target?: string
+}
+
+export interface Association<T> {
     author: string
     cdate: string
     id: string
-    payload: string
+    payload: T
     schema: string
     signature: string
-    streams: string
+    targetID: string
+    targetType: string
+}
+
+export interface MessagePostRequest {
+    signedObject: string
+    signature: string
+    streams: string[]
+}
+
+export interface Message<T> {
+    associations: Array<Association<any>>
+    author: string
+    cdate: string
+    id: string
+    payload: SignedObject<T>
+    schema: string
+    signature: string
+    streams: string[]
+}
+
+export interface Character<T> {
+    associations: Array<Association<any>>
+    author: string
+    schema: string
+    id: string
+    payload: SignedObject<T>
+    signature: string
+    cdate: string
 }
 
 export interface ServerEvent {
     type: string
     action: string
-    body: Message | Association
+    body: StreamedMessage<any> | Association<any>
+}
+
+export interface StreamedMessage<T> extends Message<T> {
+    host: string
 }
 
 export interface Emoji {
@@ -63,17 +100,26 @@ export interface Emoji {
 }
 
 export interface ProfileWithAddress extends Profile {
+    // TODO: deprecate
     ccaddress: string
 }
 
-export interface Stream {
+export interface Host {
+    fqdn: string
+    ccaddr: string
+    role: string
+    pubkey: string
+    cdate: Date
+}
+
+export interface Stream<T> {
     id: string
     author: string
     maintainer: string[]
     writer: string[]
     reader: string[]
     schema: string
-    meta: string
+    payload: T
     signature: string
     cdate: string
 }

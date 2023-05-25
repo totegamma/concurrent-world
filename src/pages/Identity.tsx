@@ -4,8 +4,10 @@ import { ApplicationContext } from '../App'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import { ProfileEditor } from '../components/ProfileEditor'
+import { useApi } from '../context/api'
 
 export function Identity(): JSX.Element {
+    const api = useApi()
     const theme = useTheme()
     const appData = useContext(ApplicationContext)
     const [showPrivateKey, setShowPrivateKey] = useState(false)
@@ -27,37 +29,26 @@ export function Identity(): JSX.Element {
                     Identity
                 </Typography>
                 <Divider />
-                <ProfileEditor
-                    initial={appData.profile}
-                    userAddress={appData.userAddress}
-                    privatekey={appData.privatekey}
-                    serverAddress={appData.serverAddress}
-                />
+                <ProfileEditor initial={appData.profile} />
                 <Divider />
+                <Typography variant="h3" gutterBottom>
+                    Host
+                </Typography>
+                <Typography sx={{ wordBreak: 'break-all' }}>{api.host?.fqdn}</Typography>
                 <Typography variant="h3" gutterBottom>
                     Home Stream
                 </Typography>
-                <Typography sx={{ wordBreak: 'break-all' }}>
-                    {appData.profile.homeStream}
-                </Typography>
+                <Typography sx={{ wordBreak: 'break-all' }}>{appData.userstreams?.payload.body.homeStream}</Typography>
                 <Typography variant="h3" gutterBottom>
                     Notification Stream
                 </Typography>
                 <Typography sx={{ wordBreak: 'break-all' }}>
-                    {appData.profile.notificationStream}
+                    {appData.userstreams?.payload.body.notificationStream}
                 </Typography>
                 <Typography variant="h3" gutterBottom>
                     Concurrent Address
                 </Typography>
-                <Typography sx={{ wordBreak: 'break-all' }}>
-                    {appData.userAddress}
-                </Typography>
-                <Typography variant="h3" gutterBottom>
-                    Publickey
-                </Typography>
-                <Typography sx={{ wordBreak: 'break-all' }}>
-                    {appData.publickey}
-                </Typography>
+                <Typography sx={{ wordBreak: 'break-all' }}>{api.userAddress}</Typography>
                 <Typography variant="h3" gutterBottom>
                     Privatekey
                 </Typography>
@@ -68,9 +59,7 @@ export function Identity(): JSX.Element {
                         alignItems: 'center'
                     }}
                 >
-                    {showPrivateKey
-                        ? appData.privatekey
-                        : '•••••••••••••••••••••••••••••••••••••••••••••••••'}
+                    {showPrivateKey ? api.privatekey : '•••••••••••••••••••••••••••••••••••••••••••••••••'}
                     <IconButton
                         sx={{ ml: 'auto' }}
                         onClick={() => {
@@ -78,13 +67,9 @@ export function Identity(): JSX.Element {
                         }}
                     >
                         {!showPrivateKey ? (
-                            <VisibilityIcon
-                                sx={{ color: theme.palette.text.primary }}
-                            />
+                            <VisibilityIcon sx={{ color: theme.palette.text.primary }} />
                         ) : (
-                            <VisibilityOffIcon
-                                sx={{ color: theme.palette.text.primary }}
-                            />
+                            <VisibilityOffIcon sx={{ color: theme.palette.text.primary }} />
                         )}
                     </IconButton>
                 </Typography>

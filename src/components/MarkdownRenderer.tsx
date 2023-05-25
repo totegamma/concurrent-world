@@ -1,9 +1,5 @@
-import {
-    type ImgHTMLAttributes,
-    type DetailedHTMLProps,
-    useContext
-} from 'react'
-import { Box, Typography } from '@mui/material'
+import { type ImgHTMLAttributes, type DetailedHTMLProps, useContext } from 'react'
+import { Box, Link, Typography } from '@mui/material'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
@@ -25,11 +21,7 @@ const sanitizeOption = {
     tagNames: [...(defaultSchema.tagNames ?? []), 'marquee'],
     attributes: {
         ...defaultSchema.attributes,
-        marquee: [
-            ...(defaultSchema.attributes?.marquee ?? []),
-            'direction',
-            'behavior'
-        ]
+        marquee: [...(defaultSchema.attributes?.marquee ?? []), 'direction', 'behavior']
     }
 }
 
@@ -71,46 +63,56 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                             {children}
                         </Typography>
                     ),
-                    h1: ({ children }) => (
-                        <Typography variant="h1">{children}</Typography>
+                    h1: ({ children }) => <Typography variant="h1">{children}</Typography>,
+                    h2: ({ children }) => <Typography variant="h2">{children}</Typography>,
+                    h3: ({ children }) => <Typography variant="h3">{children}</Typography>,
+                    h4: ({ children }) => <Typography variant="h4">{children}</Typography>,
+                    h5: ({ children }) => <Typography variant="h5">{children}</Typography>,
+                    h6: ({ children }) => <Typography variant="h6">{children}</Typography>,
+                    ul: ({ children }) => <ul style={{ listStyle: 'inside' }}>{children}</ul>,
+                    blockquote: ({ children }) => (
+                        <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
+                            {children}
+                        </blockquote>
                     ),
-                    h2: ({ children }) => (
-                        <Typography variant="h2">{children}</Typography>
+                    a: ({ children, href }) => (
+                        <Link href={href} target="_blank">
+                            {children}
+                        </Link>
                     ),
-                    h3: ({ children }) => (
-                        <Typography variant="h3">{children}</Typography>
-                    ),
-                    h4: ({ children }) => (
-                        <Typography variant="h4">{children}</Typography>
-                    ),
-                    h5: ({ children }) => (
-                        <Typography variant="h5">{children}</Typography>
-                    ),
-                    h6: ({ children }) => (
-                        <Typography variant="h6">{children}</Typography>
-                    ),
-                    ul: ({ children }) => <ul>{children}</ul>,
-                    code: ({ node, children }) => {
+                    code: ({ node, children, inline }) => {
                         const language = node.position
                             ? props.messagebody
-                                  .slice(
-                                      node.position.start.offset,
-                                      node.position.end.offset
-                                  )
+                                  .slice(node.position.start.offset, node.position.end.offset)
                                   .split('\n')[0]
                                   .slice(3)
                             : ''
-                        return (
+                        return inline ? (
+                            <span
+                                style={{
+                                    fontFamily: 'Source Code Pro, monospace',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                                    borderRadius: '2px',
+                                    border: '0.5px solid #ddd',
+                                    padding: '0 0.5rem',
+                                    margin: '0 0.2rem'
+                                }}
+                            >
+                                {children}
+                            </span>
+                        ) : (
                             <Box
                                 sx={{
-                                    overflow: 'hidden',
-                                    borderRadius: '10px'
+                                    borderRadius: '10px',
+                                    overflow: 'hidden'
                                 }}
                             >
                                 <SyntaxHighlighter
                                     style={materialDark}
                                     language={language}
                                     PreTag="div"
+                                    customStyle={{ margin: 0, padding: '10px 15px', overflow: 'auto' }}
+                                    codeTagProps={{ style: { fontFamily: 'Source Code Pro, monospace' } }}
                                 >
                                     {String(children).replace(/\n$/, '')}
                                 </SyntaxHighlighter>
@@ -119,10 +121,7 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                     },
                     img: (
                         props: Pick<
-                            DetailedHTMLProps<
-                                ImgHTMLAttributes<HTMLImageElement>,
-                                HTMLImageElement
-                            >,
+                            DetailedHTMLProps<ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>,
                             'key' | keyof ImgHTMLAttributes<HTMLImageElement>
                         > &
                             ReactMarkdownProps
@@ -139,12 +138,15 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                             )
                         }
                         return (
-                            <img
-                                {...props}
-                                style={{
-                                    maxWidth: '100%'
-                                }}
-                            />
+                            <a href={props.src} target="_blank" rel="noreferrer">
+                                <img
+                                    {...props}
+                                    style={{
+                                        maxWidth: '100%',
+                                        borderRadius: '10px'
+                                    }}
+                                />
+                            </a>
                         )
                     }
                 }}

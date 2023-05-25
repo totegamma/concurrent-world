@@ -26,9 +26,11 @@ export const Keygen = (): key => {
     }
 }
 
-export const LoadKey = (privateKey: string): key => {
+export const LoadKey = (privateKey: string): key | null => {
     const ellipsis = new Ec('secp256k1')
     const keyPair = ellipsis.keyFromPrivate(privateKey)
+    console.log(keyPair)
+    if (!keyPair.getPrivate()) return null
     const privatekey = keyPair.getPrivate().toString('hex')
     const publickey = keyPair.getPublic().encode('hex', false)
     const ethAddress = computeAddress('0x' + publickey)
@@ -72,9 +74,7 @@ export const humanReadableTimeDiff = (time: Date): string => {
         return `${Math.round(elapsed / msPerHour)}時間前`
     } else {
         return (
-            (current.getFullYear() === time.getFullYear()
-                ? ''
-                : `${time.getFullYear()}年 `) +
+            (current.getFullYear() === time.getFullYear() ? '' : `${time.getFullYear()}年 `) +
             `${String(time.getMonth() + 1).padStart(2, '0')}月` +
             `${String(time.getDate()).padStart(2, '0')}日 ` +
             `${String(time.getHours()).padStart(2, '0')}時` +

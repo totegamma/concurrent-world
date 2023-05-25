@@ -7,73 +7,59 @@ import {
     ListItemButton,
     ListItemIcon,
     ListItemText,
+    MenuItem,
+    Select,
     TextField,
     Typography,
     useTheme
 } from '@mui/material'
-import { useContext, useEffect, useState } from 'react'
-import { ApplicationContext } from '../App'
+import { useEffect, useState } from 'react'
 import StarIcon from '@mui/icons-material/Star'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
-import type { Stream } from '../model'
-import { Sign } from '../util'
+import type { Host, Stream } from '../model'
+import { useApi } from '../context/api'
+import { useFollow } from '../context/FollowContext'
 
-export interface ExplorerProps {
-    watchList: string[]
-    setWatchList: (newlist: string[]) => void
-}
-
-export function Explorer(props: ExplorerProps): JSX.Element {
+export function Explorer(): JSX.Element {
+    const api = useApi()
     const theme = useTheme()
+    const follow = useFollow()
 
-    const appData = useContext(ApplicationContext)
-    const [streams, setStreams] = useState<Stream[]>([])
+    const [hosts, setHosts] = useState<Host[]>([...(api.host ? [api.host] : [])])
+    const [currentHost, setCurrentHost] = useState<string>(api.host?.fqdn ?? '')
+    const [streams, setStreams] = useState<Array<Stream<any>>>([])
     const [newStreamName, setNewStreamName] = useState<string>('')
 
+    const loadHosts = (): void => {
+        api.getKnownHosts().then((e) => {
+            setHosts([...(api.host ? [api.host] : []), ...e])
+        })
+    }
+
     const loadStreams = (): void => {
-        fetch(
-            appData.serverAddress +
-                'stream/list?schema=net.gammalab.concurrent.tbdStreamMeta'
-        ).then((data) => {
-            data.json().then((json) => {
-                setStreams(json)
-            })
+        api.getStreamListBySchema('net.gammalab.concurrent.tbdStreamMeta', currentHost).then((e) => {
+            setStreams(e)
         })
     }
 
     const createNewStream = (name: string): void => {
-        const payloadObj = {
+        api.createStream('net.gammalab.concurrent.tbdStreamMeta', {
             name
-        }
-
-        const payload = JSON.stringify(payloadObj)
-        const signature = Sign(appData.privatekey, payload)
-
-        const requestOptions = {
-            method: 'PUT',
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({
-                author: appData.userAddress,
-                maintainer: [],
-                writer: [],
-                reader: [],
-                schema: 'net.gammalab.concurrent.tbdStreamMeta',
-                meta: payload,
-                signature
-            })
-        }
-
-        fetch(appData.serverAddress + 'stream', requestOptions)
-            .then(async (res) => await res.json())
-            .then((data) => {
-                console.log(data)
-                loadStreams()
-            })
+        }).then((_) => {
+            loadStreams()
+        })
     }
 
     useEffect(() => {
+        loadHosts()
         loadStreams()
     }, [])
+
+    useEffect(() => {
+        loadStreams()
+    }, [currentHost])
+
+    if (!api.host) return <>loading...</>
 
     return (
         <Box
@@ -90,6 +76,20 @@ export function Explorer(props: ExplorerProps): JSX.Element {
             <Typography variant="h2" gutterBottom>
                 Explorer
             </Typography>
+            <Select
+                value={currentHost}
+                label="Host"
+                onChange={(e) => {
+                    setCurrentHost(e.target.value)
+                }}
+                defaultValue={api.host.fqdn}
+            >
+                {hosts.map((e) => (
+                    <MenuItem key={e.fqdn} value={e.fqdn}>
+                        {e.fqdn}
+                    </MenuItem>
+                ))}
+            </Select>
             <Divider />
             <Typography variant="h3" gutterBottom>
                 streams
@@ -120,43 +120,29 @@ export function Explorer(props: ExplorerProps): JSX.Element {
                         <ListItem key={value.id} disablePadding>
                             <ListItemButton
                                 onClick={() => {
-                                    if (props.watchList.includes(value.id)) {
-                                        props.setWatchList(
-                                            props.watchList.filter(
-                                                (e) => e !== value.id
-                                            )
-                                        )
+                                    if (follow.bookmarkingStreams.includes(`${value.id}@${currentHost}`)) {
+                                        follow.unbookmarkStream(`${value.id}@${currentHost}`)
                                     } else {
-                                        props.setWatchList([
-                                            ...props.watchList,
-                                            value.id
-                                        ])
+                                        follow.bookmarkStream(`${value.id}@${currentHost}`)
                                     }
                                 }}
                             >
                                 <ListItemIcon>
-                                    {props.watchList.includes(value.id) ? (
+                                    {follow.bookmarkingStreams.includes(`${value.id}@${currentHost}`) ? (
                                         <StarIcon
                                             sx={{
-                                                color: theme.palette.text
-                                                    .primary
+                                                color: theme.palette.text.primary
                                             }}
                                         />
                                     ) : (
                                         <StarBorderIcon
                                             sx={{
-                                                color: theme.palette.text
-                                                    .primary
+                                                color: theme.palette.text.primary
                                             }}
                                         />
                                     )}
                                 </ListItemIcon>
-                                <ListItemText
-                                    id={labelId}
-                                    primary={`%${
-                                        JSON.parse(value.meta).name as string
-                                    }`}
-                                />
+                                <ListItemText id={labelId} primary={`%${value.payload.body.name as string}`} />
                             </ListItemButton>
                         </ListItem>
                     )

@@ -35,10 +35,7 @@ export const LogoutButton = (): JSX.Element => {
                         background: theme.palette.background.paper
                     }}
                 >
-                    <Typography
-                        component="h2"
-                        sx={{ color: theme.palette.text.primary }}
-                    >
+                    <Typography component="h2" sx={{ color: theme.palette.text.primary }}>
                         Are you sure?
                     </Typography>
                     <Typography sx={{ color: theme.palette.text.primary }}>

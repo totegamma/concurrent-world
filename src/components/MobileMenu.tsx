@@ -20,46 +20,22 @@ export function MobileMenu(): JSX.Element {
                     marginBottom: 'env(safe-area-inset-bottom)'
                 }}
             >
-                <Button
-                    sx={{ color: 'background.contrastText', width: 1 }}
-                    component={NavLink}
-                    to="/"
-                >
+                <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/">
                     <HomeIcon />
                 </Button>
-                <Button
-                    sx={{ color: 'background.contrastText', width: 1 }}
-                    component={NavLink}
-                    to="/notifications"
-                >
+                <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/notifications">
                     <NotificationsIcon />
                 </Button>
-                <Button
-                    sx={{ color: 'background.contrastText', width: 1 }}
-                    component={NavLink}
-                    to="/associations"
-                >
+                <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/associations">
                     <MessageIcon />
                 </Button>
-                <Button
-                    sx={{ color: 'background.contrastText', width: 1 }}
-                    component={NavLink}
-                    to="/explorer"
-                >
+                <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/explorer">
                     <ExploreIcon />
                 </Button>
-                <Button
-                    sx={{ color: 'background.contrastText', width: 1 }}
-                    component={NavLink}
-                    to="/identity"
-                >
+                <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/identity">
                     <BadgeIcon />
                 </Button>
-                <Button
-                    sx={{ color: 'background.contrastText', width: 1 }}
-                    component={NavLink}
-                    to="/settings"
-                >
+                <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/settings">
                     <SettingsIcon />
                 </Button>
             </Box>

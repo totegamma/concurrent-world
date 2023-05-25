@@ -1,28 +1,14 @@
-import {
-    Button,
-    Divider,
-    Typography,
-    TextField,
-    Box,
-    useTheme
-} from '@mui/material'
-import { useContext } from 'react'
-import { ApplicationContext } from '../App'
+import { Button, Divider, Typography, Box, useTheme } from '@mui/material'
 import { LogoutButton } from '../components/Settings/LogoutButton'
 import { ThemeSelect } from '../components/Settings/ThemeSelect'
 import { ImgurSettings } from '../components/Settings/Imgur'
 
 export interface SettingsProp {
     setThemeName: (themeName: string) => void
-    setServerAddr: (serverAddr: string) => void
-    setUserAddr: (userAddr: string) => void
-    setPubKey: (key: string) => void
-    setPrvKey: (key: string) => void
 }
 
 export function Settings(props: SettingsProp): JSX.Element {
     const theme = useTheme()
-    const appData = useContext(ApplicationContext)
 
     return (
         <>
@@ -56,14 +42,6 @@ export function Settings(props: SettingsProp): JSX.Element {
                         }}
                     >
                         <Typography variant="h3">Basic</Typography>
-                        <TextField
-                            label="server"
-                            variant="outlined"
-                            value={appData.serverAddress}
-                            onChange={(e) => {
-                                props.setServerAddr(e.target.value)
-                            }}
-                        />
                         <Button
                             variant="contained"
                             onClick={(_) => {

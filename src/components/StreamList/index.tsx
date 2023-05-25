@@ -1,36 +1,25 @@
-import React, { useContext, useEffect } from 'react'
-import {
-    DndProvider,
-    getBackendOptions,
-    MultiBackend,
-    Tree
-} from '@minoru/react-dnd-treeview'
+import { useEffect } from 'react'
+import { DndProvider, getBackendOptions, MultiBackend, Tree } from '@minoru/react-dnd-treeview'
 import CreateNewFolder from '@mui/icons-material/CreateNewFolder'
 
 import styles from './index.module.css'
-import {
-    Box,
-    CssBaseline,
-    IconButton,
-    ThemeProvider,
-    Typography,
-    useTheme
-} from '@mui/material'
+import { Box, CssBaseline, IconButton, ThemeProvider, Typography, useTheme } from '@mui/material'
 import type { Stream, ConcurrentTheme } from '../../model'
 import { CustomNode } from './CustomNode'
 import { CustomDragPreview } from './CustomDragPreview'
 import { Placeholder } from './Placeholder'
-import { ApplicationContext } from '../../App'
 import { usePersistent } from '../../hooks/usePersistent'
 
 import { v4 as uuidv4 } from 'uuid'
 import PercentIcon from '@mui/icons-material/Percent'
+import { useApi } from '../../context/api'
+import { useFollow } from '../../context/FollowContext'
 export interface WatchStream {
     id: number | string
     parent: number
     droppable: boolean
     text: string
-    data: Stream | undefined
+    data: Stream<any> | undefined
 }
 
 interface StreamListProps {
@@ -38,31 +27,27 @@ interface StreamListProps {
 }
 
 export function StreamList(props: StreamListProps): JSX.Element {
-    const appData = useContext(ApplicationContext)
+    const api = useApi()
+    const follow = useFollow()
     const theme = useTheme<ConcurrentTheme>()
-    const [watchStreamTree, setWatchStreamTree] = usePersistent<WatchStream[]>(
-        'watchStreamTree',
-        []
-    )
+    const [watchStreamTree, setWatchStreamTree] = usePersistent<WatchStream[]>('watchStreamTree', [])
 
     useEffect(() => {
         ;(async () => {
-            const streams = await Promise.all(
-                appData.watchStreams.map(
-                    async (id) => await appData.streamDict.get(id)
-                )
-            )
+            const streams = await Promise.all(follow.bookmarkingStreams.map(async (id) => await api.readStream(id)))
             if (watchStreamTree.length === 0) {
                 // init watch stream tree
                 console.log('init watch stream tree')
                 setWatchStreamTree(
-                    streams.map((stream, index) => ({
-                        id: stream.id,
-                        parent: 0,
-                        droppable: false,
-                        text: JSON.parse(stream.meta).name || 'Unknown',
-                        data: stream
-                    }))
+                    streams
+                        .map((stream, _) => ({
+                            id: stream?.id,
+                            parent: 0,
+                            droppable: false,
+                            text: stream?.payload.body.name || 'Unknown',
+                            data: stream
+                        }))
+                        .filter((e) => e.id) as WatchStream[]
                 )
             } else {
                 // update watch stream three
@@ -72,23 +57,19 @@ export function StreamList(props: StreamListProps): JSX.Element {
                     if (node.data === undefined) {
                         return true
                     }
-                    return appData.watchStreams.includes(node.data.id)
+                    return follow.bookmarkingStreams.includes(node.data.id)
                 })
                 // when a stream is added, add it to the tree
                 streams.forEach((stream) => {
                     if (stream === undefined) {
                         return
                     }
-                    if (
-                        !watchStreamTree.some(
-                            (node) => node.data?.id === stream.id
-                        )
-                    ) {
+                    if (!watchStreamTree.some((node) => node.data?.id === stream.id)) {
                         newTree.push({
                             id: stream.id,
                             parent: 0,
                             droppable: false,
-                            text: JSON.parse(stream.meta).name || 'Unknown',
+                            text: stream.payload.body.name || 'Unknown',
                             data: stream
                         })
                     }
@@ -96,7 +77,7 @@ export function StreamList(props: StreamListProps): JSX.Element {
                 setWatchStreamTree(newTree)
             }
         })()
-    }, [appData.watchStreams])
+    }, [follow.bookmarkingStreams])
 
     const addFolder = (): void => {
         setWatchStreamTree([
@@ -118,23 +99,13 @@ export function StreamList(props: StreamListProps): JSX.Element {
 
     return (
         <>
-            <Box
-                display={'flex'}
-                flexDirection={'row'}
-                gap={'8px'}
-                sx={{ paddingLeft: '16px', paddingTop: '8px' }}
-            >
+            <Box display={'flex'} flexDirection={'row'} gap={'8px'} sx={{ paddingLeft: '16px', paddingTop: '8px' }}>
                 <PercentIcon
                     sx={{
                         color: 'background.contrastText'
                     }}
                 />
-                <Typography
-                    flex={1}
-                    fontSize={'0.875rem'}
-                    justifyContent={'center'}
-                    marginY={'3px'}
-                >
+                <Typography flex={1} fontSize={'0.875rem'} justifyContent={'center'} marginY={'3px'}>
                     Streams
                 </Typography>
 
@@ -150,10 +121,7 @@ export function StreamList(props: StreamListProps): JSX.Element {
             </Box>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
-                <DndProvider
-                    backend={MultiBackend}
-                    options={getBackendOptions()}
-                >
+                <DndProvider backend={MultiBackend} options={getBackendOptions()}>
                     <div className={styles.tree}>
                         <Tree
                             tree={watchStreamTree}
@@ -169,11 +137,7 @@ export function StreamList(props: StreamListProps): JSX.Element {
                                     onClick={props.onClick}
                                 />
                             )}
-                            dragPreviewRender={(monitorProps) => (
-                                <CustomDragPreview
-                                    monitorProps={monitorProps}
-                                />
-                            )}
+                            dragPreviewRender={(monitorProps) => <CustomDragPreview monitorProps={monitorProps} />}
                             onDrop={handleDrop}
                             classes={{
                                 root: styles.treeRoot,
@@ -182,18 +146,13 @@ export function StreamList(props: StreamListProps): JSX.Element {
                             }}
                             sort={false}
                             insertDroppableFirst={false}
-                            canDrop={(
-                                tree,
-                                { dragSource, dropTargetId, dropTarget }
-                            ) => {
+                            canDrop={(tree, { dragSource, dropTargetId, dropTarget }) => {
                                 if (dragSource?.parent === dropTargetId) {
                                     return true
                                 }
                             }}
                             dropTargetOffset={5}
-                            placeholderRender={(node, { depth }) => (
-                                <Placeholder node={node} depth={depth} />
-                            )}
+                            placeholderRender={(node, { depth }) => <Placeholder node={node} depth={depth} />}
                         />
                     </div>
                 </DndProvider>

@@ -17,15 +17,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
             <Suspense fallback={<>loading...</>}>
                 <Routes>
                     <Route path="/welcome" element={<Welcome />} />
-                    <Route
-                        path="*"
-                        element={
-                            <LoginGuard
-                                component={<AppPage />}
-                                redirect="/welcome"
-                            />
-                        }
-                    />
+                    <Route path="*" element={<LoginGuard component={<AppPage />} redirect="/welcome" />} />
                 </Routes>
             </Suspense>
         </BrowserRouter>

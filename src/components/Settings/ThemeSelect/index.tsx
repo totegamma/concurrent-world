@@ -10,10 +10,7 @@ export interface ThemeSelectProp {
 
 export const ThemeSelect = (props: ThemeSelectProp): JSX.Element => {
     const previewTheme: Record<string, ConcurrentTheme> = useMemo(
-        () =>
-            Object.fromEntries(
-                Object.keys(Themes).map((e) => [e, createConcurrentTheme(e)])
-            ),
+        () => Object.fromEntries(Object.keys(Themes).map((e) => [e, createConcurrentTheme(e)])),
         []
     )
 
@@ -37,8 +34,7 @@ export const ThemeSelect = (props: ThemeSelectProp): JSX.Element => {
                             }}
                             style={{
                                 border: 'none',
-                                background:
-                                    previewTheme[e].palette.background.paper,
+                                background: previewTheme[e].palette.background.paper,
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '10px',
@@ -51,24 +47,14 @@ export const ThemeSelect = (props: ThemeSelectProp): JSX.Element => {
                                 sx={{
                                     display: 'flex',
                                     borderRadius: '100px',
-                                    background:
-                                        previewTheme[e].palette.primary
-                                            .contrastText
+                                    background: previewTheme[e].palette.primary.contrastText
                                 }}
                             >
                                 <ConcurrentLogo
                                     size="40px"
-                                    upperColor={
-                                        previewTheme[e].palette.primary.main
-                                    }
-                                    lowerColor={
-                                        previewTheme[e].palette.background
-                                            .default
-                                    }
-                                    frameColor={
-                                        previewTheme[e].palette.background
-                                            .default
-                                    }
+                                    upperColor={previewTheme[e].palette.primary.main}
+                                    lowerColor={previewTheme[e].palette.background.default}
+                                    frameColor={previewTheme[e].palette.background.default}
                                 />
                             </Box>
                             <Typography

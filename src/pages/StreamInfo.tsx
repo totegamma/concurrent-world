@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
     Divider,
     Tabs,
@@ -15,36 +15,25 @@ import {
 import { StreamPicker } from '../components/StreamPicker'
 import { usePersistent } from '../hooks/usePersistent'
 import type { ProfileWithAddress } from '../model'
-import { ApplicationContext } from '../App'
 import { useLocation } from 'react-router-dom'
 import { CCAvatar } from '../components/CCAvatar'
+import { useApi } from '../context/api'
+import { Schemas } from '../schemas'
+import { useFollow } from '../context/FollowContext'
 
-export interface StreamInfoProps {
-    followList: string[]
-    setFollowList: (newlist: string[]) => void
-}
-
-export function StreamInfo(props: StreamInfoProps): JSX.Element {
-    const appData = useContext(ApplicationContext)
+export function StreamInfo(): JSX.Element {
+    const api = useApi()
+    const follow = useFollow()
     const reactlocation = useLocation()
     const [tab, setTab] = useState(0)
 
-    const [followStreams, setFollowStreams] = usePersistent<string[]>(
-        'followStreams',
-        []
-    )
-    const [defaultPostHome, setDefaultPostHome] = usePersistent<string[]>(
-        'defaultPostHome',
-        []
-    )
-    const [defaultPostNonHome, setDefaultPostNonHome] = usePersistent<string[]>(
-        'defaultPostNonHome',
-        []
-    )
+    const [defaultPostHome, setDefaultPostHome] = usePersistent<string[]>('defaultPostHome', [])
+    const [defaultPostNonHome, setDefaultPostNonHome] = usePersistent<string[]>('defaultPostNonHome', [])
 
     const [title, setTitle] = useState<string>('')
 
     useEffect(() => {
+        console.log(reactlocation.hash)
         if (!reactlocation.hash || reactlocation.hash === '#') {
             setTitle('Home')
             return
@@ -53,13 +42,13 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
             reactlocation.hash
                 .replace('#', '')
                 .split(',')
-                .map((e) => appData.streamDict.get(e))
+                .map((e) => api.readStream(e))
         ).then((a) => {
+            console.log(a)
             setTitle(
                 a
-                    .map((e) => e.meta)
+                    .map((e) => e?.payload.body.name)
                     .filter((e) => e)
-                    .map((e) => JSON.parse(e).name)
                     .join(', ')
             )
         })
@@ -69,21 +58,21 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
 
     useEffect(() => {
         Promise.all(
-            props.followList.map((ccaddress) =>
-                appData.userDict.get(ccaddress).then((e) => {
+            follow.followingUsers.map((ccaddress: string) =>
+                api.readCharacter(ccaddress, Schemas.profile).then((e) => {
                     return {
                         ccaddress,
-                        ...e
+                        ...e?.payload.body
                     }
                 })
             )
         ).then((e) => {
             setFollowList(e)
         })
-    }, [props.followList])
+    }, [follow.followingUsers])
 
     const unfollow = (ccaddress: string): void => {
-        props.setFollowList(props.followList.filter((e) => e !== ccaddress))
+        follow.unfollowUser(ccaddress)
     }
 
     return (
@@ -118,10 +107,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                     {tab === 0 && (
                         <Box>
                             <Typography variant="h3">ストリーム</Typography>
-                            <StreamPicker
-                                selected={followStreams}
-                                setSelected={setFollowStreams}
-                            />
+                            <StreamPicker selected={follow.followingStreams} setSelected={follow.setFollowingStreams} />
                             <Divider />
                             <Typography variant="h3">ユーザー</Typography>
                             <List
@@ -148,16 +134,9 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                                     >
                                         <ListItemButton>
                                             <ListItemAvatar>
-                                                <CCAvatar
-                                                    avatarURL={user.avatar}
-                                                    identiconSource={
-                                                        user.ccaddress
-                                                    }
-                                                />
+                                                <CCAvatar avatarURL={user.avatar} identiconSource={user.ccaddress} />
                                             </ListItemAvatar>
-                                            <ListItemText
-                                                primary={user.username}
-                                            />
+                                            <ListItemText primary={user.username} />
                                         </ListItemButton>
                                     </ListItem>
                                 ))}
@@ -167,16 +146,10 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                     {tab === 1 && (
                         <Box>
                             <Typography variant="h3">ホーム</Typography>
-                            <StreamPicker
-                                selected={defaultPostHome}
-                                setSelected={setDefaultPostHome}
-                            />
+                            <StreamPicker selected={defaultPostHome} setSelected={setDefaultPostHome} />
                             <Divider />
                             <Typography variant="h3">ホーム以外</Typography>
-                            <StreamPicker
-                                selected={defaultPostNonHome}
-                                setSelected={setDefaultPostNonHome}
-                            />
+                            <StreamPicker selected={defaultPostNonHome} setSelected={setDefaultPostNonHome} />
                             <Divider />
                         </Box>
                     )}

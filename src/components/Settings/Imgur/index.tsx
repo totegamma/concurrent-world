@@ -35,8 +35,7 @@ export const ImgurSettings = (): JSX.Element => {
                 <Typography>
                     Imgurに登録した後、
                     <a href={'https://api.imgur.com/oauth2/addclient'}>ここ</a>
-                    でアプリケーションを作成してください。「OAuth 2
-                    authorization without a callback URL」で大丈夫です
+                    でアプリケーションを作成してください。「OAuth 2 authorization without a callback URL」で大丈夫です
                 </Typography>
                 <Box>
                     <TextField

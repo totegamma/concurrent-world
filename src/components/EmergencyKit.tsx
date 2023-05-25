@@ -1,15 +1,7 @@
 export function EmergencyKit(): JSX.Element {
     const gracefulResetLocalStorage = (): void => {
         for (const key in localStorage) {
-            if (
-                [
-                    'PrivateKey',
-                    'PublicKey',
-                    'Address',
-                    'ServerAddress'
-                ].includes(key)
-            )
-                continue
+            if (['PrivateKey', 'PublicKey', 'Address', 'ServerAddress'].includes(key)) continue
             localStorage.removeItem(key)
         }
     }
@@ -30,9 +22,7 @@ export function EmergencyKit(): JSX.Element {
                 </button>
             </div>
             <div>
-                <button onClick={resetAllLocalstorage}>
-                    localStorageをすべてリセットする
-                </button>
+                <button onClick={resetAllLocalstorage}>localStorageをすべてリセットする</button>
             </div>
         </>
     )
