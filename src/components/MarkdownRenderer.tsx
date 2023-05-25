@@ -1,5 +1,5 @@
 import { type ImgHTMLAttributes, type DetailedHTMLProps, useContext } from 'react'
-import { Box, Typography } from '@mui/material'
+import { Box, Link, Typography } from '@mui/material'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
@@ -69,22 +69,47 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                     h4: ({ children }) => <Typography variant="h4">{children}</Typography>,
                     h5: ({ children }) => <Typography variant="h5">{children}</Typography>,
                     h6: ({ children }) => <Typography variant="h6">{children}</Typography>,
-                    ul: ({ children }) => <ul>{children}</ul>,
-                    code: ({ node, children }) => {
+                    ul: ({ children }) => <ul style={{ listStyle: 'inside' }}>{children}</ul>,
+                    blockquote: ({ children }) => (
+                        <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
+                            {children}
+                        </blockquote>
+                    ),
+                    a: ({ children, href }) => <Link href={href}>{children}</Link>,
+                    code: ({ node, children, inline }) => {
                         const language = node.position
                             ? props.messagebody
                                   .slice(node.position.start.offset, node.position.end.offset)
                                   .split('\n')[0]
                                   .slice(3)
                             : ''
-                        return (
+                        return inline ? (
+                            <span
+                                style={{
+                                    fontFamily: "'Source Code Pro', monospace",
+                                    backgroundColor: '#eee',
+                                    borderRadius: '2px',
+                                    border: '0.5px solid #ddd',
+                                    padding: '0 0.5rem',
+                                    margin: '0 0.2rem'
+                                }}
+                            >
+                                {children}
+                            </span>
+                        ) : (
                             <Box
                                 sx={{
                                     overflow: 'hidden',
                                     borderRadius: '10px'
                                 }}
                             >
-                                <SyntaxHighlighter style={materialDark} language={language} PreTag="div">
+                                <SyntaxHighlighter
+                                    style={materialDark}
+                                    language={language}
+                                    PreTag="div"
+                                    customStyle={{ margin: 0, padding: '10px 15px' }}
+                                    codeTagProps={{ style: { fontFamily: '"Source Code Pro"' } }}
+                                >
                                     {String(children).replace(/\n$/, '')}
                                 </SyntaxHighlighter>
                             </Box>
@@ -109,12 +134,15 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                             )
                         }
                         return (
-                            <img
-                                {...props}
-                                style={{
-                                    maxWidth: '100%'
-                                }}
-                            />
+                            <a href={props.src} target="_blank" rel="noreferrer">
+                                <img
+                                    {...props}
+                                    style={{
+                                        maxWidth: '100%',
+                                        borderRadius: '10px'
+                                    }}
+                                />
+                            </a>
                         )
                     }
                 }}
