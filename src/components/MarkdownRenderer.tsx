@@ -86,8 +86,8 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                         return inline ? (
                             <span
                                 style={{
-                                    fontFamily: "'Source Code Pro', monospace",
-                                    backgroundColor: '#eee',
+                                    fontFamily: 'Source Code Pro, monospace',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.3)',
                                     borderRadius: '2px',
                                     border: '0.5px solid #ddd',
                                     padding: '0 0.5rem',
@@ -99,16 +99,16 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                         ) : (
                             <Box
                                 sx={{
-                                    overflow: 'hidden',
-                                    borderRadius: '10px'
+                                    borderRadius: '10px',
+                                    overflow: 'hidden'
                                 }}
                             >
                                 <SyntaxHighlighter
                                     style={materialDark}
                                     language={language}
                                     PreTag="div"
-                                    customStyle={{ margin: 0, padding: '10px 15px' }}
-                                    codeTagProps={{ style: { fontFamily: '"Source Code Pro"' } }}
+                                    customStyle={{ margin: 0, padding: '10px 15px', overflow: 'auto' }}
+                                    codeTagProps={{ style: { fontFamily: 'Source Code Pro, monospace' } }}
                                 >
                                     {String(children).replace(/\n$/, '')}
                                 </SyntaxHighlighter>

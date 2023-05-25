@@ -238,7 +238,8 @@ function App(): JSX.Element {
                                     sx={{
                                         display: 'flex',
                                         flex: 1,
-                                        maxWidth: '1280px'
+                                        maxWidth: '1280px',
+                                        width: '100%'
                                     }}
                                 >
                                     <Box
