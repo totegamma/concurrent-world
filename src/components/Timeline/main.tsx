@@ -25,7 +25,6 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
             props.timeline.set(dated)
             setHasMoreData(true)
         })
-        console.log('render timeline!', props.streams)
     }, [props.streams])
 
     const loadMore = useCallback(async () => {
@@ -38,7 +37,6 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
         api?.readStreamRanged(props.streams, props.timeline.current[props.timeline.current.length - 1].timestamp).then(
             (data: StreamElement[]) => {
                 if (last !== props.timeline.current) {
-                    console.log('timeline changed!!!')
                     return
                 }
                 const idtable = props.timeline.current.map((e) => e.id)
@@ -52,7 +50,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                 } else setHasMoreData(false)
             }
         )
-    }, [props.streams])
+    }, [api, props.streams, props.timeline])
 
     return (
         <List sx={{ flex: 1, width: '100%' }}>
