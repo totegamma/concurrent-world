@@ -3,7 +3,10 @@ import { useContext, useRef, useState } from 'react'
 import { ApplicationContext } from '../../../App'
 
 const sx: SxProps = {
-    marginX: '20px',
+    marginX: {
+        sm: 0,
+        md: '20px'
+    },
     marginTop: '10px',
     maxWidth: '500px'
 }
@@ -12,15 +15,13 @@ export const ImgurSettings = (): JSX.Element => {
     const appData = useContext(ApplicationContext)
 
     const clientIdRef = useRef<HTMLInputElement>(null)
-    const clientSecretRef = useRef<HTMLInputElement>(null)
 
     const [buttonText, setButtonText] = useState<string>('Save')
 
     const handleSave = (): void => {
-        if (clientIdRef.current && clientSecretRef.current) {
+        if (clientIdRef.current) {
             appData.setImgurSettings({
-                clientId: clientIdRef.current.value,
-                clientSecret: clientSecretRef.current.value
+                clientId: clientIdRef.current.value
             })
             setButtonText('OK!')
             setTimeout(() => {
@@ -45,15 +46,6 @@ export const ImgurSettings = (): JSX.Element => {
                         sx={sx}
                         defaultValue={appData.imgurSettings.clientId}
                         inputRef={clientIdRef}
-                        type="password"
-                    />
-                    <TextField
-                        label="ClientSecret"
-                        variant="outlined"
-                        fullWidth={true}
-                        sx={sx}
-                        defaultValue={appData.imgurSettings.clientSecret}
-                        inputRef={clientSecretRef}
                         type="password"
                     />
                 </Box>

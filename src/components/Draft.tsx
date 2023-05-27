@@ -128,6 +128,9 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         if (isImage) {
             const imageFile = event.clipboardData?.items[0].getAsFile()
             if (imageFile) {
+                const uploadingText = ' ![uploading...]()'
+                setDraft(draft + uploadingText)
+
                 const URLObj = window.URL || window.webkitURL
                 const imgSrc = URLObj.createObjectURL(imageFile)
                 console.log(imageFile, imgSrc)
@@ -135,9 +138,17 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 reader.onload = async (event) => {
                     const base64Text = event
                     if (!base64Text.target) return
-                    const result = await uploadToImgur(base64Text.target.result as string)
-                    if (!result) return
-                    setDraft(draft + `![image](${result})`)
+                    try {
+                        const result = await uploadToImgur(base64Text.target.result as string)
+                        setDraft(draft.replace(uploadingText, ''))
+                        if (!result) {
+                            setDraft(draft + `![upload failed]()`)
+                            return
+                        }
+                        setDraft(draft + `![image](${result})`)
+                    } catch (e) {
+                        setDraft(draft + `![upload failed]()`)
+                    }
                 }
                 reader.readAsDataURL(imageFile)
             }

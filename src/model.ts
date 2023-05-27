@@ -117,7 +117,6 @@ export interface Stream<T> {
 
 export interface ImgurSettings {
     clientId: string
-    clientSecret: string
 }
 
 interface ConcurrentTypeBackground extends TypeBackground {
