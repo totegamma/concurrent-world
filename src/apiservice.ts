@@ -1,8 +1,8 @@
 import type { Stream, MessagePostRequest, SignedObject, Character, Host, StreamElement, Message, Entity } from './model'
-
+import { v4 as uuidv4 } from 'uuid'
 // @ts-expect-error vite dynamic import
 import { branch, sha } from '~build/info'
-import { Sign } from './util'
+import { Sign, SignJWT } from './util'
 import { Schemas } from './schemas'
 import { type Userstreams } from './schemas/userstreams'
 const branchName = branch || window.location.host.split('.')[0]
@@ -434,5 +434,15 @@ export default class ConcurrentApiClient {
         }).then((data) => {
             console.log(data)
         })
+    }
+
+    constructJWT(claim: Record<string, string>): string {
+        const payload = JSON.stringify({
+            jti: uuidv4(),
+            iss: this.userAddress,
+            iat: new Date().getTime(),
+            ...claim
+        })
+        return SignJWT(payload, this.privatekey)
     }
 }

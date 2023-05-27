@@ -53,6 +53,7 @@ function App(): JSX.Element {
     useEffect(() => {
         const api = new ConcurrentApiClient(address, prvkey, host)
         initializeApi(api)
+        console.log(api.constructJWT({}))
     }, [host, address, prvkey])
 
     const [themeName, setThemeName] = usePersistent<string>('Theme', Object.keys(Themes)[0])
