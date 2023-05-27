@@ -1,10 +1,4 @@
-import type {
-    Color,
-    CommonColors,
-    PaletteMode,
-    Theme,
-    TypeBackground
-} from '@mui/material'
+import type { Color, CommonColors, PaletteMode, Theme, TypeBackground } from '@mui/material'
 import type {
     Palette,
     PaletteAugmentColorOptions,
@@ -16,6 +10,13 @@ import type {
 } from '@mui/material/styles/createPalette'
 
 import type { Profile } from './schemas/profile'
+
+export interface ServerEvent {
+    stream: string
+    type: string
+    action: string
+    body: StreamElement
+}
 
 export interface StreamElement {
     timestamp: string
@@ -81,16 +82,6 @@ export interface Character<T> {
     payload: SignedObject<T>
     signature: string
     cdate: string
-}
-
-export interface ServerEvent {
-    type: string
-    action: string
-    body: StreamedMessage<any> | Association<any>
-}
-
-export interface StreamedMessage<T> extends Message<T> {
-    host: string
 }
 
 export interface Emoji {
