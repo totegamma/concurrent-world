@@ -28,8 +28,7 @@ export const ApplicationContext = createContext<appData>({
     emojiDict: {},
     websocketState: -1,
     imgurSettings: {
-        clientId: '',
-        clientSecret: ''
+        clientId: ''
     },
     setImgurSettings: (_: ImgurSettings) => {}
 })
@@ -58,8 +57,7 @@ function App(): JSX.Element {
     const [themeName, setThemeName] = usePersistent<string>('Theme', Object.keys(Themes)[0])
 
     const [imgurSettings, setImgurSettings] = usePersistent<ImgurSettings>('imgurSettings', {
-        clientId: '',
-        clientSecret: ''
+        clientId: ''
     })
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
     const messages = useObjectList<StreamElementDated>()
