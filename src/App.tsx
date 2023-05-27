@@ -67,7 +67,10 @@ function App(): JSX.Element {
 
     const { lastMessage, readyState, sendJsonMessage } = useWebSocket(`wss://${host.fqdn}/api/v1/socket`, {
         shouldReconnect: (_) => true,
-        reconnectInterval: (attempt) => Math.min(Math.pow(2, attempt) * 1000, 10000)
+        reconnectInterval: (attempt) => Math.min(Math.pow(2, attempt) * 1000, 10000),
+        onOpen: (_) => {
+            sendJsonMessage({ channels: currentStreams })
+        }
     })
 
     const [playNotification] = useSound(Sound)
