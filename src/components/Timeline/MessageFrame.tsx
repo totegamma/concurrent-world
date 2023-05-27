@@ -294,7 +294,7 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                                         color: theme.palette.text.secondary
                                     }}
                                     onClick={() => {
-                                        inspector.inspectItem(message)
+                                        inspector.inspectItem(props.message)
                                     }}
                                 >
                                     <MoreHorizIcon />
