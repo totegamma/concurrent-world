@@ -9,17 +9,7 @@ import { useObjectList } from './hooks/useObjectList'
 import { Schemas } from './schemas'
 import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu'
-import type {
-    StreamElementDated,
-    ServerEvent,
-    Association,
-    Emoji,
-    ConcurrentTheme,
-    ImgurSettings,
-    Character,
-    Host,
-    StreamedMessage
-} from './model'
+import type { StreamElementDated, ServerEvent, Emoji, ConcurrentTheme, ImgurSettings, Character, Host } from './model'
 import { Associations, Explorer, Notifications, Identity, Settings, TimelinePage } from './pages'
 
 import Sound from './resources/Bubble.wav'
@@ -77,7 +67,7 @@ function App(): JSX.Element {
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
 
-    const { lastMessage, readyState } = useWebSocket(`wss://${host.fqdn}/api/v1/socket`, {
+    const { lastMessage, readyState, sendJsonMessage } = useWebSocket(`wss://${host.fqdn}/api/v1/socket`, {
         shouldReconnect: (_) => true,
         reconnectInterval: (attempt) => Math.min(Math.pow(2, attempt) * 1000, 10000)
     })
@@ -120,27 +110,23 @@ function App(): JSX.Element {
     }, [address, api])
 
     useEffect(() => {
+        sendJsonMessage({ channels: currentStreams })
+    }, [currentStreams])
+
+    useEffect(() => {
         if (!lastMessage) return
         const event: ServerEvent = JSON.parse(lastMessage.data)
         if (!event) return
         switch (event.type) {
             case 'message': {
-                const message = event.body as StreamedMessage<any>
                 switch (event.action) {
                     case 'create': {
-                        // TODO: cache message
-                        if (messages.current.find((e) => e.id === message.id) != null) {
+                        if (messages.current.find((e) => e.id === event.body.id) != null) {
                             return
                         }
-                        const groupA = currentStreams
-                        const groupB = message.streams
-                        if (!groupA.some((e) => groupB.includes(e))) return
                         const current = new Date().getTime()
                         messages.pushFront({
-                            timestamp: new Date(message.cdate).getTime().toString().replace('.', '-'),
-                            id: message.id,
-                            author: message.author,
-                            currenthost: message.host,
+                            ...event.body,
                             LastUpdated: current
                         })
                         playNotificationRef.current()
@@ -153,12 +139,10 @@ function App(): JSX.Element {
                 break
             }
             case 'association': {
-                const association = event.body as Association<any>
-                console.log(event)
                 switch (event.action) {
                     case 'create': {
-                        api?.invalidateMessage(association.targetID)
-                        const target = messages.current.find((e) => e.id === association.targetID)
+                        api?.invalidateMessage(event.body.id)
+                        const target = messages.current.find((e) => e.id === event.body.id)
                         if (target) {
                             target.LastUpdated = new Date().getTime()
                             messages.update((e) => [...e])
@@ -166,8 +150,8 @@ function App(): JSX.Element {
                         break
                     }
                     case 'delete': {
-                        api?.invalidateMessage(association.targetID)
-                        const target = messages.current.find((e) => e.id === association.targetID)
+                        api?.invalidateMessage(event.body.id)
+                        const target = messages.current.find((e) => e.id === event.body.id)
                         if (target) {
                             target.LastUpdated = new Date().getTime()
                             messages.update((e) => [...e])
