@@ -1,6 +1,36 @@
 import { ec as Ec } from 'elliptic'
 import { keccak256, computeAddress } from 'ethers'
 
+export const fetchWithTimeout = async (
+    url: RequestInfo,
+    init: RequestInit,
+    timeoutMs = 15 * 1000
+): Promise<Response> => {
+    const controller = new AbortController()
+    const clientTimeout = setTimeout(() => {
+        controller.abort()
+    }, timeoutMs)
+
+    try {
+        const reqConfig: RequestInit = { ...init, signal: controller.signal }
+        const res = await fetch(url, reqConfig)
+        if (!res.ok) {
+            const description = `status code:${res.status}`
+            console.error(description)
+        }
+
+        return res
+    } catch (e: unknown) {
+        if (e instanceof Error && e.name === 'AbortError') {
+            throw new Error()
+        } else {
+            throw new Error()
+        }
+    } finally {
+        clearTimeout(clientTimeout)
+    }
+}
+
 export const Sign = (privatekey: string, payload: string): string => {
     const ellipsis = new Ec('secp256k1')
     const keyPair = ellipsis.keyFromPrivate(privatekey)
@@ -23,7 +53,16 @@ export const SignJWT = (payload: string, privatekey: string): string => {
     const ellipsis = new Ec('secp256k1')
     const keyPair = ellipsis.keyFromPrivate(privatekey)
     const signature = keyPair.sign(bodyHash, 'hex', { canonical: true })
-    return body + '.' + byteToBase64Url([...signature.r.toArray(), ...signature.s.toArray(), signature.recoveryParam!])
+    const base64 = makeUrlSafe(
+        window.btoa(
+            String.fromCharCode.apply(null, [
+                ...signature.r.toArray(),
+                ...signature.s.toArray(),
+                signature.recoveryParam ?? 0
+            ])
+        )
+    )
+    return body + '.' + base64
 }
 
 export const Keygen = (): key => {
@@ -43,7 +82,6 @@ export const Keygen = (): key => {
 export const LoadKey = (privateKey: string): key | null => {
     const ellipsis = new Ec('secp256k1')
     const keyPair = ellipsis.keyFromPrivate(privateKey)
-    console.log(keyPair)
     if (!keyPair.getPrivate()) return null
     const privatekey = keyPair.getPrivate().toString('hex')
     const publickey = keyPair.getPublic().encode('hex', false)
@@ -95,34 +133,4 @@ export const humanReadableTimeDiff = (time: Date): string => {
             `${String(time.getMinutes()).padStart(2, '0')}分`
         )
     }
-}
-
-const byteToBase64Url = (byte: number[]): string => {
-    const key = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'
-    const bytes = new Uint8Array(byte)
-    let newBase64 = ''
-    let currentChar = 0
-    for (let i = 0; i < bytes.length; i++) {
-        // Go over three 8-bit bytes to encode four base64 6-bit chars
-        if (i % 3 === 0) {
-            // First Byte
-            currentChar = bytes[i] >> 2 // First 6-bits for first base64 char
-            newBase64 += key[currentChar] // Add the first base64 char to the string
-            currentChar = (bytes[i] << 4) & 63 // Erase first 6-bits, add first 2 bits for second base64 char
-        }
-        if (i % 3 === 1) {
-            // Second Byte
-            currentChar += bytes[i] >> 4 // Concat first 4-bits from second byte for second base64 char
-            newBase64 += key[currentChar] // Add the second base64 char to the string
-            currentChar = (bytes[i] << 2) & 63 // Add two zeros, add 4-bits from second half of second byte
-        }
-        if (i % 3 === 2) {
-            // Third Byte
-            currentChar += bytes[i] >> 6 // Concat first 2-bits of third byte for the third base64 char
-            newBase64 += key[currentChar] // Add the third base64 char to the string
-            currentChar = bytes[i] & 63 // Add last 6-bits from third byte for the fourth base64 char
-            newBase64 += key[currentChar] // Add the fourth base64 char to the string
-        }
-    }
-    return newBase64
 }
