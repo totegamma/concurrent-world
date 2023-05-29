@@ -126,10 +126,14 @@ function App(): JSX.Element {
                             return
                         }
                         const current = new Date().getTime()
-                        messages.pushFront({
-                            ...event.body,
-                            LastUpdated: current
-                        })
+                        messages.pushFront(
+                            {
+                                ...event.body,
+                                LastUpdated: current
+                            },
+                            (lhs: StreamElementDated[], rhs: StreamElementDated) =>
+                                lhs.find((e: StreamElementDated) => e.id === rhs.id) == null
+                        )
                         playNotificationRef.current()
                         break
                     }
