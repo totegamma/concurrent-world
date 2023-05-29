@@ -1,6 +1,36 @@
 import { ec as Ec } from 'elliptic'
 import { keccak256, computeAddress } from 'ethers'
 
+export const fetchWithTimeout = async (
+    url: RequestInfo,
+    init: RequestInit,
+    timeoutMs = 15 * 1000
+): Promise<Response> => {
+    const controller = new AbortController()
+    const clientTimeout = setTimeout(() => {
+        controller.abort()
+    }, timeoutMs)
+
+    try {
+        const reqConfig: RequestInit = { ...init, signal: controller.signal }
+        const res = await fetch(url, reqConfig)
+        if (!res.ok) {
+            const description = `status code:${res.status}`
+            console.error(description)
+        }
+
+        return res
+    } catch (e: unknown) {
+        if (e instanceof Error && e.name === 'AbortError') {
+            throw new Error()
+        } else {
+            throw new Error()
+        }
+    } finally {
+        clearTimeout(clientTimeout)
+    }
+}
+
 export const Sign = (privatekey: string, payload: string): string => {
     const ellipsis = new Ec('secp256k1')
     const keyPair = ellipsis.keyFromPrivate(privatekey)
@@ -10,6 +40,29 @@ export const Sign = (privatekey: string, payload: string): string => {
     const s = toHexString(signature.s.toArray())
     const v = signature.recoveryParam === 0 ? '00' : '01'
     return r + s + v
+}
+
+const makeUrlSafe = (input: string): string => {
+    return input.replaceAll('=', '').replaceAll('+', '-').replaceAll('/', '_')
+}
+
+export const SignJWT = (payload: string, privatekey: string): string => {
+    const header = JSON.stringify({ alg: 'ECRECOVER', typ: 'JWT' })
+    const body = makeUrlSafe(window.btoa(header) + '.' + window.btoa(payload))
+    const bodyHash = keccak256(new TextEncoder().encode(body)).slice(2)
+    const ellipsis = new Ec('secp256k1')
+    const keyPair = ellipsis.keyFromPrivate(privatekey)
+    const signature = keyPair.sign(bodyHash, 'hex', { canonical: true })
+    const base64 = makeUrlSafe(
+        window.btoa(
+            String.fromCharCode.apply(null, [
+                ...signature.r.toArray(),
+                ...signature.s.toArray(),
+                signature.recoveryParam ?? 0
+            ])
+        )
+    )
+    return body + '.' + base64
 }
 
 export const Keygen = (): key => {
@@ -29,7 +82,6 @@ export const Keygen = (): key => {
 export const LoadKey = (privateKey: string): key | null => {
     const ellipsis = new Ec('secp256k1')
     const keyPair = ellipsis.keyFromPrivate(privateKey)
-    console.log(keyPair)
     if (!keyPair.getPrivate()) return null
     const privatekey = keyPair.getPrivate().toString('hex')
     const publickey = keyPair.getPublic().encode('hex', false)

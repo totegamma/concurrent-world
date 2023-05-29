@@ -1,8 +1,8 @@
 import type { Stream, MessagePostRequest, SignedObject, Character, Host, StreamElement, Message, Entity } from './model'
-
+import { v4 as uuidv4 } from 'uuid'
 // @ts-expect-error vite dynamic import
 import { branch, sha } from '~build/info'
-import { Sign } from './util'
+import { Sign, SignJWT, fetchWithTimeout } from './util'
 import { Schemas } from './schemas'
 import { type Userstreams } from './schemas/userstreams'
 const branchName = branch || window.location.host.split('.')[0]
@@ -13,6 +13,7 @@ export default class ConcurrentApiClient {
     host: Host | undefined
     userAddress: string
     privatekey: string
+    token?: string
 
     entityCache: Record<string, Entity> = {}
     messageCache: Record<string, Message<any>> = {}
@@ -24,6 +25,57 @@ export default class ConcurrentApiClient {
         this.userAddress = userAddress
         this.privatekey = privatekey
         console.log('oOoOoOoOoO API SERVICE CREATED OoOoOoOoOo')
+    }
+
+    async getJWT(): Promise<string> {
+        console.log('request token!')
+        if (!this.host) throw new Error()
+        const requestJwt = this.constructJWT({})
+        const requestOptions = {
+            method: 'GET',
+            headers: { authentication: requestJwt }
+        }
+        return await fetchWithTimeout(`https://${this.host.fqdn}${apiPath}/auth/claim`, requestOptions)
+            .then(async (res) => await res.json())
+            .then((data) => {
+                this.token = data.jwt
+                return data.jwt
+            })
+    }
+
+    checkJwtIsValid(jwt: string): boolean {
+        const split = jwt.split('.')
+        if (split.length !== 3) return false
+        const encoded = split[1]
+        const payload = window.atob(
+            encoded.replace('-', '+').replace('_', '/') + '=='.slice((2 - encoded.length * 3) & 3)
+        )
+        try {
+            const claims = JSON.parse(payload)
+            const nbf = parseInt(claims.nbf)
+            const exp = parseInt(claims.exp)
+            const now = Math.floor(new Date().getTime() / 1000)
+
+            return nbf < now && now < exp
+        } catch (e) {
+            console.log(e)
+        }
+        return false
+    }
+
+    fetchWithCredential = async (url: RequestInfo, init: RequestInit, timeoutMs?: number): Promise<Response> => {
+        let jwt = this.token
+        if (!jwt || !this.checkJwtIsValid(jwt)) {
+            jwt = await this.getJWT()
+        }
+        const requestInit = {
+            ...init,
+            headers: {
+                ...init.headers,
+                authentication: 'Bearer ' + jwt
+            }
+        }
+        return await fetchWithTimeout(url, requestInit, timeoutMs)
     }
 
     // Message
@@ -55,7 +107,7 @@ export default class ConcurrentApiClient {
             body: JSON.stringify(request)
         }
 
-        return await fetch(`https://${this.host.fqdn}${apiPath}/messages`, requestOptions)
+        return await this.fetchWithCredential(`https://${this.host.fqdn}${apiPath}/messages`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 return data
@@ -123,7 +175,7 @@ export default class ConcurrentApiClient {
             })
         }
 
-        return await fetch(`https://${targetHost}${apiPath}/associations`, requestOptions)
+        return await this.fetchWithCredential(`https://${targetHost}${apiPath}/associations`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 return data
@@ -141,7 +193,7 @@ export default class ConcurrentApiClient {
             })
         }
 
-        return await fetch(`https://${targetHost}${apiPath}/associations`, requestOptions)
+        return await this.fetchWithCredential(`https://${targetHost}${apiPath}/associations`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 return data
@@ -177,7 +229,7 @@ export default class ConcurrentApiClient {
             body: JSON.stringify(request)
         }
 
-        return await fetch(`https://${this.host.fqdn}${apiPath}/characters`, requestOptions)
+        return await this.fetchWithCredential(`https://${this.host.fqdn}${apiPath}/characters`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 return data
@@ -192,7 +244,6 @@ export default class ConcurrentApiClient {
         let characterHost = host
         if (characterHost === '') {
             const entity = await this.readEntity(author)
-            console.log('resolved entity:', entity)
             characterHost = entity?.host ?? this.host.fqdn
             if (!characterHost || characterHost === '') characterHost = this.host.fqdn
         }
@@ -242,7 +293,7 @@ export default class ConcurrentApiClient {
             })
         }
 
-        return await fetch(`https://${this.host.fqdn}${apiPath}/stream`, requestOptions)
+        return await this.fetchWithCredential(`https://${this.host.fqdn}${apiPath}/stream`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 return data
@@ -292,7 +343,6 @@ export default class ConcurrentApiClient {
             const host = stream.split('@')[1] ?? this.host.fqdn
             plan[host] = [...(plan[host] ? plan[host] : []), id]
         }
-        console.log(plan)
 
         const requestOptions = {
             method: 'GET',
@@ -322,7 +372,6 @@ export default class ConcurrentApiClient {
             const host = stream.split('@')[1] ?? this.host.fqdn
             plan[host] = [...(plan[host] ? plan[host] : []), id]
         }
-        console.log(plan)
 
         const requestOptions = {
             method: 'GET',
@@ -434,5 +483,18 @@ export default class ConcurrentApiClient {
         }).then((data) => {
             console.log(data)
         })
+    }
+
+    constructJWT(claim: Record<string, string>): string {
+        const payload = JSON.stringify({
+            jti: uuidv4(),
+            iss: this.userAddress,
+            iat: Math.floor(new Date().getTime() / 1000).toString(),
+            aud: this.host?.fqdn,
+            nbf: Math.floor(new Date().getTime() / 1000).toString(),
+            exp: Math.floor((new Date().getTime() + 5 * 60 * 1000) / 1000).toString(),
+            ...claim
+        })
+        return SignJWT(payload, this.privatekey)
     }
 }
