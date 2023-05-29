@@ -48,6 +48,13 @@ export const Default = (arg: Props): JSX.Element => {
                     <Button>Default</Button>
                     <Button variant="contained">contained</Button>
                     <Button variant="outlined">outlined</Button>
+                    <Button disabled={true}>outlined</Button>
+                    <Button disabled={true} variant="contained">
+                        contained
+                    </Button>
+                    <Button disabled={true} variant="outlined">
+                        outlined
+                    </Button>
                 </Box>
             </CssBaseline>
         </ThemeProvider>
