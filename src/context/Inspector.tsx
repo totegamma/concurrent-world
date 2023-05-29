@@ -1,4 +1,15 @@
-import { Box, Drawer, Paper, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material'
+import {
+    Box,
+    Drawer,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableRow,
+    Typography,
+    useMediaQuery,
+    useTheme
+} from '@mui/material'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
 import type { Character, Message, StreamElement } from '../model'
@@ -21,6 +32,8 @@ interface InspectorProps {
 
 export const InspectorProvider = (props: InspectorProps): JSX.Element => {
     const api = useApi()
+    const theme = useTheme()
+    const greaterThanMid = useMediaQuery(theme.breakpoints.up('md'))
     const [inspectingItem, inspectItem] = useState<StreamElement | null>(null)
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [message, setMessage] = useState<Message<any> | undefined>()
@@ -46,18 +59,28 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
             }, [])}
         >
             {props.children}
+
             <Drawer
-                anchor={'right'}
+                anchor={greaterThanMid ? 'right' : 'bottom'}
                 open={inspectingItem != null}
                 onClose={() => {
                     inspectItem(null)
                 }}
                 PaperProps={{
                     sx: {
-                        width: '40vw',
-                        borderRadius: '20px 0 0 20px',
-                        overflowY: 'auto',
-                        padding: '20px'
+                        width: {
+                            md: '40vw'
+                        },
+                        height: {
+                            xs: '80vh',
+                            md: '100%'
+                        },
+                        borderRadius: {
+                            xs: '20px 20px 0 0',
+                            md: '20px 0 0 20px'
+                        },
+                        overflowY: 'hidden',
+                        padding: '20px 0 10px 20px'
                     }
                 }}
             >
@@ -66,7 +89,10 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                         sx={{
                             margin: 0,
                             wordBreak: 'break-all',
-                            whiteSpace: 'pre-wrap'
+                            whiteSpace: 'pre-wrap',
+                            height: '100%',
+                            overflowY: 'auto',
+                            paddingRight: '10px'
                         }}
                     >
                         <Typography variant="h1">Inspect</Typography>
