@@ -5,6 +5,7 @@ import { MessageFrame } from './MessageFrame'
 import type { IuseObjectList } from '../../hooks/useObjectList'
 import type { StreamElement, StreamElementDated } from '../../model'
 import { useApi } from '../../context/api'
+import { InspectorProvider } from '../../context/Inspector'
 
 export interface TimelineProps {
     streams: string[]
@@ -55,25 +56,27 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     }, [api, props.streams, props.timeline])
 
     return (
-        <List sx={{ flex: 1, width: '100%' }}>
-            <Divider />
-            <InfiniteScroll
-                loadMore={() => {
-                    loadMore()
-                }}
-                hasMore={hasMoreData}
-                loader={<React.Fragment key={0}>Loading...</React.Fragment>}
-                useWindow={false}
-                getScrollParent={() => props.scrollParentRef.current}
-            >
-                {props.timeline.current.map((e) => (
-                    <React.Fragment key={e.id}>
-                        <MessageFrame message={e} lastUpdated={e.LastUpdated} />
-                        <Divider variant="inset" component="li" sx={{ margin: '0 5px' }} />
-                    </React.Fragment>
-                ))}
-            </InfiniteScroll>
-        </List>
+        <InspectorProvider>
+            <List sx={{ flex: 1, width: '100%' }}>
+                <Divider />
+                <InfiniteScroll
+                    loadMore={() => {
+                        loadMore()
+                    }}
+                    hasMore={hasMoreData}
+                    loader={<React.Fragment key={0}>Loading...</React.Fragment>}
+                    useWindow={false}
+                    getScrollParent={() => props.scrollParentRef.current}
+                >
+                    {props.timeline.current.map((e) => (
+                        <React.Fragment key={e.id}>
+                            <MessageFrame message={e} lastUpdated={e.LastUpdated} />
+                            <Divider variant="inset" component="li" sx={{ margin: '0 5px' }} />
+                        </React.Fragment>
+                    ))}
+                </InfiniteScroll>
+            </List>
+        </InspectorProvider>
     )
 })
 
