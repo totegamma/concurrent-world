@@ -1,4 +1,15 @@
-import { Box, Divider, List, ListItem, ListItemButton, ListItemText, Typography, useTheme } from '@mui/material'
+import {
+    Box,
+    Button,
+    ButtonBase,
+    Divider,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemText,
+    Typography,
+    useTheme
+} from '@mui/material'
 import { Link } from 'react-router-dom'
 
 import HomeIcon from '@mui/icons-material/Home'
@@ -17,6 +28,7 @@ import buildTime from '~build/time'
 // @ts-expect-error vite dynamic import
 import { branch, sha } from '~build/info'
 import { StreamList } from './StreamList'
+import { CCAvatar } from './CCAvatar'
 
 const branchName = branch || window.location.host.split('.')[0]
 
@@ -31,6 +43,10 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
     const theme = useTheme<ConcurrentTheme>()
 
     const iconColor = appData.websocketState === 1 ? theme.palette.background.contrastText : theme.palette.text.disabled
+
+    if (!appData) {
+        return <>loading...</>
+    }
 
     return (
         <Box sx={{ gap: '15px', height: '100%' }}>
@@ -166,6 +182,33 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                     </>
                 )}
                 <StreamList onClick={props.onClick} />
+                <ButtonBase
+                    component={Link}
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'left',
+                        m: 0,
+                        p: '15px'
+                    }}
+                    to={'/entity/' + (appData.profile?.author ?? '')}
+                >
+                    <CCAvatar
+                        alt={appData.profile?.payload.body.username}
+                        avatarURL={appData.profile?.payload.body.avatar}
+                        identiconSource={appData.profile?.author ?? ''}
+                        sx={{
+                            width: '40px',
+                            height: '40px'
+                        }}
+                    />
+                    <Typography
+                        sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}
+                        color={theme.palette.background.contrastText}
+                    >
+                        {appData.profile?.payload.body.username}
+                    </Typography>
+                </ButtonBase>
             </Box>
         </Box>
     )
