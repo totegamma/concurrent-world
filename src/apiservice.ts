@@ -124,6 +124,9 @@ export default class ConcurrentApiClient {
             method: 'GET',
             headers: {}
         })
+        if (!res.ok) {
+            return await Promise.reject(new Error('fetch failed'))
+        }
         const data = await res.json()
         if (!data.payload) {
             return undefined

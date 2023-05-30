@@ -128,10 +128,8 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
 
     if (!fetchSuccess) {
         return (
-            <ListItem sx={{ display: 'flex', justifyContent: 'center' }}>
-                <Typography variant="caption" color="text.disabled">
-                    404 not found
-                </Typography>
+            <ListItem sx={{display: 'flex', justifyContent: 'center'}}>
+                <Typography>404 not found</Typography>
             </ListItem>
         )
     }
@@ -376,21 +374,19 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                     </ListItemIcon>
                     <ListItemText>詳細</ListItemText>
                 </MenuItem>
-                {props.message.author === api.userAddress && (
-                    <MenuItem
-                        onClick={() => {
-                            api.deleteMessage(props.message.id)
-                            api.invalidateMessage(props.message.id)
-                            setMessage(undefined)
-                            setMessageAnchor(null)
-                        }}
-                    >
-                        <ListItemIcon>
-                            <DeleteForeverIcon />
-                        </ListItemIcon>
-                        <ListItemText>メッセージを削除</ListItemText>
-                    </MenuItem>
-                )}
+                <MenuItem
+                    onClick={() => {
+                        api.deleteMessage(props.message.id)
+                        api.invalidateMessage(props.message.id)
+                        setMessage(undefined)
+                        setMessageAnchor(null)
+                    }}
+                >
+                    <ListItemIcon>
+                        <DeleteForeverIcon />
+                    </ListItemIcon>
+                    <ListItemText>メッセージを削除</ListItemText>
+                </MenuItem>
             </Menu>
         </ListItem>
     )
