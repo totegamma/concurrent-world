@@ -1,4 +1,4 @@
-import { Box, Divider, Paper, Typography } from '@mui/material'
+import { Box, Button, Divider, Paper, Typography } from '@mui/material'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useApi } from '../context/api'
@@ -9,15 +9,18 @@ import { Schemas } from '../schemas'
 import { CCAvatar } from '../components/CCAvatar'
 import { Timeline } from '../components/Timeline'
 import { useObjectList } from '../hooks/useObjectList'
+import { useFollow } from '../context/FollowContext'
 
 export function EntityPage(): JSX.Element {
     const api = useApi()
+    const followService = useFollow()
     const { id } = useParams()
     const [entity, setEntity] = useState<Entity>()
     const [profile, setProfile] = useState<Character<Profile>>()
     const [streams, setStreams] = useState<Character<Userstreams>>()
     const messages = useObjectList<StreamElementDated>()
     const scrollParentRef = useRef<HTMLDivElement>(null)
+    const following = id && followService.followingUsers.includes(id)
 
     useEffect(() => {
         if (!id) return
@@ -87,12 +90,40 @@ export function EntityPage(): JSX.Element {
                     />
                     <Box
                         sx={{
-                            p: '40px 10px',
+                            p: '10px',
                             display: 'flex',
                             alignItems: 'center',
                             flexFlow: 'column'
                         }}
                     >
+                        <Box
+                            sx={{
+                                height: '32px',
+                                width: '100%',
+                                display: 'flex',
+                                flexFlow: 'row-reverse'
+                            }}
+                        >
+                            {following ? (
+                                <Button
+                                    variant={'outlined'}
+                                    onClick={() => {
+                                        followService.unfollowUser(id)
+                                    }}
+                                >
+                                    Following
+                                </Button>
+                            ) : (
+                                <Button
+                                    variant={'contained'}
+                                    onClick={() => {
+                                        id && followService.followUser(id)
+                                    }}
+                                >
+                                    Follow
+                                </Button>
+                            )}
+                        </Box>
                         <Typography>アドレス: {entity.ccaddr}</Typography>
                         <Typography>現住所: {entity.host !== '' ? entity.host : api.host?.fqdn}</Typography>
                         <Typography>Home: {streams.payload.body.homeStream}</Typography>
