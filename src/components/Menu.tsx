@@ -29,6 +29,7 @@ import buildTime from '~build/time'
 import { branch, sha } from '~build/info'
 import { StreamList } from './StreamList'
 import { CCAvatar } from './CCAvatar'
+import { useApi } from '../context/api'
 
 const branchName = branch || window.location.host.split('.')[0]
 
@@ -38,6 +39,7 @@ export interface MenuProps {
 }
 
 export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
+    const api = useApi()
     const appData = useContext(ApplicationContext)
 
     const theme = useTheme<ConcurrentTheme>()
@@ -188,6 +190,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'left',
+                        gap: '15px',
                         m: 0,
                         p: '15px'
                     }}
@@ -196,18 +199,20 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                     <CCAvatar
                         alt={appData.profile?.payload.body.username}
                         avatarURL={appData.profile?.payload.body.avatar}
-                        identiconSource={appData.profile?.author ?? ''}
+                        identiconSource={api.userAddress}
                         sx={{
                             width: '40px',
                             height: '40px'
                         }}
                     />
-                    <Typography
-                        sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}
-                        color={theme.palette.background.contrastText}
-                    >
-                        {appData.profile?.payload.body.username}
-                    </Typography>
+                    <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', flexFlow: 'column' }}>
+                        <Typography color={theme.palette.background.contrastText}>
+                            {appData.profile?.payload.body.username}
+                        </Typography>
+                        <Typography variant="caption" color={theme.palette.background.contrastText}>
+                            {api.host?.fqdn}
+                        </Typography>
+                    </Box>
                 </ButtonBase>
             </Box>
         </Box>
