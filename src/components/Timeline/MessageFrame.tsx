@@ -387,7 +387,7 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                         onClick={() => {
                             api.deleteMessage(props.message.id)
                             api.invalidateMessage(props.message.id)
-                            setMessage(undefined)
+                            setFetchSucceed(false)
                             setMessageAnchor(null)
                         }}
                     >
