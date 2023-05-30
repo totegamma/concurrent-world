@@ -21,7 +21,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 
-import type { Character, Message as CCMessage, ProfileWithAddress, StreamElement } from '../../model'
+import type { Character, Message as CCMessage, ProfileWithAddress, StreamElement, Stream } from '../../model'
 import type { Profile } from '../../schemas/profile'
 import { Schemas } from '../../schemas'
 import { CCAvatar } from '../CCAvatar'
@@ -42,7 +42,7 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
     const inspector = useInspector()
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [message, setMessage] = useState<CCMessage<any> | undefined>()
-    const [msgstreams, setStreams] = useState<string[]>([])
+    const [msgstreams, setStreams] = useState<Array<Stream<any>>>([])
     const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
     const [messageAnchor, setMessageAnchor] = useState<null | HTMLElement>(null)
 
@@ -57,10 +57,8 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
             .then((msg) => {
                 if (!msg) return
                 setMessage(msg)
-                Promise.all(
-                    msg.streams.map(async (id) => await api.readStream(id).then((e) => e?.payload.body.name))
-                ).then((e) => {
-                    setStreams(e.filter((x) => x))
+                Promise.all(msg.streams.map(async (id) => await api.readStream(id))).then((e) => {
+                    setStreams(e.filter((x) => x?.payload.body.name) as Array<Stream<any>>)
                 })
             })
             .catch((error) => {
@@ -329,18 +327,26 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                                     <MoreHorizIcon />
                                 </IconButton>
                             </Box>
-                            <Box>
+                            <Box sx={{ display: 'flex', gap: '3px' }}>
                                 {/* right */}
-                                <Typography
-                                    component="span"
-                                    sx={{
-                                        fontweight: '400',
-                                        fontSize: '13px',
-                                        color: 'text.secondary'
-                                    }}
-                                >
-                                    {msgstreams.map((e) => `%${e.length < 12 ? e : e.slice(0, 9) + '...'}`).join(' ')}
-                                </Typography>
+                                {msgstreams.map((e) => (
+                                    <Link
+                                        key={e.id}
+                                        underline="hover"
+                                        sx={{
+                                            fontweight: '400',
+                                            fontSize: '13px',
+                                            color: 'text.secondary'
+                                        }}
+                                        href={'/#' + e.id}
+                                    >
+                                        {`%${
+                                            e.payload.body.name.length < 12
+                                                ? (e.payload.body.name as string)
+                                                : (e.payload.body.name.slice(0, 9) as string) + '...'
+                                        }`}
+                                    </Link>
+                                ))}
                             </Box>
                         </Box>
                     </Box>
