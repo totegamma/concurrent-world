@@ -8,7 +8,6 @@ import { TimelineHeader } from '../components/TimelineHeader'
 import { useApi } from '../context/api'
 import { useFollow } from '../context/FollowContext'
 import { Timeline } from '../components/Timeline/main'
-import { InspectorProvider } from '../context/Inspector'
 
 export interface TimelinePageProps {
     messages: IuseObjectList<StreamElementDated>
@@ -42,7 +41,7 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
     }, [reactlocation.hash])
 
     return (
-        <InspectorProvider>
+        <>
             <TimelineHeader
                 location={reactlocation}
                 setMobileMenuOpen={props.setMobileMenuOpen}
@@ -76,7 +75,7 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                     </Box>
                 )}
             </Box>
-        </InspectorProvider>
+        </>
     )
 })
 TimelinePage.displayName = 'TimelinePage'

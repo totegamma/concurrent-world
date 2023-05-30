@@ -1,8 +1,25 @@
 import { useState, useEffect, useCallback, memo } from 'react'
-import { ListItem, Box, Typography, Link, IconButton, useTheme, Tooltip, Skeleton } from '@mui/material'
+import {
+    ListItem,
+    Box,
+    Typography,
+    Link,
+    IconButton,
+    useTheme,
+    Tooltip,
+    Skeleton,
+    Menu,
+    MenuItem,
+    ListItemText,
+    ListItemIcon
+} from '@mui/material'
+import { Link as routerLink } from 'react-router-dom'
 import StarIcon from '@mui/icons-material/Star'
 import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import ContentPasteIcon from '@mui/icons-material/ContentPaste'
+import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 
 import type { Character, Message as CCMessage, ProfileWithAddress, StreamElement } from '../../model'
 import type { Profile } from '../../schemas/profile'
@@ -11,9 +28,9 @@ import { CCAvatar } from '../CCAvatar'
 import { TimeDiff } from '../TimeDiff'
 import type { Like } from '../../schemas/like'
 import { useApi } from '../../context/api'
-import { useFollow } from '../../context/FollowContext'
 import { Multiplexer } from './Multiplexer'
 import { useInspector } from '../../context/Inspector'
+import type { SimpleNote } from '../../schemas/simpleNote'
 
 export interface MessageFrameProp {
     message: StreamElement
@@ -23,15 +40,17 @@ export interface MessageFrameProp {
 export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JSX.Element => {
     const api = useApi()
     const inspector = useInspector()
-    const followService = useFollow()
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [message, setMessage] = useState<CCMessage<any> | undefined>()
     const [msgstreams, setStreams] = useState<string[]>([])
     const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
+    const [messageAnchor, setMessageAnchor] = useState<null | HTMLElement>(null)
 
     const theme = useTheme()
 
     const [hasOwnReaction, setHasOwnReaction] = useState<boolean>(false)
+
+    const [fetchSuccess, setFetchSucceed] = useState<boolean>(true)
 
     useEffect(() => {
         api.fetchMessage(props.message.id, props.message.currenthost)
@@ -45,7 +64,8 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                 })
             })
             .catch((error) => {
-                console.error(error)
+                console.log(error)
+                setFetchSucceed(false)
             })
 
         api.readCharacter(props.message.author, Schemas.profile, props.message.currenthost)
@@ -106,6 +126,16 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
         })
     }, [])
 
+    if (!fetchSuccess) {
+        return (
+            <ListItem sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Typography variant="caption" color="text.disabled">
+                    404 not found
+                </Typography>
+            </ListItem>
+        )
+    }
+
     if (!message?.payload?.body) {
         return (
             <ListItem
@@ -150,9 +180,8 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                                 width: { xs: '38px', sm: '48px' },
                                 height: { xs: '38px', sm: '48px' }
                             }}
-                            onClick={() => {
-                                followService.followUser(props.message.author)
-                            }}
+                            component={routerLink}
+                            to={'/entity/' + message.author}
                         >
                             <CCAvatar
                                 alt={author?.payload.body.username}
@@ -226,7 +255,7 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                                 justifyContent: 'space-between'
                             }}
                         >
-                            <Box sx={{ display: 'flex' }}>
+                            <Box sx={{ display: 'flex', gap: '20px' }}>
                                 {/* left */}
                                 <Tooltip
                                     title={
@@ -293,8 +322,8 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                                         p: '0',
                                         color: theme.palette.text.secondary
                                     }}
-                                    onClick={() => {
-                                        inspector.inspectItem(props.message)
+                                    onClick={(e) => {
+                                        setMessageAnchor(e.currentTarget)
                                     }}
                                 >
                                     <MoreHorizIcon />
@@ -317,6 +346,52 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                     </Box>
                 </>
             )}
+            <Menu
+                anchorEl={messageAnchor}
+                open={Boolean(messageAnchor)}
+                onClose={() => {
+                    setMessageAnchor(null)
+                }}
+            >
+                <MenuItem
+                    onClick={() => {
+                        const target: CCMessage<SimpleNote> = message
+                        navigator.clipboard.writeText(target.payload.body.body)
+                        setMessageAnchor(null)
+                    }}
+                >
+                    <ListItemIcon>
+                        <ContentPasteIcon />
+                    </ListItemIcon>
+                    <ListItemText>ソースをコピー</ListItemText>
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        inspector.inspectItem(props.message)
+                        setMessageAnchor(null)
+                    }}
+                >
+                    <ListItemIcon>
+                        <ManageSearchIcon />
+                    </ListItemIcon>
+                    <ListItemText>詳細</ListItemText>
+                </MenuItem>
+                {props.message.author === api.userAddress && (
+                    <MenuItem
+                        onClick={() => {
+                            api.deleteMessage(props.message.id)
+                            api.invalidateMessage(props.message.id)
+                            setMessage(undefined)
+                            setMessageAnchor(null)
+                        }}
+                    >
+                        <ListItemIcon>
+                            <DeleteForeverIcon />
+                        </ListItemIcon>
+                        <ListItemText>メッセージを削除</ListItemText>
+                    </MenuItem>
+                )}
+            </Menu>
         </ListItem>
     )
 })
