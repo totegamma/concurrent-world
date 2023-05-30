@@ -3,7 +3,8 @@ import { DndProvider, getBackendOptions, MultiBackend, Tree } from '@minoru/reac
 import CreateNewFolder from '@mui/icons-material/CreateNewFolder'
 
 import styles from './index.module.css'
-import { Box, CssBaseline, IconButton, ThemeProvider, Typography, useTheme } from '@mui/material'
+import { CssBaseline, IconButton, ThemeProvider, Typography, useTheme } from '@mui/material'
+import Box from '@mui/material/Box'
 import type { Stream, ConcurrentTheme } from '../../model'
 import { CustomNode } from './CustomNode'
 import { CustomDragPreview } from './CustomDragPreview'
