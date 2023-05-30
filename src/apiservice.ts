@@ -134,6 +134,24 @@ export default class ConcurrentApiClient {
         return message
     }
 
+    async deleteMessage(target: string, host: string = ''): Promise<any> {
+        if (!this.host) throw new Error()
+        const targetHost = !host ? this.host.fqdn : host
+        const requestOptions = {
+            method: 'DELETE',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({
+                id: target
+            })
+        }
+
+        return await this.fetchWithCredential(`https://${targetHost}${apiPath}/messages`, requestOptions)
+            .then(async (res) => await res.json())
+            .then((data) => {
+                return data
+            })
+    }
+
     invalidateMessage(target: string): void {
         delete this.messageCache[target]
     }

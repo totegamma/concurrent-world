@@ -129,7 +129,7 @@ export function Registration(): JSX.Element {
                 <Button
                     variant="contained"
                     component={Link}
-                    to={'http://' + (host?.fqdn ?? '') + '/register?ccaddr=' + userAddress}
+                    to={'http://' + (host?.fqdn ?? '') + '/register?token=' + (api?.constructJWT({}) ?? '')}
                     target="_blank"
                     disabled={!host}
                 >
