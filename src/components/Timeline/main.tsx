@@ -17,6 +17,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     const [hasMoreData, setHasMoreData] = useState<boolean>(false)
 
     useEffect(() => {
+        console.log('load recent!', props.streams)
         api?.readStreamRecent(props.streams).then((data: StreamElement[]) => {
             const current = new Date().getTime()
             const dated = data.map((e) => {
@@ -29,6 +30,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
 
     const loadMore = useCallback(async () => {
         if (!api.host) return
+        console.log('load more!')
         const last = props.timeline.current
         if (!props.timeline.current[props.timeline.current.length - 1]?.timestamp) {
             return

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, memo } from 'react'
 import { ListItem, Box, Typography, Link, IconButton, useTheme, Tooltip, Skeleton } from '@mui/material'
+import { Link as routerLink } from 'react-router-dom'
 import StarIcon from '@mui/icons-material/Star'
 import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
@@ -11,7 +12,6 @@ import { CCAvatar } from '../CCAvatar'
 import { TimeDiff } from '../TimeDiff'
 import type { Like } from '../../schemas/like'
 import { useApi } from '../../context/api'
-import { useFollow } from '../../context/FollowContext'
 import { Multiplexer } from './Multiplexer'
 import { useInspector } from '../../context/Inspector'
 
@@ -23,7 +23,6 @@ export interface MessageFrameProp {
 export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JSX.Element => {
     const api = useApi()
     const inspector = useInspector()
-    const followService = useFollow()
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [message, setMessage] = useState<CCMessage<any> | undefined>()
     const [msgstreams, setStreams] = useState<string[]>([])
@@ -150,9 +149,8 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                                 width: { xs: '38px', sm: '48px' },
                                 height: { xs: '38px', sm: '48px' }
                             }}
-                            onClick={() => {
-                                followService.followUser(props.message.author)
-                            }}
+                            component={routerLink}
+                            to={'/entity/' + message.author}
                         >
                             <CCAvatar
                                 alt={author?.payload.body.username}

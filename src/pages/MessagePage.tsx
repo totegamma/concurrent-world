@@ -1,6 +1,6 @@
 import { Box, Divider, Typography } from '@mui/material'
 
-export function Notifications(): JSX.Element {
+export function MessagePage(): JSX.Element {
     return (
         <Box
             sx={{
@@ -8,13 +8,13 @@ export function Notifications(): JSX.Element {
                 flexDirection: 'column',
                 gap: '5px',
                 padding: '20px',
-                backgroundColor: 'background.paper',
+                background: 'background.paper',
                 minHeight: '100%',
                 overflow: 'scroll'
             }}
         >
             <Typography variant="h2" gutterBottom>
-                Notifications
+                Message
             </Typography>
             <Divider />
         </Box>

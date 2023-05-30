@@ -10,7 +10,16 @@ import { Schemas } from './schemas'
 import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu'
 import type { StreamElementDated, ServerEvent, Emoji, ConcurrentTheme, ImgurSettings, Character, Host } from './model'
-import { Associations, Explorer, Notifications, Identity, Settings, TimelinePage } from './pages'
+import {
+    Associations,
+    Explorer,
+    Notifications,
+    Identity,
+    Settings,
+    TimelinePage,
+    EntityPage,
+    MessagePage
+} from './pages'
 
 import Sound from './resources/Bubble.wav'
 import useSound from 'use-sound'
@@ -289,6 +298,8 @@ function App(): JSX.Element {
                                                     element={<Settings setThemeName={setThemeName} />}
                                                 />
                                                 <Route path="/streaminfo" element={<StreamInfo />} />
+                                                <Route path="/message/:id" element={<MessagePage />} />
+                                                <Route path="/entity/:id" element={<EntityPage />} />
                                             </Routes>
                                         </Paper>
                                         <Box
