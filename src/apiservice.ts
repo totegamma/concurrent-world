@@ -132,6 +132,7 @@ export default class ConcurrentApiClient {
             return undefined
         }
         const message = data
+        message.rawpayload = message.payload
         message.payload = JSON.parse(message.payload)
         this.messageCache[id] = message
         return message

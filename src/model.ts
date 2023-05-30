@@ -69,6 +69,7 @@ export interface Message<T> {
     cdate: string
     id: string
     payload: SignedObject<T>
+    rawpayload: string
     schema: string
     signature: string
     streams: string[]

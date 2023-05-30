@@ -1,5 +1,5 @@
 import { ec as Ec } from 'elliptic'
-import { keccak256, computeAddress } from 'ethers'
+import { keccak256, computeAddress, recoverAddress, toUtf8Bytes } from 'ethers'
 
 export const fetchWithTimeout = async (
     url: RequestInfo,
@@ -29,6 +29,12 @@ export const fetchWithTimeout = async (
     } finally {
         clearTimeout(clientTimeout)
     }
+}
+
+export const validateSignature = (body: string, signature: string, expectedAuthor: string): boolean => {
+    const messageHash = keccak256(new TextEncoder().encode(body))
+    const recovered = recoverAddress(messageHash, '0x' + signature)
+    return recovered.slice(2) === expectedAuthor.slice(2)
 }
 
 export const Sign = (privatekey: string, payload: string): string => {

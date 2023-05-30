@@ -1,4 +1,5 @@
 import {
+    Alert,
     Box,
     Drawer,
     Paper,
@@ -10,6 +11,7 @@ import {
     useMediaQuery,
     useTheme
 } from '@mui/material'
+
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
 import type { Character, Message, StreamElement } from '../model'
@@ -18,6 +20,7 @@ import type { Profile } from '../schemas/profile'
 import { MessageFrame } from '../components/Timeline'
 import { materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { validateSignature } from '../util'
 
 interface InspectorState {
     inspectingItem: StreamElement | null
@@ -37,11 +40,13 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
     const [inspectingItem, inspectItem] = useState<StreamElement | null>(null)
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [message, setMessage] = useState<Message<any> | undefined>()
+    const [signatureIsValid, setSignatureIsValid] = useState<boolean>(false)
 
     useEffect(() => {
         if (!inspectingItem) return
         api.fetchMessage(inspectingItem.id, inspectingItem.currenthost).then((msg) => {
             if (!msg) return
+            setSignatureIsValid(validateSignature(msg.rawpayload, msg.signature, msg.author))
             setMessage(msg)
         })
         api.readCharacter(inspectingItem.author, Schemas.profile, inspectingItem.currenthost).then((author) => {
@@ -99,6 +104,11 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                         <Paper sx={{ background: '#fff', m: '10px 0', p: '0 20px' }}>
                             <MessageFrame message={inspectingItem} lastUpdated={0} />
                         </Paper>
+                        {signatureIsValid ? (
+                            <Alert severity="success">Signature is valid!</Alert>
+                        ) : (
+                            <Alert severity="error">Signature is invalid!</Alert>
+                        )}
                         <Table sx={{ fontSize: '10px' }}>
                             <TableBody>
                                 <TableRow>
