@@ -1,5 +1,5 @@
 import { ec as Ec } from 'elliptic'
-import { keccak256, computeAddress, recoverAddress, toUtf8Bytes } from 'ethers'
+import { keccak256, computeAddress, recoverAddress } from 'ethers'
 
 export const fetchWithTimeout = async (
     url: RequestInfo,
@@ -16,15 +16,15 @@ export const fetchWithTimeout = async (
         const res = await fetch(url, reqConfig)
         if (!res.ok) {
             const description = `status code:${res.status}`
-            console.error(description)
+            Promise.reject(new Error(description))
         }
 
         return res
     } catch (e: unknown) {
-        if (e instanceof Error && e.name === 'AbortError') {
-            throw new Error()
+        if (e instanceof Error) {
+            return await Promise.reject(new Error(`${e.name}: ${e.message}`))
         } else {
-            throw new Error()
+            return await Promise.reject(new Error('fetch failed with unknown error'))
         }
     } finally {
         clearTimeout(clientTimeout)

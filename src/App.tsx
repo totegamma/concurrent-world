@@ -2,6 +2,7 @@ import { useEffect, useState, createContext, useRef, useMemo } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider, Drawer } from '@mui/material'
 import useWebSocket, { type ReadyState } from 'react-use-websocket'
+import { SnackbarProvider } from 'notistack'
 
 import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
@@ -211,138 +212,143 @@ function App(): JSX.Element {
         return <>building api service...</>
     }
 
-    return (
-        <ThemeProvider theme={theme}>
-            <ClockContext.Provider value={clock}>
-                <ApiProvider api={api}>
-                    <FollowProvider>
-                        <ApplicationContext.Provider value={applicationContext}>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    background: [
-                                        theme.palette.background.default,
-                                        `linear-gradient(${theme.palette.background.default}, ${darken(
-                                            theme.palette.background.default,
-                                            0.1
-                                        )})`
-                                    ],
-                                    width: '100vw',
-                                    height: '100dvh'
-                                }}
-                            >
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        flex: 1,
-                                        maxWidth: '1280px',
-                                        width: '100%'
-                                    }}
-                                >
-                                    <Box
-                                        sx={{
-                                            display: {
-                                                xs: 'none',
-                                                sm: 'block',
-                                                width: '200px'
-                                            }
-                                        }}
-                                    >
-                                        <Menu />
-                                    </Box>
-                                    <Box
-                                        sx={{
-                                            display: 'flex',
-                                            flexFlow: 'column',
-                                            overflow: 'hidden',
-                                            flex: 1
-                                        }}
-                                    >
-                                        <Paper
-                                            sx={{
-                                                flexGrow: '1',
-                                                margin: {
-                                                    xs: '4px',
-                                                    sm: '10px'
-                                                },
-                                                mb: { xs: 0, sm: '10px' },
-                                                display: 'flex',
-                                                flexFlow: 'column',
-                                                borderRadius: {
-                                                    xs: '15px',
-                                                    md: '20px'
-                                                },
-                                                overflow: 'hidden',
-                                                background: 'none'
-                                            }}
-                                        >
-                                            <Routes>
-                                                <Route
-                                                    index
-                                                    element={
-                                                        <TimelinePage
-                                                            messages={messages}
-                                                            currentStreams={currentStreams}
-                                                            setCurrentStreams={setCurrentStreams}
-                                                            setMobileMenuOpen={setMobileMenuOpen}
-                                                        />
-                                                    }
-                                                />
-                                                <Route path="/associations" element={<Associations />} />
-                                                <Route path="/explorer" element={<Explorer />} />
-                                                <Route path="/notifications" element={<Notifications />} />
-                                                <Route path="/identity" element={<Identity />} />
-                                                <Route
-                                                    path="/settings"
-                                                    element={<Settings setThemeName={setThemeName} />}
-                                                />
-                                                <Route path="/streaminfo" element={<StreamInfo />} />
-                                                <Route path="/message/:id" element={<MessagePage />} />
-                                                <Route path="/entity/:id" element={<EntityPage />} />
-                                            </Routes>
-                                        </Paper>
-                                        <Box
-                                            sx={{
-                                                display: {
-                                                    xs: 'block',
-                                                    sm: 'none'
-                                                }
-                                            }}
-                                        >
-                                            <MobileMenu />
-                                        </Box>
-                                    </Box>
-                                </Box>
-                            </Box>
-                            <Drawer
-                                anchor={'left'}
-                                open={mobileMenuOpen}
-                                onClose={() => {
-                                    setMobileMenuOpen(false)
-                                }}
-                                PaperProps={{
-                                    sx: {
-                                        width: '200px',
-                                        padding: '0 5px 0 0',
-                                        borderRadius: '0 20px 20px 0',
-                                        overflow: 'hidden',
-                                        backgroundColor: 'background.default'
+    const providers = (childs: JSX.Element): JSX.Element => (
+        <SnackbarProvider>
+            <ThemeProvider theme={theme}>
+                <ClockContext.Provider value={clock}>
+                    <ApiProvider api={api}>
+                        <FollowProvider>
+                            <ApplicationContext.Provider value={applicationContext}>
+                                {childs}
+                            </ApplicationContext.Provider>
+                        </FollowProvider>
+                    </ApiProvider>
+                </ClockContext.Provider>
+            </ThemeProvider>
+        </SnackbarProvider>
+    )
+
+    return providers(
+        <>
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    background: [
+                        theme.palette.background.default,
+                        `linear-gradient(${theme.palette.background.default}, ${darken(
+                            theme.palette.background.default,
+                            0.1
+                        )})`
+                    ],
+                    width: '100vw',
+                    height: '100dvh'
+                }}
+            >
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flex: 1,
+                        maxWidth: '1280px',
+                        width: '100%'
+                    }}
+                >
+                    <Box
+                        sx={{
+                            display: {
+                                xs: 'none',
+                                sm: 'block',
+                                width: '200px'
+                            }
+                        }}
+                    >
+                        <Menu />
+                    </Box>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexFlow: 'column',
+                            overflow: 'hidden',
+                            flex: 1
+                        }}
+                    >
+                        <Paper
+                            sx={{
+                                flexGrow: '1',
+                                margin: {
+                                    xs: '4px',
+                                    sm: '10px'
+                                },
+                                mb: { xs: 0, sm: '10px' },
+                                display: 'flex',
+                                flexFlow: 'column',
+                                borderRadius: {
+                                    xs: '15px',
+                                    md: '20px'
+                                },
+                                overflow: 'hidden',
+                                background: 'none'
+                            }}
+                        >
+                            <Routes>
+                                <Route
+                                    index
+                                    element={
+                                        <TimelinePage
+                                            messages={messages}
+                                            currentStreams={currentStreams}
+                                            setCurrentStreams={setCurrentStreams}
+                                            setMobileMenuOpen={setMobileMenuOpen}
+                                        />
                                     }
-                                }}
-                            >
-                                <Menu
-                                    onClick={() => {
-                                        setMobileMenuOpen(false)
-                                    }}
-                                    hideMenu
                                 />
-                            </Drawer>
-                        </ApplicationContext.Provider>
-                    </FollowProvider>
-                </ApiProvider>
-            </ClockContext.Provider>
-        </ThemeProvider>
+                                <Route path="/associations" element={<Associations />} />
+                                <Route path="/explorer" element={<Explorer />} />
+                                <Route path="/notifications" element={<Notifications />} />
+                                <Route path="/identity" element={<Identity />} />
+                                <Route path="/settings" element={<Settings setThemeName={setThemeName} />} />
+                                <Route path="/streaminfo" element={<StreamInfo />} />
+                                <Route path="/message/:id" element={<MessagePage />} />
+                                <Route path="/entity/:id" element={<EntityPage />} />
+                            </Routes>
+                        </Paper>
+                        <Box
+                            sx={{
+                                display: {
+                                    xs: 'block',
+                                    sm: 'none'
+                                }
+                            }}
+                        >
+                            <MobileMenu />
+                        </Box>
+                    </Box>
+                </Box>
+            </Box>
+            <Drawer
+                anchor={'left'}
+                open={mobileMenuOpen}
+                onClose={() => {
+                    setMobileMenuOpen(false)
+                }}
+                PaperProps={{
+                    sx: {
+                        width: '200px',
+                        padding: '0 5px 0 0',
+                        borderRadius: '0 20px 20px 0',
+                        overflow: 'hidden',
+                        backgroundColor: 'background.default'
+                    }
+                }}
+            >
+                <Menu
+                    onClick={() => {
+                        setMobileMenuOpen(false)
+                    }}
+                    hideMenu
+                />
+            </Drawer>
+        </>
     )
 }
 

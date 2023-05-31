@@ -58,7 +58,6 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     return (
         <InspectorProvider>
             <List sx={{ flex: 1, width: '100%' }}>
-                <Divider />
                 <InfiniteScroll
                     loadMore={() => {
                         loadMore()
