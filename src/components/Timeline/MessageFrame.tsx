@@ -53,6 +53,7 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
     const [fetchSuccess, setFetchSucceed] = useState<boolean>(true)
 
     useEffect(() => {
+        console.log('fetch!', props.message.id)
         api.fetchMessage(props.message.id, props.message.currenthost)
             .then((msg) => {
                 if (!msg) return
@@ -102,8 +103,10 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
 
     const favorite = useCallback(async (): Promise<void> => {
         const targetStream = [
-            (await api.readCharacter(props.message.author, Schemas.profile))?.payload.body.notificationStream
+            (await api.readCharacter(props.message.author, Schemas.userstreams))?.payload.body.notificationStream
         ].filter((e) => e) as string[]
+
+        console.log(targetStream)
 
         api.createAssociation<Like>(
             Schemas.like,

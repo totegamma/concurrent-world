@@ -1,7 +1,8 @@
-import { Divider, List } from '@mui/material'
+import { Divider, List, Typography } from '@mui/material'
 import React, { type RefObject, memo, useCallback, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroller'
 import { MessageFrame } from './MessageFrame'
+import { AssociationFrame } from './AssociationFrame'
 import type { IuseObjectList } from '../../hooks/useObjectList'
 import type { StreamElement, StreamElementDated } from '../../model'
 import { useApi } from '../../context/api'
@@ -69,7 +70,13 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                 >
                     {props.timeline.current.map((e) => (
                         <React.Fragment key={e.id}>
-                            <MessageFrame message={e} lastUpdated={e.LastUpdated} />
+                            {e.type === 'message' && <MessageFrame message={e} lastUpdated={e.LastUpdated} />}
+                            {e.type === 'association' && (
+                                <AssociationFrame association={e} lastUpdated={e.LastUpdated} />
+                            )}
+                            {e.type !== 'message' && e.type !== 'association' && (
+                                <Typography>Unknown message type: {e.type}</Typography>
+                            )}
                             <Divider variant="inset" component="li" sx={{ margin: '0 5px' }} />
                         </React.Fragment>
                     ))}

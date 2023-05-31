@@ -1,4 +1,14 @@
-import type { Stream, MessagePostRequest, SignedObject, Character, Host, StreamElement, Message, Entity } from './model'
+import type {
+    Stream,
+    MessagePostRequest,
+    SignedObject,
+    Character,
+    Host,
+    StreamElement,
+    Message,
+    Entity,
+    Association
+} from './model'
 import { v4 as uuidv4 } from 'uuid'
 // @ts-expect-error vite dynamic import
 import { branch, sha } from '~build/info'
@@ -18,6 +28,7 @@ export default class ConcurrentApiClient {
     entityCache: Record<string, Entity> = {}
     messageCache: Record<string, Message<any>> = {}
     characterCache: Record<string, Character<any>> = {}
+    associationCache: Record<string, Association<any>> = {}
     streamCache: Record<string, Stream<any>> = {}
 
     constructor(userAddress: string, privatekey: string, host?: Host) {
@@ -220,6 +231,30 @@ export default class ConcurrentApiClient {
             })
     }
 
+    async fetchAssociation(id: string, host: string = ''): Promise<Association<any> | undefined> {
+        if (!this.host) throw new Error()
+        if (this.associationCache[id]) {
+            return this.associationCache[id]
+        }
+        const associationHost = !host ? this.host.fqdn : host
+        const res = await fetch(`https://${associationHost}${apiPath}/associations/${id}`, {
+            method: 'GET',
+            headers: {}
+        })
+        if (!res.ok) {
+            return await Promise.reject(new Error('fetch failed'))
+        }
+        const data = await res.json()
+        if (!data.association) {
+            return undefined
+        }
+        const association = data.association
+        association.rawpayload = association.payload
+        association.payload = JSON.parse(association.payload)
+        this.associationCache[id] = association
+        return association
+    }
+
     // Character
     async upsertCharacter<T>(schema: string, body: T, id?: string): Promise<any> {
         if (!this.host) throw new Error()
@@ -285,7 +320,7 @@ export default class ConcurrentApiClient {
     }
 
     // Stream
-    async createStream(schema: string, body: any): Promise<any> {
+    async createStream<T>(schema: string, body: T): Promise<any> {
         if (!this.host) throw new Error()
         const signObject = {
             signer: this.userAddress,
@@ -477,30 +512,28 @@ export default class ConcurrentApiClient {
 
     async setupUserstreams(): Promise<void> {
         const userstreams = await this.readCharacter(this.userAddress, Schemas.userstreams)
-        if (userstreams) return
-        const res0 = await this.createStream('net.gammalab.concurrent.tbdStreamHomeMeta', this.userAddress + '-home')
+        const id = userstreams?.id
+        const res0 = await this.createStream(Schemas.utilitystream, {})
         const homeStream = res0.id
         console.log('home', homeStream)
 
-        const res1 = await this.createStream(
-            'net.gammalab.concurrent.tbdStreamHomeMeta',
-            this.userAddress + '-notification'
-        )
+        const res1 = await this.createStream(Schemas.utilitystream, {})
         const notificationStream = res1.id
         console.log('notification', notificationStream)
 
-        const res2 = await this.createStream(
-            'net.gammalab.concurrent.tbdStreamHomeMeta',
-            this.userAddress + '-association'
-        )
+        const res2 = await this.createStream(Schemas.utilitystream, {})
         const associationStream = res2.id
         console.log('notification', associationStream)
 
-        this.upsertCharacter<Userstreams>(Schemas.userstreams, {
-            homeStream,
-            notificationStream,
-            associationStream
-        }).then((data) => {
+        this.upsertCharacter<Userstreams>(
+            Schemas.userstreams,
+            {
+                homeStream,
+                notificationStream,
+                associationStream
+            },
+            id
+        ).then((data) => {
             console.log(data)
         })
     }
