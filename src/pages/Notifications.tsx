@@ -17,9 +17,7 @@ export function Notifications(props: NotificationsProps): JSX.Element {
     const scrollParentRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        console.warn('hi!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         const myassociations = appData.userstreams?.payload.body.notificationStream
-        console.log(appData)
         if (!myassociations) return
         props.setCurrentStreams([myassociations])
         scrollParentRef.current?.scroll({ top: 0 })
@@ -34,7 +32,7 @@ export function Notifications(props: NotificationsProps): JSX.Element {
                 padding: '20px',
                 backgroundColor: 'background.paper',
                 minHeight: '100%',
-                overflow: 'scroll'
+                overflowY: 'scroll'
             }}
         >
             <Typography variant="h2" gutterBottom>
@@ -43,8 +41,6 @@ export function Notifications(props: NotificationsProps): JSX.Element {
             <Divider />
             <Box
                 sx={{
-                    overflowX: 'hidden',
-                    overflowY: 'auto',
                     width: '100%',
                     padding: { xs: '8px', sm: '8px 16px' },
                     background: theme.palette.background.paper,

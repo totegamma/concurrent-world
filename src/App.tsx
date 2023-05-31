@@ -2,7 +2,7 @@ import { useEffect, useState, createContext, useRef, useMemo } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider, Drawer } from '@mui/material'
 import useWebSocket, { type ReadyState } from 'react-use-websocket'
-import { SnackbarProvider } from 'notistack'
+import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 
 import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
@@ -22,7 +22,8 @@ import {
     MessagePage
 } from './pages'
 
-import Sound from './resources/Bubble.wav'
+import BubbleSound from './resources/Bubble.wav'
+import NotificationSound from './resources/Notification.wav'
 import useSound from 'use-sound'
 import { MobileMenu } from './components/MobileMenu'
 import { StreamInfo } from './pages/StreamInfo'
@@ -83,13 +84,16 @@ function App(): JSX.Element {
         }
     })
 
-    const [playNotification] = useSound(Sound)
+    const [playBubble] = useSound(BubbleSound)
+    const [playNotification] = useSound(NotificationSound, { volume: 0.3 })
+    const playBubbleRef = useRef(playBubble)
     const playNotificationRef = useRef(playNotification)
     const [profile, setProfile] = useState<Character<Profile>>()
     const [userstreams, setUserstreams] = useState<Character<Userstreams>>()
     useEffect(() => {
+        playBubbleRef.current = playBubble
         playNotificationRef.current = playNotification
-    }, [playNotification])
+    }, [playBubble, playNotification])
 
     const [clock, setClock] = useState<Date>(new Date())
     useEffect(() => {
@@ -144,7 +148,7 @@ function App(): JSX.Element {
                             (lhs: StreamElementDated[], rhs: StreamElementDated) =>
                                 lhs.find((e: StreamElementDated) => e.id === rhs.id) == null
                         )
-                        playNotificationRef.current()
+                        playBubbleRef.current()
                         break
                     }
                     default:
@@ -161,6 +165,24 @@ function App(): JSX.Element {
                         if (target) {
                             target.LastUpdated = new Date().getTime()
                             messages.update((e) => [...e])
+                        }
+                        if (event.stream === userstreams?.payload.body.notificationStream) {
+                            playNotificationRef.current()
+                            api?.fetchAssociation(event.body.id, event.body.currenthost).then((a) => {
+                                a &&
+                                    api.fetchMessage(a.targetID).then((m) => {
+                                        m &&
+                                            api
+                                                .readCharacter(m.author, Schemas.profile)
+                                                .then((c: Character<Profile> | undefined) => {
+                                                    enqueueSnackbar(
+                                                        `${c?.payload.body.username ?? 'anonymous'} favorited "${
+                                                            (m.payload.body.body as string) ?? 'your message.'
+                                                        }"`
+                                                    )
+                                                })
+                                    })
+                            })
                         }
                         break
                     }
