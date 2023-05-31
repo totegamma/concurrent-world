@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect, useRef, memo } from 'react'
-import { InputBase, Box, Button, useTheme, IconButton, Divider } from '@mui/material'
+import { InputBase, Box, Button, useTheme, IconButton, Divider, CircularProgress } from '@mui/material'
 import { ApplicationContext } from '../App'
 import SendIcon from '@mui/icons-material/Send'
 import HomeIcon from '@mui/icons-material/Home'
@@ -15,6 +15,7 @@ import { useLocation } from 'react-router-dom'
 import { usePersistent } from '../hooks/usePersistent'
 import type { SimpleNote } from '../schemas/simpleNote'
 import { useApi } from '../context/api'
+import { useSnackbar } from 'notistack'
 
 export interface EmojiProps {
     shortcodes: string
@@ -60,6 +61,9 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const [defaultPostNonHome] = usePersistent<string[]>('defaultPostNonHome', [])
 
     const [postHome, setPostHome] = useState<boolean>(true)
+    const [sending, setSending] = useState<boolean>(false)
+
+    const { enqueueSnackbar } = useSnackbar()
 
     useEffect(() => {
         setMessageDestStreams([
@@ -88,6 +92,11 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     }, [appData.emojiDict])
 
     const post = (): void => {
+        if (draft.length === 0 || draft.trim().length === 0) {
+            enqueueSnackbar('Message must not be empty!', { variant: 'error' })
+            return
+        }
+        setSending(true)
         const streams = [
             ...new Set([
                 ...props.currentStreams.split(','),
@@ -99,9 +108,15 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             body: draft
         }
 
-        api.createMessage<SimpleNote>(Schemas.simpleNote, body, streams).then((_) => {
-            setDraft('')
-        })
+        api.createMessage<SimpleNote>(Schemas.simpleNote, body, streams)
+            .then((_) => {
+                setDraft('')
+                setSending(false)
+            })
+            .catch((e: Error) => {
+                console.log(e.name)
+                enqueueSnackbar(e.message, { variant: 'error' })
+            })
     }
 
     const uploadToImgur = async (base64Data: string): Promise<string> => {
@@ -315,26 +330,44 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 >
                     <EmojiEmotions />
                 </IconButton>
-                <Button
-                    color="primary"
-                    variant="contained"
-                    disabled={draft.length === 0 || draft.trim().length === 0}
-                    onClick={(_) => {
-                        post()
-                    }}
+                <Box
                     sx={{
                         padding: '4px 16px',
                         margin: '4px 0 4px 8px',
-                        '&.Mui-disabled': {
-                            background: theme.palette.divider,
-                            color: theme.palette.text.disabled,
-                            margin: '4px 0 4px 8px'
-                        }
+                        position: 'relative'
                     }}
-                    endIcon={<SendIcon />}
                 >
-                    Send
-                </Button>
+                    <Button
+                        color="primary"
+                        variant="contained"
+                        disabled={sending}
+                        onClick={(_) => {
+                            post()
+                        }}
+                        sx={{
+                            '&.Mui-disabled': {
+                                background: theme.palette.divider,
+                                color: theme.palette.text.disabled
+                            }
+                        }}
+                        endIcon={<SendIcon />}
+                    >
+                        Send
+                    </Button>
+                    {sending && (
+                        <CircularProgress
+                            size={24}
+                            sx={{
+                                color: 'primary.main',
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                marginTop: '-12px',
+                                marginLeft: '-12px'
+                            }}
+                        />
+                    )}
+                </Box>
             </Box>
         </Box>
     )

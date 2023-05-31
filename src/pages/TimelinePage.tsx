@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef } from 'react'
-import { Box, useTheme } from '@mui/material'
+import { Box, Divider, useTheme } from '@mui/material'
 import type { StreamElementDated } from '../model'
 import { type IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'
@@ -60,6 +60,7 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
             >
                 <Box>
                     <Draft currentStreams={reactlocation.hash.replace('#', '')} />
+                    <Divider />
                 </Box>
                 {(reactlocation.hash === '' || reactlocation.hash === '#') &&
                 followService.followingStreams.length === 0 &&

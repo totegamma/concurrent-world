@@ -107,11 +107,9 @@ export default class ConcurrentApiClient {
             body: JSON.stringify(request)
         }
 
-        return await this.fetchWithCredential(`https://${this.host.fqdn}${apiPath}/messages`, requestOptions)
-            .then(async (res) => await res.json())
-            .then((data) => {
-                return data
-            })
+        const res = await this.fetchWithCredential(`https://${this.host.fqdn}${apiPath}/messages`, requestOptions)
+
+        return await res.json()
     }
 
     async fetchMessage(id: string, host: string = ''): Promise<Message<any> | undefined> {
