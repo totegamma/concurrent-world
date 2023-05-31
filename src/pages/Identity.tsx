@@ -1,4 +1,4 @@
-import { Box, Divider, Typography, IconButton, useTheme } from '@mui/material'
+import { Box, Divider, Typography, IconButton, useTheme, Button } from '@mui/material'
 import { useContext, useState } from 'react'
 import { ApplicationContext } from '../App'
 import VisibilityIcon from '@mui/icons-material/Visibility'
@@ -44,6 +44,12 @@ export function Identity(): JSX.Element {
                 </Typography>
                 <Typography sx={{ wordBreak: 'break-all' }}>
                     {appData.userstreams?.payload.body.notificationStream}
+                </Typography>
+                <Typography variant="h3" gutterBottom>
+                    Association Stream
+                </Typography>
+                <Typography sx={{ wordBreak: 'break-all' }}>
+                    {appData.userstreams?.payload.body.associationStream}
                 </Typography>
                 <Typography variant="h3" gutterBottom>
                     Concurrent Address

@@ -320,7 +320,7 @@ export default class ConcurrentApiClient {
     }
 
     // Stream
-    async createStream(schema: string, body: any): Promise<any> {
+    async createStream<T>(schema: string, body: T): Promise<any> {
         if (!this.host) throw new Error()
         const signObject = {
             signer: this.userAddress,
@@ -512,30 +512,28 @@ export default class ConcurrentApiClient {
 
     async setupUserstreams(): Promise<void> {
         const userstreams = await this.readCharacter(this.userAddress, Schemas.userstreams)
-        if (userstreams) return
-        const res0 = await this.createStream('net.gammalab.concurrent.tbdStreamHomeMeta', this.userAddress + '-home')
+        const id = userstreams?.id
+        const res0 = await this.createStream(Schemas.utilitystream, {})
         const homeStream = res0.id
         console.log('home', homeStream)
 
-        const res1 = await this.createStream(
-            'net.gammalab.concurrent.tbdStreamHomeMeta',
-            this.userAddress + '-notification'
-        )
+        const res1 = await this.createStream(Schemas.utilitystream, {})
         const notificationStream = res1.id
         console.log('notification', notificationStream)
 
-        const res2 = await this.createStream(
-            'net.gammalab.concurrent.tbdStreamHomeMeta',
-            this.userAddress + '-association'
-        )
+        const res2 = await this.createStream(Schemas.utilitystream, {})
         const associationStream = res2.id
         console.log('notification', associationStream)
 
-        this.upsertCharacter<Userstreams>(Schemas.userstreams, {
-            homeStream,
-            notificationStream,
-            associationStream
-        }).then((data) => {
+        this.upsertCharacter<Userstreams>(
+            Schemas.userstreams,
+            {
+                homeStream,
+                notificationStream,
+                associationStream
+            },
+            id
+        ).then((data) => {
             console.log(data)
         })
     }

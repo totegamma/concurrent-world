@@ -19,6 +19,8 @@ import StarBorderIcon from '@mui/icons-material/StarBorder'
 import type { Host, Stream } from '../model'
 import { useApi } from '../context/api'
 import { useFollow } from '../context/FollowContext'
+import { Schemas } from '../schemas'
+import type { Commonstream } from '../schemas/commonstream'
 
 export function Explorer(): JSX.Element {
     const api = useApi()
@@ -37,14 +39,16 @@ export function Explorer(): JSX.Element {
     }
 
     const loadStreams = (): void => {
-        api.getStreamListBySchema('net.gammalab.concurrent.tbdStreamMeta', currentHost).then((e) => {
+        api.getStreamListBySchema(Schemas.commonstream, currentHost).then((e) => {
             setStreams(e)
         })
     }
 
     const createNewStream = (name: string): void => {
-        api.createStream('net.gammalab.concurrent.tbdStreamMeta', {
-            name
+        api.createStream<Commonstream>(Schemas.commonstream, {
+            name,
+            shortname: name,
+            description: ''
         }).then((_) => {
             loadStreams()
         })
