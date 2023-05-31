@@ -1,4 +1,14 @@
-import type { Stream, MessagePostRequest, SignedObject, Character, Host, StreamElement, Message, Entity } from './model'
+import type {
+    Stream,
+    MessagePostRequest,
+    SignedObject,
+    Character,
+    Host,
+    StreamElement,
+    Message,
+    Entity,
+    Association
+} from './model'
 import { v4 as uuidv4 } from 'uuid'
 // @ts-expect-error vite dynamic import
 import { branch, sha } from '~build/info'
@@ -18,6 +28,7 @@ export default class ConcurrentApiClient {
     entityCache: Record<string, Entity> = {}
     messageCache: Record<string, Message<any>> = {}
     characterCache: Record<string, Character<any>> = {}
+    associationCache: Record<string, Association<any>> = {}
     streamCache: Record<string, Stream<any>> = {}
 
     constructor(userAddress: string, privatekey: string, host?: Host) {
@@ -218,6 +229,30 @@ export default class ConcurrentApiClient {
             .then((data) => {
                 return data
             })
+    }
+
+    async fetchAssociation(id: string, host: string = ''): Promise<Association<any> | undefined> {
+        if (!this.host) throw new Error()
+        if (this.associationCache[id]) {
+            return this.associationCache[id]
+        }
+        const associationHost = !host ? this.host.fqdn : host
+        const res = await fetch(`https://${associationHost}${apiPath}/associations/${id}`, {
+            method: 'GET',
+            headers: {}
+        })
+        if (!res.ok) {
+            return await Promise.reject(new Error('fetch failed'))
+        }
+        const data = await res.json()
+        if (!data.association) {
+            return undefined
+        }
+        const association = data.association
+        association.rawpayload = association.payload
+        association.payload = JSON.parse(association.payload)
+        this.associationCache[id] = association
+        return association
     }
 
     // Character

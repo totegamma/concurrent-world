@@ -1,6 +1,30 @@
-import { Box, Divider, Typography } from '@mui/material'
+import { Box, Divider, Typography, useTheme } from '@mui/material'
+import type { StreamElementDated } from '../model'
+import type { IuseObjectList } from '../hooks/useObjectList'
+import { useContext, useEffect, useRef } from 'react'
+import { ApplicationContext } from '../App'
+import { Timeline } from '../components/Timeline'
 
-export function Notifications(): JSX.Element {
+export interface NotificationsProps {
+    messages: IuseObjectList<StreamElementDated>
+    currentStreams: string[]
+    setCurrentStreams: (input: string[]) => void
+}
+
+export function Notifications(props: NotificationsProps): JSX.Element {
+    const theme = useTheme()
+    const appData = useContext(ApplicationContext)
+    const scrollParentRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        console.warn('hi!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+        const myassociations = appData.userstreams?.payload.body.notificationStream
+        console.log(appData)
+        if (!myassociations) return
+        props.setCurrentStreams([myassociations])
+        scrollParentRef.current?.scroll({ top: 0 })
+    }, [appData.userstreams])
+
     return (
         <Box
             sx={{
@@ -17,6 +41,25 @@ export function Notifications(): JSX.Element {
                 Notifications
             </Typography>
             <Divider />
+            <Box
+                sx={{
+                    overflowX: 'hidden',
+                    overflowY: 'auto',
+                    width: '100%',
+                    padding: { xs: '8px', sm: '8px 16px' },
+                    background: theme.palette.background.paper,
+                    minHeight: '100%'
+                }}
+                ref={scrollParentRef}
+            >
+                <Box sx={{ display: 'flex', flex: 1 }}>
+                    <Timeline
+                        streams={props.currentStreams}
+                        timeline={props.messages}
+                        scrollParentRef={scrollParentRef}
+                    />
+                </Box>
+            </Box>
         </Box>
     )
 }

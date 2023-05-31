@@ -21,6 +21,7 @@ export interface ServerEvent {
 export interface StreamElement {
     timestamp: string
     id: string
+    type: string
     author: string
     currenthost: string
 }
