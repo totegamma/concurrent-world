@@ -79,7 +79,9 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                         <StreamInfo id={reactlocation.hash.replace('#', '').split(',')[0]} />
                     </Collapse>
                     <Collapse in={mode === 'edit'}>
-                        <HomeSettings />
+                        <Box sx={{ padding: { xs: '8px', sm: '8px 16px' } }}>
+                            <HomeSettings />
+                        </Box>
                     </Collapse>
                     <Divider />
                 </Box>

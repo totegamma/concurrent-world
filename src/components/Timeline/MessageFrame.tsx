@@ -369,7 +369,7 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                     }}
                 >
                     <ListItemIcon>
-                        <ContentPasteIcon />
+                        <ContentPasteIcon sx={{ color: 'text.primary' }} />
                     </ListItemIcon>
                     <ListItemText>ソースをコピー</ListItemText>
                 </MenuItem>
@@ -380,7 +380,7 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                     }}
                 >
                     <ListItemIcon>
-                        <ManageSearchIcon />
+                        <ManageSearchIcon sx={{ color: 'text.primary' }} />
                     </ListItemIcon>
                     <ListItemText>詳細</ListItemText>
                 </MenuItem>
@@ -394,7 +394,7 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                         }}
                     >
                         <ListItemIcon>
-                            <DeleteForeverIcon />
+                            <DeleteForeverIcon sx={{ color: 'text.primary' }} />
                         </ListItemIcon>
                         <ListItemText>メッセージを削除</ListItemText>
                     </MenuItem>

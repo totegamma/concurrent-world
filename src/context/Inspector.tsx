@@ -85,7 +85,8 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                             md: '20px 0 0 20px'
                         },
                         overflowY: 'hidden',
-                        padding: '20px 0 10px 20px'
+                        padding: '20px 0 10px 20px',
+                        backgroundColor: 'background.default'
                     }
                 }}
             >
@@ -101,7 +102,7 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                         }}
                     >
                         <Typography variant="h1">Inspect</Typography>
-                        <Paper sx={{ background: '#fff', m: '10px 0', p: '0 20px' }}>
+                        <Paper sx={{ m: '10px 0', p: '0 20px' }}>
                             <MessageFrame message={inspectingItem} lastUpdated={0} />
                         </Paper>
                         {signatureIsValid ? (
