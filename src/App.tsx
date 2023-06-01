@@ -173,7 +173,7 @@ function App(): JSX.Element {
                                     api.fetchMessage(a.targetID).then((m) => {
                                         m &&
                                             api
-                                                .readCharacter(m.author, Schemas.profile)
+                                                .readCharacter(a.author, Schemas.profile)
                                                 .then((c: Character<Profile> | undefined) => {
                                                     enqueueSnackbar(
                                                         `${c?.payload.body.username ?? 'anonymous'} favorited "${
@@ -235,7 +235,7 @@ function App(): JSX.Element {
     }
 
     const providers = (childs: JSX.Element): JSX.Element => (
-        <SnackbarProvider>
+        <SnackbarProvider preventDuplicate>
             <ThemeProvider theme={theme}>
                 <ClockContext.Provider value={clock}>
                     <ApiProvider api={api}>
