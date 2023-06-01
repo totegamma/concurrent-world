@@ -104,7 +104,7 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
                 >
                     <b>{title}</b>
                 </Button>
-                <Box sx={{ position: 'relative', width: '40px', height: '40px' }}>
+                <Box sx={{ position: 'relative', width: '40px', height: '40px', mr: '8px' }}>
                     <Zoom
                         in={props.mode === 'info'}
                         timeout={transitionDuration}

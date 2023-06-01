@@ -70,17 +70,17 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                 ref={scrollParentRef}
             >
                 <Box>
-                    <Collapse in={mode === 'compose' || mode === 'home'}>
+                    <Collapse in={mode === 'edit'}>
                         <Box sx={{ padding: { xs: '8px', sm: '8px 16px' } }}>
-                            <Draft currentStreams={reactlocation.hash.replace('#', '')} />
+                            <HomeSettings />
                         </Box>
                     </Collapse>
                     <Collapse in={mode === 'info'}>
                         <StreamInfo id={reactlocation.hash.replace('#', '').split(',')[0]} />
                     </Collapse>
-                    <Collapse in={mode === 'edit'}>
+                    <Collapse in={mode === 'compose' || mode === 'home'}>
                         <Box sx={{ padding: { xs: '8px', sm: '8px 16px' } }}>
-                            <HomeSettings />
+                            <Draft currentStreams={reactlocation.hash.replace('#', '')} />
                         </Box>
                     </Collapse>
                     <Divider />
