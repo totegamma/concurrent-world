@@ -19,7 +19,8 @@ import {
     Settings,
     TimelinePage,
     EntityPage,
-    MessagePage
+    MessagePage,
+    Devtool
 } from './pages'
 
 import BubbleSound from './resources/Bubble.wav'
@@ -350,6 +351,7 @@ function App(): JSX.Element {
                                 <Route path="/streaminfo" element={<StreamInfo />} />
                                 <Route path="/message/:id" element={<MessagePage />} />
                                 <Route path="/entity/:id" element={<EntityPage />} />
+                                <Route path="/devtool" element={<Devtool />} />
                             </Routes>
                         </Paper>
                         <Box
