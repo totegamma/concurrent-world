@@ -19,7 +19,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
         api.readStream(props.id).then((e) => {
             setStream(e)
         })
-    }, [])
+    }, [props.id])
 
     return (
         <>
