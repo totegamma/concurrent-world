@@ -64,7 +64,6 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                     overflowX: 'hidden',
                     overflowY: 'auto',
                     width: '100%',
-                    padding: { xs: '8px', sm: '8px 16px' },
                     background: theme.palette.background.paper,
                     minHeight: '100%'
                 }}
@@ -72,7 +71,9 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
             >
                 <Box>
                     <Collapse in={mode === 'compose' || mode === 'home'}>
-                        <Draft currentStreams={reactlocation.hash.replace('#', '')} />
+                        <Box sx={{ padding: { xs: '8px', sm: '8px 16px' } }}>
+                            <Draft currentStreams={reactlocation.hash.replace('#', '')} />
+                        </Box>
                     </Collapse>
                     <Collapse in={mode === 'info'}>
                         <StreamInfo id={reactlocation.hash.replace('#', '').split(',')[0]} />
@@ -87,7 +88,7 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                 followService.followingUsers.length === 0 ? (
                     <Box>まだ誰も、どのストリームもフォローしていません。Explorerタブから探しに行きましょう。</Box>
                 ) : (
-                    <Box sx={{ display: 'flex', flex: 1 }}>
+                    <Box sx={{ display: 'flex', flex: 1, padding: { xs: '8px', sm: '8px 16px' } }}>
                         <Timeline
                             streams={props.currentStreams}
                             timeline={props.messages}

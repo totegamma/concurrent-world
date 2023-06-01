@@ -10,6 +10,7 @@ import { CCAvatar } from '../components/CCAvatar'
 import { Timeline } from '../components/Timeline'
 import { useObjectList } from '../hooks/useObjectList'
 import { useFollow } from '../context/FollowContext'
+import Background from '../resources/defaultbg.png'
 
 export function EntityPage(): JSX.Element {
     const api = useApi()
@@ -67,7 +68,9 @@ export function EntityPage(): JSX.Element {
             </Box>
             <Box /* profile */
                 sx={{
-                    backgroundColor: 'background.default'
+                    backgroundImage: `url(${Background})`,
+                    backgroundPosition: 'center',
+                    objectFit: 'cover'
                 }}
             >
                 <Paper

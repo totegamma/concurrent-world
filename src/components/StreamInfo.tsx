@@ -1,9 +1,10 @@
-import { Box, Button, Divider, Typography } from '@mui/material'
+import { Box, Button, Divider, Paper, Typography } from '@mui/material'
 import type { Commonstream } from '../schemas/commonstream'
 import { useEffect, useState } from 'react'
 import { useApi } from '../context/api'
 import type { Stream } from '../model'
 import { useFollow } from '../context/FollowContext'
+import Background from '../resources/defaultbg.png'
 
 export interface StreamInfoProps {
     id: string
@@ -24,13 +25,21 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
     return (
         <>
             {stream ? (
-                <Box sx={{ padding: '20px', display: 'flex' }}>
-                    <Box sx={{ flex: 1 }}>
+                <Box
+                    sx={{
+                        padding: '20px',
+                        display: 'flex',
+                        backgroundImage: `url(${Background})`,
+                        backgroundPosition: 'center',
+                        objectFit: 'cover'
+                    }}
+                >
+                    <Paper sx={{ flex: 1, padding: '20px' }}>
                         <Typography variant="h1">{stream.payload.body.name}</Typography>
                         <Typography variant="caption">{props.id}</Typography>
                         <Divider />
-                        <Typography>{stream.payload.body.description}</Typography>
-                    </Box>
+                        <Typography>{stream.payload.body.description || 'まだ説明はありません'}</Typography>
+                    </Paper>
                     <Box sx={{ display: 'flex', flex: 1, flexFlow: 'row-reverse' }}>
                         {bookmarking ? (
                             <Button
@@ -38,6 +47,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                                 onClick={() => {
                                     followService.unbookmarkStream(props.id)
                                 }}
+                                sx={{ height: '50px' }}
                             >
                                 Favorited
                             </Button>
@@ -47,6 +57,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                                 onClick={() => {
                                     followService.bookmarkStream(props.id)
                                 }}
+                                sx={{ height: '50px' }}
                             >
                                 Favorite
                             </Button>
