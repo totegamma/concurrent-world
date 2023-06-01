@@ -306,13 +306,16 @@ export const ConcurrentDefaultTheme = {
         h6: {
             fontSize: 11.2
         }
+    },
+    transitions: {
+        duration: {
+            entieringScreen: 50,
+            leavingScreen: 50
+        }
     }
 }
 
 export const createConcurrentTheme = (name: string): ConcurrentTheme => {
-    const theme: ConcurrentTheme = Object.assign(
-        createTheme(),
-        Object.assign(ConcurrentDefaultTheme, Themes[name])
-    )
+    const theme: ConcurrentTheme = Object.assign(createTheme(), Object.assign(ConcurrentDefaultTheme, Themes[name]))
     return createTheme(theme) as ConcurrentTheme
 }

@@ -1,16 +1,21 @@
 import { type RefObject, useContext, useEffect, useState, memo } from 'react'
-import { IconButton, Box, useTheme, Button } from '@mui/material'
-import InfoIcon from '@mui/icons-material/Info'
-import { Link, type Location as ReactLocation } from 'react-router-dom'
+import { IconButton, Box, useTheme, Button, Zoom } from '@mui/material'
+import { type Location as ReactLocation } from 'react-router-dom'
 import { ApplicationContext } from '../App'
 import { ConcurrentLogo } from './ConcurrentLogo'
 import type { ConcurrentTheme } from '../model'
 import { useApi } from '../context/api'
 
+import InfoIcon from '@mui/icons-material/Info'
+import CreateIcon from '@mui/icons-material/Create'
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
+
 export interface TimelineHeaderProps {
     location: ReactLocation
     scrollParentRef: RefObject<HTMLDivElement>
     setMobileMenuOpen: (state: boolean) => void
+    mode: string
+    setMode: (_: string) => void
 }
 
 export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderProps): JSX.Element => {
@@ -41,6 +46,11 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
     }, [props.location.hash])
 
     const iconColor = appData.websocketState === 1 ? theme.palette.background.contrastText : theme.palette.text.disabled
+
+    const transitionDuration = {
+        enter: theme.transitions.duration.enteringScreen,
+        exit: theme.transitions.duration.leavingScreen
+    }
 
     return (
         <Box
@@ -94,9 +104,76 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
                 >
                     <b>{title}</b>
                 </Button>
-                <IconButton sx={{ p: '8px' }} component={Link} to={`/streaminfo${props.location.hash}`}>
-                    <InfoIcon sx={{ color: 'primary.contrastText' }} />
-                </IconButton>
+                <Box sx={{ position: 'relative', width: '40px', height: '40px' }}>
+                    <Zoom
+                        in={props.mode === 'info'}
+                        timeout={transitionDuration}
+                        style={{
+                            transitionDelay: `${props.mode === 'info' ? transitionDuration.exit : 0}ms`
+                        }}
+                        unmountOnExit
+                    >
+                        <IconButton
+                            sx={{ p: '8px', position: 'absolute' }}
+                            onClick={() => {
+                                props.setMode('compose')
+                            }}
+                        >
+                            <CreateIcon sx={{ color: 'primary.contrastText' }} />
+                        </IconButton>
+                    </Zoom>
+                    <Zoom
+                        in={props.mode === 'compose'}
+                        timeout={transitionDuration}
+                        style={{
+                            transitionDelay: `${props.mode === 'compose' ? transitionDuration.exit : 0}ms`
+                        }}
+                        unmountOnExit
+                    >
+                        <IconButton
+                            sx={{ p: '8px', position: 'absolute' }}
+                            onClick={() => {
+                                props.setMode('info')
+                            }}
+                        >
+                            <InfoIcon sx={{ color: 'primary.contrastText' }} />
+                        </IconButton>
+                    </Zoom>
+                    <Zoom
+                        in={props.mode === 'home'}
+                        timeout={transitionDuration}
+                        style={{
+                            transitionDelay: `${props.mode === 'home' ? transitionDuration.exit : 0}ms`
+                        }}
+                        unmountOnExit
+                    >
+                        <IconButton
+                            sx={{ p: '8px', position: 'absolute' }}
+                            onClick={() => {
+                                props.setMode('edit')
+                            }}
+                        >
+                            <PlaylistAddIcon sx={{ color: 'primary.contrastText' }} />
+                        </IconButton>
+                    </Zoom>
+                    <Zoom
+                        in={props.mode === 'edit'}
+                        timeout={transitionDuration}
+                        style={{
+                            transitionDelay: `${props.mode === 'edit' ? transitionDuration.exit : 0}ms`
+                        }}
+                        unmountOnExit
+                    >
+                        <IconButton
+                            sx={{ p: '8px', position: 'absolute' }}
+                            onClick={() => {
+                                props.setMode('home')
+                            }}
+                        >
+                            <CreateIcon sx={{ color: 'primary.contrastText' }} />
+                        </IconButton>
+                    </Zoom>
+                </Box>
             </Box>
         </Box>
     )

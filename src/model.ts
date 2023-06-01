@@ -112,7 +112,7 @@ export interface Stream<T> {
     writer: string[]
     reader: string[]
     schema: string
-    payload: T
+    payload: SignedObject<T>
     signature: string
     cdate: string
 }

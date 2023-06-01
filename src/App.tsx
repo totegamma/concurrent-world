@@ -27,7 +27,6 @@ import BubbleSound from './resources/Bubble.wav'
 import NotificationSound from './resources/Notification.wav'
 import useSound from 'use-sound'
 import { MobileMenu } from './components/MobileMenu'
-import { StreamInfo } from './pages/StreamInfo'
 import ApiProvider from './context/api'
 import ConcurrentApiClient from './apiservice'
 import { FollowProvider } from './context/FollowContext'
@@ -348,7 +347,6 @@ function App(): JSX.Element {
                                 />
                                 <Route path="/identity" element={<Identity />} />
                                 <Route path="/settings" element={<Settings setThemeName={setThemeName} />} />
-                                <Route path="/streaminfo" element={<StreamInfo />} />
                                 <Route path="/message/:id" element={<MessagePage />} />
                                 <Route path="/entity/:id" element={<EntityPage />} />
                                 <Route path="/devtool" element={<Devtool />} />
