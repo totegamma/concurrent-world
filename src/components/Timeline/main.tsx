@@ -20,7 +20,10 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
 
     useEffect(() => {
         console.log('load recent!', props.streams)
+        let unmounted = false
+        props.timeline.clear()
         api?.readStreamRecent(props.streams).then((data: StreamElement[]) => {
+            if (unmounted) return
             const current = new Date().getTime()
             const dated = data.map((e) => {
                 return { ...e, LastUpdated: current }
@@ -28,21 +31,22 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
             props.timeline.set(dated)
             setHasMoreData(true)
         })
+        return () => {
+            unmounted = true
+        }
     }, [props.streams])
 
-    const loadMore = useCallback(async () => {
+    const loadMore = useCallback(() => {
         if (!api.host) return
         console.log('load more!')
-        const last = props.timeline.current
+        let unmounted = false
         if (!props.timeline.current[props.timeline.current.length - 1]?.timestamp) {
             return
         }
 
         api?.readStreamRanged(props.streams, props.timeline.current[props.timeline.current.length - 1].timestamp).then(
             (data: StreamElement[]) => {
-                if (last !== props.timeline.current) {
-                    return
-                }
+                if (unmounted) return
                 const idtable = props.timeline.current.map((e) => e.id)
                 const newdata = data.filter((e) => !idtable.includes(e.id))
                 if (newdata.length > 0) {
@@ -54,6 +58,10 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                 } else setHasMoreData(false)
             }
         )
+
+        return () => {
+            unmounted = true
+        }
     }, [api, props.streams, props.timeline])
 
     return (

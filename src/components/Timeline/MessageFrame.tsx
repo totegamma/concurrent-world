@@ -53,7 +53,6 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
     const [fetchSuccess, setFetchSucceed] = useState<boolean>(true)
 
     useEffect(() => {
-        console.log('fetch!', props.message.id)
         api.fetchMessage(props.message.id, props.message.currenthost)
             .then((msg) => {
                 if (!msg) return

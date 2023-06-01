@@ -67,11 +67,9 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                         <Typography>
                             <b>{author?.payload.body.username}</b> favorites
                         </Typography>
-                        <Typography>
-                            <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
-                                {message?.payload.body.body}
-                            </blockquote>
-                        </Typography>
+                        <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
+                            {message?.payload.body.body}
+                        </blockquote>
                     </Box>
                 </ListItem>
             )}
