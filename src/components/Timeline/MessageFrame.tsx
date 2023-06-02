@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, memo } from 'react'
+import { useState, useEffect, useCallback, memo, useContext } from 'react'
 import {
     ListItem,
     Box,
@@ -31,6 +31,7 @@ import { useApi } from '../../context/api'
 import { Multiplexer } from './Multiplexer'
 import { useInspector } from '../../context/Inspector'
 import type { SimpleNote } from '../../schemas/simpleNote'
+import { ApplicationContext } from '../../App'
 
 export interface MessageFrameProp {
     message: StreamElement
@@ -39,6 +40,7 @@ export interface MessageFrameProp {
 
 export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JSX.Element => {
     const api = useApi()
+    const appData = useContext(ApplicationContext)
     const inspector = useInspector()
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [message, setMessage] = useState<CCMessage<any> | undefined>()
@@ -102,7 +104,8 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
 
     const favorite = useCallback(async (): Promise<void> => {
         const targetStream = [
-            (await api.readCharacter(props.message.author, Schemas.userstreams))?.payload.body.notificationStream
+            (await api.readCharacter(props.message.author, Schemas.userstreams))?.payload.body.notificationStream,
+            appData.userstreams?.payload.body.associationStream
         ].filter((e) => e) as string[]
 
         console.log(targetStream)
