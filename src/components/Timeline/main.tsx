@@ -1,4 +1,4 @@
-import { Divider, List, Typography } from '@mui/material'
+import { Divider, List, Typography, useTheme } from '@mui/material'
 import React, { type RefObject, memo, useCallback, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroller'
 import { MessageFrame } from './MessageFrame'
@@ -7,6 +7,7 @@ import type { IuseObjectList } from '../../hooks/useObjectList'
 import type { StreamElement, StreamElementDated } from '../../model'
 import { useApi } from '../../context/api'
 import { InspectorProvider } from '../../context/Inspector'
+import { Loading } from '../Loading'
 
 export interface TimelineProps {
     streams: string[]
@@ -17,6 +18,7 @@ export interface TimelineProps {
 export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element => {
     const api = useApi()
     const [hasMoreData, setHasMoreData] = useState<boolean>(false)
+    const theme = useTheme()
 
     useEffect(() => {
         console.log('load recent!', props.streams)
@@ -72,7 +74,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                         loadMore()
                     }}
                     hasMore={hasMoreData}
-                    loader={<React.Fragment key={0}>Loading...</React.Fragment>}
+                    loader={<Loading message="Loading..." color={theme.palette.text.primary} />}
                     useWindow={false}
                     getScrollParent={() => props.scrollParentRef.current}
                 >
