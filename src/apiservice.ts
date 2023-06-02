@@ -355,6 +355,39 @@ export default class ConcurrentApiClient {
             })
     }
 
+    async updateStream(id: string, partialSignObject: any): Promise<any> {
+        if (!this.host) throw new Error()
+
+        const signObject = {
+            ...partialSignObject,
+            signer: this.userAddress,
+            type: 'Stream',
+            meta: {
+                client: `concurrent-web ${branchName as string}-${sha as string}`
+            },
+            signedAt: new Date().toISOString()
+        }
+
+        const signedObject = JSON.stringify(signObject)
+        const signature = Sign(this.privatekey, signedObject)
+
+        const requestOptions = {
+            method: 'PUT',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({
+                id,
+                signedObject,
+                signature
+            })
+        }
+
+        return await this.fetchWithCredential(`https://${this.host.fqdn}${apiPath}/stream`, requestOptions)
+            .then(async (res) => await res.json())
+            .then((data) => {
+                return data
+            })
+    }
+
     async getStreamListBySchema(schema: string, remote?: string): Promise<Array<Stream<any>>> {
         if (!this.host) throw new Error()
         return await fetch(`https://${remote ?? this.host.fqdn}${apiPath}/stream/list?schema=${schema}`).then(

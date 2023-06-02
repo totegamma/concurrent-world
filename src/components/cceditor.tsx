@@ -7,6 +7,7 @@ import { fetchWithTimeout } from '../util'
 export interface CCEditorProps {
     schemaURL: string
     onSubmit: (_: any) => void
+    init?: any
 }
 
 export const CCEditor = memo<CCEditorProps>((props: CCEditorProps): JSX.Element => {
@@ -28,8 +29,10 @@ export const CCEditor = memo<CCEditorProps>((props: CCEditorProps): JSX.Element 
                 <Form
                     schema={schema}
                     validator={validator}
+                    formData={props.init}
                     onSubmit={(e) => {
                         console.log(e.formData)
+                        props.onSubmit(e.formData)
                     }}
                 />
             )}
