@@ -227,7 +227,7 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                                         }
                                     }}
                                 >
-                                    {author?.payload.body.username ?? 'anonymous'}
+                                    {author?.payload.body.username || 'anonymous'}
                                 </Typography>
                                 <Typography
                                     component="span"

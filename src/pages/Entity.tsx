@@ -64,7 +64,7 @@ export function EntityPage(): JSX.Element {
                     p: '2px'
                 }}
             >
-                <b>{profile.payload.body.username}</b>
+                <b>{profile.payload.body.username || 'anonymous'}</b>
             </Box>
             <Box /* profile */
                 sx={{
