@@ -212,7 +212,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         flex: 1
                     }}
                 >
-                    <StreamPicker color="none" selected={messageDestStreams} setSelected={setMessageDestStreams} />
+                    <StreamPicker selected={messageDestStreams} setSelected={setMessageDestStreams} />
                 </Box>
                 <IconButton
                     onClick={() => {
