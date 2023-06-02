@@ -112,8 +112,8 @@ export default function Welcome(): JSX.Element {
 
             <Modal
                 open={registrationOpen}
-                onClose={(): void => {
-                    setRegistrationOpen(false)
+                onClose={(_, reason): void => {
+                    if (reason === 'escapeKeyDown') setRegistrationOpen(false)
                 }}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
@@ -122,8 +122,8 @@ export default function Welcome(): JSX.Element {
             </Modal>
             <Modal
                 open={importOpen}
-                onClose={(): void => {
-                    setImportOpen(false)
+                onClose={(_, reason): void => {
+                    if (reason === 'escapeKeyDown') setImportOpen(false)
                 }}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
