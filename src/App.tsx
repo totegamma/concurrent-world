@@ -125,8 +125,13 @@ function App(): JSX.Element {
     }, [address, api])
 
     useEffect(() => {
-        sendJsonMessage({ channels: currentStreams })
-    }, [currentStreams])
+        sendJsonMessage({
+            channels: [
+                ...currentStreams,
+                ...(userstreams?.payload.body.notificationStream ? [userstreams.payload.body.notificationStream] : [])
+            ]
+        })
+    }, [currentStreams, userstreams])
 
     useEffect(() => {
         if (!lastMessage) return
