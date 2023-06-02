@@ -2,6 +2,7 @@ import {
     Box,
     Button,
     Divider,
+    IconButton,
     List,
     ListItem,
     ListItemButton,
@@ -21,6 +22,7 @@ import { useApi } from '../context/api'
 import { useFollow } from '../context/FollowContext'
 import { Schemas } from '../schemas'
 import type { Commonstream } from '../schemas/commonstream'
+import { Link } from 'react-router-dom'
 
 export function Explorer(): JSX.Element {
     const api = useApi()
@@ -117,21 +119,24 @@ export function Explorer(): JSX.Element {
                     Create
                 </Button>
             </Box>
-            <List dense sx={{ width: '100%', maxWidth: 360 }}>
+            <List dense sx={{ width: '100%' }}>
                 {streams.map((value) => {
                     const labelId = `checkbox-list-secondary-label-${value.id}`
                     return (
-                        <ListItem key={value.id} disablePadding>
-                            <ListItemButton
-                                onClick={() => {
-                                    if (follow.bookmarkingStreams.includes(`${value.id}@${currentHost}`)) {
-                                        follow.unbookmarkStream(`${value.id}@${currentHost}`)
-                                    } else {
-                                        follow.bookmarkStream(`${value.id}@${currentHost}`)
-                                    }
-                                }}
-                            >
-                                <ListItemIcon>
+                        <ListItem
+                            key={value.id}
+                            disablePadding
+                            secondaryAction={
+                                <IconButton
+                                    sx={{ flexGrow: 0 }}
+                                    onClick={() => {
+                                        if (follow.bookmarkingStreams.includes(`${value.id}@${currentHost}`)) {
+                                            follow.unbookmarkStream(`${value.id}@${currentHost}`)
+                                        } else {
+                                            follow.bookmarkStream(`${value.id}@${currentHost}`)
+                                        }
+                                    }}
+                                >
                                     {follow.bookmarkingStreams.includes(`${value.id}@${currentHost}`) ? (
                                         <StarIcon
                                             sx={{
@@ -145,7 +150,16 @@ export function Explorer(): JSX.Element {
                                             }}
                                         />
                                     )}
-                                </ListItemIcon>
+                                </IconButton>
+                            }
+                        >
+                            <ListItemButton
+                                component={Link}
+                                to={'/#' + value.id}
+                                sx={{
+                                    height: '50px'
+                                }}
+                            >
                                 <ListItemText id={labelId} primary={`%${value.payload.body.name as string}`} />
                             </ListItemButton>
                         </ListItem>

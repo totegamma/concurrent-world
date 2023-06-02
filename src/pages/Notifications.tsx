@@ -42,7 +42,6 @@ export function Notifications(props: NotificationsProps): JSX.Element {
             <Box
                 sx={{
                     width: '100%',
-                    padding: { xs: '8px', sm: '8px 16px' },
                     background: theme.palette.background.paper,
                     minHeight: '100%'
                 }}
