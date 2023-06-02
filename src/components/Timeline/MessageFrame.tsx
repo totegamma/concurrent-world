@@ -103,10 +103,12 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
     }, [message?.associations])
 
     const favorite = useCallback(async (): Promise<void> => {
-        const targetStream = [
-            (await api.readCharacter(props.message.author, Schemas.userstreams))?.payload.body.notificationStream,
-            appData.userstreams?.payload.body.associationStream
-        ].filter((e) => e) as string[]
+        const authorInbox = (await api.readCharacter(props.message.author, Schemas.userstreams))?.payload.body
+            .notificationStream
+        console.log(authorInbox)
+        const targetStream = [authorInbox, appData.userstreams?.payload.body.associationStream].filter(
+            (e) => e
+        ) as string[]
 
         console.log(targetStream)
 
