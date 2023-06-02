@@ -74,7 +74,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                         loadMore()
                     }}
                     hasMore={hasMoreData}
-                    loader={<Loading message="Loading..." color={theme.palette.text.primary} />}
+                    loader={<Loading key={0} message="Loading..." color={theme.palette.text.primary} />}
                     useWindow={false}
                     getScrollParent={() => props.scrollParentRef.current}
                 >
