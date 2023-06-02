@@ -19,6 +19,7 @@ import { CCAvatar } from '../components/CCAvatar'
 import { useApi } from '../context/api'
 import { Schemas } from '../schemas'
 import { useFollow } from '../context/FollowContext'
+import { Link } from 'react-router-dom'
 
 export function HomeSettings(): JSX.Element {
     const api = useApi()
@@ -51,9 +52,6 @@ export function HomeSettings(): JSX.Element {
 
     return (
         <Box>
-            <Typography variant="h2">Navigator Settings</Typography>
-            <Divider />
-            ストリームをフォローするためには、まずExplorerタブでフォロー候補のストリームをお気に入り登録する必要があります。
             <Tabs
                 value={tab}
                 onChange={(_, index) => {
@@ -61,55 +59,82 @@ export function HomeSettings(): JSX.Element {
                 }}
             >
                 <Tab label="フォロー" />
-                <Tab label="投稿先" />
+                <Tab label="デフォルト投稿先" />
             </Tabs>
             {tab === 0 && (
-                <Box>
-                    <Typography variant="h3">ストリーム</Typography>
-                    <StreamPicker selected={follow.followingStreams} setSelected={follow.setFollowingStreams} />
+                <Box sx={{ display: 'flex', gap: '10px', flexFlow: 'column', mt: '10px' }}>
+                    <Box>
+                        <Typography variant="h3" gutterBottom>
+                            ストリーム
+                        </Typography>
+                        <StreamPicker
+                            selected={follow.followingStreams}
+                            setSelected={follow.setFollowingStreams}
+                            sx={{ backgroundColor: 'primary.main' }}
+                        />
+                    </Box>
                     <Divider />
-                    <Typography variant="h3">ユーザー</Typography>
-                    <List
-                        dense
-                        sx={{
-                            width: '100%',
-                            bgcolor: 'background.paper',
-                            overflow: 'scroll'
-                        }}
-                    >
-                        {followList.map((user) => (
-                            <ListItem
-                                key={user.ccaddress}
-                                secondaryAction={
-                                    <Button
-                                        onClick={() => {
-                                            unfollow(user.ccaddress)
-                                        }}
-                                    >
-                                        unfollow
-                                    </Button>
-                                }
-                                disablePadding
-                            >
-                                <ListItemButton>
-                                    <ListItemAvatar>
-                                        <CCAvatar avatarURL={user.avatar} identiconSource={user.ccaddress} />
-                                    </ListItemAvatar>
-                                    <ListItemText primary={user.username} />
-                                </ListItemButton>
-                            </ListItem>
-                        ))}
-                    </List>
+                    <Box>
+                        <Typography variant="h3" gutterBottom>
+                            ユーザー
+                        </Typography>
+                        <List
+                            dense
+                            sx={{
+                                width: '100%',
+                                bgcolor: 'background.paper',
+                                overflowY: 'auto'
+                            }}
+                        >
+                            {followList.map((user) => (
+                                <ListItem
+                                    key={user.ccaddress}
+                                    secondaryAction={
+                                        <Button
+                                            onClick={() => {
+                                                unfollow(user.ccaddress)
+                                            }}
+                                        >
+                                            unfollow
+                                        </Button>
+                                    }
+                                    disablePadding
+                                >
+                                    <ListItemButton component={Link} to={'/entity/' + user.ccaddress}>
+                                        <ListItemAvatar>
+                                            <CCAvatar avatarURL={user.avatar} identiconSource={user.ccaddress} />
+                                        </ListItemAvatar>
+                                        <ListItemText sx={{ color: 'primary.main' }} primary={user.username} />
+                                    </ListItemButton>
+                                </ListItem>
+                            ))}
+                        </List>
+                    </Box>
                 </Box>
             )}
             {tab === 1 && (
-                <Box>
-                    <Typography variant="h3">ホーム</Typography>
-                    <StreamPicker selected={defaultPostHome} setSelected={setDefaultPostHome} />
+                <Box sx={{ display: 'flex', gap: '10px', flexFlow: 'column', mt: '10px' }}>
+                    <Box>
+                        <Typography variant="h3" gutterBottom>
+                            ホーム
+                        </Typography>
+                        <StreamPicker
+                            selected={defaultPostHome}
+                            setSelected={setDefaultPostHome}
+                            sx={{ backgroundColor: 'primary.main' }}
+                        />
+                    </Box>
                     <Divider />
-                    <Typography variant="h3">ホーム以外</Typography>
-                    <StreamPicker selected={defaultPostNonHome} setSelected={setDefaultPostNonHome} />
-                    <Divider />
+                    <Box>
+                        <Typography variant="h3" gutterBottom>
+                            ホーム以外
+                        </Typography>
+                        <StreamPicker
+                            selected={defaultPostNonHome}
+                            setSelected={setDefaultPostNonHome}
+                            sx={{ backgroundColor: 'primary.main' }}
+                        />
+                    </Box>
                 </Box>
             )}
         </Box>

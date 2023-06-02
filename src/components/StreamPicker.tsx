@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Chip, InputBase } from '@mui/material'
+import { Autocomplete, Box, Chip, InputBase, type SxProps } from '@mui/material'
 import { memo, useEffect, useState } from 'react'
 import { useApi } from '../context/api'
 import { useFollow } from '../context/FollowContext'
@@ -6,7 +6,7 @@ import { useFollow } from '../context/FollowContext'
 export interface StreamPickerProps {
     selected: string[]
     setSelected: (selected: string[]) => void
-    color?: string
+    sx?: SxProps
 }
 
 interface StreamOption {
@@ -50,8 +50,9 @@ export const StreamPicker = memo<StreamPickerProps>((props: StreamPickerProps): 
     return (
         <Box
             sx={{
-                backgroundColor: props.color ?? 'primary.main',
+                ...props.sx,
                 borderRadius: '20px',
+                padding: '0px 10px',
                 flex: '1'
             }}
         >
@@ -73,7 +74,7 @@ export const StreamPicker = memo<StreamPickerProps>((props: StreamPickerProps): 
                             {...params.InputProps}
                             {...rest}
                             sx={{ color: 'primary.contrastText' }}
-                            placeholder="select"
+                            placeholder={props.selected.length === 0 ? 'select' : ''}
                         />
                     )
                 }}
