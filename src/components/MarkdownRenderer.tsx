@@ -75,11 +75,23 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                             {children}
                         </blockquote>
                     ),
-                    a: ({ children, href }) => (
-                        <Link href={href} target="_blank">
-                            {children}
-                        </Link>
-                    ),
+                    a: ({ children, href }) => {
+                        if (href?.endsWith('.wav') || href?.endsWith('.mp3')) {
+                            return (
+                                <audio controls src={href}>
+                                    <Link href={href} target="_blank">
+                                        {children}
+                                    </Link>
+                                </audio>
+                            )
+                        } else {
+                            return (
+                                <Link href={href} target="_blank">
+                                    {children}
+                                </Link>
+                            )
+                        }
+                    },
                     code: ({ node, children, inline }) => {
                         const language = node.position
                             ? props.messagebody
