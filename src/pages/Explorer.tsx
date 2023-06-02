@@ -6,7 +6,6 @@ import {
     List,
     ListItem,
     ListItemButton,
-    ListItemIcon,
     ListItemText,
     MenuItem,
     Select,
@@ -130,14 +129,14 @@ export function Explorer(): JSX.Element {
                                 <IconButton
                                     sx={{ flexGrow: 0 }}
                                     onClick={() => {
-                                        if (follow.bookmarkingStreams.includes(`${value.id}@${currentHost}`)) {
-                                            follow.unbookmarkStream(`${value.id}@${currentHost}`)
+                                        if (follow.bookmarkingStreams.includes(value.id)) {
+                                            follow.unbookmarkStream(value.id)
                                         } else {
-                                            follow.bookmarkStream(`${value.id}@${currentHost}`)
+                                            follow.bookmarkStream(value.id)
                                         }
                                     }}
                                 >
-                                    {follow.bookmarkingStreams.includes(`${value.id}@${currentHost}`) ? (
+                                    {follow.bookmarkingStreams.includes(value.id) ? (
                                         <StarIcon
                                             sx={{
                                                 color: theme.palette.text.primary
