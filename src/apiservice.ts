@@ -15,6 +15,7 @@ import { branch, sha } from '~build/info'
 import { Sign, SignJWT, fetchWithTimeout } from './util'
 import { Schemas } from './schemas'
 import { type Userstreams } from './schemas/userstreams'
+
 const branchName = branch || window.location.host.split('.')[0]
 
 const apiPath = '/api/v1'
@@ -25,11 +26,11 @@ export default class ConcurrentApiClient {
     privatekey: string
     token?: string
 
-    entityCache: Record<string, Entity> = {}
-    messageCache: Record<string, Message<any>> = {}
-    characterCache: Record<string, Character<any>> = {}
-    associationCache: Record<string, Association<any>> = {}
-    streamCache: Record<string, Stream<any>> = {}
+    entityCache: Record<string, Promise<Entity> | undefined> = {}
+    messageCache: Record<string, Promise<Message<any>> | undefined> = {}
+    characterCache: Record<string, Promise<Character<any>> | undefined> = {}
+    associationCache: Record<string, Promise<Association<any>> | undefined> = {}
+    streamCache: Record<string, Promise<Stream<any>> | undefined> = {}
 
     constructor(userAddress: string, privatekey: string, host?: Host) {
         this.host = host
@@ -126,25 +127,26 @@ export default class ConcurrentApiClient {
     async fetchMessage(id: string, host: string = ''): Promise<Message<any> | undefined> {
         if (!this.host) throw new Error()
         if (this.messageCache[id]) {
-            return this.messageCache[id]
+            return await this.messageCache[id]
         }
         const messageHost = !host ? this.host.fqdn : host
-        const res = await fetch(`https://${messageHost}${apiPath}/messages/${id}`, {
+        this.messageCache[id] = fetch(`https://${messageHost}${apiPath}/messages/${id}`, {
             method: 'GET',
             headers: {}
+        }).then(async (res) => {
+            if (!res.ok) {
+                throw new Error('fetch failed')
+            }
+            const data = await res.json()
+            if (!data.payload) {
+                return undefined
+            }
+            const message = data
+            message.rawpayload = message.payload
+            message.payload = JSON.parse(message.payload)
+            return message
         })
-        if (!res.ok) {
-            return await Promise.reject(new Error('fetch failed'))
-        }
-        const data = await res.json()
-        if (!data.payload) {
-            return undefined
-        }
-        const message = data
-        message.rawpayload = message.payload
-        message.payload = JSON.parse(message.payload)
-        this.messageCache[id] = message
-        return message
+        return await this.messageCache[id]
     }
 
     async deleteMessage(target: string, host: string = ''): Promise<any> {
@@ -234,25 +236,27 @@ export default class ConcurrentApiClient {
     async fetchAssociation(id: string, host: string = ''): Promise<Association<any> | undefined> {
         if (!this.host) throw new Error()
         if (this.associationCache[id]) {
-            return this.associationCache[id]
+            return await this.associationCache[id]
         }
         const associationHost = !host ? this.host.fqdn : host
-        const res = await fetch(`https://${associationHost}${apiPath}/associations/${id}`, {
+        this.associationCache[id] = fetch(`https://${associationHost}${apiPath}/associations/${id}`, {
             method: 'GET',
             headers: {}
+        }).then(async (res) => {
+            if (!res.ok) {
+                return await Promise.reject(new Error('fetch failed'))
+            }
+            const data = await res.json()
+            if (!data.association) {
+                return undefined
+            }
+            const association = data.association
+            association.rawpayload = association.payload
+            association.payload = JSON.parse(association.payload)
+            this.associationCache[id] = association
+            return association
         })
-        if (!res.ok) {
-            return await Promise.reject(new Error('fetch failed'))
-        }
-        const data = await res.json()
-        if (!data.association) {
-            return undefined
-        }
-        const association = data.association
-        association.rawpayload = association.payload
-        association.payload = JSON.parse(association.payload)
-        this.associationCache[id] = association
-        return association
+        return await this.associationCache[id]
     }
 
     // Character
@@ -292,9 +296,9 @@ export default class ConcurrentApiClient {
     }
 
     async readCharacter(author: string, schema: string, host: string = ''): Promise<Character<any> | undefined> {
-        if (!this.host) throw new Error()
+        if (!this.host || !author) throw new Error()
         if (this.characterCache[author + schema]) {
-            return this.characterCache[author + schema]
+            return await this.characterCache[author + schema]
         }
         let characterHost = host
         if (characterHost === '') {
@@ -302,21 +306,23 @@ export default class ConcurrentApiClient {
             characterHost = entity?.host ?? this.host.fqdn
             if (!characterHost || characterHost === '') characterHost = this.host.fqdn
         }
-        const res = await fetch(
+        this.characterCache[author + schema] = fetch(
             `https://${characterHost}${apiPath}/characters?author=${author}&schema=${encodeURIComponent(schema)}`,
             {
                 method: 'GET',
                 headers: {}
             }
-        )
-        const data = await res.json()
-        if (data.characters.length === 0) {
-            return undefined
-        }
-        const character = data.characters[0]
-        character.payload = JSON.parse(character.payload)
-        this.characterCache[author + schema] = character
-        return character
+        ).then(async (res) => {
+            const data = await res.json()
+            if (data.characters.length === 0) {
+                return undefined
+            }
+            const character = data.characters[0]
+            character.payload = JSON.parse(character.payload)
+            this.characterCache[author + schema] = character
+            return character
+        })
+        return await this.characterCache[author + schema]
     }
 
     // Stream
@@ -371,23 +377,28 @@ export default class ConcurrentApiClient {
     async readStream(id: string): Promise<Stream<any> | undefined> {
         if (!this.host) throw new Error()
         if (this.streamCache[id]) {
-            return this.streamCache[id]
+            return await this.streamCache[id]
         }
         const key = id.split('@')[0]
         const host = id.split('@')[1] ?? this.host.fqdn
-        const res = await fetch(`https://${host}${apiPath}/stream?stream=${key}`, {
+        this.streamCache[id] = fetch(`https://${host}${apiPath}/stream?stream=${key}`, {
             method: 'GET',
             headers: {}
+        }).then(async (res) => {
+            if (!res.ok) {
+                throw new Error('fetch failed')
+            }
+            const data = await res.json()
+            if (!data.payload) {
+                return undefined
+            }
+            const stream = data
+            stream.id = id
+            stream.payload = JSON.parse(stream.payload)
+            this.streamCache[id] = stream
+            return stream
         })
-        const data = await res.json()
-        if (!data.payload) {
-            return undefined
-        }
-        const stream = data
-        stream.id = id
-        stream.payload = JSON.parse(stream.payload)
-        this.characterCache[id] = stream
-        return stream
+        return await this.streamCache[id]
     }
 
     async readStreamRecent(streams: string[]): Promise<StreamElement[]> {
@@ -471,18 +482,20 @@ export default class ConcurrentApiClient {
     async readEntity(ccaddr: string): Promise<Entity | undefined> {
         if (!this.host) throw new Error()
         if (this.entityCache[ccaddr]) {
-            return this.entityCache[ccaddr]
+            return await this.entityCache[ccaddr]
         }
-        const res = await fetch(`https://${this.host.fqdn}${apiPath}/entity/${ccaddr}`, {
+        this.entityCache[ccaddr] = fetch(`https://${this.host.fqdn}${apiPath}/entity/${ccaddr}`, {
             method: 'GET',
             headers: {}
+        }).then(async (res) => {
+            const entity = await res.json()
+            if (!entity || entity.ccaddr === '') {
+                return undefined
+            }
+            this.entityCache[ccaddr] = entity
+            return entity
         })
-        const entity = await res.json()
-        if (!entity || entity.ccaddr === '') {
-            return undefined
-        }
-        this.entityCache[ccaddr] = entity
-        return entity
+        return await this.entityCache[ccaddr]
     }
 
     // Utils
