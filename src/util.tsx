@@ -44,8 +44,10 @@ export const Sign = (privatekey: string, payload: string): string => {
     const signature = keyPair.sign(messageHash, 'hex', { canonical: true })
     const r = toHexString(signature.r.toArray())
     const s = toHexString(signature.s.toArray())
+    const rpad = '0'.repeat(64 - r.length) + r
+    const spad = '0'.repeat(64 - s.length) + s
     const v = signature.recoveryParam === 0 ? '00' : '01'
-    return r + s + v
+    return rpad + spad + v
 }
 
 const makeUrlSafe = (input: string): string => {
