@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Modal, Paper, Typography } from '@mui/material'
+import { Box, Button, Divider, Modal, Paper, TextField, Typography } from '@mui/material'
 import type { Commonstream } from '../schemas/commonstream'
 import { useCallback, useEffect, useState } from 'react'
 import { useApi } from '../context/api'
@@ -7,6 +7,7 @@ import { useFollow } from '../context/FollowContext'
 import Background from '../resources/defaultbg.png'
 import { CCEditor } from './cceditor'
 import { Schemas } from '../schemas'
+import { useSnackbar } from 'notistack'
 
 export interface StreamInfoProps {
     id: string
@@ -15,15 +16,22 @@ export interface StreamInfoProps {
 export function StreamInfo(props: StreamInfoProps): JSX.Element {
     const api = useApi()
     const followService = useFollow()
+    const { enqueueSnackbar } = useSnackbar()
     const [stream, setStream] = useState<Stream<Commonstream>>()
     const bookmarking = followService.bookmarkingStreams.includes(props.id)
     const [settingsOpen, setSettingsOpen] = useState(false)
     const isAuthor = stream?.author === api.userAddress
     const isMaintainer = stream?.maintainer.includes(api.userAddress)
 
+    const [writerDraft, setWriterDraft] = useState('')
+    const [readerDraft, setReaderDraft] = useState('')
+
     useEffect(() => {
         api.readStream(props.id).then((e) => {
+            if (!e) return
             setStream(e)
+            setWriterDraft(e.writer.join('\n'))
+            setReaderDraft(e.reader.join('\n'))
         })
     }, [props.id])
 
@@ -34,11 +42,17 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                 schema: Schemas.commonstream,
                 body,
                 maintainer: stream.maintainer,
-                writer: stream.writer,
-                reader: stream.reader
+                writer: writerDraft.split('\n').filter((e) => e),
+                reader: readerDraft.split('\n').filter((e) => e)
             })
+                .then((_) => {
+                    enqueueSnackbar('更新しました', { variant: 'success' })
+                })
+                .catch((_) => {
+                    enqueueSnackbar('更新に失敗しました', { variant: 'error' })
+                })
         },
-        [api, stream]
+        [api, stream, writerDraft, readerDraft]
     )
 
     if (!stream) {
@@ -114,8 +128,38 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                     }}
                 >
                     <Typography variant="h2">{stream.payload.body.name}</Typography>
-                    <Divider />
-                    <CCEditor schemaURL={Schemas.commonstream} init={stream.payload.body} onSubmit={updateStream} />
+                    <Divider sx={{ mb: '20px' }} />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                        <Typography variant="h3">権限</Typography>
+                        <TextField
+                            label="writer"
+                            multiline
+                            value={writerDraft}
+                            onChange={(e) => {
+                                setWriterDraft(e.target.value)
+                            }}
+                        />
+                        <TextField
+                            label="reader"
+                            multiline
+                            value={readerDraft}
+                            onChange={(e) => {
+                                setReaderDraft(e.target.value)
+                            }}
+                        />
+                        <Box>
+                            <Typography>空の場合パブリックになります。</Typography>
+                            <Typography>改行区切りで複数人指定できます。</Typography>
+                        </Box>
+                        <Box>
+                            <Typography variant="h3">属性</Typography>
+                            <CCEditor
+                                schemaURL={Schemas.commonstream}
+                                init={stream.payload.body}
+                                onSubmit={updateStream}
+                            />
+                        </Box>
+                    </Box>
                 </Paper>
             </Modal>
         </>
