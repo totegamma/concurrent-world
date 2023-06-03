@@ -8,9 +8,8 @@ interface ReplyNoteProps {
 }
 
 export const ReplyNote = (props: ReplyNoteProps): JSX.Element => {
-    return (
-        <>
-            {/* <MessageFrame message={{id: props.message.payload.body.replyToMessageId}}/> */}
+    // @ts-ignore
+    return (<><MessageFrame message={{id: props.message.payload.body.replyToMessageId}}/>
             <MarkdownRenderer messagebody={props.message.payload.body.body} />
         </>
     )
