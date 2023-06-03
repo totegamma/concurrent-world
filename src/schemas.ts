@@ -5,5 +5,8 @@ export const Schemas = {
     userstreams:
         'https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/characters/userstreams/0.0.1.json',
     commonstream: 'https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/streams/common/0.0.1.json',
-    utilitystream: 'https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/streams/utility/0.0.1.json'
+    utilitystream: 'https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/streams/utility/0.0.1.json',
+    replyMessage: 'https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/messages/reply/0.0.1.json',
+    replyAssociation:
+        'https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/associations/reply/0.0.1.json'
 }

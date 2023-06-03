@@ -20,6 +20,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
+import ReplyIcon from '@mui/icons-material/Reply'
 
 import type { Character, Message as CCMessage, ProfileWithAddress, StreamElement, Stream } from '../../model'
 import type { Profile } from '../../schemas/profile'
@@ -32,6 +33,8 @@ import { Multiplexer } from './Multiplexer'
 import { useInspector } from '../../context/Inspector'
 import type { SimpleNote } from '../../schemas/simpleNote'
 import { ApplicationContext } from '../../App'
+import type { ReplyMessage } from '../../schemas/replyMessage'
+import type { ReplyAssociation } from '../../schemas/replyAssociation'
 
 export interface MessageFrameProp {
     message: StreamElement
@@ -81,7 +84,11 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
         const fetchUsers = async (): Promise<any> => {
             const authors = message?.associations.filter((e) => e.schema === Schemas.like).map((m) => m.author) ?? []
 
-            if (message?.associations.find((e) => e.author === api.userAddress) != null) {
+            if (
+                message?.associations
+                    .filter((a) => a.schema === Schemas.like)
+                    .find((e) => e.author === api.userAddress) != null
+            ) {
                 setHasOwnReaction(true)
             } else {
                 setHasOwnReaction(false)
@@ -130,6 +137,25 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
             api.invalidateMessage(props.message.id)
         })
     }, [])
+
+    const handleReply = async (): Promise<void> => {
+        console.log('messageId', message?.id)
+        const data = await api?.createMessage<ReplyMessage>(
+            Schemas.replyMessage,
+            {
+                replyToMessageId: message?.id || '',
+                body: 'このメッセージは素晴らしいですね ' + Math.floor(Math.random() * 1000).toString()
+            },
+            message?.streams || []
+        )
+        await api?.createAssociation<ReplyAssociation>(
+            Schemas.replyAssociation,
+            { messageId: data.content.id },
+            message?.id || '',
+            'messages',
+            message?.streams || []
+        )
+    }
 
     if (!fetchSuccess) {
         return (
@@ -262,6 +288,13 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                         >
                             <Box sx={{ display: 'flex', gap: '20px' }}>
                                 {/* left */}
+                                <IconButton
+                                    onClick={() => {
+                                        handleReply()
+                                    }}
+                                >
+                                    <ReplyIcon />
+                                </IconButton>
                                 <Tooltip
                                     title={
                                         <Box
