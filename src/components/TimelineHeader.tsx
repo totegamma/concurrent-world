@@ -1,5 +1,5 @@
 import { type RefObject, useContext, useEffect, useState, memo } from 'react'
-import { IconButton, Box, useTheme, Button, Zoom } from '@mui/material'
+import { IconButton, Box, useTheme, Button, Zoom, Tooltip } from '@mui/material'
 import { type Location as ReactLocation } from 'react-router-dom'
 import { ApplicationContext } from '../App'
 import { ConcurrentLogo } from './ConcurrentLogo'
@@ -16,6 +16,7 @@ export interface TimelineHeaderProps {
     setMobileMenuOpen: (state: boolean) => void
     mode: string
     setMode: (_: string) => void
+    writeable: boolean
 }
 
 export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderProps): JSX.Element => {
@@ -113,14 +114,22 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
                         }}
                         unmountOnExit
                     >
-                        <IconButton
-                            sx={{ p: '8px', position: 'absolute' }}
-                            onClick={() => {
-                                props.setMode('compose')
-                            }}
-                        >
-                            <CreateIcon sx={{ color: 'primary.contrastText' }} />
-                        </IconButton>
+                        {props.writeable ? (
+                            <IconButton
+                                sx={{ p: '8px', position: 'absolute' }}
+                                onClick={() => {
+                                    props.setMode('compose')
+                                }}
+                            >
+                                <CreateIcon sx={{ color: 'primary.contrastText' }} />
+                            </IconButton>
+                        ) : (
+                            <IconButton sx={{ p: '8px', position: 'absolute' }}>
+                                <Tooltip title="you have no permission to write to this stream" placement="left" arrow>
+                                    <CreateIcon sx={{ color: 'disabled' }} />
+                                </Tooltip>
+                            </IconButton>
+                        )}
                     </Zoom>
                     <Zoom
                         in={props.mode === 'compose'}
