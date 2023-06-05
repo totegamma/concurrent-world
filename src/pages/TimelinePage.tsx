@@ -27,6 +27,7 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
     const scrollParentRef = useRef<HTMLDivElement>(null)
 
     const [mode, setMode] = useState<string>('compose')
+    const [writeable, setWriteable] = useState<boolean>(true)
 
     useEffect(() => {
         ;(async () => {
@@ -50,6 +51,25 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
         scrollParentRef.current?.scroll({ top: 0 })
     }, [reactlocation.hash])
 
+    useEffect(() => {
+        // check if the all of streams are writable
+        if (!reactlocation.hash) return
+        ;(async () => {
+            const writeable = await Promise.all(
+                props.currentStreams.map(async (e) => {
+                    const stream = await api.readStream(e)
+                    if (!stream) return false
+                    if (stream.author === api.userAddress) return true
+                    if (stream.writer.length === 0) return true
+                    return stream.writer.includes(api.userAddress)
+                })
+            )
+            const result = writeable.every((e) => e)
+            setWriteable(result)
+            setMode(result ? mode : 'info')
+        })()
+    }, [props.currentStreams])
+
     return (
         <>
             <TimelineHeader
@@ -58,6 +78,7 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                 scrollParentRef={scrollParentRef}
                 mode={mode}
                 setMode={setMode}
+                writeable={writeable}
             />
             <Box
                 sx={{
