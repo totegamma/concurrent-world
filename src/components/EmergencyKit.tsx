@@ -15,7 +15,16 @@ export function EmergencyKit(): JSX.Element {
         <>
             <h1>Emergency!</h1>
             何かしらのエラーが発生しました。
+            <button
+                style={{ height: '100px', width: '100%' }}
+                onClick={(): void => {
+                    window.location.reload()
+                }}
+            >
+                とりあえずリロード
+            </button>
             <h2>Medical Kit</h2>
+            <div>3回くらいリロードしても解決しないなら↓</div>
             <div>
                 <button onClick={gracefulResetLocalStorage}>
                     アカウント情報以外のlocalstorageをすべてリセットする
