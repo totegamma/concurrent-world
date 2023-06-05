@@ -29,22 +29,24 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
     const [mode, setMode] = useState<string>('compose')
     const [writeable, setWriteable] = useState<boolean>(true)
 
+    const isHome = !reactlocation.hash
+    const queriedStreams = reactlocation.hash.replace('#', '').split(',')
+
     useEffect(() => {
         ;(async () => {
-            if (!reactlocation.hash) {
-                // home
-                props.setCurrentStreams([
-                    ...followService.followingStreams,
-                    ...(await api.getUserHomeStreams(followService.followingUsers))
-                ])
+            if (isHome) {
+                props.setCurrentStreams(
+                    [
+                        ...followService.followingStreams,
+                        ...(await api.getUserHomeStreams(followService.followingUsers))
+                    ].filter((e) => e)
+                )
             } else {
-                // non-home
-                props.setCurrentStreams(reactlocation.hash.replace('#', '').split(','))
+                props.setCurrentStreams(queriedStreams)
             }
         })()
-        const streams = reactlocation.hash.replace('#', '').split(',')
-        let mymode = followService.bookmarkingStreams.includes(streams[0]) ? 'compose' : 'info'
-        if (streams.length !== 1) mymode = 'compose'
+        let mymode = followService.bookmarkingStreams.includes(queriedStreams[0]) ? 'compose' : 'info'
+        if (queriedStreams.length !== 1) mymode = 'compose'
         if (!reactlocation.hash) mymode = 'home'
         setMode(mymode)
 
@@ -97,11 +99,11 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                         </Box>
                     </Collapse>
                     <Collapse in={mode === 'info'}>
-                        <StreamInfo id={reactlocation.hash.replace('#', '').split(',')[0]} />
+                        <StreamInfo id={queriedStreams[0]} />
                     </Collapse>
                     <Collapse in={mode === 'compose' || mode === 'home'}>
                         <Box sx={{ padding: { xs: '8px', sm: '8px 16px' } }}>
-                            <Draft currentStreams={reactlocation.hash.replace('#', '')} />
+                            <Draft currentStreams={isHome ? [] : queriedStreams} />
                         </Box>
                     </Collapse>
                     <Divider />

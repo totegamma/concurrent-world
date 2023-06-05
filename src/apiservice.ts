@@ -135,7 +135,7 @@ export default class ConcurrentApiClient {
             headers: {}
         }).then(async (res) => {
             if (!res.ok) {
-                throw new Error('fetch failed')
+                return await Promise.reject(new Error(`fetch failed: ${res.status} ${await res.text()}`))
             }
             const data = await res.json()
             if (!data.payload) {
@@ -244,7 +244,7 @@ export default class ConcurrentApiClient {
             headers: {}
         }).then(async (res) => {
             if (!res.ok) {
-                return await Promise.reject(new Error('fetch failed'))
+                return await Promise.reject(new Error(`fetch failed: ${res.status} ${await res.text()}`))
             }
             const data = await res.json()
             if (!data.association) {
@@ -419,7 +419,7 @@ export default class ConcurrentApiClient {
             headers: {}
         }).then(async (res) => {
             if (!res.ok) {
-                throw new Error('fetch failed')
+                return await Promise.reject(new Error(`fetch failed: ${res.status} ${await res.text()}`))
             }
             const data = await res.json()
             if (!data.payload) {

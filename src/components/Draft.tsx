@@ -22,7 +22,7 @@ export interface EmojiProps {
 }
 
 export interface DraftProps {
-    currentStreams: string
+    currentStreams: string[]
 }
 
 export interface Skin {
@@ -67,10 +67,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
 
     useEffect(() => {
         setMessageDestStreams([
-            ...new Set([
-                ...(reactlocation.hash ? defaultPostNonHome : defaultPostHome),
-                ...props.currentStreams.split(',')
-            ])
+            ...new Set([...(reactlocation.hash ? defaultPostNonHome : defaultPostHome), ...props.currentStreams])
         ])
     }, [reactlocation.hash])
 
@@ -99,7 +96,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         setSending(true)
         const streams = [
             ...new Set([
-                ...props.currentStreams.split(','),
+                ...props.currentStreams,
                 ...messageDestStreams,
                 ...(postHome ? [appData.userstreams?.payload.body.homeStream] : [])
             ])
