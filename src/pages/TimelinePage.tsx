@@ -53,11 +53,13 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
 
     useEffect(() => {
         // check if the all of streams are writable
+        if (!reactlocation.hash) return
         ;(async () => {
             const writeable = await Promise.all(
                 props.currentStreams.map(async (e) => {
                     const stream = await api.readStream(e)
                     if (!stream) return false
+                    if (stream.author === api.userAddress) return true
                     if (stream.writer.length === 0) return true
                     return stream.writer.includes(api.userAddress)
                 })
