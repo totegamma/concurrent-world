@@ -45,7 +45,7 @@ export function StreamList(props: StreamListProps): JSX.Element {
                             id: stream?.id,
                             parent: 0,
                             droppable: false,
-                            text: stream?.payload.body.name || 'Unknown',
+                            text: '',
                             data: stream
                         }))
                         .filter((e) => e.id) as WatchStream[]
@@ -70,7 +70,7 @@ export function StreamList(props: StreamListProps): JSX.Element {
                             id: stream.id,
                             parent: 0,
                             droppable: false,
-                            text: stream.payload.body.name || 'Unknown',
+                            text: '',
                             data: stream
                         })
                     }

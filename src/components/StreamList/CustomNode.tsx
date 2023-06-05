@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Typography from '@mui/material/Typography'
 import ArrowRightIcon from '@mui/icons-material/ArrowRight'
 import EditIcon from '@mui/icons-material/Edit'
@@ -11,6 +11,7 @@ import type { Stream } from '../../model'
 import type { WatchStream } from './index'
 import { useNavigate } from 'react-router-dom'
 import { styled } from '@mui/material/styles'
+import { useApi } from '../../context/api'
 
 const CustomNodeText = styled('div')(({ theme }) => ({}))
 
@@ -90,12 +91,21 @@ export const CustomNode = (props: CustomNodeProps): JSX.Element => {
               paddingLeft: '7.5px'
           }
 
+    const [streamName, setStreamName] = useState<string>('')
+    const api = useApi()
+    useEffect(() => {
+        if (!props.node.data) return
+        api?.readStream(props.node.data.id).then((stream) => {
+            setStreamName(stream?.payload.body.name ?? props.node.data)
+        })
+    }, [props.node.id, api])
+
     if (props.node.data) {
         return (
             <div className={`tree-node ${styles.root}`} style={{ paddingInlineStart: indent }}>
                 <div className={`${styles.expandIconWrapperText} `} onClick={handleToggle}></div>
                 <CustomNodeText className={styles.labelGridItem} onClick={handleToggle} sx={selectedStyle}>
-                    <div className={styles.streamName} onClick={handleNavigate}>{`${props.node.text}`}</div>
+                    <div role={'button'} className={styles.streamName} onClick={handleNavigate}>{`${streamName}`}</div>
                 </CustomNodeText>
             </div>
         )
