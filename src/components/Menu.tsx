@@ -1,6 +1,5 @@
 import {
     Box,
-    Button,
     ButtonBase,
     Divider,
     List,
@@ -14,6 +13,7 @@ import { Link } from 'react-router-dom'
 
 import HomeIcon from '@mui/icons-material/Home'
 import BadgeIcon from '@mui/icons-material/Badge'
+import BuildIcon from '@mui/icons-material/Build'
 import MessageIcon from '@mui/icons-material/Message'
 import ExploreIcon from '@mui/icons-material/Explore'
 import SettingsIcon from '@mui/icons-material/Settings'
@@ -176,6 +176,17 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                         />
 
                                         <ListItemText primary="Settings" />
+                                    </ListItemButton>
+                                </ListItem>
+                                <ListItem disablePadding>
+                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/devtool">
+                                        <BuildIcon
+                                            sx={{
+                                                color: 'background.contrastText'
+                                            }}
+                                        />
+
+                                        <ListItemText primary="DevTool" />
                                     </ListItemButton>
                                 </ListItem>
                             </List>
