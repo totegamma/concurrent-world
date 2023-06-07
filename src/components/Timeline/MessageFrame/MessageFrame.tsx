@@ -14,15 +14,15 @@ import {
     ListItemIcon
 } from '@mui/material'
 
-import type { Character, Message as CCMessage, ProfileWithAddress, StreamElement, Stream } from '../../model'
-import type { Profile } from '../../schemas/profile'
-import { Schemas } from '../../schemas'
-import type { Like } from '../../schemas/like'
-import { useApi } from '../../context/api'
-import { useInspector } from '../../context/Inspector'
-import { ApplicationContext } from '../../App'
-import type { ReplyMessage } from '../../schemas/replyMessage'
-import type { ReplyAssociation } from '../../schemas/replyAssociation'
+import type { Character, Message as CCMessage, ProfileWithAddress, StreamElement, Stream } from '../../../model'
+import type { Profile } from '../../../schemas/profile'
+import { Schemas } from '../../../schemas'
+import type { Like } from '../../../schemas/like'
+import { useApi } from '../../../context/api'
+import { useInspector } from '../../../context/Inspector'
+import { ApplicationContext } from '../../../App'
+import type { ReplyMessage } from '../../../schemas/replyMessage'
+import type { ReplyAssociation } from '../../../schemas/replyAssociation'
 import { MessageView } from './MessageView'
 
 export interface MessageFrameProp {

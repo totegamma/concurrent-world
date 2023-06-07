@@ -1,15 +1,13 @@
 import { Box, Divider, List, Modal, Typography, useTheme } from '@mui/material'
 import React, { type RefObject, memo, useCallback, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroller'
-import { MessageFrame } from './MessageFrame'
 import { AssociationFrame } from './AssociationFrame'
 import type { IuseObjectList } from '../../hooks/useObjectList'
 import type { StreamElement, StreamElementDated } from '../../model'
 import { useApi } from '../../context/api'
 import { InspectorProvider } from '../../context/Inspector'
 import { Loading } from '../Loading'
-import { Draft } from '../Draft'
-import { MessageMultiplexer, Multiplexer } from './Multiplexer'
+import { MessageMultiplexer } from './Multiplexer'
 
 export interface TimelineProps {
     streams: string[]

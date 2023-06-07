@@ -1,7 +1,7 @@
 import type { Message } from '../../model'
 import { MarkdownRenderer } from '../MarkdownRenderer'
 import type { ReplyMessage } from '../../schemas/replyMessage'
-import { MessageFrame } from './MessageFrame'
+import { MessageFrame } from './MessageFrame/MessageFrame'
 
 interface ReplyNoteProps {
     message: Message<ReplyMessage>

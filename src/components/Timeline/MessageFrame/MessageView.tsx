@@ -12,23 +12,24 @@ import {
     Typography
 } from '@mui/material'
 import { Link as routerLink } from 'react-router-dom'
-import { CCAvatar } from '../CCAvatar'
-import { TimeDiff } from '../TimeDiff'
+import { CCAvatar } from '../../CCAvatar'
+import { TimeDiff } from '../../TimeDiff'
 import ReplyIcon from '@mui/icons-material/Reply'
 import StarIcon from '@mui/icons-material/Star'
 import StarOutlineIcon from '@mui/icons-material/StarOutline'
-import { Schemas } from '../../schemas'
+import { Schemas } from '../../../schemas'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
-import type { Character, Message as CCMessage, ProfileWithAddress, Stream, StreamElement } from '../../model'
-import { SimpleNote } from './SimpleNote'
-import type { SimpleNote as TypeSimpleNote } from '../../schemas/simpleNote'
+import type { Character, Message as CCMessage, ProfileWithAddress, Stream, StreamElement } from '../../../model'
+import { SimpleNote } from '../SimpleNote'
+import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-import type { Profile } from '../../schemas/profile'
-import type ConcurrentApiClient from '../../apiservice'
-import type { InspectorState } from '../../context/Inspector'
+import type { Profile } from '../../../schemas/profile'
+import type ConcurrentApiClient from '../../../apiservice'
+import type { InspectorState } from '../../../context/Inspector'
 import React from 'react'
+import {MessageHeader} from "./MessageHeader";
 
 export interface MessageViewProps {
     propsMessage: StreamElement
@@ -96,50 +97,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                             overflow: 'auto'
                         }}
                     >
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'baseline',
-                                justifyContent: 'space-between'
-                            }}
-                        >
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'baseline',
-                                    gap: '5px'
-                                }}
-                            >
-                                <Typography
-                                    component="span"
-                                    sx={{
-                                        fontWeight: '700',
-                                        fontSize: {
-                                            xs: '0.9rem',
-                                            sm: '1rem'
-                                        }
-                                    }}
-                                >
-                                    {props.author?.payload.body.username || 'anonymous'}
-                                </Typography>
-                                <Typography
-                                    component="span"
-                                    sx={{
-                                        fontweight: '400',
-                                        fontSize: '10px',
-                                        display: {
-                                            xs: 'none',
-                                            sm: 'inline'
-                                        }
-                                    }}
-                                >
-                                    {props.message.author}
-                                </Typography>
-                            </Box>
-                            <Link component="button" underline="hover" color="inherit">
-                                <TimeDiff date={new Date(props.message.cdate)} />
-                            </Link>
-                        </Box>
+                        <MessageHeader authorAddress={props.message.author} cdate={props.message.cdate} username={props.author?.payload.body.username} />
                         {/* <Multiplexer body={props.message} /> */}
                         <SimpleNote message={props.message} />
                         <Box
