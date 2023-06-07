@@ -33,6 +33,8 @@ import { FollowProvider } from './context/FollowContext'
 import type { Profile } from './schemas/profile'
 import type { Userstreams } from './schemas/userstreams'
 
+const iOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent)
+
 export const ApplicationContext = createContext<appData>({
     profile: undefined,
     userstreams: undefined,
@@ -379,6 +381,9 @@ function App(): JSX.Element {
                 onClose={() => {
                     setMobileMenuOpen(false)
                 }}
+                disableBackdropTransition={!iOS}
+                disableDiscovery={iOS}
+                disableSwipeToOpen={false}
                 PaperProps={{
                     sx: {
                         width: '200px',
