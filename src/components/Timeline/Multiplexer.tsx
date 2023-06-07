@@ -10,6 +10,7 @@ interface MultiplexerProps {
 export const Multiplexer = (props: MultiplexerProps): JSX.Element => {
     switch (props.body.schema) {
         case Schemas.simpleNote:
+            // return <MessageFrame message={props.message} lastUpdated={props.lastUpdated} />
             return <SimpleNote message={props.body} />
         case Schemas.replyMessage:
             return <ReplyNote message={props.body} />
