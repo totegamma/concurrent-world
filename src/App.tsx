@@ -1,6 +1,6 @@
 import { useEffect, useState, createContext, useRef, useMemo } from 'react'
 import { Routes, Route } from 'react-router-dom'
-import { darken, Box, Paper, ThemeProvider, Drawer } from '@mui/material'
+import { darken, Box, Paper, ThemeProvider, SwipeableDrawer } from '@mui/material'
 import useWebSocket, { type ReadyState } from 'react-use-websocket'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 
@@ -370,9 +370,12 @@ function App(): JSX.Element {
                     </Box>
                 </Box>
             </Box>
-            <Drawer
+            <SwipeableDrawer
                 anchor={'left'}
                 open={mobileMenuOpen}
+                onOpen={() => {
+                    setMobileMenuOpen(true)
+                }}
                 onClose={() => {
                     setMobileMenuOpen(false)
                 }}
@@ -392,7 +395,7 @@ function App(): JSX.Element {
                     }}
                     hideMenu
                 />
-            </Drawer>
+            </SwipeableDrawer>
         </>
     )
 }
