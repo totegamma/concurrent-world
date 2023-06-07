@@ -15,12 +15,13 @@ import { branch, sha } from '~build/info'
 import { Sign, SignJWT, fetchWithTimeout } from './util'
 import { Schemas } from './schemas'
 import { type Userstreams } from './schemas/userstreams'
+import { ApiService } from './abstraction/apiservice'
 
 const branchName = branch || window.location.host.split('.')[0]
 
 const apiPath = '/api/v1'
 
-export default class ConcurrentApiClient {
+export default class ConcurrentApiClient extends ApiService {
     host: Host | undefined
     userAddress: string
     privatekey: string
@@ -33,6 +34,7 @@ export default class ConcurrentApiClient {
     streamCache: Record<string, Promise<Stream<any>> | undefined> = {}
 
     constructor(userAddress: string, privatekey: string, host?: Host) {
+        super()
         this.host = host
         this.userAddress = userAddress
         this.privatekey = privatekey
@@ -75,7 +77,7 @@ export default class ConcurrentApiClient {
         return false
     }
 
-    fetchWithCredential = async (url: RequestInfo, init: RequestInit, timeoutMs?: number): Promise<Response> => {
+    async fetchWithCredential(url: RequestInfo, init: RequestInit, timeoutMs?: number): Promise<Response> {
         let jwt = this.token
         if (!jwt || !this.checkJwtIsValid(jwt)) {
             jwt = await this.getJWT()

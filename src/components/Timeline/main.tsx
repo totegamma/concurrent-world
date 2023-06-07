@@ -67,38 +67,8 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
         }
     }, [api, props.streams, props.timeline])
 
-    const style = {
-        position: 'absolute' as 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: 400,
-        bgcolor: 'background.paper',
-        border: '2px solid #000',
-        boxShadow: 24,
-        p: 4
-    }
-
-    const [open, setOpen] = React.useState(true)
-    const handleOpen = (): void => {
-        setOpen(true)
-    }
-    const handleClose = (): void => {
-        setOpen(false)
-    }
-
     return (
         <>
-            <Modal
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
-                <Box sx={style}>
-                    <Draft currentStreams={''} />
-                </Box>
-            </Modal>
             <InspectorProvider>
                 <List sx={{ flex: 1, width: '100%' }}>
                     <InfiniteScroll

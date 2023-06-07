@@ -35,6 +35,7 @@ import type { SimpleNote } from '../../schemas/simpleNote'
 import { ApplicationContext } from '../../App'
 import type { ReplyMessage } from '../../schemas/replyMessage'
 import type { ReplyAssociation } from '../../schemas/replyAssociation'
+import { MessageView } from './MessageView'
 
 export interface MessageFrameProp {
     message: StreamElement
@@ -188,257 +189,23 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
     }
 
     return (
-        <ListItem
-            sx={{
-                alignItems: 'flex-start',
-                flex: 1,
-                p: { xs: '7px 0', sm: '10px 0' },
-                wordBreak: 'break-word'
-            }}
-        >
-            {message?.payload?.body && (
-                <>
-                    <Box
-                        sx={{
-                            padding: {
-                                xs: '5px 8px 0 0',
-                                sm: '8px 10px 0 0'
-                            }
-                        }}
-                    >
-                        <IconButton
-                            sx={{
-                                width: { xs: '38px', sm: '48px' },
-                                height: { xs: '38px', sm: '48px' }
-                            }}
-                            component={routerLink}
-                            to={'/entity/' + message.author}
-                        >
-                            <CCAvatar
-                                alt={author?.payload.body.username}
-                                avatarURL={author?.payload.body.avatar}
-                                identiconSource={message.author}
-                                sx={{
-                                    width: { xs: '38px', sm: '48px' },
-                                    height: { xs: '38px', sm: '48px' }
-                                }}
-                            />
-                        </IconButton>
-                    </Box>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flex: 1,
-                            flexDirection: 'column',
-                            width: '100%',
-                            overflow: 'auto'
-                        }}
-                    >
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'baseline',
-                                justifyContent: 'space-between'
-                            }}
-                        >
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'baseline',
-                                    gap: '5px'
-                                }}
-                            >
-                                <Typography
-                                    component="span"
-                                    sx={{
-                                        fontWeight: '700',
-                                        fontSize: {
-                                            xs: '0.9rem',
-                                            sm: '1rem'
-                                        }
-                                    }}
-                                >
-                                    {author?.payload.body.username || 'anonymous'}
-                                </Typography>
-                                <Typography
-                                    component="span"
-                                    sx={{
-                                        fontweight: '400',
-                                        fontSize: '10px',
-                                        display: {
-                                            xs: 'none',
-                                            sm: 'inline'
-                                        }
-                                    }}
-                                >
-                                    {message.author}
-                                </Typography>
-                            </Box>
-                            <Link component="button" underline="hover" color="inherit">
-                                <TimeDiff date={new Date(message.cdate)} />
-                            </Link>
-                        </Box>
-                        <Multiplexer body={message} />
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                gap: '10px',
-                                justifyContent: 'space-between'
-                            }}
-                        >
-                            <Box sx={{ display: 'flex', gap: '20px' }}>
-                                {/* left */}
-                                <IconButton
-                                    onClick={() => {
-                                        handleReply()
-                                    }}
-                                >
-                                    <ReplyIcon />
-                                </IconButton>
-                                <Tooltip
-                                    title={
-                                        <Box
-                                            sx={{
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                gap: 1
-                                            }}
-                                        >
-                                            {reactUsers.map((user) => (
-                                                <Box
-                                                    key={user.ccaddress}
-                                                    sx={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: 1
-                                                    }}
-                                                >
-                                                    <CCAvatar
-                                                        sx={{
-                                                            height: '20px',
-                                                            width: '20px'
-                                                        }}
-                                                        avatarURL={user.avatar}
-                                                        identiconSource={user.ccaddress}
-                                                        alt={user.ccaddress}
-                                                    />
-                                                    {user.username ?? 'anonymous'}
-                                                </Box>
-                                            ))}
-                                        </Box>
-                                    }
-                                    placement="top"
-                                    disableHoverListener={reactUsers.length === 0}
-                                >
-                                    <Box sx={{ display: 'flex' }}>
-                                        <IconButton
-                                            sx={{
-                                                p: '0',
-                                                color: theme.palette.text.secondary
-                                            }}
-                                            color="primary"
-                                            onClick={() => {
-                                                if (hasOwnReaction) {
-                                                    unfavorite(
-                                                        message.associations.find((e) => e.author === api.userAddress)
-                                                            ?.id
-                                                    )
-                                                } else {
-                                                    favorite()
-                                                }
-                                            }}
-                                        >
-                                            {hasOwnReaction ? <StarIcon /> : <StarOutlineIcon />}
-                                        </IconButton>
-                                        <Typography sx={{ size: '16px' }}>
-                                            {message.associations.filter((e) => e.schema === Schemas.like).length}
-                                        </Typography>
-                                    </Box>
-                                </Tooltip>
-                                <IconButton
-                                    sx={{
-                                        p: '0',
-                                        color: theme.palette.text.secondary
-                                    }}
-                                    onClick={(e) => {
-                                        setMessageAnchor(e.currentTarget)
-                                    }}
-                                >
-                                    <MoreHorizIcon />
-                                </IconButton>
-                            </Box>
-                            <Box sx={{ display: 'flex', gap: '3px' }}>
-                                {/* right */}
-                                {msgstreams.map((e) => (
-                                    <Link
-                                        key={e.id}
-                                        underline="hover"
-                                        sx={{
-                                            fontweight: '400',
-                                            fontSize: '13px',
-                                            color: 'text.secondary'
-                                        }}
-                                        href={'/#' + e.id}
-                                    >
-                                        {`%${
-                                            e.payload.body.name.length < 12
-                                                ? (e.payload.body.name as string)
-                                                : (e.payload.body.name.slice(0, 9) as string) + '...'
-                                        }`}
-                                    </Link>
-                                ))}
-                            </Box>
-                        </Box>
-                    </Box>
-                </>
-            )}
-            <Menu
-                anchorEl={messageAnchor}
-                open={Boolean(messageAnchor)}
-                onClose={() => {
-                    setMessageAnchor(null)
-                }}
-            >
-                <MenuItem
-                    onClick={() => {
-                        const target: CCMessage<SimpleNote> = message
-                        navigator.clipboard.writeText(target.payload.body.body)
-                        setMessageAnchor(null)
-                    }}
-                >
-                    <ListItemIcon>
-                        <ContentPasteIcon sx={{ color: 'text.primary' }} />
-                    </ListItemIcon>
-                    <ListItemText>ソースをコピー</ListItemText>
-                </MenuItem>
-                <MenuItem
-                    onClick={() => {
-                        inspector.inspectItem(props.message)
-                        setMessageAnchor(null)
-                    }}
-                >
-                    <ListItemIcon>
-                        <ManageSearchIcon sx={{ color: 'text.primary' }} />
-                    </ListItemIcon>
-                    <ListItemText>詳細</ListItemText>
-                </MenuItem>
-                {props.message.author === api.userAddress && (
-                    <MenuItem
-                        onClick={() => {
-                            api.deleteMessage(props.message.id)
-                            api.invalidateMessage(props.message.id)
-                            setFetchSucceed(false)
-                            setMessageAnchor(null)
-                        }}
-                    >
-                        <ListItemIcon>
-                            <DeleteForeverIcon sx={{ color: 'text.primary' }} />
-                        </ListItemIcon>
-                        <ListItemText>メッセージを削除</ListItemText>
-                    </MenuItem>
-                )}
-            </Menu>
-        </ListItem>
+        <MessageView
+            propsMessage={props.message}
+            message={message}
+            author={author}
+            reactUsers={reactUsers}
+            theme={theme}
+            hasOwnReaction={hasOwnReaction}
+            msgstreams={msgstreams}
+            messageAnchor={messageAnchor}
+            api={api}
+            inspector={inspector}
+            handleReply={handleReply}
+            unfavorite={unfavorite}
+            favorite={favorite}
+            setMessageAnchor={setMessageAnchor}
+            setFetchSucceed={setFetchSucceed}
+        />
     )
 })
 

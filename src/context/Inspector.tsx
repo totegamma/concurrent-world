@@ -22,7 +22,7 @@ import { materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { validateSignature } from '../util'
 
-interface InspectorState {
+export interface InspectorState {
     inspectingItem: StreamElement | null
     inspectItem: React.Dispatch<React.SetStateAction<StreamElement | null>>
 }
