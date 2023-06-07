@@ -20,7 +20,8 @@ import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import { Schemas } from '../../schemas'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import type { Character, Message as CCMessage, ProfileWithAddress, Stream, StreamElement } from '../../model'
-import type { SimpleNote } from '../../schemas/simpleNote'
+import { SimpleNote } from './SimpleNote'
+import type { SimpleNote as TypeSimpleNote } from '../../schemas/simpleNote'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
@@ -28,11 +29,10 @@ import type { Profile } from '../../schemas/profile'
 import type ConcurrentApiClient from '../../apiservice'
 import type { InspectorState } from '../../context/Inspector'
 import React from 'react'
-import { Multiplexer } from './Multiplexer'
 
 export interface MessageViewProps {
     propsMessage: StreamElement
-    message: CCMessage<SimpleNote>
+    message: CCMessage<TypeSimpleNote>
     author: Character<Profile> | undefined
     reactUsers: ProfileWithAddress[]
     theme: Theme
@@ -140,7 +140,8 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                                 <TimeDiff date={new Date(props.message.cdate)} />
                             </Link>
                         </Box>
-                        <Multiplexer body={props.message} />
+                        {/* <Multiplexer body={props.message} /> */}
+                        <SimpleNote message={props.message} />
                         <Box
                             sx={{
                                 display: 'flex',
@@ -264,7 +265,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
             >
                 <MenuItem
                     onClick={() => {
-                        const target: CCMessage<SimpleNote> = props.message
+                        const target: CCMessage<TypeSimpleNote> = props.message
                         navigator.clipboard.writeText(target.payload.body.body)
                         props.setMessageAnchor(null)
                     }}

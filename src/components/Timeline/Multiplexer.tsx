@@ -1,20 +1,36 @@
-import type { Message } from '../../model'
 import { Schemas } from '../../schemas'
-import { SimpleNote } from './SimpleNote'
-import { ReplyNote } from './ReplyNote'
+import type { Message as CCMessage, StreamElement } from '../../model'
+import { useApi } from '../../context/api'
+import { useEffect, useState } from 'react'
+import { MessageFrame } from './MessageFrame'
 
 interface MultiplexerProps {
-    body: Message<any>
+    message: StreamElement
+    lastUpdated: number
 }
 
-export const Multiplexer = (props: MultiplexerProps): JSX.Element => {
-    switch (props.body.schema) {
+export const MessageMultiplexer = (props: MultiplexerProps): JSX.Element => {
+    const api = useApi()
+    const [message, setMessage] = useState<CCMessage<any> | undefined>()
+
+    useEffect(() => {
+        console.log('Multiplexer: ' + props.message.id)
+        api.fetchMessage(props.message.id, props.message.currenthost)
+            .then((msg) => {
+                if (!msg) return
+                setMessage(msg)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }, [props.message, props.lastUpdated])
+
+    switch (message?.schema) {
         case Schemas.simpleNote:
-            // return <MessageFrame message={props.message} lastUpdated={props.lastUpdated} />
-            return <SimpleNote message={props.body} />
+            return <MessageFrame message={props.message} lastUpdated={props.lastUpdated} />
         case Schemas.replyMessage:
-            return <ReplyNote message={props.body} />
+            return <h1>reply</h1>
         default:
-            return <>unknown schema: {props.body.schema}</>
+            return <>unknown schema: {message?.schema}</>
     }
 }
