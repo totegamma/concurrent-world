@@ -94,7 +94,7 @@ export class ApiMock extends ApiService {
     }
 
     getStreamListBySchema(schema: string, remote?: string): Promise<Array<Stream<any>>> {
-        return Promise.resolve([StreamMock])
+        return Promise.resolve([StreamMock()])
     }
 
     getUserHomeStreams(users: string[]): Promise<string[]> {

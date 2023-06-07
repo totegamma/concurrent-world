@@ -1,18 +1,10 @@
-import type {
-    Character,
-    Message,
-    Stream,
-    StreamElement,
-    Association,
-    type Message as CCMessage,
-    SignedObject
-} from '../model'
+import type { Character, Message, Stream, StreamElement, Association, SignedObject } from '../model'
 import { type Profile } from '../schemas/profile'
 
 import { type Commonstream } from '../schemas/commonstream'
 import { type SimpleNote } from '../schemas/simpleNote'
 
-export const StreamMock = (streamName: string): Stream<Commonstream> => {
+export const StreamMock = (streamName: string = 'MockStreamName'): Stream<Commonstream> => {
     return {
         id: 'streamid',
         author: 'author',
@@ -44,7 +36,7 @@ export const MessageMock = (
     body: string = 'MockBody',
     author: string = 'MockAuthor',
     cdate: string = '2023-06-06T00:15:21.43756+09:00'
-): CCMessage<SimpleNote> => {
+): Message<SimpleNote> => {
     return {
         associations: [],
         author,
