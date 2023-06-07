@@ -1,5 +1,5 @@
-import { Box } from '@mui/material'
-import { forwardRef, useState } from 'react'
+import { Box, Button, TextField, Typography } from '@mui/material'
+import { forwardRef, useEffect, useState } from 'react'
 import type { RJSFSchema } from '@rjsf/utils'
 import Form from '@rjsf/mui'
 import validator from '@rjsf/validator-ajv8'
@@ -21,20 +21,42 @@ const schema: RJSFSchema = {
 export const ActivityPub = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
     const api = useApi()
     const [loading, setLoading] = useState(false)
+    const [registered, setRegistered] = useState(false)
+    const [userID, setUserID] = useState('')
 
-    const register = (form: any): void => {
+    useEffect(() => {
+        const requestOptions = {
+            method: 'GET',
+            headers: {
+                'content-type': 'application/json'
+            }
+        }
+
+        api.fetchWithCredential(`https://${api.host!.fqdn}/api/v1/ap/entity/${api.userAddress}`, requestOptions)
+            .then(async (res) => await res.json())
+            .then((data) => {
+                console.log(data)
+                setUserID(data.content)
+                setRegistered(true)
+            })
+            .catch((e) => {
+                console.log(e)
+                setRegistered(false)
+            })
+    }, [])
+
+    const register = (): void => {
         if (!api) {
             return
         }
         setLoading(true)
         const requestOptions = {
-            method: 'PUT',
+            method: 'POST',
             headers: {
                 'content-type': 'application/json'
             },
             body: JSON.stringify({
-                id: api.userAddress,
-                ...form
+                id: userID
             })
         }
 
@@ -51,24 +73,82 @@ export const ActivityPub = forwardRef<HTMLDivElement>((props, ref): JSX.Element 
             })
     }
 
+    const updateProfile = (form: any): void => {
+        if (!api) {
+            return
+        }
+        setLoading(true)
+        const requestOptions = {
+            method: 'PUT',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: userID,
+                ...form
+            })
+        }
+
+        api.fetchWithCredential(`https://${api.host!.fqdn}/api/v1/ap/person`, requestOptions)
+            .then(async (res) => await res.json())
+            .then((data) => {
+                console.log(data)
+                setLoading(false)
+                alert('success')
+            })
+            .catch((e) => {
+                alert(e)
+                setLoading(false)
+            })
+    }
+
     return (
         <div ref={ref} {...props}>
-            <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '10px'
-                }}
-            >
-                <Form
-                    disabled={loading}
-                    schema={schema}
-                    validator={validator}
-                    onSubmit={(e) => {
-                        register(e.formData)
+            {!registered ? (
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '10px'
                     }}
-                />
-            </Box>
+                >
+                    <h3>Register</h3>
+                    <Typography>一度登録すると変更できません</Typography>
+                    <TextField
+                        label="UserID"
+                        value={userID}
+                        onChange={(x) => {
+                            setUserID(x.target.value)
+                        }}
+                    />
+                    <Button
+                        variant="contained"
+                        onClick={() => {
+                            register()
+                        }}
+                    >
+                        register
+                    </Button>
+                </Box>
+            ) : (
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '10px'
+                    }}
+                >
+                    <Typography>UserID: {userID}</Typography>
+                    <Form
+                        disabled={loading}
+                        schema={schema}
+                        validator={validator}
+                        onSubmit={(e) => {
+                            updateProfile(e.formData)
+                        }}
+                    />
+                </Box>
+            )}
         </div>
     )
 })
