@@ -590,7 +590,7 @@ export default class ConcurrentApiClient {
             iss: this.userAddress,
             iat: Math.floor(new Date().getTime() / 1000).toString(),
             aud: this.host?.fqdn,
-            nbf: Math.floor(new Date().getTime() / 1000).toString(),
+            nbf: Math.floor((new Date().getTime() - 5 * 60 * 1000) / 1000).toString(),
             exp: Math.floor((new Date().getTime() + 5 * 60 * 1000) / 1000).toString(),
             ...claim
         })
