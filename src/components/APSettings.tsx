@@ -1,9 +1,10 @@
 import { Box, Button, TextField, Typography } from '@mui/material'
-import { forwardRef, useEffect, useState } from 'react'
+import { forwardRef, useContext, useEffect, useState } from 'react'
 import type { RJSFSchema } from '@rjsf/utils'
 import Form from '@rjsf/mui'
 import validator from '@rjsf/validator-ajv8'
-import { useApi } from '../../context/api'
+import { useApi } from '../context/api'
+import { ApplicationContext } from '../App'
 
 const schema: RJSFSchema = {
     title: 'ActivityPubSettings',
@@ -14,15 +15,18 @@ const schema: RJSFSchema = {
         name: { type: 'string', title: 'Name' },
         summary: { type: 'string', title: 'Bio' },
         profile_url: { type: 'string', title: 'ProfileURL' },
-        icon_url: { type: 'string', title: 'IconURL' }
+        icon_url: { type: 'string', title: 'IconURL' },
+        homestream: { type: 'string', title: 'Homestream' }
     }
 }
 
-export const ActivityPub = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
+export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
     const api = useApi()
+    const appData = useContext(ApplicationContext)
     const [loading, setLoading] = useState(false)
     const [registered, setRegistered] = useState(false)
     const [userID, setUserID] = useState('')
+    const [form, setForm] = useState<any>({})
 
     useEffect(() => {
         const requestOptions = {
@@ -44,6 +48,31 @@ export const ActivityPub = forwardRef<HTMLDivElement>((props, ref): JSX.Element 
                 setRegistered(false)
             })
     }, [])
+
+    useEffect(() => {
+        if (!api) return
+        if (!userID) return
+        const requestOptions = {
+            method: 'GET',
+            headers: {
+                'content-type': 'application/json'
+            }
+        }
+        const profile = window.location.protocol + '//' + window.location.host + '/entity/' + api.userAddress
+        const home = appData.userstreams?.payload.body.homeStream
+        api.fetchWithCredential(`https://${api.host!.fqdn}/api/v1/ap/person/${userID}`, requestOptions)
+            .then(async (res) => await res.json())
+            .then((data) => {
+                console.log(data)
+                setForm({
+                    name: data.content.name,
+                    summary: data.content.summary,
+                    profile_url: data.content.profile_url || profile,
+                    icon_url: data.content.icon_url,
+                    homestream: data.content.homestream || home
+                })
+            })
+    }, [userID])
 
     const register = (): void => {
         if (!api) {
@@ -143,6 +172,10 @@ export const ActivityPub = forwardRef<HTMLDivElement>((props, ref): JSX.Element 
                         disabled={loading}
                         schema={schema}
                         validator={validator}
+                        formData={form}
+                        onChange={(e) => {
+                            setForm(e.formData)
+                        }}
                         onSubmit={(e) => {
                             updateProfile(e.formData)
                         }}
@@ -153,4 +186,4 @@ export const ActivityPub = forwardRef<HTMLDivElement>((props, ref): JSX.Element 
     )
 })
 
-ActivityPub.displayName = 'ActivityPub'
+APSettings.displayName = 'APSettings'
