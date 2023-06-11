@@ -72,6 +72,15 @@ export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
                     homestream: data.content.homestream || home
                 })
             })
+            .catch((_) => {
+                setForm({
+                    name: appData.profile?.payload.body.username,
+                    summary: appData.profile?.payload.body.description,
+                    profile_url: profile,
+                    icon_url: appData.profile?.payload.body.avatar,
+                    homestream: home
+                })
+            })
     }, [userID])
 
     const register = (): void => {
