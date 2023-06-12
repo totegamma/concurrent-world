@@ -1,4 +1,4 @@
-import { Box, Divider, Typography, useTheme } from '@mui/material'
+import { Box, Divider, Typography } from '@mui/material'
 import type { StreamElementDated } from '../model'
 import type { IuseObjectList } from '../hooks/useObjectList'
 import { useContext, useEffect, useRef } from 'react'
@@ -12,7 +12,6 @@ export interface AssociationsProps {
 }
 
 export function Associations(props: AssociationsProps): JSX.Element {
-    const theme = useTheme()
     const appData = useContext(ApplicationContext)
     const scrollParentRef = useRef<HTMLDivElement>(null)
 
@@ -26,31 +25,31 @@ export function Associations(props: AssociationsProps): JSX.Element {
     return (
         <Box
             sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '5px',
-                padding: '20px',
-                backgroundColor: 'background.paper',
+                overflowX: 'hidden',
+                overflowY: 'scroll',
+                width: '100%',
                 minHeight: '100%',
-                overflow: 'scroll'
+                backgroundColor: 'background.paper'
             }}
         >
-            <Typography variant="h2" gutterBottom>
-                Associations
-            </Typography>
-            <Divider />
             <Box
                 sx={{
-                    overflowX: 'hidden',
-                    overflowY: 'auto',
+                    padding: '20px 20px 0 20px'
+                }}
+            >
+                <Typography variant="h2" gutterBottom>
+                    Associations
+                </Typography>
+                <Divider />
+            </Box>
+            <Box
+                sx={{
                     width: '100%',
-                    padding: { xs: '8px', sm: '8px 16px' },
-                    background: theme.palette.background.paper,
                     minHeight: '100%'
                 }}
                 ref={scrollParentRef}
             >
-                <Box sx={{ display: 'flex', flex: 1 }}>
+                <Box sx={{ display: 'flex', flex: 1, padding: { xs: '8px', sm: '8px 16px' } }}>
                     <Timeline
                         streams={props.currentStreams}
                         timeline={props.messages}

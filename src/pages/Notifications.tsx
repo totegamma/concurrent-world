@@ -1,4 +1,4 @@
-import { Box, Divider, Typography, useTheme } from '@mui/material'
+import { Box, Divider, Typography } from '@mui/material'
 import type { StreamElementDated } from '../model'
 import type { IuseObjectList } from '../hooks/useObjectList'
 import { useContext, useEffect, useRef } from 'react'
@@ -12,7 +12,6 @@ export interface NotificationsProps {
 }
 
 export function Notifications(props: NotificationsProps): JSX.Element {
-    const theme = useTheme()
     const appData = useContext(ApplicationContext)
     const scrollParentRef = useRef<HTMLDivElement>(null)
 
@@ -26,28 +25,31 @@ export function Notifications(props: NotificationsProps): JSX.Element {
     return (
         <Box
             sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '5px',
-                padding: '20px',
-                backgroundColor: 'background.paper',
+                overflowX: 'hidden',
+                overflowY: 'scroll',
+                width: '100%',
                 minHeight: '100%',
-                overflowY: 'scroll'
+                backgroundColor: 'background.paper'
             }}
         >
-            <Typography variant="h2" gutterBottom>
-                Notifications
-            </Typography>
-            <Divider />
+            <Box
+                sx={{
+                    padding: '20px 20px 0 20px'
+                }}
+            >
+                <Typography variant="h2" gutterBottom>
+                    Notifications
+                </Typography>
+                <Divider />
+            </Box>
             <Box
                 sx={{
                     width: '100%',
-                    background: theme.palette.background.paper,
                     minHeight: '100%'
                 }}
                 ref={scrollParentRef}
             >
-                <Box sx={{ display: 'flex', flex: 1 }}>
+                <Box sx={{ display: 'flex', flex: 1, padding: { xs: '8px', sm: '8px 16px' } }}>
                     <Timeline
                         streams={props.currentStreams}
                         timeline={props.messages}

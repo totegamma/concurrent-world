@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef, useState } from 'react'
-import { Box, Collapse, Divider, useTheme } from '@mui/material'
+import { Box, Collapse, Divider } from '@mui/material'
 import type { StreamElementDated } from '../model'
 import { type IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'
@@ -21,7 +21,6 @@ export interface TimelinePageProps {
 export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): JSX.Element => {
     const api = useApi()
     const followService = useFollow()
-    const theme = useTheme()
 
     const reactlocation = useLocation()
     const scrollParentRef = useRef<HTMLDivElement>(null)
@@ -87,8 +86,8 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                     overflowX: 'hidden',
                     overflowY: 'auto',
                     width: '100%',
-                    background: theme.palette.background.paper,
-                    minHeight: '100%'
+                    minHeight: '100%',
+                    backgroundColor: 'background.paper'
                 }}
                 ref={scrollParentRef}
             >
