@@ -28,7 +28,6 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                 setMessage(m)
                 if (!m) return
                 const isMeToOther = a.author !== api.userAddress
-                console.log(isMeToOther)
                 api.readCharacter(
                     isMeToOther ? props.association.author : m.author,
                     Schemas.profile,

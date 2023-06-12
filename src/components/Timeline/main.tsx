@@ -18,12 +18,15 @@ export interface TimelineProps {
 export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element => {
     const api = useApi()
     const [hasMoreData, setHasMoreData] = useState<boolean>(false)
+    const [isFetching, setIsFetching] = useState<boolean>(false)
     const theme = useTheme()
 
     useEffect(() => {
-        console.log('load recent!', props.streams)
-        let unmounted = false
+        if (!api.host) return
         props.timeline.clear()
+        let unmounted = false
+        setIsFetching(true)
+        setHasMoreData(true)
         api?.readStreamRecent(props.streams).then((data: StreamElement[]) => {
             if (unmounted) return
             const current = new Date().getTime()
@@ -40,12 +43,11 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
 
     const loadMore = useCallback(() => {
         if (!api.host) return
-        console.log('load more!')
+        if (isFetching) return
+        if (!props.timeline.current[props.timeline.current.length - 1]?.timestamp) return
+        if (!hasMoreData) return
         let unmounted = false
-        if (!props.timeline.current[props.timeline.current.length - 1]?.timestamp) {
-            return
-        }
-
+        setIsFetching(true)
         api?.readStreamRanged(props.streams, props.timeline.current[props.timeline.current.length - 1].timestamp).then(
             (data: StreamElement[]) => {
                 if (unmounted) return
@@ -60,11 +62,14 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                 } else setHasMoreData(false)
             }
         )
-
         return () => {
             unmounted = true
         }
-    }, [api, props.streams, props.timeline])
+    }, [api, props.streams, props.timeline, hasMoreData, isFetching])
+
+    useEffect(() => {
+        setIsFetching(false)
+    }, [props.timeline.current])
 
     return (
         <InspectorProvider>
@@ -73,6 +78,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                     loadMore={() => {
                         loadMore()
                     }}
+                    initialLoad={false}
                     hasMore={hasMoreData}
                     loader={<Loading key={0} message="Loading..." color={theme.palette.text.primary} />}
                     useWindow={false}
