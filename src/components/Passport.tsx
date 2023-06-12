@@ -43,20 +43,23 @@ export function Passport(): JSX.Element {
             }}
         >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 242.65 153.01">
-                <rect width="242.65" height="153.01" rx="10" ry="10" fill={theme.palette.primary.main} />
+                <path
+                    fill={theme.palette.primary.main}
+                    d="m233.21,0H9.44C4.23,0,0,4.23,0,9.44v134.14c0,5.21,4.23,9.44,9.44,9.44h223.77c5.21,0,9.44-4.23,9.44-9.44V9.44c0-5.21-4.23-9.44-9.44-9.44Zm-93.33,14.34h-37.1c-2.2,0-3.98-1.78-3.98-3.98s1.78-3.98,3.98-3.98h37.1c2.2,0,3.98,1.78,3.98,3.98s-1.78,3.98-3.98,3.98Z"
+                />
 
-                <text style={style3} transform="translate(12 15)">
+                <text style={style3} transform="translate(12 14)">
                     <tspan x="0" y="0">
                         CONCURRENT
                     </tspan>
                 </text>
 
-                <text style={style1} transform="translate(100 35)">
+                <text style={style1} transform="translate(100 30)">
                     <tspan x="0" y="0">
                         current name
                     </tspan>
                 </text>
-                <text style={style3} transform="translate(100 43)">
+                <text style={style3} transform="translate(100 40)">
                     <tspan x="0" y="0">
                         {appData.profile?.payload.body.username}
                     </tspan>
@@ -67,30 +70,30 @@ export function Passport(): JSX.Element {
                         current address
                     </tspan>
                 </text>
-                <text style={style3} transform="translate(100 68)">
+                <text style={style3} transform="translate(100 70)">
                     <tspan x="0" y="0">
                         {api.host?.fqdn}
                     </tspan>
                 </text>
 
-                <text style={style1} transform="translate(100 85)">
+                <text style={style1} transform="translate(100 90)">
                     <tspan x="0" y="0">
                         registered
                     </tspan>
                 </text>
-                <text style={style3} transform="translate(100 93)">
+                <text style={style3} transform="translate(100 100)">
                     <tspan x="0" y="0">
                         {cdate.toLocaleDateString()}
                     </tspan>
                 </text>
 
-                <text style={style3} transform="translate(200 93)">
+                <text style={style3} transform="translate(200 100)">
                     <tspan x="0" y="0">
                         100
                     </tspan>
                 </text>
 
-                <text style={style1} transform="translate(12 115)">
+                <text style={style1} transform="translate(12 118)">
                     <tspan x="0" y="0">
                         You are permitted to travel to other servers
                     </tspan>
@@ -110,17 +113,17 @@ export function Passport(): JSX.Element {
 
                 <path
                     style={style2}
-                    d="m56.13,99.92c-5.12,0-10.08-1-14.76-2.98-4.51-1.91-8.57-4.64-12.05-8.12s-6.21-7.53-8.12-12.05c-1.98-4.68-2.98-9.64-2.98-14.76s1-10.08,2.98-14.76c1.91-4.51,4.64-8.57,8.12-12.05s7.53-6.21,12.05-8.12c4.68-1.98,9.64-2.98,14.76-2.98v8.8c-16.05,0-29.1,13.06-29.1,29.1s13.06,29.1,29.1,29.1,29.1-13.06,29.1-29.1h8.8c0,5.12-1,10.08-2.98,14.76-1.91,4.51-4.64,8.57-8.12,12.05s-7.53,6.21-12.05,8.12c-4.68,1.98-9.64,2.98-14.76,2.98Z"
+                    d="m53.14,100.35c-5.12,0-10.08-1-14.76-2.98-4.51-1.91-8.57-4.64-12.05-8.12s-6.21-7.53-8.12-12.05c-1.98-4.68-2.98-9.64-2.98-14.76s1-10.08,2.98-14.76c1.91-4.51,4.64-8.57,8.12-12.05s7.53-6.21,12.05-8.12c4.68-1.98,9.64-2.98,14.76-2.98v8.8c-16.05,0-29.1,13.06-29.1,29.1s13.06,29.1,29.1,29.1,29.1-13.06,29.1-29.1h8.8c0,5.12-1,10.08-2.98,14.76-1.91,4.51-4.64,8.57-8.12,12.05-3.48,3.48-7.53,6.21-12.05,8.12-4.68,1.98-9.64,2.98-14.76,2.98Z"
                 />
 
                 <mask id="passportMask">
-                    <circle cx="56.13" cy="62.01" r="25" fill="white" />
+                    <circle cx="53.14" cy="62.44" r="25" fill="white" />
                 </mask>
                 <image
                     mask={'url(#passportMask)'}
                     href={appData.profile?.payload.body.avatar || ''}
-                    x="31.13"
-                    y="37.01"
+                    x="28.14"
+                    y="37.44"
                     width="50"
                     height="50"
                 />
