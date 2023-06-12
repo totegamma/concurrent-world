@@ -20,13 +20,11 @@ export function Associations(props: AssociationsProps): JSX.Element {
         if (!myassociations) return
         props.setCurrentStreams([myassociations])
         scrollParentRef.current?.scroll({ top: 0 })
-    }, [])
+    }, [appData.userstreams])
 
     return (
         <Box
             sx={{
-                overflowX: 'hidden',
-                overflowY: 'scroll',
                 width: '100%',
                 minHeight: '100%',
                 backgroundColor: 'background.paper'
@@ -44,7 +42,10 @@ export function Associations(props: AssociationsProps): JSX.Element {
             </Box>
             <Box
                 sx={{
+                    overflowX: 'hidden',
+                    overflowY: 'auto',
                     width: '100%',
+                    height: '100%',
                     minHeight: '100%'
                 }}
                 ref={scrollParentRef}

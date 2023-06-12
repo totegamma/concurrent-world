@@ -25,8 +25,6 @@ export function Notifications(props: NotificationsProps): JSX.Element {
     return (
         <Box
             sx={{
-                overflowX: 'hidden',
-                overflowY: 'scroll',
                 width: '100%',
                 minHeight: '100%',
                 backgroundColor: 'background.paper'
@@ -44,7 +42,10 @@ export function Notifications(props: NotificationsProps): JSX.Element {
             </Box>
             <Box
                 sx={{
+                    overflowX: 'hidden',
+                    overflowY: 'auto',
                     width: '100%',
+                    height: '100%',
                     minHeight: '100%'
                 }}
                 ref={scrollParentRef}
