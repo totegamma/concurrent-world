@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Paper, Typography } from '@mui/material'
+import { Box, Button, Collapse, Divider, IconButton, Paper, Typography, Zoom, alpha, useTheme } from '@mui/material'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useApi } from '../context/api'
@@ -11,14 +11,21 @@ import { Timeline } from '../components/Timeline'
 import { useObjectList } from '../hooks/useObjectList'
 import { useFollow } from '../context/FollowContext'
 import Background from '../resources/defaultbg.png'
+import InfoIcon from '@mui/icons-material/Info'
+import CreateIcon from '@mui/icons-material/Create'
+import { ProfileEditor } from '../components/ProfileEditor'
+import { useSnackbar } from 'notistack'
 
 export function EntityPage(): JSX.Element {
     const api = useApi()
+    const theme = useTheme()
     const followService = useFollow()
+    const { enqueueSnackbar } = useSnackbar()
     const { id } = useParams()
     const [entity, setEntity] = useState<Entity>()
     const [profile, setProfile] = useState<Character<Profile>>()
     const [streams, setStreams] = useState<Character<Userstreams>>()
+    const [mode, setMode] = useState<'info' | 'edit'>('info')
     const messages = useObjectList<StreamElementDated>()
     const scrollParentRef = useRef<HTMLDivElement>(null)
     const following = id && followService.followingUsers.includes(id)
@@ -40,6 +47,11 @@ export function EntityPage(): JSX.Element {
         return streams?.payload.body.homeStream ? [streams.payload.body.homeStream] : []
     }, [streams])
 
+    const transitionDuration = {
+        enter: theme.transitions.duration.enteringScreen,
+        exit: theme.transitions.duration.leavingScreen
+    }
+
     if (!entity || !profile || !streams) {
         return <>loading...</>
     }
@@ -56,86 +68,152 @@ export function EntityPage(): JSX.Element {
             <Box /* header */
                 sx={{
                     display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
+                    justifyContent: 'space-between',
                     alignItems: 'center',
                     color: 'primary.contrastText',
                     backgroundColor: 'primary.main',
                     p: '2px'
                 }}
             >
+                <Box sx={{ width: '40px', ml: '8px' }}></Box>
                 <b>{profile.payload.body.username || 'anonymous'}</b>
+                <Box
+                    sx={{
+                        position: 'relative',
+                        width: '40px',
+                        height: '40px',
+                        mr: '8px',
+                        visibility: id === api.userAddress ? 'visible' : 'hidden'
+                    }}
+                >
+                    <Zoom
+                        in={mode === 'info'}
+                        timeout={transitionDuration}
+                        style={{
+                            transitionDelay: `${mode === 'info' ? transitionDuration.exit : 0}ms`
+                        }}
+                        unmountOnExit
+                    >
+                        <IconButton
+                            sx={{ p: '8px', position: 'absolute' }}
+                            onClick={() => {
+                                setMode('edit')
+                            }}
+                        >
+                            <CreateIcon sx={{ color: 'primary.contrastText' }} />
+                        </IconButton>
+                    </Zoom>
+                    <Zoom
+                        in={mode === 'edit'}
+                        timeout={transitionDuration}
+                        style={{
+                            transitionDelay: `${mode === 'edit' ? transitionDuration.exit : 0}ms`
+                        }}
+                        unmountOnExit
+                    >
+                        <IconButton
+                            sx={{ p: '8px', position: 'absolute' }}
+                            onClick={() => {
+                                setMode('info')
+                            }}
+                        >
+                            <InfoIcon sx={{ color: 'primary.contrastText' }} />
+                        </IconButton>
+                    </Zoom>
+                </Box>
             </Box>
             <Box /* profile */
                 sx={{
-                    backgroundImage: `url(${Background})`,
+                    backgroundImage: `url(${profile.payload.body.banner || Background})`,
                     backgroundPosition: 'center',
-                    objectFit: 'cover'
+                    backgroundSize: 'cover'
                 }}
             >
-                <Paper
-                    sx={{
-                        position: 'relative',
-                        margin: '50px'
-                    }}
-                >
-                    <CCAvatar
-                        alt={profile.payload.body.username}
-                        avatarURL={profile.payload.body.avatar}
-                        identiconSource={entity.ccaddr}
+                <Collapse in={mode === 'info'}>
+                    <Paper
                         sx={{
-                            width: '64px',
-                            height: '64px',
-                            position: 'absolute',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)'
-                        }}
-                    />
-                    <Box
-                        sx={{
-                            p: '10px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            flexFlow: 'column'
+                            position: 'relative',
+                            margin: '50px',
+                            backgroundColor: alpha(theme.palette.background.paper, 0.8)
                         }}
                     >
+                        <CCAvatar
+                            alt={profile.payload.body.username}
+                            avatarURL={profile.payload.body.avatar}
+                            identiconSource={entity.ccaddr}
+                            sx={{
+                                width: '80px',
+                                height: '80px',
+                                position: 'absolute',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)'
+                            }}
+                        />
                         <Box
                             sx={{
-                                height: '32px',
-                                width: '100%',
+                                p: '10px',
                                 display: 'flex',
-                                flexFlow: 'row-reverse'
+                                flexFlow: 'column',
+                                gap: '15px'
                             }}
                         >
-                            {following ? (
-                                <Button
-                                    variant={'outlined'}
-                                    onClick={() => {
-                                        followService.unfollowUser(id)
-                                    }}
-                                >
-                                    Following
-                                </Button>
-                            ) : (
-                                <Button
-                                    variant={'contained'}
-                                    onClick={() => {
-                                        id && followService.followUser(id)
-                                    }}
-                                >
-                                    Follow
-                                </Button>
-                            )}
+                            <Box
+                                sx={{
+                                    height: '32px',
+                                    display: 'flex',
+                                    flexFlow: 'row-reverse'
+                                }}
+                            >
+                                {following ? (
+                                    <Button
+                                        variant={'outlined'}
+                                        onClick={() => {
+                                            followService.unfollowUser(id)
+                                        }}
+                                    >
+                                        Following
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        variant={'contained'}
+                                        onClick={() => {
+                                            id && followService.followUser(id)
+                                        }}
+                                    >
+                                        Follow
+                                    </Button>
+                                )}
+                            </Box>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexFlow: 'column',
+                                    alignItems: 'center'
+                                }}
+                            >
+                                <Typography>{profile.payload.body.description}</Typography>
+                            </Box>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexFlow: 'column',
+                                    alignItems: 'flex-end'
+                                }}
+                            >
+                                <Typography variant="caption">
+                                    現住所: {entity.host !== '' ? entity.host : api.host?.fqdn}
+                                </Typography>
+                                <Typography variant="caption">{entity.ccaddr}</Typography>
+                            </Box>
                         </Box>
-                        <Typography>アドレス: {entity.ccaddr}</Typography>
-                        <Typography>現住所: {entity.host !== '' ? entity.host : api.host?.fqdn}</Typography>
-                        <Typography>Home: {streams.payload.body.homeStream}</Typography>
-                        <Typography>Notification: {streams.payload.body.notificationStream}</Typography>
-                        <Typography>Association: {streams.payload.body.associationStream}</Typography>
-                        <Divider />
-                        <Typography>{profile.payload.body.description}</Typography>
-                    </Box>
-                </Paper>
+                    </Paper>
+                </Collapse>
+                <Collapse in={mode === 'edit'}>
+                    <ProfileEditor
+                        initial={profile}
+                        onSubmit={() => enqueueSnackbar('プロフィールを更新しました', { variant: 'success' })}
+                    />
+                </Collapse>
             </Box>
             <Box /* timeline */
                 sx={{
