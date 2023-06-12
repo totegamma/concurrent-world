@@ -40,7 +40,16 @@ export function Identity(): JSX.Element {
                 </Tabs>
                 {tab === 0 && (
                     <>
-                        <Passport />
+                        <Typography variant="h3" gutterBottom>
+                            Passport
+                        </Typography>
+                        <Box
+                            sx={{
+                                padding: '10px 50px'
+                            }}
+                        >
+                            <Passport />
+                        </Box>
                         <Divider />
                         <Typography variant="h3" gutterBottom>
                             Privatekey
