@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box'
 import { Themes, createConcurrentTheme } from '../themes'
-import { Button, Divider, Modal, Paper, ThemeProvider, Typography, darken } from '@mui/material'
+import { Button, Modal, Paper, ThemeProvider, Typography, darken } from '@mui/material'
 import { ConcurrentLogo } from '../components/ConcurrentLogo'
 import { useState } from 'react'
 import { Registration } from '../components/Registration'
@@ -144,18 +144,10 @@ export default function Welcome(): JSX.Element {
                 >
                     <Typography variant="h1">話題ごとのタイムライン</Typography>
                     <Typography>
-                        <Typography>
-                            Concurrentは「ストリーム」と呼ばれる、共有のタイムラインがたくさんあります。
-                        </Typography>
-                        <Typography>
-                            従来SNSの、「このアカウントのフォロワーにこういう話をするのはちょっと・・・」という気持ちから複数アカウントを切り替える煩雑さからオサラバ。
-                        </Typography>
-                        <Typography>
-                            好きな話題を、ふわさしいストリームで興味のある人同士で集まって盛り上がりましょう。
-                        </Typography>
-                        <Typography>
-                            また、ストリームを複数フォローして、自分だけのホームタイムラインを作り上げることができます。
-                        </Typography>
+                        Concurrentは「ストリーム」と呼ばれる、共有のタイムラインがたくさんあります。
+                        従来SNSの、「このアカウントのフォロワーにこういう話をするのはちょっと・・・」という気持ちから複数アカウントを切り替える煩雑さからオサラバ。
+                        好きな話題を、ふわさしいストリームで興味のある人同士で集まって盛り上がりましょう。
+                        また、ストリームを複数フォローして、自分だけのホームタイムラインを作り上げることができます。
                     </Typography>
                 </Paper>
                 <Paper
@@ -168,19 +160,11 @@ export default function Welcome(): JSX.Element {
                 >
                     <Typography variant="h1">あなたの発言はあなたのもの</Typography>
                     <Typography>
-                        <Typography>
-                            多くのサービスでは突然アカウントが凍結されて、あなたのデータが奪われてしまうことがあります。
-                        </Typography>
-                        <Typography>
-                            Concurrentは分散型なので、自身の信頼できるサーバーを選ぶことができます。もちろん、ご自身で建ててもいいですよ！
-                        </Typography>
-                        <Typography>
-                            ストリームのモデレーターはストリームからあなたの発言を除去することはできても、あなたの発言そのものは削除できません。
-                        </Typography>
-                        <Typography>
-                            パブリックなストリームから投稿が取り除かれても、あなたのフォロワーにはあなたの発言を届けることができます。
-                        </Typography>
-                        <Typography>モデレーションと権利の両方のバランスを取っているのがConcurrentです。</Typography>
+                        多くのサービスでは突然アカウントが凍結されて、あなたのデータが奪われてしまうことがあります。
+                        Concurrentは分散型なので、自身の信頼できるサーバーを選ぶことができます。もちろん、ご自身で建ててもいいですよ！
+                        ストリームのモデレーターはストリームからあなたの発言を除去することはできても、あなたの発言そのものは削除できません。
+                        パブリックなストリームから投稿が取り除かれても、あなたのフォロワーにはあなたの発言を届けることができます。
+                        モデレーションと権利の両方のバランスを取っているのがConcurrentです。
                     </Typography>
                 </Paper>
                 <Paper
@@ -200,30 +184,18 @@ export default function Welcome(): JSX.Element {
                         分散型だから、サーバーごとにアカウントを作らないとそれぞれのローカルは見えないんじゃないの？
                     </Typography>
                     <Typography sx={{ color: 'background.contrastText' }}>
-                        <Typography>
-                            Concurrentは分散型ですが、「ローカルタイムライン」は存在しません。代わりに、「ストリーム」と呼ばれる共有のタイムラインがたくさんあります。
-                        </Typography>
-                        <Typography>
-                            どのサーバーにアカウントを作っても、すべての(公開)ストリームに書き込むことができるため、ローカルタイムラインのためにそれぞれのサーバーごとにアカウントを作成する必要はありません。
-                        </Typography>
-                        <Typography>
-                            純粋に、そのサーバーがどの程度信用できるか、どの国に設置されていてどのような法的な制限を受けるのかということだけに集中してサーバーを選ぶことができます。
-                        </Typography>
+                        Concurrentは分散型ですが、「ローカルタイムライン」は存在しません。代わりに、「ストリーム」と呼ばれる共有のタイムラインがたくさんあります。
+                        どのサーバーにアカウントを作っても、すべての(公開)ストリームに書き込むことができるため、ローカルタイムラインのためにそれぞれのサーバーごとにアカウントを作成する必要はありません。
+                        純粋に、そのサーバーがどの程度信用できるか、どの国に設置されていてどのような法的な制限を受けるのかということだけに集中してサーバーを選ぶことができます。
                     </Typography>
                     <Typography variant="h2" sx={{ color: 'background.contrastText' }}>
                         フォロー数・フォロワー数は見れないの？
                     </Typography>
                     <Typography sx={{ color: 'background.contrastText' }}>
-                        <Typography>
-                            誰が誰をフォローしているのかはプライベートな情報です。あなただって、リアルで友達だから...
-                            という理由でフォローしなくちゃいけない義理にも疲れたでしょう。
-                        </Typography>
-                        <Typography>
-                            また、発言をフォロワーだけでなくストリームを見ている人にも届けられるConcurrentでは、フォロワー数はほとんど意味のない数字です。
-                        </Typography>
-                        <Typography>
-                            代わりに、すてきな人を応援する気持ちとして、プロフィールにいいねを送ることができます。
-                        </Typography>
+                        誰が誰をフォローしているのかはプライベートな情報です。あなただって、リアルで友達だから...
+                        という理由でフォローしなくちゃいけない義理にも疲れたでしょう。
+                        また、発言をフォロワーだけでなくストリームを見ている人にも届けられるConcurrentでは、フォロワー数はほとんど意味のない数字です。
+                        代わりに、すてきな人を応援する気持ちとして、プロフィールにいいねを送ることができます。
                     </Typography>
                 </Paper>
             </Box>

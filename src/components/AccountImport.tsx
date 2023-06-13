@@ -4,7 +4,7 @@ import Divider from '@mui/material/Divider'
 import Paper from '@mui/material/Paper'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
-import { useEffect, useState } from 'react'
+import { forwardRef, useEffect, useState } from 'react'
 import { LoadKey } from '../util'
 import { useNavigate } from 'react-router-dom'
 import { HDNodeWallet } from 'ethers'
@@ -12,7 +12,7 @@ import { LangJa } from '../utils/lang-ja'
 import ConcurrentApiClient from '../apiservice'
 import type { Host } from '../model'
 
-export function AccountImport(): JSX.Element {
+export const AccountImport = forwardRef<HTMLDivElement>((): JSX.Element => {
     const navigate = useNavigate()
     const [mnemonic, setMnemonic] = useState<string>('')
     const [secret, setSecret] = useState<string>('')
@@ -107,4 +107,6 @@ export function AccountImport(): JSX.Element {
             </Button>
         </Paper>
     )
-}
+})
+
+AccountImport.displayName = 'AccountImport'

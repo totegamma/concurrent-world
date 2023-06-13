@@ -5,7 +5,7 @@ import StepLabel from '@mui/material/StepLabel'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import Paper from '@mui/material/Paper'
-import { useEffect, useMemo, useState } from 'react'
+import { forwardRef, useEffect, useMemo, useState } from 'react'
 import { Mnemonic, randomBytes, HDNodeWallet } from 'ethers'
 import { LangJa } from '../utils/lang-ja'
 import { Link, useNavigate } from 'react-router-dom'
@@ -19,7 +19,7 @@ import ConcurrentApiClient from '../apiservice'
 import ApiProvider from '../context/api'
 import type { Host } from '../model'
 
-export function Registration(): JSX.Element {
+export const Registration = forwardRef<HTMLDivElement>((): JSX.Element => {
     const navigate = useNavigate()
     const [activeStep, setActiveStep] = useState(0)
     const [mnemonicTest, setMnemonicTest] = useState<string>('')
@@ -316,4 +316,6 @@ export function Registration(): JSX.Element {
             </Paper>
         </ApiProvider>
     )
-}
+})
+
+Registration.displayName = 'Registration'
