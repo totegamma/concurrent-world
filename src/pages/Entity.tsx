@@ -76,7 +76,20 @@ export function EntityPage(): JSX.Element {
                 }}
             >
                 <Box sx={{ width: '40px', ml: '8px' }}></Box>
-                <b>{profile.payload.body.username || 'anonymous'}</b>
+                <Button
+                    sx={{
+                        color: 'primary.contrastText'
+                    }}
+                    onClick={() => {
+                        scrollParentRef.current?.scroll({
+                            top: 0,
+                            behavior: 'smooth'
+                        })
+                    }}
+                    disableRipple
+                >
+                    <b>{profile.payload.body.username || 'anonymous'}</b>
+                </Button>
                 <Box
                     sx={{
                         position: 'relative',
@@ -122,110 +135,115 @@ export function EntityPage(): JSX.Element {
                     </Zoom>
                 </Box>
             </Box>
-            <Box /* profile */
-                sx={{
-                    backgroundImage: `url(${profile.payload.body.banner || Background})`,
-                    backgroundPosition: 'center',
-                    backgroundSize: 'cover'
-                }}
-            >
-                <Collapse in={mode === 'info'}>
-                    <Paper
-                        sx={{
-                            position: 'relative',
-                            margin: '50px',
-                            backgroundColor: alpha(theme.palette.background.paper, 0.8)
-                        }}
-                    >
-                        <CCAvatar
-                            alt={profile.payload.body.username}
-                            avatarURL={profile.payload.body.avatar}
-                            identiconSource={entity.ccaddr}
-                            sx={{
-                                width: '80px',
-                                height: '80px',
-                                position: 'absolute',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)'
-                            }}
-                        />
-                        <Box
-                            sx={{
-                                p: '10px',
-                                display: 'flex',
-                                flexFlow: 'column',
-                                gap: '15px'
-                            }}
-                        >
-                            <Box
-                                sx={{
-                                    height: '32px',
-                                    display: 'flex',
-                                    flexFlow: 'row-reverse'
-                                }}
-                            >
-                                {following ? (
-                                    <Button
-                                        variant={'outlined'}
-                                        onClick={() => {
-                                            followService.unfollowUser(id)
-                                        }}
-                                    >
-                                        Following
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        variant={'contained'}
-                                        onClick={() => {
-                                            id && followService.followUser(id)
-                                        }}
-                                    >
-                                        Follow
-                                    </Button>
-                                )}
-                            </Box>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    flexFlow: 'column',
-                                    alignItems: 'center'
-                                }}
-                            >
-                                <Typography>{profile.payload.body.description}</Typography>
-                            </Box>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    flexFlow: 'column',
-                                    alignItems: 'flex-end'
-                                }}
-                            >
-                                <Typography variant="caption">
-                                    現住所: {entity.host !== '' ? entity.host : api.host?.fqdn}
-                                </Typography>
-                                <Typography variant="caption">{entity.ccaddr}</Typography>
-                            </Box>
-                        </Box>
-                    </Paper>
-                </Collapse>
-                <Collapse in={mode === 'edit'}>
-                    <ProfileEditor
-                        initial={profile}
-                        onSubmit={() => enqueueSnackbar('プロフィールを更新しました', { variant: 'success' })}
-                    />
-                </Collapse>
-            </Box>
-            <Box /* timeline */
+            <Box /* body */
                 sx={{
                     overflowX: 'hidden',
+                    overflowY: 'auto',
                     width: '100%',
-                    minHeight: '100%',
-                    padding: { xs: '8px', sm: '8px 16px' },
-                    overflowY: 'scroll'
+                    minHeight: '100%'
                 }}
                 ref={scrollParentRef}
             >
-                <Timeline streams={targetStreams} timeline={messages} scrollParentRef={scrollParentRef} />
+                <Box /* profile */
+                    sx={{
+                        backgroundImage: `url(${profile.payload.body.banner || Background})`,
+                        backgroundPosition: 'center',
+                        backgroundSize: 'cover'
+                    }}
+                >
+                    <Collapse in={mode === 'info'}>
+                        <Paper
+                            sx={{
+                                position: 'relative',
+                                margin: '50px',
+                                backgroundColor: alpha(theme.palette.background.paper, 0.8)
+                            }}
+                        >
+                            <CCAvatar
+                                alt={profile.payload.body.username}
+                                avatarURL={profile.payload.body.avatar}
+                                identiconSource={entity.ccaddr}
+                                sx={{
+                                    width: '80px',
+                                    height: '80px',
+                                    position: 'absolute',
+                                    left: '50%',
+                                    transform: 'translate(-50%, -50%)'
+                                }}
+                            />
+                            <Box
+                                sx={{
+                                    p: '10px',
+                                    display: 'flex',
+                                    flexFlow: 'column',
+                                    gap: '15px'
+                                }}
+                            >
+                                <Box
+                                    sx={{
+                                        height: '32px',
+                                        display: 'flex',
+                                        flexFlow: 'row-reverse'
+                                    }}
+                                >
+                                    {following ? (
+                                        <Button
+                                            variant={'outlined'}
+                                            onClick={() => {
+                                                followService.unfollowUser(id)
+                                            }}
+                                        >
+                                            Following
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            variant={'contained'}
+                                            onClick={() => {
+                                                id && followService.followUser(id)
+                                            }}
+                                        >
+                                            Follow
+                                        </Button>
+                                    )}
+                                </Box>
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        flexFlow: 'column',
+                                        alignItems: 'center'
+                                    }}
+                                >
+                                    <Typography>{profile.payload.body.description}</Typography>
+                                </Box>
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        flexFlow: 'column',
+                                        alignItems: 'flex-end'
+                                    }}
+                                >
+                                    <Typography variant="caption">
+                                        現住所: {entity.host !== '' ? entity.host : api.host?.fqdn}
+                                    </Typography>
+                                    <Typography variant="caption">{entity.ccaddr}</Typography>
+                                </Box>
+                            </Box>
+                        </Paper>
+                    </Collapse>
+                    <Collapse in={mode === 'edit'}>
+                        <ProfileEditor
+                            initial={profile}
+                            onSubmit={() => enqueueSnackbar('プロフィールを更新しました', { variant: 'success' })}
+                        />
+                    </Collapse>
+                </Box>
+                <Box /* timeline */
+                    sx={{
+                        padding: { xs: '8px', sm: '8px 16px' }
+                    }}
+                >
+                    <Timeline streams={targetStreams} timeline={messages} scrollParentRef={scrollParentRef} />
+                </Box>
             </Box>
         </Box>
     )
