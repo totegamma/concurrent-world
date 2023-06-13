@@ -42,7 +42,7 @@ export function Identity(): JSX.Element {
                     <>
                         <Box
                             sx={{
-                                padding: '10px 50px'
+                                padding: { xs: '10px', sm: '10px 50px' }
                             }}
                         >
                             <Passport />
