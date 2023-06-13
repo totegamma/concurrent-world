@@ -89,15 +89,15 @@ dependencies:
   react-markdown:
     specifier: ^8.0.7
     version: 8.0.7(@types/react@18.0.26)(react@18.2.0)
+  react-parallax-tilt:
+    specifier: ^1.7.146
+    version: 1.7.146(react-dom@18.2.0)(react@18.2.0)
   react-router-dom:
     specifier: ^6.11.0
     version: 6.11.0(react-dom@18.2.0)(react@18.2.0)
   react-syntax-highlighter:
     specifier: ^15.5.0
     version: 15.5.0(react@18.2.0)
-  react-tilt:
-    specifier: ^1.0.2
-    version: 1.0.2(@types/react-dom@18.0.9)(@types/react@18.0.26)(react-dom@18.2.0)(react@18.2.0)
   react-use-websocket:
     specifier: ^4.3.1
     version: 4.3.1(react-dom@18.2.0)(react@18.2.0)
@@ -4112,6 +4112,7 @@ packages:
     resolution: {integrity: sha512-qnVvHxASt/H7i+XG1U1xMiY5t+IHcPGUK7TDMDzom08xa7e86eCeKOiLZezwCKVxJn6NEiiy2ekgX8aQssjIKg==}
     dependencies:
       '@types/react': 18.0.26
+    dev: true
 
   /@types/react-infinite-scroller@1.2.3:
     resolution: {integrity: sha512-l60JckVoO+dxmKW2eEG7jbliEpITsTJvRPTe97GazjF5+ylagAuyYdXl8YY9DQsTP9QjhqGKZROknzgscGJy0A==}
@@ -9366,6 +9367,16 @@ packages:
       - supports-color
     dev: false
 
+  /react-parallax-tilt@1.7.146(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-qwrVBDuRvQCIc9NDSq7Uqf9oQgNqlay7g5iI1EM4in69wghYJygvzxjNll4J0UXzknJ6G5+O2RKeGLMn/6PIfg==}
+    peerDependencies:
+      react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
   /react-refresh@0.14.0:
     resolution: {integrity: sha512-wViHqhAd8OHeLS/IRMJjTSDHF3U9eWi62F/MledQGPdJGDhodXJ9PBLNGr6WWL7qlH12Mt3TyTpbS+hGXMjCzQ==}
     engines: {node: '>=0.10.0'}
@@ -9405,20 +9416,6 @@ packages:
       prismjs: 1.29.0
       react: 18.2.0
       refractor: 3.6.0
-    dev: false
-
-  /react-tilt@1.0.2(@types/react-dom@18.0.9)(@types/react@18.0.26)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-21tUUsmuw5id/6NDtKqwYTG4taVnw+BoUwIG6YsgPC9GI6cx4BnBuSqgriQYAYcv3bdGNzecaBL+rvQRAm28bg==}
-    peerDependencies:
-      '@types/react': ^18.0.29
-      '@types/react-dom': ^18.0.11
-      react: ^18.2.0
-      react-dom: ^18.2.0
-    dependencies:
-      '@types/react': 18.0.26
-      '@types/react-dom': 18.0.9
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /react-transition-group@4.4.5(react-dom@18.2.0)(react@18.2.0):

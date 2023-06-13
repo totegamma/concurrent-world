@@ -37,12 +37,12 @@ export function Passport(): JSX.Element {
     }
 
     return (
-        <Box
-            sx={{
+        <div
+            style={{
                 filter: 'drop-shadow(1px 3px 5px rgba(0, 0, 0, 0.2))'
             }}
         >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 242.65 153.01">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 242.65 153" style={{ display: 'block' }}>
                 <path
                     fill={theme.palette.primary.main}
                     d="m233.21,0H9.44C4.23,0,0,4.23,0,9.44v134.14c0,5.21,4.23,9.44,9.44,9.44h223.77c5.21,0,9.44-4.23,9.44-9.44V9.44c0-5.21-4.23-9.44-9.44-9.44Zm-93.33,14.34h-37.1c-2.2,0-3.98-1.78-3.98-3.98s1.78-3.98,3.98-3.98h37.1c2.2,0,3.98,1.78,3.98,3.98s-1.78,3.98-3.98,3.98Z"
@@ -128,6 +128,6 @@ export function Passport(): JSX.Element {
                     height="50"
                 />
             </svg>
-        </Box>
+        </div>
     )
 }
