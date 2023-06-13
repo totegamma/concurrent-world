@@ -1,12 +1,13 @@
 import Box from '@mui/material/Box'
 import { Themes, createConcurrentTheme } from '../themes'
-import { Button, Modal, Paper, ThemeProvider, Typography, darken } from '@mui/material'
+import { Button, IconButton, Modal, Paper, ThemeProvider, Typography, darken } from '@mui/material'
 import { ConcurrentLogo } from '../components/ConcurrentLogo'
 import { useState } from 'react'
 import { Registration } from '../components/Registration'
 import { AccountImport } from '../components/AccountImport'
 import { usePersistent } from '../hooks/usePersistent'
 import type { ConcurrentTheme } from '../model'
+import CloseIcon from '@mui/icons-material/Close'
 
 export default function Welcome(): JSX.Element {
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue2')
@@ -202,23 +203,75 @@ export default function Welcome(): JSX.Element {
 
             <Modal
                 open={registrationOpen}
-                onClose={(_, reason): void => {
-                    if (reason === 'escapeKeyDown') setRegistrationOpen(false)
-                }}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
-                <Registration />
+                <Paper
+                    sx={{
+                        width: { xs: '90vw', md: '60vw' },
+                        height: { xs: '90vh', md: '600px' },
+                        p: '10px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        gap: '10px'
+                    }}
+                >
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
+                        }}
+                    >
+                        <Typography>Concurrentアカウントセットアップウィザード</Typography>
+                        <IconButton
+                            onClick={(): void => {
+                                setRegistrationOpen(false)
+                            }}
+                        >
+                            <CloseIcon sx={{ color: 'text.primary' }} />
+                        </IconButton>
+                    </Box>
+                    <Registration />
+                </Paper>
             </Modal>
-            <Modal
-                open={importOpen}
-                onClose={(_, reason): void => {
-                    if (reason === 'escapeKeyDown') setImportOpen(false)
-                }}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
-                <AccountImport />
+            <Modal open={importOpen} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+                <Paper
+                    sx={{
+                        width: { xs: '90vw', md: '60vw' },
+                        height: { xs: '90vh', md: '600px' },
+                        p: '10px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        overflow: 'hidden'
+                    }}
+                >
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
+                        }}
+                    >
+                        <Typography variant="h2">アカウントのインポート</Typography>
+                        <IconButton
+                            onClick={(): void => {
+                                setImportOpen(false)
+                            }}
+                        >
+                            <CloseIcon sx={{ color: 'text.primary' }} />
+                        </IconButton>
+                    </Box>
+                    <AccountImport />
+                </Paper>
             </Modal>
         </ThemeProvider>
     )

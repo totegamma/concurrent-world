@@ -5,7 +5,7 @@ import StepLabel from '@mui/material/StepLabel'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import Paper from '@mui/material/Paper'
-import { forwardRef, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Mnemonic, randomBytes, HDNodeWallet } from 'ethers'
 import { LangJa } from '../utils/lang-ja'
 import { Link, useNavigate } from 'react-router-dom'
@@ -19,7 +19,7 @@ import ConcurrentApiClient from '../apiservice'
 import ApiProvider from '../context/api'
 import type { Host } from '../model'
 
-export const Registration = forwardRef<HTMLDivElement>((): JSX.Element => {
+export function Registration(): JSX.Element {
     const navigate = useNavigate()
     const [activeStep, setActiveStep] = useState(0)
     const [mnemonicTest, setMnemonicTest] = useState<string>('')
@@ -201,21 +201,7 @@ export const Registration = forwardRef<HTMLDivElement>((): JSX.Element => {
 
     return (
         <ApiProvider api={api}>
-            <Paper
-                sx={{
-                    width: { xs: '90vw', md: '60vw' },
-                    height: { xs: '90vh', md: '600px' },
-                    p: '10px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    overflow: 'hidden'
-                }}
-            >
-                <Typography>Concurrentアカウントセットアップウィザード</Typography>
+            <>
                 <Stepper /* for Desktop */
                     sx={{
                         display: { xs: 'none', md: 'flex' }
@@ -313,9 +299,7 @@ export const Registration = forwardRef<HTMLDivElement>((): JSX.Element => {
                         </Button>
                     }
                 />
-            </Paper>
+            </>
         </ApiProvider>
     )
-})
-
-Registration.displayName = 'Registration'
+}

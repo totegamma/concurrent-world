@@ -4,7 +4,7 @@ import Divider from '@mui/material/Divider'
 import Paper from '@mui/material/Paper'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
-import { forwardRef, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { LoadKey } from '../util'
 import { useNavigate } from 'react-router-dom'
 import { HDNodeWallet } from 'ethers'
@@ -12,7 +12,7 @@ import { LangJa } from '../utils/lang-ja'
 import ConcurrentApiClient from '../apiservice'
 import type { Host } from '../model'
 
-export const AccountImport = forwardRef<HTMLDivElement>((): JSX.Element => {
+export function AccountImport(): JSX.Element {
     const navigate = useNavigate()
     const [mnemonic, setMnemonic] = useState<string>('')
     const [secret, setSecret] = useState<string>('')
@@ -59,21 +59,7 @@ export const AccountImport = forwardRef<HTMLDivElement>((): JSX.Element => {
     }
 
     return (
-        <Paper
-            sx={{
-                width: { xs: '90vw', md: '60vw' },
-                height: { xs: '90vh', md: '600px' },
-                p: '10px',
-                display: 'flex',
-                flexDirection: 'column',
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                gap: '10px'
-            }}
-        >
-            <Typography variant="h2">アカウントのインポート</Typography>
+        <>
             <Typography variant="h3">ふっかつの呪文から</Typography>
             <TextField
                 placeholder="12個の単語からなる呪文"
@@ -105,8 +91,6 @@ export const AccountImport = forwardRef<HTMLDivElement>((): JSX.Element => {
             <Button disabled={!entityFound} variant="contained" onClick={accountImport}>
                 インポート
             </Button>
-        </Paper>
+        </>
     )
-})
-
-AccountImport.displayName = 'AccountImport'
+}
