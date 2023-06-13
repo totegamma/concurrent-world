@@ -5,6 +5,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import { useApi } from '../context/api'
 import { APSettings } from '../components/APSettings'
 import { Passport } from '../components/Passport'
+import { Tilt } from 'react-tilt'
 
 export function Identity(): JSX.Element {
     const api = useApi()
@@ -45,7 +46,14 @@ export function Identity(): JSX.Element {
                                 padding: { xs: '10px', sm: '10px 50px' }
                             }}
                         >
-                            <Passport />
+                            <Tilt
+                                options={{
+                                    scale: 1,
+                                    perspective: 2000
+                                }}
+                            >
+                                <Passport />
+                            </Tilt>
                         </Box>
                         <Divider />
                         <Typography variant="h3" gutterBottom>
