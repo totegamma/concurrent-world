@@ -15,6 +15,8 @@ import InfoIcon from '@mui/icons-material/Info'
 import CreateIcon from '@mui/icons-material/Create'
 import { ProfileEditor } from '../components/ProfileEditor'
 import { useSnackbar } from 'notistack'
+import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1'
+import PersonRemoveIcon from '@mui/icons-material/PersonRemove'
 
 export function EntityPage(): JSX.Element {
     const api = useApi()
@@ -28,6 +30,7 @@ export function EntityPage(): JSX.Element {
     const [mode, setMode] = useState<'info' | 'edit'>('info')
     const messages = useObjectList<StreamElementDated>()
     const scrollParentRef = useRef<HTMLDivElement>(null)
+    const self = id === api.userAddress
     const following = id && followService.followingUsers.includes(id)
 
     useEffect(() => {
@@ -95,44 +98,84 @@ export function EntityPage(): JSX.Element {
                         position: 'relative',
                         width: '40px',
                         height: '40px',
-                        mr: '8px',
-                        visibility: id === api.userAddress ? 'visible' : 'hidden'
+                        mr: '8px'
                     }}
                 >
-                    <Zoom
-                        in={mode === 'info'}
-                        timeout={transitionDuration}
-                        style={{
-                            transitionDelay: `${mode === 'info' ? transitionDuration.exit : 0}ms`
-                        }}
-                        unmountOnExit
-                    >
-                        <IconButton
-                            sx={{ p: '8px', position: 'absolute' }}
-                            onClick={() => {
-                                setMode('edit')
-                            }}
-                        >
-                            <CreateIcon sx={{ color: 'primary.contrastText' }} />
-                        </IconButton>
-                    </Zoom>
-                    <Zoom
-                        in={mode === 'edit'}
-                        timeout={transitionDuration}
-                        style={{
-                            transitionDelay: `${mode === 'edit' ? transitionDuration.exit : 0}ms`
-                        }}
-                        unmountOnExit
-                    >
-                        <IconButton
-                            sx={{ p: '8px', position: 'absolute' }}
-                            onClick={() => {
-                                setMode('info')
-                            }}
-                        >
-                            <InfoIcon sx={{ color: 'primary.contrastText' }} />
-                        </IconButton>
-                    </Zoom>
+                    {self ? (
+                        <>
+                            <Zoom
+                                in={mode === 'info'}
+                                timeout={transitionDuration}
+                                style={{
+                                    transitionDelay: `${mode === 'info' ? transitionDuration.exit : 0}ms`
+                                }}
+                                unmountOnExit
+                            >
+                                <IconButton
+                                    sx={{ p: '8px', position: 'absolute' }}
+                                    onClick={() => {
+                                        setMode('edit')
+                                    }}
+                                >
+                                    <CreateIcon sx={{ color: 'primary.contrastText' }} />
+                                </IconButton>
+                            </Zoom>
+                            <Zoom
+                                in={mode === 'edit'}
+                                timeout={transitionDuration}
+                                style={{
+                                    transitionDelay: `${mode === 'edit' ? transitionDuration.exit : 0}ms`
+                                }}
+                                unmountOnExit
+                            >
+                                <IconButton
+                                    sx={{ p: '8px', position: 'absolute' }}
+                                    onClick={() => {
+                                        setMode('info')
+                                    }}
+                                >
+                                    <InfoIcon sx={{ color: 'primary.contrastText' }} />
+                                </IconButton>
+                            </Zoom>
+                        </>
+                    ) : (
+                        <>
+                            <Zoom
+                                in={following || false}
+                                timeout={transitionDuration}
+                                style={{
+                                    transitionDelay: `${following ? transitionDuration.exit : 0}ms`
+                                }}
+                                unmountOnExit
+                            >
+                                <IconButton
+                                    onClick={() => {
+                                        id && followService.unfollowUser(id)
+                                        enqueueSnackbar('Unfollowed', { variant: 'success' })
+                                    }}
+                                >
+                                    <PersonRemoveIcon sx={{ color: 'primary.contrastText' }} />
+                                </IconButton>
+                            </Zoom>
+                            <Zoom
+                                in={!following}
+                                timeout={transitionDuration}
+                                style={{
+                                    transitionDelay: `${following ? 0 : transitionDuration.exit}ms`
+                                }}
+                                unmountOnExit
+                            >
+                                <IconButton
+                                    onClick={() => {
+                                        id && followService.followUser(id)
+                                        enqueueSnackbar('Followed', { variant: 'success' })
+                                    }}
+                                >
+                                    <PersonAddAlt1Icon sx={{ color: 'primary.contrastText' }} />
+                                </IconButton>
+                            </Zoom>
+                        </>
+                    )}
                 </Box>
             </Box>
             <Box /* body */
@@ -185,27 +228,7 @@ export function EntityPage(): JSX.Element {
                                         display: 'flex',
                                         flexFlow: 'row-reverse'
                                     }}
-                                >
-                                    {following ? (
-                                        <Button
-                                            variant={'outlined'}
-                                            onClick={() => {
-                                                followService.unfollowUser(id)
-                                            }}
-                                        >
-                                            Following
-                                        </Button>
-                                    ) : (
-                                        <Button
-                                            variant={'contained'}
-                                            onClick={() => {
-                                                id && followService.followUser(id)
-                                            }}
-                                        >
-                                            Follow
-                                        </Button>
-                                    )}
-                                </Box>
+                                ></Box>
                                 <Box
                                     sx={{
                                         display: 'flex',
