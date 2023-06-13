@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef, useState } from 'react'
-import { Box, Collapse, Divider } from '@mui/material'
+import { Box, Collapse, Divider, List } from '@mui/material'
 import type { StreamElementDated } from '../model'
 import { type IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'
@@ -90,6 +90,7 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                     backgroundColor: 'background.paper'
                 }}
                 ref={scrollParentRef}
+                id="scrollableDiv"
             >
                 <Box>
                     <Collapse in={mode === 'edit'}>
@@ -112,13 +113,20 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                 followService.followingUsers.length === 0 ? (
                     <Box>まだ誰も、どのストリームもフォローしていません。Explorerタブから探しに行きましょう。</Box>
                 ) : (
-                    <Box sx={{ display: 'flex', flex: 1, padding: { xs: '8px', sm: '8px 16px' } }}>
+                    <List
+                        sx={{
+                            display: 'flex',
+                            flex: 1,
+                            padding: { xs: '8px', sm: '8px 16px' },
+                            flexDirection: 'column'
+                        }}
+                    >
                         <Timeline
                             streams={props.currentStreams}
                             timeline={props.messages}
                             scrollParentRef={scrollParentRef}
                         />
-                    </Box>
+                    </List>
                 )}
             </Box>
         </>

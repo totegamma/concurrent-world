@@ -1,15 +1,17 @@
-import { Box, Typography } from '@mui/material'
+import { Box, type SxProps, Typography } from '@mui/material'
 import { ConcurrentLogo } from './ConcurrentLogo'
 
 export interface LoadingProps {
     message: string
     color: string
+    sx: SxProps
 }
 
 export const Loading = (props: LoadingProps): JSX.Element => {
     return (
         <Box
             sx={{
+                ...props.sx,
                 color: props.color,
                 display: 'flex',
                 flexDirection: 'row',

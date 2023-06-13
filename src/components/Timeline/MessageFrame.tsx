@@ -167,7 +167,8 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                 alignItems: 'flex-start',
                 flex: 1,
                 p: { xs: '7px 0', sm: '10px 0' },
-                wordBreak: 'break-word'
+                wordBreak: 'break-word',
+                overflow: 'hidden'
             }}
         >
             {message?.payload?.body && (

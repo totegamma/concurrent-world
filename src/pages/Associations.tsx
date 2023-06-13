@@ -49,6 +49,7 @@ export function Associations(props: AssociationsProps): JSX.Element {
                     minHeight: '100%'
                 }}
                 ref={scrollParentRef}
+                id="scrollableDiv"
             >
                 <Box sx={{ display: 'flex', flex: 1, padding: { xs: '8px', sm: '8px 16px' } }}>
                     <Timeline

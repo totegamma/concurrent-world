@@ -1,6 +1,6 @@
 import { Divider, List, Typography, useTheme } from '@mui/material'
 import React, { type RefObject, memo, useCallback, useEffect, useState } from 'react'
-import InfiniteScroll from 'react-infinite-scroller'
+import InfiniteScroll from 'react-infinite-scroll-component'
 import { MessageFrame } from './MessageFrame'
 import { AssociationFrame } from './AssociationFrame'
 import type { IuseObjectList } from '../../hooks/useObjectList'
@@ -21,6 +21,8 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     const [isFetching, setIsFetching] = useState<boolean>(false)
     const theme = useTheme()
 
+    const [effectCaller, setEffectCaller] = useState<number>(0)
+
     useEffect(() => {
         if (!api.host) return
         props.timeline.clear()
@@ -39,7 +41,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
         return () => {
             unmounted = true
         }
-    }, [props.streams])
+    }, [props.streams, effectCaller])
 
     const loadMore = useCallback(() => {
         if (!api.host) return
@@ -71,18 +73,39 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
         setIsFetching(false)
     }, [props.timeline.current])
 
+    const loader = hasMoreData ? (
+        <Loading
+            sx={{
+                padding: '10px 0'
+            }}
+            key={0}
+            message="Loading..."
+            color={theme.palette.text.primary}
+        />
+    ) : (
+        <Typography>Yay! You&apos;ve seen it all :)</Typography>
+    )
+
     return (
         <InspectorProvider>
             <List sx={{ flex: 1, width: '100%' }}>
                 <InfiniteScroll
-                    loadMore={() => {
+                    next={() => {
+                        console.log('load more')
                         loadMore()
                     }}
-                    initialLoad={false}
                     hasMore={hasMoreData}
-                    loader={<Loading key={0} message="Loading..." color={theme.palette.text.primary} />}
-                    useWindow={false}
-                    getScrollParent={() => props.scrollParentRef.current}
+                    loader={loader}
+                    dataLength={props.timeline.current.length}
+                    scrollableTarget={'scrollableDiv'}
+                    refreshFunction={() => {
+                        console.log('refresh')
+                        setEffectCaller(effectCaller + 1)
+                    }}
+                    pullDownToRefresh
+                    pullDownToRefreshThreshold={50}
+                    pullDownToRefreshContent={<h3 style={{ textAlign: 'center' }}>&#8595; Pull down to refresh</h3>}
+                    releaseToRefreshContent={<h3 style={{ textAlign: 'center' }}>&#8593; Release to refresh</h3>}
                 >
                     {props.timeline.current.map((e) => (
                         <React.Fragment key={e.id}>
