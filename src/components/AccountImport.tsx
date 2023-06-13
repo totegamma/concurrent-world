@@ -59,21 +59,7 @@ export function AccountImport(): JSX.Element {
     }
 
     return (
-        <Paper
-            sx={{
-                width: { xs: '90vw', md: '60vw' },
-                height: { xs: '90vh', md: '600px' },
-                p: '10px',
-                display: 'flex',
-                flexDirection: 'column',
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                gap: '10px'
-            }}
-        >
-            <Typography variant="h2">アカウントのインポート</Typography>
+        <>
             <Typography variant="h3">ふっかつの呪文から</Typography>
             <TextField
                 placeholder="12個の単語からなる呪文"
@@ -105,6 +91,6 @@ export function AccountImport(): JSX.Element {
             <Button disabled={!entityFound} variant="contained" onClick={accountImport}>
                 インポート
             </Button>
-        </Paper>
+        </>
     )
 }
