@@ -72,7 +72,15 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
     }, [props.currentStreams])
 
     return (
-        <>
+        <Box
+            sx={{
+                width: '100%',
+                minHeight: '100%',
+                backgroundColor: 'background.paper',
+                display: 'flex',
+                flexDirection: 'column'
+            }}
+        >
             <TimelineHeader
                 location={reactlocation}
                 setMobileMenuOpen={props.setMobileMenuOpen}
@@ -84,14 +92,16 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
             <Box
                 sx={{
                     overflowX: 'hidden',
-                    overflowY: 'auto',
-                    width: '100%',
-                    minHeight: '100%',
-                    backgroundColor: 'background.paper'
+                    overflowY: 'auto'
                 }}
                 ref={scrollParentRef}
             >
-                <Box>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }}
+                >
                     <Collapse in={mode === 'edit'}>
                         <Box sx={{ padding: { xs: '8px', sm: '8px 16px' } }}>
                             <HomeSettings />
@@ -121,7 +131,7 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                     </Box>
                 )}
             </Box>
-        </>
+        </Box>
     )
 })
 TimelinePage.displayName = 'TimelinePage'

@@ -27,7 +27,9 @@ export function Associations(props: AssociationsProps): JSX.Element {
             sx={{
                 width: '100%',
                 minHeight: '100%',
-                backgroundColor: 'background.paper'
+                backgroundColor: 'background.paper',
+                display: 'flex',
+                flexDirection: 'column'
             }}
         >
             <Box
@@ -43,10 +45,7 @@ export function Associations(props: AssociationsProps): JSX.Element {
             <Box
                 sx={{
                     overflowX: 'hidden',
-                    overflowY: 'auto',
-                    width: '100%',
-                    height: '100%',
-                    minHeight: '100%'
+                    overflowY: 'auto'
                 }}
                 ref={scrollParentRef}
             >
