@@ -287,7 +287,8 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             <Box
                 sx={{
                     display: 'flex',
-                    justifyContent: 'flex-end'
+                    justifyContent: 'flex-end',
+                    alignItems: 'center'
                 }}
             >
                 <IconButton
