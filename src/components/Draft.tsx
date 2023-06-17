@@ -222,13 +222,16 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             <Box
                 sx={{
                     display: 'flex',
-                    flexDirection: { xs: 'column', md: 'row' }
+                    flexDirection: { xs: 'column', md: 'row' },
+                    alignItems: 'start',
+                    px: '10px',
+                    gap: 2
                 }}
             >
                 <InputBase
                     multiline
                     minRows={3}
-                    maxRows={6}
+                    maxRows={7}
                     value={draft}
                     onChange={(e) => {
                         setDraft(e.target.value)
@@ -236,8 +239,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     onPaste={handlePasteImage}
                     placeholder="今、なにしてる？"
                     sx={{
-                        width: 1,
-                        padding: '0'
+                        width: 1
                     }}
                     onKeyDown={(e: any) => {
                         if (draft.length === 0 || draft.trim().length === 0) return
@@ -248,13 +250,13 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 />
                 {openPreview && (
                     <>
-                        <Divider orientation="vertical" />
+                        <Divider flexItem />
+                        <Divider orientation="vertical" flexItem />
                         <Box
                             sx={{
                                 width: 1,
-                                height: '171px',
-                                overflow: 'scroll',
-                                px: 1
+                                maxHeight: '171px',
+                                overflow: 'scroll'
                             }}
                         >
                             <MarkdownRenderer messagebody={draft} />
@@ -287,7 +289,8 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             <Box
                 sx={{
                     display: 'flex',
-                    justifyContent: 'flex-end'
+                    justifyContent: 'flex-end',
+                    alignItems: 'center'
                 }}
             >
                 <IconButton

@@ -1,13 +1,14 @@
 import {
     Alert,
     Box,
-    Drawer,
     Paper,
+    SwipeableDrawer,
     Table,
     TableBody,
     TableCell,
     TableRow,
     Typography,
+    styled,
     useMediaQuery,
     useTheme
 } from '@mui/material'
@@ -21,6 +22,7 @@ import { MessageFrame } from '../components/Timeline'
 import { materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { validateSignature } from '../util'
+import grey from '@mui/material/colors/grey'
 
 export interface InspectorState {
     inspectingItem: StreamElement | null
@@ -32,6 +34,16 @@ const InspectorContext = createContext<InspectorState | undefined>(undefined)
 interface InspectorProps {
     children: JSX.Element | JSX.Element[]
 }
+
+const Puller = styled(Box)(({ theme }) => ({
+    width: 30,
+    height: 6,
+    backgroundColor: theme.palette.mode === 'light' ? grey[300] : grey[900],
+    borderRadius: 3,
+    position: 'absolute',
+    top: 8,
+    left: 'calc(50% - 15px)'
+}))
 
 export const InspectorProvider = (props: InspectorProps): JSX.Element => {
     const api = useApi()
@@ -65,9 +77,11 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
         >
             {props.children}
 
-            <Drawer
+            <SwipeableDrawer
+                disableSwipeToOpen
                 anchor={greaterThanMid ? 'right' : 'bottom'}
                 open={inspectingItem != null}
+                onOpen={() => {}}
                 onClose={() => {
                     inspectItem(null)
                 }}
@@ -89,6 +103,7 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                     }
                 }}
             >
+                <Puller visibility={greaterThanMid ? 'hidden' : 'visible'} />
                 {inspectingItem && message ? (
                     <Box
                         sx={{
@@ -193,7 +208,7 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                 ) : (
                     <Box>nothing to inspect...</Box>
                 )}
-            </Drawer>
+            </SwipeableDrawer>
         </InspectorContext.Provider>
     )
 }

@@ -18,16 +18,24 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     const [message, setMessage] = useState<Message<any> | undefined>()
     const [association, setAssociation] = useState<Association<any> | undefined>()
 
+    const isMeToOther = association?.author !== api.userAddress
+
     useEffect(() => {
         api.fetchAssociation(props.association.id, props.association.currenthost).then((a) => {
             if (!a) return
             setAssociation(a)
             api.fetchMessage(a.targetID, props.association.currenthost).then((m) => {
                 setMessage(m)
+                if (!m) return
+                const isMeToOther = a.author !== api.userAddress
+                api.readCharacter(
+                    isMeToOther ? props.association.author : m.author,
+                    Schemas.profile,
+                    props.association.currenthost
+                ).then((author) => {
+                    setAuthor(author)
+                })
             })
-        })
-        api.readCharacter(props.association.author, Schemas.profile, props.association.currenthost).then((author) => {
-            setAuthor(author)
         })
     }, [])
 
@@ -44,28 +52,60 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     return (
         <>
             {association.schema === Schemas.like && (
-                <ListItem sx={{ display: 'flex', gap: '15px' }}>
-                    <IconButton
+                <ListItem
+                    sx={{
+                        alignItems: 'flex-start',
+                        flex: 1,
+                        p: { xs: '7px 0', sm: '10px 0' },
+                        wordBreak: 'break-word'
+                    }}
+                >
+                    <Box
                         sx={{
-                            width: { xs: '38px', sm: '48px' },
-                            height: { xs: '38px', sm: '48px' }
+                            padding: {
+                                xs: '5px 8px 0 0',
+                                sm: '8px 10px 0 0'
+                            }
                         }}
-                        component={routerLink}
-                        to={'/entity/' + association.author}
                     >
-                        <CCAvatar
-                            alt={author?.payload.body.username}
-                            avatarURL={author?.payload.body.avatar}
-                            identiconSource={association.author}
+                        <IconButton
                             sx={{
                                 width: { xs: '38px', sm: '48px' },
                                 height: { xs: '38px', sm: '48px' }
                             }}
-                        />
-                    </IconButton>
-                    <Box sx={{ display: 'flex', flexFlow: 'column' }}>
+                            component={routerLink}
+                            to={'/entity/' + association.author}
+                        >
+                            <CCAvatar
+                                alt={author?.payload.body.username}
+                                avatarURL={author?.payload.body.avatar}
+                                identiconSource={association.author}
+                                sx={{
+                                    width: { xs: '38px', sm: '48px' },
+                                    height: { xs: '38px', sm: '48px' }
+                                }}
+                            />
+                        </IconButton>
+                    </Box>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flex: 1,
+                            flexDirection: 'column',
+                            width: '100%',
+                            overflow: 'auto'
+                        }}
+                    >
                         <Typography>
-                            <b>{author?.payload.body.username}</b> favorites
+                            {isMeToOther ? (
+                                <>
+                                    <b>{author?.payload.body.username}</b> favorited your message
+                                </>
+                            ) : (
+                                <>
+                                    You favorited <b>{author?.payload.body.username}</b>&apos;s message
+                                </>
+                            )}
                         </Typography>
                         <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
                             {message?.payload.body.body}

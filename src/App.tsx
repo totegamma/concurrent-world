@@ -1,6 +1,6 @@
 import { useEffect, useState, createContext, useRef, useMemo } from 'react'
 import { Routes, Route } from 'react-router-dom'
-import { darken, Box, Paper, ThemeProvider, Drawer } from '@mui/material'
+import { darken, Box, Paper, ThemeProvider, SwipeableDrawer } from '@mui/material'
 import useWebSocket, { type ReadyState } from 'react-use-websocket'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 
@@ -32,6 +32,8 @@ import ConcurrentApiClient from './apiservice'
 import { FollowProvider } from './context/FollowContext'
 import type { Profile } from './schemas/profile'
 import type { Userstreams } from './schemas/userstreams'
+
+const iOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent)
 
 export const ApplicationContext = createContext<appData>({
     profile: undefined,
@@ -370,12 +372,18 @@ function App(): JSX.Element {
                     </Box>
                 </Box>
             </Box>
-            <Drawer
+            <SwipeableDrawer
                 anchor={'left'}
                 open={mobileMenuOpen}
+                onOpen={() => {
+                    setMobileMenuOpen(true)
+                }}
                 onClose={() => {
                     setMobileMenuOpen(false)
                 }}
+                disableBackdropTransition={!iOS}
+                disableDiscovery={iOS}
+                disableSwipeToOpen={false}
                 PaperProps={{
                     sx: {
                         width: '200px',
@@ -392,7 +400,7 @@ function App(): JSX.Element {
                     }}
                     hideMenu
                 />
-            </Drawer>
+            </SwipeableDrawer>
         </>
     )
 }

@@ -1,4 +1,4 @@
-import { Box, Divider, List, Modal, Typography, useTheme } from '@mui/material'
+import { Divider, List, Modal, Typography, useTheme } from '@mui/material'
 import React, { type RefObject, memo, useCallback, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroller'
 import { AssociationFrame } from './AssociationFrame'
@@ -7,7 +7,7 @@ import type { StreamElement, StreamElementDated } from '../../model'
 import { useApi } from '../../context/api'
 import { InspectorProvider } from '../../context/Inspector'
 import { Loading } from '../Loading'
-import { MessageMultiplexer } from './Multiplexer'
+import { MessageFrame } from './MessageFrame/MessageFrame'
 
 export interface TimelineProps {
     streams: string[]
@@ -18,12 +18,15 @@ export interface TimelineProps {
 export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element => {
     const api = useApi()
     const [hasMoreData, setHasMoreData] = useState<boolean>(false)
+    const [isFetching, setIsFetching] = useState<boolean>(false)
     const theme = useTheme()
 
     useEffect(() => {
-        console.log('load recent!', props.streams)
-        let unmounted = false
+        if (!api.host) return
         props.timeline.clear()
+        let unmounted = false
+        setIsFetching(true)
+        setHasMoreData(true)
         api?.readStreamRecent(props.streams).then((data: StreamElement[]) => {
             if (unmounted) return
             const current = new Date().getTime()
@@ -40,12 +43,11 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
 
     const loadMore = useCallback(() => {
         if (!api.host) return
-        console.log('load more!')
+        if (isFetching) return
+        if (!props.timeline.current[props.timeline.current.length - 1]?.timestamp) return
+        if (!hasMoreData) return
         let unmounted = false
-        if (!props.timeline.current[props.timeline.current.length - 1]?.timestamp) {
-            return
-        }
-
+        setIsFetching(true)
         api?.readStreamRanged(props.streams, props.timeline.current[props.timeline.current.length - 1].timestamp).then(
             (data: StreamElement[]) => {
                 if (unmounted) return
@@ -60,41 +62,43 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                 } else setHasMoreData(false)
             }
         )
-
         return () => {
             unmounted = true
         }
-    }, [api, props.streams, props.timeline])
+    }, [api, props.streams, props.timeline, hasMoreData, isFetching])
+
+    useEffect(() => {
+        setIsFetching(false)
+    }, [props.timeline.current])
 
     return (
-        <>
-            <InspectorProvider>
-                <List sx={{ flex: 1, width: '100%' }}>
-                    <InfiniteScroll
-                        loadMore={() => {
-                            loadMore()
-                        }}
-                        hasMore={hasMoreData}
-                        loader={<Loading key={0} message="Loading..." color={theme.palette.text.primary} />}
-                        useWindow={false}
-                        getScrollParent={() => props.scrollParentRef.current}
-                    >
-                        {props.timeline.current.map((e) => (
-                            <React.Fragment key={e.id}>
-                                {e.type === 'message' && <MessageMultiplexer message={e} lastUpdated={e.LastUpdated} />}
-                                {e.type === 'association' && (
-                                    <AssociationFrame association={e} lastUpdated={e.LastUpdated} />
-                                )}
-                                {e.type !== 'message' && e.type !== 'association' && (
-                                    <Typography>Unknown message type: {e.type}</Typography>
-                                )}
-                                <Divider variant="inset" component="li" sx={{ margin: '0 5px' }} />
-                            </React.Fragment>
-                        ))}
-                    </InfiniteScroll>
-                </List>
-            </InspectorProvider>
-        </>
+        <InspectorProvider>
+            <List sx={{ flex: 1, width: '100%' }}>
+                <InfiniteScroll
+                    loadMore={() => {
+                        loadMore()
+                    }}
+                    initialLoad={false}
+                    hasMore={hasMoreData}
+                    loader={<Loading key={0} message="Loading..." color={theme.palette.text.primary} />}
+                    useWindow={false}
+                    getScrollParent={() => props.scrollParentRef.current}
+                >
+                    {props.timeline.current.map((e) => (
+                        <React.Fragment key={e.id}>
+                            {e.type === 'message' && <MessageFrame message={e} lastUpdated={e.LastUpdated} />}
+                            {e.type === 'association' && (
+                                <AssociationFrame association={e} lastUpdated={e.LastUpdated} />
+                            )}
+                            {e.type !== 'message' && e.type !== 'association' && (
+                                <Typography>Unknown message type: {e.type}</Typography>
+                            )}
+                            <Divider variant="inset" component="li" sx={{ margin: '0 5px' }} />
+                        </React.Fragment>
+                    ))}
+                </InfiniteScroll>
+            </List>
+        </InspectorProvider>
     )
 })
 

@@ -201,21 +201,7 @@ export function Registration(): JSX.Element {
 
     return (
         <ApiProvider api={api}>
-            <Paper
-                sx={{
-                    width: { xs: '90vw', md: '60vw' },
-                    height: { xs: '90vh', md: '600px' },
-                    p: '10px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    overflow: 'hidden'
-                }}
-            >
-                <Typography>Concurrentアカウントセットアップウィザード</Typography>
+            <>
                 <Stepper /* for Desktop */
                     sx={{
                         display: { xs: 'none', md: 'flex' }
@@ -313,7 +299,7 @@ export function Registration(): JSX.Element {
                         </Button>
                     }
                 />
-            </Paper>
+            </>
         </ApiProvider>
     )
 }

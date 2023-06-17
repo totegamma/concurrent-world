@@ -89,6 +89,9 @@ dependencies:
   react-markdown:
     specifier: ^8.0.7
     version: 8.0.7(@types/react@18.0.26)(react@18.2.0)
+  react-parallax-tilt:
+    specifier: ^1.7.146
+    version: 1.7.146(react-dom@18.2.0)(react@18.2.0)
   react-router-dom:
     specifier: ^6.11.0
     version: 6.11.0(react-dom@18.2.0)(react@18.2.0)
@@ -9362,6 +9365,16 @@ packages:
       vfile: 5.3.7
     transitivePeerDependencies:
       - supports-color
+    dev: false
+
+  /react-parallax-tilt@1.7.146(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-qwrVBDuRvQCIc9NDSq7Uqf9oQgNqlay7g5iI1EM4in69wghYJygvzxjNll4J0UXzknJ6G5+O2RKeGLMn/6PIfg==}
+    peerDependencies:
+      react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /react-refresh@0.14.0:
