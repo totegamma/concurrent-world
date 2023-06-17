@@ -1,12 +1,14 @@
-import {Box, IconButton, Typography, useTheme} from "@mui/material";
-import StarIcon from "@mui/icons-material/Star";
-import StarOutlineIcon from "@mui/icons-material/StarOutline";
-import {Schemas} from "../../schemas";
-import React from "react";
+import { Box, IconButton, Typography, useTheme } from '@mui/material'
+import StarIcon from '@mui/icons-material/Star'
+import StarOutlineIcon from '@mui/icons-material/StarOutline'
+import { Schemas } from '../../schemas'
+import React from 'react'
 
 export interface IconWithNumberProps {
     icon: JSX.Element
     onClick: () => void
+    state: boolean
+    message: any
 }
 export const IconWithNumber = (props: IconWithNumberProps): JSX.Element => {
     const theme = useTheme()
@@ -21,11 +23,9 @@ export const IconWithNumber = (props: IconWithNumberProps): JSX.Element => {
                 color="primary"
                 onClick={props.onClick}
             >
-                {props.hasOwnReaction ? <StarIcon /> : <StarOutlineIcon />}
+                {props.state ? <StarIcon /> : <StarOutlineIcon />}
             </IconButton>
-            <Typography sx={{ size: '16px' }}>
-                {props.message.associations.filter((e) => e.schema === Schemas.like).length}
-            </Typography>
+            <Typography sx={{ size: '16px' }}>{props.message}</Typography>
         </Box>
     )
 }
