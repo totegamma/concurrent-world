@@ -10,9 +10,25 @@ import { useNavigate } from 'react-router-dom'
 import { HDNodeWallet } from 'ethers'
 import { LangJa } from '../utils/lang-ja'
 import ConcurrentApiClient from '../apiservice'
-import type { Host } from '../model'
+import type { ConcurrentTheme, Host } from '../model'
+import { usePersistent } from '../hooks/usePersistent'
+import { Themes, createConcurrentTheme } from '../themes'
+import { ThemeProvider } from '@emotion/react'
+import { ConcurrentLogo } from '../components/ConcurrentLogo'
+import { darken } from '@mui/material'
 
 export function AccountImport(): JSX.Element {
+    const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue2')
+    const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
+
+    const themes: string[] = Object.keys(Themes)
+    const randomTheme = (): void => {
+        const box = themes.filter((e) => e !== themeName)
+        const newThemeName = box[Math.floor(Math.random() * box.length)]
+        setThemeName(newThemeName)
+        setTheme(createConcurrentTheme(newThemeName))
+    }
+
     const navigate = useNavigate()
     const [mnemonic, setMnemonic] = useState<string>('')
     const [secret, setSecret] = useState<string>('')
@@ -59,38 +75,98 @@ export function AccountImport(): JSX.Element {
     }
 
     return (
-        <>
-            <Typography variant="h3">ふっかつの呪文から</Typography>
-            <TextField
-                placeholder="12個の単語からなる呪文"
-                value={mnemonic}
-                onChange={(e) => {
-                    setMnemonic(e.target.value)
+        <ThemeProvider theme={theme}>
+            <Box
+                sx={{
+                    padding: '20px',
+                    gap: '20px',
+                    display: 'flex',
+                    width: '100vw',
+                    minHeight: '100dvh',
+                    flexDirection: 'column',
+                    background: [
+                        theme.palette.background.default,
+                        `linear-gradient(${theme.palette.background.default}, ${darken(
+                            theme.palette.background.default,
+                            0.1
+                        )})`
+                    ]
                 }}
-            />
-            <Box>
-                <Divider>または</Divider>
+            >
+                <Button
+                    disableRipple
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                        textTransform: 'none',
+                        '&:hover': {
+                            background: 'none'
+                        }
+                    }}
+                    onClick={randomTheme}
+                >
+                    <Box>
+                        <ConcurrentLogo
+                            size="25px"
+                            upperColor={theme.palette.background.contrastText}
+                            lowerColor={theme.palette.background.contrastText}
+                            frameColor={theme.palette.background.contrastText}
+                        />
+                    </Box>
+                    <Typography
+                        sx={{
+                            color: 'background.contrastText',
+                            fontSize: '25px'
+                        }}
+                    >
+                        Concurrent
+                    </Typography>
+                </Button>
+                <Paper
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        width: '100%',
+                        padding: '20px',
+                        flex: 1,
+                        gap: '20px'
+                    }}
+                >
+                    <Typography variant="h3">ふっかつの呪文から</Typography>
+                    <TextField
+                        placeholder="12個の単語からなる呪文"
+                        value={mnemonic}
+                        onChange={(e) => {
+                            setMnemonic(e.target.value)
+                        }}
+                    />
+                    <Box>
+                        <Divider>または</Divider>
+                    </Box>
+                    <Typography variant="h3">秘密鍵を直接入力</Typography>
+                    <TextField
+                        placeholder="0x..."
+                        value={secret}
+                        onChange={(e) => {
+                            setSecret(e.target.value)
+                        }}
+                    />
+                    <Divider sx={{ my: '30px' }} />
+                    <Typography variant="h3">ホストサーバーアドレス</Typography>
+                    <TextField
+                        placeholder="https://example.tld/"
+                        value={server}
+                        onChange={(e) => {
+                            setServer(e.target.value)
+                        }}
+                    />
+                    <Button disabled={!entityFound} variant="contained" onClick={accountImport}>
+                        インポート
+                    </Button>
+                </Paper>
             </Box>
-            <Typography variant="h3">秘密鍵を直接入力</Typography>
-            <TextField
-                placeholder="0x..."
-                value={secret}
-                onChange={(e) => {
-                    setSecret(e.target.value)
-                }}
-            />
-            <Divider sx={{ my: '30px' }} />
-            <Typography variant="h3">ホストサーバーアドレス</Typography>
-            <TextField
-                placeholder="https://example.tld/"
-                value={server}
-                onChange={(e) => {
-                    setServer(e.target.value)
-                }}
-            />
-            <Button disabled={!entityFound} variant="contained" onClick={accountImport}>
-                インポート
-            </Button>
-        </>
+        </ThemeProvider>
     )
 }
