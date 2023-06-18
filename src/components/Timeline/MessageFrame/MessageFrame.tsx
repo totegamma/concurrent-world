@@ -25,6 +25,7 @@ import type { ReplyMessage } from '../../../schemas/replyMessage'
 import type { ReplyAssociation } from '../../../schemas/replyAssociation'
 import { MessageView } from './MessageView'
 import { ThinMessageView } from './ThinMessageView'
+import { useMessageDetail } from '../../../context/MessageDetail'
 
 export interface MessageFrameProp {
     message: CCMessage<any>
@@ -36,6 +37,7 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
     const api = useApi()
     const appData = useContext(ApplicationContext)
     const inspector = useInspector()
+    const messageDetail = useMessageDetail()
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [message, setMessage] = useState<CCMessage<any> | undefined>()
     const [msgstreams, setStreams] = useState<Array<Stream<any>>>([])
@@ -99,6 +101,11 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
 
         api.createAssociation<Like>(Schemas.like, {}, id, author, 'messages', targetStream).then((_) => {
             api.invalidateMessage(id)
+
+            // MEMO 無理やり更新
+            api.fetchMessageWithAuthor(id, author).then((message) => {
+                setMessage(message)
+            })
         })
     }, [])
 
@@ -106,37 +113,17 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
         if (!deletekey) return
         api.deleteAssociation(deletekey, author).then((_) => {
             api.invalidateMessage(props.message.id)
+
+            // MEMO 無理やり更新
+            api.fetchMessageWithAuthor(props.message.id, author).then((message) => {
+                setMessage(message)
+            })
         })
     }, [])
 
     const handleReply = async (): Promise<void> => {
         console.log('messageId', message?.id)
-        const data = await api?.createMessage<ReplyMessage>(
-            Schemas.replyMessage,
-            {
-                replyToMessageId: message?.id || '',
-                replyToMessageAuthor: message?.author || '',
-                body: 'このメッセージは素晴らしいですね ' + Math.floor(Math.random() * 1000).toString()
-            },
-            message?.streams || []
-        )
-
-        const authorInbox = (await api.readCharacter(message?.author || '', Schemas.userstreams))?.payload.body
-            .notificationStream
-        const targetStream = [authorInbox, appData.userstreams?.payload.body.associationStream].filter(
-            (e) => e
-        ) as string[]
-
-        console.log('assosiation', targetStream)
-
-        await api?.createAssociation<ReplyAssociation>(
-            Schemas.replyAssociation,
-            { messageId: data.content.id, messageAuthor: api.userAddress },
-            message?.id || '',
-            message?.author || '',
-            'messages',
-            targetStream || []
-        )
+        messageDetail.showMessage({ messageId: message?.id || '', author: message?.author || '' })
     }
 
     if (!fetchSuccess) {

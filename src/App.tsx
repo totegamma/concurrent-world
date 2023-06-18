@@ -176,6 +176,18 @@ function App(): JSX.Element {
                         if (event.stream === userstreams?.payload.body.notificationStream) {
                             playNotificationRef.current()
                             api?.fetchAssociation(event.body.id, event.body.currenthost).then((a) => {
+                                if (!a) return
+                                if (a.schema === Schemas.replyAssociation) {
+                                    api?.readCharacter(a.author, Schemas.profile).then(
+                                        (c: Character<Profile> | undefined) => {
+                                            enqueueSnackbar(
+                                                `${c?.payload.body.username ?? 'anonymous'} replied to your message.`
+                                            )
+                                        }
+                                    )
+                                    return
+                                }
+
                                 a &&
                                     api.fetchMessage(a.targetID).then((m) => {
                                         m &&

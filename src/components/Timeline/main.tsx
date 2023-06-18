@@ -9,6 +9,7 @@ import { InspectorProvider } from '../../context/Inspector'
 import { Loading } from '../Loading'
 import { MessageFrame } from './MessageFrame/MessageFrame'
 import { MessageMultiplexer } from './Multiplexer'
+import { MessageDetailProvider } from '../../context/MessageDetail'
 
 export interface TimelineProps {
     streams: string[]
@@ -74,31 +75,33 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
 
     return (
         <InspectorProvider>
-            <List sx={{ flex: 1, width: '100%' }}>
-                <InfiniteScroll
-                    loadMore={() => {
-                        loadMore()
-                    }}
-                    initialLoad={false}
-                    hasMore={hasMoreData}
-                    loader={<Loading key={0} message="Loading..." color={theme.palette.text.primary} />}
-                    useWindow={false}
-                    getScrollParent={() => props.scrollParentRef.current}
-                >
-                    {props.timeline.current.map((e) => (
-                        <React.Fragment key={e.id}>
-                            {e.type === 'message' && <MessageMultiplexer message={e} lastUpdated={e.LastUpdated} />}
-                            {e.type === 'association' && (
-                                <AssociationFrame association={e} lastUpdated={e.LastUpdated} />
-                            )}
-                            {e.type !== 'message' && e.type !== 'association' && (
-                                <Typography>Unknown message type: {e.type}</Typography>
-                            )}
-                            <Divider variant="inset" component="li" sx={{ margin: '0 5px' }} />
-                        </React.Fragment>
-                    ))}
-                </InfiniteScroll>
-            </List>
+            <MessageDetailProvider>
+                <List sx={{ flex: 1, width: '100%' }}>
+                    <InfiniteScroll
+                        loadMore={() => {
+                            loadMore()
+                        }}
+                        initialLoad={false}
+                        hasMore={hasMoreData}
+                        loader={<Loading key={0} message="Loading..." color={theme.palette.text.primary} />}
+                        useWindow={false}
+                        getScrollParent={() => props.scrollParentRef.current}
+                    >
+                        {props.timeline.current.map((e) => (
+                            <React.Fragment key={e.id}>
+                                {e.type === 'message' && <MessageMultiplexer message={e} lastUpdated={e.LastUpdated} />}
+                                {e.type === 'association' && (
+                                    <AssociationFrame association={e} lastUpdated={e.LastUpdated} />
+                                )}
+                                {e.type !== 'message' && e.type !== 'association' && (
+                                    <Typography>Unknown message type: {e.type}</Typography>
+                                )}
+                                <Divider variant="inset" component="li" sx={{ margin: '0 5px' }} />
+                            </React.Fragment>
+                        ))}
+                    </InfiniteScroll>
+                </List>
+            </MessageDetailProvider>
         </InspectorProvider>
     )
 })
