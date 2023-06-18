@@ -1,5 +1,6 @@
 import {
     Box,
+    ButtonBase,
     Divider,
     List,
     ListItem,
@@ -12,51 +13,42 @@ import { Link } from 'react-router-dom'
 
 import HomeIcon from '@mui/icons-material/Home'
 import BadgeIcon from '@mui/icons-material/Badge'
+import BuildIcon from '@mui/icons-material/Build'
 import MessageIcon from '@mui/icons-material/Message'
 import ExploreIcon from '@mui/icons-material/Explore'
 import SettingsIcon from '@mui/icons-material/Settings'
 import NotificationsIcon from '@mui/icons-material/Notifications'
-import PercentIcon from '@mui/icons-material/Percent'
-import { useContext, useEffect, useState } from 'react'
+import { memo, useContext } from 'react'
 import { ApplicationContext } from '../App'
-import type { ConcurrentTheme, Stream } from '../model'
-import { ConcurrentLogo } from './ConcurrentLogo'
+import type { ConcurrentTheme } from '../model'
 
 // @ts-expect-error vite dynamic import
 import buildTime from '~build/time'
 // @ts-expect-error vite dynamic import
 import { branch, sha } from '~build/info'
+import { StreamList } from './StreamList'
+import { CCAvatar } from './CCAvatar'
+import { useApi } from '../context/api'
+import { ConcurrentWordmark } from './ConcurrentWordmark'
 
 const branchName = branch || window.location.host.split('.')[0]
 
 export interface MenuProps {
-    streams: string[]
     hideMenu?: boolean
     onClick?: () => void
 }
 
-export function Menu(props: MenuProps): JSX.Element {
+export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
+    const api = useApi()
     const appData = useContext(ApplicationContext)
-    const [watchStreams, setWatchStreams] = useState<Stream[]>([])
 
     const theme = useTheme<ConcurrentTheme>()
 
-    useEffect(() => {
-        ;(async () => {
-            setWatchStreams(
-                await Promise.all(
-                    props.streams.map(
-                        async (id) => await appData.streamDict.get(id)
-                    )
-                )
-            )
-        })()
-    }, [props.streams])
+    const iconColor = appData.websocketState === 1 ? theme.palette.background.contrastText : theme.palette.text.disabled
 
-    const iconColor =
-        appData.websocketState === 1
-            ? theme.palette.background.contrastText
-            : theme.palette.text.disabled
+    if (!appData) {
+        return <>loading...</>
+    }
 
     return (
         <Box sx={{ gap: '15px', height: '100%' }}>
@@ -69,34 +61,8 @@ export function Menu(props: MenuProps): JSX.Element {
                     color: 'background.contrastText'
                 }}
             >
-                <Box
-                    sx={{
-                        display: 'flex',
-                        gap: '8px',
-                        justifyContent: 'center'
-                    }}
-                >
-                    <Box>
-                        <ConcurrentLogo
-                            size="32px"
-                            upperColor={iconColor}
-                            lowerColor={iconColor}
-                            frameColor={iconColor}
-                        />
-                    </Box>
-                    <Typography
-                        sx={{
-                            color: 'background.contrastText',
-                            fontWeight: 600,
-                            fontSize: '22px'
-                        }}
-                    >
-                        Concurrent
-                    </Typography>
-                </Box>
-                <Box sx={{ textAlign: 'center', fontWeight: 600 }}>
-                    開発中α版
-                </Box>
+                <ConcurrentWordmark color={iconColor} />
+                <Box sx={{ textAlign: 'center', fontWeight: 600 }}>開発中α版</Box>
                 <Box
                     sx={{
                         textAlign: 'center',
@@ -123,11 +89,7 @@ export function Menu(props: MenuProps): JSX.Element {
                         >
                             <List dense sx={{ width: '100%', maxWidth: 360 }}>
                                 <ListItem disablePadding>
-                                    <ListItemButton
-                                        sx={{ gap: 1 }}
-                                        component={Link}
-                                        to="/"
-                                    >
+                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/">
                                         <HomeIcon
                                             sx={{
                                                 color: 'background.contrastText'
@@ -138,11 +100,7 @@ export function Menu(props: MenuProps): JSX.Element {
                                     </ListItemButton>
                                 </ListItem>
                                 <ListItem disablePadding>
-                                    <ListItemButton
-                                        sx={{ gap: 1 }}
-                                        component={Link}
-                                        to="/notifications"
-                                    >
+                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/notifications">
                                         <NotificationsIcon
                                             sx={{
                                                 color: 'background.contrastText'
@@ -153,11 +111,7 @@ export function Menu(props: MenuProps): JSX.Element {
                                     </ListItemButton>
                                 </ListItem>
                                 <ListItem disablePadding>
-                                    <ListItemButton
-                                        sx={{ gap: 1 }}
-                                        component={Link}
-                                        to="/associations"
-                                    >
+                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/associations">
                                         <MessageIcon
                                             sx={{
                                                 color: 'background.contrastText'
@@ -168,11 +122,7 @@ export function Menu(props: MenuProps): JSX.Element {
                                     </ListItemButton>
                                 </ListItem>
                                 <ListItem disablePadding>
-                                    <ListItemButton
-                                        sx={{ gap: 1 }}
-                                        component={Link}
-                                        to="/explorer"
-                                    >
+                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/explorer">
                                         <ExploreIcon
                                             sx={{
                                                 color: 'background.contrastText'
@@ -183,11 +133,7 @@ export function Menu(props: MenuProps): JSX.Element {
                                     </ListItemButton>
                                 </ListItem>
                                 <ListItem disablePadding>
-                                    <ListItemButton
-                                        sx={{ gap: 1 }}
-                                        component={Link}
-                                        to="/identity"
-                                    >
+                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/identity">
                                         <BadgeIcon
                                             sx={{
                                                 color: 'background.contrastText'
@@ -198,11 +144,7 @@ export function Menu(props: MenuProps): JSX.Element {
                                     </ListItemButton>
                                 </ListItem>
                                 <ListItem disablePadding>
-                                    <ListItemButton
-                                        sx={{ gap: 1 }}
-                                        component={Link}
-                                        to="/settings"
-                                    >
+                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/settings">
                                         <SettingsIcon
                                             sx={{
                                                 color: 'background.contrastText'
@@ -212,60 +154,56 @@ export function Menu(props: MenuProps): JSX.Element {
                                         <ListItemText primary="Settings" />
                                     </ListItemButton>
                                 </ListItem>
+                                <ListItem disablePadding>
+                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/devtool">
+                                        <BuildIcon
+                                            sx={{
+                                                color: 'background.contrastText'
+                                            }}
+                                        />
+
+                                        <ListItemText primary="DevTool" />
+                                    </ListItemButton>
+                                </ListItem>
                             </List>
                         </Box>
                         <Divider />
                     </>
                 )}
-                <Box
+                <StreamList onClick={props.onClick} />
+                <ButtonBase
+                    component={Link}
                     sx={{
                         display: 'flex',
-                        flexDirection: 'column',
-                        gap: '5px',
-                        overflowY: 'auto',
-                        overflowX: 'hidden'
+                        alignItems: 'center',
+                        justifyContent: 'left',
+                        gap: '15px',
+                        m: 0,
+                        p: '15px'
                     }}
+                    to={'/entity/' + (appData.profile?.author ?? '')}
                 >
-                    <List
-                        dense
+                    <CCAvatar
+                        alt={appData.profile?.payload.body.username}
+                        avatarURL={appData.profile?.payload.body.avatar}
+                        identiconSource={api.userAddress}
                         sx={{
-                            width: '100%',
-                            maxWidth: 360,
-                            display: 'flex',
-                            flexDirection: 'column'
+                            width: '40px',
+                            height: '40px'
                         }}
-                    >
-                        {watchStreams.map((stream) => {
-                            const labelId = `checkbox-list-secondary-label-${stream.id}`
-                            return (
-                                <ListItem key={stream.id} disablePadding>
-                                    <ListItemButton
-                                        component={Link}
-                                        to={`/#${stream.id}`}
-                                        sx={{ gap: 1 }}
-                                        onClick={props.onClick}
-                                    >
-                                        <PercentIcon
-                                            sx={{
-                                                color: 'background.contrastText'
-                                            }}
-                                        />
-                                        <ListItemText
-                                            id={labelId}
-                                            primary={
-                                                stream.meta
-                                                    ? JSON.parse(stream.meta)
-                                                          .name
-                                                    : 'backrooms'
-                                            }
-                                        />
-                                    </ListItemButton>
-                                </ListItem>
-                            )
-                        })}
-                    </List>
-                </Box>
+                    />
+                    <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', flexFlow: 'column' }}>
+                        <Typography color={theme.palette.background.contrastText}>
+                            {appData.profile?.payload.body.username}
+                        </Typography>
+                        <Typography variant="caption" color={theme.palette.background.contrastText}>
+                            {api.host?.fqdn}
+                        </Typography>
+                    </Box>
+                </ButtonBase>
             </Box>
         </Box>
     )
-}
+})
+
+Menu.displayName = 'Menu'

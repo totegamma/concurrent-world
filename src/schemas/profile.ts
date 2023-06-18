@@ -9,6 +9,10 @@ export interface Profile {
     username?: string
     avatar?: string
     description?: string
-    homeStream?: string
-    notificationStream?: string
+    banner?: string
+    links?: {
+        key?: string
+        value?: string
+        [k: string]: unknown
+    }[]
 }

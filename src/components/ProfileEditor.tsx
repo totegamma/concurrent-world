@@ -1,132 +1,79 @@
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
-import Typography from '@mui/material/Typography'
-import { useState } from 'react'
-import { Sign } from '../util'
+import { useEffect, useState } from 'react'
 import { Schemas } from '../schemas'
 import Button from '@mui/material/Button'
-import type { Stream, User } from '../model'
+import type { Profile } from '../schemas/profile'
+import { useApi } from '../context/api'
+import type { Character } from '../model'
+import { CCAvatar } from './CCAvatar'
+import Background from '../resources/defaultbg.png'
+import { alpha, useTheme } from '@mui/material'
 
 interface ProfileEditorProps {
-    initial: User
-    userAddress: string
-    privatekey: string
-    serverAddress: string
-    onSubmit?: () => void
+    initial?: Character<Profile>
+    onSubmit?: (profile: Profile) => void
 }
 
 export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
-    const [username, setUsername] = useState<string>(
-        props.initial.username ?? ''
-    )
-    const [avatar, setAvatar] = useState<string>(props.initial.avatar ?? '')
+    const api = useApi()
+    const theme = useTheme()
+    const [username, setUsername] = useState<string>(props.initial?.payload.body.username ?? '')
+    const [avatar, setAvatar] = useState<string>(props.initial?.payload.body.avatar ?? '')
+    const [description, setDescription] = useState<string>(props.initial?.payload.body.description ?? '')
+    const [banner, setBanner] = useState<string>(props.initial?.payload.body.banner ?? '')
 
     const updateProfile = async (): Promise<void> => {
-        let homeStreamID = props.initial.homestream
-        if (homeStreamID === undefined || homeStreamID === '') {
-            const payloadObj = {
-                username: username + '-home'
-            }
-
-            const payload = JSON.stringify(payloadObj)
-            const signature = Sign(props.privatekey, payload)
-
-            const requestOptions = {
-                method: 'PUT',
-                headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({
-                    author: props.userAddress,
-                    maintainer: [props.userAddress],
-                    writer: [props.userAddress],
-                    reader: [],
-                    schema: 'net.gammalab.concurrent.tbdStreamHomeMeta',
-                    meta: payload,
-                    signature
-                })
-            }
-
-            homeStreamID = (
-                await fetch(
-                    props.serverAddress + 'stream',
-                    requestOptions
-                ).then(async (res) => (await res.json()) as Stream)
-            ).id
-        }
-        console.log('home', homeStreamID)
-
-        let notificationStreamID = props.initial.notificationstream
-        if (notificationStreamID === undefined || notificationStreamID === '') {
-            const payloadObj = {
-                username: username + '-notification'
-            }
-
-            const payload = JSON.stringify(payloadObj)
-            const signature = Sign(props.privatekey, payload)
-
-            const requestOptions = {
-                method: 'PUT',
-                headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({
-                    author: props.userAddress,
-                    maintainer: [props.userAddress],
-                    writer: [],
-                    reader: [props.userAddress],
-                    schema: 'net.gammalab.concurrent.tbdStreamNotificationMeta',
-                    meta: payload,
-                    signature
-                })
-            }
-
-            notificationStreamID = (
-                await fetch(
-                    props.serverAddress + 'stream',
-                    requestOptions
-                ).then(async (res) => (await res.json()) as Stream)
-            ).id
-        }
-        console.log('notification', notificationStreamID)
-
-        const payloadObj = {
+        const profile = {
             username,
             avatar,
-            description: '',
-            home: homeStreamID,
-            notification: notificationStreamID
+            description,
+            banner
         }
-
-        const payload = JSON.stringify(payloadObj)
-        const signature = Sign(props.privatekey, payload)
-
-        const requestOptions = {
-            method: 'PUT',
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({
-                author: props.userAddress,
-                schema: Schemas.profile,
-                payload,
-                signature
-            })
-        }
-
-        fetch(props.serverAddress + 'characters', requestOptions)
-            .then(async (res) => await res.json())
-            .then((data) => {
-                console.log(data)
-                props.onSubmit?.()
-            })
+        api.upsertCharacter<Profile>(Schemas.profile, profile, props.initial?.id).then((data) => {
+            console.log(data)
+            props.onSubmit?.(profile)
+        })
     }
 
+    useEffect(() => {
+        setUsername(props.initial?.payload.body.username ?? '')
+        setAvatar(props.initial?.payload.body.avatar ?? '')
+        setDescription(props.initial?.payload.body.description ?? '')
+        setBanner(props.initial?.payload.body.banner ?? '')
+    }, [props.initial])
+
     return (
-        <>
-            <Typography variant="h3" gutterBottom>
-                Profile
-            </Typography>
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                gap: '15px',
+                backgroundImage: `url(${banner || Background})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                padding: '15px'
+            }}
+        >
+            <CCAvatar
+                avatarURL={avatar}
+                identiconSource={api.userAddress}
+                sx={{
+                    width: '64px',
+                    height: '64px'
+                }}
+            />
+
             <Box
                 sx={{
                     display: 'flex',
                     flexDirection: 'column',
                     padding: '15px',
-                    gap: '5px'
+                    gap: '5px',
+                    flex: 1,
+                    backgroundColor: alpha(theme.palette.background.paper, 0.8),
+                    borderRadius: '5px',
+                    border: '1px solid rgba(255, 255, 255, 0.3)'
                 }}
             >
                 <TextField
@@ -138,11 +85,28 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
                     }}
                 />
                 <TextField
+                    label="description"
+                    variant="outlined"
+                    value={description}
+                    multiline
+                    onChange={(e) => {
+                        setDescription(e.target.value)
+                    }}
+                />
+                <TextField
                     label="avatarURL"
                     variant="outlined"
                     value={avatar}
                     onChange={(e) => {
                         setAvatar(e.target.value)
+                    }}
+                />
+                <TextField
+                    label="bannerURL"
+                    variant="outlined"
+                    value={banner}
+                    onChange={(e) => {
+                        setBanner(e.target.value)
                     }}
                 />
                 <Button
@@ -154,6 +118,6 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
                     Update
                 </Button>
             </Box>
-        </>
+        </Box>
     )
 }

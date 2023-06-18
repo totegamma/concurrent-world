@@ -1,29 +1,38 @@
 # Concurrent-web
-Concurren-webは分散マイクロブログ基盤である[Concurrent](https://github.com/totegamma/concurrent)のwebクライアント実装の1つです。
+Concurrent-webは分散マイクロブログ基盤である[Concurrent](https://github.com/totegamma/concurrent)のwebクライアント実装の1つです。
 現在は絶賛開発中で、最低限の機能しかありません。
 
-## Motivation of Concurrent
-本体であるConcurrentは、「セルフホストでお一人様インスタンス建てたい！けどローカルが1人ぼっちなのは寂しい...」という問題を解決するために生まれました。
+### 世界は一つ
+Concurrentを始めるのに、所属するコミュニティを選ぶ必要はありません。 
+アカウントを作成すれば、誰とでもつながることができ、好きな話題同士で集まったコミュニティタイムライン(concurrentではストリームと呼びます)で交流できます。
 
-完全検閲フリーを目指しているnostrと比較すると、Concurrentは自分のメッセージ本体を格納するDBと、メッセージ送信先のストリームをホストするサーバーのガバナンス*の影響は受けてしまいます。
-しかし、前者はセルフホストすることで解決し、後者はそれはそれで正しいと考えているため問題にはなりません。
-
-<small>ガバナンス: ここで言うガバナンスとは、サービス終了によるデータの消失や、サーバー管理者に発言を削除されることを指す。</small>
+### 環境は無数
+発信する内容はどうしてもそのサーバーが設置してある国や、運用している団体により検閲・制限されてしまいます。
+これ自体は仕方ないことですが、利用者としては自身が身を置く環境は選びたいものです。 
+Concurrentは分散型なので、自身の発言を管理してくれる「ホスト」を自分で選ぶことができます。もちろん、ホストは自分で建てることもできますよ！
 
 ## Getting Started
 ### 前準備
-nodeとnpmがインストールされている必要があります。
+nodeとpnpmがインストールされている必要があります。  
+
+> [volta](https://volta.sh/) を使うことをお勧めします。
+> ```shell
+> # package.jsonで指定されているNode.jsをインストールする
+> volta install node
+> volta install pnpm
+> ```
+
 ```
-npm i
+pnpm i
 ```
 
 ### devビルド
 ```
-npm run dev
+pnpm dev
 ```
 ### 本番ビルド
 ```
-npm run build
+pnpm build
 ```
 
 ### schemaファイルの生成

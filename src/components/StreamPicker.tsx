@@ -1,11 +1,12 @@
-import { Autocomplete, Box, Chip, InputBase } from '@mui/material'
-import { useContext, useEffect, useState } from 'react'
-import { ApplicationContext } from '../App'
+import { Autocomplete, Box, Chip, InputBase, type SxProps } from '@mui/material'
+import { memo, useEffect, useState } from 'react'
+import { useApi } from '../context/api'
+import { useFollow } from '../context/FollowContext'
 
 export interface StreamPickerProps {
     selected: string[]
     setSelected: (selected: string[]) => void
-    color?: string
+    sx?: SxProps
 }
 
 interface StreamOption {
@@ -13,44 +14,45 @@ interface StreamOption {
     id: string
 }
 
-export function StreamPicker(props: StreamPickerProps): JSX.Element {
-    const appData = useContext(ApplicationContext)
+export const StreamPicker = memo<StreamPickerProps>((props: StreamPickerProps): JSX.Element => {
+    const api = useApi()
+    const followService = useFollow()
     const [options, setOptions] = useState<StreamOption[]>([])
     const [selectedStreams, setSelectedStreams] = useState<StreamOption[]>([])
 
     useEffect(() => {
-        setOptions(
-            Object.values(appData.streamDict.body.current)
-                .filter((e) => e.meta)
-                .map((e) => {
-                    return {
-                        label: JSON.parse(e.meta).name as string,
-                        id: e.id
-                    }
-                })
-                .filter((e) => e.label)
-        )
-    }, [appData.streamDict.body])
+        Promise.all(followService.bookmarkingStreams.map((e) => api.readStream(e))).then((a) => {
+            setOptions(
+                a
+                    .filter((e) => e?.payload)
+                    .map((e) => {
+                        return {
+                            label: e!.payload.body.name,
+                            id: e!.id
+                        }
+                    })
+            )
+        })
+    }, [])
 
     useEffect(() => {
-        Promise.all(props.selected.map((e) => appData.streamDict.get(e))).then(
-            (a) => {
-                setSelectedStreams(
-                    a
-                        .filter((e) => e.meta)
-                        .map((e) => {
-                            return { label: JSON.parse(e.meta).name, id: e.id }
-                        })
-                )
-            }
-        )
+        Promise.all(props.selected.map((e) => api.readStream(e))).then((a) => {
+            setSelectedStreams(
+                a
+                    .filter((e) => e?.payload)
+                    .map((e) => {
+                        return { label: e!.payload.body.name, id: e!.id }
+                    })
+            )
+        })
     }, [props.selected])
 
     return (
         <Box
             sx={{
-                backgroundColor: props.color ?? 'primary.main',
+                ...props.sx,
                 borderRadius: '20px',
+                padding: '0px 10px',
                 flex: '1'
             }}
         >
@@ -72,7 +74,7 @@ export function StreamPicker(props: StreamPickerProps): JSX.Element {
                             {...params.InputProps}
                             {...rest}
                             sx={{ color: 'primary.contrastText' }}
-                            placeholder="select"
+                            placeholder={props.selected.length === 0 ? 'select' : ''}
                         />
                     )
                 }}
@@ -80,14 +82,11 @@ export function StreamPicker(props: StreamPickerProps): JSX.Element {
                     value.map((option, index) => (
                         // disabling ESLint here becase 'key' should exist in {..getTagProps({index})}
                         // eslint-disable-next-line
-                        <Chip
-                            label={option.label}
-                            sx={{ color: 'text.default' }}
-                            {...getTagProps({ index })}
-                        />
+                        <Chip label={option.label} sx={{ color: 'text.default' }} {...getTagProps({ index })} />
                     ))
                 }
             />
         </Box>
     )
-}
+})
+StreamPicker.displayName = 'StreamPicker'

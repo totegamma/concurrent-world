@@ -1,14 +1,17 @@
-import { Box, Divider, Typography, IconButton, useTheme } from '@mui/material'
-import { useContext, useState } from 'react'
-import { ApplicationContext } from '../App'
+import { Box, Divider, Typography, IconButton, useTheme, Tabs, Tab } from '@mui/material'
+import { useState } from 'react'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
-import { ProfileEditor } from '../components/ProfileEditor'
+import { useApi } from '../context/api'
+import { APSettings } from '../components/APSettings'
+import { Passport } from '../components/Passport'
+import Tilt from 'react-parallax-tilt'
 
 export function Identity(): JSX.Element {
+    const api = useApi()
     const theme = useTheme()
-    const appData = useContext(ApplicationContext)
     const [showPrivateKey, setShowPrivateKey] = useState(false)
+    const [tab, setTab] = useState(0)
 
     return (
         <>
@@ -27,67 +30,54 @@ export function Identity(): JSX.Element {
                     Identity
                 </Typography>
                 <Divider />
-                <ProfileEditor
-                    initial={appData.profile}
-                    userAddress={appData.userAddress}
-                    privatekey={appData.privatekey}
-                    serverAddress={appData.serverAddress}
-                />
-                <Divider />
-                <Typography variant="h3" gutterBottom>
-                    Home Stream
-                </Typography>
-                <Typography sx={{ wordBreak: 'break-all' }}>
-                    {appData.profile.homestream}
-                </Typography>
-                <Typography variant="h3" gutterBottom>
-                    Notification Stream
-                </Typography>
-                <Typography sx={{ wordBreak: 'break-all' }}>
-                    {appData.profile.notificationstream}
-                </Typography>
-                <Typography variant="h3" gutterBottom>
-                    Concurrent Address
-                </Typography>
-                <Typography sx={{ wordBreak: 'break-all' }}>
-                    {appData.userAddress}
-                </Typography>
-                <Typography variant="h3" gutterBottom>
-                    Publickey
-                </Typography>
-                <Typography sx={{ wordBreak: 'break-all' }}>
-                    {appData.publickey}
-                </Typography>
-                <Typography variant="h3" gutterBottom>
-                    Privatekey
-                </Typography>
-                <Typography
-                    sx={{
-                        wordBreak: 'break-all',
-                        display: 'flex',
-                        alignItems: 'center'
+                <Tabs
+                    value={tab}
+                    onChange={(_, index) => {
+                        setTab(index)
                     }}
                 >
-                    {showPrivateKey
-                        ? appData.privatekey
-                        : '•••••••••••••••••••••••••••••••••••••••••••••••••'}
-                    <IconButton
-                        sx={{ ml: 'auto' }}
-                        onClick={() => {
-                            setShowPrivateKey(!showPrivateKey)
-                        }}
-                    >
-                        {!showPrivateKey ? (
-                            <VisibilityIcon
-                                sx={{ color: theme.palette.text.primary }}
-                            />
-                        ) : (
-                            <VisibilityOffIcon
-                                sx={{ color: theme.palette.text.primary }}
-                            />
-                        )}
-                    </IconButton>
-                </Typography>
+                    <Tab label="Concurrent" />
+                    <Tab label="ActivityPub" />
+                </Tabs>
+                {tab === 0 && (
+                    <>
+                        <Box
+                            sx={{
+                                padding: { xs: '10px', sm: '10px 50px' }
+                            }}
+                        >
+                            <Tilt glareEnable={true} glareBorderRadius="5%">
+                                <Passport />
+                            </Tilt>
+                        </Box>
+                        <Divider />
+                        <Typography variant="h3" gutterBottom>
+                            Privatekey
+                        </Typography>
+                        <Typography
+                            sx={{
+                                wordBreak: 'break-all',
+                                display: 'flex',
+                                alignItems: 'center'
+                            }}
+                        >
+                            {showPrivateKey ? api.privatekey : '•••••••••••••••••••••••••••••••••••••••••••••••••'}
+                            <IconButton
+                                sx={{ ml: 'auto' }}
+                                onClick={() => {
+                                    setShowPrivateKey(!showPrivateKey)
+                                }}
+                            >
+                                {!showPrivateKey ? (
+                                    <VisibilityIcon sx={{ color: theme.palette.text.primary }} />
+                                ) : (
+                                    <VisibilityOffIcon sx={{ color: theme.palette.text.primary }} />
+                                )}
+                            </IconButton>
+                        </Typography>
+                    </>
+                )}
+                {tab === 1 && <APSettings />}
             </Box>
         </>
     )

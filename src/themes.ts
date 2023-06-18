@@ -63,6 +63,19 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 disabled: 'rgba(255, 255, 255, 0.703)'
             },
             divider: 'rgba(255, 255, 255, 0.2)'
+        },
+        components: {
+            MuiCssBaseline: {
+                styleOverrides: `
+                ::-webkit-scrollbar{
+                    width: 10px;
+                },
+                ::-webkit-scrollbar-thumb {
+                    background-color: rgba(255, 255, 255, 0.2);
+                    border-radius: 10px;
+                }
+                `
+            }
         }
     },
     highcontrast_yb: {
@@ -81,6 +94,19 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 disabled: 'rgba(255, 255, 255, 0.5)'
             },
             divider: 'rgba(255, 255, 255, 0.2)'
+        },
+        components: {
+            MuiCssBaseline: {
+                styleOverrides: `
+                ::-webkit-scrollbar{
+                    width: 10px;
+                },
+                ::-webkit-scrollbar-thumb {
+                    background-color: rgba(255, 255, 255, 0.2);
+                    border-radius: 10px;
+                }
+                `
+            }
         }
     },
     rabbuttz: {
@@ -236,6 +262,19 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 disabled: 'rgba(255, 255, 255, 0.6)'
             },
             divider: 'rgba(255, 255, 255, 0.2)'
+        },
+        components: {
+            MuiCssBaseline: {
+                styleOverrides: `
+                ::-webkit-scrollbar{
+                    width: 10px;
+                },
+                ::-webkit-scrollbar-thumb {
+                    background-color: rgba(255, 255, 255, 0.2);
+                    border-radius: 10px;
+                }
+                `
+            }
         }
     },
     darkgray: {
@@ -258,6 +297,19 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 disabled: 'rgba(255, 255, 255, 0.5)'
             },
             divider: 'rgba(255, 255, 255, 0.2)'
+        },
+        components: {
+            MuiCssBaseline: {
+                styleOverrides: `
+                ::-webkit-scrollbar{
+                    width: 10px;
+                },
+                ::-webkit-scrollbar-thumb {
+                    background-color: rgba(255, 255, 255, 0.2);
+                    border-radius: 10px;
+                }
+                `
+            }
         }
     },
     messy: {
@@ -277,6 +329,19 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 disabled: 'rgba(255, 255, 255, 0.5)'
             },
             divider: 'rgba(255, 255, 255, 0.2)'
+        },
+        components: {
+            MuiCssBaseline: {
+                styleOverrides: `
+                ::-webkit-scrollbar{
+                    width: 10px;
+                },
+                ::-webkit-scrollbar-thumb {
+                    background-color: rgba(255, 255, 255, 0.2);
+                    border-radius: 10px;
+                }
+                `
+            }
         }
     }
 }
@@ -306,13 +371,29 @@ export const ConcurrentDefaultTheme = {
         h6: {
             fontSize: 11.2
         }
+    },
+    transitions: {
+        duration: {
+            entieringScreen: 50,
+            leavingScreen: 50
+        }
+    },
+    components: {
+        MuiCssBaseline: {
+            styleOverrides: `
+            ::-webkit-scrollbar{
+                width: 10px;
+            },
+            ::-webkit-scrollbar-thumb {
+                background-color: rgba(0, 0, 0, 0.2);
+                border-radius: 10px;
+            }
+            `
+        }
     }
 }
 
 export const createConcurrentTheme = (name: string): ConcurrentTheme => {
-    const theme: ConcurrentTheme = Object.assign(
-        createTheme(),
-        Object.assign(ConcurrentDefaultTheme, Themes[name])
-    )
+    const theme: ConcurrentTheme = Object.assign(createTheme(), Object.assign(ConcurrentDefaultTheme, Themes[name]))
     return createTheme(theme) as ConcurrentTheme
 }

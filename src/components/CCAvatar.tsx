@@ -17,11 +17,7 @@ export const CCAvatar = (props: CCAvatarProps): JSX.Element => {
                 ...props.sx
             }}
         >
-            <BoringAvatar
-                name={props.identiconSource}
-                variant="beam"
-                size={1000}
-            />
+            <BoringAvatar name={props.identiconSource} variant="beam" size={1000} />
         </Avatar>
     )
 }
