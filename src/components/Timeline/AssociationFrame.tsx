@@ -1,5 +1,5 @@
 import { memo, useCallback, useContext, useEffect, useState } from 'react'
-import type { Association, Character, Message, StreamElement, type CCID, type ProfileWithAddress } from '../../model'
+import type { Association, Character, Message, StreamElement, CCID, ProfileWithAddress } from '../../model'
 import { useApi } from '../../context/api'
 import { Schemas } from '../../schemas'
 import { Box, IconButton, ListItem, Typography, useTheme } from '@mui/material'
