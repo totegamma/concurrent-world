@@ -1,9 +1,7 @@
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
-import { useEffect, useMemo, useState } from 'react'
-import { Mnemonic, randomBytes, HDNodeWallet } from 'ethers'
-import { LangJa } from '../utils/lang-ja'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import TextField from '@mui/material/TextField'
 import Divider from '@mui/material/Divider'
@@ -18,6 +16,7 @@ import Tilt from 'react-parallax-tilt'
 import { PassportRenderer } from '../components/Passport'
 import { CCAvatar } from '../components/CCAvatar'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
+import { generateIdentity } from '../util'
 
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import { type Profile } from '../schemas/profile'
@@ -40,20 +39,29 @@ export function Registration(): JSX.Element {
     const [mnemonicTest, setMnemonicTest] = useState<string>('')
     const [profile, setProfile] = useState<Profile>()
 
-    const entrophy = useMemo(() => randomBytes(16), [])
-    const mnemonic = useMemo(() => Mnemonic.fromEntropy(entrophy, null, LangJa.wordlist()), [])
-    const wallet = useMemo(() => HDNodeWallet.fromPhrase(mnemonic.phrase, undefined, undefined, LangJa.wordlist()), [])
-    const userAddress = 'CC' + wallet.address.slice(2)
-    const privateKey = wallet.privateKey.slice(2)
+    const [mnemonic, setMnemonic] = useState<string>('')
+    const [CCID, setCCID] = useState<string>('')
+    const [privateKey, setPrivateKey] = useState<string>('')
+    const [publicKey, setPublicKey] = useState<string>('')
+
+    useEffect(() => {
+        const identity = generateIdentity()
+        setMnemonic(identity.mnemonic)
+        setCCID(identity.CCID)
+        setPrivateKey(identity.privateKey)
+        setPublicKey(identity.publicKey)
+    }, [])
+
     const [server, setServer] = useState<string>('')
     const [host, setHost] = useState<Host>()
     const [entityFound, setEntityFound] = useState<boolean>(false)
 
     const [api, initializeApi] = useState<ConcurrentApiClient>()
     useEffect(() => {
-        const api = new ConcurrentApiClient(userAddress, privateKey, host)
+        if (!CCID || !privateKey) return
+        const api = new ConcurrentApiClient(CCID, privateKey, host)
         initializeApi(api)
-    }, [host, userAddress, privateKey])
+    }, [host, CCID, privateKey])
 
     useEffect(() => {
         if (!api) return
@@ -66,15 +74,15 @@ export function Registration(): JSX.Element {
 
     const setupAccount = (): void => {
         localStorage.setItem('Host', JSON.stringify(host))
-        localStorage.setItem('PublicKey', JSON.stringify(wallet.publicKey.slice(2)))
+        localStorage.setItem('PublicKey', JSON.stringify(publicKey))
         localStorage.setItem('PrivateKey', JSON.stringify(privateKey))
-        localStorage.setItem('Address', JSON.stringify(userAddress))
+        localStorage.setItem('Address', JSON.stringify(CCID))
         navigate('/')
     }
 
     const checkRegistration = async (): Promise<void> => {
         console.log('check!!!')
-        const entity = await api?.readEntity(userAddress)
+        const entity = await api?.readEntity(CCID)
         console.log(entity)
         setEntityFound(!!entity && entity.ccaddr != null)
     }
@@ -92,7 +100,7 @@ export function Registration(): JSX.Element {
                         <Tilt glareEnable={true} glareBorderRadius="5%">
                             <PassportRenderer
                                 theme={theme}
-                                ccid={userAddress}
+                                ccid={CCID}
                                 name={''}
                                 avatar={''}
                                 host={''}
@@ -150,8 +158,8 @@ export function Registration(): JSX.Element {
                                 gap: '10px'
                             }}
                         >
-                            <CCAvatar identiconSource={userAddress} />
-                            {userAddress}
+                            <CCAvatar identiconSource={CCID} />
+                            {CCID}
                         </Paper>
                         <Typography>これは、Concurrentの世界であなたを特定する文字列です。</Typography>
                         <Divider />
@@ -189,7 +197,7 @@ export function Registration(): JSX.Element {
                             width: '100%'
                         }}
                     >
-                        {mnemonic.phrase.split('　').map((e, i) => (
+                        {mnemonic.split('　').map((e, i) => (
                             <Box
                                 key={i}
                                 sx={{
@@ -213,7 +221,7 @@ export function Registration(): JSX.Element {
                     <Button
                         variant="contained"
                         onClick={() => {
-                            navigator.clipboard.writeText(mnemonic.phrase)
+                            navigator.clipboard.writeText(mnemonic)
                         }}
                         startIcon={<ContentPasteIcon />}
                     >
@@ -263,10 +271,10 @@ export function Registration(): JSX.Element {
                             width: '100%'
                         }}
                     />
-                    {mnemonic.phrase === mnemonicTest ? '一致しています' : '一致していません'}
+                    {mnemonic === mnemonicTest ? '一致しています' : '一致していません'}
                     <Button
                         variant="contained"
-                        disabled={mnemonic.phrase !== mnemonicTest}
+                        disabled={mnemonic !== mnemonicTest}
                         onClick={(): void => {
                             setActiveStep(4)
                         }}
@@ -384,7 +392,7 @@ export function Registration(): JSX.Element {
                         <Tilt glareEnable={true} glareBorderRadius="5%">
                             <PassportRenderer
                                 theme={theme}
-                                ccid={userAddress}
+                                ccid={CCID}
                                 name={profile?.username ?? ''}
                                 avatar={profile?.avatar ?? ''}
                                 host={host?.fqdn ?? ''}

@@ -1,8 +1,6 @@
 import { Box, Button, Typography } from '@mui/material'
 import { forwardRef, useState } from 'react'
-
-import { Mnemonic, randomBytes, HDNodeWallet } from 'ethers'
-import { LangJa } from '../../utils/lang-ja'
+import { generateIdentity } from '../../util'
 
 export const IdentityGenerator = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
     const [mnemonic, setMnemonic] = useState<string>('')
@@ -10,18 +8,13 @@ export const IdentityGenerator = forwardRef<HTMLDivElement>((props, ref): JSX.El
     const [privateKey, setPrivateKey] = useState<string>('')
     const [publicKey, setPublicKey] = useState<string>('')
 
-    const generateIdentity = (): void => {
-        const entrophy = randomBytes(16)
-        const mnemonic = Mnemonic.fromEntropy(entrophy, null, LangJa.wordlist())
-        const wallet = HDNodeWallet.fromPhrase(mnemonic.phrase, undefined, undefined, LangJa.wordlist())
-        const CCID = 'CC' + wallet.address.slice(2)
-        const privateKey = wallet.privateKey.slice(2)
-        const publicKey = wallet.publicKey.slice(2)
+    const generate = (): void => {
+        const identity = generateIdentity()
 
-        setMnemonic(mnemonic.phrase)
-        setCCID(CCID)
-        setPrivateKey(privateKey)
-        setPublicKey(publicKey)
+        setMnemonic(identity.mnemonic)
+        setCCID(identity.CCID)
+        setPrivateKey(identity.privateKey)
+        setPublicKey(identity.publicKey)
     }
 
     return (
@@ -34,7 +27,7 @@ export const IdentityGenerator = forwardRef<HTMLDivElement>((props, ref): JSX.El
                 }}
             >
                 <Typography variant="h3">IdentityGenerator</Typography>
-                <Button variant="contained" onClick={generateIdentity}>
+                <Button variant="contained" onClick={generate}>
                     Generate
                 </Button>
                 <Typography variant="h3">mnemonic</Typography>

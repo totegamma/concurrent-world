@@ -1,5 +1,29 @@
 import { ec as Ec } from 'elliptic'
-import { keccak256, computeAddress, recoverAddress } from 'ethers'
+import { keccak256, computeAddress, recoverAddress, Mnemonic, randomBytes, HDNodeWallet } from 'ethers'
+import { LangJa } from './utils/lang-ja'
+
+interface identity {
+    mnemonic: string
+    privateKey: string
+    publicKey: string
+    CCID: string
+}
+
+export const generateIdentity = (): identity => {
+    const entrophy = randomBytes(16)
+    const mnemonic = Mnemonic.fromEntropy(entrophy, null, LangJa.wordlist())
+    const wallet = HDNodeWallet.fromPhrase(mnemonic.phrase, undefined, undefined, LangJa.wordlist())
+    const CCID = 'CC' + wallet.address.slice(2)
+    const privateKey = wallet.privateKey.slice(2)
+    const publicKey = wallet.publicKey.slice(2)
+
+    return {
+        mnemonic: mnemonic.phrase,
+        privateKey,
+        publicKey,
+        CCID
+    }
+}
 
 export const fetchWithTimeout = async (
     url: RequestInfo,
