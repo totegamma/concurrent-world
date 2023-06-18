@@ -14,7 +14,7 @@ import {
     ListItemIcon
 } from '@mui/material'
 
-import type { Character, Message as CCMessage, ProfileWithAddress, StreamElement, Stream } from '../../../model'
+import type { Character, Message as CCMessage, ProfileWithAddress, StreamElement, Stream, CCID } from '../../../model'
 import type { Profile } from '../../../schemas/profile'
 import { Schemas } from '../../../schemas'
 import type { Like } from '../../../schemas/like'
@@ -53,8 +53,6 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
     useEffect(() => {
         setMessage(props.message)
 
-        console.log(props.message.payload.body.replyToMessageId)
-
         api.readCharacter(props.message.author, Schemas.profile)
             .then((author) => {
                 setAuthor(author)
@@ -70,7 +68,7 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
         api.readCharacter(props.message.payload.body.replyToMessageAuthor, Schemas.profile).then((author) => {
             setReplyAuthor(author)
         })
-    }, [props.message])
+    }, [props.message, props.lastUpdated])
 
     useEffect(() => {
         const fetchUsers = async (): Promise<any> => {
@@ -99,9 +97,9 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
         }
 
         fetchUsers()
-    }, [message?.associations])
+    }, [message?.associations, props.lastUpdated])
 
-    const favorite = useCallback(async ({ id, author }: { id: string; author: string }): Promise<void> => {
+    const favorite = useCallback(async ({ id, author }: { id: string; author: CCID }): Promise<void> => {
         const authorInbox = (await api.readCharacter(author, Schemas.userstreams))?.payload.body.notificationStream
         console.log(authorInbox)
         const targetStream = [authorInbox, appData.userstreams?.payload.body.associationStream].filter(
@@ -110,7 +108,7 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
 
         console.log(targetStream)
 
-        api.createAssociation<Like>(Schemas.like, {}, id, 'messages', author, targetStream).then((_) => {
+        api.createAssociation<Like>(Schemas.like, {}, id, author, 'messages', targetStream).then((_) => {
             api.invalidateMessage(id)
         })
     }, [])
@@ -184,7 +182,7 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
 
     return (
         <>
-            {replyMessage && <MessageFrame message={replyMessage} lastUpdated={1}></MessageFrame>}
+            {replyMessage && <MessageFrame message={replyMessage} lastUpdated={1} thin={true}></MessageFrame>}
             <Box
                 sx={{
                     paddingLeft: 2
@@ -204,16 +202,13 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
                     messageAnchor={messageAnchor}
                     api={api}
                     inspectHandler={() => {
-                        // TODO: inspect message
-                        // inspector.inspectItem(props.message)
+                        inspector.inspectItem({ messageId: message.id, author: message.author })
                     }}
                     handleReply={handleReply}
                     unfavorite={() => {
                         unfavorite(message.associations.find((e) => e.author === api.userAddress)?.id, message.author)
                     }}
-                    favorite={() => {
-                        return favorite({ ...props.message })
-                    }}
+                    favorite={() => favorite({ ...props.message })}
                     setMessageAnchor={setMessageAnchor}
                     setFetchSucceed={setFetchSucceed}
                 />

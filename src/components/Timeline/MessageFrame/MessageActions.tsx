@@ -34,6 +34,10 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
             <Box sx={{ display: 'flex', gap: '20px' }}>
                 {/* left */}
                 <IconButton
+                    sx={{
+                        p: '0',
+                        color: props.theme.palette.text.secondary
+                    }}
                     onClick={() => {
                         props.handleReply()
                     }}

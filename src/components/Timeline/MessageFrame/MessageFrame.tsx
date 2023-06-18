@@ -24,10 +24,12 @@ import { ApplicationContext } from '../../../App'
 import type { ReplyMessage } from '../../../schemas/replyMessage'
 import type { ReplyAssociation } from '../../../schemas/replyAssociation'
 import { MessageView } from './MessageView'
+import { ThinMessageView } from './ThinMessageView'
 
 export interface MessageFrameProp {
     message: CCMessage<any>
     lastUpdated: number
+    thin?: boolean
 }
 
 export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JSX.Element => {
@@ -47,19 +49,6 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
     const [fetchSuccess, setFetchSucceed] = useState<boolean>(true)
 
     useEffect(() => {
-        // api.fetchMessage(props.message.id, props.message.currenthost)
-        //     .then((msg) => {
-        //         if (!msg) return
-        //         setMessage(msg)
-        //         Promise.all(msg.streams.map(async (id) => await api.readStream(id))).then((e) => {
-        //             setStreams(e.filter((x) => x?.payload.body.name) as Array<Stream<any>>)
-        //         })
-        //     })
-        //     .catch((error) => {
-        //         console.log(error)
-        //         setFetchSucceed(false)
-        //     })
-
         setMessage(props.message)
 
         api.readCharacter(props.message.author, Schemas.profile)
@@ -100,11 +89,12 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
         fetchUsers()
     }, [message?.associations])
 
-    const favorite = useCallback(async ({ id, author }: { id: string; author: string }): Promise<void> => {
+    const favorite = useCallback(async ({ id, author }: { id: string; author: CCID }): Promise<void> => {
         const authorInbox = (await api.readCharacter(author, Schemas.userstreams))?.payload.body.notificationStream
         console.log(authorInbox)
-        const targetStream = [appData.userstreams?.payload.body.associationStream].filter((e) => e) as string[]
-
+        const targetStream = [authorInbox, appData.userstreams?.payload.body.associationStream].filter(
+            (e) => e
+        ) as string[]
         console.log(targetStream)
 
         api.createAssociation<Like>(Schemas.like, {}, id, author, 'messages', targetStream).then((_) => {
@@ -181,26 +171,49 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
 
     return (
         <>
-            <MessageView
-                message={message}
-                author={author}
-                reactUsers={reactUsers}
-                theme={theme}
-                hasOwnReaction={hasOwnReaction}
-                msgstreams={msgstreams}
-                messageAnchor={messageAnchor}
-                api={api}
-                inspectHandler={() => {
-                    inspector.inspectItem({ messageId: message.id, author: message.author })
-                }}
-                handleReply={handleReply}
-                unfavorite={() => {
-                    unfavorite(message.associations.find((e) => e.author === api.userAddress)?.id, message.author)
-                }}
-                favorite={() => favorite({ ...props.message })}
-                setMessageAnchor={setMessageAnchor}
-                setFetchSucceed={setFetchSucceed}
-            />
+            {props.thin ? (
+                <ThinMessageView
+                    message={message}
+                    author={author}
+                    reactUsers={reactUsers}
+                    theme={theme}
+                    hasOwnReaction={hasOwnReaction}
+                    msgstreams={msgstreams}
+                    messageAnchor={messageAnchor}
+                    api={api}
+                    inspectHandler={() => {
+                        inspector.inspectItem({ messageId: message.id, author: message.author })
+                    }}
+                    handleReply={handleReply}
+                    unfavorite={() => {
+                        unfavorite(message.associations.find((e) => e.author === api.userAddress)?.id, message.author)
+                    }}
+                    favorite={() => favorite({ ...props.message })}
+                    setMessageAnchor={setMessageAnchor}
+                    setFetchSucceed={setFetchSucceed}
+                />
+            ) : (
+                <MessageView
+                    message={message}
+                    author={author}
+                    reactUsers={reactUsers}
+                    theme={theme}
+                    hasOwnReaction={hasOwnReaction}
+                    msgstreams={msgstreams}
+                    messageAnchor={messageAnchor}
+                    api={api}
+                    inspectHandler={() => {
+                        inspector.inspectItem({ messageId: message.id, author: message.author })
+                    }}
+                    handleReply={handleReply}
+                    unfavorite={() => {
+                        unfavorite(message.associations.find((e) => e.author === api.userAddress)?.id, message.author)
+                    }}
+                    favorite={() => favorite({ ...props.message })}
+                    setMessageAnchor={setMessageAnchor}
+                    setFetchSucceed={setFetchSucceed}
+                />
+            )}
         </>
     )
 })
