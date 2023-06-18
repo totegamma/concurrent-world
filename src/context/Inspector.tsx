@@ -25,8 +25,8 @@ import { validateSignature } from '../util'
 import grey from '@mui/material/colors/grey'
 
 export interface InspectorState {
-    inspectingItem: StreamElement | null
-    inspectItem: React.Dispatch<React.SetStateAction<StreamElement | null>>
+    inspectingItem: { messageId: string; author: string } | null
+    inspectItem: React.Dispatch<React.SetStateAction<{ messageId: string; author: string } | null>>
 }
 
 const InspectorContext = createContext<InspectorState | undefined>(undefined)
@@ -49,19 +49,21 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
     const api = useApi()
     const theme = useTheme()
     const greaterThanMid = useMediaQuery(theme.breakpoints.up('md'))
-    const [inspectingItem, inspectItem] = useState<StreamElement | null>(null)
+    const [inspectingItem, inspectItem] = useState<{ messageId: string; author: string } | null>(null)
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [message, setMessage] = useState<Message<any> | undefined>()
     const [signatureIsValid, setSignatureIsValid] = useState<boolean>(false)
+    const [currentHost, setCurrentHost] = useState<string>('')
 
     useEffect(() => {
         if (!inspectingItem) return
-        api.fetchMessage(inspectingItem.id, inspectingItem.currenthost).then((msg) => {
+
+        api.fetchMessageWithAuthor(inspectingItem.messageId, inspectingItem.author).then((msg) => {
             if (!msg) return
             setSignatureIsValid(validateSignature(msg.rawpayload, msg.signature, msg.author))
             setMessage(msg)
         })
-        api.readCharacter(inspectingItem.author, Schemas.profile, inspectingItem.currenthost).then((author) => {
+        api.readCharacter(inspectingItem.author, Schemas.profile).then((author) => {
             setAuthor(author)
         })
     }, [inspectingItem])
@@ -117,8 +119,7 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                     >
                         <Typography variant="h1">Inspect</Typography>
                         <Paper sx={{ m: '10px 0', p: '0 20px' }} elevation={0} variant="outlined">
-                            {/* TODO fix this later */}
-                            {/* <MessageFrame message={inspectingItem} lastUpdated={0} /> */}
+                            <MessageFrame message={message} lastUpdated={0} />
                         </Paper>
                         {signatureIsValid ? (
                             <Alert severity="success">Signature is valid!</Alert>
@@ -139,12 +140,12 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                                     </TableCell>
                                     <TableCell>{message.author}</TableCell>
                                 </TableRow>
-                                <TableRow>
-                                    <TableCell>
-                                        <b>Host</b>
-                                    </TableCell>
-                                    <TableCell>{inspectingItem.currenthost}</TableCell>
-                                </TableRow>
+                                {/* <TableRow> */}
+                                {/*     <TableCell> */}
+                                {/*         <b>Host</b> */}
+                                {/*     </TableCell> */}
+                                {/*     <TableCell>{inspectingItem.currenthost}</TableCell> */}
+                                {/* </TableRow> */}
                                 <TableRow>
                                     <TableCell>
                                         <b>Schema</b>

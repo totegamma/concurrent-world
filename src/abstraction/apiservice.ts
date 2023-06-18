@@ -23,9 +23,9 @@ export abstract class ApiService {
         schema: string,
         body: T,
         target: string,
+        targetAuthor: string,
         targetType: string,
-        streams: string[],
-        host: string
+        streams: string[]
     ): Promise<any>
     abstract deleteAssociation(target: string, host: string): Promise<any>
     abstract fetchAssociation(id: string, host: string): Promise<Association<any> | undefined>

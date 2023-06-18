@@ -14,7 +14,7 @@ export interface MessageActionsProps {
     reactUsers: ProfileWithAddress[]
     theme: Theme
     hasOwnReaction: boolean
-    unfavorite: (deleteKey: string | undefined) => void
+    unfavorite: () => void
     api: ConcurrentApiClient
     message: CCMessage<TypeSimpleNote>
     favorite: () => Promise<void>
@@ -84,9 +84,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                             color="primary"
                             onClick={() => {
                                 if (props.hasOwnReaction) {
-                                    props.unfavorite(
-                                        props.message.associations.find((e) => e.author === props.api.userAddress)?.id
-                                    )
+                                    props.unfavorite()
                                 } else {
                                     props.favorite()
                                 }

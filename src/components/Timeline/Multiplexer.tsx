@@ -27,21 +27,9 @@ export const MessageMultiplexer = (props: MultiplexerProps): JSX.Element => {
 
     switch (message?.schema) {
         case Schemas.simpleNote:
-            return (
-                <MessageFrame
-                    message={message}
-                    currentHost={props.message.currenthost}
-                    lastUpdated={props.lastUpdated}
-                />
-            )
+            return <MessageFrame message={message} lastUpdated={props.lastUpdated} />
         case Schemas.replyMessage:
-            return (
-                <ReplyMessageFrame
-                    message={message}
-                    currentHost={props.message.currenthost}
-                    lastUpdated={props.lastUpdated}
-                />
-            )
+            return <ReplyMessageFrame message={message} lastUpdated={props.lastUpdated} />
         default:
             return <>unknown schema: {message?.schema}</>
     }

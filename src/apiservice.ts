@@ -7,7 +7,8 @@ import type {
     StreamElement,
     Message,
     Entity,
-    Association
+    Association,
+    CCID
 } from './model'
 import { v4 as uuidv4 } from 'uuid'
 // @ts-expect-error vite dynamic import
@@ -151,6 +152,12 @@ export default class ConcurrentApiClient extends ApiService {
         return await this.messageCache[id]
     }
 
+    async fetchMessageWithAuthor(messageId: string, author: string): Promise<Message<any> | undefined> {
+        const entity = await this.readEntity(author)
+        if (!entity) throw new Error()
+        return await this.fetchMessage(messageId, entity.host)
+    }
+
     async deleteMessage(target: string, host: string = ''): Promise<any> {
         if (!this.host) throw new Error()
         const targetHost = !host ? this.host.fqdn : host
@@ -178,12 +185,13 @@ export default class ConcurrentApiClient extends ApiService {
         schema: string,
         body: T,
         target: string,
+        targetAuthor: CCID,
         targetType: string,
-        streams: string[],
-        host: string = ''
+        streams: string[]
     ): Promise<any> {
         if (!this.host) throw new Error()
-        const targetHost = !host ? this.host.fqdn : host
+        const entity = await this.readEntity(targetAuthor)
+        const targetHost = entity?.host || this.host.fqdn
         const signObject: SignedObject<T> = {
             signer: this.userAddress,
             type: 'Association',
@@ -217,9 +225,10 @@ export default class ConcurrentApiClient extends ApiService {
             })
     }
 
-    async deleteAssociation(target: string, host: string = ''): Promise<any> {
+    async deleteAssociation(target: string, targetAuthor: CCID): Promise<any> {
         if (!this.host) throw new Error()
-        const targetHost = !host ? this.host.fqdn : host
+        const entity = await this.readEntity(targetAuthor)
+        const targetHost = entity?.host || this.host.fqdn
         const requestOptions = {
             method: 'DELETE',
             headers: { 'content-type': 'application/json' },
@@ -297,17 +306,14 @@ export default class ConcurrentApiClient extends ApiService {
             })
     }
 
-    async readCharacter(author: string, schema: string, host: string = ''): Promise<Character<any> | undefined> {
+    async readCharacter(author: string, schema: string): Promise<Character<any> | undefined> {
         if (!this.host || !author) throw new Error()
         if (this.characterCache[author + schema]) {
             return await this.characterCache[author + schema]
         }
-        let characterHost = host
-        if (characterHost === '') {
-            const entity = await this.readEntity(author)
-            characterHost = entity?.host ?? this.host.fqdn
-            if (!characterHost || characterHost === '') characterHost = this.host.fqdn
-        }
+        const entity = await this.readEntity(author)
+        let characterHost = entity?.host ?? this.host.fqdn
+        if (!characterHost || characterHost === '') characterHost = this.host.fqdn
         this.characterCache[author + schema] = fetch(
             `https://${characterHost}${apiPath}/characters?author=${author}&schema=${encodeURIComponent(schema)}`,
             {
@@ -542,8 +548,7 @@ export default class ConcurrentApiClient extends ApiService {
                     const entity = await this.readEntity(ccaddress)
                     const character: Character<Userstreams> | undefined = await this.readCharacter(
                         ccaddress,
-                        Schemas.userstreams,
-                        entity?.host
+                        Schemas.userstreams
                     )
 
                     if (!character?.payload.body.homeStream) return undefined

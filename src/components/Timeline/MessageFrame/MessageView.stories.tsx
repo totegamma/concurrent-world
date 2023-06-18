@@ -1,6 +1,6 @@
 import type { Meta } from '@storybook/react'
 import { useState, useEffect } from 'react'
-import type { ConcurrentTheme } from '../../../model'
+import type { CCID, ConcurrentTheme } from '../../../model'
 import { createConcurrentTheme, Themes } from '../../../themes'
 import { CssBaseline, ThemeProvider } from '@mui/material'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
@@ -88,7 +88,7 @@ export const Default = (arg: Props): JSX.Element => {
                                         api={new ApiMock()}
                                         inspectHandler={() => {}}
                                         handleReply={async () => {}}
-                                        unfavorite={(id: string | undefined) => {}}
+                                        unfavorite={() => {}}
                                         favorite={async () => {}}
                                         setMessageAnchor={setMessageAnchor}
                                         setFetchSucceed={(success: boolean) => {}}

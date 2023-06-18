@@ -38,9 +38,9 @@ export class ApiMock extends ApiService {
         schema: string,
         body: T,
         target: string,
+        targetAuthor: string,
         targetType: string,
-        streams: string[],
-        host: string
+        streams: string[]
     ): Promise<any> {
         return Promise.resolve(undefined)
     }
@@ -50,6 +50,10 @@ export class ApiMock extends ApiService {
     }
 
     createStream<T>(schema: string, body: T): Promise<any> {
+        return Promise.resolve(undefined)
+    }
+
+    fetchMessageWithAuthor(id: string, host: string): Promise<Message<any> | undefined> {
         return Promise.resolve(undefined)
     }
 
@@ -103,7 +107,7 @@ export class ApiMock extends ApiService {
 
     invalidateMessage(target: string): void {}
 
-    readCharacter(author: string, schema: string, host: string): Promise<Character<any> | undefined> {
+    readCharacter(author: string, schema: string): Promise<Character<any> | undefined> {
         return Promise.resolve(undefined)
     }
 

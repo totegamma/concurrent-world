@@ -150,3 +150,5 @@ interface ConcurrentPalette extends Palette {
 export interface ConcurrentTheme extends Theme {
     palette: ConcurrentPalette
 }
+
+export type CCID = string

@@ -25,7 +25,7 @@ export interface MessageViewProps {
     api: ConcurrentApiClient
     inspectHandler: () => void
     handleReply: () => Promise<void>
-    unfavorite: (deleteKey: string | undefined) => void
+    unfavorite: () => void
     favorite: () => Promise<void>
     setMessageAnchor: (anchor: null | HTMLElement) => void
     setFetchSucceed: (fetchSucceed: boolean) => void
