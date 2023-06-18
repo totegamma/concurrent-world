@@ -3,6 +3,7 @@ import { Box, Divider, Fade, Tab, Tabs, Typography } from '@mui/material'
 import { ServerJWT } from './ServerJWT'
 import { UserJWT } from './UserJWT'
 import { CCComposer } from './CCComposer'
+import { IdentityGenerator } from './IdentityGenerator'
 
 export const Devtool = memo((): JSX.Element => {
     const [tab, setTab] = useState(0)
@@ -28,6 +29,7 @@ export const Devtool = memo((): JSX.Element => {
                 <Tab label="Composer" />
                 <Tab label="ServerJWT" />
                 <Tab label="UserJWT" />
+                <Tab label="IdentityGenerator" />
             </Tabs>
             <Divider />
             <Box sx={{ position: 'relative', mt: '20px' }}>
@@ -44,6 +46,11 @@ export const Devtool = memo((): JSX.Element => {
                 <Fade in={tab === 2} unmountOnExit>
                     <Box sx={{ position: 'absolute', width: '100%' }}>
                         <UserJWT />
+                    </Box>
+                </Fade>
+                <Fade in={tab === 3} unmountOnExit>
+                    <Box sx={{ position: 'absolute', width: '100%' }}>
+                        <IdentityGenerator />
                     </Box>
                 </Fade>
             </Box>
