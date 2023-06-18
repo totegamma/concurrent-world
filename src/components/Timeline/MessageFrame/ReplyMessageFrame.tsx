@@ -24,6 +24,7 @@ import { ApplicationContext } from '../../../App'
 import type { ReplyMessage } from '../../../schemas/replyMessage'
 import type { ReplyAssociation } from '../../../schemas/replyAssociation'
 import { MessageView } from './MessageView'
+import { MessageFrame } from './MessageFrame'
 
 export interface MessageFrameProp {
     message: CCMessage<any>
@@ -31,15 +32,18 @@ export interface MessageFrameProp {
     lastUpdated: number
 }
 
-export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JSX.Element => {
+export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JSX.Element => {
     const api = useApi()
     const appData = useContext(ApplicationContext)
     const inspector = useInspector()
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [message, setMessage] = useState<CCMessage<any> | undefined>()
+    const [replyMessage, setReplyMessage] = useState<CCMessage<any> | undefined>()
+    const [replyAuthor, setReplyAuthor] = useState<Character<Profile> | undefined>()
     const [msgstreams, setStreams] = useState<Array<Stream<any>>>([])
     const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
     const [messageAnchor, setMessageAnchor] = useState<null | HTMLElement>(null)
+    const [replyMessageAnchor, setReplyMessageAnchor] = useState<null | HTMLElement>(null)
 
     const theme = useTheme()
 
@@ -48,20 +52,9 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
     const [fetchSuccess, setFetchSucceed] = useState<boolean>(true)
 
     useEffect(() => {
-        // api.fetchMessage(props.message.id, props.message.currenthost)
-        //     .then((msg) => {
-        //         if (!msg) return
-        //         setMessage(msg)
-        //         Promise.all(msg.streams.map(async (id) => await api.readStream(id))).then((e) => {
-        //             setStreams(e.filter((x) => x?.payload.body.name) as Array<Stream<any>>)
-        //         })
-        //     })
-        //     .catch((error) => {
-        //         console.log(error)
-        //         setFetchSucceed(false)
-        //     })
-
         setMessage(props.message)
+
+        console.log(props.message.payload.body.replyToMessageId)
 
         api.readCharacter(props.message.author, Schemas.profile, props.currentHost)
             .then((author) => {
@@ -70,7 +63,15 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
             .catch((error) => {
                 console.error(error)
             })
-    }, [props.message, props.lastUpdated])
+
+        api.fetchMessage(props.message.payload.body.replyToMessageId).then((msg) => {
+            setReplyMessage(msg)
+        })
+
+        api.readCharacter(props.message.payload.body.replyToMessageAuthor, Schemas.profile).then((author) => {
+            setReplyAuthor(author)
+        })
+    }, [props.message])
 
     useEffect(() => {
         const fetchUsers = async (): Promise<any> => {
@@ -177,27 +178,42 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
 
     return (
         <>
-            <MessageView
-                message={message}
-                author={author}
-                reactUsers={reactUsers}
-                theme={theme}
-                hasOwnReaction={hasOwnReaction}
-                msgstreams={msgstreams}
-                messageAnchor={messageAnchor}
-                api={api}
-                inspectHandler={() => {
-                    // TODO
-                    // inspector.inspectItem(props.message)
+            {replyMessage && (
+                <MessageFrame message={replyMessage} currentHost={props.currentHost} lastUpdated={1}></MessageFrame>
+            )}
+            <Box
+                sx={{
+                    paddingLeft: 2
                 }}
-                handleReply={handleReply}
-                unfavorite={unfavorite}
-                favorite={() => favorite({ ...props.message, currenthost: props.currentHost })}
-                setMessageAnchor={setMessageAnchor}
-                setFetchSucceed={setFetchSucceed}
-            />
+            >
+                <Typography variant="caption" color="text.disabled">
+                    {' '}
+                    {replyAuthor?.payload.body.username || 'Anonymous'} さんが返信{' '}
+                </Typography>
+                <MessageView
+                    message={message}
+                    author={author}
+                    reactUsers={reactUsers}
+                    theme={theme}
+                    hasOwnReaction={hasOwnReaction}
+                    msgstreams={msgstreams}
+                    messageAnchor={messageAnchor}
+                    api={api}
+                    inspectHandler={() => {
+                        // TODO: inspect message
+                        // inspector.inspectItem(props.message)
+                    }}
+                    handleReply={handleReply}
+                    unfavorite={unfavorite}
+                    favorite={() => {
+                        favorite({ ...props.message, currenthost: props.currentHost })
+                    }}
+                    setMessageAnchor={setMessageAnchor}
+                    setFetchSucceed={setFetchSucceed}
+                />
+            </Box>
         </>
     )
 })
 
-MessageFrame.displayName = 'MessageFrame'
+ReplyMessageFrame.displayName = 'MessageFrame'

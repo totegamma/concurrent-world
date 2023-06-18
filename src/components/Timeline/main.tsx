@@ -8,6 +8,7 @@ import { useApi } from '../../context/api'
 import { InspectorProvider } from '../../context/Inspector'
 import { Loading } from '../Loading'
 import { MessageFrame } from './MessageFrame/MessageFrame'
+import { MessageMultiplexer } from './Multiplexer'
 
 export interface TimelineProps {
     streams: string[]
@@ -86,7 +87,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                 >
                     {props.timeline.current.map((e) => (
                         <React.Fragment key={e.id}>
-                            {e.type === 'message' && <MessageFrame message={e} lastUpdated={e.LastUpdated} />}
+                            {e.type === 'message' && <MessageMultiplexer message={e} lastUpdated={e.LastUpdated} />}
                             {e.type === 'association' && (
                                 <AssociationFrame association={e} lastUpdated={e.LastUpdated} />
                             )}

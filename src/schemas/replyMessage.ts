@@ -7,6 +7,7 @@
 
 export interface ReplyMessage {
     replyToMessageId: string
+    replyToMessageAuthor: string
     body: string
     emojis?: {
         [k: string]: string | number

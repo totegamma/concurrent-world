@@ -1,16 +1,16 @@
-import {Box, IconButton, Link, type Theme, Tooltip, Typography} from "@mui/material";
-import ReplyIcon from "@mui/icons-material/Reply";
-import {CCAvatar} from "../../CCAvatar";
-import StarIcon from "@mui/icons-material/Star";
-import StarOutlineIcon from "@mui/icons-material/StarOutline";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import React from "react";
-import type {Stream, Message as CCMessage, ProfileWithAddress} from "../../../model";
-import type ConcurrentApiClient from "../../../apiservice";
-import {Schemas} from "../../../schemas";
-import type {SimpleNote as TypeSimpleNote} from "../../../schemas/simpleNote";
+import { Box, IconButton, Link, type Theme, Tooltip, Typography } from '@mui/material'
+import ReplyIcon from '@mui/icons-material/Reply'
+import { CCAvatar } from '../../CCAvatar'
+import StarIcon from '@mui/icons-material/Star'
+import StarOutlineIcon from '@mui/icons-material/StarOutline'
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
+import React from 'react'
+import type { Stream, Message as CCMessage, ProfileWithAddress } from '../../../model'
+import type ConcurrentApiClient from '../../../apiservice'
+import { Schemas } from '../../../schemas'
+import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
 export interface MessageActionsProps {
-    handleReply: () => void
+    handleReply: () => Promise<void>
     reactUsers: ProfileWithAddress[]
     theme: Theme
     hasOwnReaction: boolean
@@ -85,9 +85,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                             onClick={() => {
                                 if (props.hasOwnReaction) {
                                     props.unfavorite(
-                                        props.message.associations.find(
-                                            (e) => e.author === props.api.userAddress
-                                        )?.id
+                                        props.message.associations.find((e) => e.author === props.api.userAddress)?.id
                                     )
                                 } else {
                                     props.favorite()

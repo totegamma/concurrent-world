@@ -7,4 +7,5 @@
 
 export interface ReplyAssociation {
     messageId: string
+    messageAuthor: string
 }

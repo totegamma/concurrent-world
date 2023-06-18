@@ -86,13 +86,12 @@ export const Default = (arg: Props): JSX.Element => {
                                         msgstreams={[StreamMock(arg.streamName)]}
                                         messageAnchor={messageAnchor}
                                         api={new ApiMock()}
-                                        inspector={inspector}
+                                        inspectHandler={() => {}}
                                         handleReply={async () => {}}
                                         unfavorite={(id: string | undefined) => {}}
                                         favorite={async () => {}}
                                         setMessageAnchor={setMessageAnchor}
                                         setFetchSucceed={(success: boolean) => {}}
-                                        propsMessage={StreamElementMock}
                                     />
                                 </Paper>
                             </ThemeProvider>

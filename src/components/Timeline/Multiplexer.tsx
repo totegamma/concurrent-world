@@ -3,6 +3,7 @@ import type { Message as CCMessage, StreamElement } from '../../model'
 import { useApi } from '../../context/api'
 import { useEffect, useState } from 'react'
 import { MessageFrame } from './MessageFrame/MessageFrame'
+import { ReplyMessageFrame } from './MessageFrame/ReplyMessageFrame'
 
 interface MultiplexerProps {
     message: StreamElement
@@ -14,7 +15,6 @@ export const MessageMultiplexer = (props: MultiplexerProps): JSX.Element => {
     const [message, setMessage] = useState<CCMessage<any> | undefined>()
 
     useEffect(() => {
-        console.log('Multiplexer: ' + props.message.id)
         api.fetchMessage(props.message.id, props.message.currenthost)
             .then((msg) => {
                 if (!msg) return
@@ -27,9 +27,21 @@ export const MessageMultiplexer = (props: MultiplexerProps): JSX.Element => {
 
     switch (message?.schema) {
         case Schemas.simpleNote:
-            return <MessageFrame message={props.message} lastUpdated={props.lastUpdated} />
+            return (
+                <MessageFrame
+                    message={message}
+                    currentHost={props.message.currenthost}
+                    lastUpdated={props.lastUpdated}
+                />
+            )
         case Schemas.replyMessage:
-            return <h1>reply</h1>
+            return (
+                <ReplyMessageFrame
+                    message={message}
+                    currentHost={props.message.currenthost}
+                    lastUpdated={props.lastUpdated}
+                />
+            )
         default:
             return <>unknown schema: {message?.schema}</>
     }

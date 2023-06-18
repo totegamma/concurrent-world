@@ -1,13 +1,4 @@
-import {
-    Box,
-    IconButton,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
-    Menu,
-    MenuItem,
-    type Theme,
-} from '@mui/material'
+import { Box, IconButton, ListItem, ListItemIcon, ListItemText, Menu, MenuItem, type Theme } from '@mui/material'
 import { Link as routerLink } from 'react-router-dom'
 import { CCAvatar } from '../../CCAvatar'
 import type { Character, Message as CCMessage, ProfileWithAddress, Stream, StreamElement } from '../../../model'
@@ -18,14 +9,13 @@ import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import type { Profile } from '../../../schemas/profile'
 import type ConcurrentApiClient from '../../../apiservice'
-import type { InspectorState } from '../../../context/Inspector'
 import React from 'react'
-import {MessageHeader} from "./MessageHeader";
-import {MessageActions} from "./MessageActions";
+import { MessageHeader } from './MessageHeader'
+import { MessageActions } from './MessageActions'
+import type { ReplyMessage } from '../../../schemas/replyMessage'
 
 export interface MessageViewProps {
-    propsMessage: StreamElement
-    message: CCMessage<TypeSimpleNote>
+    message: CCMessage<TypeSimpleNote | ReplyMessage>
     author: Character<Profile> | undefined
     reactUsers: ProfileWithAddress[]
     theme: Theme
@@ -33,7 +23,7 @@ export interface MessageViewProps {
     msgstreams: Array<Stream<any>>
     messageAnchor: null | HTMLElement
     api: ConcurrentApiClient
-    inspector: InspectorState
+    inspectHandler: () => void
     handleReply: () => Promise<void>
     unfavorite: (deleteKey: string | undefined) => void
     favorite: () => Promise<void>
@@ -89,13 +79,24 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                             overflow: 'auto'
                         }}
                     >
-                        <MessageHeader authorAddress={props.message.author} cdate={props.message.cdate} username={props.author?.payload.body.username} />
-                        {/* <Multiplexer body={props.message} /> */}
+                        <MessageHeader
+                            authorAddress={props.message.author}
+                            cdate={props.message.cdate}
+                            username={props.author?.payload.body.username}
+                        />
                         <SimpleNote message={props.message} />
-                        <MessageActions handleReply={props.handleReply} reactUsers={props.reactUsers} theme={props.theme}
-                                        hasOwnReaction={props.hasOwnReaction} unfavorite={props.unfavorite} api={props.api}
-                                        message={props.message} favorite={props.favorite} setMessageAnchor={props.setMessageAnchor}
-                                        msgstreams={props.msgstreams} />
+                        <MessageActions
+                            handleReply={props.handleReply}
+                            reactUsers={props.reactUsers}
+                            theme={props.theme}
+                            hasOwnReaction={props.hasOwnReaction}
+                            unfavorite={props.unfavorite}
+                            api={props.api}
+                            message={props.message}
+                            favorite={props.favorite}
+                            setMessageAnchor={props.setMessageAnchor}
+                            msgstreams={props.msgstreams}
+                        />
                     </Box>
                 </>
             )}
@@ -120,7 +121,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                 </MenuItem>
                 <MenuItem
                     onClick={() => {
-                        props.inspector.inspectItem(props.propsMessage)
+                        props.inspectHandler()
                         props.setMessageAnchor(null)
                     }}
                 >
