@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
-import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
 import { Schemas } from '../schemas'
 import Button from '@mui/material/Button'
@@ -13,7 +12,7 @@ import { alpha, useTheme } from '@mui/material'
 
 interface ProfileEditorProps {
     initial?: Character<Profile>
-    onSubmit?: () => void
+    onSubmit?: (profile: Profile) => void
 }
 
 export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
@@ -25,18 +24,15 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
     const [banner, setBanner] = useState<string>(props.initial?.payload.body.banner ?? '')
 
     const updateProfile = async (): Promise<void> => {
-        api.upsertCharacter<Profile>(
-            Schemas.profile,
-            {
-                username,
-                avatar,
-                description,
-                banner
-            },
-            props.initial?.id
-        ).then((data) => {
+        const profile = {
+            username,
+            avatar,
+            description,
+            banner
+        }
+        api.upsertCharacter<Profile>(Schemas.profile, profile, props.initial?.id).then((data) => {
             console.log(data)
-            props.onSubmit?.()
+            props.onSubmit?.(profile)
         })
     }
 

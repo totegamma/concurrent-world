@@ -17,6 +17,7 @@ export function Passport(): JSX.Element {
             avatar={appData.profile?.payload.body.avatar || ''}
             host={api.host?.fqdn || ''}
             cdate={new Date(appData.profile?.payload.signedAt ?? 0).toLocaleDateString()}
+            trust={100}
         />
     )
 }
@@ -28,6 +29,7 @@ export interface PassportRendererProps {
     avatar: string
     host: string
     cdate: string
+    trust: number
 }
 
 export function PassportRenderer(props: PassportRendererProps): JSX.Element {
@@ -109,7 +111,7 @@ export function PassportRenderer(props: PassportRendererProps): JSX.Element {
 
                 <text style={style3} transform="translate(200 100)">
                     <tspan x="0" y="0">
-                        100
+                        {props.trust}
                     </tspan>
                 </text>
 
