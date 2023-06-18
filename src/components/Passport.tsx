@@ -1,4 +1,4 @@
-import { Box, useTheme } from '@mui/material'
+import { useTheme } from '@mui/material'
 import { type ConcurrentTheme } from '../model'
 import { ApplicationContext } from '../App'
 import { useContext } from 'react'
@@ -9,29 +9,49 @@ export function Passport(): JSX.Element {
     const appData = useContext(ApplicationContext)
     const theme = useTheme<ConcurrentTheme>()
 
-    const line1 = 'P<' + api.userAddress
-    let line2 = api.host?.fqdn.toUpperCase().replace(/(\.|-)/g, '<') ?? 'UNKNOWN'
-    line2 += '<'.repeat(40 - line2.length) + '0xFF'
+    return (
+        <PassportRenderer
+            theme={theme}
+            ccid={api.userAddress}
+            name={appData.profile?.payload.body.username || ''}
+            avatar={appData.profile?.payload.body.avatar || ''}
+            host={api.host?.fqdn || ''}
+            cdate={new Date(appData.profile?.payload.signedAt ?? 0).toLocaleDateString()}
+        />
+    )
+}
 
-    const cdate = new Date(appData.profile?.payload.signedAt ?? 0)
+export interface PassportRendererProps {
+    theme: ConcurrentTheme
+    ccid: string
+    name: string
+    avatar: string
+    host: string
+    cdate: string
+}
+
+export function PassportRenderer(props: PassportRendererProps): JSX.Element {
+    const line1 = 'P<' + props.ccid
+    let line2 = props.host.toUpperCase().replace(/(\.|-)/g, '<') ?? 'UNKNOWN'
+    line2 += '<'.repeat(40 - line2.length) + '0xFF'
 
     const style1 = {
         fontSize: '5px',
-        fill: theme.palette.primary.contrastText,
+        fill: props.theme.palette.primary.contrastText,
         fontFamily: 'SourceCodeProRoman-Regular, Source Code Pro',
         fontVariationSettings: 'wght 400'
     }
 
     const style2 = {
         fontSize: '6px',
-        fill: theme.palette.primary.contrastText,
+        fill: props.theme.palette.primary.contrastText,
         fontFamily: 'SourceCodeProRoman-Regular, Source Code Pro',
         fontVariationSettings: 'wght 400'
     }
 
     const style3 = {
         fontSize: '8px',
-        fill: theme.palette.primary.contrastText,
+        fill: props.theme.palette.primary.contrastText,
         fontFamily: 'SourceCodeProRoman-Regular, Source Code Pro',
         fontVariationSettings: 'wght 600'
     }
@@ -44,7 +64,7 @@ export function Passport(): JSX.Element {
         >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 242.65 153" style={{ display: 'block' }}>
                 <path
-                    fill={theme.palette.primary.main}
+                    fill={props.theme.palette.primary.main}
                     d="m233.21,0H9.44C4.23,0,0,4.23,0,9.44v134.14c0,5.21,4.23,9.44,9.44,9.44h223.77c5.21,0,9.44-4.23,9.44-9.44V9.44c0-5.21-4.23-9.44-9.44-9.44Zm-93.33,14.34h-37.1c-2.2,0-3.98-1.78-3.98-3.98s1.78-3.98,3.98-3.98h37.1c2.2,0,3.98,1.78,3.98,3.98s-1.78,3.98-3.98,3.98Z"
                 />
 
@@ -61,7 +81,7 @@ export function Passport(): JSX.Element {
                 </text>
                 <text style={style3} transform="translate(100 40)">
                     <tspan x="0" y="0">
-                        {appData.profile?.payload.body.username}
+                        {props.name}
                     </tspan>
                 </text>
 
@@ -72,7 +92,7 @@ export function Passport(): JSX.Element {
                 </text>
                 <text style={style3} transform="translate(100 70)">
                     <tspan x="0" y="0">
-                        {api.host?.fqdn}
+                        {props.host}
                     </tspan>
                 </text>
 
@@ -83,7 +103,7 @@ export function Passport(): JSX.Element {
                 </text>
                 <text style={style3} transform="translate(100 100)">
                     <tspan x="0" y="0">
-                        {cdate.toLocaleDateString()}
+                        {props.cdate}
                     </tspan>
                 </text>
 
@@ -98,7 +118,7 @@ export function Passport(): JSX.Element {
                         You are permitted to travel to other servers
                     </tspan>
                     <tspan x="0" y="5">
-                        under the trust held by {api.host?.fqdn}.
+                        under the trust held by {props.host}.
                     </tspan>
                 </text>
 
@@ -121,7 +141,7 @@ export function Passport(): JSX.Element {
                 </mask>
                 <image
                     mask={'url(#passportMask)'}
-                    href={appData.profile?.payload.body.avatar || ''}
+                    href={props.avatar || ''}
                     x="28.14"
                     y="37.44"
                     width="50"
