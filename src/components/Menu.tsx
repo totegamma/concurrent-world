@@ -21,7 +21,6 @@ import NotificationsIcon from '@mui/icons-material/Notifications'
 import { memo, useContext } from 'react'
 import { ApplicationContext } from '../App'
 import type { ConcurrentTheme } from '../model'
-import { ConcurrentLogo } from './ConcurrentLogo'
 
 // @ts-expect-error vite dynamic import
 import buildTime from '~build/time'
@@ -30,6 +29,7 @@ import { branch, sha } from '~build/info'
 import { StreamList } from './StreamList'
 import { CCAvatar } from './CCAvatar'
 import { useApi } from '../context/api'
+import { ConcurrentWordmark } from './ConcurrentWordmark'
 
 const branchName = branch || window.location.host.split('.')[0]
 
@@ -61,31 +61,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                     color: 'background.contrastText'
                 }}
             >
-                <Box
-                    sx={{
-                        display: 'flex',
-                        gap: '8px',
-                        justifyContent: 'center'
-                    }}
-                >
-                    <Box>
-                        <ConcurrentLogo
-                            size="32px"
-                            upperColor={iconColor}
-                            lowerColor={iconColor}
-                            frameColor={iconColor}
-                        />
-                    </Box>
-                    <Typography
-                        sx={{
-                            color: 'background.contrastText',
-                            fontWeight: 600,
-                            fontSize: '22px'
-                        }}
-                    >
-                        Concurrent
-                    </Typography>
-                </Box>
+                <ConcurrentWordmark color={iconColor} />
                 <Box sx={{ textAlign: 'center', fontWeight: 600 }}>開発中α版</Box>
                 <Box
                     sx={{

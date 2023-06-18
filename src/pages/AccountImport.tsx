@@ -14,8 +14,8 @@ import type { ConcurrentTheme, Host } from '../model'
 import { usePersistent } from '../hooks/usePersistent'
 import { Themes, createConcurrentTheme } from '../themes'
 import { ThemeProvider } from '@emotion/react'
-import { ConcurrentLogo } from '../components/ConcurrentLogo'
 import { darken } from '@mui/material'
+import { ConcurrentWordmark } from '../components/ConcurrentWordmark'
 
 export function AccountImport(): JSX.Element {
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue2')
@@ -107,22 +107,7 @@ export function AccountImport(): JSX.Element {
                     }}
                     onClick={randomTheme}
                 >
-                    <Box>
-                        <ConcurrentLogo
-                            size="25px"
-                            upperColor={theme.palette.background.contrastText}
-                            lowerColor={theme.palette.background.contrastText}
-                            frameColor={theme.palette.background.contrastText}
-                        />
-                    </Box>
-                    <Typography
-                        sx={{
-                            color: 'background.contrastText',
-                            fontSize: '25px'
-                        }}
-                    >
-                        Concurrent
-                    </Typography>
+                    <ConcurrentWordmark color={theme.palette.background.contrastText} />
                 </Button>
                 <Paper
                     sx={{

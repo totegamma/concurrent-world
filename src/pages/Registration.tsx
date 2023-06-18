@@ -14,7 +14,6 @@ import type { ConcurrentTheme, Host } from '../model'
 import { Fade, IconButton, Paper, ThemeProvider, darken } from '@mui/material'
 import { usePersistent } from '../hooks/usePersistent'
 import { Themes, createConcurrentTheme } from '../themes'
-import { ConcurrentLogo } from '../components/ConcurrentLogo'
 import Tilt from 'react-parallax-tilt'
 import { PassportRenderer } from '../components/Passport'
 import { CCAvatar } from '../components/CCAvatar'
@@ -22,6 +21,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import { type Profile } from '../schemas/profile'
+import { ConcurrentWordmark } from '../components/ConcurrentWordmark'
 
 export function Registration(): JSX.Element {
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue2')
@@ -447,22 +447,7 @@ export function Registration(): JSX.Element {
                         }}
                         onClick={randomTheme}
                     >
-                        <Box>
-                            <ConcurrentLogo
-                                size="25px"
-                                upperColor={theme.palette.background.contrastText}
-                                lowerColor={theme.palette.background.contrastText}
-                                frameColor={theme.palette.background.contrastText}
-                            />
-                        </Box>
-                        <Typography
-                            sx={{
-                                color: 'background.contrastText',
-                                fontSize: '25px'
-                            }}
-                        >
-                            Concurrent
-                        </Typography>
+                        <ConcurrentWordmark color={theme.palette.background.contrastText} />
                     </Button>
                     <Paper
                         sx={{
