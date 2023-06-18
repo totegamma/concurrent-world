@@ -76,7 +76,7 @@ export function Registration(): JSX.Element {
         console.log('check!!!')
         const entity = await api?.readEntity(userAddress)
         console.log(entity)
-        setEntityFound(!!entity && entity.ccaddr !== '')
+        setEntityFound(!!entity && entity.ccaddr != null)
     }
 
     const steps = [

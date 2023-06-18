@@ -1,7 +1,7 @@
 import { useTheme } from '@mui/material'
 import { type ConcurrentTheme } from '../model'
 import { ApplicationContext } from '../App'
-import { useContext } from 'react'
+import { useContext, useId } from 'react'
 import { useApi } from '../context/api'
 
 export function Passport(): JSX.Element {
@@ -57,6 +57,8 @@ export function PassportRenderer(props: PassportRendererProps): JSX.Element {
         fontFamily: 'SourceCodeProRoman-Regular, Source Code Pro',
         fontVariationSettings: 'wght 600'
     }
+
+    const maskId = useId()
 
     return (
         <div
@@ -138,16 +140,17 @@ export function PassportRenderer(props: PassportRendererProps): JSX.Element {
                     d="m53.14,100.35c-5.12,0-10.08-1-14.76-2.98-4.51-1.91-8.57-4.64-12.05-8.12s-6.21-7.53-8.12-12.05c-1.98-4.68-2.98-9.64-2.98-14.76s1-10.08,2.98-14.76c1.91-4.51,4.64-8.57,8.12-12.05s7.53-6.21,12.05-8.12c4.68-1.98,9.64-2.98,14.76-2.98v8.8c-16.05,0-29.1,13.06-29.1,29.1s13.06,29.1,29.1,29.1,29.1-13.06,29.1-29.1h8.8c0,5.12-1,10.08-2.98,14.76-1.91,4.51-4.64,8.57-8.12,12.05-3.48,3.48-7.53,6.21-12.05,8.12-4.68,1.98-9.64,2.98-14.76,2.98Z"
                 />
 
-                <mask id="passportMask">
+                <mask id={maskId}>
                     <circle cx="53.14" cy="62.44" r="25" fill="white" />
                 </mask>
                 <image
-                    mask={'url(#passportMask)'}
+                    mask={`url(#${maskId})`}
                     href={props.avatar || ''}
                     x="28.14"
                     y="37.44"
                     width="50"
                     height="50"
+                    preserveAspectRatio="xMidYMid slice"
                 />
             </svg>
         </div>
