@@ -22,6 +22,7 @@ import { ApplicationContext } from '../App'
 export interface MessageDetailState {
     showingMessage: { messageId: string; author: CCID } | null
     showMessage: Dispatch<SetStateAction<{ messageId: string; author: CCID } | null>>
+    reRouteMessage: (messageId: string, author: CCID) => void
 }
 
 const MessageDetailContext = createContext<MessageDetailState | undefined>(undefined)
@@ -55,6 +56,16 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
             setMessage(msg)
         })
     }, [showingMessage])
+
+    const reRouteMessage = async (messageId: string, author: CCID): Promise<void> => {
+        console.log('reRouteMessage', messageId, author)
+        const message = await api.fetchMessageWithAuthor(messageId, author)
+
+        await api.reRouteMessage(messageId, author, [
+            ...(message?.streams || []),
+            appData.userstreams?.payload.body.homeStream || ''
+        ])
+    }
 
     const sendReply = async (replyText: string): Promise<void> => {
         console.log('messageId', message?.id)
@@ -99,7 +110,8 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
             value={useMemo(() => {
                 return {
                     showingMessage,
-                    showMessage
+                    showMessage,
+                    reRouteMessage
                 }
             }, [])}
         >

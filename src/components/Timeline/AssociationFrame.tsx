@@ -11,6 +11,7 @@ import { MessageView } from './Message/MessageView'
 import { useInspector } from '../../context/Inspector'
 import { ApplicationContext } from '../../App'
 import { useMessageDetail } from '../../context/MessageDetail'
+import { ReRouteMessageFrame } from './Message/ReRouteMessageFrame'
 
 export interface AssociationFrameProp {
     association: StreamElement
@@ -27,10 +28,13 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     const [message, setMessage] = useState<Message<any> | undefined>()
     const [association, setAssociation] = useState<Association<any> | undefined>()
 
+    // TODO いずれ消す
     const [replyMessage, setReplyMessage] = useState<Message<any> | undefined>()
     const [messageAnchor, setMessageAnchor] = useState<null | HTMLElement>(null)
 
     const isMeToOther = association?.author !== api.userAddress
+
+    const [reRouteMessage, setReRouteMessage] = useState<Message<any> | undefined>()
 
     // TODO いずれ消す
     const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
@@ -56,6 +60,14 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                     setAuthor(author)
                 })
 
+                return
+            }
+
+            if (a?.schema === Schemas.reRouteAssociation) {
+                console.log('ass', a)
+                api.fetchMessageWithAuthor(a.payload.body.messageId, a.payload.body.messageAuthor).then((m) => {
+                    setReRouteMessage(m)
+                })
                 return
             }
 
@@ -134,9 +146,9 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
         )
     }
 
-    return (
-        <>
-            {association.schema === Schemas.like && (
+    switch (association.schema) {
+        case Schemas.like:
+            return (
                 <ListItem
                     sx={{
                         alignItems: 'flex-start',
@@ -197,9 +209,9 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                         </blockquote>
                     </Box>
                 </ListItem>
-            )}
-
-            {association.schema === Schemas.replyAssociation && (
+            )
+        case Schemas.replyAssociation:
+            return (
                 <>
                     {replyMessage && <MessageFrame message={replyMessage} lastUpdated={1} thin={true}></MessageFrame>}
                     <Box
@@ -230,6 +242,9 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                         author: message?.author || ''
                                     })
                                 }}
+                                handleReRoute={async () => {
+                                    messageDetail.reRouteMessage(message?.id || '', message?.author)
+                                }}
                                 unfavorite={() => {
                                     unfavorite(
                                         message.associations.find((e) => e.author === api.userAddress)?.id,
@@ -245,9 +260,27 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                         )}
                     </Box>
                 </>
-            )}
-        </>
-    )
+            )
+        case Schemas.reRouteAssociation:
+            if (!reRouteMessage) {
+                return (
+                    <ListItem sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <Typography variant="caption" color="text.disabled">
+                            ReRouted message not found
+                        </Typography>
+                    </ListItem>
+                )
+            }
+            return <ReRouteMessageFrame message={reRouteMessage} lastUpdated={0} />
+        default:
+            return (
+                <ListItem sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Typography variant="caption" color="text.disabled">
+                        Unknown association schema
+                    </Typography>
+                </ListItem>
+            )
+    }
 })
 
 AssociationFrame.displayName = 'AssociationFrame'
