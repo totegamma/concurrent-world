@@ -97,7 +97,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
         }
 
         fetchUsers()
-    }, [message?.associations])
+    }, [message?.associations, message])
 
     const favorite = useCallback(
         async ({ id, author }: { id: string; author: CCID }): Promise<void> => {
@@ -112,9 +112,16 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     const unfavorite = useCallback(
         (deletekey: string | undefined, author: string): void => {
             if (!deletekey) return
-            api.unFavoriteMessage(deletekey, author)
+            console.log(deletekey, author)
+            api.unFavoriteMessage(deletekey, author).then(() => {
+                console.log('hogehoge!')
+                api.fetchMessageWithAuthor(association?.payload.body.messageId, association?.author ?? '').then((m) => {
+                    console.log('message', m)
+                    setMessage(m)
+                })
+            })
         },
-        [association]
+        [association, message]
     )
 
     if (!association) {
