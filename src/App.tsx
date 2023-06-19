@@ -189,7 +189,7 @@ function App(): JSX.Element {
                                     return
                                 }
 
-                                a &&
+                                if (a.schema === Schemas.like) {
                                     api.fetchMessage(a.targetID).then((m) => {
                                         m &&
                                             api
@@ -202,6 +202,10 @@ function App(): JSX.Element {
                                                     )
                                                 })
                                     })
+                                    return
+                                }
+
+                                enqueueSnackbar('unknown association received.')
                             })
                         }
                         break

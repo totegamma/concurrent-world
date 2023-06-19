@@ -1,8 +1,6 @@
 import { ApiService } from '../abstraction/apiservice'
-import type { Association, Character, Entity, Host, Message, Stream, StreamElement, type CCID } from '../model'
+import type { Association, Character, Entity, Host, Message, Stream, StreamElement, CCID } from '../model'
 import { StreamMock } from './modelmock'
-import { Schemas } from '../schemas'
-import { Like } from '../schemas/like'
 
 export class ApiMock extends ApiService {
     host: Host | undefined
