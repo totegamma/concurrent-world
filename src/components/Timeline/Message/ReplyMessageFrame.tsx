@@ -149,7 +149,7 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
             >
                 <Typography variant="caption" color="text.disabled">
                     {' '}
-                    {replyAuthor?.payload.body.username || 'Anonymous'} さんが返信{' '}
+                    {author?.payload.body.username || 'Anonymous'} さんが返信{' '}
                 </Typography>
                 <MessageView
                     message={message}
