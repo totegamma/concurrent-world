@@ -9,7 +9,6 @@ import { CCAvatar } from '../CCAvatar'
 import { MessageFrame } from './Message/MessageFrame'
 import { MessageView } from './Message/MessageView'
 import { useInspector } from '../../context/Inspector'
-import { type Like } from '../../schemas/like'
 import { ApplicationContext } from '../../App'
 import { useMessageDetail } from '../../context/MessageDetail'
 

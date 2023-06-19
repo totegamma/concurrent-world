@@ -1,31 +1,19 @@
-import {
-    Alert,
-    Box,
-    Paper,
-    SwipeableDrawer,
-    Table,
-    TableBody,
-    TableCell,
-    TableRow,
-    Typography,
-    styled,
-    useMediaQuery,
-    useTheme,
-    Modal,
-    TextField,
-    Button
-} from '@mui/material'
+import { Box, Paper, useTheme, Modal, TextField, Button } from '@mui/material'
 
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import {
+    createContext,
+    type Dispatch,
+    type SetStateAction,
+    useContext,
+    useEffect,
+    useMemo,
+    useRef,
+    useState
+} from 'react'
 import { useApi } from './api'
-import type { CCID, Character, Message, StreamElement } from '../model'
+import type { CCID, Message } from '../model'
 import { Schemas } from '../schemas'
-import type { Profile } from '../schemas/profile'
 import { MessageFrame } from '../components/Timeline'
-import { materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { validateSignature } from '../util'
-import grey from '@mui/material/colors/grey'
 import SendIcon from '@mui/icons-material/Send'
 import { type ReplyMessage } from '../schemas/replyMessage'
 import { type ReplyAssociation } from '../schemas/replyAssociation'
@@ -33,7 +21,7 @@ import { ApplicationContext } from '../App'
 
 export interface MessageDetailState {
     showingMessage: { messageId: string; author: CCID } | null
-    showMessage: React.Dispatch<React.SetStateAction<{ messageId: string; author: CCID } | null>>
+    showMessage: Dispatch<SetStateAction<{ messageId: string; author: CCID } | null>>
 }
 
 const MessageDetailContext = createContext<MessageDetailState | undefined>(undefined)
@@ -41,16 +29,6 @@ const MessageDetailContext = createContext<MessageDetailState | undefined>(undef
 interface MessageDetailProps {
     children: JSX.Element | JSX.Element[]
 }
-
-const Puller = styled(Box)(({ theme }) => ({
-    width: 30,
-    height: 6,
-    backgroundColor: theme.palette.mode === 'light' ? grey[300] : grey[900],
-    borderRadius: 3,
-    position: 'absolute',
-    top: 8,
-    left: 'calc(50% - 15px)'
-}))
 
 const style = {
     position: 'absolute' as 'absolute',

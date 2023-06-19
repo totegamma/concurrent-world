@@ -1,7 +1,7 @@
 import { Box, IconButton, ListItem, ListItemIcon, ListItemText, Menu, MenuItem, type Theme } from '@mui/material'
 import { Link as routerLink } from 'react-router-dom'
 import { CCAvatar } from '../../CCAvatar'
-import type { Character, Message as CCMessage, ProfileWithAddress, Stream, StreamElement } from '../../../model'
+import type { Character, Message as CCMessage, ProfileWithAddress, Stream } from '../../../model'
 import { SimpleNote } from '../SimpleNote'
 import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
