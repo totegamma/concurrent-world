@@ -102,21 +102,9 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
 
     const favorite = useCallback(
         async ({ id, author }: { id: string; author: CCID }): Promise<void> => {
-            const authorInbox = (await api.readCharacter(author, Schemas.userstreams))?.payload.body.notificationStream
-            console.log(authorInbox)
-            const targetStream = [authorInbox, appData.userstreams?.payload.body.associationStream].filter(
-                (e) => e
-            ) as string[]
-
-            console.log(targetStream)
-
-            api.createAssociation<Like>(Schemas.like, {}, id, author, 'messages', targetStream).then((_) => {
-                api.invalidateMessage(id)
-                // MEMO 無理やり更新
-                console.log(association?.payload.body)
-                api.fetchMessageWithAuthor(association?.payload.body.messageId, association?.author ?? '').then((m) => {
-                    setMessage(m)
-                })
+            await api.favoriteMessage(id, author)
+            api.fetchMessageWithAuthor(association?.payload.body.messageId, association?.author ?? '').then((m) => {
+                setMessage(m)
             })
         },
         [association]
@@ -125,14 +113,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     const unfavorite = useCallback(
         (deletekey: string | undefined, author: string): void => {
             if (!deletekey) return
-            api.deleteAssociation(deletekey, author).then((_) => {
-                api.invalidateMessage(association?.payload.body.messageId)
-                // MEMO 無理やり更新
-                console.log(association?.payload.body)
-                api.fetchMessageWithAuthor(association?.payload.body.messageId, association?.author ?? '').then((m) => {
-                    setMessage(m)
-                })
-            })
+            api.unFavoriteMessage(deletekey, author)
         },
         [association]
     )
