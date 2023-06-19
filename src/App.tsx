@@ -1,4 +1,5 @@
 import { useEffect, useState, createContext, useRef, useMemo } from 'react'
+import { DndProvider, getBackendOptions, MultiBackend, Tree } from '@minoru/react-dnd-treeview'
 import { Routes, Route } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider, SwipeableDrawer } from '@mui/material'
 import useWebSocket, { type ReadyState } from 'react-use-websocket'
@@ -255,17 +256,19 @@ function App(): JSX.Element {
 
     const providers = (childs: JSX.Element): JSX.Element => (
         <SnackbarProvider preventDuplicate>
-            <ThemeProvider theme={theme}>
-                <ClockContext.Provider value={clock}>
-                    <ApiProvider api={api}>
-                        <FollowProvider>
-                            <ApplicationContext.Provider value={applicationContext}>
-                                {childs}
-                            </ApplicationContext.Provider>
-                        </FollowProvider>
-                    </ApiProvider>
-                </ClockContext.Provider>
-            </ThemeProvider>
+            <DndProvider backend={MultiBackend} options={getBackendOptions()}>
+                <ThemeProvider theme={theme}>
+                    <ClockContext.Provider value={clock}>
+                        <ApiProvider api={api}>
+                            <FollowProvider>
+                                <ApplicationContext.Provider value={applicationContext}>
+                                    {childs}
+                                </ApplicationContext.Provider>
+                            </FollowProvider>
+                        </ApiProvider>
+                    </ClockContext.Provider>
+                </ThemeProvider>
+            </DndProvider>
         </SnackbarProvider>
     )
 
