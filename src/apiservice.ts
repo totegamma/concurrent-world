@@ -600,8 +600,8 @@ export default class ConcurrentApiClient extends ApiService {
     }
 
     async unFavoriteMessage(associationID: string, author: string): Promise<void> {
-        await this.deleteAssociation(associationID, author)
-        this.invalidateMessage(associationID)
+        const { targetID } = await this.deleteAssociation(associationID, author)
+        this.invalidateMessage(targetID)
     }
 
     constructJWT(claim: Record<string, string>): string {
