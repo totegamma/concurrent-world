@@ -1,5 +1,5 @@
-import { memo, useEffect, useRef, useState } from 'react'
-import { Box, Collapse, Divider } from '@mui/material'
+import React, { memo, useEffect, useRef, useState } from 'react'
+import { Box, Collapse, Divider, Modal, Typography, useTheme } from '@mui/material'
 import type { StreamElementDated } from '../model'
 import { type IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'

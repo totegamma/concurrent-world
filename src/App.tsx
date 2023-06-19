@@ -1,4 +1,5 @@
 import { useEffect, useState, createContext, useRef, useMemo } from 'react'
+import { DndProvider, getBackendOptions, MultiBackend, Tree } from '@minoru/react-dnd-treeview'
 import { Routes, Route } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider, SwipeableDrawer } from '@mui/material'
 import useWebSocket, { type ReadyState } from 'react-use-websocket'
@@ -176,7 +177,19 @@ function App(): JSX.Element {
                         if (event.stream === userstreams?.payload.body.notificationStream) {
                             playNotificationRef.current()
                             api?.fetchAssociation(event.body.id, event.body.currenthost).then((a) => {
-                                a &&
+                                if (!a) return
+                                if (a.schema === Schemas.replyAssociation) {
+                                    api?.readCharacter(a.author, Schemas.profile).then(
+                                        (c: Character<Profile> | undefined) => {
+                                            enqueueSnackbar(
+                                                `${c?.payload.body.username ?? 'anonymous'} replied to your message.`
+                                            )
+                                        }
+                                    )
+                                    return
+                                }
+
+                                if (a.schema === Schemas.like) {
                                     api.fetchMessage(a.targetID).then((m) => {
                                         m &&
                                             api
@@ -189,6 +202,10 @@ function App(): JSX.Element {
                                                     )
                                                 })
                                     })
+                                    return
+                                }
+
+                                enqueueSnackbar('unknown association received.')
                             })
                         }
                         break
@@ -243,17 +260,19 @@ function App(): JSX.Element {
 
     const providers = (childs: JSX.Element): JSX.Element => (
         <SnackbarProvider preventDuplicate>
-            <ThemeProvider theme={theme}>
-                <ClockContext.Provider value={clock}>
-                    <ApiProvider api={api}>
-                        <FollowProvider>
-                            <ApplicationContext.Provider value={applicationContext}>
-                                {childs}
-                            </ApplicationContext.Provider>
-                        </FollowProvider>
-                    </ApiProvider>
-                </ClockContext.Provider>
-            </ThemeProvider>
+            <DndProvider backend={MultiBackend} options={getBackendOptions()}>
+                <ThemeProvider theme={theme}>
+                    <ClockContext.Provider value={clock}>
+                        <ApiProvider api={api}>
+                            <FollowProvider>
+                                <ApplicationContext.Provider value={applicationContext}>
+                                    {childs}
+                                </ApplicationContext.Provider>
+                            </FollowProvider>
+                        </ApiProvider>
+                    </ClockContext.Provider>
+                </ThemeProvider>
+            </DndProvider>
         </SnackbarProvider>
     )
 

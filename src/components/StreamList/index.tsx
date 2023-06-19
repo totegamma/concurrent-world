@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { DndProvider, getBackendOptions, MultiBackend, Tree } from '@minoru/react-dnd-treeview'
+import { Tree } from '@minoru/react-dnd-treeview'
 import CreateNewFolder from '@mui/icons-material/CreateNewFolder'
 
 import styles from './index.module.css'
@@ -122,41 +122,39 @@ export function StreamList(props: StreamListProps): JSX.Element {
             </Box>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
-                <DndProvider backend={MultiBackend} options={getBackendOptions()}>
-                    <div className={styles.tree}>
-                        <Tree
-                            tree={watchStreamTree}
-                            rootId={0}
-                            render={(node, { depth, isOpen, onToggle }) => (
-                                <CustomNode
-                                    node={node}
-                                    depth={depth}
-                                    isOpen={isOpen}
-                                    onToggle={onToggle}
-                                    tree={watchStreamTree}
-                                    setWatchStreamTree={setWatchStreamTree}
-                                    onClick={props.onClick}
-                                />
-                            )}
-                            dragPreviewRender={(monitorProps) => <CustomDragPreview monitorProps={monitorProps} />}
-                            onDrop={handleDrop}
-                            classes={{
-                                root: styles.treeRoot,
-                                draggingSource: styles.draggingSource,
-                                placeholder: styles.placeholderContainer
-                            }}
-                            sort={false}
-                            insertDroppableFirst={false}
-                            canDrop={(tree, { dragSource, dropTargetId, dropTarget }) => {
-                                if (dragSource?.parent === dropTargetId) {
-                                    return true
-                                }
-                            }}
-                            dropTargetOffset={5}
-                            placeholderRender={(node, { depth }) => <Placeholder node={node} depth={depth} />}
-                        />
-                    </div>
-                </DndProvider>
+                <div className={styles.tree}>
+                    <Tree
+                        tree={watchStreamTree}
+                        rootId={0}
+                        render={(node, { depth, isOpen, onToggle }) => (
+                            <CustomNode
+                                node={node}
+                                depth={depth}
+                                isOpen={isOpen}
+                                onToggle={onToggle}
+                                tree={watchStreamTree}
+                                setWatchStreamTree={setWatchStreamTree}
+                                onClick={props.onClick}
+                            />
+                        )}
+                        dragPreviewRender={(monitorProps) => <CustomDragPreview monitorProps={monitorProps} />}
+                        onDrop={handleDrop}
+                        classes={{
+                            root: styles.treeRoot,
+                            draggingSource: styles.draggingSource,
+                            placeholder: styles.placeholderContainer
+                        }}
+                        sort={false}
+                        insertDroppableFirst={false}
+                        canDrop={(tree, { dragSource, dropTargetId, dropTarget }) => {
+                            if (dragSource?.parent === dropTargetId) {
+                                return true
+                            }
+                        }}
+                        dropTargetOffset={5}
+                        placeholderRender={(node, { depth }) => <Placeholder node={node} depth={depth} />}
+                    />
+                </div>
             </ThemeProvider>
         </>
     )

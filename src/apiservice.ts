@@ -7,7 +7,8 @@ import type {
     StreamElement,
     Message,
     Entity,
-    Association
+    Association,
+    CCID
 } from './model'
 import { v4 as uuidv4 } from 'uuid'
 // @ts-expect-error vite dynamic import
@@ -15,12 +16,14 @@ import { branch, sha } from '~build/info'
 import { Sign, SignJWT, fetchWithTimeout } from './util'
 import { Schemas } from './schemas'
 import { type Userstreams } from './schemas/userstreams'
+import { ApiService } from './abstraction/apiservice'
+import type { Like } from './schemas/like'
 
 const branchName = branch || window.location.host.split('.')[0]
 
 const apiPath = '/api/v1'
 
-export default class ConcurrentApiClient {
+export default class ConcurrentApiClient extends ApiService {
     host: Host | undefined
     userAddress: string
     privatekey: string
@@ -33,6 +36,7 @@ export default class ConcurrentApiClient {
     streamCache: Record<string, Promise<Stream<any>> | undefined> = {}
 
     constructor(userAddress: string, privatekey: string, host?: Host) {
+        super()
         this.host = host
         this.userAddress = userAddress
         this.privatekey = privatekey
@@ -75,7 +79,7 @@ export default class ConcurrentApiClient {
         return false
     }
 
-    fetchWithCredential = async (url: RequestInfo, init: RequestInit, timeoutMs?: number): Promise<Response> => {
+    async fetchWithCredential(url: RequestInfo, init: RequestInit, timeoutMs?: number): Promise<Response> {
         let jwt = this.token
         if (!jwt || !this.checkJwtIsValid(jwt)) {
             jwt = await this.getJWT()
@@ -149,6 +153,12 @@ export default class ConcurrentApiClient {
         return await this.messageCache[id]
     }
 
+    async fetchMessageWithAuthor(messageId: string, author: string): Promise<Message<any> | undefined> {
+        const entity = await this.readEntity(author)
+        if (!entity) throw new Error()
+        return await this.fetchMessage(messageId, entity.host)
+    }
+
     async deleteMessage(target: string, host: string = ''): Promise<any> {
         if (!this.host) throw new Error()
         const targetHost = !host ? this.host.fqdn : host
@@ -176,12 +186,13 @@ export default class ConcurrentApiClient {
         schema: string,
         body: T,
         target: string,
+        targetAuthor: CCID,
         targetType: string,
-        streams: string[],
-        host: string = ''
+        streams: string[]
     ): Promise<any> {
         if (!this.host) throw new Error()
-        const targetHost = !host ? this.host.fqdn : host
+        const entity = await this.readEntity(targetAuthor)
+        const targetHost = entity?.host || this.host.fqdn
         const signObject: SignedObject<T> = {
             signer: this.userAddress,
             type: 'Association',
@@ -215,9 +226,10 @@ export default class ConcurrentApiClient {
             })
     }
 
-    async deleteAssociation(target: string, host: string = ''): Promise<any> {
+    async deleteAssociation(target: string, targetAuthor: CCID): Promise<any> {
         if (!this.host) throw new Error()
-        const targetHost = !host ? this.host.fqdn : host
+        const entity = await this.readEntity(targetAuthor)
+        const targetHost = entity?.host || this.host.fqdn
         const requestOptions = {
             method: 'DELETE',
             headers: { 'content-type': 'application/json' },
@@ -295,17 +307,14 @@ export default class ConcurrentApiClient {
             })
     }
 
-    async readCharacter(author: string, schema: string, host: string = ''): Promise<Character<any> | undefined> {
+    async readCharacter(author: string, schema: string): Promise<Character<any> | undefined> {
         if (!this.host || !author) throw new Error()
         if (this.characterCache[author + schema]) {
             return await this.characterCache[author + schema]
         }
-        let characterHost = host
-        if (characterHost === '') {
-            const entity = await this.readEntity(author)
-            characterHost = entity?.host ?? this.host.fqdn
-            if (!characterHost || characterHost === '') characterHost = this.host.fqdn
-        }
+        const entity = await this.readEntity(author)
+        let characterHost = entity?.host ?? this.host.fqdn
+        if (!characterHost || characterHost === '') characterHost = this.host.fqdn
         this.characterCache[author + schema] = fetch(
             `https://${characterHost}${apiPath}/characters?author=${author}&schema=${encodeURIComponent(schema)}`,
             {
@@ -512,7 +521,7 @@ export default class ConcurrentApiClient {
     }
 
     // Entity
-    async readEntity(ccaddr: string): Promise<Entity | undefined> {
+    async readEntity(ccaddr: CCID): Promise<Entity | undefined> {
         if (!this.host) throw new Error()
         if (this.entityCache[ccaddr]) {
             return await this.entityCache[ccaddr]
@@ -532,7 +541,6 @@ export default class ConcurrentApiClient {
     }
 
     // Utils
-
     async getUserHomeStreams(users: string[]): Promise<string[]> {
         return (
             await Promise.all(
@@ -540,8 +548,7 @@ export default class ConcurrentApiClient {
                     const entity = await this.readEntity(ccaddress)
                     const character: Character<Userstreams> | undefined = await this.readCharacter(
                         ccaddress,
-                        Schemas.userstreams,
-                        entity?.host
+                        Schemas.userstreams
                     )
 
                     if (!character?.payload.body.homeStream) return undefined
@@ -582,6 +589,19 @@ export default class ConcurrentApiClient {
         ).then((data) => {
             console.log(data)
         })
+    }
+
+    async favoriteMessage(id: string, author: CCID): Promise<void> {
+        const userStreams = await this.readCharacter(this.userAddress, Schemas.userstreams)
+        const authorInbox = (await this.readCharacter(author, Schemas.userstreams))?.payload.body.notificationStream
+        const targetStream = [authorInbox, userStreams?.payload.body.associationStream].filter((e) => e) as string[]
+        await this.createAssociation<Like>(Schemas.like, {}, id, author, 'messages', targetStream)
+        this.invalidateMessage(id)
+    }
+
+    async unFavoriteMessage(associationID: string, author: string): Promise<void> {
+        await this.deleteAssociation(associationID, author)
+        this.invalidateMessage(associationID)
     }
 
     constructJWT(claim: Record<string, string>): string {

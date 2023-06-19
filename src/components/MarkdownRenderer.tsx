@@ -31,7 +31,6 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
     const genEmojiTag = (emoji: Emoji): string => {
         return `<img src="${emoji.publicUrl}" alt="emoji:${emoji.name}:" title=":${emoji?.name}:"/>`
     }
-
     const messagebody = props.messagebody.replace(/:\w+:/gi, (name: string) => {
         const emoji: Emoji | undefined = appData.emojiDict[name.slice(1, -1)]
         if (emoji) {
