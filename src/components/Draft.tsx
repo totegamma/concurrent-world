@@ -332,8 +332,6 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 </IconButton>
                 <Box
                     sx={{
-                        padding: '4px 16px',
-                        margin: '4px 0 4px 8px',
                         position: 'relative'
                     }}
                 >
