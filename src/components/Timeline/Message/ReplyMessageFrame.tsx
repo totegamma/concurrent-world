@@ -63,7 +63,10 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
                 console.error(error)
             })
 
-        api.fetchMessage(props.message.payload.body.replyToMessageId).then((msg) => {
+        api.fetchMessageWithAuthor(
+            props.message.payload.body.replyToMessageId,
+            props.message.payload.body.replyToMessageAuthor
+        ).then((msg) => {
             setReplyMessage(msg)
         })
 
