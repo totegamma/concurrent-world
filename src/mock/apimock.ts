@@ -1,6 +1,8 @@
 import { ApiService } from '../abstraction/apiservice'
-import type { Association, Character, Entity, Host, Message, Stream, StreamElement } from '../model'
+import type { Association, Character, Entity, Host, Message, Stream, StreamElement, type CCID } from '../model'
 import { StreamMock } from './modelmock'
+import { Schemas } from '../schemas'
+import { Like } from '../schemas/like'
 
 export class ApiMock extends ApiService {
     host: Host | undefined
@@ -138,4 +140,8 @@ export class ApiMock extends ApiService {
     upsertCharacter<T>(schema: string, body: T, id?: string): Promise<any> {
         return Promise.resolve(undefined)
     }
+
+    async favoriteMessage(id: string, author: CCID): Promise<void> {}
+
+    async unFavoriteMessage(associationID: string, author: string): Promise<void> {}
 }
