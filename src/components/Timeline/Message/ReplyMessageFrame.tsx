@@ -24,23 +24,23 @@ import { ApplicationContext } from '../../../App'
 import type { ReplyMessage } from '../../../schemas/replyMessage'
 import type { ReplyAssociation } from '../../../schemas/replyAssociation'
 import { MessageView } from './MessageView'
-import { ThinMessageView } from './ThinMessageView'
+import { MessageFrame } from './MessageFrame'
 import { useMessageDetail } from '../../../context/MessageDetail'
 
 export interface MessageFrameProp {
     message: CCMessage<any>
     lastUpdated: number
-    thin?: boolean
 }
 
-export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JSX.Element => {
+export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JSX.Element => {
     const api = useApi()
-    const appData = useContext(ApplicationContext)
     const inspector = useInspector()
     const messageDetail = useMessageDetail()
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [message, setMessage] = useState<CCMessage<any> | undefined>()
-    const [msgstreams, setStreams] = useState<Array<Stream<any>>>([])
+    const [replyMessage, setReplyMessage] = useState<CCMessage<any> | undefined>()
+    const [replyAuthor, setReplyAuthor] = useState<Character<Profile> | undefined>()
+    const [msgStreams, setStreams] = useState<Array<Stream<any>>>([])
     const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
     const [messageAnchor, setMessageAnchor] = useState<null | HTMLElement>(null)
 
@@ -52,7 +52,9 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
 
     useEffect(() => {
         setMessage(props.message)
-
+        Promise.all(props.message.streams.map(async (id) => await api.readStream(id))).then((e) => {
+            setStreams(e.filter((x) => x?.payload.body.name) as Array<Stream<any>>)
+        })
         api.readCharacter(props.message.author, Schemas.profile)
             .then((author) => {
                 setAuthor(author)
@@ -60,6 +62,14 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
             .catch((error) => {
                 console.error(error)
             })
+
+        api.fetchMessage(props.message.payload.body.replyToMessageId).then((msg) => {
+            setReplyMessage(msg)
+        })
+
+        api.readCharacter(props.message.payload.body.replyToMessageAuthor, Schemas.profile).then((author) => {
+            setReplyAuthor(author)
+        })
     }, [props.message, props.lastUpdated])
 
     useEffect(() => {
@@ -89,42 +99,12 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
         }
 
         fetchUsers()
-    }, [message?.associations])
+    }, [message?.associations, props.lastUpdated])
 
-    const favorite = useCallback(async ({ id, author }: { id: string; author: CCID }): Promise<void> => {
-        const authorInbox = (await api.readCharacter(author, Schemas.userstreams))?.payload.body.notificationStream
-        console.log(authorInbox)
-        const targetStream = [authorInbox, appData.userstreams?.payload.body.associationStream].filter(
-            (e) => e
-        ) as string[]
-        console.log(targetStream)
-
-        api.createAssociation<Like>(Schemas.like, {}, id, author, 'messages', targetStream).then((_) => {
-            api.invalidateMessage(id)
-
-            // MEMO 無理やり更新
-            api.fetchMessageWithAuthor(id, author).then((message) => {
-                setMessage(message)
-            })
-        })
-    }, [])
-
-    const unfavorite = useCallback((deletekey: string | undefined, author: CCID): void => {
+    const unfavorite = useCallback(async (deletekey: string | undefined, author: CCID): Promise<void> => {
         if (!deletekey) return
-        api.deleteAssociation(deletekey, author).then((_) => {
-            api.invalidateMessage(props.message.id)
-
-            // MEMO 無理やり更新
-            api.fetchMessageWithAuthor(props.message.id, author).then((message) => {
-                setMessage(message)
-            })
-        })
+        await api.unFavoriteMessage(deletekey, author)
     }, [])
-
-    const handleReply = async (): Promise<void> => {
-        console.log('messageId', message?.id)
-        messageDetail.showMessage({ messageId: message?.id || '', author: message?.author || '' })
-    }
 
     if (!fetchSuccess) {
         return (
@@ -158,51 +138,41 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
 
     return (
         <>
-            {props.thin ? (
-                <ThinMessageView
-                    message={message}
-                    author={author}
-                    reactUsers={reactUsers}
-                    theme={theme}
-                    hasOwnReaction={hasOwnReaction}
-                    msgstreams={msgstreams}
-                    messageAnchor={messageAnchor}
-                    api={api}
-                    inspectHandler={() => {
-                        inspector.inspectItem({ messageId: message.id, author: message.author })
-                    }}
-                    handleReply={handleReply}
-                    unfavorite={() => {
-                        unfavorite(message.associations.find((e) => e.author === api.userAddress)?.id, message.author)
-                    }}
-                    favorite={() => favorite({ ...props.message })}
-                    setMessageAnchor={setMessageAnchor}
-                    setFetchSucceed={setFetchSucceed}
-                />
-            ) : (
+            {replyMessage && <MessageFrame message={replyMessage} lastUpdated={1} thin={true}></MessageFrame>}
+            <Box
+                sx={{
+                    paddingLeft: 2
+                }}
+            >
+                <Typography variant="caption" color="text.disabled">
+                    {' '}
+                    {replyAuthor?.payload.body.username || 'Anonymous'} さんが返信{' '}
+                </Typography>
                 <MessageView
                     message={message}
                     author={author}
                     reactUsers={reactUsers}
                     theme={theme}
                     hasOwnReaction={hasOwnReaction}
-                    msgstreams={msgstreams}
+                    msgstreams={msgStreams}
                     messageAnchor={messageAnchor}
                     api={api}
                     inspectHandler={() => {
                         inspector.inspectItem({ messageId: message.id, author: message.author })
                     }}
-                    handleReply={handleReply}
+                    handleReply={async () => {
+                        messageDetail.showMessage({ messageId: message?.id || '', author: message?.author || '' })
+                    }}
                     unfavorite={() => {
                         unfavorite(message.associations.find((e) => e.author === api.userAddress)?.id, message.author)
                     }}
-                    favorite={() => favorite({ ...props.message })}
+                    favorite={() => api.favoriteMessage(props.message.id, props.message.author)}
                     setMessageAnchor={setMessageAnchor}
                     setFetchSucceed={setFetchSucceed}
                 />
-            )}
+            </Box>
         </>
     )
 })
 
-MessageFrame.displayName = 'MessageFrame'
+ReplyMessageFrame.displayName = 'MessageFrame'

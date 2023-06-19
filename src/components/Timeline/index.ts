@@ -1,2 +1,2 @@
 export * from './main'
-export * from './MessageFrame/MessageFrame'
+export * from './Message/MessageFrame'

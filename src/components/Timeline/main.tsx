@@ -7,7 +7,7 @@ import type { StreamElement, StreamElementDated } from '../../model'
 import { useApi } from '../../context/api'
 import { InspectorProvider } from '../../context/Inspector'
 import { Loading } from '../Loading'
-import { MessageFrame } from './MessageFrame/MessageFrame'
+import { MessageFrame } from './Message/MessageFrame'
 import { MessageMultiplexer } from './Multiplexer'
 import { MessageDetailProvider } from '../../context/MessageDetail'
 

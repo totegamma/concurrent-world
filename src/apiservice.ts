@@ -17,6 +17,7 @@ import { Sign, SignJWT, fetchWithTimeout } from './util'
 import { Schemas } from './schemas'
 import { type Userstreams } from './schemas/userstreams'
 import { ApiService } from './abstraction/apiservice'
+import type { Like } from './schemas/like'
 
 const branchName = branch || window.location.host.split('.')[0]
 
@@ -520,7 +521,7 @@ export default class ConcurrentApiClient extends ApiService {
     }
 
     // Entity
-    async readEntity(ccaddr: string): Promise<Entity | undefined> {
+    async readEntity(ccaddr: CCID): Promise<Entity | undefined> {
         if (!this.host) throw new Error()
         if (this.entityCache[ccaddr]) {
             return await this.entityCache[ccaddr]
@@ -540,7 +541,6 @@ export default class ConcurrentApiClient extends ApiService {
     }
 
     // Utils
-
     async getUserHomeStreams(users: string[]): Promise<string[]> {
         return (
             await Promise.all(
@@ -589,6 +589,19 @@ export default class ConcurrentApiClient extends ApiService {
         ).then((data) => {
             console.log(data)
         })
+    }
+
+    async favoriteMessage(id: string, author: CCID): Promise<void> {
+        const userStreams = await this.readCharacter(this.userAddress, Schemas.userstreams)
+        const authorInbox = (await this.readCharacter(author, Schemas.userstreams))?.payload.body.notificationStream
+        const targetStream = [authorInbox, userStreams?.payload.body.associationStream].filter((e) => e) as string[]
+        await this.createAssociation<Like>(Schemas.like, {}, id, author, 'messages', targetStream)
+        this.invalidateMessage(id)
+    }
+
+    async unFavoriteMessage(associationID: string, author: string): Promise<void> {
+        await this.deleteAssociation(associationID, author)
+        this.invalidateMessage(associationID)
     }
 
     constructJWT(claim: Record<string, string>): string {

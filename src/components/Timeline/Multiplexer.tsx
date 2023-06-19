@@ -2,8 +2,8 @@ import { Schemas } from '../../schemas'
 import type { Message as CCMessage, StreamElement } from '../../model'
 import { useApi } from '../../context/api'
 import { useEffect, useState } from 'react'
-import { MessageFrame } from './MessageFrame/MessageFrame'
-import { ReplyMessageFrame } from './MessageFrame/ReplyMessageFrame'
+import { MessageFrame } from './Message/MessageFrame'
+import { ReplyMessageFrame } from './Message/ReplyMessageFrame'
 
 interface MultiplexerProps {
     message: StreamElement
