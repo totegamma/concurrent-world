@@ -340,7 +340,11 @@ export default class ConcurrentApiClient extends ApiService {
     }
 
     // Stream
-    async createStream<T>(schema: string, body: T): Promise<any> {
+    async createStream<T>(
+        schema: string,
+        body: T,
+        { maintainer = [], writer = [], reader = [] }: { maintainer?: CCID[]; writer?: CCID[]; reader?: CCID[] } = {}
+    ): Promise<any> {
         if (!this.host) throw new Error()
         const signObject = {
             signer: this.userAddress,
@@ -351,9 +355,9 @@ export default class ConcurrentApiClient extends ApiService {
                 client: `concurrent-web ${branchName as string}-${sha as string}`
             },
             signedAt: new Date().toISOString(),
-            maintainer: [],
-            writer: [],
-            reader: []
+            maintainer,
+            writer,
+            reader
         }
 
         const signedObject = JSON.stringify(signObject)
@@ -571,15 +575,15 @@ export default class ConcurrentApiClient extends ApiService {
     async setupUserstreams(): Promise<void> {
         const userstreams = await this.readCharacter(this.userAddress, Schemas.userstreams)
         const id = userstreams?.id
-        const res0 = await this.createStream(Schemas.utilitystream, {})
+        const res0 = await this.createStream(Schemas.utilitystream, {}, { writer: [this.userAddress] })
         const homeStream = res0.id
         console.log('home', homeStream)
 
-        const res1 = await this.createStream(Schemas.utilitystream, {})
+        const res1 = await this.createStream(Schemas.utilitystream, {}, { reader: [this.userAddress] })
         const notificationStream = res1.id
         console.log('notification', notificationStream)
 
-        const res2 = await this.createStream(Schemas.utilitystream, {})
+        const res2 = await this.createStream(Schemas.utilitystream, {}, { writer: [this.userAddress] })
         const associationStream = res2.id
         console.log('notification', associationStream)
 

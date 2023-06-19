@@ -1,4 +1,4 @@
-import type { Association, Character, Entity, Host, Message, Stream, StreamElement } from '../model'
+import type { Association, CCID, Character, Entity, Host, Message, Stream, StreamElement } from '../model'
 
 export abstract class ApiService {
     abstract host: Host | undefined
@@ -31,7 +31,11 @@ export abstract class ApiService {
     abstract fetchAssociation(id: string, host: string): Promise<Association<any> | undefined>
     abstract upsertCharacter<T>(schema: string, body: T, id?: string): Promise<any>
     abstract readCharacter(author: string, schema: string, host: string): Promise<Character<any> | undefined>
-    abstract createStream<T>(schema: string, body: T): Promise<any>
+    abstract createStream<T>(
+        schema: string,
+        body: T,
+        { maintainer = [], writer = [], reader = [] }: { maintainer?: CCID[]; writer?: CCID[]; reader?: CCID[] }
+    ): Promise<any>
     abstract updateStream(id: string, partialSignObject: any): Promise<any>
     abstract getStreamListBySchema(schema: string, remote?: string): Promise<Array<Stream<any>>>
     abstract readStream(id: string): Promise<Stream<any> | undefined>
