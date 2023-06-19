@@ -25,6 +25,8 @@ export const MessageMultiplexer = (props: MultiplexerProps): JSX.Element => {
             })
     }, [props.message, props.lastUpdated])
 
+    if (!message) return <></>
+
     switch (message?.schema) {
         case Schemas.simpleNote:
             return <MessageFrame message={message} lastUpdated={props.lastUpdated} />
