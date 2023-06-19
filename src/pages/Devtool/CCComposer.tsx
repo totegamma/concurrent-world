@@ -14,6 +14,7 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
     const [streams, setStreams] = useState<string>('')
 
     const [associationTarget, setAssociationTarget] = useState<string>('')
+    const [associationTargetAuthor, setAssociationTargetAuthor] = useState<string>('')
     const [associationTargetType, setAssociationTargetType] = useState<string>('message')
 
     const [character, setCharacter] = useState<Character<any>>()
@@ -23,7 +24,14 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
     }
 
     const createAssociation = async (e: any): Promise<void> => {
-        api.createAssociation(schemaURL, e, associationTarget, associationTargetType, streams.split(','))
+        api.createAssociation(
+            schemaURL,
+            e,
+            associationTarget,
+            associationTargetAuthor,
+            associationTargetType,
+            streams.split(',')
+        )
     }
 
     const createCharacter = async (e: any): Promise<void> => {
@@ -74,6 +82,13 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
                             value={associationTarget}
                             onChange={(e) => {
                                 setAssociationTarget(e.target.value)
+                            }}
+                        />
+                        <TextField
+                            label="Target Author"
+                            value={associationTargetAuthor}
+                            onChange={(e) => {
+                                setAssociationTargetAuthor(e.target.value)
                             }}
                         />
                         <Select
