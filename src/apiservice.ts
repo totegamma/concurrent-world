@@ -226,7 +226,10 @@ export default class ConcurrentApiClient extends ApiService {
             })
     }
 
-    async deleteAssociation(target: string, targetAuthor: CCID): Promise<any> {
+    async deleteAssociation(
+        target: string,
+        targetAuthor: CCID
+    ): Promise<{ status: string; content: Association<any> }> {
         if (!this.host) throw new Error()
         const entity = await this.readEntity(targetAuthor)
         const targetHost = entity?.host || this.host.fqdn
@@ -240,7 +243,7 @@ export default class ConcurrentApiClient extends ApiService {
 
         return await this.fetchWithCredential(`https://${targetHost}${apiPath}/associations`, requestOptions)
             .then(async (res) => await res.json())
-            .then((data) => {
+            .then((data: { status: string; content: Association<any> }) => {
                 return data
             })
     }
@@ -600,8 +603,8 @@ export default class ConcurrentApiClient extends ApiService {
     }
 
     async unFavoriteMessage(associationID: string, author: string): Promise<void> {
-        const { targetID } = await this.deleteAssociation(associationID, author)
-        this.invalidateMessage(targetID)
+        const { content } = await this.deleteAssociation(associationID, author)
+        this.invalidateMessage(content.targetID)
     }
 
     constructJWT(claim: Record<string, string>): string {
