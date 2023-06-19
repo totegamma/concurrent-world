@@ -1,6 +1,9 @@
 import { ApiService } from '../abstraction/apiservice'
 import type { Association, Character, Entity, Host, Message, Stream, StreamElement, CCID } from '../model'
 import { StreamMock } from './modelmock'
+import { ReRouteMessage } from '../schemas/reRouteMessage'
+import { Schemas } from '../schemas'
+import { ReRouteAssociation } from '../schemas/reRouteAssociation'
 
 export class ApiMock extends ApiService {
     host: Host | undefined
@@ -142,4 +145,6 @@ export class ApiMock extends ApiService {
     async favoriteMessage(id: string, author: CCID): Promise<void> {}
 
     async unFavoriteMessage(associationID: string, author: string): Promise<void> {}
+
+    async reRouteMessage(id: string, author: CCID, streams: string[], body?: string): Promise<void> {}
 }

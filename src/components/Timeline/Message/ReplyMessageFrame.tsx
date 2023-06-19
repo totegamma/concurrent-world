@@ -166,6 +166,9 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
                     handleReply={async () => {
                         messageDetail.showMessage({ messageId: message?.id || '', author: message?.author || '' })
                     }}
+                    handleReRoute={async () => {
+                        messageDetail.reRouteMessage(message.id, message.author)
+                    }}
                     unfavorite={() => {
                         unfavorite(message.associations.find((e) => e.author === api.userAddress)?.id, message.author)
                     }}

@@ -25,6 +25,7 @@ export interface MessageViewProps {
     api: ConcurrentApiClient
     inspectHandler: () => void
     handleReply: () => Promise<void>
+    handleReRoute: () => Promise<void>
     unfavorite: () => void
     favorite: () => Promise<void>
     setMessageAnchor: (anchor: null | HTMLElement) => void
@@ -87,6 +88,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                         <SimpleNote message={props.message} />
                         <MessageActions
                             handleReply={props.handleReply}
+                            handleReRoute={props.handleReRoute}
                             reactUsers={props.reactUsers}
                             theme={props.theme}
                             hasOwnReaction={props.hasOwnReaction}

@@ -88,6 +88,7 @@ export const Default = (arg: Props): JSX.Element => {
                                         api={new ApiMock()}
                                         inspectHandler={() => {}}
                                         handleReply={async () => {}}
+                                        handleReRoute={async () => {}}
                                         unfavorite={() => {}}
                                         favorite={async () => {}}
                                         setMessageAnchor={setMessageAnchor}

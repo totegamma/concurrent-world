@@ -36,6 +36,7 @@ export interface MessageFrameProp {
 export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JSX.Element => {
     const api = useApi()
     const inspector = useInspector()
+    const appContext = useContext(ApplicationContext)
     const messageDetail = useMessageDetail()
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [message, setMessage] = useState<CCMessage<any> | undefined>()
@@ -92,9 +93,22 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
         fetchUsers()
     }, [message?.associations])
 
+    const reloadMessage = useCallback(async () => {
+        try {
+            console.log('reload message')
+            const newMessage = await api.fetchMessageWithAuthor(props.message.id, props.message.author)
+            setMessage(newMessage)
+            setFetchSucceed(true)
+        } catch (error) {
+            setFetchSucceed(false)
+        }
+    }, [props.message.id, props.message.author])
+
     const unfavorite = useCallback(async (deletekey: string | undefined, author: CCID): Promise<void> => {
         if (!deletekey) return
         await api.unFavoriteMessage(deletekey, author)
+        // 後々消す
+        reloadMessage()
     }, [])
 
     if (!fetchSuccess) {
@@ -162,10 +176,17 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                     handleReply={async () => {
                         messageDetail.showMessage({ messageId: message?.id || '', author: message?.author || '' })
                     }}
+                    handleReRoute={async () => {
+                        messageDetail.reRouteMessage(message.id, message?.author)
+                    }}
                     unfavorite={() => {
                         unfavorite(message.associations.find((e) => e.author === api.userAddress)?.id, message.author)
                     }}
-                    favorite={() => api.favoriteMessage(props.message.id, props.message.author)}
+                    favorite={async () => {
+                        await api.favoriteMessage(props.message.id, props.message.author)
+                        // 後々消す
+                        reloadMessage()
+                    }}
                     setMessageAnchor={setMessageAnchor}
                     setFetchSucceed={setFetchSucceed}
                 />

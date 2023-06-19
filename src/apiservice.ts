@@ -18,6 +18,8 @@ import { Schemas } from './schemas'
 import { type Userstreams } from './schemas/userstreams'
 import { ApiService } from './abstraction/apiservice'
 import type { Like } from './schemas/like'
+import type { ReRouteMessage } from './schemas/reRouteMessage'
+import type { ReRouteAssociation } from './schemas/reRouteAssociation'
 
 const branchName = branch || window.location.host.split('.')[0]
 
@@ -605,6 +607,32 @@ export default class ConcurrentApiClient extends ApiService {
     async unFavoriteMessage(associationID: string, author: string): Promise<void> {
         const { content } = await this.deleteAssociation(associationID, author)
         this.invalidateMessage(content.targetID)
+    }
+
+    async reRouteMessage(id: string, author: CCID, streams: string[], body?: string): Promise<void> {
+        const { content } = await this.createMessage<ReRouteMessage>(
+            Schemas.reRouteMessage,
+            {
+                body,
+                rerouteMessageId: id,
+                rerouteMessageAuthor: author
+            },
+            streams
+        )
+        const createdMessageId = content.id
+
+        const userStreams = await this.readCharacter(this.userAddress, Schemas.userstreams)
+        const authorInbox = (await this.readCharacter(author, Schemas.userstreams))?.payload.body.notificationStream
+        const targetStream = [authorInbox, userStreams?.payload.body.associationStream].filter((e) => e) as string[]
+
+        await this.createAssociation<ReRouteAssociation>(
+            Schemas.reRouteAssociation,
+            { messageId: createdMessageId, messageAuthor: this.userAddress },
+            id,
+            author,
+            'messages',
+            targetStream
+        )
     }
 
     constructJWT(claim: Record<string, string>): string {

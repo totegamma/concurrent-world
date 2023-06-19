@@ -189,6 +189,17 @@ function App(): JSX.Element {
                                     return
                                 }
 
+                                if (a.schema === Schemas.reRouteAssociation) {
+                                    api?.readCharacter(a.author, Schemas.profile).then(
+                                        (c: Character<Profile> | undefined) => {
+                                            enqueueSnackbar(
+                                                `${c?.payload.body.username ?? 'anonymous'} rerouted to your message.`
+                                            )
+                                        }
+                                    )
+                                    return
+                                }
+
                                 if (a.schema === Schemas.like) {
                                     api.fetchMessage(a.targetID).then((m) => {
                                         m &&

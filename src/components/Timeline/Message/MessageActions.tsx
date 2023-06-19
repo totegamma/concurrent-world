@@ -4,6 +4,7 @@ import { CCAvatar } from '../../CCAvatar'
 import StarIcon from '@mui/icons-material/Star'
 import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
+import RepeatIcon from '@mui/icons-material/Repeat'
 import React from 'react'
 import type { Stream, Message as CCMessage, ProfileWithAddress } from '../../../model'
 import type ConcurrentApiClient from '../../../apiservice'
@@ -11,6 +12,7 @@ import { Schemas } from '../../../schemas'
 import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
 export interface MessageActionsProps {
     handleReply: () => Promise<void>
+    handleReRoute: () => Promise<void>
     reactUsers: ProfileWithAddress[]
     theme: Theme
     hasOwnReaction: boolean
@@ -43,6 +45,17 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     }}
                 >
                     <ReplyIcon />
+                </IconButton>
+                <IconButton
+                    sx={{
+                        p: '0',
+                        color: props.theme.palette.text.secondary
+                    }}
+                    onClick={() => {
+                        props.handleReRoute()
+                    }}
+                >
+                    <RepeatIcon />
                 </IconButton>
                 <Tooltip
                     title={
