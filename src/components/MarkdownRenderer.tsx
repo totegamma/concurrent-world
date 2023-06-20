@@ -85,7 +85,7 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                             )
                         } else {
                             return (
-                                <Link href={href} target="_blank" color="secondary">
+                                <Link href={href} target="_blank" color="secondary" underline="hover">
                                     {children}
                                 </Link>
                             )

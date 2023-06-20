@@ -33,6 +33,7 @@
         "ethers": "^6.3.0",
         "json-schema-to-typescript": "^13.0.1",
         "notistack": "^3.0.1",
+        "pnpm": "^8.6.3",
         "react": "^18.2.0",
         "react-dnd": "^16.0.1",
         "react-dom": "^18.2.0",

@@ -9,7 +9,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 main: '#7e7e7e'
             },
             secondary: {
-                main: '#414141'
+                main: '#737373'
             },
             background: {
                 default: '#9e9e9e',
@@ -23,7 +23,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 main: '#E0576F'
             },
             secondary: {
-                main: '#3d111a'
+                main: '#81225b'
             },
             background: {
                 default: '#C74E64',
@@ -37,7 +37,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 main: '#0476d9'
             },
             secondary: {
-                main: '#00294d'
+                main: '#1e6476'
             },
             background: {
                 default: '#023059',
@@ -51,7 +51,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 main: '#c52b26'
             },
             secondary: {
-                main: '#430705'
+                main: '#663916'
             },
             background: {
                 default: '#e07d43',
@@ -133,7 +133,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 main: '#c52b26'
             },
             secondary: {
-                main: '#c52b26'
+                main: '#90591e'
             },
             background: {
                 default: '#e07d43',
@@ -148,7 +148,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 main: '#FFF'
             },
             secondary: {
-                main: '#002647'
+                main: '#156a84'
             },
             background: {
                 default: '#0476D9',
@@ -162,10 +162,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         palette: {
             primary: {
                 main: '#0469c1',
-                contrastText: '#81e4ff'
+                contrastText: '#cffffe'
             },
             secondary: {
-                main: '#002d54'
+                main: '#154f90'
             },
             background: {
                 default: '#ffd54c',
@@ -186,7 +186,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 main: '#663741'
             },
             secondary: {
-                main: '#663741'
+                main: '#663e37'
             },
             background: {
                 default: '#a99996',
@@ -201,7 +201,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 main: '#70868b'
             },
             secondary: {
-                main: '#343b3d'
+                main: '#4d6662'
             },
             background: {
                 default: '#839fa1',
@@ -222,7 +222,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 main: '#939195'
             },
             secondary: {
-                main: '#333334'
+                main: '#4b4b56'
             },
             background: {
                 default: '#6d6d70',
@@ -254,7 +254,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 contrastText: '#ffeba8'
             },
             secondary: {
-                main: '#423131'
+                main: '#5f4d3c'
             },
             background: {
                 default: '#e3dccc',
@@ -276,7 +276,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 contrastText: '#fffefa'
             },
             secondary: {
-                main: '#2b2722'
+                main: '#4a5a54'
             },
             background: {
                 default: '#188aa3',
@@ -297,7 +297,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 main: '#116691'
             },
             secondary: {
-                main: '#d5f1ff'
+                main: '#b3f6ff'
             },
             background: {
                 default: '#211a3d',
@@ -332,7 +332,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 contrastText: '#ffffff'
             },
             secondary: {
-                main: '#eeeeee'
+                main: '#d7d7d7'
             },
             background: {
                 default: '#333333',
@@ -367,11 +367,11 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 contrastText: '#fff2c3'
             },
             secondary: {
-                main: '#ffd8d8'
+                main: '#9b7298'
             },
             background: {
-                default: '#17161e',
-                paper: '#1f181c',
+                default: '#18171d',
+                paper: '#242023',
                 contrastText: '#f1f1ca'
             },
             text: {
