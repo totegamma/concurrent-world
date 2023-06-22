@@ -56,7 +56,6 @@ export const ReRouteMessageFrame = memo<ReRouteMessageFrameProp>((props: ReRoute
     useEffect(() => {
         setMessage(props.message)
 
-        console.log(props.message)
         api.readCharacter(props.message.author, Schemas.profile).then((e) => {
             setAuthor(e)
         })
@@ -65,7 +64,6 @@ export const ReRouteMessageFrame = memo<ReRouteMessageFrameProp>((props: ReRoute
             props.message.payload.body.rerouteMessageId,
             props.message.payload.body.rerouteMessageAuthor
         ).then((e) => {
-            console.log(e)
             setReRouteMessage(e)
         })
 

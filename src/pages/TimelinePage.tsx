@@ -33,41 +33,45 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
 
     const [defaultPostHome] = usePersistent<string[]>('defaultPostHome', [])
     const [defaultPostNonHome] = usePersistent<string[]>('defaultPostNonHome', [])
-    const queriedStreams = reactlocation.hash.replace('#', '').split(',')
+    const queriedStreams = reactlocation.hash
+        .replace('#', '')
+        .split(',')
+        .filter((e) => e !== '')
     const streamPickerInitial = [
         ...new Set([
             ...(reactlocation.hash && reactlocation.hash !== '' ? defaultPostNonHome : defaultPostHome),
             ...queriedStreams
         ])
-    ].filter((e) => e !== '')
+    ]
 
     useEffect(() => {
-        let mymode = followService.bookmarkingStreams.includes(queriedStreams[0]) ? 'compose' : 'info'
-        if (queriedStreams.length !== 1) mymode = 'compose'
-        if (!reactlocation.hash) mymode = 'home'
-        setMode(mymode)
+        let mode = 'compose'
+        if (queriedStreams.length === 0) {
+            // at home
+            mode = 'home'
+        } else {
+            // at non-home
+            mode = followService.bookmarkingStreams.includes(queriedStreams[0]) ? 'compose' : 'info'
+            ;(async () => {
+                // check writeable
+                const writeable = await Promise.all(
+                    queriedStreams.map(async (e) => {
+                        const stream = await api.readStream(e)
+                        if (!stream) return false
+                        if (stream.author === api.userAddress) return true
+                        if (stream.writer.length === 0) return true
+                        return stream.writer.includes(api.userAddress)
+                    })
+                )
+                const result = writeable.every((e) => e)
+                setWriteable(result)
+                setMode(result ? mode : 'info')
+            })()
+        }
+        setMode(mode)
 
         scrollParentRef.current?.scroll({ top: 0 })
     }, [reactlocation.hash])
-
-    useEffect(() => {
-        // check if the all of streams are writable
-        if (!reactlocation.hash) return
-        ;(async () => {
-            const writeable = await Promise.all(
-                appData.displayingStream.map(async (e) => {
-                    const stream = await api.readStream(e)
-                    if (!stream) return false
-                    if (stream.author === api.userAddress) return true
-                    if (stream.writer.length === 0) return true
-                    return stream.writer.includes(api.userAddress)
-                })
-            )
-            const result = writeable.every((e) => e)
-            setWriteable(result)
-            setMode(result ? mode : 'info')
-        })()
-    }, [appData.displayingStream, api.userAddress])
 
     return (
         <Box
