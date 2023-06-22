@@ -1,7 +1,7 @@
 import { memo, useContext, useEffect, useRef, useState } from 'react'
 import { Box, Collapse, Divider } from '@mui/material'
 import type { StreamElementDated } from '../model'
-import { type IuseObjectList } from '../hooks/useObjectList'
+import type { IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'
 import { useLocation } from 'react-router-dom'
 import { TimelineHeader } from '../components/TimelineHeader'
@@ -11,6 +11,8 @@ import { Timeline } from '../components/Timeline/main'
 import { StreamInfo } from '../components/StreamInfo'
 import { HomeSettings } from '../components/HomeSettings'
 import { ApplicationContext } from '../App'
+import { type SimpleNote } from '../schemas/simpleNote'
+import { Schemas } from '../schemas'
 
 export interface TimelinePageProps {
     messages: IuseObjectList<StreamElementDated>
@@ -101,8 +103,18 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                         <Box sx={{ padding: { xs: '8px', sm: '8px 16px' } }}>
                             <Draft
                                 streamPickerInitial={appData.displayingStream}
-                                onSubmit={async (text: string) => {
-                                    return true
+                                onSubmit={async (text: string, destinations: string[]) => {
+                                    const body = {
+                                        body: text
+                                    }
+                                    return await api
+                                        .createMessage<SimpleNote>(Schemas.simpleNote, body, destinations)
+                                        .then((_) => {
+                                            return null
+                                        })
+                                        .catch((e) => {
+                                            return e
+                                        })
                                 }}
                             />
                         </Box>

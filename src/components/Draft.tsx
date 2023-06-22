@@ -36,7 +36,7 @@ interface CustomEmoji {
 
 export interface DraftProps {
     streamPickerInitial: string[]
-    onSubmit: (_: string) => Promise<boolean>
+    onSubmit: (text: string, destinations: string[]) => Promise<Error>
 }
 
 export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
@@ -82,13 +82,16 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             enqueueSnackbar('Message must not be empty!', { variant: 'error' })
             return
         }
+        const dest = [
+            ...new Set([...destStreams, ...(postHome ? [appData.userstreams?.payload.body.homeStream] : [])])
+        ].filter((e) => e) as string[]
         setSending(true)
-        props.onSubmit(draft).then((success) => {
-            if (success) {
-                setDraft('')
+        props.onSubmit(draft, dest).then((error) => {
+            if (error) {
+                enqueueSnackbar(`Failed to post message: ${error.message}`, { variant: 'error' })
                 setSending(false)
             } else {
-                enqueueSnackbar('Failed to post message!', { variant: 'error' })
+                setDraft('')
                 setSending(false)
             }
         })
