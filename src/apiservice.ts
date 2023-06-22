@@ -51,7 +51,7 @@ export default class ConcurrentApiClient extends ApiService {
         const requestJwt = this.constructJWT({})
         const requestOptions = {
             method: 'GET',
-            headers: { authentication: requestJwt }
+            headers: { authorization: requestJwt }
         }
         return await fetchWithTimeout(`https://${this.host.fqdn}${apiPath}/auth/claim`, requestOptions)
             .then(async (res) => await res.json())
@@ -90,7 +90,7 @@ export default class ConcurrentApiClient extends ApiService {
             ...init,
             headers: {
                 ...init.headers,
-                authentication: 'Bearer ' + jwt
+                authorization: 'Bearer ' + jwt
             }
         }
         return await fetchWithTimeout(url, requestInit, timeoutMs)
