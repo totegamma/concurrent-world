@@ -7,8 +7,6 @@ import { Timeline } from '../components/Timeline'
 
 export interface AssociationsProps {
     messages: IuseObjectList<StreamElementDated>
-    currentStreams: string[]
-    setCurrentStreams: (input: string[]) => void
 }
 
 export function Associations(props: AssociationsProps): JSX.Element {
@@ -16,9 +14,6 @@ export function Associations(props: AssociationsProps): JSX.Element {
     const scrollParentRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        const myassociations = appData.userstreams?.payload.body.associationStream
-        if (!myassociations) return
-        props.setCurrentStreams([myassociations])
         scrollParentRef.current?.scroll({ top: 0 })
     }, [appData.userstreams])
 
@@ -51,7 +46,7 @@ export function Associations(props: AssociationsProps): JSX.Element {
             >
                 <Box sx={{ display: 'flex', flex: 1, padding: { xs: '8px', sm: '8px 16px' } }}>
                     <Timeline
-                        streams={props.currentStreams}
+                        streams={appData.displayingStream}
                         timeline={props.messages}
                         scrollParentRef={scrollParentRef}
                     />
