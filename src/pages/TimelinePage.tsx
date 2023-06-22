@@ -11,8 +11,9 @@ import { Timeline } from '../components/Timeline/main'
 import { StreamInfo } from '../components/StreamInfo'
 import { HomeSettings } from '../components/HomeSettings'
 import { ApplicationContext } from '../App'
-import { type SimpleNote } from '../schemas/simpleNote'
+import type { SimpleNote } from '../schemas/simpleNote'
 import { Schemas } from '../schemas'
+import { usePersistent } from '../hooks/usePersistent'
 
 export interface TimelinePageProps {
     messages: IuseObjectList<StreamElementDated>
@@ -30,7 +31,15 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
     const [mode, setMode] = useState<string>('compose')
     const [writeable, setWriteable] = useState<boolean>(true)
 
+    const [defaultPostHome] = usePersistent<string[]>('defaultPostHome', [])
+    const [defaultPostNonHome] = usePersistent<string[]>('defaultPostNonHome', [])
     const queriedStreams = reactlocation.hash.replace('#', '').split(',')
+    const streamPickerInitial = [
+        ...new Set([
+            ...(reactlocation.hash && reactlocation.hash !== '' ? defaultPostNonHome : defaultPostHome),
+            ...queriedStreams
+        ])
+    ].filter((e) => e !== '')
 
     useEffect(() => {
         let mymode = followService.bookmarkingStreams.includes(queriedStreams[0]) ? 'compose' : 'info'
@@ -102,7 +111,7 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                     <Collapse in={mode === 'compose' || mode === 'home'}>
                         <Box sx={{ padding: { xs: '8px', sm: '8px 16px' } }}>
                             <Draft
-                                streamPickerInitial={appData.displayingStream}
+                                streamPickerInitial={streamPickerInitial}
                                 onSubmit={async (text: string, destinations: string[]) => {
                                     const body = {
                                         body: text
