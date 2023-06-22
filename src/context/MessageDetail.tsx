@@ -1,19 +1,18 @@
-import { Box, Paper, useTheme, Modal, TextField, Button, Divider } from '@mui/material'
+import { Box, Paper, Modal, Divider, Typography } from '@mui/material'
 
-import { createContext, type Dispatch, type SetStateAction, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
 import type { CCID, Message } from '../model'
 import { Schemas } from '../schemas'
 import { MessageFrame } from '../components/Timeline'
-import { type ReplyMessage } from '../schemas/replyMessage'
-import { type ReplyAssociation } from '../schemas/replyAssociation'
+import type { ReplyMessage } from '../schemas/replyMessage'
+import type { ReplyAssociation } from '../schemas/replyAssociation'
 import { ApplicationContext } from '../App'
 import { Draft } from '../components/Draft'
 
 export interface MessageDetailState {
     showingMessage: { messageId: string; author: CCID } | null
-    showMessage: Dispatch<SetStateAction<{ messageId: string; author: CCID } | null>>
-    reRouteMessage: (messageId: string, author: CCID) => void
+    openAction: (mode: 'reply' | 'reroute', messageId: string, author: CCID) => void
 }
 
 const MessageDetailContext = createContext<MessageDetailState | undefined>(undefined)
@@ -37,6 +36,12 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
     const [showingMessage, showMessage] = useState<{ messageId: string; author: CCID } | null>(null)
     const [message, setMessage] = useState<Message<any> | undefined>()
     const [messageStreamWithoutHome, setMessageStreamWithoutHome] = useState<string[]>([])
+    const [mode, setMode] = useState<'reply' | 'reroute' | 'none'>('none')
+
+    const openAction = useCallback((mode: 'reply' | 'reroute', messageId: string, author: CCID) => {
+        setMode(mode)
+        showMessage({ messageId, author })
+    }, [])
 
     useEffect(() => {
         console.log('MessageDetailProvider useEffect', showingMessage)
@@ -52,16 +57,6 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
             })
         })
     }, [showingMessage])
-
-    const reRouteMessage = async (messageId: string, author: CCID): Promise<void> => {
-        console.log('reRouteMessage', messageId, author)
-        const message = await api.fetchMessageWithAuthor(messageId, author)
-
-        await api.reRouteMessage(messageId, author, [
-            ...(message?.streams || []),
-            appData.userstreams?.payload.body.homeStream || ''
-        ])
-    }
 
     const sendReply = async (replyText: string, messageStream: string[]): Promise<void> => {
         const data = await api?.createMessage<ReplyMessage>(
@@ -104,8 +99,7 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
             value={useMemo(() => {
                 return {
                     showingMessage,
-                    showMessage,
-                    reRouteMessage
+                    openAction
                 }
             }, [])}
         >
@@ -113,20 +107,26 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
 
             {message && (
                 <Modal
-                    open={!!showingMessage?.messageId}
+                    open={mode !== 'none'}
                     onClose={() => {
                         showMessage(null)
+                        setMode('none')
                     }}
                 >
                     <Paper sx={style}>
-                        <MessageFrame message={message} lastUpdated={0}></MessageFrame>
+                        <Typography variant="h3">{mode === 'reply' ? 'Reply' : 'Reroute'}</Typography>
+                        <MessageFrame thin message={message} lastUpdated={0}></MessageFrame>
                         <Divider />
                         <Box sx={{ display: 'flex' }}>
                             <Draft
-                                submitButtonLabel="Reply"
+                                allowEmpty={mode === 'reroute'}
+                                submitButtonLabel={mode === 'reply' ? 'Reply' : 'Reroute'}
                                 streamPickerInitial={messageStreamWithoutHome}
                                 onSubmit={async (text, streams): Promise<Error | null> => {
-                                    handleReply(text, streams)
+                                    if (mode === 'reroute')
+                                        await api.reRouteMessage(message.id, message.author, streams, text)
+                                    else await handleReply(text, streams)
+                                    setMode('none')
                                     return null
                                 }}
                             />

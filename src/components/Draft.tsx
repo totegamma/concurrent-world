@@ -38,6 +38,7 @@ export interface DraftProps {
     submitButtonLabel?: string
     streamPickerInitial: string[]
     onSubmit: (text: string, destinations: string[]) => Promise<Error | null>
+    allowEmpty?: boolean
 }
 
 export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
@@ -79,7 +80,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     }, [appData.emojiDict])
 
     const post = (): void => {
-        if (draft.length === 0 || draft.trim().length === 0) {
+        if (!props.allowEmpty && (draft.length === 0 || draft.trim().length === 0)) {
             enqueueSnackbar('Message must not be empty!', { variant: 'error' })
             return
         }

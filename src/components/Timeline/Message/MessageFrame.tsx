@@ -1,28 +1,11 @@
 import { useState, useEffect, useCallback, memo, useContext } from 'react'
-import {
-    ListItem,
-    Box,
-    Typography,
-    Link,
-    IconButton,
-    useTheme,
-    Tooltip,
-    Skeleton,
-    Menu,
-    MenuItem,
-    ListItemText,
-    ListItemIcon
-} from '@mui/material'
+import { ListItem, Box, Typography, useTheme, Skeleton } from '@mui/material'
 
-import type { Character, Message as CCMessage, ProfileWithAddress, StreamElement, Stream, CCID } from '../../../model'
+import type { Character, Message as CCMessage, ProfileWithAddress, Stream, CCID } from '../../../model'
 import type { Profile } from '../../../schemas/profile'
 import { Schemas } from '../../../schemas'
-import type { Like } from '../../../schemas/like'
 import { useApi } from '../../../context/api'
 import { useInspector } from '../../../context/Inspector'
-import { ApplicationContext } from '../../../App'
-import type { ReplyMessage } from '../../../schemas/replyMessage'
-import type { ReplyAssociation } from '../../../schemas/replyAssociation'
 import { MessageView } from './MessageView'
 import { ThinMessageView } from './ThinMessageView'
 import { useMessageDetail } from '../../../context/MessageDetail'
@@ -36,7 +19,6 @@ export interface MessageFrameProp {
 export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JSX.Element => {
     const api = useApi()
     const inspector = useInspector()
-    const appContext = useContext(ApplicationContext)
     const messageDetail = useMessageDetail()
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [message, setMessage] = useState<CCMessage<any> | undefined>()
@@ -174,10 +156,10 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                         inspector.inspectItem({ messageId: message.id, author: message.author })
                     }}
                     handleReply={async () => {
-                        messageDetail.showMessage({ messageId: message?.id || '', author: message?.author || '' })
+                        messageDetail.openAction('reply', message?.id || '', message?.author || '')
                     }}
                     handleReRoute={async () => {
-                        messageDetail.reRouteMessage(message.id, message?.author)
+                        messageDetail.openAction('reroute', message.id, message?.author)
                     }}
                     unfavorite={() => {
                         unfavorite(message.associations.find((e) => e.author === api.userAddress)?.id, message.author)
