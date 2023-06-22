@@ -3,7 +3,6 @@ import { InputBase, Box, Button, useTheme, IconButton, Divider, CircularProgress
 import { ApplicationContext } from '../App'
 import SendIcon from '@mui/icons-material/Send'
 import HomeIcon from '@mui/icons-material/Home'
-import { Schemas } from '../schemas'
 import Picker from '@emoji-mart/react'
 import data from '@emoji-mart/data'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
@@ -11,54 +10,48 @@ import Splitscreen from '@mui/icons-material/Splitscreen'
 import ImageIcon from '@mui/icons-material/Image'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import { StreamPicker } from './StreamPicker'
-import { useLocation } from 'react-router-dom'
-import { usePersistent } from '../hooks/usePersistent'
-import type { SimpleNote } from '../schemas/simpleNote'
-import { useApi } from '../context/api'
 import { useSnackbar } from 'notistack'
 
-export interface EmojiProps {
+interface EmojiProps {
     shortcodes: string
 }
 
-export interface DraftProps {
-    currentStreams: string[]
-}
-
-export interface Skin {
+interface Skin {
     src: string
 }
 
-export interface Emoji {
+interface Emoji {
     id: string
     name: string
     keywords: string[]
     skins: Skin[]
 }
 
-export interface CustomEmoji {
+interface CustomEmoji {
     id?: string
     name?: string
     emojis?: Emoji[]
     keywords?: string[] | undefined
 }
 
+export interface DraftProps {
+    submitButtonLabel?: string
+    streamPickerInitial: string[]
+    onSubmit: (text: string, destinations: string[]) => Promise<Error | null>
+    allowEmpty?: boolean
+}
+
 export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const appData = useContext(ApplicationContext)
-    const api = useApi()
     const theme = useTheme()
 
     const [draft, setDraft] = useState<string>('')
+    const [destStreams, setDestStreams] = useState<string[]>(props.streamPickerInitial)
     const [selectEmoji, setSelectEmoji] = useState<boolean>(false)
     const [customEmoji, setCustomEmoji] = useState<CustomEmoji[]>([])
     const [openPreview, setOpenPreview] = useState<boolean>(false)
-    const [messageDestStreams, setMessageDestStreams] = useState<string[]>([])
 
-    const reactlocation = useLocation()
     const inputRef = useRef<HTMLInputElement>(null)
-
-    const [defaultPostHome] = usePersistent<string[]>('defaultPostHome', [])
-    const [defaultPostNonHome] = usePersistent<string[]>('defaultPostNonHome', [])
 
     const [postHome, setPostHome] = useState<boolean>(true)
     const [sending, setSending] = useState<boolean>(false)
@@ -66,10 +59,8 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const { enqueueSnackbar } = useSnackbar()
 
     useEffect(() => {
-        setMessageDestStreams([
-            ...new Set([...(reactlocation.hash ? defaultPostNonHome : defaultPostHome), ...props.currentStreams])
-        ])
-    }, [reactlocation.hash])
+        setDestStreams(props.streamPickerInitial)
+    }, [props.streamPickerInitial])
 
     useEffect(() => {
         const emojis: CustomEmoji[] = [
@@ -89,31 +80,23 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     }, [appData.emojiDict])
 
     const post = (): void => {
-        if (draft.length === 0 || draft.trim().length === 0) {
+        if (!props.allowEmpty && (draft.length === 0 || draft.trim().length === 0)) {
             enqueueSnackbar('Message must not be empty!', { variant: 'error' })
             return
         }
-        setSending(true)
-        const streams = [
-            ...new Set([
-                ...props.currentStreams,
-                ...messageDestStreams,
-                ...(postHome ? [appData.userstreams?.payload.body.homeStream] : [])
-            ])
+        const dest = [
+            ...new Set([...destStreams, ...(postHome ? [appData.userstreams?.payload.body.homeStream] : [])])
         ].filter((e) => e) as string[]
-        const body = {
-            body: draft
-        }
-
-        api.createMessage<SimpleNote>(Schemas.simpleNote, body, streams)
-            .then((_) => {
+        setSending(true)
+        props.onSubmit(draft, dest).then((error) => {
+            if (error) {
+                enqueueSnackbar(`Failed to post message: ${error.message}`, { variant: 'error' })
+                setSending(false)
+            } else {
                 setDraft('')
                 setSending(false)
-            })
-            .catch((e: Error) => {
-                console.log(e.name)
-                enqueueSnackbar(e.message, { variant: 'error' })
-            })
+            }
+        })
     }
 
     const uploadToImgur = async (base64Data: string): Promise<string> => {
@@ -198,7 +181,8 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'stretch',
-                borderColor: 'text.disabled'
+                borderColor: 'text.disabled',
+                width: '100%'
             }}
         >
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -209,7 +193,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         flex: 1
                     }}
                 >
-                    <StreamPicker selected={messageDestStreams} setSelected={setMessageDestStreams} />
+                    <StreamPicker selected={destStreams} setSelected={setDestStreams} />
                 </Box>
                 <IconButton
                     onClick={() => {
@@ -350,7 +334,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         }}
                         endIcon={<SendIcon />}
                     >
-                        Send
+                        {props.submitButtonLabel ?? 'SEND'}
                     </Button>
                     {sending && (
                         <CircularProgress

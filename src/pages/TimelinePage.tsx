@@ -1,7 +1,7 @@
-import React, { memo, useEffect, useRef, useState } from 'react'
-import { Box, Collapse, Divider, Modal, Typography, useTheme } from '@mui/material'
+import { memo, useContext, useEffect, useRef, useState } from 'react'
+import { Box, Collapse, Divider } from '@mui/material'
 import type { StreamElementDated } from '../model'
-import { type IuseObjectList } from '../hooks/useObjectList'
+import type { IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'
 import { useLocation } from 'react-router-dom'
 import { TimelineHeader } from '../components/TimelineHeader'
@@ -10,16 +10,18 @@ import { useFollow } from '../context/FollowContext'
 import { Timeline } from '../components/Timeline/main'
 import { StreamInfo } from '../components/StreamInfo'
 import { HomeSettings } from '../components/HomeSettings'
+import { ApplicationContext } from '../App'
+import { type SimpleNote } from '../schemas/simpleNote'
+import { Schemas } from '../schemas'
 
 export interface TimelinePageProps {
     messages: IuseObjectList<StreamElementDated>
-    currentStreams: string[]
-    setCurrentStreams: (input: string[]) => void
     setMobileMenuOpen: (state: boolean) => void
 }
 
 export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): JSX.Element => {
     const api = useApi()
+    const appData = useContext(ApplicationContext)
     const followService = useFollow()
 
     const reactlocation = useLocation()
@@ -28,22 +30,9 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
     const [mode, setMode] = useState<string>('compose')
     const [writeable, setWriteable] = useState<boolean>(true)
 
-    const isHome = !reactlocation.hash
     const queriedStreams = reactlocation.hash.replace('#', '').split(',')
 
     useEffect(() => {
-        ;(async () => {
-            if (isHome) {
-                props.setCurrentStreams(
-                    [
-                        ...followService.followingStreams,
-                        ...(await api.getUserHomeStreams(followService.followingUsers))
-                    ].filter((e) => e)
-                )
-            } else {
-                props.setCurrentStreams(queriedStreams)
-            }
-        })()
         let mymode = followService.bookmarkingStreams.includes(queriedStreams[0]) ? 'compose' : 'info'
         if (queriedStreams.length !== 1) mymode = 'compose'
         if (!reactlocation.hash) mymode = 'home'
@@ -57,7 +46,7 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
         if (!reactlocation.hash) return
         ;(async () => {
             const writeable = await Promise.all(
-                props.currentStreams.map(async (e) => {
+                appData.displayingStream.map(async (e) => {
                     const stream = await api.readStream(e)
                     if (!stream) return false
                     if (stream.author === api.userAddress) return true
@@ -69,7 +58,7 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
             setWriteable(result)
             setMode(result ? mode : 'info')
         })()
-    }, [props.currentStreams])
+    }, [appData.displayingStream, api.userAddress])
 
     return (
         <Box
@@ -112,7 +101,22 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                     </Collapse>
                     <Collapse in={mode === 'compose' || mode === 'home'}>
                         <Box sx={{ padding: { xs: '8px', sm: '8px 16px' } }}>
-                            <Draft currentStreams={isHome ? [] : queriedStreams} />
+                            <Draft
+                                streamPickerInitial={appData.displayingStream}
+                                onSubmit={async (text: string, destinations: string[]) => {
+                                    const body = {
+                                        body: text
+                                    }
+                                    return await api
+                                        .createMessage<SimpleNote>(Schemas.simpleNote, body, destinations)
+                                        .then((_) => {
+                                            return null
+                                        })
+                                        .catch((e) => {
+                                            return e
+                                        })
+                                }}
+                            />
                         </Box>
                     </Collapse>
                     <Divider />
@@ -124,7 +128,7 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                 ) : (
                     <Box sx={{ display: 'flex', flex: 1, padding: { xs: '8px', sm: '8px 16px' } }}>
                         <Timeline
-                            streams={props.currentStreams}
+                            streams={appData.displayingStream}
                             timeline={props.messages}
                             scrollParentRef={scrollParentRef}
                         />

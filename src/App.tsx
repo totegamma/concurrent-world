@@ -1,6 +1,6 @@
 import { useEffect, useState, createContext, useRef, useMemo } from 'react'
-import { DndProvider, getBackendOptions, MultiBackend, Tree } from '@minoru/react-dnd-treeview'
-import { Routes, Route } from 'react-router-dom'
+import { DndProvider, getBackendOptions, MultiBackend } from '@minoru/react-dnd-treeview'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider, SwipeableDrawer } from '@mui/material'
 import useWebSocket, { type ReadyState } from 'react-use-websocket'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
@@ -44,7 +44,8 @@ export const ApplicationContext = createContext<appData>({
     imgurSettings: {
         clientId: ''
     },
-    setImgurSettings: (_: ImgurSettings) => {}
+    setImgurSettings: (_: ImgurSettings) => {},
+    displayingStream: []
 })
 
 export interface appData {
@@ -54,6 +55,7 @@ export interface appData {
     websocketState: ReadyState
     imgurSettings: ImgurSettings
     setImgurSettings: (settings: ImgurSettings) => void
+    displayingStream: string[]
 }
 
 export const ClockContext = createContext<Date>(new Date())
@@ -75,7 +77,43 @@ function App(): JSX.Element {
     })
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
     const messages = useObjectList<StreamElementDated>()
-    const [currentStreams, setCurrentStreams] = useState<string[]>([])
+    const [userstreams, setUserstreams] = useState<Character<Userstreams>>()
+
+    const [followingUserStreams, setFollowingUserStreams] = useState<string[]>([])
+    useEffect(() => {
+        const followingUsers = JSON.parse(localStorage.getItem('followingUsers') ?? '[]')
+        api?.getUserHomeStreams(followingUsers).then((streams) => {
+            setFollowingUserStreams(streams)
+        })
+    }, [api])
+
+    const path = useLocation()
+    const displayingStream: string[] = useMemo(() => {
+        switch (path.pathname) {
+            case '/': {
+                const query = path.hash.replace('#', '').split(',')
+                if (query.length === 0 || query[0] === '') {
+                    // is Home
+                    const followingStreams = JSON.parse(localStorage.getItem('followingStreams') ?? '[]')
+                    return [...followingStreams, ...followingUserStreams].filter((e) => e)
+                }
+                return query
+            }
+            case '/notifications': {
+                const notifications = userstreams?.payload.body.notificationStream
+                if (!notifications) return []
+                return [notifications]
+            }
+            case '/associations': {
+                const associations = userstreams?.payload.body.associationStream
+                if (!associations) return []
+                return [associations]
+            }
+            default: {
+                return []
+            }
+        }
+    }, [path, userstreams, followingUserStreams])
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
 
@@ -83,7 +121,7 @@ function App(): JSX.Element {
         shouldReconnect: (_) => true,
         reconnectInterval: (attempt) => Math.min(Math.pow(2, attempt) * 1000, 10000),
         onOpen: (_) => {
-            sendJsonMessage({ channels: currentStreams })
+            sendJsonMessage({ channels: displayingStream })
         }
     })
 
@@ -92,7 +130,6 @@ function App(): JSX.Element {
     const playBubbleRef = useRef(playBubble)
     const playNotificationRef = useRef(playNotification)
     const [profile, setProfile] = useState<Character<Profile>>()
-    const [userstreams, setUserstreams] = useState<Character<Userstreams>>()
     useEffect(() => {
         playBubbleRef.current = playBubble
         playNotificationRef.current = playNotification
@@ -130,11 +167,11 @@ function App(): JSX.Element {
     useEffect(() => {
         sendJsonMessage({
             channels: [
-                ...currentStreams,
+                ...displayingStream,
                 ...(userstreams?.payload.body.notificationStream ? [userstreams.payload.body.notificationStream] : [])
             ]
         })
-    }, [currentStreams, userstreams])
+    }, [displayingStream, userstreams])
 
     useEffect(() => {
         if (!lastMessage) return
@@ -261,9 +298,10 @@ function App(): JSX.Element {
             userstreams,
             websocketState: readyState,
             imgurSettings,
-            setImgurSettings
+            setImgurSettings,
+            displayingStream
         }
-    }, [emojiDict, profile, userstreams, readyState, imgurSettings, setImgurSettings])
+    }, [emojiDict, profile, userstreams, readyState, imgurSettings, setImgurSettings, displayingStream])
 
     if (!api) {
         return <>building api service...</>
@@ -352,36 +390,11 @@ function App(): JSX.Element {
                             <Routes>
                                 <Route
                                     index
-                                    element={
-                                        <TimelinePage
-                                            messages={messages}
-                                            currentStreams={currentStreams}
-                                            setCurrentStreams={setCurrentStreams}
-                                            setMobileMenuOpen={setMobileMenuOpen}
-                                        />
-                                    }
+                                    element={<TimelinePage messages={messages} setMobileMenuOpen={setMobileMenuOpen} />}
                                 />
-                                <Route
-                                    path="/associations"
-                                    element={
-                                        <Associations
-                                            messages={messages}
-                                            currentStreams={currentStreams}
-                                            setCurrentStreams={setCurrentStreams}
-                                        />
-                                    }
-                                />
+                                <Route path="/associations" element={<Associations messages={messages} />} />
                                 <Route path="/explorer" element={<Explorer />} />
-                                <Route
-                                    path="/notifications"
-                                    element={
-                                        <Notifications
-                                            messages={messages}
-                                            currentStreams={currentStreams}
-                                            setCurrentStreams={setCurrentStreams}
-                                        />
-                                    }
-                                />
+                                <Route path="/notifications" element={<Notifications messages={messages} />} />
                                 <Route path="/identity" element={<Identity />} />
                                 <Route path="/settings" element={<Settings setThemeName={setThemeName} />} />
                                 <Route path="/message/:id" element={<MessagePage />} />

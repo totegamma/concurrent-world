@@ -237,13 +237,10 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                     inspector.inspectItem({ messageId: message.id, author: message.author })
                                 }}
                                 handleReply={async () => {
-                                    messageDetail.showMessage({
-                                        messageId: message?.id || '',
-                                        author: message?.author || ''
-                                    })
+                                    messageDetail.openAction('reply', message?.id || '', message?.author || '')
                                 }}
                                 handleReRoute={async () => {
-                                    messageDetail.reRouteMessage(message?.id || '', message?.author)
+                                    messageDetail.openAction('reroute', message?.id || '', message?.author)
                                 }}
                                 unfavorite={() => {
                                     unfavorite(
