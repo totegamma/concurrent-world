@@ -35,8 +35,9 @@ interface CustomEmoji {
 }
 
 export interface DraftProps {
+    submitButtonLabel?: string
     streamPickerInitial: string[]
-    onSubmit: (text: string, destinations: string[]) => Promise<Error>
+    onSubmit: (text: string, destinations: string[]) => Promise<Error | null>
 }
 
 export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
@@ -179,7 +180,8 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'stretch',
-                borderColor: 'text.disabled'
+                borderColor: 'text.disabled',
+                width: '100%'
             }}
         >
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -331,7 +333,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         }}
                         endIcon={<SendIcon />}
                     >
-                        Send
+                        {props.submitButtonLabel ?? 'SEND'}
                     </Button>
                     {sending && (
                         <CircularProgress

@@ -1,23 +1,14 @@
-import { Box, Paper, useTheme, Modal, TextField, Button } from '@mui/material'
+import { Box, Paper, useTheme, Modal, TextField, Button, Divider } from '@mui/material'
 
-import {
-    createContext,
-    type Dispatch,
-    type SetStateAction,
-    useContext,
-    useEffect,
-    useMemo,
-    useRef,
-    useState
-} from 'react'
+import { createContext, type Dispatch, type SetStateAction, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
 import type { CCID, Message } from '../model'
 import { Schemas } from '../schemas'
 import { MessageFrame } from '../components/Timeline'
-import SendIcon from '@mui/icons-material/Send'
 import { type ReplyMessage } from '../schemas/replyMessage'
 import { type ReplyAssociation } from '../schemas/replyAssociation'
 import { ApplicationContext } from '../App'
+import { Draft } from '../components/Draft'
 
 export interface MessageDetailState {
     showingMessage: { messageId: string; author: CCID } | null
@@ -42,11 +33,10 @@ const style = {
 
 export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element => {
     const api = useApi()
-    const theme = useTheme()
     const appData = useContext(ApplicationContext)
     const [showingMessage, showMessage] = useState<{ messageId: string; author: CCID } | null>(null)
     const [message, setMessage] = useState<Message<any> | undefined>()
-    const textFieldRef = useRef<HTMLInputElement>(null)
+    const [messageStreamWithoutHome, setMessageStreamWithoutHome] = useState<string[]>([])
 
     useEffect(() => {
         console.log('MessageDetailProvider useEffect', showingMessage)
@@ -54,6 +44,12 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
 
         api.fetchMessageWithAuthor(showingMessage.messageId, showingMessage.author).then((msg) => {
             setMessage(msg)
+            if (!msg) return
+            api.readCharacter(showingMessage.author, Schemas.userstreams).then((userstreams) => {
+                setMessageStreamWithoutHome(
+                    msg.streams.filter((e: string) => e !== userstreams?.payload.body.homeStream)
+                )
+            })
         })
     }, [showingMessage])
 
@@ -67,8 +63,7 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
         ])
     }
 
-    const sendReply = async (replyText: string): Promise<void> => {
-        console.log('messageId', message?.id)
+    const sendReply = async (replyText: string, messageStream: string[]): Promise<void> => {
         const data = await api?.createMessage<ReplyMessage>(
             Schemas.replyMessage,
             {
@@ -76,7 +71,7 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
                 replyToMessageAuthor: message?.author || '',
                 body: replyText
             },
-            message?.streams || []
+            messageStream
         )
 
         const authorInbox = (await api.readCharacter(message?.author || '', Schemas.userstreams))?.payload.body
@@ -97,11 +92,10 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
         )
     }
 
-    const handleReply = async (): Promise<void> => {
+    const handleReply = async (replyText: string, replyMessageStreams: string[]): Promise<void> => {
         if (!message) return
-        const replyText = textFieldRef.current?.value
         if (!replyText) return
-        await sendReply(replyText)
+        await sendReply(replyText, replyMessageStreams)
         showMessage(null)
     }
 
@@ -123,30 +117,19 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
                     onClose={() => {
                         showMessage(null)
                     }}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
                 >
                     <Paper sx={style}>
                         <MessageFrame message={message} lastUpdated={0}></MessageFrame>
+                        <Divider />
                         <Box sx={{ display: 'flex' }}>
-                            <TextField id="outlined-basic" inputRef={textFieldRef} label="返信" variant="outlined" />
-                            <Button
-                                color="primary"
-                                variant="contained"
-                                // disabled={sending}
-                                onClick={(_) => {
-                                    handleReply()
+                            <Draft
+                                submitButtonLabel="Reply"
+                                streamPickerInitial={messageStreamWithoutHome}
+                                onSubmit={async (text, streams): Promise<Error | null> => {
+                                    handleReply(text, streams)
+                                    return null
                                 }}
-                                sx={{
-                                    '&.Mui-disabled': {
-                                        background: theme.palette.divider,
-                                        color: theme.palette.text.disabled
-                                    }
-                                }}
-                                endIcon={<SendIcon />}
-                            >
-                                Send
-                            </Button>
+                            />
                         </Box>
                     </Paper>
                 </Modal>
