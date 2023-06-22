@@ -27,7 +27,7 @@ const style = {
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: '700px',
-    px: 2
+    p: 2
 }
 
 export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element => {
@@ -114,7 +114,6 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
                     }}
                 >
                     <Paper sx={style}>
-                        <Typography variant="h3">{mode === 'reply' ? 'Reply' : 'Reroute'}</Typography>
                         <MessageFrame thin message={message} lastUpdated={0}></MessageFrame>
                         <Divider />
                         <Box sx={{ display: 'flex' }}>
