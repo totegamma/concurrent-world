@@ -9,6 +9,7 @@ import { useInspector } from '../../../context/Inspector'
 import { MessageView } from './MessageView'
 import { MessageFrame } from './MessageFrame'
 import { useMessageDetail } from '../../../context/MessageDetail'
+import ReplyIcon from '@mui/icons-material/Reply'
 
 export interface MessageFrameProp {
     message: CCMessage<any>
@@ -124,15 +125,12 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
 
     return (
         <>
-            {replyMessage && <MessageFrame message={replyMessage} lastUpdated={1} thin={true}></MessageFrame>}
-            <Box
-                sx={{
-                    paddingLeft: 2
-                }}
-            >
-                <Typography variant="caption" color="text.disabled">
+            {replyMessage && <MessageFrame message={replyMessage} lastUpdated={1} oneline={true}></MessageFrame>}
+            <Box>
+                <Typography variant="caption" color="text.disabled" sx={{ alignItems: 'center' }}>
                     {' '}
-                    {author?.payload.body.username || 'Anonymous'} さんが返信{' '}
+                    <ReplyIcon sx={{ fontSize: '90%' }} />
+                    {author?.payload.body.username || 'Anonymous'} さんが返信しました{' '}
                 </Typography>
                 <MessageView
                     message={message}

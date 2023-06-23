@@ -15,6 +15,7 @@ import {
 } from '@mui/material'
 
 import type { Character, Message as CCMessage, ProfileWithAddress, StreamElement, Stream, CCID } from '../../../model'
+import RepeatIcon from '@mui/icons-material/Repeat'
 import type { Profile } from '../../../schemas/profile'
 import { Schemas } from '../../../schemas'
 import type { Like } from '../../../schemas/like'
@@ -81,9 +82,18 @@ export const ReRouteMessageFrame = memo<ReRouteMessageFrameProp>((props: ReRoute
 
     return (
         <>
-            <Typography>{author?.payload.body.username || 'Anonymous'} さんがReRouteしました</Typography>
+            <Typography
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontSize: '0.8rem'
+                }}
+            >
+                <RepeatIcon sx={{ fontSize: '90%' }} />
+                {author?.payload.body.username || 'Anonymous'} さんがReRouteしました
+            </Typography>
             {reRouteMessage && (
-                <Box sx={{ ml: 2 }}>
+                <Box>
                     <MessageFrame message={reRouteMessage} lastUpdated={0}></MessageFrame>
                 </Box>
             )}

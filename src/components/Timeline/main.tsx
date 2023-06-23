@@ -95,7 +95,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                                 {e.type !== 'message' && e.type !== 'association' && (
                                     <Typography>Unknown message type: {e.type}</Typography>
                                 )}
-                                <Divider variant="inset" component="li" sx={{ margin: '0 5px' }} />
+                                <Divider variant="inset" component="li" sx={{ margin: '8px 4px' }} />
                             </React.Fragment>
                         ))}
                     </InfiniteScroll>

@@ -9,5 +9,5 @@ export interface TimeDiffProps {
 
 export const TimeDiff = (props: TimeDiffProps): JSX.Element => {
     useContext(ClockContext)
-    return <Box>{humanReadableTimeDiff(props.date)}</Box>
+    return <Box sx={{ width: 'max-content' }}>{humanReadableTimeDiff(props.date)}</Box>
 }

@@ -38,7 +38,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
             sx={{
                 alignItems: 'flex-start',
                 flex: 1,
-                p: { xs: '7px 0', sm: '10px 0' },
+                p: { xs: '0', sm: '0' },
                 wordBreak: 'break-word'
             }}
         >

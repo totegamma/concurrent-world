@@ -8,12 +8,14 @@ import { useApi } from '../../../context/api'
 import { useInspector } from '../../../context/Inspector'
 import { MessageView } from './MessageView'
 import { ThinMessageView } from './ThinMessageView'
+import { OneLineMessageView } from './OneLineMessageView'
 import { useMessageDetail } from '../../../context/MessageDetail'
 
 export interface MessageFrameProp {
     message: CCMessage<any>
     lastUpdated: number
     thin?: boolean
+    oneline?: boolean
 }
 
 export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JSX.Element => {
@@ -127,6 +129,23 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
         <>
             {props.thin ? (
                 <ThinMessageView
+                    message={message}
+                    author={author}
+                    reactUsers={reactUsers}
+                    theme={theme}
+                    hasOwnReaction={hasOwnReaction}
+                    msgstreams={msgStreams}
+                    messageAnchor={messageAnchor}
+                    api={api}
+                    inspectHandler={() => {}}
+                    handleReply={async () => {}}
+                    unfavorite={() => {}}
+                    favorite={async () => {}}
+                    setMessageAnchor={setMessageAnchor}
+                    setFetchSucceed={setFetchSucceed}
+                />
+            ) : props.oneline ? (
+                <OneLineMessageView
                     message={message}
                     author={author}
                     reactUsers={reactUsers}
