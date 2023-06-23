@@ -122,7 +122,7 @@ export function StreamList(props: StreamListProps): JSX.Element {
             </Box>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
-                <div className={styles.tree}>
+                <div className={styles.tree} style={{ marginRight: 8 }}>
                     <Tree
                         tree={watchStreamTree}
                         rootId={0}

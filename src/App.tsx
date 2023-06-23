@@ -356,7 +356,8 @@ function App(): JSX.Element {
                                 xs: 'none',
                                 sm: 'block',
                                 width: '200px'
-                            }
+                            },
+                            padding: 1
                         }}
                     >
                         <Menu />

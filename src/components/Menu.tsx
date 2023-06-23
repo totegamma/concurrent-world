@@ -51,7 +51,18 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
     }
 
     return (
-        <Box sx={{ gap: '15px', height: '100%', overflowX: 'hidden' }}>
+        <Box
+            sx={{
+                gap: '15px',
+                height: '100%',
+                scrollbarGutter: 'stable',
+                overflowX: 'hidden',
+                overflowY: 'hidden',
+                '&:hover': {
+                    overflowY: 'scroll'
+                }
+            }}
+        >
             <Box
                 sx={{
                     display: 'flex',
