@@ -23,7 +23,6 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [message, setMessage] = useState<CCMessage<any> | undefined>()
     const [replyMessage, setReplyMessage] = useState<CCMessage<any> | undefined>()
-    const [replyAuthor, setReplyAuthor] = useState<Character<Profile> | undefined>()
     const [msgStreams, setStreams] = useState<Array<Stream<any>>>([])
     const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
     const [messageAnchor, setMessageAnchor] = useState<null | HTMLElement>(null)
@@ -52,10 +51,6 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
             props.message.payload.body.replyToMessageAuthor
         ).then((msg) => {
             setReplyMessage(msg)
-        })
-
-        api.readCharacter(props.message.payload.body.replyToMessageAuthor, Schemas.profile).then((author) => {
-            setReplyAuthor(author)
         })
     }, [props.message, props.lastUpdated])
 
@@ -125,13 +120,13 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
 
     return (
         <>
-            {replyMessage && <MessageFrame message={replyMessage} lastUpdated={1} variant="oneline"></MessageFrame>}
-            <Box>
-                <Typography variant="caption" color="text.disabled" sx={{ alignItems: 'center' }}>
-                    {' '}
+            {replyMessage && (
+                <Box display="flex" alignItems="center" gap={1}>
                     <ReplyIcon sx={{ fontSize: '90%' }} />
-                    {author?.payload.body.username || 'Anonymous'} さんが返信しました{' '}
-                </Typography>
+                    <MessageFrame message={replyMessage} lastUpdated={1} variant="oneline"></MessageFrame>
+                </Box>
+            )}
+            <Box>
                 <MessageView
                     message={message}
                     author={author}
