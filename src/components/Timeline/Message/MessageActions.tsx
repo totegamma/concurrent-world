@@ -44,7 +44,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         props.handleReply()
                     }}
                 >
-                    <ReplyIcon />
+                    <ReplyIcon sx={{ fontSize: '80%' }} />
                 </IconButton>
                 <IconButton
                     sx={{
@@ -55,7 +55,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         props.handleReRoute()
                     }}
                 >
-                    <RepeatIcon />
+                    <RepeatIcon sx={{ fontSize: '80%' }} />
                 </IconButton>
                 <Tooltip
                     title={
@@ -107,7 +107,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                 }
                             }}
                         >
-                            {props.hasOwnReaction ? <StarIcon /> : <StarOutlineIcon />}
+                            {props.hasOwnReaction ? <StarIcon sx={{ fontSize: '80%' }} /> : <StarOutlineIcon />}
                         </IconButton>
                         <Typography sx={{ size: '16px' }}>
                             {props.message.associations.filter((e) => e.schema === Schemas.like).length}
@@ -123,7 +123,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         props.setMessageAnchor(e.currentTarget)
                     }}
                 >
-                    <MoreHorizIcon />
+                    <MoreHorizIcon sx={{ fontSize: '80%' }} />
                 </IconButton>
             </Box>
             <Box sx={{ display: 'flex', gap: '3px' }}>

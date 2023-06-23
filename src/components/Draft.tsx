@@ -240,7 +240,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             sx={{
                                 width: 1,
                                 maxHeight: '171px',
-                                overflow: 'scroll'
+                                overflowY: 'scroll'
                             }}
                         >
                             <MarkdownRenderer messagebody={draft} />
@@ -273,82 +273,87 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             <Box
                 sx={{
                     display: 'flex',
-                    justifyContent: 'flex-end',
+                    justifyContent: 'space-between',
                     alignItems: 'center'
                 }}
             >
-                <IconButton
-                    sx={{
-                        color: theme.palette.text.secondary
-                    }}
-                    onClick={onFileUploadClick}
-                >
-                    <ImageIcon />
-                    <input
-                        hidden
-                        ref={inputRef}
-                        type="file"
-                        onChange={(e) => {
-                            onFileInputChange(e)
+                <Box>
+                    <IconButton
+                        sx={{
+                            color: theme.palette.text.secondary
                         }}
-                        accept={'.png, .jpg, .jpeg, .gif'}
-                    />
-                </IconButton>
-                <IconButton
-                    sx={{
-                        color: theme.palette.text.secondary
-                    }}
-                    onClick={() => {
-                        setOpenPreview(!openPreview)
-                    }}
-                >
-                    <Splitscreen sx={{ transform: 'rotate(90deg)' }} />
-                </IconButton>
-                <IconButton
-                    sx={{
-                        color: theme.palette.text.secondary
-                    }}
-                    onClick={() => {
-                        setSelectEmoji(!selectEmoji)
-                    }}
-                >
-                    <EmojiEmotions />
-                </IconButton>
+                        onClick={onFileUploadClick}
+                    >
+                        <ImageIcon sx={{ fontSize: '80%' }} />
+                        <input
+                            hidden
+                            ref={inputRef}
+                            type="file"
+                            onChange={(e) => {
+                                onFileInputChange(e)
+                            }}
+                            accept={'.png, .jpg, .jpeg, .gif'}
+                        />
+                    </IconButton>
+                    <IconButton
+                        sx={{
+                            color: theme.palette.text.secondary
+                        }}
+                        onClick={() => {
+                            setOpenPreview(!openPreview)
+                        }}
+                    >
+                        <Splitscreen sx={{ transform: 'rotate(90deg)', fontSize: '80%' }} />
+                    </IconButton>
+                    <IconButton
+                        sx={{
+                            color: theme.palette.text.secondary
+                        }}
+                        onClick={() => {
+                            setSelectEmoji(!selectEmoji)
+                        }}
+                    >
+                        <EmojiEmotions sx={{ fontSize: '80%' }} />
+                    </IconButton>
+                </Box>
                 <Box
                     sx={{
-                        position: 'relative'
+                        display: 'flex',
+                        alignItems: 'center'
                     }}
                 >
-                    <Button
-                        color="primary"
-                        variant="contained"
-                        disabled={sending}
-                        onClick={(_) => {
-                            post()
-                        }}
-                        sx={{
-                            '&.Mui-disabled': {
-                                background: theme.palette.divider,
-                                color: theme.palette.text.disabled
-                            }
-                        }}
-                        endIcon={<SendIcon />}
-                    >
-                        {props.submitButtonLabel ?? 'SEND'}
-                    </Button>
-                    {sending && (
-                        <CircularProgress
-                            size={24}
-                            sx={{
-                                color: 'primary.main',
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                marginTop: '-12px',
-                                marginLeft: '-12px'
+                    <Box>
+                        <Button
+                            color="primary"
+                            variant="contained"
+                            disabled={sending}
+                            onClick={(_) => {
+                                post()
                             }}
-                        />
-                    )}
+                            sx={{
+                                '&.Mui-disabled': {
+                                    background: theme.palette.divider,
+                                    color: theme.palette.text.disabled
+                                }
+                            }}
+                            endIcon={<SendIcon />}
+                        >
+                            {props.submitButtonLabel ?? 'SEND'}
+                        </Button>
+                        {sending && (
+                            <CircularProgress
+                                size={24}
+                                sx={{
+                                    color: 'primary.main',
+                                    position: 'absolute',
+                                    top: '50%',
+                                    left: '50%',
+                                    marginTop: '-12px',
+                                    marginLeft: '-12px'
+                                }}
+                            />
+                        )}
+                    </Box>
                 </Box>
             </Box>
         </Box>
