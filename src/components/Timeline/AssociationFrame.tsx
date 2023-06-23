@@ -219,7 +219,9 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
         case Schemas.replyAssociation:
             return (
                 <>
-                    {replyMessage && <MessageFrame message={replyMessage} lastUpdated={1} thin={true}></MessageFrame>}
+                    {replyMessage && (
+                        <MessageFrame message={replyMessage} lastUpdated={1} variant="thin"></MessageFrame>
+                    )}
                     <Box
                         sx={{
                             paddingLeft: 2

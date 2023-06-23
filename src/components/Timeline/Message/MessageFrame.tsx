@@ -14,8 +14,7 @@ import { useMessageDetail } from '../../../context/MessageDetail'
 export interface MessageFrameProp {
     message: CCMessage<any>
     lastUpdated: number
-    thin?: boolean
-    oneline?: boolean
+    variant?: 'default' | 'thin' | 'oneline'
 }
 
 export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JSX.Element => {
@@ -125,9 +124,9 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
         )
     }
 
-    return (
-        <>
-            {props.thin ? (
+    switch (props.variant) {
+        case 'thin':
+            return (
                 <ThinMessageView
                     message={message}
                     author={author}
@@ -144,7 +143,9 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                     setMessageAnchor={setMessageAnchor}
                     setFetchSucceed={setFetchSucceed}
                 />
-            ) : props.oneline ? (
+            )
+        case 'oneline':
+            return (
                 <OneLineMessageView
                     message={message}
                     author={author}
@@ -161,7 +162,10 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                     setMessageAnchor={setMessageAnchor}
                     setFetchSucceed={setFetchSucceed}
                 />
-            ) : (
+            )
+
+        default:
+            return (
                 <MessageView
                     message={message}
                     author={author}
@@ -191,9 +195,8 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                     setMessageAnchor={setMessageAnchor}
                     setFetchSucceed={setFetchSucceed}
                 />
-            )}
-        </>
-    )
+            )
+    }
 })
 
 MessageFrame.displayName = 'MessageFrame'

@@ -125,7 +125,7 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
 
     return (
         <>
-            {replyMessage && <MessageFrame message={replyMessage} lastUpdated={1} oneline={true}></MessageFrame>}
+            {replyMessage && <MessageFrame message={replyMessage} lastUpdated={1} variant="oneline"></MessageFrame>}
             <Box>
                 <Typography variant="caption" color="text.disabled" sx={{ alignItems: 'center' }}>
                     {' '}
