@@ -1,4 +1,4 @@
-import { Box, Link, Typography, IconButton, ListItem, type Theme } from '@mui/material'
+import { Box, Link, Typography, IconButton, type Theme } from '@mui/material'
 import { Link as routerLink } from 'react-router-dom'
 import { CCAvatar } from '../../CCAvatar'
 import type { Character, Message as CCMessage, ProfileWithAddress, Stream } from '../../../model'

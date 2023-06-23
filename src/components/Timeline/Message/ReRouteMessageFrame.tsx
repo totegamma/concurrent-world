@@ -9,6 +9,7 @@ import { useApi } from '../../../context/api'
 import { MessageFrame } from './MessageFrame'
 import { CCAvatar } from '../../CCAvatar'
 import { Link as routerLink } from 'react-router-dom'
+import { TimeDiff } from '../../TimeDiff'
 
 export interface ReRouteMessageFrameProp {
     message: CCMessage<any>
@@ -62,11 +63,21 @@ export const ReRouteMessageFrame = memo<ReRouteMessageFrameProp>((props: ReRoute
                             xs: '0.8rem',
                             sm: '0.9rem'
                         },
-                        color: 'text.disabled'
+                        color: 'text.disabled',
+                        flex: 1
                     }}
                 >
                     {author?.payload.body.username || 'Anonymous'} rerouted
                 </Typography>
+                <Box
+                    color="text.disabled"
+                    fontSize={{
+                        xs: '0.7rem',
+                        sm: '0.8rem'
+                    }}
+                >
+                    <TimeDiff date={new Date(props.message.cdate)} />
+                </Box>
             </Box>
             {reRouteMessage ? (
                 <Box>
