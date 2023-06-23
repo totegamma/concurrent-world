@@ -38,17 +38,42 @@ export function AccountImport(): JSX.Element {
     const [api, initializeApi] = useState<ConcurrentApiClient>()
 
     useEffect(() => {
+        let privatekey = ''
+        let ccid = ''
         if (mnemonic === '') {
             const key = LoadKey(secret)
             if (!key) return
-            const api = new ConcurrentApiClient(key.ccaddress, key.privatekey, host)
-            initializeApi(api)
+            privatekey = key.privatekey
+            ccid = key.ccaddress
         } else {
-            const wallet = HDNodeWallet.fromPhrase(mnemonic, undefined, undefined, LangJa.wordlist()) // TODO: move to utils
-            const api = new ConcurrentApiClient('CC' + wallet.address.slice(2), wallet.privateKey.slice(2), host)
-            initializeApi(api)
+            try {
+                const wallet = HDNodeWallet.fromPhrase(mnemonic.trim(), undefined, undefined, LangJa.wordlist()) // TODO: move to utils
+                privatekey = wallet.privateKey.slice(2)
+                ccid = 'CC' + wallet.address.slice(2)
+            } catch (e) {
+                console.log(e)
+                return
+            }
         }
-    }, [mnemonic, secret, host])
+
+        const hub = new ConcurrentApiClient(ccid, privatekey, {
+            fqdn: 'hub.concurrent.world',
+            ccaddr: '',
+            role: '',
+            pubkey: '',
+            cdate: new Date()
+        })
+
+        initializeApi(hub)
+
+        console.log(ccid)
+        hub.readEntity(ccid).then((entity) => {
+            console.log(entity)
+            if (!entity) return
+            setServer(entity.host || 'hub.concurrent.world')
+            setEntityFound(true)
+        })
+    }, [mnemonic, secret])
 
     useEffect(() => {
         if (!api) return
@@ -56,15 +81,12 @@ export function AccountImport(): JSX.Element {
         api.getHostProfile(fqdn).then((e: any) => {
             setHost(e)
         })
-        console.log(fqdn)
-    }, [server])
-
-    useEffect(() => {
-        console.log('check!!!')
-        api?.readEntity(api.userAddress).then((entity) => {
+        api.readEntity(api.userAddress).then((entity) => {
             setEntityFound(!!entity && entity.ccaddr !== '')
         })
-    }, [api])
+
+        console.log(fqdn)
+    }, [server, api])
 
     const accountImport = (): void => {
         if (!api) return
