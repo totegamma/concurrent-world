@@ -64,6 +64,7 @@ export const ReRouteMessageFrame = memo<ReRouteMessageFrameProp>((props: ReRoute
                             sm: '0.9rem'
                         },
                         color: 'text.disabled',
+                        fontWeight: 700,
                         flex: 1
                     }}
                 >
