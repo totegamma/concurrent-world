@@ -107,7 +107,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                 }
                             }}
                         >
-                            {props.hasOwnReaction ? <StarIcon sx={{ fontSize: '80%' }} /> : <StarOutlineIcon />}
+                            {props.hasOwnReaction ? <StarIcon sx={{ fontSize: '80%' }} /> : <StarOutlineIcon  sx={{ fontSize: '80%' }} />}
                         </IconButton>
                         <Typography sx={{ size: '16px' }}>
                             {props.message.associations.filter((e) => e.schema === Schemas.like).length}
