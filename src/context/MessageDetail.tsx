@@ -1,4 +1,4 @@
-import { Box, Paper, Modal, Divider, Typography } from '@mui/material'
+import { Box, Paper, Modal, Divider } from '@mui/material'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
@@ -22,11 +22,12 @@ interface MessageDetailProps {
 }
 
 const style = {
-    position: 'absolute' as 'absolute',
+    position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: '700px',
+    maxWidth: '90vw',
     p: 2
 }
 

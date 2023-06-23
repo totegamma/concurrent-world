@@ -9,18 +9,32 @@ import { ProfileEditor } from '../components/ProfileEditor'
 import ConcurrentApiClient from '../apiservice'
 import ApiProvider from '../context/api'
 import type { ConcurrentTheme, Host } from '../model'
-import { Fade, IconButton, Paper, ThemeProvider, darken } from '@mui/material'
+import {
+    Avatar,
+    Fade,
+    Grid,
+    IconButton,
+    List,
+    ListItemAvatar,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Paper,
+    ThemeProvider,
+    darken
+} from '@mui/material'
 import { usePersistent } from '../hooks/usePersistent'
 import { Themes, createConcurrentTheme } from '../themes'
 import Tilt from 'react-parallax-tilt'
 import { PassportRenderer } from '../components/Passport'
 import { CCAvatar } from '../components/CCAvatar'
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import { generateIdentity } from '../util'
-
-import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import { type Profile } from '../schemas/profile'
 import { ConcurrentWordmark } from '../components/ConcurrentWordmark'
+
+import ContentPasteIcon from '@mui/icons-material/ContentPaste'
+import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 
 export function Registration(): JSX.Element {
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue2')
@@ -94,7 +108,9 @@ export function Registration(): JSX.Element {
                 <>
                     <Box
                         sx={{
-                            padding: '30px'
+                            padding: '30px',
+                            maxWidth: '500px',
+                            margin: 'auto'
                         }}
                     >
                         <Tilt glareEnable={true} glareBorderRadius="5%">
@@ -154,12 +170,22 @@ export function Registration(): JSX.Element {
                                 padding: '10px',
                                 fontWeight: 'bold',
                                 display: 'flex',
+                                flexDirection: { xs: 'column', sm: 'row' },
                                 alignItems: 'center',
                                 gap: '10px'
                             }}
                         >
                             <CCAvatar identiconSource={CCID} />
-                            {CCID}
+                            <Typography
+                                sx={{
+                                    fontSize: {
+                                        xs: '0.9rem',
+                                        sm: '1rem'
+                                    }
+                                }}
+                            >
+                                {CCID}
+                            </Typography>
                         </Paper>
                         <Typography>これは、Concurrentの世界であなたを特定する文字列です。</Typography>
                         <Divider />
@@ -191,15 +217,21 @@ export function Registration(): JSX.Element {
                 >
                     <Paper
                         variant="outlined"
+                        component={Grid}
                         style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(4, 1fr)',
-                            width: '100%'
+                            width: '100%',
+                            margin: 1
                         }}
+                        spacing={1}
+                        columns={4}
+                        container
                     >
                         {mnemonic.split('　').map((e, i) => (
-                            <Box
+                            <Grid
                                 key={i}
+                                item
+                                xs={2}
+                                sm={1}
                                 sx={{
                                     display: 'flex',
                                     alignItems: 'center',
@@ -215,7 +247,7 @@ export function Registration(): JSX.Element {
                                 >
                                     {e}
                                 </Paper>
-                            </Box>
+                            </Grid>
                         ))}
                     </Paper>
                     <Button
@@ -297,15 +329,31 @@ export function Registration(): JSX.Element {
                 >
                     あなたのメッセージを保存・配信してくれるホストサーバーを探しましょう。
                     どのホストサーバーを選択しても、だれとでもつながる事ができます。
-                    <Box
-                        sx={{
-                            width: '100%'
-                        }}
-                    >
+                    <Box width="100%" display="flex" flexDirection="column">
                         <Typography variant="h3">リストから選択</Typography>
-                        公開ホスト検索は未実装です
+                        <List>
+                            <ListItemButton
+                                component={Link}
+                                to={`https://hub.concurrent.world/register?token=${
+                                    api?.constructJWT({ aud: 'hub.concurrent.world' }) ?? ''
+                                }`}
+                                target="_blank"
+                                onClick={() => {
+                                    setServer('hub.concurrent.world')
+                                }}
+                            >
+                                <ListItemAvatar>
+                                    <Avatar></Avatar>
+                                </ListItemAvatar>
+                                <ListItemText primary="hub.concurrent.world" />
+                                <ListItemIcon>
+                                    <OpenInNewIcon />
+                                </ListItemIcon>
+                            </ListItemButton>
+                        </List>
                         <Divider>または</Divider>
                         <Typography variant="h3">URLから直接入力</Typography>
+                        <Box flex="1" />
                         <Box sx={{ display: 'flex', gap: '10px' }}>
                             <TextField
                                 placeholder="https://example.tld/"
