@@ -9,7 +9,6 @@ import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import type { Profile } from '../../../schemas/profile'
 import type ConcurrentApiClient from '../../../apiservice'
-import React from 'react'
 import { MessageHeader } from './MessageHeader'
 import { MessageActions } from './MessageActions'
 import type { ReplyMessage } from '../../../schemas/replyMessage'
@@ -30,6 +29,7 @@ export interface MessageViewProps {
     favorite: () => Promise<void>
     setMessageAnchor: (anchor: null | HTMLElement) => void
     setFetchSucceed: (fetchSucceed: boolean) => void
+    beforeMessage?: JSX.Element
 }
 
 export const MessageView = (props: MessageViewProps): JSX.Element => {
@@ -86,6 +86,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                             cdate={props.message.cdate}
                             username={props.author?.payload.body.username}
                         />
+                        {props.beforeMessage}
                         <SimpleNote message={props.message} />
                         <MessageActions
                             handleReply={props.handleReply}

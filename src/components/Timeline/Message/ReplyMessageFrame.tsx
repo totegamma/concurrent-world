@@ -23,6 +23,7 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [message, setMessage] = useState<CCMessage<any> | undefined>()
     const [replyMessage, setReplyMessage] = useState<CCMessage<any> | undefined>()
+    const [replyMessageAuthor, setReplyMessageAuthor] = useState<Character<Profile> | undefined>()
     const [msgStreams, setStreams] = useState<Array<Stream<any>>>([])
     const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
     const [messageAnchor, setMessageAnchor] = useState<null | HTMLElement>(null)
@@ -53,6 +54,17 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
             setReplyMessage(msg)
         })
     }, [props.message, props.lastUpdated])
+
+    useEffect(() => {
+        if (!replyMessage) return
+        api.readCharacter(replyMessage.author, Schemas.profile)
+            .then((author) => {
+                setReplyMessageAuthor(author)
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+    }, [replyMessage])
 
     useEffect(() => {
         const fetchUsers = async (): Promise<any> => {
@@ -151,6 +163,19 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
                     favorite={() => api.favoriteMessage(props.message.id, props.message.author)}
                     setMessageAnchor={setMessageAnchor}
                     setFetchSucceed={setFetchSucceed}
+                    beforeMessage={
+                        <Box
+                            bgcolor="primary.main"
+                            color="primary.contrastText"
+                            borderRadius="100px"
+                            width="fit-content"
+                            px={1}
+                            mb={0.5}
+                            fontSize="0.8rem"
+                        >
+                            @{replyMessageAuthor?.payload.body.username}
+                        </Box>
+                    }
                 />
             </Box>
         </>

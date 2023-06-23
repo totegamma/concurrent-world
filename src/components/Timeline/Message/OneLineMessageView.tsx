@@ -55,6 +55,7 @@ export const OneLineMessageView = (props: MessageViewProps): JSX.Element => {
                     }}
                 />
             </IconButton>
+            {/*
             <Typography
                 sx={{
                     fontWeight: '700',
@@ -67,6 +68,7 @@ export const OneLineMessageView = (props: MessageViewProps): JSX.Element => {
             >
                 {props.author?.payload.body.username || 'anonymous'}
             </Typography>
+            */}
             <Box
                 sx={{
                     display: 'flex',
