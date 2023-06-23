@@ -121,7 +121,7 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
     return (
         <>
             {replyMessage && (
-                <Box display="flex" alignItems="center" gap={1}>
+                <Box display="flex" alignItems="center" gap={1} overflow="hidden">
                     <ReplyIcon sx={{ fontSize: '90%' }} />
                     <MessageFrame message={replyMessage} lastUpdated={1} variant="oneline"></MessageFrame>
                 </Box>

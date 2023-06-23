@@ -28,13 +28,14 @@ export interface MessageViewProps {
 export const OneLineMessageView = (props: MessageViewProps): JSX.Element => {
     if (!props.message?.payload?.body) return <>message not found</>
     return (
-        <ListItem
+        <Box
             sx={{
+                display: 'flex',
                 alignItems: 'center',
                 color: 'text.disabled',
+                flex: 1,
                 gap: 1
             }}
-            disablePadding
         >
             <IconButton
                 sx={{
@@ -61,8 +62,7 @@ export const OneLineMessageView = (props: MessageViewProps): JSX.Element => {
                         xs: '0.8rem',
                         sm: '0.9rem'
                     },
-                    whiteSpace: 'nowrap',
-                    width: 'auto'
+                    flexShrink: 0
                 }}
             >
                 {props.author?.payload.body.username || 'anonymous'}
@@ -70,10 +70,10 @@ export const OneLineMessageView = (props: MessageViewProps): JSX.Element => {
             <Box
                 sx={{
                     display: 'flex',
-                    whiteSpace: 'nowrap',
+                    flex: 1,
                     overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    fontSize: '0.9rem'
+                    fontSize: '0.9rem',
+                    height: '1.4rem' // FIXME
                 }}
             >
                 {props.message.payload.body.body}
@@ -82,10 +82,13 @@ export const OneLineMessageView = (props: MessageViewProps): JSX.Element => {
                 component="button"
                 underline="hover"
                 color="inherit"
-                sx={{ marginLeft: 'auto', width: 'max-content', display: 'flex' }}
+                sx={{
+                    display: 'flex',
+                    flexShrink: 0
+                }}
             >
                 <TimeDiff date={new Date(props.message.cdate)} />
             </Link>
-        </ListItem>
+        </Box>
     )
 }
