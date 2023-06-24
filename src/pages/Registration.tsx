@@ -131,7 +131,7 @@ export function Registration(): JSX.Element {
                     <Box
                         sx={{
                             padding: '30px',
-                            maxWidth: '500px',
+                            maxWidth: '600px',
                             margin: 'auto'
                         }}
                     >
@@ -456,7 +456,9 @@ export function Registration(): JSX.Element {
                 <>
                     <Box
                         sx={{
-                            padding: '30px'
+                            padding: '30px',
+                            maxWidth: '600px',
+                            margin: 'auto'
                         }}
                     >
                         <Tilt glareEnable={true} glareBorderRadius="5%">
