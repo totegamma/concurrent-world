@@ -154,59 +154,65 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                         p: { xs: '7px 0', sm: '10px 0' },
                         wordBreak: 'break-word'
                     }}
+                    disablePadding
                 >
-                    <Box
-                        sx={{
-                            padding: {
-                                xs: '5px 8px 0 0',
-                                sm: '8px 10px 0 0'
-                            }
-                        }}
+                    <ListItemButton
+                        disableGutters
+                        component={routerLink}
+                        to={`/message/${message?.id ?? ''}@${message?.author ?? ''}`}
                     >
-                        <IconButton
+                        <Box
                             sx={{
-                                width: { xs: '38px', sm: '48px' },
-                                height: { xs: '38px', sm: '48px' }
+                                padding: {
+                                    xs: '5px 8px 0 0',
+                                    sm: '8px 10px 0 0'
+                                }
                             }}
-                            component={routerLink}
-                            to={'/entity/' + association.author}
                         >
-                            <CCAvatar
-                                alt={author?.payload.body.username}
-                                avatarURL={author?.payload.body.avatar}
-                                identiconSource={isMeToOther ? association?.author : message?.author ?? ''}
+                            <IconButton
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
                                     height: { xs: '38px', sm: '48px' }
                                 }}
-                            />
-                        </IconButton>
-                    </Box>
-                    <ListItemButton
-                        sx={{
-                            flex: 1,
-                            flexDirection: 'column',
-                            width: '100%',
-                            overflow: 'auto',
-                            alignItems: 'flex-start'
-                        }}
-                        component={routerLink}
-                        to={`/message/${message?.id ?? ''}@${message?.author ?? ''}`}
-                    >
-                        <Typography>
-                            {isMeToOther ? (
-                                <>
-                                    <b>{author?.payload.body.username ?? 'anonymous'}</b> favorited your message
-                                </>
-                            ) : (
-                                <>
-                                    You favorited <b>{author?.payload.body.username ?? 'anonymous'}</b>&apos;s message
-                                </>
-                            )}
-                        </Typography>
-                        <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
-                            {message?.payload.body.body}
-                        </blockquote>
+                                component={routerLink}
+                                to={'/entity/' + association.author}
+                            >
+                                <CCAvatar
+                                    alt={author?.payload.body.username}
+                                    avatarURL={author?.payload.body.avatar}
+                                    identiconSource={isMeToOther ? association?.author : message?.author ?? ''}
+                                    sx={{
+                                        width: { xs: '38px', sm: '48px' },
+                                        height: { xs: '38px', sm: '48px' }
+                                    }}
+                                />
+                            </IconButton>
+                        </Box>
+                        <Box
+                            sx={{
+                                flex: 1,
+                                flexDirection: 'column',
+                                width: '100%',
+                                overflow: 'auto',
+                                alignItems: 'flex-start'
+                            }}
+                        >
+                            <Typography>
+                                {isMeToOther ? (
+                                    <>
+                                        <b>{author?.payload.body.username ?? 'anonymous'}</b> favorited your message
+                                    </>
+                                ) : (
+                                    <>
+                                        You favorited <b>{author?.payload.body.username ?? 'anonymous'}</b>&apos;s
+                                        message
+                                    </>
+                                )}
+                            </Typography>
+                            <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
+                                {message?.payload.body.body}
+                            </blockquote>
+                        </Box>
                     </ListItemButton>
                 </ListItem>
             )
