@@ -1,10 +1,11 @@
-import { Box, Link, Typography } from '@mui/material'
+import { Box, Typography, Link } from '@mui/material'
 import { TimeDiff } from '../../TimeDiff'
-import React from 'react'
+import { Link as RouterLink } from 'react-router-dom'
 
 export interface MessageHeaderProps {
     username?: string
-    authorAddress: string
+    messageID: string
+    authorID: string
     cdate: string
 }
 
@@ -47,10 +48,15 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                         }
                     }}
                 >
-                    {props.authorAddress}
+                    {props.authorID}
                 </Typography>
             </Box>
-            <Link component="button" underline="hover" color="inherit">
+            <Link
+                component={RouterLink}
+                underline="hover"
+                color="inherit"
+                to={`/message/${props.messageID}@${props.authorID}`}
+            >
                 <TimeDiff date={new Date(props.cdate)} />
             </Link>
         </Box>

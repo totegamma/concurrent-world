@@ -81,7 +81,8 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                         }}
                     >
                         <MessageHeader
-                            authorAddress={props.message.author}
+                            authorID={props.message.author}
+                            messageID={props.message.id}
                             cdate={props.message.cdate}
                             username={props.author?.payload.body.username}
                         />

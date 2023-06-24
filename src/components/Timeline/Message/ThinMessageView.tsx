@@ -1,17 +1,12 @@
-import { Box, IconButton, ListItem, ListItemIcon, ListItemText, Menu, MenuItem, type Theme } from '@mui/material'
+import { Box, IconButton, ListItem, type Theme } from '@mui/material'
 import { Link as routerLink } from 'react-router-dom'
 import { CCAvatar } from '../../CCAvatar'
-import type { Character, Message as CCMessage, ProfileWithAddress, Stream, StreamElement } from '../../../model'
+import type { Character, Message as CCMessage, ProfileWithAddress, Stream } from '../../../model'
 import { SimpleNote } from '../SimpleNote'
 import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
-import ContentPasteIcon from '@mui/icons-material/ContentPaste'
-import ManageSearchIcon from '@mui/icons-material/ManageSearch'
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import type { Profile } from '../../../schemas/profile'
 import type ConcurrentApiClient from '../../../apiservice'
-import React from 'react'
 import { MessageHeader } from './MessageHeader'
-import { MessageActions } from './MessageActions'
 import type { ReplyMessage } from '../../../schemas/replyMessage'
 
 export interface MessageViewProps {
@@ -80,7 +75,8 @@ export const ThinMessageView = (props: MessageViewProps): JSX.Element => {
                         }}
                     >
                         <MessageHeader
-                            authorAddress={props.message.author}
+                            authorID={props.message.author}
+                            messageID={props.message.id}
                             cdate={props.message.cdate}
                             username={props.author?.payload.body.username}
                         />
