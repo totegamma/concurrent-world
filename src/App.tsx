@@ -380,10 +380,7 @@ function App(): JSX.Element {
                                 mb: { xs: 0, sm: '10px' },
                                 display: 'flex',
                                 flexFlow: 'column',
-                                borderRadius: {
-                                    xs: '15px',
-                                    md: '20px'
-                                },
+                                borderRadius: 1,
                                 overflow: 'hidden',
                                 background: 'none'
                             }}

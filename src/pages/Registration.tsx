@@ -434,7 +434,7 @@ export function Registration(): JSX.Element {
                     <Box
                         sx={{
                             width: '100%',
-                            borderRadius: '10px',
+                            borderRadius: 1,
                             overflow: 'hidden'
                         }}
                     >

@@ -99,22 +99,23 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                                   .slice(3)
                             : ''
                         return inline ? (
-                            <span
-                                style={{
+                            <Box
+                                component="span"
+                                sx={{
                                     fontFamily: 'Source Code Pro, monospace',
                                     backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                                    borderRadius: '2px',
+                                    borderRadius: 1,
                                     border: '0.5px solid #ddd',
                                     padding: '0 0.5rem',
                                     margin: '0 0.2rem'
                                 }}
                             >
                                 {children}
-                            </span>
+                            </Box>
                         ) : (
                             <Box
                                 sx={{
-                                    borderRadius: '10px',
+                                    borderRadius: 1,
                                     overflow: 'hidden'
                                 }}
                             >
@@ -150,13 +151,7 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                         }
                         return (
                             <a href={props.src} target="_blank" rel="noreferrer">
-                                <img
-                                    {...props}
-                                    style={{
-                                        maxWidth: '100%',
-                                        borderRadius: '10px'
-                                    }}
-                                />
+                                <Box {...props} component="img" maxWidth="100%" borderRadius={1} />
                             </a>
                         )
                     }

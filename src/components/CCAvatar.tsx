@@ -14,10 +14,12 @@ export const CCAvatar = (props: CCAvatarProps): JSX.Element => {
             alt={props.alt}
             src={props.avatarURL}
             sx={{
-                ...props.sx
+                ...props.sx,
+                borderRadius: 1
             }}
+            variant="square"
         >
-            <BoringAvatar name={props.identiconSource} variant="beam" size={1000} />
+            <BoringAvatar square name={props.identiconSource} variant="beam" size={1000} />
         </Avatar>
     )
 }
