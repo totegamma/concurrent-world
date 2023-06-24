@@ -480,7 +480,7 @@ export default class ConcurrentApiClient extends ApiService {
         }
         // sort result
         result.sort((a, b) => {
-            return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+            return parseFloat(b.timestamp.replace('-', '.')) - parseFloat(a.timestamp.replace('-', '.'))
         })
         // remove duplication
         result = result.filter((e, i, self) => {
@@ -526,7 +526,7 @@ export default class ConcurrentApiClient extends ApiService {
         }
         // sort result
         result.sort((a, b) => {
-            return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+            return parseFloat(b.timestamp.replace('-', '.')) - parseFloat(a.timestamp.replace('-', '.'))
         })
         // remove duplication
         result = result.filter((e, i, self) => {
