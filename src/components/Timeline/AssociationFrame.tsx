@@ -1,15 +1,14 @@
-import { memo, useCallback, useContext, useEffect, useState } from 'react'
+import { memo, useCallback, useEffect, useState } from 'react'
 import type { Association, Character, Message, StreamElement, CCID, ProfileWithAddress } from '../../model'
 import { useApi } from '../../context/api'
 import { Schemas } from '../../schemas'
-import { Box, IconButton, ListItem, Typography, useTheme } from '@mui/material'
+import { Box, IconButton, ListItem, ListItemButton, Typography, useTheme } from '@mui/material'
 import type { Profile } from '../../schemas/profile'
 import { Link as routerLink } from 'react-router-dom'
 import { CCAvatar } from '../CCAvatar'
 import { MessageFrame } from './Message/MessageFrame'
 import { MessageView } from './Message/MessageView'
 import { useInspector } from '../../context/Inspector'
-import { ApplicationContext } from '../../App'
 import { useMessageDetail } from '../../context/MessageDetail'
 import { ReRouteMessageFrame } from './Message/ReRouteMessageFrame'
 
@@ -22,7 +21,6 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     const api = useApi()
     const theme = useTheme()
     const inspector = useInspector()
-    const appData = useContext(ApplicationContext)
     const messageDetail = useMessageDetail()
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [message, setMessage] = useState<Message<any> | undefined>()
@@ -176,7 +174,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                             <CCAvatar
                                 alt={author?.payload.body.username}
                                 avatarURL={author?.payload.body.avatar}
-                                identiconSource={association.author}
+                                identiconSource={isMeToOther ? association?.author : message?.author ?? ''}
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
                                     height: { xs: '38px', sm: '48px' }
@@ -184,30 +182,32 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                             />
                         </IconButton>
                     </Box>
-                    <Box
+                    <ListItemButton
                         sx={{
-                            display: 'flex',
                             flex: 1,
                             flexDirection: 'column',
                             width: '100%',
-                            overflow: 'auto'
+                            overflow: 'auto',
+                            alignItems: 'flex-start'
                         }}
+                        component={routerLink}
+                        to={`/message/${message?.id ?? ''}@${message?.author ?? ''}`}
                     >
                         <Typography>
                             {isMeToOther ? (
                                 <>
-                                    <b>{author?.payload.body.username}</b> favorited your message
+                                    <b>{author?.payload.body.username ?? 'anonymous'}</b> favorited your message
                                 </>
                             ) : (
                                 <>
-                                    You favorited <b>{author?.payload.body.username}</b>&apos;s message
+                                    You favorited <b>{author?.payload.body.username ?? 'anonymous'}</b>&apos;s message
                                 </>
                             )}
                         </Typography>
                         <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
                             {message?.payload.body.body}
                         </blockquote>
-                    </Box>
+                    </ListItemButton>
                 </ListItem>
             )
         case Schemas.replyAssociation:
