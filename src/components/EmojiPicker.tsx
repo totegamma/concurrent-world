@@ -58,17 +58,6 @@ export const EmojiPicker = ({ onSelected }: EmojiPickerProps): JSX.Element => {
             }
         ]
 
-        /* <Picker
-      // data={data}
-      categories={['fluffy']}
-      custom={customEmoji}
-      searchPosition="static"
-      onEmojiSelect={(emoji: EmojiProps) => {
-          console.log(typeof emoji)
-          // setDraft(draft + emoji.shortcodes)
-        }}
-      /> */
-
         instance.current = new Picker({
             categories: ['fluffy'],
             searchPosition: 'static',
@@ -79,12 +68,6 @@ export const EmojiPicker = ({ onSelected }: EmojiPickerProps): JSX.Element => {
             },
             ref
         })
-
-        console.log(emojis)
-        console.log('setting picker')
-        console.log(React.createElement('div', { ref }))
-        console.log(ref)
-        console.log(instance)
 
         return () => {
             instance.current = null
