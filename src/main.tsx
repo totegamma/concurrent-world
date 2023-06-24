@@ -8,6 +8,7 @@ import { Suspense, lazy } from 'react'
 import { FullScreenLoading } from './components/FullScreenLoading'
 import { Registration } from './pages/Registration'
 import { AccountImport } from './pages/AccountImport'
+import { GuestTimelinePage } from './pages/GuestTimeline'
 
 const AppPage = lazy(() => import('./App'))
 
@@ -22,6 +23,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                     <Route path="/welcome" element={<Welcome />} />
                     <Route path="/register" element={<Registration />} />
                     <Route path="/import" element={<AccountImport />} />
+                    <Route path="/guest/" element={<GuestTimelinePage />} />
                     <Route path="*" element={<LoginGuard component={<AppPage />} redirect="/welcome" />} />
                 </Routes>
             </Suspense>
