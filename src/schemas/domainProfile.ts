@@ -11,5 +11,7 @@ export interface DomainProfile {
     description?: string
     iconURL?: string
     bannerURL?: string
-    defaultStream?: string[]
+    defaultBookmarkStreams?: string[]
+    defaultFollowingStreams?: string[]
+    defaultPostStreams?: string[]
 }

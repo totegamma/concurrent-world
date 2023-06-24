@@ -8,7 +8,7 @@ import Divider from '@mui/material/Divider'
 import { ProfileEditor } from '../components/ProfileEditor'
 import ConcurrentApiClient from '../apiservice'
 import ApiProvider from '../context/api'
-import type { ConcurrentTheme, Host } from '../model'
+import type { Character, ConcurrentTheme, Host } from '../model'
 import {
     Avatar,
     Fade,
@@ -35,6 +35,8 @@ import { ConcurrentWordmark } from '../components/ConcurrentWordmark'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
+import { Schemas } from '../schemas'
+import { type DomainProfile } from '../schemas/domainProfile'
 
 export function Registration(): JSX.Element {
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue2')
@@ -87,11 +89,31 @@ export function Registration(): JSX.Element {
     }, [server])
 
     const setupAccount = (): void => {
+        if (!api) return
+        if (!host) return
         localStorage.setItem('Host', JSON.stringify(host))
         localStorage.setItem('PublicKey', JSON.stringify(publicKey))
         localStorage.setItem('PrivateKey', JSON.stringify(privateKey))
         localStorage.setItem('Address', JSON.stringify(CCID))
-        navigate('/')
+
+        api?.readCharacter(host.ccaddr, Schemas.domainProfile).then((profile: Character<DomainProfile> | undefined) => {
+            console.log(profile)
+            if (profile) {
+                if (profile.payload.body.defaultBookmarkStreams)
+                    localStorage.setItem(
+                        'bookmarkingStreams',
+                        JSON.stringify(profile.payload.body.defaultBookmarkStreams)
+                    )
+                if (profile.payload.body.defaultFollowingStreams)
+                    localStorage.setItem(
+                        'followingStreams',
+                        JSON.stringify(profile.payload.body.defaultFollowingStreams)
+                    )
+                if (profile.payload.body.defaultPostStreams)
+                    localStorage.setItem('defaultPostHome', JSON.stringify(profile.payload.body.defaultPostStreams))
+            }
+            navigate('/')
+        })
     }
 
     const checkRegistration = async (): Promise<void> => {
