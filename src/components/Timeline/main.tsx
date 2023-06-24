@@ -1,4 +1,4 @@
-import { Divider, List, Modal, Typography, useTheme } from '@mui/material'
+import { Divider, List, Typography, useTheme } from '@mui/material'
 import React, { type RefObject, memo, useCallback, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroller'
 import { AssociationFrame } from './AssociationFrame'
@@ -7,7 +7,6 @@ import type { StreamElement, StreamElementDated } from '../../model'
 import { useApi } from '../../context/api'
 import { InspectorProvider } from '../../context/Inspector'
 import { Loading } from '../Loading'
-import { MessageFrame } from './Message/MessageFrame'
 import { MessageMultiplexer } from './Multiplexer'
 import { MessageDetailProvider } from '../../context/MessageDetail'
 

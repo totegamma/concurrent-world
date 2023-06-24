@@ -478,6 +478,20 @@ export default class ConcurrentApiClient extends ApiService {
             ).then(async (res) => await res.json())
             result = [...result, ...response]
         }
+        // sort result
+        result.sort((a, b) => {
+            return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        })
+        // remove duplication
+        result = result.filter((e, i, self) => {
+            return (
+                self.findIndex((s) => {
+                    return s.id === e.id
+                }) === i
+            )
+        })
+        // clip max 16
+        result = result.slice(0, 16)
         return result
     }
 
@@ -510,6 +524,20 @@ export default class ConcurrentApiClient extends ApiService {
             ).then(async (res) => await res.json())
             result = [...result, ...response]
         }
+        // sort result
+        result.sort((a, b) => {
+            return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        })
+        // remove duplication
+        result = result.filter((e, i, self) => {
+            return (
+                self.findIndex((s) => {
+                    return s.id === e.id
+                }) === i
+            )
+        })
+        // clip max 16
+        result = result.slice(0, 16)
         return result
     }
 
