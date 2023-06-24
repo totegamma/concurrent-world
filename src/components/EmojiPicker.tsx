@@ -3,8 +3,14 @@ import data from '@emoji-mart/data'
 import React, { useContext, useEffect, useRef } from 'react'
 import { ApplicationContext } from '../App'
 
+// emoji returned from onEmojiSelect
 export interface EmojiProps {
+    id: string
+    keywords: string[]
+    name: string
+    native: string
     shortcodes: string
+    src: string
 }
 
 export interface Skin {
@@ -26,17 +32,16 @@ export interface CustomEmoji {
 }
 
 export interface EmojiPickerProps {
-    setDraft: (draft: string) => void
-    draft: string
+    onSelected: (emoji: EmojiProps) => void
 }
 
-export const EmojiPicker = ({ setDraft, draft }: EmojiPickerProps): JSX.Element => {
+export const EmojiPicker = ({ onSelected }: EmojiPickerProps): JSX.Element => {
     const appData = useContext(ApplicationContext)
-
-    const draftRef = useRef<string>(draft)
 
     const ref = useRef<any>(null)
     const instance = useRef<any>(null)
+
+    const onSelectedRef = useRef<(emoji: EmojiProps) => void>(onSelected)
 
     useEffect(() => {
         console.log('loading emojis...')
@@ -59,10 +64,10 @@ export const EmojiPicker = ({ setDraft, draft }: EmojiPickerProps): JSX.Element 
       custom={customEmoji}
       searchPosition="static"
       onEmojiSelect={(emoji: EmojiProps) => {
-        console.log(typeof emoji)
-        // setDraft(draft + emoji.shortcodes)
-      }}
-    /> */
+          console.log(typeof emoji)
+          // setDraft(draft + emoji.shortcodes)
+        }}
+      /> */
 
         instance.current = new Picker({
             categories: ['fluffy'],
@@ -70,7 +75,7 @@ export const EmojiPicker = ({ setDraft, draft }: EmojiPickerProps): JSX.Element 
             data,
             custom: emojis,
             onEmojiSelect: (emoji: EmojiProps) => {
-                setDraft(draftRef.current + emoji.shortcodes)
+                onSelectedRef.current(emoji)
             },
             ref
         })
@@ -87,8 +92,8 @@ export const EmojiPicker = ({ setDraft, draft }: EmojiPickerProps): JSX.Element 
     }, [appData.emojiDict])
 
     useEffect(() => {
-        draftRef.current = draft
-    }, [draft])
+        onSelectedRef.current = onSelected
+    }, [onSelected])
 
     return <div ref={ref}></div>
 }

@@ -220,7 +220,11 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     horizontal: 'left'
                 }}
             >
-                <EmojiPicker setDraft={setDraft} draft={draft} />
+                <EmojiPicker
+                    onSelected={(emoji) => {
+                        setDraft(draft + emoji.shortcodes)
+                    }}
+                />
             </Popover>
             <Box
                 sx={{
