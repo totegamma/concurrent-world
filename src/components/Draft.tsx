@@ -1,16 +1,18 @@
 import { useState, useContext, useEffect, useRef, memo } from 'react'
-import { InputBase, Box, Button, useTheme, IconButton, Divider, CircularProgress } from '@mui/material'
+import { InputBase, Box, Button, useTheme, IconButton, Divider, CircularProgress, Popover } from '@mui/material'
 import { ApplicationContext } from '../App'
 import SendIcon from '@mui/icons-material/Send'
 import HomeIcon from '@mui/icons-material/Home'
 import Picker from '@emoji-mart/react'
 import data from '@emoji-mart/data'
+import { Schemas } from '../schemas'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 import Splitscreen from '@mui/icons-material/Splitscreen'
 import ImageIcon from '@mui/icons-material/Image'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import { StreamPicker } from './StreamPicker'
 import { useSnackbar } from 'notistack'
+import { EmojiPicker } from './EmojiPicker'
 
 interface EmojiProps {
     shortcodes: string
@@ -45,10 +47,11 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const appData = useContext(ApplicationContext)
     const theme = useTheme()
 
-    const [draft, setDraft] = useState<string>('')
     const [destStreams, setDestStreams] = useState<string[]>(props.streamPickerInitial)
     const [selectEmoji, setSelectEmoji] = useState<boolean>(false)
-    const [customEmoji, setCustomEmoji] = useState<CustomEmoji[]>([])
+    const [emojiAnchor, setEmojiAnchor] = useState<null | HTMLElement>(null)
+
+    const [draft, setDraft] = useState<string>('')
     const [openPreview, setOpenPreview] = useState<boolean>(false)
 
     const inputRef = useRef<HTMLInputElement>(null)
@@ -61,23 +64,6 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     useEffect(() => {
         setDestStreams(props.streamPickerInitial)
     }, [props.streamPickerInitial])
-
-    useEffect(() => {
-        const emojis: CustomEmoji[] = [
-            {
-                id: 'fluffy',
-                name: 'Fluffy Social',
-                emojis: Object.entries(appData.emojiDict).map(([key, value]) => ({
-                    id: key,
-                    name: value.name,
-                    keywords: value.aliases,
-                    skins: [{ src: value.publicUrl }]
-                }))
-            }
-        ]
-
-        setCustomEmoji(emojis)
-    }, [appData.emojiDict])
 
     const post = (): void => {
         if (!props.allowEmpty && (draft.length === 0 || draft.trim().length === 0)) {
@@ -248,28 +234,19 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     </>
                 )}
             </Box>
-            {selectEmoji && (
-                <Box
-                    sx={{
-                        position: 'absolute',
-                        top: 150,
-                        right: { xs: 10, mb: 90 },
-                        zIndex: 9
-                    }}
-                >
-                    <Picker
-                        data={data}
-                        categories={['fluffy']}
-                        custom={customEmoji}
-                        searchPosition="static"
-                        onEmojiSelect={(emoji: EmojiProps) => {
-                            console.log(typeof emoji)
-                            setDraft(draft + emoji.shortcodes)
-                            setSelectEmoji(false)
-                        }}
-                    />
-                </Box>
-            )}
+            <Popover
+                open={selectEmoji}
+                anchorEl={emojiAnchor}
+                onClose={() => {
+                    setSelectEmoji(false)
+                }}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left'
+                }}
+            >
+                <EmojiPicker setDraft={setDraft} draft={draft} />
+            </Popover>
             <Box
                 sx={{
                     display: 'flex',
@@ -309,8 +286,9 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         sx={{
                             color: theme.palette.text.secondary
                         }}
-                        onClick={() => {
+                        onClick={(e) => {
                             setSelectEmoji(!selectEmoji)
+                            setEmojiAnchor(e.currentTarget)
                         }}
                     >
                         <EmojiEmotions sx={{ fontSize: '80%' }} />
