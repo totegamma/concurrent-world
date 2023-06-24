@@ -3,9 +3,6 @@ import { InputBase, Box, Button, useTheme, IconButton, Divider, CircularProgress
 import { ApplicationContext } from '../App'
 import SendIcon from '@mui/icons-material/Send'
 import HomeIcon from '@mui/icons-material/Home'
-import Picker from '@emoji-mart/react'
-import data from '@emoji-mart/data'
-import { Schemas } from '../schemas'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 import Splitscreen from '@mui/icons-material/Splitscreen'
 import ImageIcon from '@mui/icons-material/Image'
@@ -13,28 +10,6 @@ import { MarkdownRenderer } from './MarkdownRenderer'
 import { StreamPicker } from './StreamPicker'
 import { useSnackbar } from 'notistack'
 import { EmojiPicker } from './EmojiPicker'
-
-interface EmojiProps {
-    shortcodes: string
-}
-
-interface Skin {
-    src: string
-}
-
-interface Emoji {
-    id: string
-    name: string
-    keywords: string[]
-    skins: Skin[]
-}
-
-interface CustomEmoji {
-    id?: string
-    name?: string
-    emojis?: Emoji[]
-    keywords?: string[] | undefined
-}
 
 export interface DraftProps {
     submitButtonLabel?: string
