@@ -140,11 +140,10 @@ export class ApiMock extends ApiService {
     }
 
     async readKV(_key: string): Promise<string | undefined> {
-        await Promise.resolve(undefined)
+        return undefined
     }
 
     async writeKV(_key: string, _value: string): Promise<void> {
-        await Promise.resolve()
     }
 
     async favoriteMessage(id: string, author: CCID): Promise<void> {}
