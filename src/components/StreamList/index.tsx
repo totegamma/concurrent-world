@@ -3,9 +3,9 @@ import { Tree } from '@minoru/react-dnd-treeview'
 import CreateNewFolder from '@mui/icons-material/CreateNewFolder'
 
 import styles from './index.module.css'
-import { CssBaseline, IconButton, ThemeProvider, Typography, useTheme } from '@mui/material'
+import { IconButton, Typography } from '@mui/material'
 import Box from '@mui/material/Box'
-import type { Stream, ConcurrentTheme } from '../../model'
+import type { Stream } from '../../model'
 import { CustomNode } from './CustomNode'
 import { CustomDragPreview } from './CustomDragPreview'
 import { Placeholder } from './Placeholder'
@@ -30,7 +30,6 @@ interface StreamListProps {
 export function StreamList(props: StreamListProps): JSX.Element {
     const api = useApi()
     const follow = useFollow()
-    const theme = useTheme<ConcurrentTheme>()
     const [watchStreamTree, setWatchStreamTree] = usePersistent<WatchStream[]>('watchStreamTree', [])
 
     useEffect(() => {
@@ -120,42 +119,39 @@ export function StreamList(props: StreamListProps): JSX.Element {
                     <CreateNewFolder fontSize={'small'} />
                 </IconButton>
             </Box>
-            <ThemeProvider theme={theme}>
-                <CssBaseline />
-                <div className={styles.tree} style={{ marginRight: 8 }}>
-                    <Tree
-                        tree={watchStreamTree}
-                        rootId={0}
-                        render={(node, { depth, isOpen, onToggle }) => (
-                            <CustomNode
-                                node={node}
-                                depth={depth}
-                                isOpen={isOpen}
-                                onToggle={onToggle}
-                                tree={watchStreamTree}
-                                setWatchStreamTree={setWatchStreamTree}
-                                onClick={props.onClick}
-                            />
-                        )}
-                        dragPreviewRender={(monitorProps) => <CustomDragPreview monitorProps={monitorProps} />}
-                        onDrop={handleDrop}
-                        classes={{
-                            root: styles.treeRoot,
-                            draggingSource: styles.draggingSource,
-                            placeholder: styles.placeholderContainer
-                        }}
-                        sort={false}
-                        insertDroppableFirst={false}
-                        canDrop={(tree, { dragSource, dropTargetId, dropTarget }) => {
-                            if (dragSource?.parent === dropTargetId) {
-                                return true
-                            }
-                        }}
-                        dropTargetOffset={5}
-                        placeholderRender={(node, { depth }) => <Placeholder node={node} depth={depth} />}
-                    />
-                </div>
-            </ThemeProvider>
+            <div className={styles.tree} style={{ marginRight: 8 }}>
+                <Tree
+                    tree={watchStreamTree}
+                    rootId={0}
+                    render={(node, { depth, isOpen, onToggle }) => (
+                        <CustomNode
+                            node={node}
+                            depth={depth}
+                            isOpen={isOpen}
+                            onToggle={onToggle}
+                            tree={watchStreamTree}
+                            setWatchStreamTree={setWatchStreamTree}
+                            onClick={props.onClick}
+                        />
+                    )}
+                    dragPreviewRender={(monitorProps) => <CustomDragPreview monitorProps={monitorProps} />}
+                    onDrop={handleDrop}
+                    classes={{
+                        root: styles.treeRoot,
+                        draggingSource: styles.draggingSource,
+                        placeholder: styles.placeholderContainer
+                    }}
+                    sort={false}
+                    insertDroppableFirst={false}
+                    canDrop={(tree, { dragSource, dropTargetId, dropTarget }) => {
+                        if (dragSource?.parent === dropTargetId) {
+                            return true
+                        }
+                    }}
+                    dropTargetOffset={5}
+                    placeholderRender={(node, { depth }) => <Placeholder node={node} depth={depth} />}
+                />
+            </div>
         </>
     )
 }

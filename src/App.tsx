@@ -1,7 +1,7 @@
 import { useEffect, useState, createContext, useRef, useMemo } from 'react'
 import { DndProvider, getBackendOptions, MultiBackend } from '@minoru/react-dnd-treeview'
 import { Routes, Route, useLocation } from 'react-router-dom'
-import { darken, Box, Paper, ThemeProvider, SwipeableDrawer } from '@mui/material'
+import { darken, Box, Paper, ThemeProvider, SwipeableDrawer, CssBaseline } from '@mui/material'
 import useWebSocket, { type ReadyState } from 'react-use-websocket'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 
@@ -311,6 +311,7 @@ function App(): JSX.Element {
         <SnackbarProvider preventDuplicate>
             <DndProvider backend={MultiBackend} options={getBackendOptions()}>
                 <ThemeProvider theme={theme}>
+                    <CssBaseline />
                     <ClockContext.Provider value={clock}>
                         <ApiProvider api={api}>
                             <FollowProvider>
@@ -354,10 +355,10 @@ function App(): JSX.Element {
                         sx={{
                             display: {
                                 xs: 'none',
-                                sm: 'block',
-                                width: '200px'
+                                sm: 'block'
                             },
-                            padding: 1
+                            width: '200px',
+                            m: 1
                         }}
                     >
                         <Menu />
@@ -373,10 +374,7 @@ function App(): JSX.Element {
                         <Paper
                             sx={{
                                 flexGrow: '1',
-                                margin: {
-                                    xs: '4px',
-                                    sm: '10px'
-                                },
+                                margin: 1,
                                 mb: { xs: 0, sm: '10px' },
                                 display: 'flex',
                                 flexFlow: 'column',

@@ -1,7 +1,6 @@
 ul {
     list-style: none;
     box-sizing: border-box;
-    height: 100%;
     padding: 0;
 }
 
@@ -10,13 +9,11 @@ ul {
 }
 
 .tree {
-    height: 100%;
     padding-left: 8px;
     padding-top: 10px;
 }
 
 .treeRoot {
-    height: 100%;
     margin-top: auto;
 }
 

@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box'
 import { Themes, createConcurrentTheme } from '../themes'
-import { Button, Paper, ThemeProvider, Typography, darken } from '@mui/material'
+import { Button, CssBaseline, Paper, ThemeProvider, Typography, darken } from '@mui/material'
 import { ConcurrentLogo } from '../components/ConcurrentLogo'
 import { useState } from 'react'
 import { usePersistent } from '../hooks/usePersistent'
@@ -22,6 +22,7 @@ export default function Welcome(): JSX.Element {
 
     return (
         <ThemeProvider theme={theme}>
+            <CssBaseline />
             <Box
                 sx={{
                     display: 'flex',
