@@ -54,7 +54,6 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                     )
                 })
 
-                console.log('reaction0', reaction, props.emojiUsers)
                 return (
                     <Tooltip
                         key={shortcode}
