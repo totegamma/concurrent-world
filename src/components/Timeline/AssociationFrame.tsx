@@ -220,50 +220,40 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
             return (
                 <>
                     {replyMessage && (
-                        <MessageFrame message={replyMessage} lastUpdated={1} variant="thin"></MessageFrame>
+                        <MessageFrame message={replyMessage} lastUpdated={1} variant="oneline"></MessageFrame>
                     )}
-                    <Box
-                        sx={{
-                            paddingLeft: 2
-                        }}
-                    >
-                        <Typography variant="caption" color="text.disabled">
-                            {' '}
-                            {author?.payload.body.username || 'Anonymous'} さんが返信{' '}
-                        </Typography>
-                        {message && (
-                            <MessageView
-                                message={message}
-                                author={author}
-                                reactUsers={reactUsers}
-                                theme={theme}
-                                hasOwnReaction={hasOwnReaction}
-                                msgstreams={[]}
-                                messageAnchor={messageAnchor}
-                                api={api}
-                                inspectHandler={() => {
-                                    inspector.inspectItem({ messageId: message.id, author: message.author })
-                                }}
-                                handleReply={async () => {
-                                    messageDetail.openAction('reply', message?.id || '', message?.author || '')
-                                }}
-                                handleReRoute={async () => {
-                                    messageDetail.openAction('reroute', message?.id || '', message?.author)
-                                }}
-                                unfavorite={() => {
-                                    unfavorite(
-                                        message.associations.find((e) => e.author === api.userAddress)?.id,
-                                        message.author
-                                    )
-                                }}
-                                favorite={() => favorite({ ...message })}
-                                setMessageAnchor={setMessageAnchor}
-                                setFetchSucceed={() => {
-                                    return true
-                                }}
-                            />
-                        )}
-                    </Box>
+                    {message && (
+                        <MessageView
+                            message={message}
+                            author={author}
+                            reactUsers={reactUsers}
+                            theme={theme}
+                            hasOwnReaction={hasOwnReaction}
+                            msgstreams={[]}
+                            messageAnchor={messageAnchor}
+                            api={api}
+                            inspectHandler={() => {
+                                inspector.inspectItem({ messageId: message.id, author: message.author })
+                            }}
+                            handleReply={async () => {
+                                messageDetail.openAction('reply', message?.id || '', message?.author || '')
+                            }}
+                            handleReRoute={async () => {
+                                messageDetail.openAction('reroute', message?.id || '', message?.author)
+                            }}
+                            unfavorite={() => {
+                                unfavorite(
+                                    message.associations.find((e) => e.author === api.userAddress)?.id,
+                                    message.author
+                                )
+                            }}
+                            favorite={() => favorite({ ...message })}
+                            setMessageAnchor={setMessageAnchor}
+                            setFetchSucceed={() => {
+                                return true
+                            }}
+                        />
+                    )}
                 </>
             )
         case Schemas.reRouteAssociation:
