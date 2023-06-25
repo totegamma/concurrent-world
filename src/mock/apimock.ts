@@ -1,9 +1,6 @@
 import { ApiService } from '../abstraction/apiservice'
 import type { Association, Character, Entity, Host, Message, Stream, StreamElement, CCID } from '../model'
 import { StreamMock } from './modelmock'
-import { ReRouteMessage } from '../schemas/reRouteMessage'
-import { Schemas } from '../schemas'
-import { ReRouteAssociation } from '../schemas/reRouteAssociation'
 
 export class ApiMock extends ApiService {
     host: Host | undefined
@@ -140,6 +137,14 @@ export class ApiMock extends ApiService {
 
     upsertCharacter<T>(schema: string, body: T, id?: string): Promise<any> {
         return Promise.resolve(undefined)
+    }
+
+    async readKV(_key: string): Promise<string | undefined> {
+        await Promise.resolve(undefined)
+    }
+
+    async writeKV(_key: string, _value: string): Promise<void> {
+        await Promise.resolve()
     }
 
     async favoriteMessage(id: string, author: CCID): Promise<void> {}
