@@ -1,16 +1,19 @@
-import { useState, useContext, useEffect, useRef, memo } from 'react'
+import { useState, useContext, useEffect, useRef, memo, useMemo } from 'react'
 import { InputBase, Box, Button, useTheme, IconButton, Divider, CircularProgress, Popover } from '@mui/material'
 import { ApplicationContext } from '../App'
-import SendIcon from '@mui/icons-material/Send'
-import HomeIcon from '@mui/icons-material/Home'
-import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
-import Splitscreen from '@mui/icons-material/Splitscreen'
-import ImageIcon from '@mui/icons-material/Image'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import { StreamPicker } from './StreamPicker'
-import { useSnackbar } from 'notistack'
+import { closeSnackbar, useSnackbar } from 'notistack'
 import { EmojiPicker } from './EmojiPicker'
 import { usePreference } from '../context/PreferenceContext'
+import { usePersistent } from '../hooks/usePersistent'
+
+import SendIcon from '@mui/icons-material/Send'
+import HomeIcon from '@mui/icons-material/Home'
+import ImageIcon from '@mui/icons-material/Image'
+import DeleteIcon from '@mui/icons-material/Delete'
+import Splitscreen from '@mui/icons-material/Splitscreen'
+import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 
 export interface DraftProps {
     submitButtonLabel?: string
@@ -28,7 +31,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const [selectEmoji, setSelectEmoji] = useState<boolean>(false)
     const [emojiAnchor, setEmojiAnchor] = useState<null | HTMLElement>(null)
 
-    const [draft, setDraft] = useState<string>('')
+    const [draft, setDraft] = usePersistent<string>('draft', '')
     const [openPreview, setOpenPreview] = useState<boolean>(false)
 
     const inputRef = useRef<HTMLInputElement>(null)
@@ -273,6 +276,30 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         }}
                     >
                         <EmojiEmotions sx={{ fontSize: '80%' }} />
+                    </IconButton>
+                    <IconButton
+                        sx={{
+                            color: theme.palette.text.secondary
+                        }}
+                        onClick={() => {
+                            if (draft.length === 0) return
+                            enqueueSnackbar('Draft Cleared.', {
+                                autoHideDuration: 5000,
+                                action: (key) => (
+                                    <Button
+                                        onClick={() => {
+                                            closeSnackbar(key)
+                                            setDraft(draft)
+                                        }}
+                                    >
+                                        undo
+                                    </Button>
+                                )
+                            })
+                            setDraft('')
+                        }}
+                    >
+                        <DeleteIcon sx={{ fontSize: '80%' }} />
                     </IconButton>
                 </Box>
                 <Box
