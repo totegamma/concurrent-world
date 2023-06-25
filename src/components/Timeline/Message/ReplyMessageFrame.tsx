@@ -25,6 +25,7 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
     const [replyMessageAuthor, setReplyMessageAuthor] = useState<Character<Profile> | undefined>()
     const [msgStreams, setStreams] = useState<Array<Stream<any>>>([])
     const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
+    const [emojiUsers, setEmojiUsers] = useState<ProfileWithAddress[]>([])
     const [messageAnchor, setMessageAnchor] = useState<null | HTMLElement>(null)
     const [emojiPickerAnchor, setEmojiPickerAnchor] = useState<null | HTMLElement>(null)
 
@@ -67,6 +68,24 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
     }, [replyMessage])
 
     useEffect(() => {
+        // TODO: まとめてfetchする
+        const fetchEmojiUsers = async (): Promise<any> => {
+            const authors =
+                message?.associations.filter((e) => e.schema === Schemas.emojiAssociation).map((m) => m.author) ?? []
+
+            const users = await Promise.all(
+                authors.map((ccaddress) =>
+                    api.readCharacter(ccaddress, Schemas.profile).then((e) => {
+                        return {
+                            ccaddress,
+                            ...e?.payload.body
+                        }
+                    })
+                )
+            )
+            setEmojiUsers(users)
+        }
+
         const fetchUsers = async (): Promise<any> => {
             const authors = message?.associations.filter((e) => e.schema === Schemas.like).map((m) => m.author) ?? []
 
@@ -93,6 +112,7 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
         }
 
         fetchUsers()
+        fetchEmojiUsers()
     }, [message?.associations, props.lastUpdated])
 
     const unfavorite = useCallback(async (deletekey: string | undefined, author: CCID): Promise<void> => {
@@ -138,6 +158,7 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
                     message={message}
                     author={author}
                     reactUsers={reactUsers}
+                    emojiUsers={emojiUsers}
                     theme={theme}
                     hasOwnReaction={hasOwnReaction}
                     msgstreams={msgStreams}

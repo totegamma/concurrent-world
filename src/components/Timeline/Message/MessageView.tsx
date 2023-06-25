@@ -29,6 +29,7 @@ export interface MessageViewProps {
     message: CCMessage<TypeSimpleNote | ReplyMessage>
     author: Character<Profile> | undefined
     reactUsers: ProfileWithAddress[]
+    emojiUsers: ProfileWithAddress[]
     theme: Theme
     hasOwnReaction: boolean
     msgstreams: Array<Stream<any>>
@@ -96,7 +97,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                         />
                         {props.beforeMessage}
                         <SimpleNote message={props.message} />
-                        <MessageReactions message={props.message} />
+                        <MessageReactions message={props.message} emojiUsers={props.emojiUsers} />
                         <MessageActions
                             handleReply={props.handleReply}
                             handleReRoute={props.handleReRoute}

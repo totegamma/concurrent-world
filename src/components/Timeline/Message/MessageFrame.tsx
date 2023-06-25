@@ -27,6 +27,7 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
     const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
     const [messageAnchor, setMessageAnchor] = useState<null | HTMLElement>(null)
     const [emojiPickerAnchor, setEmojiPickerAnchor] = useState<null | HTMLElement>(null)
+    const [emojiUsers, setEmojiUsers] = useState<ProfileWithAddress[]>([])
 
     const theme = useTheme()
 
@@ -49,6 +50,24 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
     }, [props.message, props.lastUpdated])
 
     useEffect(() => {
+        // TODO: まとめてfetchする
+        const fetchEmojiUsers = async (): Promise<any> => {
+            const authors =
+                message?.associations.filter((e) => e.schema === Schemas.emojiAssociation).map((m) => m.author) ?? []
+
+            const users = await Promise.all(
+                authors.map((ccaddress) =>
+                    api.readCharacter(ccaddress, Schemas.profile).then((e) => {
+                        return {
+                            ccaddress,
+                            ...e?.payload.body
+                        }
+                    })
+                )
+            )
+            setEmojiUsers(users)
+        }
+
         const fetchUsers = async (): Promise<any> => {
             const authors = message?.associations.filter((e) => e.schema === Schemas.like).map((m) => m.author) ?? []
 
@@ -75,6 +94,7 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
         }
 
         fetchUsers()
+        fetchEmojiUsers()
     }, [message?.associations])
 
     const reloadMessage = useCallback(async () => {
@@ -171,6 +191,7 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                     message={message}
                     author={author}
                     reactUsers={reactUsers}
+                    emojiUsers={emojiUsers}
                     theme={theme}
                     hasOwnReaction={hasOwnReaction}
                     msgstreams={msgStreams}
