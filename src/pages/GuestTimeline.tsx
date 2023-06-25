@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Box, Button, Divider, Paper, ThemeProvider, darken } from '@mui/material'
+import { Box, Button, CssBaseline, Divider, Paper, ThemeProvider, darken } from '@mui/material'
 import type { ConcurrentTheme, StreamElementDated } from '../model'
 import { useObjectList } from '../hooks/useObjectList'
 import { Link, useLocation } from 'react-router-dom'
@@ -11,6 +11,7 @@ import { ClockContext } from '../App'
 import { Themes, createConcurrentTheme } from '../themes'
 import { usePersistent } from '../hooks/usePersistent'
 import { ConcurrentWordmark } from '../components/ConcurrentWordmark'
+import { Css } from '@mui/icons-material'
 
 export function GuestTimelinePage(): JSX.Element {
     const reactlocation = useLocation()
@@ -77,6 +78,7 @@ export function GuestTimelinePage(): JSX.Element {
 
     return (
         <ThemeProvider theme={theme}>
+            <CssBaseline />
             <ClockContext.Provider value={clock}>
                 <ApiProvider api={api}>
                     <Box

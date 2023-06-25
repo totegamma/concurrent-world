@@ -11,6 +11,7 @@ import ApiProvider from '../context/api'
 import type { Character, ConcurrentTheme, Host } from '../model'
 import {
     Avatar,
+    CssBaseline,
     Fade,
     Grid,
     IconButton,
@@ -434,7 +435,7 @@ export function Registration(): JSX.Element {
                     <Box
                         sx={{
                             width: '100%',
-                            borderRadius: '10px',
+                            borderRadius: 1,
                             overflow: 'hidden'
                         }}
                     >
@@ -495,6 +496,7 @@ export function Registration(): JSX.Element {
 
     return (
         <ThemeProvider theme={theme}>
+            <CssBaseline />
             <ApiProvider api={api}>
                 <Box
                     sx={{

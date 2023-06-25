@@ -136,7 +136,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
 
     if (!association) {
         return (
-            <ListItem sx={{ display: 'flex', justifyContent: 'center' }}>
+            <ListItem sx={{ display: 'flex', justifyContent: 'center' }} disablePadding disableGutters>
                 <Typography variant="caption" color="text.disabled">
                     404 not found
                 </Typography>
@@ -150,8 +150,6 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                 <ListItem
                     sx={{
                         alignItems: 'flex-start',
-                        flex: 1,
-                        p: { xs: '7px 0', sm: '10px 0' },
                         wordBreak: 'break-word'
                     }}
                     disablePadding
@@ -160,34 +158,32 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                         disableGutters
                         component={routerLink}
                         to={`/message/${message?.id ?? ''}@${message?.author ?? ''}`}
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            flex: 1,
+                            gap: 2
+                        }}
                     >
-                        <Box
+                        <IconButton
                             sx={{
-                                padding: {
-                                    xs: '5px 8px 0 0',
-                                    sm: '8px 10px 0 0'
-                                }
+                                width: { xs: '38px', sm: '48px' },
+                                height: { xs: '38px', sm: '48px' },
+                                mt: { xs: '3px', sm: '5px' }
                             }}
+                            component={routerLink}
+                            to={'/entity/' + association.author}
                         >
-                            <IconButton
+                            <CCAvatar
+                                alt={author?.payload.body.username}
+                                avatarURL={author?.payload.body.avatar}
+                                identiconSource={isMeToOther ? association?.author : message?.author ?? ''}
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
                                     height: { xs: '38px', sm: '48px' }
                                 }}
-                                component={routerLink}
-                                to={'/entity/' + association.author}
-                            >
-                                <CCAvatar
-                                    alt={author?.payload.body.username}
-                                    avatarURL={author?.payload.body.avatar}
-                                    identiconSource={isMeToOther ? association?.author : message?.author ?? ''}
-                                    sx={{
-                                        width: { xs: '38px', sm: '48px' },
-                                        height: { xs: '38px', sm: '48px' }
-                                    }}
-                                />
-                            </IconButton>
-                        </Box>
+                            />
+                        </IconButton>
                         <Box
                             sx={{
                                 flex: 1,
@@ -219,49 +215,41 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
         case Schemas.replyAssociation:
             return (
                 <>
-                    {replyMessage && <MessageFrame message={replyMessage} lastUpdated={1} thin={true}></MessageFrame>}
-                    <Box
-                        sx={{
-                            paddingLeft: 2
-                        }}
-                    >
-                        <Typography variant="caption" color="text.disabled">
-                            {' '}
-                            {author?.payload.body.username || 'Anonymous'} さんが返信{' '}
-                        </Typography>
-                        {message && (
-                            <MessageView
-                                message={message}
-                                author={author}
-                                reactUsers={reactUsers}
-                                theme={theme}
-                                hasOwnReaction={hasOwnReaction}
-                                msgstreams={[]}
-                                messageAnchor={messageAnchor}
-                                api={api}
-                                inspectHandler={() => {
-                                    inspector.inspectItem({ messageId: message.id, author: message.author })
-                                }}
-                                handleReply={async () => {
-                                    messageDetail.openAction('reply', message?.id || '', message?.author || '')
-                                }}
-                                handleReRoute={async () => {
-                                    messageDetail.openAction('reroute', message?.id || '', message?.author)
-                                }}
-                                unfavorite={() => {
-                                    unfavorite(
-                                        message.associations.find((e) => e.author === api.userAddress)?.id,
-                                        message.author
-                                    )
-                                }}
-                                favorite={() => favorite({ ...message })}
-                                setMessageAnchor={setMessageAnchor}
-                                setFetchSucceed={() => {
-                                    return true
-                                }}
-                            />
-                        )}
-                    </Box>
+                    {replyMessage && (
+                        <MessageFrame message={replyMessage} lastUpdated={1} variant="oneline"></MessageFrame>
+                    )}
+                    {message && (
+                        <MessageView
+                            message={message}
+                            author={author}
+                            reactUsers={reactUsers}
+                            theme={theme}
+                            hasOwnReaction={hasOwnReaction}
+                            msgstreams={[]}
+                            messageAnchor={messageAnchor}
+                            api={api}
+                            inspectHandler={() => {
+                                inspector.inspectItem({ messageId: message.id, author: message.author })
+                            }}
+                            handleReply={async () => {
+                                messageDetail.openAction('reply', message?.id || '', message?.author || '')
+                            }}
+                            handleReRoute={async () => {
+                                messageDetail.openAction('reroute', message?.id || '', message?.author)
+                            }}
+                            unfavorite={() => {
+                                unfavorite(
+                                    message.associations.find((e) => e.author === api.userAddress)?.id,
+                                    message.author
+                                )
+                            }}
+                            favorite={() => favorite({ ...message })}
+                            setMessageAnchor={setMessageAnchor}
+                            setFetchSucceed={() => {
+                                return true
+                            }}
+                        />
+                    )}
                 </>
             )
         case Schemas.reRouteAssociation:

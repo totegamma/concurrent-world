@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, memo } from 'react'
-import { ListItem, Box, Typography, useTheme, Skeleton } from '@mui/material'
+import { ListItem, Box, Typography, useTheme, Skeleton, Chip } from '@mui/material'
 
 import type { Character, Message as CCMessage, ProfileWithAddress, Stream, CCID } from '../../../model'
 import type { Profile } from '../../../schemas/profile'
@@ -22,7 +22,7 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [message, setMessage] = useState<CCMessage<any> | undefined>()
     const [replyMessage, setReplyMessage] = useState<CCMessage<any> | undefined>()
-    const [replyAuthor, setReplyAuthor] = useState<Character<Profile> | undefined>()
+    const [replyMessageAuthor, setReplyMessageAuthor] = useState<Character<Profile> | undefined>()
     const [msgStreams, setStreams] = useState<Array<Stream<any>>>([])
     const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
     const [messageAnchor, setMessageAnchor] = useState<null | HTMLElement>(null)
@@ -52,11 +52,18 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
         ).then((msg) => {
             setReplyMessage(msg)
         })
-
-        api.readCharacter(props.message.payload.body.replyToMessageAuthor, Schemas.profile).then((author) => {
-            setReplyAuthor(author)
-        })
     }, [props.message, props.lastUpdated])
+
+    useEffect(() => {
+        if (!replyMessage) return
+        api.readCharacter(replyMessage.author, Schemas.profile)
+            .then((author) => {
+                setReplyMessageAuthor(author)
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+    }, [replyMessage])
 
     useEffect(() => {
         const fetchUsers = async (): Promise<any> => {
@@ -94,7 +101,7 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
 
     if (!fetchSuccess) {
         return (
-            <ListItem sx={{ display: 'flex', justifyContent: 'center' }}>
+            <ListItem sx={{ display: 'flex', justifyContent: 'center' }} disablePadding disableGutters>
                 <Typography variant="caption" color="text.disabled">
                     404 not found
                 </Typography>
@@ -124,16 +131,8 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
 
     return (
         <>
-            {replyMessage && <MessageFrame message={replyMessage} lastUpdated={1} thin={true}></MessageFrame>}
-            <Box
-                sx={{
-                    paddingLeft: 2
-                }}
-            >
-                <Typography variant="caption" color="text.disabled">
-                    {' '}
-                    {author?.payload.body.username || 'Anonymous'} さんが返信{' '}
-                </Typography>
+            {replyMessage && <MessageFrame message={replyMessage} lastUpdated={1} variant="oneline"></MessageFrame>}
+            <Box>
                 <MessageView
                     message={message}
                     author={author}
@@ -158,6 +157,13 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
                     favorite={() => api.favoriteMessage(props.message.id, props.message.author)}
                     setMessageAnchor={setMessageAnchor}
                     setFetchSucceed={setFetchSucceed}
+                    beforeMessage={
+                        <Chip
+                            label={`@${replyMessageAuthor?.payload.body.username || 'anonymous'}`}
+                            size="small"
+                            sx={{ width: 'fit-content', mb: 1 }}
+                        />
+                    }
                 />
             </Box>
         </>

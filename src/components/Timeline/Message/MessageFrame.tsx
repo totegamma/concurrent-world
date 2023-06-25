@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, memo, useContext } from 'react'
+import { useState, useEffect, useCallback, memo } from 'react'
 import { ListItem, Box, Typography, useTheme, Skeleton } from '@mui/material'
 
 import type { Character, Message as CCMessage, ProfileWithAddress, Stream, CCID } from '../../../model'
@@ -8,12 +8,13 @@ import { useApi } from '../../../context/api'
 import { useInspector } from '../../../context/Inspector'
 import { MessageView } from './MessageView'
 import { ThinMessageView } from './ThinMessageView'
+import { OneLineMessageView } from './OneLineMessageView'
 import { useMessageDetail } from '../../../context/MessageDetail'
 
 export interface MessageFrameProp {
     message: CCMessage<any>
     lastUpdated: number
-    thin?: boolean
+    variant?: 'default' | 'thin' | 'oneline'
 }
 
 export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JSX.Element => {
@@ -95,7 +96,7 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
 
     if (!fetchSuccess) {
         return (
-            <ListItem sx={{ display: 'flex', justifyContent: 'center' }}>
+            <ListItem sx={{ display: 'flex', justifyContent: 'center' }} disablePadding disableGutters>
                 <Typography variant="caption" color="text.disabled">
                     404 not found
                 </Typography>
@@ -123,9 +124,9 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
         )
     }
 
-    return (
-        <>
-            {props.thin ? (
+    switch (props.variant) {
+        case 'thin':
+            return (
                 <ThinMessageView
                     message={message}
                     author={author}
@@ -142,7 +143,29 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                     setMessageAnchor={setMessageAnchor}
                     setFetchSucceed={setFetchSucceed}
                 />
-            ) : (
+            )
+        case 'oneline':
+            return (
+                <OneLineMessageView
+                    message={message}
+                    author={author}
+                    reactUsers={reactUsers}
+                    theme={theme}
+                    hasOwnReaction={hasOwnReaction}
+                    msgstreams={msgStreams}
+                    messageAnchor={messageAnchor}
+                    api={api}
+                    inspectHandler={() => {}}
+                    handleReply={async () => {}}
+                    unfavorite={() => {}}
+                    favorite={async () => {}}
+                    setMessageAnchor={setMessageAnchor}
+                    setFetchSucceed={setFetchSucceed}
+                />
+            )
+
+        default:
+            return (
                 <MessageView
                     message={message}
                     author={author}
@@ -172,9 +195,8 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                     setMessageAnchor={setMessageAnchor}
                     setFetchSucceed={setFetchSucceed}
                 />
-            )}
-        </>
-    )
+            )
+    }
 })
 
 MessageFrame.displayName = 'MessageFrame'

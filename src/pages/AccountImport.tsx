@@ -14,7 +14,7 @@ import type { ConcurrentTheme, Host } from '../model'
 import { usePersistent } from '../hooks/usePersistent'
 import { Themes, createConcurrentTheme } from '../themes'
 import { ThemeProvider } from '@emotion/react'
-import { darken } from '@mui/material'
+import { CssBaseline, darken } from '@mui/material'
 import { ConcurrentWordmark } from '../components/ConcurrentWordmark'
 
 export function AccountImport(): JSX.Element {
@@ -98,6 +98,7 @@ export function AccountImport(): JSX.Element {
 
     return (
         <ThemeProvider theme={theme}>
+            <CssBaseline />
             <Box
                 sx={{
                     padding: '20px',
