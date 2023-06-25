@@ -39,24 +39,31 @@ export const ReRouteMessageFrame = memo<ReRouteMessageFrameProp>((props: ReRoute
     return (
         <>
             <Box display="flex" alignItems="center" gap={1}>
-                <RepeatIcon sx={{ fontSize: '90%' }} />
-                <IconButton
-                    sx={{
-                        width: { xs: '12px', sm: '18px' },
-                        height: { xs: '12px', sm: '18px' }
-                    }}
-                    component={routerLink}
-                    to={'/entity/' + props.message.author}
+                <Box
+                    display="flex"
+                    width={{ xs: '38px', sm: '48px' }}
+                    justifyContent="space-between"
+                    alignItems="center"
                 >
-                    <CCAvatar
-                        avatarURL={author?.payload.body.avatar}
-                        identiconSource={props.message.author}
+                    <RepeatIcon sx={{ fontSize: '90%' }} />
+                    <IconButton
                         sx={{
                             width: { xs: '12px', sm: '18px' },
                             height: { xs: '12px', sm: '18px' }
                         }}
-                    />
-                </IconButton>
+                        component={routerLink}
+                        to={'/entity/' + props.message.author}
+                    >
+                        <CCAvatar
+                            avatarURL={author?.payload.body.avatar}
+                            identiconSource={props.message.author}
+                            sx={{
+                                width: { xs: '12px', sm: '18px' },
+                                height: { xs: '12px', sm: '18px' }
+                            }}
+                        />
+                    </IconButton>
+                </Box>
                 <Typography
                     sx={{
                         fontSize: {
