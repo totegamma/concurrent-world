@@ -68,7 +68,31 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                     h4: ({ children }) => <Typography variant="h4">{children}</Typography>,
                     h5: ({ children }) => <Typography variant="h5">{children}</Typography>,
                     h6: ({ children }) => <Typography variant="h6">{children}</Typography>,
-                    ul: ({ children }) => <ul style={{ listStyle: 'inside' }}>{children}</ul>,
+                    ul: ({ children }) => (
+                        <ul
+                            style={{
+                                paddingInlineStart: 0,
+                                paddingLeft: '1.5em',
+                                listStylePosition: 'outside',
+                                listStyleType: 'disc'
+                            }}
+                        >
+                            {children}
+                        </ul>
+                    ),
+                    ol: ({ children }) => (
+                        <ol
+                            style={{
+                                paddingInlineStart: 0,
+                                paddingLeft: '1.5em',
+                                listStylePosition: 'outside',
+                                listStyleType: 'decimal'
+                            }}
+                        >
+                            {children}
+                        </ol>
+                    ),
+                    li: ({ children }) => <li style={{ marginLeft: 0 }}>{children}</li>,
                     blockquote: ({ children }) => (
                         <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
                             {children}
