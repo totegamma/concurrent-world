@@ -11,7 +11,7 @@ import { useObjectList } from './hooks/useObjectList'
 import { Schemas } from './schemas'
 import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu'
-import type { StreamElementDated, ServerEvent, Emoji, ConcurrentTheme, ImgurSettings, Character, Host } from './model'
+import type { StreamElementDated, ServerEvent, Emoji, ConcurrentTheme, Character, Host } from './model'
 import {
     Associations,
     Explorer,
@@ -30,9 +30,9 @@ import useSound from 'use-sound'
 import { MobileMenu } from './components/MobileMenu'
 import ApiProvider from './context/api'
 import ConcurrentApiClient from './apiservice'
-import { FollowProvider } from './context/FollowContext'
 import type { Profile } from './schemas/profile'
 import type { Userstreams } from './schemas/userstreams'
+import { PreferenceProvider } from './context/PreferenceContext'
 
 const iOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent)
 
@@ -41,10 +41,6 @@ export const ApplicationContext = createContext<appData>({
     userstreams: undefined,
     emojiDict: {},
     websocketState: -1,
-    imgurSettings: {
-        clientId: ''
-    },
-    setImgurSettings: (_: ImgurSettings) => {},
     displayingStream: []
 })
 
@@ -53,8 +49,6 @@ export interface appData {
     userstreams: Character<Userstreams> | undefined
     emojiDict: Record<string, Emoji>
     websocketState: ReadyState
-    imgurSettings: ImgurSettings
-    setImgurSettings: (settings: ImgurSettings) => void
     displayingStream: string[]
 }
 
@@ -72,9 +66,6 @@ function App(): JSX.Element {
 
     const [themeName, setThemeName] = usePersistent<string>('Theme', Object.keys(Themes)[0])
 
-    const [imgurSettings, setImgurSettings] = usePersistent<ImgurSettings>('imgurSettings', {
-        clientId: ''
-    })
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
     const messages = useObjectList<StreamElementDated>()
     const [userstreams, setUserstreams] = useState<Character<Userstreams>>()
@@ -297,11 +288,9 @@ function App(): JSX.Element {
             profile,
             userstreams,
             websocketState: readyState,
-            imgurSettings,
-            setImgurSettings,
             displayingStream
         }
-    }, [emojiDict, profile, userstreams, readyState, imgurSettings, setImgurSettings, displayingStream])
+    }, [emojiDict, profile, userstreams, readyState, displayingStream])
 
     if (!api) {
         return <>building api service...</>
@@ -314,11 +303,11 @@ function App(): JSX.Element {
                     <CssBaseline />
                     <ClockContext.Provider value={clock}>
                         <ApiProvider api={api}>
-                            <FollowProvider>
+                            <PreferenceProvider>
                                 <ApplicationContext.Provider value={applicationContext}>
                                     {childs}
                                 </ApplicationContext.Provider>
-                            </FollowProvider>
+                            </PreferenceProvider>
                         </ApiProvider>
                     </ClockContext.Provider>
                 </ThemeProvider>

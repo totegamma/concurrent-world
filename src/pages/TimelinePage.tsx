@@ -6,7 +6,6 @@ import { Draft } from '../components/Draft'
 import { useLocation } from 'react-router-dom'
 import { TimelineHeader } from '../components/TimelineHeader'
 import { useApi } from '../context/api'
-import { useFollow } from '../context/FollowContext'
 import { Timeline } from '../components/Timeline/main'
 import { StreamInfo } from '../components/StreamInfo'
 import { HomeSettings } from '../components/HomeSettings'
@@ -14,6 +13,7 @@ import { ApplicationContext } from '../App'
 import type { SimpleNote } from '../schemas/simpleNote'
 import { Schemas } from '../schemas'
 import { usePersistent } from '../hooks/usePersistent'
+import { usePreference } from '../context/PreferenceContext'
 
 export interface TimelinePageProps {
     messages: IuseObjectList<StreamElementDated>
@@ -23,7 +23,7 @@ export interface TimelinePageProps {
 export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): JSX.Element => {
     const api = useApi()
     const appData = useContext(ApplicationContext)
-    const followService = useFollow()
+    const pref = usePreference()
 
     const reactlocation = useLocation()
     const scrollParentRef = useRef<HTMLDivElement>(null)
@@ -51,7 +51,7 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
             mode = 'home'
         } else {
             // at non-home
-            mode = followService.bookmarkingStreams.includes(queriedStreams[0]) ? 'compose' : 'info'
+            mode = pref.bookmarkingStreams.includes(queriedStreams[0]) ? 'compose' : 'info'
             ;(async () => {
                 // check writeable
                 const writeable = await Promise.all(
@@ -135,8 +135,8 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                     <Divider />
                 </Box>
                 {(reactlocation.hash === '' || reactlocation.hash === '#') &&
-                followService.followingStreams.length === 0 &&
-                followService.followingUsers.length === 0 ? (
+                pref.followingStreams.length === 0 &&
+                pref.followingUsers.length === 0 ? (
                     <Box>まだ誰も、どのストリームもフォローしていません。Explorerタブから探しに行きましょう。</Box>
                 ) : (
                     <Box sx={{ display: 'flex', flex: 1, padding: { xs: '8px', sm: '8px 16px' } }}>

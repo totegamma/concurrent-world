@@ -10,6 +10,7 @@ import { MarkdownRenderer } from './MarkdownRenderer'
 import { StreamPicker } from './StreamPicker'
 import { useSnackbar } from 'notistack'
 import { EmojiPicker } from './EmojiPicker'
+import { usePreference } from '../context/PreferenceContext'
 
 export interface DraftProps {
     submitButtonLabel?: string
@@ -21,6 +22,7 @@ export interface DraftProps {
 export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const appData = useContext(ApplicationContext)
     const theme = useTheme()
+    const pref = usePreference()
 
     const [destStreams, setDestStreams] = useState<string[]>(props.streamPickerInitial)
     const [selectEmoji, setSelectEmoji] = useState<boolean>(false)
@@ -63,12 +65,12 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const uploadToImgur = async (base64Data: string): Promise<string> => {
         const url = 'https://api.imgur.com/3/image'
 
-        if (!appData.imgurSettings.clientId) return ''
+        if (!pref.imgurClientID) return ''
 
         const result = await fetch(url, {
             method: 'POST',
             headers: {
-                Authorization: `Client-ID ${appData.imgurSettings.clientId}`,
+                Authorization: `Client-ID ${pref.imgurClientID}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({

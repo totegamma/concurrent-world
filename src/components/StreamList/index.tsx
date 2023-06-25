@@ -14,7 +14,7 @@ import { usePersistent } from '../../hooks/usePersistent'
 import { v4 as uuidv4 } from 'uuid'
 import PercentIcon from '@mui/icons-material/Percent'
 import { useApi } from '../../context/api'
-import { useFollow } from '../../context/FollowContext'
+import { usePreference } from '../../context/PreferenceContext'
 export interface WatchStream {
     id: number | string
     parent: number
@@ -29,12 +29,12 @@ interface StreamListProps {
 
 export function StreamList(props: StreamListProps): JSX.Element {
     const api = useApi()
-    const follow = useFollow()
+    const pref = usePreference()
     const [watchStreamTree, setWatchStreamTree] = usePersistent<WatchStream[]>('watchStreamTree', [])
 
     useEffect(() => {
         ;(async () => {
-            const streams = await Promise.all(follow.bookmarkingStreams.map(async (id) => await api.readStream(id)))
+            const streams = await Promise.all(pref.bookmarkingStreams.map(async (id) => await api.readStream(id)))
             if (watchStreamTree.length === 0) {
                 // init watch stream tree
                 console.log('init watch stream tree')
@@ -57,7 +57,7 @@ export function StreamList(props: StreamListProps): JSX.Element {
                     if (node.data === undefined) {
                         return true
                     }
-                    return follow.bookmarkingStreams.includes(node.data.id)
+                    return pref.bookmarkingStreams.includes(node.data.id)
                 })
                 // when a stream is added, add it to the tree
                 streams.forEach((stream) => {
@@ -77,7 +77,7 @@ export function StreamList(props: StreamListProps): JSX.Element {
                 setWatchStreamTree(newTree)
             }
         })()
-    }, [follow.bookmarkingStreams])
+    }, [pref.bookmarkingStreams])
 
     const addFolder = (): void => {
         setWatchStreamTree([

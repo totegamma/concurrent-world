@@ -1,4 +1,4 @@
-import { Box, Button, Collapse, Divider, IconButton, Paper, Typography, Zoom, alpha, useTheme } from '@mui/material'
+import { Box, Button, Collapse, IconButton, Paper, Typography, Zoom, alpha, useTheme } from '@mui/material'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useApi } from '../context/api'
@@ -9,7 +9,6 @@ import { Schemas } from '../schemas'
 import { CCAvatar } from '../components/CCAvatar'
 import { Timeline } from '../components/Timeline'
 import { useObjectList } from '../hooks/useObjectList'
-import { useFollow } from '../context/FollowContext'
 import Background from '../resources/defaultbg.png'
 import InfoIcon from '@mui/icons-material/Info'
 import CreateIcon from '@mui/icons-material/Create'
@@ -17,11 +16,12 @@ import { ProfileEditor } from '../components/ProfileEditor'
 import { useSnackbar } from 'notistack'
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1'
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove'
+import { usePreference } from '../context/PreferenceContext'
 
 export function EntityPage(): JSX.Element {
     const api = useApi()
     const theme = useTheme()
-    const followService = useFollow()
+    const pref = usePreference()
     const { enqueueSnackbar } = useSnackbar()
     const { id } = useParams()
     const [entity, setEntity] = useState<Entity>()
@@ -31,7 +31,7 @@ export function EntityPage(): JSX.Element {
     const messages = useObjectList<StreamElementDated>()
     const scrollParentRef = useRef<HTMLDivElement>(null)
     const self = id === api.userAddress
-    const following = id && followService.followingUsers.includes(id)
+    const following = id && pref.followingUsers.includes(id)
 
     useEffect(() => {
         if (!id) return
@@ -150,7 +150,7 @@ export function EntityPage(): JSX.Element {
                             >
                                 <IconButton
                                     onClick={() => {
-                                        id && followService.unfollowUser(id)
+                                        id && pref.unfollowUser(id)
                                         enqueueSnackbar('Unfollowed', { variant: 'success' })
                                     }}
                                 >
@@ -167,7 +167,7 @@ export function EntityPage(): JSX.Element {
                             >
                                 <IconButton
                                     onClick={() => {
-                                        id && followService.followUser(id)
+                                        id && pref.followUser(id)
                                         enqueueSnackbar('Followed', { variant: 'success' })
                                     }}
                                 >

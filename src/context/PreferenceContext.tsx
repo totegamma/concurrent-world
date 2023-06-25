@@ -1,7 +1,13 @@
 import { createContext, useCallback, useContext, useMemo } from 'react'
 import { usePersistent } from '../hooks/usePersistent'
 
-interface FollowState {
+interface PreferenceState {
+    themeName: string
+    setThemeName: (_: string) => void
+
+    imgurClientID: string
+    setImgurClientID: (_: string) => void
+
     followingUsers: string[]
     followUser: (_: string) => void
     unfollowUser: (_: string) => void
@@ -14,18 +20,27 @@ interface FollowState {
     bookmarkingStreams: string[]
     bookmarkStream: (_: string) => void
     unbookmarkStream: (_: string) => void
+
+    defaultPostHome: string[]
+    setDefaultPostHome: (_: string[]) => void
+    defaultPostNonHome: string[]
+    setDefaultPostNonHome: (_: string[]) => void
 }
 
-const FollowContext = createContext<FollowState | undefined>(undefined)
+const PreferenceContext = createContext<PreferenceState | undefined>(undefined)
 
-interface FollowProviderProps {
+interface PreferenceProviderProps {
     children: JSX.Element
 }
 
-export const FollowProvider = (props: FollowProviderProps): JSX.Element => {
+export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element => {
+    const [themeName, setThemeName] = usePersistent<string>('themeName', 'basic')
+    const [imgurClientID, setImgurClientID] = usePersistent<string>('imgurClientID', '')
     const [followingUsers, setFollowingUsers] = usePersistent<string[]>('followingUsers', [])
     const [followingStreams, setFollowingStreams] = usePersistent<string[]>('followingStreams', [])
     const [bookmarkingStreams, setBookmarkingStreams] = usePersistent<string[]>('bookmarkingStreams', [])
+    const [defaultPostHome, setDefaultPostHome] = usePersistent<string[]>('defaultPostHome', [])
+    const [defaultPostNonHome, setDefaultPostNonHome] = usePersistent<string[]>('defaultPostNonHome', [])
 
     const followUser = useCallback(
         (ccaddr: string): void => {
@@ -72,39 +87,51 @@ export const FollowProvider = (props: FollowProviderProps): JSX.Element => {
         [bookmarkingStreams, setBookmarkingStreams]
     )
 
-    return (
-        <FollowContext.Provider
-            value={useMemo(() => {
-                return {
-                    followingUsers,
-                    setFollowingStreams,
-                    followUser,
-                    unfollowUser,
-                    followingStreams,
-                    followStream,
-                    unfollowStream,
-                    bookmarkingStreams,
-                    bookmarkStream,
-                    unbookmarkStream
-                }
-            }, [
-                followingUsers,
-                setFollowingStreams,
-                followUser,
-                unfollowUser,
-                followingStreams,
-                followStream,
-                unfollowStream,
-                bookmarkingStreams,
-                bookmarkStream,
-                unbookmarkStream
-            ])}
-        >
-            {props.children}
-        </FollowContext.Provider>
-    )
+    const value = useMemo(() => {
+        return {
+            themeName,
+            setThemeName,
+            imgurClientID,
+            setImgurClientID,
+            followingUsers,
+            followUser,
+            unfollowUser,
+            followingStreams,
+            setFollowingStreams,
+            followStream,
+            unfollowStream,
+            bookmarkingStreams,
+            bookmarkStream,
+            unbookmarkStream,
+            defaultPostHome,
+            setDefaultPostHome,
+            defaultPostNonHome,
+            setDefaultPostNonHome
+        }
+    }, [
+        themeName,
+        setThemeName,
+        imgurClientID,
+        setImgurClientID,
+        followingUsers,
+        followUser,
+        unfollowUser,
+        followingStreams,
+        setFollowingStreams,
+        followStream,
+        unfollowStream,
+        bookmarkingStreams,
+        bookmarkStream,
+        unbookmarkStream,
+        defaultPostHome,
+        setDefaultPostHome,
+        defaultPostNonHome,
+        setDefaultPostNonHome
+    ])
+
+    return <PreferenceContext.Provider value={value}>{props.children}</PreferenceContext.Provider>
 }
 
-export function useFollow(): FollowState {
-    return useContext(FollowContext) as FollowState
+export function usePreference(): PreferenceState {
+    return useContext(PreferenceContext) as PreferenceState
 }
