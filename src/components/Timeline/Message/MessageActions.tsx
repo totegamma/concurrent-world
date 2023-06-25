@@ -5,7 +5,6 @@ import StarIcon from '@mui/icons-material/Star'
 import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import RepeatIcon from '@mui/icons-material/Repeat'
-import React from 'react'
 import type { Stream, Message as CCMessage, ProfileWithAddress } from '../../../model'
 import type ConcurrentApiClient from '../../../apiservice'
 import { Schemas } from '../../../schemas'
@@ -29,11 +28,10 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
         <Box
             sx={{
                 display: 'flex',
-                gap: '10px',
                 justifyContent: 'space-between'
             }}
         >
-            <Box sx={{ display: 'flex', gap: '20px' }}>
+            <Box sx={{ display: 'flex', gap: 4 }}>
                 {/* left */}
                 <IconButton
                     sx={{
@@ -107,7 +105,11 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                 }
                             }}
                         >
-                            {props.hasOwnReaction ? <StarIcon sx={{ fontSize: '80%' }} /> : <StarOutlineIcon  sx={{ fontSize: '80%' }} />}
+                            {props.hasOwnReaction ? (
+                                <StarIcon sx={{ fontSize: '80%' }} />
+                            ) : (
+                                <StarOutlineIcon sx={{ fontSize: '80%' }} />
+                            )}
                         </IconButton>
                         <Typography sx={{ size: '16px' }}>
                             {props.message.associations.filter((e) => e.schema === Schemas.like).length}
@@ -126,7 +128,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     <MoreHorizIcon sx={{ fontSize: '80%' }} />
                 </IconButton>
             </Box>
-            <Box sx={{ display: 'flex', gap: '3px' }}>
+            <Box display="flex">
                 {/* right */}
                 {props.msgstreams.map((e) => (
                     <Link
@@ -140,9 +142,9 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         href={'/#' + e.id}
                     >
                         {`%${
-                            e.payload.body.name.length < 12
+                            e.payload.body.name.length < 15
                                 ? (e.payload.body.name as string)
-                                : (e.payload.body.name.slice(0, 9) as string) + '...'
+                                : (e.payload.body.name.slice(0, 2) as string) + '...'
                         }`}
                     </Link>
                 ))}

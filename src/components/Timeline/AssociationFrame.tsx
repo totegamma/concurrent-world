@@ -136,7 +136,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
 
     if (!association) {
         return (
-            <ListItem sx={{ display: 'flex', justifyContent: 'center' }}>
+            <ListItem sx={{ display: 'flex', justifyContent: 'center' }} disablePadding disableGutters>
                 <Typography variant="caption" color="text.disabled">
                     404 not found
                 </Typography>
@@ -150,8 +150,6 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                 <ListItem
                     sx={{
                         alignItems: 'flex-start',
-                        flex: 1,
-                        p: { xs: '7px 0', sm: '10px 0' },
                         wordBreak: 'break-word'
                     }}
                     disablePadding
@@ -160,34 +158,32 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                         disableGutters
                         component={routerLink}
                         to={`/message/${message?.id ?? ''}@${message?.author ?? ''}`}
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            flex: 1,
+                            gap: 2
+                        }}
                     >
-                        <Box
+                        <IconButton
                             sx={{
-                                padding: {
-                                    xs: '5px 8px 0 0',
-                                    sm: '8px 10px 0 0'
-                                }
+                                width: { xs: '38px', sm: '48px' },
+                                height: { xs: '38px', sm: '48px' },
+                                mt: { xs: '3px', sm: '5px' }
                             }}
+                            component={routerLink}
+                            to={'/entity/' + association.author}
                         >
-                            <IconButton
+                            <CCAvatar
+                                alt={author?.payload.body.username}
+                                avatarURL={author?.payload.body.avatar}
+                                identiconSource={isMeToOther ? association?.author : message?.author ?? ''}
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
                                     height: { xs: '38px', sm: '48px' }
                                 }}
-                                component={routerLink}
-                                to={'/entity/' + association.author}
-                            >
-                                <CCAvatar
-                                    alt={author?.payload.body.username}
-                                    avatarURL={author?.payload.body.avatar}
-                                    identiconSource={isMeToOther ? association?.author : message?.author ?? ''}
-                                    sx={{
-                                        width: { xs: '38px', sm: '48px' },
-                                        height: { xs: '38px', sm: '48px' }
-                                    }}
-                                />
-                            </IconButton>
-                        </Box>
+                            />
+                        </IconButton>
                         <Box
                             sx={{
                                 flex: 1,

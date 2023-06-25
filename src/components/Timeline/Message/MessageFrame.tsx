@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, memo, useContext } from 'react'
+import { useState, useEffect, useCallback, memo } from 'react'
 import { ListItem, Box, Typography, useTheme, Skeleton } from '@mui/material'
 
 import type { Character, Message as CCMessage, ProfileWithAddress, Stream, CCID } from '../../../model'
@@ -96,7 +96,7 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
 
     if (!fetchSuccess) {
         return (
-            <ListItem sx={{ display: 'flex', justifyContent: 'center' }}>
+            <ListItem sx={{ display: 'flex', justifyContent: 'center' }} disablePadding disableGutters>
                 <Typography variant="caption" color="text.disabled">
                     404 not found
                 </Typography>

@@ -33,38 +33,31 @@ export const ThinMessageView = (props: MessageViewProps): JSX.Element => {
                 alignItems: 'flex-start',
                 flex: 1,
                 p: { xs: '7px 0', sm: '10px 0' },
-                wordBreak: 'break-word'
+                wordBreak: 'break-word',
+                gap: 2
             }}
         >
             {props.message?.payload?.body && (
                 <>
-                    <Box
+                    <IconButton
                         sx={{
-                            padding: {
-                                xs: '5px 8px 0 0',
-                                sm: '8px 10px 0 0'
-                            }
+                            width: { xs: '24px', sm: '36px' },
+                            height: { xs: '24px', sm: '36px' },
+                            mt: { xs: '3px', sm: '5px' }
                         }}
+                        component={routerLink}
+                        to={'/entity/' + props.message.author}
                     >
-                        <IconButton
+                        <CCAvatar
+                            alt={props.author?.payload.body.username}
+                            avatarURL={props.author?.payload.body.avatar}
+                            identiconSource={props.message.author}
                             sx={{
                                 width: { xs: '24px', sm: '36px' },
                                 height: { xs: '24px', sm: '36px' }
                             }}
-                            component={routerLink}
-                            to={'/entity/' + props.message.author}
-                        >
-                            <CCAvatar
-                                alt={props.author?.payload.body.username}
-                                avatarURL={props.author?.payload.body.avatar}
-                                identiconSource={props.message.author}
-                                sx={{
-                                    width: { xs: '24px', sm: '36px' },
-                                    height: { xs: '24px', sm: '36px' }
-                                }}
-                            />
-                        </IconButton>
-                    </Box>
+                        />
+                    </IconButton>
                     <Box
                         sx={{
                             display: 'flex',

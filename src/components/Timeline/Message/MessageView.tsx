@@ -36,41 +36,34 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
     return (
         <ListItem
             sx={{
+                wordBreak: 'break-word',
                 alignItems: 'flex-start',
                 flex: 1,
-                p: { xs: '0', sm: '0' },
-                wordBreak: 'break-word'
+                gap: 2
             }}
+            disablePadding
         >
             {props.message?.payload?.body && (
                 <>
-                    <Box
+                    <IconButton
                         sx={{
-                            padding: {
-                                xs: '5px 8px 0 0',
-                                sm: '8px 10px 0 0'
-                            }
+                            width: { xs: '38px', sm: '48px' },
+                            height: { xs: '38px', sm: '48px' },
+                            mt: { xs: '3px', sm: '5px' }
                         }}
+                        component={routerLink}
+                        to={'/entity/' + props.message.author}
                     >
-                        <IconButton
+                        <CCAvatar
+                            alt={props.author?.payload.body.username}
+                            avatarURL={props.author?.payload.body.avatar}
+                            identiconSource={props.message.author}
                             sx={{
                                 width: { xs: '38px', sm: '48px' },
                                 height: { xs: '38px', sm: '48px' }
                             }}
-                            component={routerLink}
-                            to={'/entity/' + props.message.author}
-                        >
-                            <CCAvatar
-                                alt={props.author?.payload.body.username}
-                                avatarURL={props.author?.payload.body.avatar}
-                                identiconSource={props.message.author}
-                                sx={{
-                                    width: { xs: '38px', sm: '48px' },
-                                    height: { xs: '38px', sm: '48px' }
-                                }}
-                            />
-                        </IconButton>
-                    </Box>
+                        />
+                    </IconButton>
                     <Box
                         sx={{
                             display: 'flex',

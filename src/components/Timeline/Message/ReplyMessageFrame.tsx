@@ -101,7 +101,7 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
 
     if (!fetchSuccess) {
         return (
-            <ListItem sx={{ display: 'flex', justifyContent: 'center' }}>
+            <ListItem sx={{ display: 'flex', justifyContent: 'center' }} disablePadding disableGutters>
                 <Typography variant="caption" color="text.disabled">
                     404 not found
                 </Typography>
