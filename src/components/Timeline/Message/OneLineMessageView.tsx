@@ -1,4 +1,4 @@
-import { Box, Link, Typography, IconButton, type Theme } from '@mui/material'
+import { Box, Link, IconButton, type Theme, Typography } from '@mui/material'
 import { Link as routerLink } from 'react-router-dom'
 import { CCAvatar } from '../../CCAvatar'
 import type { Character, Message as CCMessage, ProfileWithAddress, Stream } from '../../../model'
@@ -33,13 +33,14 @@ export const OneLineMessageView = (props: MessageViewProps): JSX.Element => {
                 display: 'flex',
                 alignItems: 'center',
                 color: 'text.disabled',
+                overflow: 'hidden',
                 flex: 1,
                 gap: 1
             }}
         >
             <IconButton
                 sx={{
-                    width: { xs: '12px', sm: '18px' },
+                    width: { xs: '32px', sm: '48px' },
                     height: { xs: '12px', sm: '18px' }
                 }}
                 component={routerLink}
@@ -50,35 +51,21 @@ export const OneLineMessageView = (props: MessageViewProps): JSX.Element => {
                     avatarURL={props.author?.payload.body.avatar}
                     identiconSource={props.message.author}
                     sx={{
-                        width: { xs: '12px', sm: '18px' },
+                        width: { xs: '32px', sm: '48px' },
                         height: { xs: '12px', sm: '18px' }
                     }}
                 />
             </IconButton>
-            {/*
-            <Typography
-                sx={{
-                    fontWeight: '700',
-                    fontSize: {
-                        xs: '0.8rem',
-                        sm: '0.9rem'
-                    },
-                    flexShrink: 0
-                }}
-            >
-                {props.author?.payload.body.username || 'anonymous'}
-            </Typography>
-            */}
-            <Box
-                sx={{
-                    display: 'flex',
-                    flex: 1,
-                    overflow: 'hidden',
-                    fontSize: '0.9rem',
-                    height: '1.4rem' // FIXME
-                }}
-            >
-                {props.message.payload.body.body}
+            <Box display="flex" flex={1} overflow="hidden">
+                <Typography
+                    overflow="hidden"
+                    fontSize="0.9rem"
+                    whiteSpace="nowrap"
+                    textOverflow="ellipsis"
+                    minWidth={0}
+                >
+                    {props.message.payload.body.body}
+                </Typography>
             </Box>
             <Link
                 component="button"
@@ -86,7 +73,8 @@ export const OneLineMessageView = (props: MessageViewProps): JSX.Element => {
                 color="inherit"
                 sx={{
                     display: 'flex',
-                    flexShrink: 0
+                    flexShrink: 0,
+                    fontSize: '0.8rem'
                 }}
             >
                 <TimeDiff date={new Date(props.message.cdate)} />
