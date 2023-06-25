@@ -55,6 +55,7 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                 component={RouterLink}
                 underline="hover"
                 color="inherit"
+                fontSize="0.8rem"
                 to={`/message/${props.messageID}@${props.authorID}`}
             >
                 <TimeDiff date={new Date(props.cdate)} />

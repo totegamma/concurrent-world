@@ -59,7 +59,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                 overflowX: 'hidden',
                 overflowY: 'hidden',
                 '&:hover': {
-                    overflowY: 'scroll'
+                    overflowY: 'auto'
                 }
             }}
         >
