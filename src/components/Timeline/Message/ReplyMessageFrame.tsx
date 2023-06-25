@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, memo } from 'react'
-import { ListItem, Box, Typography, useTheme, Skeleton } from '@mui/material'
+import { ListItem, Box, Typography, useTheme, Skeleton, Chip } from '@mui/material'
 
 import type { Character, Message as CCMessage, ProfileWithAddress, Stream, CCID } from '../../../model'
 import type { Profile } from '../../../schemas/profile'
@@ -9,7 +9,6 @@ import { useInspector } from '../../../context/Inspector'
 import { MessageView } from './MessageView'
 import { MessageFrame } from './MessageFrame'
 import { useMessageDetail } from '../../../context/MessageDetail'
-import ReplyIcon from '@mui/icons-material/Reply'
 
 export interface MessageFrameProp {
     message: CCMessage<any>
@@ -159,17 +158,11 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
                     setMessageAnchor={setMessageAnchor}
                     setFetchSucceed={setFetchSucceed}
                     beforeMessage={
-                        <Box
-                            bgcolor="primary.main"
-                            color="primary.contrastText"
-                            borderRadius="100px"
-                            width="fit-content"
-                            px={1}
-                            mb={0.5}
-                            fontSize="0.8rem"
-                        >
-                            @{replyMessageAuthor?.payload.body.username}
-                        </Box>
+                        <Chip
+                            label={`@${replyMessageAuthor?.payload.body.username || 'anonymous'}`}
+                            size="small"
+                            sx={{ width: 'fit-content', mb: 1 }}
+                        />
                     }
                 />
             </Box>
