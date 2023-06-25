@@ -1,4 +1,14 @@
-import { Box, IconButton, ListItem, ListItemIcon, ListItemText, Menu, MenuItem, type Theme } from '@mui/material'
+import {
+    Box,
+    IconButton,
+    ListItem,
+    ListItemIcon,
+    ListItemText,
+    Menu,
+    MenuItem,
+    Popover,
+    type Theme
+} from '@mui/material'
 import { Link as routerLink } from 'react-router-dom'
 import { CCAvatar } from '../../CCAvatar'
 import type { Character, Message as CCMessage, ProfileWithAddress, Stream } from '../../../model'
@@ -11,7 +21,9 @@ import type { Profile } from '../../../schemas/profile'
 import type ConcurrentApiClient from '../../../apiservice'
 import { MessageHeader } from './MessageHeader'
 import { MessageActions } from './MessageActions'
+import { MessageReactions } from './MessageReactions'
 import type { ReplyMessage } from '../../../schemas/replyMessage'
+import { EmojiPicker, type EmojiProps } from '../../EmojiPicker'
 
 export interface MessageViewProps {
     message: CCMessage<TypeSimpleNote | ReplyMessage>
@@ -21,13 +33,16 @@ export interface MessageViewProps {
     hasOwnReaction: boolean
     msgstreams: Array<Stream<any>>
     messageAnchor: null | HTMLElement
+    emojiPickerAnchor: null | HTMLElement
     api: ConcurrentApiClient
     inspectHandler: () => void
     handleReply: () => Promise<void>
     handleReRoute: () => Promise<void>
     unfavorite: () => void
     favorite: () => Promise<void>
+    addMessageReaction: (emoji: EmojiProps) => Promise<void>
     setMessageAnchor: (anchor: null | HTMLElement) => void
+    setEmojiPickerAnchor: (anchor: null | HTMLElement) => void
     setFetchSucceed: (fetchSucceed: boolean) => void
     beforeMessage?: JSX.Element
 }
@@ -81,6 +96,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                         />
                         {props.beforeMessage}
                         <SimpleNote message={props.message} />
+                        <MessageReactions message={props.message} />
                         <MessageActions
                             handleReply={props.handleReply}
                             handleReRoute={props.handleReRoute}
@@ -92,6 +108,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                             message={props.message}
                             favorite={props.favorite}
                             setMessageAnchor={props.setMessageAnchor}
+                            setEmojiPickerAnchor={props.setEmojiPickerAnchor}
                             msgstreams={props.msgstreams}
                         />
                     </Box>
@@ -143,6 +160,27 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                     </MenuItem>
                 )}
             </Menu>
+            <Popover
+                anchorEl={props.emojiPickerAnchor}
+                open={Boolean(props.emojiPickerAnchor)}
+                onClose={() => {
+                    props.setEmojiPickerAnchor(null)
+                }}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left'
+                }}
+            >
+                {/* onSelected={(emoji) => {
+                props.api.addMessageReaction(props.message.id, props.message.author, emoji.shortcodes, emoji.src)
+              }} */}
+                <EmojiPicker
+                    onSelected={(emoji) => {
+                        props.addMessageReaction(emoji)
+                        props.setEmojiPickerAnchor(null)
+                    }}
+                />
+            </Popover>
         </ListItem>
     )
 }

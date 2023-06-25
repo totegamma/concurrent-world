@@ -3,6 +3,7 @@ import ReplyIcon from '@mui/icons-material/Reply'
 import { CCAvatar } from '../../CCAvatar'
 import StarIcon from '@mui/icons-material/Star'
 import StarOutlineIcon from '@mui/icons-material/StarOutline'
+import AddReactionIcon from '@mui/icons-material/AddReaction'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import RepeatIcon from '@mui/icons-material/Repeat'
 import type { Stream, Message as CCMessage, ProfileWithAddress } from '../../../model'
@@ -20,6 +21,7 @@ export interface MessageActionsProps {
     message: CCMessage<TypeSimpleNote>
     favorite: () => Promise<void>
     setMessageAnchor: (anchor: null | HTMLElement) => void
+    setEmojiPickerAnchor: (anchor: null | HTMLElement) => void
     msgstreams: Array<Stream<any>>
 }
 
@@ -116,6 +118,17 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         </Typography>
                     </Box>
                 </Tooltip>
+                <IconButton
+                    sx={{
+                        p: '0',
+                        color: props.theme.palette.text.secondary
+                    }}
+                    onClick={(e) => {
+                        props.setEmojiPickerAnchor(e.currentTarget)
+                    }}
+                >
+                    <AddReactionIcon sx={{ fontSize: '80%' }} />
+                </IconButton>
                 <IconButton
                     sx={{
                         p: '0',

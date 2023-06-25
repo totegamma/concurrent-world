@@ -26,6 +26,7 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
     const [msgStreams, setStreams] = useState<Array<Stream<any>>>([])
     const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
     const [messageAnchor, setMessageAnchor] = useState<null | HTMLElement>(null)
+    const [emojiPickerAnchor, setEmojiPickerAnchor] = useState<null | HTMLElement>(null)
 
     const theme = useTheme()
 
@@ -155,7 +156,17 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
                         unfavorite(message.associations.find((e) => e.author === api.userAddress)?.id, message.author)
                     }}
                     favorite={() => api.favoriteMessage(props.message.id, props.message.author)}
+                    addMessageReaction={async (emoji) => {
+                        await api.addMessageReaction(
+                            props.message.id,
+                            props.message.author,
+                            emoji.shortcodes,
+                            emoji.src
+                        )
+                    }}
+                    emojiPickerAnchor={emojiPickerAnchor}
                     setMessageAnchor={setMessageAnchor}
+                    setEmojiPickerAnchor={setEmojiPickerAnchor}
                     setFetchSucceed={setFetchSucceed}
                     beforeMessage={
                         <Chip

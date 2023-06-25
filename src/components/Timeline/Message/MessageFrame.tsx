@@ -26,6 +26,7 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
     const [msgStreams, setStreams] = useState<Array<Stream<any>>>([])
     const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
     const [messageAnchor, setMessageAnchor] = useState<null | HTMLElement>(null)
+    const [emojiPickerAnchor, setEmojiPickerAnchor] = useState<null | HTMLElement>(null)
 
     const theme = useTheme()
 
@@ -173,6 +174,7 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                     theme={theme}
                     hasOwnReaction={hasOwnReaction}
                     msgstreams={msgStreams}
+                    emojiPickerAnchor={emojiPickerAnchor}
                     messageAnchor={messageAnchor}
                     api={api}
                     inspectHandler={() => {
@@ -192,7 +194,16 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                         // 後々消す
                         reloadMessage()
                     }}
+                    addMessageReaction={async (emoji) => {
+                        await api.addMessageReaction(
+                            props.message.id,
+                            props.message.author,
+                            emoji.shortcodes,
+                            emoji.src
+                        )
+                    }}
                     setMessageAnchor={setMessageAnchor}
+                    setEmojiPickerAnchor={setEmojiPickerAnchor}
                     setFetchSucceed={setFetchSucceed}
                 />
             )
