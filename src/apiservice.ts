@@ -577,6 +577,30 @@ export default class ConcurrentApiClient extends ApiService {
         return await this.entityCache[ccaddr]
     }
 
+    // KV
+    async readKV(key: string): Promise<string | undefined> {
+        if (!this.host) throw new Error()
+        return await this.fetchWithCredential(`https://${this.host.fqdn}${apiPath}/kv/${key}`, {
+            method: 'GET',
+            headers: {}
+        }).then(async (res) => {
+            const kv = await res.json()
+            if (!kv || kv.content === '') {
+                return undefined
+            }
+            return kv.content
+        })
+    }
+
+    async writeKV(key: string, value: string): Promise<void> {
+        if (!this.host) throw new Error()
+        await this.fetchWithCredential(`https://${this.host.fqdn}${apiPath}/kv/${key}`, {
+            method: 'PUT',
+            headers: {},
+            body: value
+        })
+    }
+
     // Utils
     async getUserHomeStreams(users: string[]): Promise<string[]> {
         return (

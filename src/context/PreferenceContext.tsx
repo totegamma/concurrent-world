@@ -1,5 +1,6 @@
-import { createContext, useCallback, useContext, useMemo } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { usePersistent } from '../hooks/usePersistent'
+import { useApi } from './api'
 
 interface PreferenceState {
     themeName: string
@@ -34,6 +35,10 @@ interface PreferenceProviderProps {
 }
 
 export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element => {
+    const api = useApi()
+
+    const [initialized, setInitialized] = useState<boolean>(false)
+
     const [themeName, setThemeName] = usePersistent<string>('themeName', 'basic')
     const [imgurClientID, setImgurClientID] = usePersistent<string>('imgurClientID', '')
     const [followingUsers, setFollowingUsers] = usePersistent<string[]>('followingUsers', [])
@@ -86,6 +91,46 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
         },
         [bookmarkingStreams, setBookmarkingStreams]
     )
+
+    useEffect(() => {
+        if (!api) return
+        if (initialized) return
+        api.readKV('world.concurrent.preference').then((storage: string | undefined) => {
+            setInitialized(true)
+            if (!storage) return
+            const parsed = JSON.parse(storage)
+            setThemeName(parsed.themeName)
+            setImgurClientID(parsed.imgurClientID)
+            setFollowingUsers(parsed.followingUsers)
+            setFollowingStreams(parsed.followingStreams)
+            setBookmarkingStreams(parsed.bookmarkingStreams)
+            setDefaultPostHome(parsed.defaultPostHome)
+            setDefaultPostNonHome(parsed.defaultPostNonHome)
+        })
+    }, [])
+
+    useEffect(() => {
+        if (!api) return
+        if (!initialized) return
+        const storage = JSON.stringify({
+            themeName,
+            imgurClientID,
+            followingUsers,
+            followingStreams,
+            bookmarkingStreams,
+            defaultPostHome,
+            defaultPostNonHome
+        })
+        api.writeKV('world.concurrent.preference', storage)
+    }, [
+        themeName,
+        imgurClientID,
+        followingUsers,
+        followingStreams,
+        bookmarkingStreams,
+        defaultPostHome,
+        defaultPostNonHome
+    ])
 
     const value = useMemo(() => {
         return {
