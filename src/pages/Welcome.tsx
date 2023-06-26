@@ -1,11 +1,12 @@
 import Box from '@mui/material/Box'
 import { Themes, createConcurrentTheme } from '../themes'
-import { Button, CssBaseline, Paper, ThemeProvider, Typography, darken } from '@mui/material'
+import { Button, CssBaseline, IconButton, Paper, ThemeProvider, Typography, darken } from '@mui/material'
 import { ConcurrentLogo } from '../components/ConcurrentLogo'
 import { useState } from 'react'
 import { usePersistent } from '../hooks/usePersistent'
 import type { ConcurrentTheme } from '../model'
 import { Link } from 'react-router-dom'
+import GitHubIcon from '@mui/icons-material/GitHub'
 
 export default function Welcome(): JSX.Element {
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue2')
@@ -77,6 +78,16 @@ export default function Welcome(): JSX.Element {
                         <Button variant="contained" component={Link} to="/import">
                             アカウントインポート
                         </Button>
+                        <IconButton
+                            color="primary"
+                            href="https://github.com/totegamma/concurrent-web"
+                            target="_blank"
+                            sx={{
+                                padding: '0px'
+                            }}
+                        >
+                            <GitHubIcon fontSize="large" />
+                        </IconButton>
                     </Box>
                 </Box>
                 <Button
@@ -118,7 +129,7 @@ export default function Welcome(): JSX.Element {
                             mb: '30px'
                         }}
                     >
-                        Concurrentはどの顔のあなたも楽しめる、ちょっと変わった分散型SNSです。
+                        Concurrentはどの &quot;顔&quot; のあなたも楽しめる、ちょっと変わった分散型SNSです。
                     </Typography>
                 </Button>
 

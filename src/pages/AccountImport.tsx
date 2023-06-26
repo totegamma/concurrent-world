@@ -36,10 +36,14 @@ export function AccountImport(): JSX.Element {
     const [host, setHost] = useState<Host>()
     const [entityFound, setEntityFound] = useState<boolean>(false)
     const [api, initializeApi] = useState<ConcurrentApiClient>()
+    const [errorMessage, setErrorMessage] = useState<string>('')
 
     useEffect(() => {
         let privatekey = ''
         let ccid = ''
+        setServer('')
+        setErrorMessage('')
+        setEntityFound(false)
         if (mnemonic === '') {
             const key = LoadKey(secret)
             if (!key) return
@@ -52,6 +56,7 @@ export function AccountImport(): JSX.Element {
                 ccid = 'CC' + wallet.address.slice(2)
             } catch (e) {
                 console.log(e)
+                setErrorMessage('シークレットコードが正しくありません。')
                 return
             }
         }
@@ -69,23 +74,46 @@ export function AccountImport(): JSX.Element {
         console.log(ccid)
         hub.readEntity(ccid).then((entity) => {
             console.log(entity)
-            if (!entity) return
-            setServer(entity.host || 'hub.concurrent.world')
-            setEntityFound(true)
+            if (entity && entity.ccaddr === ccid) {
+                setServer(entity.host || 'hub.concurrent.world')
+                setEntityFound(true)
+            } else {
+                setErrorMessage('お住まいのサーバーが見つかりませんでした。手動入力することで継続できます。')
+            }
         })
     }, [mnemonic, secret])
 
     useEffect(() => {
         if (!api) return
+        let unmounted = false
         const fqdn = server.replace('https://', '').replace('/', '')
-        api.getHostProfile(fqdn).then((e: any) => {
-            setHost(e)
-        })
-        api.readEntity(api.userAddress).then((entity) => {
-            setEntityFound(!!entity && entity.ccaddr !== '')
-        })
-
-        console.log(fqdn)
+        api.getHostProfile(fqdn)
+            .then((e: any) => {
+                if (unmounted) return
+                setHost(e)
+                api.readEntity(api.userAddress)
+                    .then((entity) => {
+                        if (unmounted) return
+                        if (!entity || entity.ccaddr !== api.userAddress) {
+                            setErrorMessage('指定のサーバーにあなたのアカウントは見つかりませんでした。')
+                            return
+                        }
+                        setErrorMessage('')
+                        setEntityFound(entity.ccaddr === api.userAddress)
+                    })
+                    .catch((_) => {
+                        if (unmounted) return
+                        setErrorMessage('指定のサーバーにあなたのアカウントは見つかりませんでした。')
+                    })
+                console.log(fqdn)
+            })
+            .catch((_) => {
+                if (unmounted) return
+                setErrorMessage('指定のサーバーに接続できませんでした。')
+            })
+        return () => {
+            unmounted = true
+        }
     }, [server, api])
 
     const accountImport = (): void => {
@@ -142,7 +170,7 @@ export function AccountImport(): JSX.Element {
                         gap: '20px'
                     }}
                 >
-                    <Typography variant="h3">ふっかつの呪文から</Typography>
+                    <Typography variant="h3">シークレットコードから</Typography>
                     <TextField
                         placeholder="12個の単語からなる呪文"
                         value={mnemonic}
@@ -170,6 +198,7 @@ export function AccountImport(): JSX.Element {
                             setServer(e.target.value)
                         }}
                     />
+                    {errorMessage}
                     <Button disabled={!entityFound} variant="contained" onClick={accountImport}>
                         インポート
                     </Button>

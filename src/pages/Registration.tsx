@@ -3,6 +3,7 @@ import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import muiLink from '@mui/material/Link'
 import TextField from '@mui/material/TextField'
 import Divider from '@mui/material/Divider'
 import { ProfileEditor } from '../components/ProfileEditor'
@@ -376,6 +377,15 @@ export function Registration(): JSX.Element {
                         </List>
                         <Divider>または</Divider>
                         <Typography variant="h3">URLから直接入力</Typography>
+                        <Typography
+                            color="text.primary"
+                            component={muiLink}
+                            variant="caption"
+                            href="https://github.com/totegamma/concurrent"
+                            target="_blank"
+                        >
+                            Tips: 自分でサーバーを建てる場合はこちら
+                        </Typography>
                         <Box flex="1" />
                         <Box sx={{ display: 'flex', gap: '10px' }}>
                             <TextField
