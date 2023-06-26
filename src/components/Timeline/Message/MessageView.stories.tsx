@@ -9,6 +9,7 @@ import { CharacterProfileMock, MessageMock, StreamElementMock, StreamMock } from
 import { ApiMock } from '../../../mock/apimock'
 import { InspectorProvider, useInspector } from '../../../context/Inspector'
 import Paper from '@mui/material/Paper'
+import { type EmojiProps } from '../../EmojiPicker'
 
 const ThemeList = Object.keys(Themes)
 
@@ -62,6 +63,7 @@ export const Default = (arg: Props): JSX.Element => {
     const inspector = useInspector()
 
     const [messageAnchor, setMessageAnchor] = useState<null | HTMLElement>(null)
+    const [emojiPickerAnchor, setEmojiPickerAnchor] = useState<null | HTMLElement>(null)
 
     useEffect(() => {
         setTheme(createConcurrentTheme(arg.themeName ?? 'basic'))
@@ -82,9 +84,11 @@ export const Default = (arg: Props): JSX.Element => {
                                         message={MessageMock(arg.body, arg.author, arg.cdate)}
                                         author={CharacterProfileMock(arg.username)}
                                         reactUsers={[]}
+                                        emojiUsers={[]}
                                         hasOwnReaction={false}
                                         msgstreams={[StreamMock(arg.streamName)]}
                                         messageAnchor={messageAnchor}
+                                        emojiPickerAnchor={emojiPickerAnchor}
                                         api={new ApiMock()}
                                         inspectHandler={() => {}}
                                         handleReply={async () => {}}
@@ -92,7 +96,9 @@ export const Default = (arg: Props): JSX.Element => {
                                         unfavorite={() => {}}
                                         favorite={async () => {}}
                                         setMessageAnchor={setMessageAnchor}
+                                        setEmojiPickerAnchor={setEmojiPickerAnchor}
                                         setFetchSucceed={(success: boolean) => {}}
+                                        addMessageReaction={async (emoji: EmojiProps) => {}}
                                     />
                                 </Paper>
                             </ThemeProvider>
