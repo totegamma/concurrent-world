@@ -244,6 +244,26 @@ function App(): JSX.Element {
                                     return
                                 }
 
+                                if (a.schema === Schemas.emojiAssociation) {
+                                    api.fetchMessage(a.targetID).then((m) => {
+                                        console.log(m)
+                                        m &&
+                                            api
+                                                .readCharacter(a.author, Schemas.profile)
+                                                .then((c: Character<Profile> | undefined) => {
+                                                    enqueueSnackbar(
+                                                        `${c?.payload.body.username ?? 'anonymous'} reacted to "${
+                                                            (m.payload.body.body as string) ?? 'your message.'
+                                                        }" with ${
+                                                            (JSON.parse(m.associations.at(-1)?.payload).body
+                                                                .shortcode as string) ?? 'emoji'
+                                                        }`
+                                                    )
+                                                })
+                                    })
+                                    return
+                                }
+
                                 enqueueSnackbar('unknown association received.')
                             })
                         }
