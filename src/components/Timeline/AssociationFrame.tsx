@@ -37,6 +37,8 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     // TODO いずれ消す
     const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
     const [hasOwnReaction, setHasOwnReaction] = useState<boolean>(false)
+    const [emojiPickerAnchor, setEmojiPickerAnchor] = useState<null | HTMLElement>(null)
+    const [emojiUsers, setEmojiUsers] = useState<ProfileWithAddress[]>([])
 
     useEffect(() => {
         api.fetchAssociation(props.association.id, props.association.currenthost).then((a) => {
@@ -223,10 +225,15 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                             message={message}
                             author={author}
                             reactUsers={reactUsers}
+                            emojiUsers={emojiUsers}
+                            addMessageReaction={async (emoji) => {
+                                await api.addMessageReaction(message.id, message.author, emoji.shortcodes, emoji.src)
+                            }}
                             theme={theme}
                             hasOwnReaction={hasOwnReaction}
                             msgstreams={[]}
                             messageAnchor={messageAnchor}
+                            emojiPickerAnchor={emojiPickerAnchor}
                             api={api}
                             inspectHandler={() => {
                                 inspector.inspectItem({ messageId: message.id, author: message.author })
@@ -245,6 +252,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                             }}
                             favorite={() => favorite({ ...message })}
                             setMessageAnchor={setMessageAnchor}
+                            setEmojiPickerAnchor={setEmojiPickerAnchor}
                             setFetchSucceed={() => {
                                 return true
                             }}
