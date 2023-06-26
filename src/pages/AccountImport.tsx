@@ -38,6 +38,9 @@ export function AccountImport(): JSX.Element {
     const [api, initializeApi] = useState<ConcurrentApiClient>()
     const [errorMessage, setErrorMessage] = useState<string>('')
 
+    const [privatekey, setPrivatekey] = useState<string>('')
+    const [ccid, setCcid] = useState<string>('')
+
     useEffect(() => {
         let privatekey = ''
         let ccid = ''
@@ -61,18 +64,12 @@ export function AccountImport(): JSX.Element {
             }
         }
 
-        const hub = new ConcurrentApiClient(ccid, privatekey, {
-            fqdn: 'hub.concurrent.world',
-            ccaddr: '',
-            role: '',
-            pubkey: '',
-            cdate: new Date()
-        })
+        setPrivatekey(privatekey)
+        setCcid(ccid)
 
-        initializeApi(hub)
+        const hubApi = new ConcurrentApiClient(ccid, privatekey, 'hub.concurrent.world')
 
-        console.log(ccid)
-        hub.readEntity(ccid).then((entity) => {
+        hubApi.readEntity(ccid).then((entity) => {
             console.log(entity)
             if (entity && entity.ccaddr === ccid) {
                 setServer(entity.host || 'hub.concurrent.world')
@@ -84,9 +81,9 @@ export function AccountImport(): JSX.Element {
     }, [mnemonic, secret])
 
     useEffect(() => {
-        if (!api) return
         let unmounted = false
         const fqdn = server.replace('https://', '').replace('/', '')
+        const api = new ConcurrentApiClient(ccid, privatekey, fqdn)
         api.getHostProfile(fqdn)
             .then((e: any) => {
                 if (unmounted) return
@@ -94,12 +91,14 @@ export function AccountImport(): JSX.Element {
                 api.readEntity(api.userAddress)
                     .then((entity) => {
                         if (unmounted) return
+                        console.log(entity)
                         if (!entity || entity.ccaddr !== api.userAddress) {
                             setErrorMessage('指定のサーバーにあなたのアカウントは見つかりませんでした。')
                             return
                         }
                         setErrorMessage('')
                         setEntityFound(entity.ccaddr === api.userAddress)
+                        initializeApi(api)
                     })
                     .catch((_) => {
                         if (unmounted) return
@@ -114,11 +113,12 @@ export function AccountImport(): JSX.Element {
         return () => {
             unmounted = true
         }
-    }, [server, api])
+    }, [server])
 
     const accountImport = (): void => {
         if (!api) return
-        localStorage.setItem('Host', JSON.stringify(host))
+        if (!host) return
+        localStorage.setItem('Domain', JSON.stringify(host.fqdn))
         localStorage.setItem('PrivateKey', JSON.stringify(api.privatekey))
         localStorage.setItem('Address', JSON.stringify(api.userAddress))
         navigate('/')

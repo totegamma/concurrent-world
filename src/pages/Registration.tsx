@@ -76,8 +76,8 @@ export function Registration(): JSX.Element {
 
     const [api, initializeApi] = useState<ConcurrentApiClient>()
     useEffect(() => {
-        if (!CCID || !privateKey) return
-        const api = new ConcurrentApiClient(CCID, privateKey, host)
+        if (!CCID || !privateKey || !host) return
+        const api = new ConcurrentApiClient(CCID, privateKey, host.fqdn)
         initializeApi(api)
     }, [host, CCID, privateKey])
 
@@ -93,7 +93,7 @@ export function Registration(): JSX.Element {
     const setupAccount = (): void => {
         if (!api) return
         if (!host) return
-        localStorage.setItem('Host', JSON.stringify(host))
+        localStorage.setItem('Domain', JSON.stringify(host.fqdn))
         localStorage.setItem('PublicKey', JSON.stringify(publicKey))
         localStorage.setItem('PrivateKey', JSON.stringify(privateKey))
         localStorage.setItem('Address', JSON.stringify(CCID))

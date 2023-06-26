@@ -27,6 +27,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
     const [readerDraft, setReaderDraft] = useState('')
 
     useEffect(() => {
+        if (!props.id) return
         api.readStream(props.id).then((e) => {
             if (!e) return
             setStream(e)

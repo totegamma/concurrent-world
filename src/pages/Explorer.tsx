@@ -17,7 +17,7 @@ import { Schemas } from '../schemas'
 import { useApi } from '../context/api'
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import type { Host, Stream } from '../model'
+import type { Stream } from '../model'
 import StarIcon from '@mui/icons-material/Star'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import type { Commonstream } from '../schemas/commonstream'
@@ -28,14 +28,15 @@ export function Explorer(): JSX.Element {
     const theme = useTheme()
     const pref = usePreference()
 
-    const [hosts, setHosts] = useState<Host[]>([...(api.host ? [api.host] : [])])
-    const [currentHost, setCurrentHost] = useState<string>(api.host?.fqdn ?? '')
+    const [hosts, setHosts] = useState<string[]>([...(api.host ? [api.host] : [])])
+    const [currentHost, setCurrentHost] = useState<string>(api.host ?? '')
     const [streams, setStreams] = useState<Array<Stream<any>>>([])
     const [newStreamName, setNewStreamName] = useState<string>('')
 
     const loadHosts = (): void => {
         api.getKnownHosts().then((e) => {
-            setHosts([...(api.host ? [api.host] : []), ...e])
+            if (!api.host) return
+            setHosts([api.host, ...e.filter((e) => e.fqdn !== api.host).map((e) => e.fqdn)])
         })
     }
 
@@ -87,11 +88,11 @@ export function Explorer(): JSX.Element {
                 onChange={(e) => {
                     setCurrentHost(e.target.value)
                 }}
-                defaultValue={api.host.fqdn}
+                defaultValue={api.host}
             >
                 {hosts.map((e) => (
-                    <MenuItem key={e.fqdn} value={e.fqdn}>
-                        {e.fqdn}
+                    <MenuItem key={e} value={e}>
+                        {e}
                     </MenuItem>
                 ))}
             </Select>

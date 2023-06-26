@@ -11,7 +11,7 @@ import { useObjectList } from './hooks/useObjectList'
 import { Schemas } from './schemas'
 import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu'
-import type { StreamElementDated, ServerEvent, Emoji, ConcurrentTheme, Character, Host } from './model'
+import type { StreamElementDated, ServerEvent, Emoji, ConcurrentTheme, Character } from './model'
 import {
     Associations,
     Explorer,
@@ -55,14 +55,14 @@ export interface appData {
 export const ClockContext = createContext<Date>(new Date())
 
 function App(): JSX.Element {
-    const [host] = usePersistent<Host>('Host', null as any)
+    const [domain] = usePersistent<string>('Domain', '')
     const [prvkey] = usePersistent<string>('PrivateKey', '')
     const [address] = usePersistent<string>('Address', '')
     const [api, initializeApi] = useState<ConcurrentApiClient>()
     useEffect(() => {
-        const api = new ConcurrentApiClient(address, prvkey, host)
+        const api = new ConcurrentApiClient(address, prvkey, domain)
         initializeApi(api)
-    }, [host, address, prvkey])
+    }, [domain, address, prvkey])
 
     const [themeName, setThemeName] = usePersistent<string>('Theme', Object.keys(Themes)[0])
 
@@ -108,7 +108,7 @@ function App(): JSX.Element {
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
 
-    const { lastMessage, readyState, sendJsonMessage } = useWebSocket(`wss://${host.fqdn}/api/v1/socket`, {
+    const { lastMessage, readyState, sendJsonMessage } = useWebSocket(`wss://${domain}/api/v1/socket`, {
         shouldReconnect: (_) => true,
         reconnectInterval: (attempt) => Math.min(Math.pow(2, attempt) * 1000, 10000),
         onOpen: (_) => {

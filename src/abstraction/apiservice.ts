@@ -1,7 +1,7 @@
 import type { Association, CCID, Character, Entity, Host, Message, Stream, StreamElement } from '../model'
 
 export abstract class ApiService {
-    abstract host: Host | undefined
+    abstract host: string | undefined
     abstract userAddress: string
     abstract privatekey: string
     abstract token?: string

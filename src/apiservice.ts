@@ -27,7 +27,7 @@ const branchName = branch || window.location.host.split('.')[0]
 const apiPath = '/api/v1'
 
 export default class ConcurrentApiClient extends ApiService {
-    host: Host | undefined
+    host: string | undefined
     userAddress: string
     privatekey: string
     token?: string
@@ -38,7 +38,7 @@ export default class ConcurrentApiClient extends ApiService {
     associationCache: Record<string, Promise<Association<any>> | undefined> = {}
     streamCache: Record<string, Promise<Stream<any>> | undefined> = {}
 
-    constructor(userAddress: string, privatekey: string, host?: Host) {
+    constructor(userAddress: string, privatekey: string, host?: string) {
         super()
         this.host = host
         this.userAddress = userAddress
@@ -54,7 +54,7 @@ export default class ConcurrentApiClient extends ApiService {
             method: 'GET',
             headers: { authorization: requestJwt }
         }
-        return await fetchWithTimeout(`https://${this.host.fqdn}${apiPath}/auth/claim`, requestOptions)
+        return await fetchWithTimeout(`https://${this.host}${apiPath}/auth/claim`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 this.token = data.jwt
@@ -126,7 +126,7 @@ export default class ConcurrentApiClient extends ApiService {
             body: JSON.stringify(request)
         }
 
-        const res = await this.fetchWithCredential(`https://${this.host.fqdn}${apiPath}/messages`, requestOptions)
+        const res = await this.fetchWithCredential(`https://${this.host}${apiPath}/messages`, requestOptions)
 
         return await res.json()
     }
@@ -136,7 +136,7 @@ export default class ConcurrentApiClient extends ApiService {
         if (this.messageCache[id]) {
             return await this.messageCache[id]
         }
-        const messageHost = !host ? this.host.fqdn : host
+        const messageHost = !host ? this.host : host
         this.messageCache[id] = fetch(`https://${messageHost}${apiPath}/messages/${id}`, {
             method: 'GET',
             headers: {}
@@ -151,6 +151,11 @@ export default class ConcurrentApiClient extends ApiService {
             const message = data
             message.rawpayload = message.payload
             message.payload = JSON.parse(message.payload)
+            message.associations = message.associations.map((a: any) => {
+                a.rawpayload = a.payload
+                a.payload = JSON.parse(a.payload)
+                return a
+            })
             return message
         })
         return await this.messageCache[id]
@@ -164,7 +169,7 @@ export default class ConcurrentApiClient extends ApiService {
 
     async deleteMessage(target: string, host: string = ''): Promise<any> {
         if (!this.host) throw new Error()
-        const targetHost = !host ? this.host.fqdn : host
+        const targetHost = !host ? this.host : host
         const requestOptions = {
             method: 'DELETE',
             headers: { 'content-type': 'application/json' },
@@ -195,7 +200,7 @@ export default class ConcurrentApiClient extends ApiService {
     ): Promise<any> {
         if (!this.host) throw new Error()
         const entity = await this.readEntity(targetAuthor)
-        const targetHost = entity?.host || this.host.fqdn
+        const targetHost = entity?.host || this.host
         const signObject: SignedObject<T> = {
             signer: this.userAddress,
             type: 'Association',
@@ -235,7 +240,7 @@ export default class ConcurrentApiClient extends ApiService {
     ): Promise<{ status: string; content: Association<any> }> {
         if (!this.host) throw new Error()
         const entity = await this.readEntity(targetAuthor)
-        const targetHost = entity?.host || this.host.fqdn
+        const targetHost = entity?.host || this.host
         const requestOptions = {
             method: 'DELETE',
             headers: { 'content-type': 'application/json' },
@@ -256,7 +261,7 @@ export default class ConcurrentApiClient extends ApiService {
         if (this.associationCache[id]) {
             return await this.associationCache[id]
         }
-        const associationHost = !host ? this.host.fqdn : host
+        const associationHost = !host ? this.host : host
         this.associationCache[id] = fetch(`https://${associationHost}${apiPath}/associations/${id}`, {
             method: 'GET',
             headers: {}
@@ -306,7 +311,7 @@ export default class ConcurrentApiClient extends ApiService {
             body: JSON.stringify(request)
         }
 
-        return await this.fetchWithCredential(`https://${this.host.fqdn}${apiPath}/characters`, requestOptions)
+        return await this.fetchWithCredential(`https://${this.host}${apiPath}/characters`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 return data
@@ -319,8 +324,8 @@ export default class ConcurrentApiClient extends ApiService {
             return await this.characterCache[author + schema]
         }
         const entity = await this.readEntity(author)
-        let characterHost = entity?.host ?? this.host.fqdn
-        if (!characterHost || characterHost === '') characterHost = this.host.fqdn
+        let characterHost = entity?.host ?? this.host
+        if (!characterHost || characterHost === '') characterHost = this.host
         this.characterCache[author + schema] = fetch(
             `https://${characterHost}${apiPath}/characters?author=${author}&schema=${encodeURIComponent(schema)}`,
             {
@@ -373,7 +378,7 @@ export default class ConcurrentApiClient extends ApiService {
             })
         }
 
-        return await this.fetchWithCredential(`https://${this.host.fqdn}${apiPath}/stream`, requestOptions)
+        return await this.fetchWithCredential(`https://${this.host}${apiPath}/stream`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 return data
@@ -406,7 +411,7 @@ export default class ConcurrentApiClient extends ApiService {
             })
         }
 
-        return await this.fetchWithCredential(`https://${this.host.fqdn}${apiPath}/stream`, requestOptions)
+        return await this.fetchWithCredential(`https://${this.host}${apiPath}/stream`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 return data
@@ -415,7 +420,7 @@ export default class ConcurrentApiClient extends ApiService {
 
     async getStreamListBySchema(schema: string, remote?: string): Promise<Array<Stream<any>>> {
         if (!this.host) throw new Error()
-        return await fetch(`https://${remote ?? this.host.fqdn}${apiPath}/stream/list?schema=${schema}`).then(
+        return await fetch(`https://${remote ?? this.host}${apiPath}/stream/list?schema=${schema}`).then(
             async (data) => {
                 return await data.json().then((arr) => {
                     return arr.map((e: any) => {
@@ -432,7 +437,7 @@ export default class ConcurrentApiClient extends ApiService {
             return await this.streamCache[id]
         }
         const key = id.split('@')[0]
-        const host = id.split('@')[1] ?? this.host.fqdn
+        const host = id.split('@')[1] ?? this.host
         this.streamCache[id] = fetch(`https://${host}${apiPath}/stream?stream=${key}`, {
             method: 'GET',
             headers: {}
@@ -458,7 +463,7 @@ export default class ConcurrentApiClient extends ApiService {
         const plan: Record<string, string[]> = {}
         for (const stream of streams) {
             const id = stream.split('@')[0]
-            const host = stream.split('@')[1] ?? this.host.fqdn
+            const host = stream.split('@')[1] ?? this.host
             plan[host] = [...(plan[host] ? plan[host] : []), id]
         }
 
@@ -501,7 +506,7 @@ export default class ConcurrentApiClient extends ApiService {
         const plan: Record<string, string[]> = {}
         for (const stream of streams) {
             const id = stream.split('@')[0]
-            const host = stream.split('@')[1] ?? this.host.fqdn
+            const host = stream.split('@')[1] ?? this.host
             plan[host] = [...(plan[host] ? plan[host] : []), id]
         }
 
@@ -544,7 +549,7 @@ export default class ConcurrentApiClient extends ApiService {
 
     // Host
     async getHostProfile(remote?: string): Promise<Host> {
-        const fqdn = remote ?? this.host?.fqdn
+        const fqdn = remote ?? this.host
         if (!fqdn) throw new Error()
         return await fetch(`https://${fqdn}${apiPath}/host`).then(async (data) => {
             return await data.json()
@@ -553,7 +558,7 @@ export default class ConcurrentApiClient extends ApiService {
 
     async getKnownHosts(remote?: string): Promise<Host[]> {
         if (!this.host) throw new Error()
-        return await fetch(`https://${remote ?? this.host.fqdn}${apiPath}/host/list`).then(async (data) => {
+        return await fetch(`https://${remote ?? this.host}${apiPath}/host/list`).then(async (data) => {
             return await data.json()
         })
     }
@@ -564,7 +569,7 @@ export default class ConcurrentApiClient extends ApiService {
         if (this.entityCache[ccaddr]) {
             return await this.entityCache[ccaddr]
         }
-        this.entityCache[ccaddr] = fetch(`https://${this.host.fqdn}${apiPath}/entity/${ccaddr}`, {
+        this.entityCache[ccaddr] = fetch(`https://${this.host}${apiPath}/entity/${ccaddr}`, {
             method: 'GET',
             headers: {}
         }).then(async (res) => {
@@ -581,7 +586,7 @@ export default class ConcurrentApiClient extends ApiService {
     // KV
     async readKV(key: string): Promise<string | undefined> {
         if (!this.host) throw new Error()
-        return await this.fetchWithCredential(`https://${this.host.fqdn}${apiPath}/kv/${key}`, {
+        return await this.fetchWithCredential(`https://${this.host}${apiPath}/kv/${key}`, {
             method: 'GET',
             headers: {}
         }).then(async (res) => {
@@ -595,7 +600,7 @@ export default class ConcurrentApiClient extends ApiService {
 
     async writeKV(key: string, value: string): Promise<void> {
         if (!this.host) throw new Error()
-        await this.fetchWithCredential(`https://${this.host.fqdn}${apiPath}/kv/${key}`, {
+        await this.fetchWithCredential(`https://${this.host}${apiPath}/kv/${key}`, {
             method: 'PUT',
             headers: {},
             body: value
@@ -715,7 +720,7 @@ export default class ConcurrentApiClient extends ApiService {
             jti: uuidv4(),
             iss: this.userAddress,
             iat: Math.floor(new Date().getTime() / 1000).toString(),
-            aud: this.host?.fqdn,
+            aud: this.host,
             nbf: Math.floor((new Date().getTime() - 5 * 60 * 1000) / 1000).toString(),
             exp: Math.floor((new Date().getTime() + 5 * 60 * 1000) / 1000).toString(),
             ...claim

@@ -6,11 +6,11 @@ interface Props {
 }
 
 export const LoginGuard = (props: Props): JSX.Element => {
-    const host = localStorage.getItem('Host') ?? ''
+    const domain = localStorage.getItem('Domain') ?? ''
     const prvkey = localStorage.getItem('PrivateKey') ?? ''
     const address = localStorage.getItem('Address') ?? ''
 
-    if (host === '' || prvkey === '' || address === '') {
+    if (domain === '' || prvkey === '' || address === '') {
         if (location.pathname === '/' && location.hash !== '') {
             return <Navigate to={'/guest/' + location.hash} state={{ from: useLocation() }} replace={true} />
         }
