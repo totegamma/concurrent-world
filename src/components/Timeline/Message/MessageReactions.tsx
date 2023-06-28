@@ -16,10 +16,16 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
     const theme = useTheme()
     const allReactions = props.message.associations.filter((m) => m.schema === Schemas.emojiAssociation)
     const filteredReactions = allReactions.reduce((acc: any, cur) => {
-        const payload = JSON.parse(cur.payload)
-        payload.body.shortcode in acc ? acc[payload.body.shortcode].push(cur) : (acc[payload.body.shortcode] = [cur])
+        try {
+            const payload = JSON.parse(cur.payload)
+            payload.body.shortcode in acc
+                ? acc[payload.body.shortcode].push(cur)
+                : (acc[payload.body.shortcode] = [cur])
 
-        return acc
+            return acc
+        } catch (_e) {
+            return acc
+        }
     }, {})
 
     return (
