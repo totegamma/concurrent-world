@@ -12,6 +12,8 @@ export const Schemas = {
         'https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/associations/reply/0.0.1.json',
     reRouteAssociation:
         'https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/associations/reroute/0.0.1.json',
+    emojiAssociation:
+        'https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/associations/emoji/0.0.1.json',
     domainProfile:
         'https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/characters/domainprofile/0.0.1.json'
 }

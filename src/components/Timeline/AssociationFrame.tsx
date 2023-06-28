@@ -37,6 +37,8 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     // TODO いずれ消す
     const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
     const [hasOwnReaction, setHasOwnReaction] = useState<boolean>(false)
+    const [emojiPickerAnchor, setEmojiPickerAnchor] = useState<null | HTMLElement>(null)
+    const [emojiUsers, setEmojiUsers] = useState<ProfileWithAddress[]>([])
 
     useEffect(() => {
         api.fetchAssociation(props.association.id, props.association.currenthost).then((a) => {
@@ -212,6 +214,83 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                     </ListItemButton>
                 </ListItem>
             )
+        case Schemas.emojiAssociation:
+            return (
+                <ListItem
+                    sx={{
+                        alignItems: 'flex-start',
+                        wordBreak: 'break-word'
+                    }}
+                    disablePadding
+                >
+                    <ListItemButton
+                        disableGutters
+                        component={routerLink}
+                        to={`/message/${message?.id ?? ''}@${message?.author ?? ''}`}
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            flex: 1,
+                            gap: 2
+                        }}
+                    >
+                        <IconButton
+                            sx={{
+                                width: { xs: '38px', sm: '48px' },
+                                height: { xs: '38px', sm: '48px' },
+                                mt: { xs: '3px', sm: '5px' }
+                            }}
+                            component={routerLink}
+                            to={'/entity/' + association.author}
+                        >
+                            <CCAvatar
+                                alt={author?.payload.body.username}
+                                avatarURL={author?.payload.body.avatar}
+                                identiconSource={isMeToOther ? association?.author : message?.author ?? ''}
+                                sx={{
+                                    width: { xs: '38px', sm: '48px' },
+                                    height: { xs: '38px', sm: '48px' }
+                                }}
+                            />
+                        </IconButton>
+                        <Box
+                            sx={{
+                                flex: 1,
+                                flexDirection: 'column',
+                                width: '100%',
+                                overflow: 'auto',
+                                alignItems: 'flex-start'
+                            }}
+                        >
+                            <Typography>
+                                {isMeToOther ? (
+                                    <>
+                                        <b>{author?.payload.body.username ?? 'anonymous'}</b> reacted your message with{' '}
+                                        <img
+                                            height="13px"
+                                            src={association?.payload.body.imageUrl}
+                                            alt={association?.payload.body.shortcode}
+                                        />
+                                    </>
+                                ) : (
+                                    <>
+                                        You reacted <b>{author?.payload.body.username ?? 'anonymous'}</b>&apos;s message
+                                        with{' '}
+                                        <img
+                                            height="13px"
+                                            src={association?.payload.body.imageUrl}
+                                            alt={association?.payload.body.shortcode}
+                                        />
+                                    </>
+                                )}
+                            </Typography>
+                            <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
+                                {message?.payload.body.body}
+                            </blockquote>
+                        </Box>
+                    </ListItemButton>
+                </ListItem>
+            )
         case Schemas.replyAssociation:
             return (
                 <>
@@ -223,10 +302,15 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                             message={message}
                             author={author}
                             reactUsers={reactUsers}
+                            emojiUsers={emojiUsers}
+                            addMessageReaction={async (emoji) => {
+                                await api.addMessageReaction(message.id, message.author, emoji.shortcodes, emoji.src)
+                            }}
                             theme={theme}
                             hasOwnReaction={hasOwnReaction}
                             msgstreams={[]}
                             messageAnchor={messageAnchor}
+                            emojiPickerAnchor={emojiPickerAnchor}
                             api={api}
                             inspectHandler={() => {
                                 inspector.inspectItem({ messageId: message.id, author: message.author })
@@ -245,6 +329,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                             }}
                             favorite={() => favorite({ ...message })}
                             setMessageAnchor={setMessageAnchor}
+                            setEmojiPickerAnchor={setEmojiPickerAnchor}
                             setFetchSucceed={() => {
                                 return true
                             }}

@@ -18,6 +18,7 @@ import { Schemas } from './schemas'
 import { type Userstreams } from './schemas/userstreams'
 import { ApiService } from './abstraction/apiservice'
 import type { Like } from './schemas/like'
+import type { EmojiAssociation } from './schemas/emojiAssociation'
 import type { ReRouteMessage } from './schemas/reRouteMessage'
 import type { ReRouteAssociation } from './schemas/reRouteAssociation'
 
@@ -657,6 +658,24 @@ export default class ConcurrentApiClient extends ApiService {
         const authorInbox = (await this.readCharacter(author, Schemas.userstreams))?.payload.body.notificationStream
         const targetStream = [authorInbox, userStreams?.payload.body.associationStream].filter((e) => e) as string[]
         await this.createAssociation<Like>(Schemas.like, {}, id, author, 'messages', targetStream)
+        this.invalidateMessage(id)
+    }
+
+    async addMessageReaction(id: string, author: CCID, shortcode: string, imageUrl: string): Promise<void> {
+        const userStreams = await this.readCharacter(this.userAddress, Schemas.userstreams)
+        const authorInbox = (await this.readCharacter(author, Schemas.userstreams))?.payload.body.notificationStream
+        const targetStream = [authorInbox, userStreams?.payload.body.associationStream].filter((e) => e) as string[]
+        await this.createAssociation<EmojiAssociation>(
+            Schemas.emojiAssociation,
+            {
+                shortcode,
+                imageUrl
+            },
+            id,
+            author,
+            'messages',
+            targetStream
+        )
         this.invalidateMessage(id)
     }
 
