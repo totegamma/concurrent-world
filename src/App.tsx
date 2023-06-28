@@ -255,8 +255,8 @@ function App(): JSX.Element {
                                                         `${c?.payload.body.username ?? 'anonymous'} reacted to "${
                                                             (m.payload.body.body as string) ?? 'your message.'
                                                         }" with ${
-                                                            (JSON.parse(m.associations.at(-1)?.payload).body
-                                                                .shortcode as string) ?? 'emoji'
+                                                            (m.associations.at(-1)?.payload.body.shortcode as string) ??
+                                                            'emoji'
                                                         }`
                                                     )
                                                 })
