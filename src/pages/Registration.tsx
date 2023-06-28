@@ -61,6 +61,7 @@ export function Registration(): JSX.Element {
     const [CCID, setCCID] = useState<string>('')
     const [privateKey, setPrivateKey] = useState<string>('')
     const [publicKey, setPublicKey] = useState<string>('')
+    const [api, initializeApi] = useState<ConcurrentApiClient>()
 
     useEffect(() => {
         const identity = generateIdentity()
@@ -68,13 +69,13 @@ export function Registration(): JSX.Element {
         setCCID(identity.CCID)
         setPrivateKey(identity.privateKey)
         setPublicKey(identity.publicKey)
+        initializeApi(new ConcurrentApiClient(identity.CCID, identity.privateKey, 'hub.concurrent.world'))
     }, [])
 
     const [server, setServer] = useState<string>('')
     const [host, setHost] = useState<Host>()
     const [entityFound, setEntityFound] = useState<boolean>(false)
 
-    const [api, initializeApi] = useState<ConcurrentApiClient>()
     useEffect(() => {
         if (!CCID || !privateKey || !host) return
         const api = new ConcurrentApiClient(CCID, privateKey, host.fqdn)
