@@ -2,12 +2,14 @@ import { Button, Divider, Typography, Box, useTheme } from '@mui/material'
 import { LogoutButton } from '../components/Settings/LogoutButton'
 import { ThemeSelect } from '../components/Settings/ThemeSelect'
 import { ImgurSettings } from '../components/Settings/Imgur'
+import { useApi } from '../context/api'
 
 export interface SettingsProp {
     setThemeName: (themeName: string) => void
 }
 
 export function Settings(props: SettingsProp): JSX.Element {
+    const api = useApi()
     const theme = useTheme()
 
     return (
@@ -49,6 +51,20 @@ export function Settings(props: SettingsProp): JSX.Element {
                             }}
                         >
                             Force Reload
+                        </Button>
+                        <Button
+                            variant="contained"
+                            onClick={(_) => {
+                                if (api.host === undefined) {
+                                    return
+                                }
+                                const jwt = api.constructJWT({
+                                    exp: Math.floor((new Date().getTime() + 60 * 60 * 1000) / 1000).toString()
+                                }) // 1h validity
+                                window.location.href = `https://${api.host}/login?token=${jwt}`
+                            }}
+                        >
+                            Goto Domain Home
                         </Button>
                     </Box>
 

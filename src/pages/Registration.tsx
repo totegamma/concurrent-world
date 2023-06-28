@@ -1,27 +1,44 @@
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
-import { useEffect, useMemo, useState } from 'react'
-import { Mnemonic, randomBytes, HDNodeWallet } from 'ethers'
-import { LangJa } from '../utils/lang-ja'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import muiLink from '@mui/material/Link'
 import TextField from '@mui/material/TextField'
 import Divider from '@mui/material/Divider'
 import { ProfileEditor } from '../components/ProfileEditor'
 import ConcurrentApiClient from '../apiservice'
 import ApiProvider from '../context/api'
-import type { ConcurrentTheme, Host } from '../model'
-import { Fade, IconButton, Paper, ThemeProvider, darken } from '@mui/material'
+import type { Character, ConcurrentTheme, Host } from '../model'
+import {
+    Avatar,
+    CssBaseline,
+    Fade,
+    Grid,
+    IconButton,
+    List,
+    ListItemAvatar,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Paper,
+    ThemeProvider,
+    darken
+} from '@mui/material'
 import { usePersistent } from '../hooks/usePersistent'
 import { Themes, createConcurrentTheme } from '../themes'
 import Tilt from 'react-parallax-tilt'
 import { PassportRenderer } from '../components/Passport'
 import { CCAvatar } from '../components/CCAvatar'
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
-
-import ContentPasteIcon from '@mui/icons-material/ContentPaste'
+import { generateIdentity } from '../util'
 import { type Profile } from '../schemas/profile'
 import { ConcurrentWordmark } from '../components/ConcurrentWordmark'
+
+import ContentPasteIcon from '@mui/icons-material/ContentPaste'
+import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
+import { Schemas } from '../schemas'
+import { type DomainProfile } from '../schemas/domainProfile'
 
 export function Registration(): JSX.Element {
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue2')
@@ -40,20 +57,29 @@ export function Registration(): JSX.Element {
     const [mnemonicTest, setMnemonicTest] = useState<string>('')
     const [profile, setProfile] = useState<Profile>()
 
-    const entrophy = useMemo(() => randomBytes(16), [])
-    const mnemonic = useMemo(() => Mnemonic.fromEntropy(entrophy, null, LangJa.wordlist()), [])
-    const wallet = useMemo(() => HDNodeWallet.fromPhrase(mnemonic.phrase, undefined, undefined, LangJa.wordlist()), [])
-    const userAddress = 'CC' + wallet.address.slice(2)
-    const privateKey = wallet.privateKey.slice(2)
+    const [mnemonic, setMnemonic] = useState<string>('')
+    const [CCID, setCCID] = useState<string>('')
+    const [privateKey, setPrivateKey] = useState<string>('')
+    const [publicKey, setPublicKey] = useState<string>('')
+
+    useEffect(() => {
+        const identity = generateIdentity()
+        setMnemonic(identity.mnemonic)
+        setCCID(identity.CCID)
+        setPrivateKey(identity.privateKey)
+        setPublicKey(identity.publicKey)
+    }, [])
+
     const [server, setServer] = useState<string>('')
     const [host, setHost] = useState<Host>()
     const [entityFound, setEntityFound] = useState<boolean>(false)
 
     const [api, initializeApi] = useState<ConcurrentApiClient>()
     useEffect(() => {
-        const api = new ConcurrentApiClient(userAddress, privateKey, host)
+        if (!CCID || !privateKey || !host) return
+        const api = new ConcurrentApiClient(CCID, privateKey, host.fqdn)
         initializeApi(api)
-    }, [host, userAddress, privateKey])
+    }, [host, CCID, privateKey])
 
     useEffect(() => {
         if (!api) return
@@ -65,16 +91,37 @@ export function Registration(): JSX.Element {
     }, [server])
 
     const setupAccount = (): void => {
-        localStorage.setItem('Host', JSON.stringify(host))
-        localStorage.setItem('PublicKey', JSON.stringify(wallet.publicKey.slice(2)))
+        if (!api) return
+        if (!host) return
+        localStorage.setItem('Domain', JSON.stringify(host.fqdn))
+        localStorage.setItem('PublicKey', JSON.stringify(publicKey))
         localStorage.setItem('PrivateKey', JSON.stringify(privateKey))
-        localStorage.setItem('Address', JSON.stringify(userAddress))
-        navigate('/')
+        localStorage.setItem('Address', JSON.stringify(CCID))
+        localStorage.setItem('Mnemonic', JSON.stringify(mnemonic))
+
+        api?.readCharacter(host.ccaddr, Schemas.domainProfile).then((profile: Character<DomainProfile> | undefined) => {
+            console.log(profile)
+            if (profile) {
+                if (profile.payload.body.defaultBookmarkStreams)
+                    localStorage.setItem(
+                        'bookmarkingStreams',
+                        JSON.stringify(profile.payload.body.defaultBookmarkStreams)
+                    )
+                if (profile.payload.body.defaultFollowingStreams)
+                    localStorage.setItem(
+                        'followingStreams',
+                        JSON.stringify(profile.payload.body.defaultFollowingStreams)
+                    )
+                if (profile.payload.body.defaultPostStreams)
+                    localStorage.setItem('defaultPostHome', JSON.stringify(profile.payload.body.defaultPostStreams))
+            }
+            navigate('/')
+        })
     }
 
     const checkRegistration = async (): Promise<void> => {
         console.log('check!!!')
-        const entity = await api?.readEntity(userAddress)
+        const entity = await api?.readEntity(CCID)
         console.log(entity)
         setEntityFound(!!entity && entity.ccaddr != null)
     }
@@ -86,13 +133,15 @@ export function Registration(): JSX.Element {
                 <>
                     <Box
                         sx={{
-                            padding: '30px'
+                            padding: '30px',
+                            maxWidth: '600px',
+                            margin: 'auto'
                         }}
                     >
                         <Tilt glareEnable={true} glareBorderRadius="5%">
                             <PassportRenderer
                                 theme={theme}
-                                ccid={userAddress}
+                                ccid={CCID}
                                 name={''}
                                 avatar={''}
                                 host={''}
@@ -146,12 +195,22 @@ export function Registration(): JSX.Element {
                                 padding: '10px',
                                 fontWeight: 'bold',
                                 display: 'flex',
+                                flexDirection: { xs: 'column', sm: 'row' },
                                 alignItems: 'center',
                                 gap: '10px'
                             }}
                         >
-                            <CCAvatar identiconSource={userAddress} />
-                            {userAddress}
+                            <CCAvatar identiconSource={CCID} />
+                            <Typography
+                                sx={{
+                                    fontSize: {
+                                        xs: '0.9rem',
+                                        sm: '1rem'
+                                    }
+                                }}
+                            >
+                                {CCID}
+                            </Typography>
                         </Paper>
                         <Typography>これは、Concurrentの世界であなたを特定する文字列です。</Typography>
                         <Divider />
@@ -183,15 +242,21 @@ export function Registration(): JSX.Element {
                 >
                     <Paper
                         variant="outlined"
+                        component={Grid}
                         style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(4, 1fr)',
-                            width: '100%'
+                            width: '100%',
+                            margin: 1
                         }}
+                        spacing={1}
+                        columns={4}
+                        container
                     >
-                        {mnemonic.phrase.split('　').map((e, i) => (
-                            <Box
+                        {mnemonic.split('　').map((e, i) => (
+                            <Grid
                                 key={i}
+                                item
+                                xs={2}
+                                sm={1}
                                 sx={{
                                     display: 'flex',
                                     alignItems: 'center',
@@ -207,13 +272,13 @@ export function Registration(): JSX.Element {
                                 >
                                     {e}
                                 </Paper>
-                            </Box>
+                            </Grid>
                         ))}
                     </Paper>
                     <Button
                         variant="contained"
                         onClick={() => {
-                            navigator.clipboard.writeText(mnemonic.phrase)
+                            navigator.clipboard.writeText(mnemonic)
                         }}
                         startIcon={<ContentPasteIcon />}
                     >
@@ -263,10 +328,10 @@ export function Registration(): JSX.Element {
                             width: '100%'
                         }}
                     />
-                    {mnemonic.phrase === mnemonicTest ? '一致しています' : '一致していません'}
+                    {mnemonic === mnemonicTest ? '一致しています' : '一致していません'}
                     <Button
                         variant="contained"
-                        disabled={mnemonic.phrase !== mnemonicTest}
+                        disabled={mnemonic !== mnemonicTest}
                         onClick={(): void => {
                             setActiveStep(4)
                         }}
@@ -289,15 +354,40 @@ export function Registration(): JSX.Element {
                 >
                     あなたのメッセージを保存・配信してくれるホストサーバーを探しましょう。
                     どのホストサーバーを選択しても、だれとでもつながる事ができます。
-                    <Box
-                        sx={{
-                            width: '100%'
-                        }}
-                    >
+                    <Box width="100%" display="flex" flexDirection="column">
                         <Typography variant="h3">リストから選択</Typography>
-                        公開ホスト検索は未実装です
+                        <List>
+                            <ListItemButton
+                                component={Link}
+                                to={`https://hub.concurrent.world/register?token=${
+                                    api?.constructJWT({ aud: 'hub.concurrent.world' }) ?? ''
+                                }`}
+                                target="_blank"
+                                onClick={() => {
+                                    setServer('hub.concurrent.world')
+                                }}
+                            >
+                                <ListItemAvatar>
+                                    <Avatar></Avatar>
+                                </ListItemAvatar>
+                                <ListItemText primary="hub.concurrent.world" />
+                                <ListItemIcon>
+                                    <OpenInNewIcon />
+                                </ListItemIcon>
+                            </ListItemButton>
+                        </List>
                         <Divider>または</Divider>
                         <Typography variant="h3">URLから直接入力</Typography>
+                        <Typography
+                            color="text.primary"
+                            component={muiLink}
+                            variant="caption"
+                            href="https://github.com/totegamma/concurrent"
+                            target="_blank"
+                        >
+                            Tips: 自分でサーバーを建てる場合はこちら
+                        </Typography>
+                        <Box flex="1" />
                         <Box sx={{ display: 'flex', gap: '10px' }}>
                             <TextField
                                 placeholder="https://example.tld/"
@@ -356,7 +446,7 @@ export function Registration(): JSX.Element {
                     <Box
                         sx={{
                             width: '100%',
-                            borderRadius: '10px',
+                            borderRadius: 1,
                             overflow: 'hidden'
                         }}
                     >
@@ -378,13 +468,15 @@ export function Registration(): JSX.Element {
                 <>
                     <Box
                         sx={{
-                            padding: '30px'
+                            padding: '30px',
+                            maxWidth: '600px',
+                            margin: 'auto'
                         }}
                     >
                         <Tilt glareEnable={true} glareBorderRadius="5%">
                             <PassportRenderer
                                 theme={theme}
-                                ccid={userAddress}
+                                ccid={CCID}
                                 name={profile?.username ?? ''}
                                 avatar={profile?.avatar ?? ''}
                                 host={host?.fqdn ?? ''}
@@ -415,6 +507,7 @@ export function Registration(): JSX.Element {
 
     return (
         <ThemeProvider theme={theme}>
+            <CssBaseline />
             <ApiProvider api={api}>
                 <Box
                     sx={{

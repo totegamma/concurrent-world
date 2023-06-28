@@ -51,7 +51,12 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
     }
 
     return (
-        <Box sx={{ gap: '15px', height: '100%' }}>
+        <Box
+            sx={{
+                height: '100%',
+                overflow: 'hidden'
+            }}
+        >
             <Box
                 sx={{
                     display: 'flex',
@@ -87,7 +92,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                 gap: '5px'
                             }}
                         >
-                            <List dense sx={{ width: '100%', maxWidth: 360 }}>
+                            <List dense sx={{ width: '100%' }}>
                                 <ListItem disablePadding>
                                     <ListItemButton sx={{ gap: 1 }} component={Link} to="/">
                                         <HomeIcon
@@ -170,16 +175,26 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         <Divider />
                     </>
                 )}
-                <StreamList onClick={props.onClick} />
+                <Box
+                    sx={{
+                        flex: 1,
+                        scrollbarGutter: 'stable',
+                        overflowX: 'hidden',
+                        overflowY: 'hidden',
+                        '&:hover': {
+                            overflowY: 'auto'
+                        }
+                    }}
+                >
+                    <StreamList onClick={props.onClick} />
+                </Box>
                 <ButtonBase
                     component={Link}
                     sx={{
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'left',
-                        gap: '15px',
-                        m: 0,
-                        p: '15px'
+                        gap: 1
                     }}
                     to={'/entity/' + (appData.profile?.author ?? '')}
                 >
@@ -197,7 +212,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                             {appData.profile?.payload.body.username}
                         </Typography>
                         <Typography variant="caption" color={theme.palette.background.contrastText}>
-                            {api.host?.fqdn}
+                            {api.host}
                         </Typography>
                     </Box>
                 </ButtonBase>

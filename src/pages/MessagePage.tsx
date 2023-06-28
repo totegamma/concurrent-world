@@ -1,6 +1,26 @@
-import { Box, Divider, Typography } from '@mui/material'
+import { Box, Divider, Paper, Typography } from '@mui/material'
+import { MessageFrame } from '../components/Timeline'
+import { useApi } from '../context/api'
+import { useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { type Message } from '../model'
 
 export function MessagePage(): JSX.Element {
+    const api = useApi()
+    const { id } = useParams()
+    const messageID = id?.split('@')[0]
+    const authorID = id?.split('@')[1]
+
+    const [message, setMessage] = useState<Message<any> | undefined>()
+
+    useEffect(() => {
+        if (!messageID || !authorID) return
+        api.fetchMessageWithAuthor(messageID, authorID).then((msg) => {
+            if (!msg) return
+            setMessage(msg)
+        })
+    }, [messageID, authorID])
+
     return (
         <Box
             sx={{
@@ -8,7 +28,7 @@ export function MessagePage(): JSX.Element {
                 flexDirection: 'column',
                 gap: '5px',
                 padding: '20px',
-                background: 'background.paper',
+                backgroundColor: 'background.paper',
                 minHeight: '100%',
                 overflow: 'scroll'
             }}
@@ -17,6 +37,15 @@ export function MessagePage(): JSX.Element {
                 Message
             </Typography>
             <Divider />
+            {message ? (
+                <Paper sx={{ m: '10px 0', p: '0 20px' }} elevation={0} variant="outlined">
+                    <MessageFrame message={message} lastUpdated={0} />
+                </Paper>
+            ) : (
+                <Typography variant="body1" gutterBottom>
+                    Loading...
+                </Typography>
+            )}
         </Box>
     )
 }

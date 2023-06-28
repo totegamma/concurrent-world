@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import type { ConcurrentTheme } from './model'
 import { createConcurrentTheme, Themes } from './themes'
 import { Box, Button, CssBaseline, ThemeProvider } from '@mui/material'
+import Paper from '@mui/material/Paper'
 
 const ThemeList = Object.keys(Themes)
 
@@ -36,7 +37,8 @@ export const Default = (arg: Props): JSX.Element => {
 
     return (
         <ThemeProvider theme={theme}>
-            <CssBaseline>
+            <CssBaseline />
+            <Paper sx={{ padding: '1em' }}>
                 <Box
                     sx={{
                         display: 'flex',
@@ -56,7 +58,7 @@ export const Default = (arg: Props): JSX.Element => {
                         outlined
                     </Button>
                 </Box>
-            </CssBaseline>
+            </Paper>
         </ThemeProvider>
     )
 }

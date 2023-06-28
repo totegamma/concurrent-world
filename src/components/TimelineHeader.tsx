@@ -89,8 +89,7 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
                     sx={{
                         width: 1,
                         justifyContent: {
-                            xs: 'flex-left',
-                            xl: 'flex-start'
+                            xs: 'flex-left'
                         },
                         color: 'primary.contrastText',
                         p: { xs: '0', xl: '8px 0 8 4px' }

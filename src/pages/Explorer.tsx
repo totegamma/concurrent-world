@@ -13,29 +13,30 @@ import {
     Typography,
     useTheme
 } from '@mui/material'
+import { Schemas } from '../schemas'
+import { useApi } from '../context/api'
+import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import type { Stream } from '../model'
 import StarIcon from '@mui/icons-material/Star'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
-import type { Host, Stream } from '../model'
-import { useApi } from '../context/api'
-import { useFollow } from '../context/FollowContext'
-import { Schemas } from '../schemas'
 import type { Commonstream } from '../schemas/commonstream'
-import { Link } from 'react-router-dom'
+import { usePreference } from '../context/PreferenceContext'
 
 export function Explorer(): JSX.Element {
     const api = useApi()
     const theme = useTheme()
-    const follow = useFollow()
+    const pref = usePreference()
 
-    const [hosts, setHosts] = useState<Host[]>([...(api.host ? [api.host] : [])])
-    const [currentHost, setCurrentHost] = useState<string>(api.host?.fqdn ?? '')
+    const [hosts, setHosts] = useState<string[]>([...(api.host ? [api.host] : [])])
+    const [currentHost, setCurrentHost] = useState<string>(api.host ?? '')
     const [streams, setStreams] = useState<Array<Stream<any>>>([])
     const [newStreamName, setNewStreamName] = useState<string>('')
 
     const loadHosts = (): void => {
         api.getKnownHosts().then((e) => {
-            setHosts([...(api.host ? [api.host] : []), ...e])
+            if (!api.host) return
+            setHosts([api.host, ...e.filter((e) => e.fqdn !== api.host).map((e) => e.fqdn)])
         })
     }
 
@@ -87,11 +88,11 @@ export function Explorer(): JSX.Element {
                 onChange={(e) => {
                     setCurrentHost(e.target.value)
                 }}
-                defaultValue={api.host.fqdn}
+                defaultValue={api.host}
             >
                 {hosts.map((e) => (
-                    <MenuItem key={e.fqdn} value={e.fqdn}>
-                        {e.fqdn}
+                    <MenuItem key={e} value={e}>
+                        {e}
                     </MenuItem>
                 ))}
             </Select>
@@ -129,14 +130,14 @@ export function Explorer(): JSX.Element {
                                 <IconButton
                                     sx={{ flexGrow: 0 }}
                                     onClick={() => {
-                                        if (follow.bookmarkingStreams.includes(value.id)) {
-                                            follow.unbookmarkStream(value.id)
+                                        if (pref.bookmarkingStreams.includes(value.id)) {
+                                            pref.unbookmarkStream(value.id)
                                         } else {
-                                            follow.bookmarkStream(value.id)
+                                            pref.bookmarkStream(value.id)
                                         }
                                     }}
                                 >
-                                    {follow.bookmarkingStreams.includes(value.id) ? (
+                                    {pref.bookmarkingStreams.includes(value.id) ? (
                                         <StarIcon
                                             sx={{
                                                 color: theme.palette.text.primary

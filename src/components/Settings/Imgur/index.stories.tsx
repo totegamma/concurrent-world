@@ -5,6 +5,7 @@ import { createConcurrentTheme, Themes } from '../../../themes'
 import { CssBaseline, ThemeProvider } from '@mui/material'
 import { ImgurSettings } from './index'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import Paper from '@mui/material/Paper'
 
 const ThemeList = Object.keys(Themes)
 
@@ -37,9 +38,10 @@ export const Default = (arg: Props): JSX.Element => {
 
     return (
         <ThemeProvider theme={theme}>
-            <CssBaseline>
+            <CssBaseline />
+            <Paper sx={{ padding: '1em' }}>
                 <ImgurSettings />
-            </CssBaseline>
+            </Paper>
         </ThemeProvider>
     )
 }

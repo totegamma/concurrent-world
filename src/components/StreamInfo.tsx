@@ -3,11 +3,11 @@ import type { Commonstream } from '../schemas/commonstream'
 import { useCallback, useEffect, useState } from 'react'
 import { useApi } from '../context/api'
 import type { Stream } from '../model'
-import { useFollow } from '../context/FollowContext'
 import Background from '../resources/defaultbg.png'
 import { CCEditor } from './cceditor'
 import { Schemas } from '../schemas'
 import { useSnackbar } from 'notistack'
+import { usePreference } from '../context/PreferenceContext'
 
 export interface StreamInfoProps {
     id: string
@@ -15,10 +15,10 @@ export interface StreamInfoProps {
 
 export function StreamInfo(props: StreamInfoProps): JSX.Element {
     const api = useApi()
-    const followService = useFollow()
+    const pref = usePreference()
     const { enqueueSnackbar } = useSnackbar()
     const [stream, setStream] = useState<Stream<Commonstream>>()
-    const bookmarking = followService.bookmarkingStreams.includes(props.id)
+    const bookmarking = pref.bookmarkingStreams.includes(props.id)
     const [settingsOpen, setSettingsOpen] = useState(false)
     const isAuthor = stream?.author === api.userAddress
     const isMaintainer = stream?.maintainer.includes(api.userAddress)
@@ -27,6 +27,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
     const [readerDraft, setReaderDraft] = useState('')
 
     useEffect(() => {
+        if (!props.id) return
         api.readStream(props.id).then((e) => {
             if (!e) return
             setStream(e)
@@ -82,7 +83,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                         <Button
                             variant={'contained'}
                             onClick={() => {
-                                followService.unbookmarkStream(props.id)
+                                pref.unbookmarkStream(props.id)
                             }}
                             sx={{ height: '50px' }}
                         >
@@ -92,7 +93,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                         <Button
                             variant={'contained'}
                             onClick={() => {
-                                followService.bookmarkStream(props.id)
+                                pref.bookmarkStream(props.id)
                             }}
                             sx={{ height: '50px' }}
                         >

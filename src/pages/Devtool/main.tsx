@@ -1,7 +1,9 @@
 import { memo, useState } from 'react'
-import { Box, Divider, Grow, Tab, Tabs, Typography } from '@mui/material'
+import { Box, Divider, Fade, Tab, Tabs, Typography } from '@mui/material'
 import { ServerJWT } from './ServerJWT'
 import { UserJWT } from './UserJWT'
+import { CCComposer } from './CCComposer'
+import { IdentityGenerator } from './IdentityGenerator'
 
 export const Devtool = memo((): JSX.Element => {
     const [tab, setTab] = useState(0)
@@ -24,21 +26,33 @@ export const Devtool = memo((): JSX.Element => {
                     setTab(index)
                 }}
             >
+                <Tab label="Composer" />
                 <Tab label="ServerJWT" />
                 <Tab label="UserJWT" />
+                <Tab label="IdentityGenerator" />
             </Tabs>
             <Divider />
             <Box sx={{ position: 'relative', mt: '20px' }}>
-                <Grow in={tab === 0} unmountOnExit>
+                <Fade in={tab === 0} unmountOnExit>
+                    <Box sx={{ position: 'absolute', width: '100%' }}>
+                        <CCComposer />
+                    </Box>
+                </Fade>
+                <Fade in={tab === 1} unmountOnExit>
                     <Box sx={{ position: 'absolute', width: '100%' }}>
                         <ServerJWT />
                     </Box>
-                </Grow>
-                <Grow in={tab === 1} unmountOnExit>
+                </Fade>
+                <Fade in={tab === 2} unmountOnExit>
                     <Box sx={{ position: 'absolute', width: '100%' }}>
                         <UserJWT />
                     </Box>
-                </Grow>
+                </Fade>
+                <Fade in={tab === 3} unmountOnExit>
+                    <Box sx={{ position: 'absolute', width: '100%' }}>
+                        <IdentityGenerator />
+                    </Box>
+                </Fade>
             </Box>
         </Box>
     )

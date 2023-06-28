@@ -13,27 +13,23 @@ import {
     ListItemText
 } from '@mui/material'
 import { StreamPicker } from '../components/StreamPicker'
-import { usePersistent } from '../hooks/usePersistent'
 import type { ProfileWithAddress } from '../model'
 import { CCAvatar } from '../components/CCAvatar'
 import { useApi } from '../context/api'
 import { Schemas } from '../schemas'
-import { useFollow } from '../context/FollowContext'
 import { Link } from 'react-router-dom'
+import { usePreference } from '../context/PreferenceContext'
 
 export function HomeSettings(): JSX.Element {
     const api = useApi()
-    const follow = useFollow()
+    const pref = usePreference()
     const [tab, setTab] = useState(0)
-
-    const [defaultPostHome, setDefaultPostHome] = usePersistent<string[]>('defaultPostHome', [])
-    const [defaultPostNonHome, setDefaultPostNonHome] = usePersistent<string[]>('defaultPostNonHome', [])
 
     const [followList, setFollowList] = useState<ProfileWithAddress[]>([])
 
     useEffect(() => {
         Promise.all(
-            follow.followingUsers.map((ccaddress: string) =>
+            pref.followingUsers.map((ccaddress: string) =>
                 api.readCharacter(ccaddress, Schemas.profile).then((e) => {
                     return {
                         ccaddress,
@@ -44,10 +40,10 @@ export function HomeSettings(): JSX.Element {
         ).then((e) => {
             setFollowList(e)
         })
-    }, [follow.followingUsers])
+    }, [pref.followingUsers])
 
     const unfollow = (ccaddress: string): void => {
-        follow.unfollowUser(ccaddress)
+        pref.unfollowUser(ccaddress)
     }
 
     return (
@@ -68,8 +64,8 @@ export function HomeSettings(): JSX.Element {
                             ストリーム
                         </Typography>
                         <StreamPicker
-                            selected={follow.followingStreams}
-                            setSelected={follow.setFollowingStreams}
+                            selected={pref.followingStreams}
+                            setSelected={pref.setFollowingStreams}
                             sx={{ backgroundColor: 'primary.main' }}
                         />
                     </Box>
@@ -119,8 +115,8 @@ export function HomeSettings(): JSX.Element {
                             ホーム
                         </Typography>
                         <StreamPicker
-                            selected={defaultPostHome}
-                            setSelected={setDefaultPostHome}
+                            selected={pref.defaultPostHome}
+                            setSelected={pref.setDefaultPostHome}
                             sx={{ backgroundColor: 'primary.main' }}
                         />
                     </Box>
@@ -130,8 +126,8 @@ export function HomeSettings(): JSX.Element {
                             ホーム以外
                         </Typography>
                         <StreamPicker
-                            selected={defaultPostNonHome}
-                            setSelected={setDefaultPostNonHome}
+                            selected={pref.defaultPostNonHome}
+                            setSelected={pref.setDefaultPostNonHome}
                             sx={{ backgroundColor: 'primary.main' }}
                         />
                     </Box>

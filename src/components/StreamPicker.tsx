@@ -1,7 +1,7 @@
 import { Autocomplete, Box, Chip, InputBase, type SxProps } from '@mui/material'
 import { memo, useEffect, useState } from 'react'
 import { useApi } from '../context/api'
-import { useFollow } from '../context/FollowContext'
+import { usePreference } from '../context/PreferenceContext'
 
 export interface StreamPickerProps {
     selected: string[]
@@ -16,12 +16,12 @@ interface StreamOption {
 
 export const StreamPicker = memo<StreamPickerProps>((props: StreamPickerProps): JSX.Element => {
     const api = useApi()
-    const followService = useFollow()
+    const pref = usePreference()
     const [options, setOptions] = useState<StreamOption[]>([])
     const [selectedStreams, setSelectedStreams] = useState<StreamOption[]>([])
 
     useEffect(() => {
-        Promise.all(followService.bookmarkingStreams.map((e) => api.readStream(e))).then((a) => {
+        Promise.all(pref.bookmarkingStreams.map((e) => api.readStream(e))).then((a) => {
             setOptions(
                 a
                     .filter((e) => e?.payload)

@@ -1,6 +1,7 @@
 import { useEffect, useState, createContext, useRef, useMemo } from 'react'
-import { Routes, Route } from 'react-router-dom'
-import { darken, Box, Paper, ThemeProvider, SwipeableDrawer } from '@mui/material'
+import { DndProvider, getBackendOptions, MultiBackend } from '@minoru/react-dnd-treeview'
+import { Routes, Route, useLocation } from 'react-router-dom'
+import { darken, Box, Paper, ThemeProvider, SwipeableDrawer, CssBaseline } from '@mui/material'
 import useWebSocket, { type ReadyState } from 'react-use-websocket'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 
@@ -10,7 +11,7 @@ import { useObjectList } from './hooks/useObjectList'
 import { Schemas } from './schemas'
 import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu'
-import type { StreamElementDated, ServerEvent, Emoji, ConcurrentTheme, ImgurSettings, Character, Host } from './model'
+import type { StreamElementDated, ServerEvent, Emoji, ConcurrentTheme, Character } from './model'
 import {
     Associations,
     Explorer,
@@ -29,9 +30,9 @@ import useSound from 'use-sound'
 import { MobileMenu } from './components/MobileMenu'
 import ApiProvider from './context/api'
 import ConcurrentApiClient from './apiservice'
-import { FollowProvider } from './context/FollowContext'
 import type { Profile } from './schemas/profile'
 import type { Userstreams } from './schemas/userstreams'
+import { PreferenceProvider } from './context/PreferenceContext'
 
 const iOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent)
 
@@ -40,10 +41,7 @@ export const ApplicationContext = createContext<appData>({
     userstreams: undefined,
     emojiDict: {},
     websocketState: -1,
-    imgurSettings: {
-        clientId: ''
-    },
-    setImgurSettings: (_: ImgurSettings) => {}
+    displayingStream: []
 })
 
 export interface appData {
@@ -51,38 +49,70 @@ export interface appData {
     userstreams: Character<Userstreams> | undefined
     emojiDict: Record<string, Emoji>
     websocketState: ReadyState
-    imgurSettings: ImgurSettings
-    setImgurSettings: (settings: ImgurSettings) => void
+    displayingStream: string[]
 }
 
 export const ClockContext = createContext<Date>(new Date())
 
 function App(): JSX.Element {
-    const [host] = usePersistent<Host>('Host', null as any)
+    const [domain] = usePersistent<string>('Domain', '')
     const [prvkey] = usePersistent<string>('PrivateKey', '')
     const [address] = usePersistent<string>('Address', '')
     const [api, initializeApi] = useState<ConcurrentApiClient>()
     useEffect(() => {
-        const api = new ConcurrentApiClient(address, prvkey, host)
+        const api = new ConcurrentApiClient(address, prvkey, domain)
         initializeApi(api)
-    }, [host, address, prvkey])
+    }, [domain, address, prvkey])
 
     const [themeName, setThemeName] = usePersistent<string>('Theme', Object.keys(Themes)[0])
 
-    const [imgurSettings, setImgurSettings] = usePersistent<ImgurSettings>('imgurSettings', {
-        clientId: ''
-    })
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
     const messages = useObjectList<StreamElementDated>()
-    const [currentStreams, setCurrentStreams] = useState<string[]>([])
+    const [userstreams, setUserstreams] = useState<Character<Userstreams>>()
+
+    const [followingUserStreams, setFollowingUserStreams] = useState<string[]>([])
+    useEffect(() => {
+        const followingUsers = JSON.parse(localStorage.getItem('followingUsers') ?? '[]')
+        api?.getUserHomeStreams(followingUsers).then((streams) => {
+            setFollowingUserStreams(streams)
+        })
+    }, [api])
+
+    const path = useLocation()
+    const displayingStream: string[] = useMemo(() => {
+        switch (path.pathname) {
+            case '/': {
+                const query = path.hash.replace('#', '').split(',')
+                if (query.length === 0 || query[0] === '') {
+                    // is Home
+                    const followingStreams = JSON.parse(localStorage.getItem('followingStreams') ?? '[]')
+                    return [...followingStreams, ...followingUserStreams].filter((e) => e)
+                }
+                return query
+            }
+            case '/notifications': {
+                const notifications = userstreams?.payload.body.notificationStream
+                if (!notifications) return []
+                return [notifications]
+            }
+            case '/associations': {
+                const associations = userstreams?.payload.body.associationStream
+                if (!associations) return []
+                return [associations]
+            }
+            default: {
+                return []
+            }
+        }
+    }, [path, userstreams, followingUserStreams])
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
 
-    const { lastMessage, readyState, sendJsonMessage } = useWebSocket(`wss://${host.fqdn}/api/v1/socket`, {
+    const { lastMessage, readyState, sendJsonMessage } = useWebSocket(`wss://${domain}/api/v1/socket`, {
         shouldReconnect: (_) => true,
         reconnectInterval: (attempt) => Math.min(Math.pow(2, attempt) * 1000, 10000),
         onOpen: (_) => {
-            sendJsonMessage({ channels: currentStreams })
+            sendJsonMessage({ channels: displayingStream })
         }
     })
 
@@ -91,7 +121,6 @@ function App(): JSX.Element {
     const playBubbleRef = useRef(playBubble)
     const playNotificationRef = useRef(playNotification)
     const [profile, setProfile] = useState<Character<Profile>>()
-    const [userstreams, setUserstreams] = useState<Character<Userstreams>>()
     useEffect(() => {
         playBubbleRef.current = playBubble
         playNotificationRef.current = playNotification
@@ -129,11 +158,11 @@ function App(): JSX.Element {
     useEffect(() => {
         sendJsonMessage({
             channels: [
-                ...currentStreams,
+                ...displayingStream,
                 ...(userstreams?.payload.body.notificationStream ? [userstreams.payload.body.notificationStream] : [])
             ]
         })
-    }, [currentStreams, userstreams])
+    }, [displayingStream, userstreams])
 
     useEffect(() => {
         if (!lastMessage) return
@@ -176,7 +205,30 @@ function App(): JSX.Element {
                         if (event.stream === userstreams?.payload.body.notificationStream) {
                             playNotificationRef.current()
                             api?.fetchAssociation(event.body.id, event.body.currenthost).then((a) => {
-                                a &&
+                                if (!a) return
+                                if (a.schema === Schemas.replyAssociation) {
+                                    api?.readCharacter(a.author, Schemas.profile).then(
+                                        (c: Character<Profile> | undefined) => {
+                                            enqueueSnackbar(
+                                                `${c?.payload.body.username ?? 'anonymous'} replied to your message.`
+                                            )
+                                        }
+                                    )
+                                    return
+                                }
+
+                                if (a.schema === Schemas.reRouteAssociation) {
+                                    api?.readCharacter(a.author, Schemas.profile).then(
+                                        (c: Character<Profile> | undefined) => {
+                                            enqueueSnackbar(
+                                                `${c?.payload.body.username ?? 'anonymous'} rerouted to your message.`
+                                            )
+                                        }
+                                    )
+                                    return
+                                }
+
+                                if (a.schema === Schemas.like) {
                                     api.fetchMessage(a.targetID).then((m) => {
                                         m &&
                                             api
@@ -189,6 +241,30 @@ function App(): JSX.Element {
                                                     )
                                                 })
                                     })
+                                    return
+                                }
+
+                                if (a.schema === Schemas.emojiAssociation) {
+                                    api.fetchMessage(a.targetID).then((m) => {
+                                        console.log(m)
+                                        m &&
+                                            api
+                                                .readCharacter(a.author, Schemas.profile)
+                                                .then((c: Character<Profile> | undefined) => {
+                                                    enqueueSnackbar(
+                                                        `${c?.payload.body.username ?? 'anonymous'} reacted to "${
+                                                            (m.payload.body.body as string) ?? 'your message.'
+                                                        }" with ${
+                                                            (JSON.parse(m.associations.at(-1)?.payload).body
+                                                                .shortcode as string) ?? 'emoji'
+                                                        }`
+                                                    )
+                                                })
+                                    })
+                                    return
+                                }
+
+                                enqueueSnackbar('unknown association received.')
                             })
                         }
                         break
@@ -232,10 +308,9 @@ function App(): JSX.Element {
             profile,
             userstreams,
             websocketState: readyState,
-            imgurSettings,
-            setImgurSettings
+            displayingStream
         }
-    }, [emojiDict, profile, userstreams, readyState, imgurSettings, setImgurSettings])
+    }, [emojiDict, profile, userstreams, readyState, displayingStream])
 
     if (!api) {
         return <>building api service...</>
@@ -243,17 +318,20 @@ function App(): JSX.Element {
 
     const providers = (childs: JSX.Element): JSX.Element => (
         <SnackbarProvider preventDuplicate>
-            <ThemeProvider theme={theme}>
-                <ClockContext.Provider value={clock}>
-                    <ApiProvider api={api}>
-                        <FollowProvider>
-                            <ApplicationContext.Provider value={applicationContext}>
-                                {childs}
-                            </ApplicationContext.Provider>
-                        </FollowProvider>
-                    </ApiProvider>
-                </ClockContext.Provider>
-            </ThemeProvider>
+            <DndProvider backend={MultiBackend} options={getBackendOptions()}>
+                <ThemeProvider theme={theme}>
+                    <CssBaseline />
+                    <ClockContext.Provider value={clock}>
+                        <ApiProvider api={api}>
+                            <PreferenceProvider>
+                                <ApplicationContext.Provider value={applicationContext}>
+                                    {childs}
+                                </ApplicationContext.Provider>
+                            </PreferenceProvider>
+                        </ApiProvider>
+                    </ClockContext.Provider>
+                </ThemeProvider>
+            </DndProvider>
         </SnackbarProvider>
     )
 
@@ -286,9 +364,10 @@ function App(): JSX.Element {
                         sx={{
                             display: {
                                 xs: 'none',
-                                sm: 'block',
-                                width: '200px'
-                            }
+                                sm: 'block'
+                            },
+                            width: '200px',
+                            m: 1
                         }}
                     >
                         <Menu />
@@ -304,17 +383,11 @@ function App(): JSX.Element {
                         <Paper
                             sx={{
                                 flexGrow: '1',
-                                margin: {
-                                    xs: '4px',
-                                    sm: '10px'
-                                },
+                                margin: 1,
                                 mb: { xs: 0, sm: '10px' },
                                 display: 'flex',
                                 flexFlow: 'column',
-                                borderRadius: {
-                                    xs: '15px',
-                                    md: '20px'
-                                },
+                                borderRadius: 1,
                                 overflow: 'hidden',
                                 background: 'none'
                             }}
@@ -322,36 +395,11 @@ function App(): JSX.Element {
                             <Routes>
                                 <Route
                                     index
-                                    element={
-                                        <TimelinePage
-                                            messages={messages}
-                                            currentStreams={currentStreams}
-                                            setCurrentStreams={setCurrentStreams}
-                                            setMobileMenuOpen={setMobileMenuOpen}
-                                        />
-                                    }
+                                    element={<TimelinePage messages={messages} setMobileMenuOpen={setMobileMenuOpen} />}
                                 />
-                                <Route
-                                    path="/associations"
-                                    element={
-                                        <Associations
-                                            messages={messages}
-                                            currentStreams={currentStreams}
-                                            setCurrentStreams={setCurrentStreams}
-                                        />
-                                    }
-                                />
+                                <Route path="/associations" element={<Associations messages={messages} />} />
                                 <Route path="/explorer" element={<Explorer />} />
-                                <Route
-                                    path="/notifications"
-                                    element={
-                                        <Notifications
-                                            messages={messages}
-                                            currentStreams={currentStreams}
-                                            setCurrentStreams={setCurrentStreams}
-                                        />
-                                    }
-                                />
+                                <Route path="/notifications" element={<Notifications messages={messages} />} />
                                 <Route path="/identity" element={<Identity />} />
                                 <Route path="/settings" element={<Settings setThemeName={setThemeName} />} />
                                 <Route path="/message/:id" element={<MessagePage />} />

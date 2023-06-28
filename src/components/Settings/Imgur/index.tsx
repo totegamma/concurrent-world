@@ -1,6 +1,6 @@
 import { Box, Button, type SxProps, TextField, Typography } from '@mui/material'
-import { useContext, useRef, useState } from 'react'
-import { ApplicationContext } from '../../../App'
+import { useRef, useState } from 'react'
+import { usePreference } from '../../../context/PreferenceContext'
 
 const sx: SxProps = {
     marginX: {
@@ -12,7 +12,7 @@ const sx: SxProps = {
 }
 
 export const ImgurSettings = (): JSX.Element => {
-    const appData = useContext(ApplicationContext)
+    const pref = usePreference()
 
     const clientIdRef = useRef<HTMLInputElement>(null)
 
@@ -20,9 +20,7 @@ export const ImgurSettings = (): JSX.Element => {
 
     const handleSave = (): void => {
         if (clientIdRef.current) {
-            appData.setImgurSettings({
-                clientId: clientIdRef.current.value
-            })
+            pref.setImgurClientID(clientIdRef.current.value)
             setButtonText('OK!')
             setTimeout(() => {
                 setButtonText('Save')
@@ -34,9 +32,8 @@ export const ImgurSettings = (): JSX.Element => {
             <Box>
                 <Typography variant="h3">ImgurSetting</Typography>
                 <Typography>
-                    Imgurに登録した後、
-                    <a href={'https://api.imgur.com/oauth2/addclient'}>ここ</a>
-                    でアプリケーションを作成してください。「OAuth 2 authorization without a callback URL」で大丈夫です
+                    Imgurに登録した後、<a href={'https://api.imgur.com/oauth2/addclient'}>このページ</a>
+                    でアプリケーションを&quot;OAuth 2 authorization without a callback URL&quot;で作成してください。
                 </Typography>
                 <Box>
                     <TextField
@@ -44,7 +41,7 @@ export const ImgurSettings = (): JSX.Element => {
                         variant="outlined"
                         fullWidth={true}
                         sx={sx}
-                        defaultValue={appData.imgurSettings.clientId}
+                        defaultValue={pref.imgurClientID}
                         inputRef={clientIdRef}
                         type="password"
                     />

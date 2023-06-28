@@ -14,7 +14,7 @@ import type { ConcurrentTheme, Host } from '../model'
 import { usePersistent } from '../hooks/usePersistent'
 import { Themes, createConcurrentTheme } from '../themes'
 import { ThemeProvider } from '@emotion/react'
-import { darken } from '@mui/material'
+import { CssBaseline, darken } from '@mui/material'
 import { ConcurrentWordmark } from '../components/ConcurrentWordmark'
 
 export function AccountImport(): JSX.Element {
@@ -36,46 +36,98 @@ export function AccountImport(): JSX.Element {
     const [host, setHost] = useState<Host>()
     const [entityFound, setEntityFound] = useState<boolean>(false)
     const [api, initializeApi] = useState<ConcurrentApiClient>()
+    const [errorMessage, setErrorMessage] = useState<string>('')
+
+    const [privatekey, setPrivatekey] = useState<string>('')
+    const [ccid, setCcid] = useState<string>('')
 
     useEffect(() => {
+        let privatekey = ''
+        let ccid = ''
+        setServer('')
+        setErrorMessage('')
+        setEntityFound(false)
         if (mnemonic === '') {
             const key = LoadKey(secret)
             if (!key) return
-            const api = new ConcurrentApiClient(key.ccaddress, key.privatekey, host)
-            initializeApi(api)
+            privatekey = key.privatekey
+            ccid = key.ccaddress
         } else {
-            const wallet = HDNodeWallet.fromPhrase(mnemonic, undefined, undefined, LangJa.wordlist()) // TODO: move to utils
-            const api = new ConcurrentApiClient('CC' + wallet.address.slice(2), wallet.privateKey.slice(2), host)
-            initializeApi(api)
+            try {
+                const wallet = HDNodeWallet.fromPhrase(mnemonic.trim(), undefined, undefined, LangJa.wordlist()) // TODO: move to utils
+                privatekey = wallet.privateKey.slice(2)
+                ccid = 'CC' + wallet.address.slice(2)
+            } catch (e) {
+                console.log(e)
+                setErrorMessage('シークレットコードが正しくありません。')
+                return
+            }
         }
-    }, [mnemonic, secret, host])
+
+        setPrivatekey(privatekey)
+        setCcid(ccid)
+
+        const hubApi = new ConcurrentApiClient(ccid, privatekey, 'hub.concurrent.world')
+
+        hubApi.readEntity(ccid).then((entity) => {
+            console.log(entity)
+            if (entity && entity.ccaddr === ccid) {
+                setServer(entity.host || 'hub.concurrent.world')
+                setEntityFound(true)
+            } else {
+                setErrorMessage('お住まいのサーバーが見つかりませんでした。手動入力することで継続できます。')
+            }
+        })
+    }, [mnemonic, secret])
 
     useEffect(() => {
-        if (!api) return
+        let unmounted = false
         const fqdn = server.replace('https://', '').replace('/', '')
-        api.getHostProfile(fqdn).then((e: any) => {
-            setHost(e)
-        })
-        console.log(fqdn)
+        const api = new ConcurrentApiClient(ccid, privatekey, fqdn)
+        api.getHostProfile(fqdn)
+            .then((e: any) => {
+                if (unmounted) return
+                setHost(e)
+                api.readEntity(api.userAddress)
+                    .then((entity) => {
+                        if (unmounted) return
+                        console.log(entity)
+                        if (!entity || entity.ccaddr !== api.userAddress) {
+                            setErrorMessage('指定のサーバーにあなたのアカウントは見つかりませんでした。')
+                            return
+                        }
+                        setErrorMessage('')
+                        setEntityFound(entity.ccaddr === api.userAddress)
+                        initializeApi(api)
+                    })
+                    .catch((_) => {
+                        if (unmounted) return
+                        setErrorMessage('指定のサーバーにあなたのアカウントは見つかりませんでした。')
+                    })
+                console.log(fqdn)
+            })
+            .catch((_) => {
+                if (unmounted) return
+                setErrorMessage('指定のサーバーに接続できませんでした。')
+            })
+        return () => {
+            unmounted = true
+        }
     }, [server])
-
-    useEffect(() => {
-        console.log('check!!!')
-        api?.readEntity(api.userAddress).then((entity) => {
-            setEntityFound(!!entity && entity.ccaddr !== '')
-        })
-    }, [api])
 
     const accountImport = (): void => {
         if (!api) return
-        localStorage.setItem('Host', JSON.stringify(host))
+        if (!host) return
+        localStorage.setItem('Domain', JSON.stringify(host.fqdn))
         localStorage.setItem('PrivateKey', JSON.stringify(api.privatekey))
         localStorage.setItem('Address', JSON.stringify(api.userAddress))
+        localStorage.setItem('Mnemonic', JSON.stringify(mnemonic))
         navigate('/')
     }
 
     return (
         <ThemeProvider theme={theme}>
+            <CssBaseline />
             <Box
                 sx={{
                     padding: '20px',
@@ -119,7 +171,7 @@ export function AccountImport(): JSX.Element {
                         gap: '20px'
                     }}
                 >
-                    <Typography variant="h3">ふっかつの呪文から</Typography>
+                    <Typography variant="h3">シークレットコードから</Typography>
                     <TextField
                         placeholder="12個の単語からなる呪文"
                         value={mnemonic}
@@ -147,6 +199,7 @@ export function AccountImport(): JSX.Element {
                             setServer(e.target.value)
                         }}
                     />
+                    {errorMessage}
                     <Button disabled={!entityFound} variant="contained" onClick={accountImport}>
                         インポート
                     </Button>

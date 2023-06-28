@@ -21,7 +21,7 @@ export const CCEditor = memo<CCEditorProps>((props: CCEditorProps): JSX.Element 
                 console.log(e)
                 setSchema(e)
             })
-    }, [])
+    }, [props.schemaURL])
 
     return (
         <Box>

@@ -1,26 +1,29 @@
-import { memo, useEffect, useRef, useState } from 'react'
+import { memo, useContext, useEffect, useRef, useState } from 'react'
 import { Box, Collapse, Divider } from '@mui/material'
 import type { StreamElementDated } from '../model'
-import { type IuseObjectList } from '../hooks/useObjectList'
+import type { IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'
 import { useLocation } from 'react-router-dom'
 import { TimelineHeader } from '../components/TimelineHeader'
 import { useApi } from '../context/api'
-import { useFollow } from '../context/FollowContext'
 import { Timeline } from '../components/Timeline/main'
 import { StreamInfo } from '../components/StreamInfo'
 import { HomeSettings } from '../components/HomeSettings'
+import { ApplicationContext } from '../App'
+import type { SimpleNote } from '../schemas/simpleNote'
+import { Schemas } from '../schemas'
+import { usePersistent } from '../hooks/usePersistent'
+import { usePreference } from '../context/PreferenceContext'
 
 export interface TimelinePageProps {
     messages: IuseObjectList<StreamElementDated>
-    currentStreams: string[]
-    setCurrentStreams: (input: string[]) => void
     setMobileMenuOpen: (state: boolean) => void
 }
 
 export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): JSX.Element => {
     const api = useApi()
-    const followService = useFollow()
+    const appData = useContext(ApplicationContext)
+    const pref = usePreference()
 
     const reactlocation = useLocation()
     const scrollParentRef = useRef<HTMLDivElement>(null)
@@ -28,48 +31,47 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
     const [mode, setMode] = useState<string>('compose')
     const [writeable, setWriteable] = useState<boolean>(true)
 
-    const isHome = !reactlocation.hash
-    const queriedStreams = reactlocation.hash.replace('#', '').split(',')
+    const [defaultPostHome] = usePersistent<string[]>('defaultPostHome', [])
+    const [defaultPostNonHome] = usePersistent<string[]>('defaultPostNonHome', [])
+    const queriedStreams = reactlocation.hash
+        .replace('#', '')
+        .split(',')
+        .filter((e) => e !== '')
+    const streamPickerInitial = [
+        ...new Set([
+            ...(reactlocation.hash && reactlocation.hash !== '' ? defaultPostNonHome : defaultPostHome),
+            ...queriedStreams
+        ])
+    ]
 
     useEffect(() => {
-        ;(async () => {
-            if (isHome) {
-                props.setCurrentStreams(
-                    [
-                        ...followService.followingStreams,
-                        ...(await api.getUserHomeStreams(followService.followingUsers))
-                    ].filter((e) => e)
+        let mode = 'compose'
+        if (queriedStreams.length === 0) {
+            // at home
+            mode = 'home'
+        } else {
+            // at non-home
+            mode = pref.bookmarkingStreams.includes(queriedStreams[0]) ? 'compose' : 'info'
+            ;(async () => {
+                // check writeable
+                const writeable = await Promise.all(
+                    queriedStreams.map(async (e) => {
+                        const stream = await api.readStream(e)
+                        if (!stream) return false
+                        if (stream.author === api.userAddress) return true
+                        if (stream.writer.length === 0) return true
+                        return stream.writer.includes(api.userAddress)
+                    })
                 )
-            } else {
-                props.setCurrentStreams(queriedStreams)
-            }
-        })()
-        let mymode = followService.bookmarkingStreams.includes(queriedStreams[0]) ? 'compose' : 'info'
-        if (queriedStreams.length !== 1) mymode = 'compose'
-        if (!reactlocation.hash) mymode = 'home'
-        setMode(mymode)
+                const result = writeable.every((e) => e)
+                setWriteable(result)
+                setMode(result ? mode : 'info')
+            })()
+        }
+        setMode(mode)
 
         scrollParentRef.current?.scroll({ top: 0 })
     }, [reactlocation.hash])
-
-    useEffect(() => {
-        // check if the all of streams are writable
-        if (!reactlocation.hash) return
-        ;(async () => {
-            const writeable = await Promise.all(
-                props.currentStreams.map(async (e) => {
-                    const stream = await api.readStream(e)
-                    if (!stream) return false
-                    if (stream.author === api.userAddress) return true
-                    if (stream.writer.length === 0) return true
-                    return stream.writer.includes(api.userAddress)
-                })
-            )
-            const result = writeable.every((e) => e)
-            setWriteable(result)
-            setMode(result ? mode : 'info')
-        })()
-    }, [props.currentStreams])
 
     return (
         <Box
@@ -112,19 +114,34 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                     </Collapse>
                     <Collapse in={mode === 'compose' || mode === 'home'}>
                         <Box sx={{ padding: { xs: '8px', sm: '8px 16px' } }}>
-                            <Draft currentStreams={isHome ? [] : queriedStreams} />
+                            <Draft
+                                streamPickerInitial={streamPickerInitial}
+                                onSubmit={async (text: string, destinations: string[]) => {
+                                    const body = {
+                                        body: text
+                                    }
+                                    return await api
+                                        .createMessage<SimpleNote>(Schemas.simpleNote, body, destinations)
+                                        .then((_) => {
+                                            return null
+                                        })
+                                        .catch((e) => {
+                                            return e
+                                        })
+                                }}
+                            />
                         </Box>
                     </Collapse>
                     <Divider />
                 </Box>
                 {(reactlocation.hash === '' || reactlocation.hash === '#') &&
-                followService.followingStreams.length === 0 &&
-                followService.followingUsers.length === 0 ? (
+                pref.followingStreams.length === 0 &&
+                pref.followingUsers.length === 0 ? (
                     <Box>まだ誰も、どのストリームもフォローしていません。Explorerタブから探しに行きましょう。</Box>
                 ) : (
                     <Box sx={{ display: 'flex', flex: 1, padding: { xs: '8px', sm: '8px 16px' } }}>
                         <Timeline
-                            streams={props.currentStreams}
+                            streams={appData.displayingStream}
                             timeline={props.messages}
                             scrollParentRef={scrollParentRef}
                         />

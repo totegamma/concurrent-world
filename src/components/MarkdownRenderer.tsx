@@ -31,7 +31,6 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
     const genEmojiTag = (emoji: Emoji): string => {
         return `<img src="${emoji.publicUrl}" alt="emoji:${emoji.name}:" title=":${emoji?.name}:"/>`
     }
-
     const messagebody = props.messagebody.replace(/:\w+:/gi, (name: string) => {
         const emoji: Emoji | undefined = appData.emojiDict[name.slice(1, -1)]
         if (emoji) {
@@ -69,7 +68,31 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                     h4: ({ children }) => <Typography variant="h4">{children}</Typography>,
                     h5: ({ children }) => <Typography variant="h5">{children}</Typography>,
                     h6: ({ children }) => <Typography variant="h6">{children}</Typography>,
-                    ul: ({ children }) => <ul style={{ listStyle: 'inside' }}>{children}</ul>,
+                    ul: ({ children }) => (
+                        <ul
+                            style={{
+                                paddingInlineStart: 0,
+                                paddingLeft: '1.5em',
+                                listStylePosition: 'outside',
+                                listStyleType: 'disc'
+                            }}
+                        >
+                            {children}
+                        </ul>
+                    ),
+                    ol: ({ children }) => (
+                        <ol
+                            style={{
+                                paddingInlineStart: 0,
+                                paddingLeft: '1.5em',
+                                listStylePosition: 'outside',
+                                listStyleType: 'decimal'
+                            }}
+                        >
+                            {children}
+                        </ol>
+                    ),
+                    li: ({ children }) => <li style={{ marginLeft: 0 }}>{children}</li>,
                     blockquote: ({ children }) => (
                         <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
                             {children}
@@ -86,7 +109,7 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                             )
                         } else {
                             return (
-                                <Link href={href} target="_blank">
+                                <Link href={href} target="_blank" color="secondary" underline="hover">
                                     {children}
                                 </Link>
                             )
@@ -100,22 +123,23 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                                   .slice(3)
                             : ''
                         return inline ? (
-                            <span
-                                style={{
+                            <Box
+                                component="span"
+                                sx={{
                                     fontFamily: 'Source Code Pro, monospace',
                                     backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                                    borderRadius: '2px',
+                                    borderRadius: 1,
                                     border: '0.5px solid #ddd',
                                     padding: '0 0.5rem',
                                     margin: '0 0.2rem'
                                 }}
                             >
                                 {children}
-                            </span>
+                            </Box>
                         ) : (
                             <Box
                                 sx={{
-                                    borderRadius: '10px',
+                                    borderRadius: 1,
                                     overflow: 'hidden'
                                 }}
                             >
@@ -151,13 +175,7 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                         }
                         return (
                             <a href={props.src} target="_blank" rel="noreferrer">
-                                <img
-                                    {...props}
-                                    style={{
-                                        maxWidth: '100%',
-                                        borderRadius: '10px'
-                                    }}
-                                />
+                                <Box {...props} component="img" maxWidth="100%" borderRadius={1} />
                             </a>
                         )
                     }

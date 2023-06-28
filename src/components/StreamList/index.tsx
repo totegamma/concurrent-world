@@ -1,11 +1,11 @@
 import { useEffect } from 'react'
-import { DndProvider, getBackendOptions, MultiBackend, Tree } from '@minoru/react-dnd-treeview'
+import { Tree } from '@minoru/react-dnd-treeview'
 import CreateNewFolder from '@mui/icons-material/CreateNewFolder'
 
 import styles from './index.module.css'
-import { CssBaseline, IconButton, ThemeProvider, Typography, useTheme } from '@mui/material'
+import { IconButton, Typography } from '@mui/material'
 import Box from '@mui/material/Box'
-import type { Stream, ConcurrentTheme } from '../../model'
+import type { Stream } from '../../model'
 import { CustomNode } from './CustomNode'
 import { CustomDragPreview } from './CustomDragPreview'
 import { Placeholder } from './Placeholder'
@@ -14,7 +14,7 @@ import { usePersistent } from '../../hooks/usePersistent'
 import { v4 as uuidv4 } from 'uuid'
 import PercentIcon from '@mui/icons-material/Percent'
 import { useApi } from '../../context/api'
-import { useFollow } from '../../context/FollowContext'
+import { usePreference } from '../../context/PreferenceContext'
 export interface WatchStream {
     id: number | string
     parent: number
@@ -29,13 +29,12 @@ interface StreamListProps {
 
 export function StreamList(props: StreamListProps): JSX.Element {
     const api = useApi()
-    const follow = useFollow()
-    const theme = useTheme<ConcurrentTheme>()
+    const pref = usePreference()
     const [watchStreamTree, setWatchStreamTree] = usePersistent<WatchStream[]>('watchStreamTree', [])
 
     useEffect(() => {
         ;(async () => {
-            const streams = await Promise.all(follow.bookmarkingStreams.map(async (id) => await api.readStream(id)))
+            const streams = await Promise.all(pref.bookmarkingStreams.map(async (id) => await api.readStream(id)))
             if (watchStreamTree.length === 0) {
                 // init watch stream tree
                 console.log('init watch stream tree')
@@ -58,7 +57,7 @@ export function StreamList(props: StreamListProps): JSX.Element {
                     if (node.data === undefined) {
                         return true
                     }
-                    return follow.bookmarkingStreams.includes(node.data.id)
+                    return pref.bookmarkingStreams.includes(node.data.id)
                 })
                 // when a stream is added, add it to the tree
                 streams.forEach((stream) => {
@@ -78,7 +77,7 @@ export function StreamList(props: StreamListProps): JSX.Element {
                 setWatchStreamTree(newTree)
             }
         })()
-    }, [follow.bookmarkingStreams])
+    }, [pref.bookmarkingStreams])
 
     const addFolder = (): void => {
         setWatchStreamTree([
@@ -120,44 +119,39 @@ export function StreamList(props: StreamListProps): JSX.Element {
                     <CreateNewFolder fontSize={'small'} />
                 </IconButton>
             </Box>
-            <ThemeProvider theme={theme}>
-                <CssBaseline />
-                <DndProvider backend={MultiBackend} options={getBackendOptions()}>
-                    <div className={styles.tree}>
-                        <Tree
+            <div className={styles.tree} style={{ marginRight: 8 }}>
+                <Tree
+                    tree={watchStreamTree}
+                    rootId={0}
+                    render={(node, { depth, isOpen, onToggle }) => (
+                        <CustomNode
+                            node={node}
+                            depth={depth}
+                            isOpen={isOpen}
+                            onToggle={onToggle}
                             tree={watchStreamTree}
-                            rootId={0}
-                            render={(node, { depth, isOpen, onToggle }) => (
-                                <CustomNode
-                                    node={node}
-                                    depth={depth}
-                                    isOpen={isOpen}
-                                    onToggle={onToggle}
-                                    tree={watchStreamTree}
-                                    setWatchStreamTree={setWatchStreamTree}
-                                    onClick={props.onClick}
-                                />
-                            )}
-                            dragPreviewRender={(monitorProps) => <CustomDragPreview monitorProps={monitorProps} />}
-                            onDrop={handleDrop}
-                            classes={{
-                                root: styles.treeRoot,
-                                draggingSource: styles.draggingSource,
-                                placeholder: styles.placeholderContainer
-                            }}
-                            sort={false}
-                            insertDroppableFirst={false}
-                            canDrop={(tree, { dragSource, dropTargetId, dropTarget }) => {
-                                if (dragSource?.parent === dropTargetId) {
-                                    return true
-                                }
-                            }}
-                            dropTargetOffset={5}
-                            placeholderRender={(node, { depth }) => <Placeholder node={node} depth={depth} />}
+                            setWatchStreamTree={setWatchStreamTree}
+                            onClick={props.onClick}
                         />
-                    </div>
-                </DndProvider>
-            </ThemeProvider>
+                    )}
+                    dragPreviewRender={(monitorProps) => <CustomDragPreview monitorProps={monitorProps} />}
+                    onDrop={handleDrop}
+                    classes={{
+                        root: styles.treeRoot,
+                        draggingSource: styles.draggingSource,
+                        placeholder: styles.placeholderContainer
+                    }}
+                    sort={false}
+                    insertDroppableFirst={false}
+                    canDrop={(tree, { dragSource, dropTargetId, dropTarget }) => {
+                        if (dragSource?.parent === dropTargetId) {
+                            return true
+                        }
+                    }}
+                    dropTargetOffset={5}
+                    placeholderRender={(node, { depth }) => <Placeholder node={node} depth={depth} />}
+                />
+            </div>
         </>
     )
 }
