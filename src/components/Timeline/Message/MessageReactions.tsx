@@ -1,7 +1,7 @@
 import type { Message as CCMessage, ProfileWithAddress } from '../../../model'
 import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
 import type { ReplyMessage } from '../../../schemas/replyMessage'
-import { Box, Button, Divider, Tooltip } from '@mui/material'
+import { Box, Button, Divider, Tooltip, Typography, alpha, useTheme } from '@mui/material'
 import { Schemas } from '../../../schemas'
 import { useApi } from '../../../context/api'
 import { CCAvatar } from '../../CCAvatar'
@@ -13,6 +13,7 @@ export interface MessageReactionsProps {
 
 export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
     const api = useApi()
+    const theme = useTheme()
     const allReactions = props.message.associations.filter((m) => m.schema === Schemas.emojiAssociation)
     const filteredReactions = allReactions.reduce((acc: any, cur) => {
         const payload = JSON.parse(cur.payload)
@@ -76,11 +77,11 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                         <Button
                             key={shortcode}
                             sx={{
-                                color: 'text.primary',
                                 p: 0,
-                                borderColor: ownReaction ? 'primary.main' : '',
+                                gap: 1,
                                 display: 'flex',
-                                gap: 1
+                                backgroundColor: ownReaction ? alpha(theme.palette.primary.main, 0.5) : 'transparent',
+                                borderColor: theme.palette.primary.main
                             }}
                             variant="outlined"
                             onClick={() => {
@@ -96,12 +97,10 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                                 }
                             }}
                         >
-                            <Box
-                                component="img"
-                                height="20px"
-                                src={JSON.parse(reaction[0].payload).body.imageUrl}
-                            ></Box>
-                            {reaction.length}
+                            <Box component="img" height="20px" src={JSON.parse(reaction[0].payload).body.imageUrl} />
+                            <Typography color={ownReaction ? 'primary.contrastText' : 'text.primary'}>
+                                {reaction.length}
+                            </Typography>
                         </Button>
                     </Tooltip>
                 )
