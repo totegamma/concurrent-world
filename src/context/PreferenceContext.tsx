@@ -95,18 +95,23 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
     useEffect(() => {
         if (!api) return
         if (initialized) return
-        api.readKV('world.concurrent.preference').then((storage: string | undefined) => {
-            setInitialized(true)
-            if (!storage) return
-            const parsed = JSON.parse(storage)
-            setThemeName(parsed.themeName)
-            setImgurClientID(parsed.imgurClientID)
-            setFollowingUsers(parsed.followingUsers)
-            setFollowingStreams(parsed.followingStreams)
-            setBookmarkingStreams(parsed.bookmarkingStreams)
-            setDefaultPostHome(parsed.defaultPostHome)
-            setDefaultPostNonHome(parsed.defaultPostNonHome)
-        })
+        api.readKV('world.concurrent.preference')
+            .then((storage: string | undefined) => {
+                setInitialized(true)
+                if (!storage) return
+                const parsed = JSON.parse(storage)
+                setThemeName(parsed.themeName)
+                setImgurClientID(parsed.imgurClientID)
+                setFollowingUsers(parsed.followingUsers)
+                setFollowingStreams(parsed.followingStreams)
+                setBookmarkingStreams(parsed.bookmarkingStreams)
+                setDefaultPostHome(parsed.defaultPostHome)
+                setDefaultPostNonHome(parsed.defaultPostNonHome)
+            })
+            .catch((e) => {
+                setInitialized(true)
+                console.log(e)
+            })
     }, [])
 
     useEffect(() => {
