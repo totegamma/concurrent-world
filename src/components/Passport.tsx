@@ -15,7 +15,7 @@ export function Passport(): JSX.Element {
             ccid={api.userAddress}
             name={appData.profile?.payload.body.username || ''}
             avatar={appData.profile?.payload.body.avatar || ''}
-            host={api.host?.fqdn || ''}
+            host={api.host || ''}
             cdate={new Date(appData.profile?.payload.signedAt ?? 0).toLocaleDateString()}
             trust={100}
         />

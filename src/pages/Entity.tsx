@@ -246,7 +246,7 @@ export function EntityPage(): JSX.Element {
                                     }}
                                 >
                                     <Typography variant="caption">
-                                        現住所: {entity.host !== '' ? entity.host : api.host?.fqdn}
+                                        現住所: {entity.host !== '' ? entity.host : api.host}
                                     </Typography>
                                     <Typography variant="caption">{entity.ccaddr}</Typography>
                                 </Box>

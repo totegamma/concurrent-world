@@ -11,7 +11,6 @@ import { ClockContext } from '../App'
 import { Themes, createConcurrentTheme } from '../themes'
 import { usePersistent } from '../hooks/usePersistent'
 import { ConcurrentWordmark } from '../components/ConcurrentWordmark'
-import { Css } from '@mui/icons-material'
 
 export function GuestTimelinePage(): JSX.Element {
     const reactlocation = useLocation()
@@ -28,13 +27,8 @@ export function GuestTimelinePage(): JSX.Element {
 
         const resolver = queriedStreams[0].split('@')[1]
 
-        const api = new ConcurrentApiClient('', '', {
-            fqdn: resolver,
-            ccaddr: '',
-            role: '',
-            pubkey: '',
-            cdate: new Date()
-        })
+        const api = new ConcurrentApiClient('', '', resolver)
+
         initializeApi(api)
     }, [])
 

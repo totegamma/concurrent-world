@@ -6,7 +6,7 @@ export const UserJWT = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
     const api = useApi()
 
     const [issuedJwt, setIssuedJwt] = useState<string>('')
-    const [audience, setAudience] = useState<string>(api?.host?.fqdn ?? '')
+    const [audience, setAudience] = useState<string>(api?.host ?? '')
 
     const issueJwt = (): void => {
         setIssuedJwt(

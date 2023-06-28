@@ -3,7 +3,7 @@ import type { Association, Character, Entity, Host, Message, Stream, StreamEleme
 import { StreamMock } from './modelmock'
 
 export class ApiMock extends ApiService {
-    host: Host | undefined
+    host: string | undefined
     userAddress: string
     privatekey: string
     token?: string

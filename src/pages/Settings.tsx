@@ -61,7 +61,7 @@ export function Settings(props: SettingsProp): JSX.Element {
                                 const jwt = api.constructJWT({
                                     exp: Math.floor((new Date().getTime() + 60 * 60 * 1000) / 1000).toString()
                                 }) // 1h validity
-                                window.location.href = `https://${api.host.fqdn}/login?token=${jwt}`
+                                window.location.href = `https://${api.host}/login?token=${jwt}`
                             }}
                         >
                             Goto Domain Home

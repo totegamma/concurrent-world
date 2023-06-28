@@ -36,7 +36,7 @@ export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
             }
         }
 
-        api.fetchWithCredential(`https://${api.host!.fqdn}/api/v1/ap/entity/${api.userAddress}`, requestOptions)
+        api.fetchWithCredential(`https://${api.host!}/api/v1/ap/entity/${api.userAddress}`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 console.log(data)
@@ -60,7 +60,7 @@ export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
         }
         const profile = window.location.protocol + '//' + window.location.host + '/entity/' + api.userAddress
         const home = appData.userstreams?.payload.body.homeStream
-        api.fetchWithCredential(`https://${api.host!.fqdn}/api/v1/ap/person/${userID}`, requestOptions)
+        api.fetchWithCredential(`https://${api.host!}/api/v1/ap/person/${userID}`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 console.log(data)
@@ -98,7 +98,7 @@ export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
             })
         }
 
-        api.fetchWithCredential(`https://${api.host!.fqdn}/api/v1/ap/entity`, requestOptions)
+        api.fetchWithCredential(`https://${api.host!}/api/v1/ap/entity`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 console.log(data)
@@ -127,7 +127,7 @@ export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
             })
         }
 
-        api.fetchWithCredential(`https://${api.host!.fqdn}/api/v1/ap/person`, requestOptions)
+        api.fetchWithCredential(`https://${api.host!}/api/v1/ap/person`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 console.log(data)

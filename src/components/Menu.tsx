@@ -212,7 +212,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                             {appData.profile?.payload.body.username}
                         </Typography>
                         <Typography variant="caption" color={theme.palette.background.contrastText}>
-                            {api.host?.fqdn}
+                            {api.host}
                         </Typography>
                     </Box>
                 </ButtonBase>
