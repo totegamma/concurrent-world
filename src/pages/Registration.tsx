@@ -97,6 +97,7 @@ export function Registration(): JSX.Element {
         localStorage.setItem('PublicKey', JSON.stringify(publicKey))
         localStorage.setItem('PrivateKey', JSON.stringify(privateKey))
         localStorage.setItem('Address', JSON.stringify(CCID))
+        localStorage.setItem('Mnemonic', JSON.stringify(mnemonic))
 
         api?.readCharacter(host.ccaddr, Schemas.domainProfile).then((profile: Character<DomainProfile> | undefined) => {
             console.log(profile)

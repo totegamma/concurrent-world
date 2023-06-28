@@ -121,6 +121,7 @@ export function AccountImport(): JSX.Element {
         localStorage.setItem('Domain', JSON.stringify(host.fqdn))
         localStorage.setItem('PrivateKey', JSON.stringify(api.privatekey))
         localStorage.setItem('Address', JSON.stringify(api.userAddress))
+        localStorage.setItem('Mnemonic', JSON.stringify(mnemonic))
         navigate('/')
     }
 
