@@ -16,16 +16,11 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
     const theme = useTheme()
     const allReactions = props.message.associations.filter((m) => m.schema === Schemas.emojiAssociation)
     const filteredReactions = allReactions.reduce((acc: any, cur) => {
-        try {
-            const payload = JSON.parse(cur.payload)
-            payload.body.shortcode in acc
-                ? acc[payload.body.shortcode].push(cur)
-                : (acc[payload.body.shortcode] = [cur])
+        cur.payload.body.shortcode in acc
+            ? acc[cur.payload.body.shortcode].push(cur)
+            : (acc[cur.payload.body.shortcode] = [cur])
 
-            return acc
-        } catch (_e) {
-            return acc
-        }
+        return acc
     }, {})
 
     return (
@@ -67,11 +62,7 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                         title={
                             <Box display="flex" flexDirection="column" alignItems="right" gap={1}>
                                 <Box display="flex" alignItems="center" gap={1}>
-                                    <Box
-                                        component="img"
-                                        height="20px"
-                                        src={JSON.parse(reaction[0].payload).body.imageUrl}
-                                    ></Box>
+                                    <Box component="img" height="20px" src={reaction[0].payload.body.imageUrl}></Box>
                                     {shortcode}
                                 </Box>
                                 <Divider flexItem></Divider>
@@ -98,12 +89,12 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                                         props.message.id,
                                         api.userAddress,
                                         shortcode,
-                                        JSON.parse(reaction[0].payload).body.imageUrl
+                                        reaction[0].payload.body.imageUrl
                                     )
                                 }
                             }}
                         >
-                            <Box component="img" height="20px" src={JSON.parse(reaction[0].payload).body.imageUrl} />
+                            <Box component="img" height="20px" src={reaction[0].payload.body.imageUrl} />
                             <Typography color={ownReaction ? 'primary.contrastText' : 'text.primary'}>
                                 {reaction.length}
                             </Typography>
