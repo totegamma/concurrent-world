@@ -189,7 +189,8 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     onPaste={handlePasteImage}
                     placeholder="今、なにしてる？"
                     sx={{
-                        width: 1
+                        width: 1,
+                        fontSize: '0.95rem'
                     }}
                     onKeyDown={(e: any) => {
                         if (draft.length === 0 || draft.trim().length === 0) return

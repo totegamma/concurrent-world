@@ -20,42 +20,24 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
         >
             <Box
                 sx={{
-                    display: 'flex',
-                    alignItems: 'baseline',
-                    gap: '5px'
+                    display: 'flex'
                 }}
             >
                 <Typography
                     component="span"
                     sx={{
                         fontWeight: '700',
-                        fontSize: {
-                            xs: '0.9rem',
-                            sm: '1rem'
-                        }
+                        fontSize: { xs: '0.75rem', sm: '0.85rem' }
                     }}
                 >
                     {props.username || 'anonymous'}
-                </Typography>
-                <Typography
-                    component="span"
-                    sx={{
-                        fontweight: '400',
-                        fontSize: '10px',
-                        display: {
-                            xs: 'none',
-                            sm: 'inline'
-                        }
-                    }}
-                >
-                    {props.authorID}
                 </Typography>
             </Box>
             <Link
                 component={RouterLink}
                 underline="hover"
                 color="inherit"
-                fontSize="0.8rem"
+                fontSize="0.75rem"
                 to={`/message/${props.messageID}@${props.authorID}`}
             >
                 <TimeDiff date={new Date(props.cdate)} />

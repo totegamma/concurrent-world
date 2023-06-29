@@ -115,7 +115,7 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
                     >
                         {props.writeable ? (
                             <IconButton
-                                sx={{ p: '8px', position: 'absolute' }}
+                                sx={{ p: 1, position: 'absolute' }}
                                 onClick={() => {
                                     props.setMode('compose')
                                 }}
@@ -123,7 +123,7 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
                                 <CreateIcon sx={{ color: 'primary.contrastText' }} />
                             </IconButton>
                         ) : (
-                            <IconButton sx={{ p: '8px', position: 'absolute' }}>
+                            <IconButton sx={{ p: 1, position: 'absolute' }}>
                                 <Tooltip title="you have no permission to write to this stream" placement="left" arrow>
                                     <CreateIcon sx={{ color: 'disabled' }} />
                                 </Tooltip>
@@ -139,7 +139,7 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
                         unmountOnExit
                     >
                         <IconButton
-                            sx={{ p: '8px', position: 'absolute' }}
+                            sx={{ p: 1, position: 'absolute' }}
                             onClick={() => {
                                 props.setMode('info')
                             }}

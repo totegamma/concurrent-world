@@ -72,7 +72,7 @@ export function Explorer(): JSX.Element {
             sx={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '5px',
+                gap: 1,
                 padding: '20px',
                 background: theme.palette.background.paper,
                 minHeight: '100%',
@@ -81,6 +81,10 @@ export function Explorer(): JSX.Element {
         >
             <Typography variant="h2" gutterBottom>
                 Explorer
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
+            <Typography variant="h3" gutterBottom>
+                server
             </Typography>
             <Select
                 value={currentHost}
@@ -100,7 +104,7 @@ export function Explorer(): JSX.Element {
             <Typography variant="h3" gutterBottom>
                 streams
             </Typography>
-            <Box sx={{ display: 'flex', gap: '10px' }}>
+            <Box sx={{ display: 'flex', gap: 1 }}>
                 <TextField
                     label="stream name"
                     variant="outlined"
@@ -157,7 +161,7 @@ export function Explorer(): JSX.Element {
                                 component={Link}
                                 to={'/#' + value.id}
                                 sx={{
-                                    height: '50px'
+                                    height: '40px'
                                 }}
                             >
                                 <ListItemText id={labelId} primary={`%${value.payload.body.name as string}`} />

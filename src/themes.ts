@@ -79,6 +79,9 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
             },
             divider: 'rgba(255, 255, 255, 0.2)'
         },
+        shape: {
+            borderRadius: 1
+        },
         components: {
             MuiCssBaseline: {
                 styleOverrides: `
@@ -112,6 +115,9 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 disabled: 'rgba(255, 255, 255, 0.5)'
             },
             divider: 'rgba(255, 255, 255, 0.2)'
+        },
+        shape: {
+            borderRadius: 1
         },
         components: {
             MuiCssBaseline: {
@@ -156,6 +162,9 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 contrastText: '#FFF'
             },
             divider: 'rgba(0, 0, 0, 0.2)'
+        },
+        shape: {
+            borderRadius: 4
         }
     },
     tote: {
@@ -193,6 +202,9 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 paper: '#f7efea',
                 contrastText: '#ffffff'
             }
+        },
+        shape: {
+            borderRadius: 2
         }
     },
     rainyday: {
@@ -214,6 +226,9 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 disabled: 'rgba(0, 0, 0, 0.5)'
             },
             divider: 'rgba(0, 0, 0, 0.2)'
+        },
+        shape: {
+            borderRadius: 0
         }
     },
     oldcomputing: {
@@ -229,6 +244,9 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 paper: '#f0edf1',
                 contrastText: '#ffffff'
             }
+        },
+        shape: {
+            borderRadius: 2
         }
     },
     redmond: {
@@ -245,6 +263,9 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 paper: '#ffffff',
                 contrastText: '#ffffff'
             }
+        },
+        shape: {
+            borderRadius: 0
         }
     },
     ニンテン: {
@@ -267,6 +288,9 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 disabled: 'rgba(0, 0, 0, 0.5)'
             },
             divider: 'rgba(0, 0, 0, 0.2)'
+        },
+        shape: {
+            borderRadius: 0
         }
     },
     sacher: {
@@ -289,6 +313,9 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 disabled: 'rgba(0, 0, 0, 0.5)'
             },
             divider: 'rgba(0, 0, 0, 0.2)'
+        },
+        shape: {
+            borderRadius: 3
         }
     },
     blue2: {
@@ -358,6 +385,9 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 }
                 `
             }
+        },
+        shape: {
+            borderRadius: 2
         }
     },
     messy: {
@@ -393,6 +423,9 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 }
                 `
             }
+        },
+        shape: {
+            borderRadius: 2
         }
     }
 }
@@ -404,6 +437,7 @@ export const ConcurrentDefaultTheme = {
         }
     },
     typography: {
+        fontSize: 14,
         h1: {
             fontSize: 32
         },
@@ -441,6 +475,9 @@ export const ConcurrentDefaultTheme = {
             }
             `
         }
+    },
+    shape: {
+        borderRadius: 4
     }
 }
 

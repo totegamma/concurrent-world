@@ -51,9 +51,10 @@ export const StreamPicker = memo<StreamPickerProps>((props: StreamPickerProps): 
         <Box
             sx={{
                 ...props.sx,
-                borderRadius: '20px',
+                borderRadius: 2,
                 padding: '0px 10px',
-                flex: '1'
+                flex: '1',
+                backgroundColor: 'backgroud.paper'
             }}
         >
             <Autocomplete

@@ -60,25 +60,25 @@ export function HomeSettings(): JSX.Element {
             {tab === 0 && (
                 <Box sx={{ display: 'flex', gap: '10px', flexFlow: 'column', mt: '10px' }}>
                     <Box>
-                        <Typography variant="h3" gutterBottom>
+                        <Typography variant="h4" gutterBottom>
                             ストリーム
                         </Typography>
                         <StreamPicker
                             selected={pref.followingStreams}
                             setSelected={pref.setFollowingStreams}
-                            sx={{ backgroundColor: 'primary.main' }}
+                            sx={{ backgroundColor: 'background.default' }}
                         />
                     </Box>
                     <Divider />
                     <Box>
-                        <Typography variant="h3" gutterBottom>
+                        <Typography variant="h4" gutterBottom>
                             ユーザー
                         </Typography>
                         <List
                             dense
                             sx={{
                                 width: '100%',
-                                bgcolor: 'background.paper',
+                                bgcolor: 'primary.paper',
                                 overflowY: 'auto'
                             }}
                         >
@@ -111,7 +111,7 @@ export function HomeSettings(): JSX.Element {
             {tab === 1 && (
                 <Box sx={{ display: 'flex', gap: '10px', flexFlow: 'column', mt: '10px' }}>
                     <Box>
-                        <Typography variant="h3" gutterBottom>
+                        <Typography variant="h4" gutterBottom>
                             ホーム
                         </Typography>
                         <StreamPicker
@@ -122,7 +122,7 @@ export function HomeSettings(): JSX.Element {
                     </Box>
                     <Divider />
                     <Box>
-                        <Typography variant="h3" gutterBottom>
+                        <Typography variant="h4" gutterBottom>
                             ホーム以外
                         </Typography>
                         <StreamPicker

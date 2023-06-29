@@ -35,12 +35,12 @@ export const OneLineMessageView = (props: MessageViewProps): JSX.Element => {
                 color: 'text.disabled',
                 overflow: 'hidden',
                 flex: 1,
-                gap: 2
+                gap: { xs: 1, sm: 2 }
             }}
         >
             <IconButton
                 sx={{
-                    width: { xs: '32px', sm: '48px' },
+                    width: { xs: '38px', sm: '48px' },
                     height: { xs: '12px', sm: '18px' }
                 }}
                 component={routerLink}
@@ -51,7 +51,7 @@ export const OneLineMessageView = (props: MessageViewProps): JSX.Element => {
                     avatarURL={props.author?.payload.body.avatar}
                     identiconSource={props.message.author}
                     sx={{
-                        width: { xs: '32px', sm: '48px' },
+                        width: { xs: '38px', sm: '48px' },
                         height: { xs: '12px', sm: '18px' }
                     }}
                 />

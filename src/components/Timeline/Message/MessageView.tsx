@@ -55,7 +55,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                 wordBreak: 'break-word',
                 alignItems: 'flex-start',
                 flex: 1,
-                gap: 2
+                gap: { xs: 1, sm: 2 }
             }}
             disablePadding
         >

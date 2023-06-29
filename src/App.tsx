@@ -383,11 +383,11 @@ function App(): JSX.Element {
                         <Paper
                             sx={{
                                 flexGrow: '1',
-                                margin: 1,
+                                margin: { xs: 0.5, sm: 1 },
                                 mb: { xs: 0, sm: '10px' },
                                 display: 'flex',
                                 flexFlow: 'column',
-                                borderRadius: 1,
+                                borderRadius: 2,
                                 overflow: 'hidden',
                                 background: 'none'
                             }}

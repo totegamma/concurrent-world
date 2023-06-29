@@ -18,7 +18,7 @@ export function Settings(props: SettingsProp): JSX.Element {
                 sx={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '5px',
+                    gap: 1,
                     padding: '20px',
                     background: theme.palette.background.paper,
                     minHeight: '100%',

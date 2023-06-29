@@ -48,8 +48,8 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                         <Typography
                             sx={{
                                 fontSize: {
-                                    xs: '0.9rem',
-                                    sm: '1rem'
+                                    xs: '0.8rem',
+                                    sm: '0.9rem'
                                 },
                                 marginBottom: {
                                     xs: '4px',
