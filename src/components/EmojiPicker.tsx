@@ -1,7 +1,7 @@
-import { Picker } from 'emoji-mart'
-import data from '@emoji-mart/data'
-import React, { useContext, useEffect, useRef } from 'react'
+import { useContext, useEffect, useRef } from 'react'
 import { ApplicationContext } from '../App'
+
+// import { Picker } from 'emoji-mart'
 
 // emoji returned from onEmojiSelect
 export interface EmojiProps {
@@ -44,7 +44,7 @@ export const EmojiPicker = ({ onSelected }: EmojiPickerProps): JSX.Element => {
     const onSelectedRef = useRef<(emoji: EmojiProps) => void>(onSelected)
 
     useEffect(() => {
-        console.log('loading emojis...')
+        let unmounted = false
         const emojis: CustomEmoji[] = [
             {
                 id: 'fluffy',
@@ -58,19 +58,26 @@ export const EmojiPicker = ({ onSelected }: EmojiPickerProps): JSX.Element => {
             }
         ]
 
-        instance.current = new Picker({
-            categories: ['fluffy'],
-            searchPosition: 'static',
-            data,
-            custom: emojis,
-            onEmojiSelect: (emoji: EmojiProps) => {
-                onSelectedRef.current(emoji)
-            },
-            ref
-        })
+        const loadPicker = async (): Promise<void> => {
+            const { Picker } = await import('emoji-mart')
+            const data = (await import('@emoji-mart/data')).default
+            if (unmounted) return
+            instance.current = new Picker({
+                categories: ['fluffy'],
+                searchPosition: 'static',
+                data,
+                custom: emojis,
+                onEmojiSelect: (emoji: EmojiProps) => {
+                    onSelectedRef.current(emoji)
+                },
+                ref
+            })
+        }
+
+        loadPicker()
 
         return () => {
-            instance.current = null
+            unmounted = true
         }
     }, [appData.emojiDict])
 
@@ -78,5 +85,5 @@ export const EmojiPicker = ({ onSelected }: EmojiPickerProps): JSX.Element => {
         onSelectedRef.current = onSelected
     }, [onSelected])
 
-    return <div ref={ref}></div>
+    return ref ? <div ref={ref}></div> : <>loading</>
 }
