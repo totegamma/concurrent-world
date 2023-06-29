@@ -1,5 +1,5 @@
-# Concurrent-web
-Concurrent-webは分散マイクロブログ基盤である[Concurrent](https://github.com/totegamma/concurrent)のwebクライアント実装の1つです。
+# Concurrent-world
+Concurrent-worldは分散マイクロブログ基盤である[Concurrent](https://github.com/totegamma/concurrent)のwebクライアント実装の1つです。
 現在は絶賛開発中で、最低限の機能しかありません。
 
 ### 世界は一つ
