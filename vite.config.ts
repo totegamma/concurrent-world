@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react-swc'
 import BuildInfo from 'vite-plugin-info'
 import { VitePWA } from 'vite-plugin-pwa'
 import basicSsl from '@vitejs/plugin-basic-ssl'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -48,9 +49,79 @@ export default defineConfig({
                         "purpose": "any"
                     }
                 ]
+            },
+            workbox: {
+                cleanupOutdatedCaches: true,
+                skipWaiting: true,
+                clientsClaim: true,
+                runtimeCaching: [
+                    {
+                        urlPattern: /index\.html/,
+                        handler: 'NetworkFirst',
+                        options: {
+                            cacheName: 'html-cache',
+                        },
+                    },
+                    {
+                        urlPattern: /.*\.(?:png|jpg|jpeg|svg|gif)/,
+                        handler: 'CacheFirst',
+                        options: {
+                            cacheName: 'image-cache',
+                            expiration: {
+                                maxEntries: 60,
+                                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+                            },
+                        },
+                    },
+                    {
+                        urlPattern: /.*\.(?:js|css)/,
+                        handler: 'CacheFirst',
+                        options: {
+                            cacheName: 'static-cache',
+                            expiration: {
+                                maxEntries: 60,
+                                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+                            },
+                        },
+                    },
+                    {
+                        urlPattern: /.*\.(?:woff|woff2|eot|ttf|otf)/,
+                        handler: 'CacheFirst',
+                        options: {
+                            cacheName: 'font-cache',
+                            expiration: {
+                                maxEntries: 60,
+                                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+                            },
+                        },
+                    },
+                    {
+                        urlPattern: /.*\.(?:json)/,
+                        handler: 'CacheFirst',
+                        options: {
+                            cacheName: 'json-cache',
+                            expiration: {
+                                maxEntries: 60,
+                                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+                            },
+                        },
+                    },
+                    {
+                        urlPattern: /.*\.(?:mp3)/,
+                        handler: 'CacheFirst',
+                        options: {
+                            cacheName: 'audio-cache',
+                            expiration: {
+                                maxEntries: 60,
+                                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+                            },
+                        },
+                    },
+                ],
             }
         }),
         BuildInfo(),
-        basicSsl()
-    ]
+        basicSsl(),
+        visualizer(),
+    ],
 })
