@@ -5,6 +5,7 @@ import { Box, Button, Divider, Tooltip, Typography, alpha, useTheme } from '@mui
 import { Schemas } from '../../../schemas'
 import { useApi } from '../../../context/api'
 import { CCAvatar } from '../../CCAvatar'
+import { Fragment } from 'react'
 
 export interface MessageReactionsProps {
     message: CCMessage<TypeSimpleNote | ReplyMessage>
@@ -52,7 +53,7 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                             {user.username ?? 'anonymous'}
                         </Box>
                     ) : (
-                        <></>
+                        <Fragment key={0} />
                     )
                 })
 
@@ -72,7 +73,6 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                         placement="top"
                     >
                         <Button
-                            key={shortcode}
                             sx={{
                                 p: 0,
                                 gap: 1,

@@ -33,9 +33,10 @@ export interface CustomEmoji {
 
 export interface EmojiPickerProps {
     onSelected: (emoji: EmojiProps) => void
+    onMounted?: () => void
 }
 
-export const EmojiPicker = ({ onSelected }: EmojiPickerProps): JSX.Element => {
+export const EmojiPicker = ({ onSelected, onMounted }: EmojiPickerProps): JSX.Element => {
     const appData = useContext(ApplicationContext)
 
     const ref = useRef<any>(null)
@@ -72,6 +73,9 @@ export const EmojiPicker = ({ onSelected }: EmojiPickerProps): JSX.Element => {
                 },
                 ref
             })
+            setTimeout(() => {
+                onMounted?.()
+            }, 1)
         }
 
         loadPicker()
