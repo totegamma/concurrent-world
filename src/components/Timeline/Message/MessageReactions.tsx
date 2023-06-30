@@ -6,10 +6,13 @@ import { Schemas } from '../../../schemas'
 import { useApi } from '../../../context/api'
 import { CCAvatar } from '../../CCAvatar'
 import { Fragment } from 'react'
+import { type EmojiProps } from '../../EmojiPicker'
 
 export interface MessageReactionsProps {
     message: CCMessage<TypeSimpleNote | ReplyMessage>
     emojiUsers: ProfileWithAddress[]
+    addMessageReaction: (emoji: EmojiProps) => Promise<void>
+    removeMessageReaction: (id: string) => Promise<void>
 }
 
 export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
@@ -84,14 +87,16 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                             variant="outlined"
                             onClick={() => {
                                 if (ownReaction) {
-                                    api.unFavoriteMessage(ownReaction.id, api.userAddress)
+                                    props.removeMessageReaction(ownReaction.id)
                                 } else {
-                                    api.addMessageReaction(
-                                        props.message.id,
-                                        api.userAddress,
-                                        shortcode,
-                                        reaction[0].payload.body.imageUrl
-                                    )
+                                    props.addMessageReaction({
+                                        id: '',
+                                        keywords: [],
+                                        name: shortcode,
+                                        native: '',
+                                        shortcodes: shortcode,
+                                        src: reaction[0].payload.body.imageUrl
+                                    })
                                 }
                             }}
                         >

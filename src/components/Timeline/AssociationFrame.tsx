@@ -333,6 +333,9 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                             setFetchSucceed={() => {
                                 return true
                             }}
+                            removeMessageReaction={async (id) => {
+                                api.unFavoriteMessage(id, message.author)
+                            }}
                         />
                     )}
                 </>

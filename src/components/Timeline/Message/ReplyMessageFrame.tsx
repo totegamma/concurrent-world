@@ -185,6 +185,9 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
                             emoji.src
                         )
                     }}
+                    removeMessageReaction={async (id) => {
+                        await api.unFavoriteMessage(id, props.message.author)
+                    }}
                     emojiPickerAnchor={emojiPickerAnchor}
                     setMessageAnchor={setMessageAnchor}
                     setEmojiPickerAnchor={setEmojiPickerAnchor}

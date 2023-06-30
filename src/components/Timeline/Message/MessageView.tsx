@@ -44,6 +44,7 @@ export interface MessageViewProps {
     unfavorite: () => void
     favorite: () => Promise<void>
     addMessageReaction: (emoji: EmojiProps) => Promise<void>
+    removeMessageReaction: (id: string) => Promise<void>
     setMessageAnchor: (anchor: null | HTMLElement) => void
     setEmojiPickerAnchor: (anchor: null | HTMLElement) => void
     setFetchSucceed: (fetchSucceed: boolean) => void
@@ -101,7 +102,12 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                         />
                         {props.beforeMessage}
                         <SimpleNote message={props.message} />
-                        <MessageReactions message={props.message} emojiUsers={props.emojiUsers} />
+                        <MessageReactions
+                            message={props.message}
+                            emojiUsers={props.emojiUsers}
+                            addMessageReaction={props.addMessageReaction}
+                            removeMessageReaction={props.removeMessageReaction}
+                        />
                         <MessageActions
                             handleReply={props.handleReply}
                             handleReRoute={props.handleReRoute}

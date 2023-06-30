@@ -208,7 +208,11 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                         messageDetail.openAction('reroute', message.id, message?.author)
                     }}
                     unfavorite={() => {
-                        unfavorite(message.associations.find((e) => e.author === api.userAddress)?.id, message.author)
+                        unfavorite(
+                            message.associations.find((e) => e.author === api.userAddress && e.schema === Schemas.like)
+                                ?.id,
+                            message.author
+                        )
                     }}
                     favorite={async () => {
                         await api.favoriteMessage(props.message.id, props.message.author)
@@ -222,6 +226,13 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                             emoji.shortcodes,
                             emoji.src
                         )
+                        // 後々消す
+                        reloadMessage()
+                    }}
+                    removeMessageReaction={async (id: string) => {
+                        await api.unFavoriteMessage(id, props.message.author)
+                        // 後々消す
+                        reloadMessage()
                     }}
                     setMessageAnchor={setMessageAnchor}
                     setEmojiPickerAnchor={setEmojiPickerAnchor}
