@@ -89,6 +89,6 @@ export const StreamElementMock: StreamElement = {
     timestamp: 'timestamp',
     id: 'id',
     type: 'type',
-    author: 'author',
+    owner: 'owner',
     currenthost: 'currenthost'
 }
