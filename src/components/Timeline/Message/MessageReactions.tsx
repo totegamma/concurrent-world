@@ -59,6 +59,7 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
 
                 return (
                     <Tooltip
+                        arrow
                         key={shortcode}
                         title={
                             <Box display="flex" flexDirection="column" alignItems="right" gap={1}>
