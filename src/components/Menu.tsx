@@ -72,7 +72,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                     sx={{
                         textAlign: 'center',
                         fontWeight: 400,
-                        fontSize: '12px',
+                        fontSize: '0.7rem',
                         marginBottom: '10px'
                     }}
                 >
@@ -89,7 +89,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                             sx={{
                                 display: 'flex',
                                 flexDirection: 'column',
-                                gap: '5px'
+                                gap: 1
                             }}
                         >
                             <List dense sx={{ width: '100%' }}>

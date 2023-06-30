@@ -1,11 +1,11 @@
 import type { Meta } from '@storybook/react'
 import { useState, useEffect } from 'react'
-import type { CCID, ConcurrentTheme } from '../../../model'
+import type { ConcurrentTheme } from '../../../model'
 import { createConcurrentTheme, Themes } from '../../../themes'
 import { CssBaseline, ThemeProvider } from '@mui/material'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { MessageView } from './MessageView'
-import { CharacterProfileMock, MessageMock, StreamElementMock, StreamMock } from '../../../mock/modelmock'
+import { CharacterProfileMock, MessageMock, StreamMock } from '../../../mock/modelmock'
 import { ApiMock } from '../../../mock/apimock'
 import { InspectorProvider, useInspector } from '../../../context/Inspector'
 import Paper from '@mui/material/Paper'
@@ -99,6 +99,7 @@ export const Default = (arg: Props): JSX.Element => {
                                         setEmojiPickerAnchor={setEmojiPickerAnchor}
                                         setFetchSucceed={(success: boolean) => {}}
                                         addMessageReaction={async (emoji: EmojiProps) => {}}
+                                        removeMessageReaction={async (_id: string) => {}}
                                     />
                                 </Paper>
                             </ThemeProvider>

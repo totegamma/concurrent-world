@@ -15,14 +15,13 @@ import {
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
-import type { Character, Message, StreamElement } from '../model'
+import type { Character, Message } from '../model'
 import { Schemas } from '../schemas'
 import type { Profile } from '../schemas/profile'
 import { MessageFrame } from '../components/Timeline'
-import { materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { validateSignature } from '../util'
 import grey from '@mui/material/colors/grey'
+import { Codeblock } from '../components/Codeblock'
 
 export interface InspectorState {
     inspectingItem: { messageId: string; author: string } | null
@@ -179,15 +178,9 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                                 overflow: 'hidden'
                             }}
                         >
-                            <SyntaxHighlighter
-                                style={materialDark}
-                                language="json"
-                                PreTag="div"
-                                customStyle={{ margin: 0, padding: '10px 15px', overflow: 'auto' }}
-                                codeTagProps={{ style: { fontFamily: 'Source Code Pro, monospace' } }}
-                            >
+                            <Codeblock language="json">
                                 {JSON.stringify(message.payload ?? 'null', null, 4)?.replaceAll('\\n', '\n')}
-                            </SyntaxHighlighter>
+                            </Codeblock>
                         </Box>
                         <Typography variant="h2">Associations:</Typography>
                         <Box
@@ -196,15 +189,7 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                                 overflow: 'hidden'
                             }}
                         >
-                            <SyntaxHighlighter
-                                style={materialDark}
-                                language={'json'}
-                                PreTag="div"
-                                customStyle={{ margin: 0, padding: '10px 15px', overflow: 'auto' }}
-                                codeTagProps={{ style: { fontFamily: 'Source Code Pro, monospace' } }}
-                            >
-                                {JSON.stringify(message.associations, null, 4)}
-                            </SyntaxHighlighter>
+                            <Codeblock language={'json'}>{JSON.stringify(message.associations, null, 4)}</Codeblock>
                         </Box>
                     </Box>
                 ) : (

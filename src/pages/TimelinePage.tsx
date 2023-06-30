@@ -139,7 +139,7 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                 pref.followingUsers.length === 0 ? (
                     <Box>まだ誰も、どのストリームもフォローしていません。Explorerタブから探しに行きましょう。</Box>
                 ) : (
-                    <Box sx={{ display: 'flex', flex: 1, padding: { xs: '8px', sm: '8px 16px' } }}>
+                    <Box sx={{ display: 'flex', flex: 1, py: { xs: 1, sm: 1 }, px: { xs: 1, sm: 2 } }}>
                         <Timeline
                             streams={appData.displayingStream}
                             timeline={props.messages}

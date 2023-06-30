@@ -7,6 +7,7 @@ import {
     Menu,
     MenuItem,
     Popover,
+    type PopoverActions,
     type Theme
 } from '@mui/material'
 import { Link as routerLink } from 'react-router-dom'
@@ -24,6 +25,7 @@ import { MessageActions } from './MessageActions'
 import { MessageReactions } from './MessageReactions'
 import type { ReplyMessage } from '../../../schemas/replyMessage'
 import { EmojiPicker, type EmojiProps } from '../../EmojiPicker'
+import { useRef } from 'react'
 
 export interface MessageViewProps {
     message: CCMessage<TypeSimpleNote | ReplyMessage>
@@ -42,6 +44,7 @@ export interface MessageViewProps {
     unfavorite: () => void
     favorite: () => Promise<void>
     addMessageReaction: (emoji: EmojiProps) => Promise<void>
+    removeMessageReaction: (id: string) => Promise<void>
     setMessageAnchor: (anchor: null | HTMLElement) => void
     setEmojiPickerAnchor: (anchor: null | HTMLElement) => void
     setFetchSucceed: (fetchSucceed: boolean) => void
@@ -49,13 +52,15 @@ export interface MessageViewProps {
 }
 
 export const MessageView = (props: MessageViewProps): JSX.Element => {
+    const repositionEmojiPicker = useRef<PopoverActions | null>(null)
+
     return (
         <ListItem
             sx={{
                 wordBreak: 'break-word',
                 alignItems: 'flex-start',
                 flex: 1,
-                gap: 2
+                gap: { xs: 1, sm: 2 }
             }}
             disablePadding
         >
@@ -97,7 +102,12 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                         />
                         {props.beforeMessage}
                         <SimpleNote message={props.message} />
-                        <MessageReactions message={props.message} emojiUsers={props.emojiUsers} />
+                        <MessageReactions
+                            message={props.message}
+                            emojiUsers={props.emojiUsers}
+                            addMessageReaction={props.addMessageReaction}
+                            removeMessageReaction={props.removeMessageReaction}
+                        />
                         <MessageActions
                             handleReply={props.handleReply}
                             handleReRoute={props.handleReRoute}
@@ -169,16 +179,17 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                 }}
                 anchorOrigin={{
                     vertical: 'bottom',
-                    horizontal: 'left'
+                    horizontal: 'center'
                 }}
+                action={repositionEmojiPicker}
             >
-                {/* onSelected={(emoji) => {
-                props.api.addMessageReaction(props.message.id, props.message.author, emoji.shortcodes, emoji.src)
-              }} */}
                 <EmojiPicker
                     onSelected={(emoji) => {
                         props.addMessageReaction(emoji)
                         props.setEmojiPickerAnchor(null)
+                    }}
+                    onMounted={() => {
+                        repositionEmojiPicker.current?.updatePosition()
                     }}
                 />
             </Popover>

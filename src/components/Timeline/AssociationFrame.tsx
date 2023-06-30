@@ -75,7 +75,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                 setMessage(m)
                 if (!m) return
                 const isMeToOther = a.author !== api.userAddress
-                api.readCharacter(isMeToOther ? props.association.author : m.author, Schemas.profile).then((author) => {
+                api.readCharacter(isMeToOther ? a.author : m.author, Schemas.profile).then((author) => {
                     setAuthor(author)
                 })
             })
@@ -332,6 +332,9 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                             setEmojiPickerAnchor={setEmojiPickerAnchor}
                             setFetchSucceed={() => {
                                 return true
+                            }}
+                            removeMessageReaction={async (id) => {
+                                api.unFavoriteMessage(id, message.author)
                             }}
                         />
                     )}

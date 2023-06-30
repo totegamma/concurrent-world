@@ -33,7 +33,12 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                 justifyContent: 'space-between'
             }}
         >
-            <Box sx={{ display: 'flex', gap: 4 }}>
+            <Box
+                sx={{
+                    display: 'flex',
+                    gap: { xs: 3, sm: 4 }
+                }}
+            >
                 {/* left */}
                 <IconButton
                     sx={{
@@ -44,7 +49,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         props.handleReply()
                     }}
                 >
-                    <ReplyIcon sx={{ fontSize: '80%' }} />
+                    <ReplyIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
                 </IconButton>
                 <IconButton
                     sx={{
@@ -55,9 +60,10 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         props.handleReRoute()
                     }}
                 >
-                    <RepeatIcon sx={{ fontSize: '80%' }} />
+                    <RepeatIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
                 </IconButton>
                 <Tooltip
+                    arrow
                     title={
                         <Box
                             sx={{
@@ -108,12 +114,12 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                             }}
                         >
                             {props.hasOwnReaction ? (
-                                <StarIcon sx={{ fontSize: '80%' }} />
+                                <StarIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
                             ) : (
-                                <StarOutlineIcon sx={{ fontSize: '80%' }} />
+                                <StarOutlineIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
                             )}
                         </IconButton>
-                        <Typography sx={{ size: '16px' }}>
+                        <Typography sx={{ size: '16px', fontSize: '13px' }}>
                             {props.message.associations.filter((e) => e.schema === Schemas.like).length}
                         </Typography>
                     </Box>
@@ -127,7 +133,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         props.setEmojiPickerAnchor(e.currentTarget)
                     }}
                 >
-                    <AddReactionIcon sx={{ fontSize: '80%' }} />
+                    <AddReactionIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
                 </IconButton>
                 <IconButton
                     sx={{
@@ -138,7 +144,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         props.setMessageAnchor(e.currentTarget)
                     }}
                 >
-                    <MoreHorizIcon sx={{ fontSize: '80%' }} />
+                    <MoreHorizIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
                 </IconButton>
             </Box>
             <Box display="flex">
@@ -149,7 +155,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         underline="hover"
                         sx={{
                             fontweight: '400',
-                            fontSize: '13px',
+                            fontSize: '12px',
                             color: 'text.secondary'
                         }}
                         href={'/#' + e.id}

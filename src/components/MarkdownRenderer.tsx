@@ -6,9 +6,8 @@ import rehypeRaw from 'rehype-raw'
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 import { type ReactMarkdownProps } from 'react-markdown/lib/ast-to-react'
 import breaks from 'remark-breaks'
+import { Codeblock } from './Codeblock'
 
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import type { Emoji } from '../model'
 import { ApplicationContext } from '../App'
 
@@ -49,8 +48,8 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                         <Typography
                             sx={{
                                 fontSize: {
-                                    xs: '0.9rem',
-                                    sm: '1rem'
+                                    xs: '0.8rem',
+                                    sm: '0.9rem'
                                 },
                                 marginBottom: {
                                     xs: '4px',
@@ -137,22 +136,7 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                                 {children}
                             </Box>
                         ) : (
-                            <Box
-                                sx={{
-                                    borderRadius: 1,
-                                    overflow: 'hidden'
-                                }}
-                            >
-                                <SyntaxHighlighter
-                                    style={materialDark}
-                                    language={language}
-                                    PreTag="div"
-                                    customStyle={{ margin: 0, padding: '10px 15px', overflow: 'auto' }}
-                                    codeTagProps={{ style: { fontFamily: 'Source Code Pro, monospace' } }}
-                                >
-                                    {String(children).replace(/\n$/, '')}
-                                </SyntaxHighlighter>
-                            </Box>
+                            <Codeblock language={language}>{String(children).replace(/\n$/, '')}</Codeblock>
                         )
                     },
                     img: (
