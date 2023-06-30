@@ -63,6 +63,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     <RepeatIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
                 </IconButton>
                 <Tooltip
+                    arrow
                     title={
                         <Box
                             sx={{
