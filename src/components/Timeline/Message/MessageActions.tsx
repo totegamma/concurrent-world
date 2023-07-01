@@ -6,11 +6,14 @@ import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import AddReactionIcon from '@mui/icons-material/AddReaction'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import RepeatIcon from '@mui/icons-material/Repeat'
+import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown'
 import type { Stream, Message as CCMessage, ProfileWithAddress } from '../../../model'
 import type ConcurrentApiClient from '../../../apiservice'
 import { Schemas } from '../../../schemas'
 import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
 import { useState } from 'react'
+import Collapse from '@mui/material/Collapse'
+import Fade from '@mui/material/Fade'
 export interface MessageActionsProps {
     handleReply: () => Promise<void>
     handleReRoute: () => Promise<void>
@@ -34,7 +37,8 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
             <Box
                 sx={{
                     display: 'flex',
-                    justifyContent: 'space-between'
+                    justifyContent: 'space-between',
+                    height: '1.5rem'
                 }}
             >
                 <Box
@@ -123,7 +127,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                     <StarOutlineIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
                                 )}
                             </IconButton>
-                            <Typography sx={{ size: '16px', fontSize: '13px' }}>
+                            <Typography sx={{ m: 'auto', size: '16px', fontSize: '13px' }}>
                                 {props.message.associations.filter((e) => e.schema === Schemas.like).length}
                             </Typography>
                         </Box>
@@ -168,7 +172,21 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     ))}
                 </Box>
                 {streamListOpen ? (
-                    <></>
+                    <Box>
+                        <IconButton
+                            onClick={() => {
+                                setStreamListOpen(false)
+                            }}
+                            sx={{
+                                p: '0',
+                                color: props.theme.palette.text.secondary
+                            }}
+                        >
+                            <ExpandCircleDownIcon
+                                sx={{ fontSize: { transform: 'rotate(180deg)', xs: '70%', sm: '80%' } }}
+                            />
+                        </IconButton>
+                    </Box>
                 ) : (
                     <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
                         {props.msgstreams[0] && (
@@ -202,24 +220,31 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     </Box>
                 )}
             </Box>
-            {streamListOpen && (
-                <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
-                    {props.msgstreams.map((e) => (
-                        <Link
-                            key={e.id}
-                            underline="hover"
-                            sx={{
-                                fontweight: '400',
-                                fontSize: '12px',
-                                color: 'text.secondary'
-                            }}
-                            href={'/#' + e.id}
-                        >
-                            {`%${e.payload.body.shortname as string}`}
-                        </Link>
-                    ))}
+            <Collapse in={streamListOpen} collapsedSize={0}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between'
+                    }}
+                >
+                    <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+                        {props.msgstreams.map((e) => (
+                            <Link
+                                key={e.id}
+                                underline="hover"
+                                sx={{
+                                    fontweight: '400',
+                                    fontSize: '12px',
+                                    color: 'text.secondary'
+                                }}
+                                href={'/#' + e.id}
+                            >
+                                {`%${e.payload.body.shortname as string}`}
+                            </Link>
+                        ))}
+                    </Box>
                 </Box>
-            )}
+            </Collapse>
         </>
     )
 }
