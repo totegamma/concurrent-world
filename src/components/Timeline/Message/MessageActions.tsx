@@ -174,7 +174,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     ))}
                 </Box>
                 <Fade in={!streamListOpen}>
-                    <Box sx={{ display: { xs: 'block', sm: 'none' }, ml: 'auto' }}>
+                    <Box sx={{ display: { xs: 'block', sm: 'none' }, ml: 'auto', overFlow: 'hidden' }}>
                         {props.msgstreams[0] && (
                             <Link
                                 underline="hover"
@@ -209,7 +209,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         </Box>
                     </Fade>
                 ) : (
-                    <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+                    <Box sx={{ display: { xs: 'block', sm: 'none', whiteSpace: 'nowrap' } }}>
                         {props.msgstreams.length > 1 && (
                             <Link
                                 onClick={() => {
