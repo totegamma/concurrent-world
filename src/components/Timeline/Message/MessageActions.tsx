@@ -14,6 +14,7 @@ import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
 import { useState } from 'react'
 import Collapse from '@mui/material/Collapse'
 import Fade from '@mui/material/Fade'
+import Slide from '@mui/material/Slide'
 export interface MessageActionsProps {
     handleReply: () => Promise<void>
     handleReRoute: () => Promise<void>
@@ -171,24 +172,8 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         </Link>
                     ))}
                 </Box>
-                {streamListOpen ? (
-                    <Box>
-                        <IconButton
-                            onClick={() => {
-                                setStreamListOpen(false)
-                            }}
-                            sx={{
-                                p: '0',
-                                color: props.theme.palette.text.secondary
-                            }}
-                        >
-                            <ExpandCircleDownIcon
-                                sx={{ fontSize: { transform: 'rotate(180deg)', xs: '70%', sm: '80%' } }}
-                            />
-                        </IconButton>
-                    </Box>
-                ) : (
-                    <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+                <Fade in={!streamListOpen}>
+                    <Box sx={{ display: { xs: 'block', sm: 'none' }, ml: 'auto' }}>
                         {props.msgstreams[0] && (
                             <Link
                                 underline="hover"
@@ -202,6 +187,28 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                 {`%${props.msgstreams[0].payload.body.shortname as string}`}
                             </Link>
                         )}
+                    </Box>
+                </Fade>
+                {streamListOpen ? (
+                    <Fade in={streamListOpen}>
+                        <Box>
+                            <IconButton
+                                onClick={() => {
+                                    setStreamListOpen(false)
+                                }}
+                                sx={{
+                                    p: '0',
+                                    color: props.theme.palette.text.secondary
+                                }}
+                            >
+                                <ExpandCircleDownIcon
+                                    sx={{ fontSize: { transform: 'rotate(180deg)', xs: '70%', sm: '80%' } }}
+                                />
+                            </IconButton>
+                        </Box>
+                    </Fade>
+                ) : (
+                    <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
                         {props.msgstreams.length > 1 && (
                             <Link
                                 onClick={() => {
