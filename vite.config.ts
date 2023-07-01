@@ -56,14 +56,14 @@ export default defineConfig({
                 clientsClaim: true,
                 runtimeCaching: [
                     {
-                        urlPattern: /index\.html/,
+                        urlPattern: /index\.html$/,
                         handler: 'NetworkFirst',
                         options: {
                             cacheName: 'html-cache',
                         },
                     },
                     {
-                        urlPattern: /.*\.(?:png|jpg|jpeg|svg|gif)/,
+                        urlPattern: /.*\.(?:png|jpg|jpeg|svg|gif)$/,
                         handler: 'CacheFirst',
                         options: {
                             cacheName: 'image-cache',
@@ -74,7 +74,7 @@ export default defineConfig({
                         },
                     },
                     {
-                        urlPattern: /.*\.(?:js|css)/,
+                        urlPattern: /.*\.(?:js|css)$/,
                         handler: 'CacheFirst',
                         options: {
                             cacheName: 'static-cache',
@@ -85,7 +85,7 @@ export default defineConfig({
                         },
                     },
                     {
-                        urlPattern: /.*\.(?:woff|woff2|eot|ttf|otf)/,
+                        urlPattern: /.*\.(?:woff|woff2|eot|ttf|otf)$/,
                         handler: 'CacheFirst',
                         options: {
                             cacheName: 'font-cache',
@@ -96,18 +96,7 @@ export default defineConfig({
                         },
                     },
                     {
-                        urlPattern: /.*\.(?:json)/,
-                        handler: 'CacheFirst',
-                        options: {
-                            cacheName: 'json-cache',
-                            expiration: {
-                                maxEntries: 60,
-                                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
-                            },
-                        },
-                    },
-                    {
-                        urlPattern: /.*\.(?:mp3)/,
+                        urlPattern: /.*\.(?:mp3)$/,
                         handler: 'CacheFirst',
                         options: {
                             cacheName: 'audio-cache',
