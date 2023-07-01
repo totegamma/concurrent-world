@@ -39,7 +39,8 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                 sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    height: '1.5rem'
+                    height: '1.5rem',
+                    overflow: 'hidden'
                 }}
             >
                 <Box
