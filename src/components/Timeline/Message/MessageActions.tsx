@@ -14,7 +14,6 @@ import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
 import { useState } from 'react'
 import Collapse from '@mui/material/Collapse'
 import Fade from '@mui/material/Fade'
-import Slide from '@mui/material/Slide'
 export interface MessageActionsProps {
     handleReply: () => Promise<void>
     handleReRoute: () => Promise<void>
