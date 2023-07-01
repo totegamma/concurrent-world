@@ -3,6 +3,7 @@ import { LogoutButton } from '../components/Settings/LogoutButton'
 import { ThemeSelect } from '../components/Settings/ThemeSelect'
 import { ImgurSettings } from '../components/Settings/Imgur'
 import { useApi } from '../context/api'
+import { useSnackbar } from 'notistack'
 
 export interface SettingsProp {
     setThemeName: (themeName: string) => void
@@ -11,6 +12,21 @@ export interface SettingsProp {
 export function Settings(props: SettingsProp): JSX.Element {
     const api = useApi()
     const theme = useTheme()
+    const { enqueueSnackbar } = useSnackbar()
+
+    const deleteAllCache = (): void => {
+        if (window.caches) {
+            caches.keys().then((names) => {
+                // Delete all the cache files
+                names.forEach((name) => {
+                    caches.delete(name)
+                })
+            })
+            enqueueSnackbar('Cache deleted', { variant: 'success' })
+        } else {
+            enqueueSnackbar('No cache to delete', { variant: 'info' })
+        }
+    }
 
     return (
         <>
@@ -44,6 +60,14 @@ export function Settings(props: SettingsProp): JSX.Element {
                         }}
                     >
                         <Typography variant="h3">Basic</Typography>
+                        <Button
+                            variant="contained"
+                            onClick={(_) => {
+                                deleteAllCache()
+                            }}
+                        >
+                            Clear Cache
+                        </Button>
                         <Button
                             variant="contained"
                             onClick={(_) => {
