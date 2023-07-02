@@ -2,6 +2,8 @@
 Concurrent-worldは分散マイクロブログ基盤である[Concurrent](https://github.com/totegamma/concurrent)のwebクライアント実装の1つです。
 現在は絶賛開発中で、最低限の機能しかありません。
 
+現在は [concurrent.world](https://concurrent.world)で公開されています。
+
 ### 世界は一つ
 Concurrentを始めるのに、所属するコミュニティを選ぶ必要はありません。 
 アカウントを作成すれば、誰とでもつながることができ、好きな話題同士で集まったコミュニティタイムライン(concurrentではストリームと呼びます)で交流できます。
