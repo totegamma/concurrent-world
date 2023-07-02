@@ -206,7 +206,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         </IconButton>
                     </Box>
                 </Fade>
-                {streamListOpen ||
+                {streamListOpen || (
                     <Box sx={{ display: { xs: 'block', sm: 'none', whiteSpace: 'nowrap' } }}>
                         {props.msgstreams.length > 1 && (
                             <Link
@@ -224,31 +224,29 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                             </Link>
                         )}
                     </Box>
-                }
+                )}
             </Box>
             <Collapse in={streamListOpen} collapsedSize={0}>
                 <Box
                     sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between'
+                        display: { xs: 'flex', sm: 'none' },
+                        gap: 1
                     }}
                 >
-                    <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
-                        {props.msgstreams.map((e) => (
-                            <Link
-                                key={e.id}
-                                underline="hover"
-                                sx={{
-                                    fontweight: '400',
-                                    fontSize: '12px',
-                                    color: 'text.secondary'
-                                }}
-                                href={'/#' + e.id}
-                            >
-                                {`%${e.payload.body.shortname as string}`}
-                            </Link>
-                        ))}
-                    </Box>
+                    {props.msgstreams.map((e) => (
+                        <Link
+                            key={e.id}
+                            underline="hover"
+                            sx={{
+                                fontweight: '400',
+                                fontSize: '12px',
+                                color: 'text.secondary'
+                            }}
+                            href={'/#' + e.id}
+                        >
+                            {`%${e.payload.body.shortname as string}`}
+                        </Link>
+                    ))}
                 </Box>
             </Collapse>
         </>
