@@ -230,7 +230,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                 <Box
                     sx={{
                         display: { xs: 'flex', sm: 'none' },
-                        gap: 1
+                        gap: 0.5
                     }}
                 >
                     {props.msgstreams.map((e) => (
