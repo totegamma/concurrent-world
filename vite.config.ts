@@ -54,6 +54,8 @@ export default defineConfig({
                 cleanupOutdatedCaches: true,
                 skipWaiting: true,
                 clientsClaim: true,
+                globDirectory: 'dist',
+                globPatterns: ['**/*.{js,css,png,jpg,jpeg,svg,gif,woff,woff2,eot,ttf,otf,mp3}'],
                 runtimeCaching: [
                     {
                         urlPattern: /.*\.(?:png|jpg|jpeg|svg|gif)$/,
@@ -97,13 +99,6 @@ export default defineConfig({
                                 maxEntries: 60,
                                 maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
                             },
-                        },
-                    },
-                    {
-                        urlPattern: /^((?!api).)*$/,
-                        handler: 'NetworkFirst',
-                        options: {
-                            cacheName: 'html-cache',
                         },
                     },
                 ],
