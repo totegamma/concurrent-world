@@ -6,10 +6,14 @@ import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import AddReactionIcon from '@mui/icons-material/AddReaction'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import RepeatIcon from '@mui/icons-material/Repeat'
+import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown'
 import type { Stream, Message as CCMessage, ProfileWithAddress } from '../../../model'
 import type ConcurrentApiClient from '../../../apiservice'
 import { Schemas } from '../../../schemas'
 import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
+import { useState } from 'react'
+import Collapse from '@mui/material/Collapse'
+import Fade from '@mui/material/Fade'
 export interface MessageActionsProps {
     handleReply: () => Promise<void>
     handleReRoute: () => Promise<void>
@@ -26,148 +30,226 @@ export interface MessageActionsProps {
 }
 
 export const MessageActions = (props: MessageActionsProps): JSX.Element => {
+    const [streamListOpen, setStreamListOpen] = useState<boolean>(false)
+
     return (
-        <Box
-            sx={{
-                display: 'flex',
-                justifyContent: 'space-between'
-            }}
-        >
+        <>
             <Box
                 sx={{
                     display: 'flex',
-                    gap: { xs: 3, sm: 4 }
+                    justifyContent: 'space-between',
+                    height: '1.5rem',
+                    overflow: 'hidden'
                 }}
             >
-                {/* left */}
-                <IconButton
+                <Box
                     sx={{
-                        p: '0',
-                        color: props.theme.palette.text.secondary
-                    }}
-                    onClick={() => {
-                        props.handleReply()
+                        display: 'flex',
+                        gap: { xs: 3, sm: 4 }
                     }}
                 >
-                    <ReplyIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
-                </IconButton>
-                <IconButton
-                    sx={{
-                        p: '0',
-                        color: props.theme.palette.text.secondary
-                    }}
-                    onClick={() => {
-                        props.handleReRoute()
-                    }}
-                >
-                    <RepeatIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
-                </IconButton>
-                <Tooltip
-                    arrow
-                    title={
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: 1
-                            }}
-                        >
-                            {props.reactUsers.map((user) => (
-                                <Box
-                                    key={user.ccaddress}
-                                    sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 1
-                                    }}
-                                >
-                                    <CCAvatar
+                    {/* left */}
+                    <IconButton
+                        sx={{
+                            p: '0',
+                            color: props.theme.palette.text.secondary
+                        }}
+                        onClick={() => {
+                            props.handleReply()
+                        }}
+                    >
+                        <ReplyIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
+                    </IconButton>
+                    <IconButton
+                        sx={{
+                            p: '0',
+                            color: props.theme.palette.text.secondary
+                        }}
+                        onClick={() => {
+                            props.handleReRoute()
+                        }}
+                    >
+                        <RepeatIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
+                    </IconButton>
+                    <Tooltip
+                        arrow
+                        title={
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: 1
+                                }}
+                            >
+                                {props.reactUsers.map((user) => (
+                                    <Box
+                                        key={user.ccaddress}
                                         sx={{
-                                            height: '20px',
-                                            width: '20px'
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 1
                                         }}
-                                        avatarURL={user.avatar}
-                                        identiconSource={user.ccaddress}
-                                        alt={user.ccaddress}
-                                    />
-                                    {user.username ?? 'anonymous'}
-                                </Box>
-                            ))}
+                                    >
+                                        <CCAvatar
+                                            sx={{
+                                                height: '20px',
+                                                width: '20px'
+                                            }}
+                                            avatarURL={user.avatar}
+                                            identiconSource={user.ccaddress}
+                                            alt={user.ccaddress}
+                                        />
+                                        {user.username ?? 'anonymous'}
+                                    </Box>
+                                ))}
+                            </Box>
+                        }
+                        placement="top"
+                        disableHoverListener={props.reactUsers.length === 0}
+                    >
+                        <Box sx={{ display: 'flex' }}>
+                            <IconButton
+                                sx={{
+                                    p: '0',
+                                    color: props.theme.palette.text.secondary
+                                }}
+                                color="primary"
+                                onClick={() => {
+                                    if (props.hasOwnReaction) {
+                                        props.unfavorite()
+                                    } else {
+                                        props.favorite()
+                                    }
+                                }}
+                            >
+                                {props.hasOwnReaction ? (
+                                    <StarIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
+                                ) : (
+                                    <StarOutlineIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
+                                )}
+                            </IconButton>
+                            <Typography sx={{ m: 'auto', size: '16px', fontSize: '13px' }}>
+                                {props.message.associations.filter((e) => e.schema === Schemas.like).length}
+                            </Typography>
                         </Box>
-                    }
-                    placement="top"
-                    disableHoverListener={props.reactUsers.length === 0}
-                >
-                    <Box sx={{ display: 'flex' }}>
+                    </Tooltip>
+                    <IconButton
+                        sx={{
+                            p: '0',
+                            color: props.theme.palette.text.secondary
+                        }}
+                        onClick={(e) => {
+                            props.setEmojiPickerAnchor(e.currentTarget)
+                        }}
+                    >
+                        <AddReactionIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
+                    </IconButton>
+                    <IconButton
+                        sx={{
+                            p: '0',
+                            color: props.theme.palette.text.secondary
+                        }}
+                        onClick={(e) => {
+                            props.setMessageAnchor(e.currentTarget)
+                        }}
+                    >
+                        <MoreHorizIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
+                    </IconButton>
+                </Box>
+                <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 0.5, ml: 'auto' }}>
+                    {props.msgstreams.map((e) => (
+                        <Link
+                            key={e.id}
+                            underline="hover"
+                            sx={{
+                                fontweight: '400',
+                                fontSize: '12px',
+                                color: 'text.secondary'
+                            }}
+                            href={'/#' + e.id}
+                        >
+                            {`%${e.payload.body.shortname as string}`}
+                        </Link>
+                    ))}
+                </Box>
+                <Fade in={!streamListOpen}>
+                    <Box sx={{ display: { sm: 'block', md: 'none' }, ml: 'auto', overFlow: 'hidden' }}>
+                        {props.msgstreams[0] && (
+                            <Link
+                                underline="hover"
+                                sx={{
+                                    fontweight: '400',
+                                    fontSize: '12px',
+                                    color: 'text.secondary'
+                                }}
+                                href={'/#' + props.msgstreams[0].id}
+                            >
+                                {`%${props.msgstreams[0].payload.body.shortname as string}`}
+                            </Link>
+                        )}
+                    </Box>
+                </Fade>
+                <Fade in={streamListOpen} unmountOnExit>
+                    <Box>
                         <IconButton
+                            onClick={() => {
+                                setStreamListOpen(false)
+                            }}
                             sx={{
                                 p: '0',
-                                color: props.theme.palette.text.secondary
-                            }}
-                            color="primary"
-                            onClick={() => {
-                                if (props.hasOwnReaction) {
-                                    props.unfavorite()
-                                } else {
-                                    props.favorite()
-                                }
+                                color: props.theme.palette.text.secondary,
+                                display: { sm: 'block', md: 'none' }
                             }}
                         >
-                            {props.hasOwnReaction ? (
-                                <StarIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
-                            ) : (
-                                <StarOutlineIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
-                            )}
+                            <ExpandCircleDownIcon
+                                sx={{ fontSize: { transform: 'rotate(180deg)', xs: '70%', sm: '80%' } }}
+                            />
                         </IconButton>
-                        <Typography sx={{ size: '16px', fontSize: '13px' }}>
-                            {props.message.associations.filter((e) => e.schema === Schemas.like).length}
-                        </Typography>
                     </Box>
-                </Tooltip>
-                <IconButton
+                </Fade>
+                {streamListOpen || (
+                    <Box sx={{ display: { sm: 'block', md: 'none', whiteSpace: 'nowrap' } }}>
+                        {props.msgstreams.length > 1 && (
+                            <Link
+                                onClick={() => {
+                                    setStreamListOpen(true)
+                                }}
+                                underline="hover"
+                                sx={{
+                                    fontweight: '400',
+                                    fontSize: '12px',
+                                    color: 'text.secondary'
+                                }}
+                            >
+                                +{props.msgstreams.length - 1}
+                            </Link>
+                        )}
+                    </Box>
+                )}
+            </Box>
+            <Collapse in={streamListOpen} collapsedSize={0}>
+                <Box
                     sx={{
-                        p: '0',
-                        color: props.theme.palette.text.secondary
-                    }}
-                    onClick={(e) => {
-                        props.setEmojiPickerAnchor(e.currentTarget)
+                        display: { sm: 'flex', md: 'none' },
+                        gap: 0.5
                     }}
                 >
-                    <AddReactionIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
-                </IconButton>
-                <IconButton
-                    sx={{
-                        p: '0',
-                        color: props.theme.palette.text.secondary
-                    }}
-                    onClick={(e) => {
-                        props.setMessageAnchor(e.currentTarget)
-                    }}
-                >
-                    <MoreHorizIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
-                </IconButton>
-            </Box>
-            <Box display="flex">
-                {/* right */}
-                {props.msgstreams.map((e) => (
-                    <Link
-                        key={e.id}
-                        underline="hover"
-                        sx={{
-                            fontweight: '400',
-                            fontSize: '12px',
-                            color: 'text.secondary'
-                        }}
-                        href={'/#' + e.id}
-                    >
-                        {`%${
-                            e.payload.body.name.length < 15
-                                ? (e.payload.body.name as string)
-                                : (e.payload.body.name.slice(0, 2) as string) + '...'
-                        }`}
-                    </Link>
-                ))}
-            </Box>
-        </Box>
+                    {props.msgstreams.map((e) => (
+                        <Link
+                            key={e.id}
+                            underline="hover"
+                            sx={{
+                                fontweight: '400',
+                                fontSize: '12px',
+                                color: 'text.secondary'
+                            }}
+                            href={'/#' + e.id}
+                        >
+                            {`%${e.payload.body.shortname as string}`}
+                        </Link>
+                    ))}
+                </Box>
+            </Collapse>
+        </>
     )
 }
