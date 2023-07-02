@@ -54,14 +54,9 @@ export default defineConfig({
                 cleanupOutdatedCaches: true,
                 skipWaiting: true,
                 clientsClaim: true,
+                globDirectory: 'dist',
+                globPatterns: ['**/*.{js,css,png,jpg,jpeg,svg,gif,woff,woff2,eot,ttf,otf,mp3}'],
                 runtimeCaching: [
-                    {
-                        urlPattern: /index\.html$/,
-                        handler: 'NetworkFirst',
-                        options: {
-                            cacheName: 'html-cache',
-                        },
-                    },
                     {
                         urlPattern: /.*\.(?:png|jpg|jpeg|svg|gif)$/,
                         handler: 'CacheFirst',
