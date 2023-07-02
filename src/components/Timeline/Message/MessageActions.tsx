@@ -156,7 +156,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         <MoreHorizIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
                     </IconButton>
                 </Box>
-                <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 0.5, ml: 'auto' }}>
                     {props.msgstreams.map((e) => (
                         <Link
                             key={e.id}
@@ -173,7 +173,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     ))}
                 </Box>
                 <Fade in={!streamListOpen}>
-                    <Box sx={{ display: { xs: 'block', sm: 'none' }, ml: 'auto', overFlow: 'hidden' }}>
+                    <Box sx={{ display: { sm: 'block', md: 'none' }, ml: 'auto', overFlow: 'hidden' }}>
                         {props.msgstreams[0] && (
                             <Link
                                 underline="hover"
@@ -197,7 +197,8 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                             }}
                             sx={{
                                 p: '0',
-                                color: props.theme.palette.text.secondary
+                                color: props.theme.palette.text.secondary,
+                                display: { sm: 'block', md: 'none' }
                             }}
                         >
                             <ExpandCircleDownIcon
@@ -207,7 +208,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     </Box>
                 </Fade>
                 {streamListOpen || (
-                    <Box sx={{ display: { xs: 'block', sm: 'none', whiteSpace: 'nowrap' } }}>
+                    <Box sx={{ display: { sm: 'block', md: 'none', whiteSpace: 'nowrap' } }}>
                         {props.msgstreams.length > 1 && (
                             <Link
                                 onClick={() => {
@@ -229,7 +230,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
             <Collapse in={streamListOpen} collapsedSize={0}>
                 <Box
                     sx={{
-                        display: { xs: 'flex', sm: 'none' },
+                        display: { sm: 'flex', md: 'none' },
                         gap: 0.5
                     }}
                 >
