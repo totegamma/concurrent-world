@@ -189,25 +189,24 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         )}
                     </Box>
                 </Fade>
-                {streamListOpen ? (
-                    <Fade in={streamListOpen}>
-                        <Box>
-                            <IconButton
-                                onClick={() => {
-                                    setStreamListOpen(false)
-                                }}
-                                sx={{
-                                    p: '0',
-                                    color: props.theme.palette.text.secondary
-                                }}
-                            >
-                                <ExpandCircleDownIcon
-                                    sx={{ fontSize: { transform: 'rotate(180deg)', xs: '70%', sm: '80%' } }}
-                                />
-                            </IconButton>
-                        </Box>
-                    </Fade>
-                ) : (
+                <Fade in={streamListOpen} unmountOnExit>
+                    <Box>
+                        <IconButton
+                            onClick={() => {
+                                setStreamListOpen(false)
+                            }}
+                            sx={{
+                                p: '0',
+                                color: props.theme.palette.text.secondary
+                            }}
+                        >
+                            <ExpandCircleDownIcon
+                                sx={{ fontSize: { transform: 'rotate(180deg)', xs: '70%', sm: '80%' } }}
+                            />
+                        </IconButton>
+                    </Box>
+                </Fade>
+                {streamListOpen ||
                     <Box sx={{ display: { xs: 'block', sm: 'none', whiteSpace: 'nowrap' } }}>
                         {props.msgstreams.length > 1 && (
                             <Link
@@ -225,7 +224,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                             </Link>
                         )}
                     </Box>
-                )}
+                }
             </Box>
             <Collapse in={streamListOpen} collapsedSize={0}>
                 <Box
