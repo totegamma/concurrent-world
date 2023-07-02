@@ -56,13 +56,6 @@ export default defineConfig({
                 clientsClaim: true,
                 runtimeCaching: [
                     {
-                        urlPattern: /index\.html$/,
-                        handler: 'NetworkFirst',
-                        options: {
-                            cacheName: 'html-cache',
-                        },
-                    },
-                    {
                         urlPattern: /.*\.(?:png|jpg|jpeg|svg|gif)$/,
                         handler: 'CacheFirst',
                         options: {
@@ -104,6 +97,13 @@ export default defineConfig({
                                 maxEntries: 60,
                                 maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
                             },
+                        },
+                    },
+                    {
+                        urlPattern: /^((?!api).)*$/,
+                        handler: 'NetworkFirst',
+                        options: {
+                            cacheName: 'html-cache',
                         },
                     },
                 ],
