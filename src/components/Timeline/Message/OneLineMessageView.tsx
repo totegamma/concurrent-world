@@ -74,7 +74,7 @@ export const OneLineMessageView = (props: MessageViewProps): JSX.Element => {
                 sx={{
                     display: 'flex',
                     flexShrink: 0,
-                    fontSize: '0.8rem'
+                    fontSize: '0.75rem'
                 }}
             >
                 <TimeDiff date={new Date(props.message.cdate)} />
