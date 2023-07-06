@@ -26,10 +26,11 @@ export const MobileMenu = (props: MobileMenuProps): JSX.Element => {
                 }}
             >
                 <Button
+                    disableRipple
                     onClick={() => {
                         props.setMobileMenuOpen(true)
                     }}
-                    sx={{ color: 'divider', transition: 'none', minWidth: 0, width: 0.3 }}
+                    sx={{ color: 'divider', minWidth: 0, width: 0.3 }}
                 >
                     <MenuIcon />
                 </Button>
