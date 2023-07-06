@@ -1,4 +1,4 @@
-import { Box, Button, useTheme, IconButton } from '@mui/material'
+import { Box, Button, IconButton } from '@mui/material'
 
 import HomeIcon from '@mui/icons-material/Home'
 import MessageIcon from '@mui/icons-material/Message'
@@ -7,10 +7,6 @@ import CreateIcon from '@mui/icons-material/Create'
 import MenuIcon from '@mui/icons-material/Menu'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import { NavLink } from 'react-router-dom'
-
-export interface MobileMenuProps {
-    setMobileMenuOpen: (state: boolean) => void
-}
 
 export const MobileMenu = (props: MobileMenuProps): JSX.Element => {
     return (
@@ -24,12 +20,7 @@ export const MobileMenu = (props: MobileMenuProps): JSX.Element => {
                     marginBottom: 'env(safe-area-inset-bottom)'
                 }}
             >
-                <IconButton
-                    sx={{ color: 'divider' }}
-                    onClick={() => {
-                        props.setMobileMenuOpen(true)
-                    }}
-                >
+                <IconButton sx={{ color: 'divider' }}>
                     <MenuIcon />
                 </IconButton>
                 <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/">
@@ -44,6 +35,8 @@ export const MobileMenu = (props: MobileMenuProps): JSX.Element => {
                 <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/explorer">
                     <ExploreIcon />
                 </Button>
+                {/*
+                未実装の新規投稿モーダルダイアログ
                 <Button
                     color="primary"
                     variant="contained"
@@ -55,6 +48,7 @@ export const MobileMenu = (props: MobileMenuProps): JSX.Element => {
                 >
                     <CreateIcon />
                 </Button>
+                */}
             </Box>
         </>
     )
