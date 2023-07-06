@@ -2,14 +2,7 @@ import { Box, Button, type SxProps, TextField, Typography } from '@mui/material'
 import { useRef, useState } from 'react'
 import { usePreference } from '../../../context/PreferenceContext'
 
-const sx: SxProps = {
-    marginX: {
-        sm: 0,
-        md: '20px'
-    },
-    marginTop: '10px',
-    maxWidth: '500px'
-}
+const sx: SxProps = {}
 
 export const ImgurSettings = (): JSX.Element => {
     const pref = usePreference()
@@ -28,28 +21,32 @@ export const ImgurSettings = (): JSX.Element => {
         }
     }
     return (
-        <>
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1rem'
+            }}
+        >
+            <Typography variant="h3">ImgurSetting</Typography>
+            <Typography>
+                Imgurに登録した後、<a href={'https://api.imgur.com/oauth2/addclient'}>このページ</a>
+                でアプリケーションを&quot;OAuth 2 authorization without a callback URL&quot;で作成してください。
+            </Typography>
             <Box>
-                <Typography variant="h3">ImgurSetting</Typography>
-                <Typography>
-                    Imgurに登録した後、<a href={'https://api.imgur.com/oauth2/addclient'}>このページ</a>
-                    でアプリケーションを&quot;OAuth 2 authorization without a callback URL&quot;で作成してください。
-                </Typography>
-                <Box>
-                    <TextField
-                        label="ClientId"
-                        variant="outlined"
-                        fullWidth={true}
-                        sx={sx}
-                        defaultValue={pref.imgurClientID}
-                        inputRef={clientIdRef}
-                        type="password"
-                    />
-                </Box>
-                <Button sx={sx} variant="contained" onClick={handleSave}>
-                    {buttonText}
-                </Button>
+                <TextField
+                    label="ClientId"
+                    variant="outlined"
+                    fullWidth={true}
+                    sx={sx}
+                    defaultValue={pref.imgurClientID}
+                    inputRef={clientIdRef}
+                    type="password"
+                />
             </Box>
-        </>
+            <Button sx={sx} variant="contained" onClick={handleSave}>
+                {buttonText}
+            </Button>
+        </Box>
     )
 }

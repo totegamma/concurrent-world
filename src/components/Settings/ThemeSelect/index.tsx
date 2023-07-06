@@ -21,7 +21,7 @@ export const ThemeSelect = (props: ThemeSelectProp): JSX.Element => {
                 sx={{
                     display: { xs: 'flex', md: 'grid' },
                     flexFlow: 'column',
-                    gridTemplateColumns: '1fr 1fr 1fr 1fr',
+                    gridTemplateColumns: { xs: '1fr 1fr 1fr', lg: '1fr 1fr 1fr 1fr' },
                     gridAutoRows: '1fr',
                     gap: '10px'
                 }}
