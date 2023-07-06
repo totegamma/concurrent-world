@@ -2,8 +2,6 @@ import { Box, Button, type SxProps, TextField, Typography } from '@mui/material'
 import { useRef, useState } from 'react'
 import { usePreference } from '../../../context/PreferenceContext'
 
-const sx: SxProps = {}
-
 export const ImgurSettings = (): JSX.Element => {
     const pref = usePreference()
 
@@ -28,7 +26,7 @@ export const ImgurSettings = (): JSX.Element => {
                 gap: '1rem'
             }}
         >
-            <Typography variant="h3">ImgurSetting</Typography>
+            <Typography variant="h3">画像投稿設定</Typography>
             <Typography>
                 Imgurに登録した後、<a href={'https://api.imgur.com/oauth2/addclient'}>このページ</a>
                 でアプリケーションを&quot;OAuth 2 authorization without a callback URL&quot;で作成してください。
@@ -38,13 +36,12 @@ export const ImgurSettings = (): JSX.Element => {
                     label="ClientId"
                     variant="outlined"
                     fullWidth={true}
-                    sx={sx}
                     defaultValue={pref.imgurClientID}
                     inputRef={clientIdRef}
                     type="password"
                 />
             </Box>
-            <Button sx={sx} variant="contained" onClick={handleSave}>
+            <Button variant="contained" onClick={handleSave}>
                 {buttonText}
             </Button>
         </Box>
