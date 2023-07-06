@@ -1,12 +1,19 @@
-import { Box, Button } from '@mui/material'
+import { Box, Button, IconButton } from '@mui/material'
+import { useState } from 'react'
 
 import HomeIcon from '@mui/icons-material/Home'
 import MessageIcon from '@mui/icons-material/Message'
 import ExploreIcon from '@mui/icons-material/Explore'
+import CreateIcon from '@mui/icons-material/Create'
+import MenuIcon from '@mui/icons-material/Menu'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import { NavLink } from 'react-router-dom'
 
-export function MobileMenu(): JSX.Element {
+export interface MobileMenuProps {
+    setMobileMenuOpen: (state: boolean) => void
+}
+
+export const MobileMenu = (props: MobileMenuProps): JSX.Element => {
     return (
         <>
             <Box
@@ -18,6 +25,15 @@ export function MobileMenu(): JSX.Element {
                     marginBottom: 'env(safe-area-inset-bottom)'
                 }}
             >
+                <Button
+                    disableRipple
+                    onClick={() => {
+                        props.setMobileMenuOpen(true)
+                    }}
+                    sx={{ color: 'divider', minWidth: 0, width: 0.3 }}
+                >
+                    <MenuIcon />
+                </Button>
                 <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/">
                     <HomeIcon />
                 </Button>
@@ -30,6 +46,20 @@ export function MobileMenu(): JSX.Element {
                 <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/explorer">
                     <ExploreIcon />
                 </Button>
+                {/*
+                未実装の新規投稿モーダルダイアログ呼び出しボタン
+                <Button
+                    color="primary"
+                    variant="contained"
+                    sx={{
+                        height: 36,
+                        my: 'auto',
+                        width: 0.6
+                    }}
+                >
+                    <CreateIcon />
+                </Button>
+                */}
             </Box>
         </>
     )
