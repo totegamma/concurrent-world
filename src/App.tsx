@@ -415,7 +415,7 @@ function App(): JSX.Element {
                                 }
                             }}
                         >
-                            <MobileMenu />
+                            <MobileMenu setMobileMenuOpen={setMobileMenuOpen} />
                         </Box>
                     </Box>
                 </Box>

@@ -1,4 +1,5 @@
 import { Box, Button, IconButton } from '@mui/material'
+import { useState } from 'react'
 
 import HomeIcon from '@mui/icons-material/Home'
 import MessageIcon from '@mui/icons-material/Message'
@@ -7,6 +8,10 @@ import CreateIcon from '@mui/icons-material/Create'
 import MenuIcon from '@mui/icons-material/Menu'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import { NavLink } from 'react-router-dom'
+
+export interface MobileMenuProps {
+    setMobileMenuOpen: (state: boolean) => void
+}
 
 export const MobileMenu = (props: MobileMenuProps): JSX.Element => {
     return (
@@ -20,7 +25,12 @@ export const MobileMenu = (props: MobileMenuProps): JSX.Element => {
                     marginBottom: 'env(safe-area-inset-bottom)'
                 }}
             >
-                <IconButton sx={{ color: 'divider' }}>
+                <IconButton
+                    onClick={() => {
+                        props.setMobileMenuOpen(true)
+                    }}
+                    sx={{ color: 'divider' }}
+                >
                     <MenuIcon />
                 </IconButton>
                 <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/">
