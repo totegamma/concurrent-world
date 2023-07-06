@@ -25,14 +25,14 @@ export const MobileMenu = (props: MobileMenuProps): JSX.Element => {
                     marginBottom: 'env(safe-area-inset-bottom)'
                 }}
             >
-                <IconButton
+                <Button
                     onClick={() => {
                         props.setMobileMenuOpen(true)
                     }}
-                    sx={{ color: 'divider' }}
+                    sx={{ color: 'divider', transition: 'none', minWidth: 0, width: 0.3 }}
                 >
                     <MenuIcon />
-                </IconButton>
+                </Button>
                 <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/">
                     <HomeIcon />
                 </Button>
@@ -46,7 +46,7 @@ export const MobileMenu = (props: MobileMenuProps): JSX.Element => {
                     <ExploreIcon />
                 </Button>
                 {/*
-                未実装の新規投稿モーダルダイアログ
+                未実装の新規投稿モーダルダイアログ呼び出しボタン
                 <Button
                     color="primary"
                     variant="contained"
