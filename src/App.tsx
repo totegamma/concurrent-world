@@ -1,7 +1,7 @@
 import { useEffect, useState, createContext, useRef, useMemo } from 'react'
 import { DndProvider, getBackendOptions, MultiBackend } from '@minoru/react-dnd-treeview'
 import { Routes, Route, useLocation } from 'react-router-dom'
-import { darken, Box, Paper, ThemeProvider, SwipeableDrawer, CssBaseline } from '@mui/material'
+import { darken, Box, Paper, ThemeProvider, CssBaseline, Drawer } from '@mui/material'
 import useWebSocket, { type ReadyState } from 'react-use-websocket'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 
@@ -33,8 +33,6 @@ import ConcurrentApiClient from './apiservice'
 import type { Profile } from './schemas/profile'
 import type { Userstreams } from './schemas/userstreams'
 import { PreferenceProvider } from './context/PreferenceContext'
-
-const iOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent)
 
 export const ApplicationContext = createContext<appData>({
     profile: undefined,
@@ -420,18 +418,12 @@ function App(): JSX.Element {
                     </Box>
                 </Box>
             </Box>
-            <SwipeableDrawer
+            <Drawer
                 anchor={'left'}
                 open={mobileMenuOpen}
-                onOpen={() => {
-                    setMobileMenuOpen(true)
-                }}
                 onClose={() => {
                     setMobileMenuOpen(false)
                 }}
-                disableBackdropTransition={!iOS}
-                disableDiscovery={iOS}
-                disableSwipeToOpen={false}
                 PaperProps={{
                     sx: {
                         width: '200px',
@@ -448,7 +440,7 @@ function App(): JSX.Element {
                     }}
                     hideMenu
                 />
-            </SwipeableDrawer>
+            </Drawer>
         </>
     )
 }
