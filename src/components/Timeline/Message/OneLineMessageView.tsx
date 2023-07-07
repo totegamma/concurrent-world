@@ -59,10 +59,10 @@ export const OneLineMessageView = (props: MessageViewProps): JSX.Element => {
             <Box display="flex" flex={1} overflow="hidden">
                 <Typography
                     overflow="hidden"
-                    fontSize="0.9rem"
                     whiteSpace="nowrap"
                     textOverflow="ellipsis"
                     minWidth={0}
+                    sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
                 >
                     {props.message.payload.body.body}
                 </Typography>
