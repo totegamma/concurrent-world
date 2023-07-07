@@ -7,10 +7,10 @@ assignees: ''
 
 ---
 
-# Problem / 問題点
+## Problem / 問題点
 <What / Where / Why>
 何の、どこが、なぜダメなのかを書く
 
-# Solution (Optional)
+## Solution (Optional)
 <How>
 どのように改善するか、あなたにアイディアがあれば書く(問題提起だけでもOK!)
