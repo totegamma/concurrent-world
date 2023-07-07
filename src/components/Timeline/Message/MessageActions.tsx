@@ -174,7 +174,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                 </Box>
                 <Fade in={!streamListOpen}>
                     <Box sx={{ display: { sm: 'block', md: 'none' }, ml: 'auto', overFlow: 'hidden' }}>
-                        {props.msgstreams[0] && (
+                        {props.msgstreams.length === 1 && (
                             <Link
                                 underline="hover"
                                 sx={{
@@ -189,6 +189,26 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         )}
                     </Box>
                 </Fade>
+                {streamListOpen || (
+                    <Box sx={{ display: { sm: 'block', md: 'none', whiteSpace: 'nowrap' } }}>
+                        {props.msgstreams.length > 1 && (
+                            <Link
+                                onClick={() => {
+                                    setStreamListOpen(true)
+                                }}
+                                underline="hover"
+                                sx={{
+                                    fontweight: '400',
+                                    fontSize: '12px',
+                                    color: 'text.secondary'
+                                }}
+                            >
+                                {`%${props.msgstreams[0].payload.body.shortname as string}`} +
+                                {props.msgstreams.length - 1}
+                            </Link>
+                        )}
+                    </Box>
+                )}
                 <Fade in={streamListOpen} unmountOnExit>
                     <Box>
                         <IconButton
@@ -207,25 +227,6 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         </IconButton>
                     </Box>
                 </Fade>
-                {streamListOpen || (
-                    <Box sx={{ display: { sm: 'block', md: 'none', whiteSpace: 'nowrap' } }}>
-                        {props.msgstreams.length > 1 && (
-                            <Link
-                                onClick={() => {
-                                    setStreamListOpen(true)
-                                }}
-                                underline="hover"
-                                sx={{
-                                    fontweight: '400',
-                                    fontSize: '12px',
-                                    color: 'text.secondary'
-                                }}
-                            >
-                                +{props.msgstreams.length - 1}
-                            </Link>
-                        )}
-                    </Box>
-                )}
             </Box>
             <Collapse in={streamListOpen} collapsedSize={0}>
                 <Box
