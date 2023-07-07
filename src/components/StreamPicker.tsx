@@ -54,7 +54,7 @@ export const StreamPicker = memo<StreamPickerProps>((props: StreamPickerProps): 
                 borderRadius: 2,
                 padding: '0px 10px',
                 flex: '1',
-                backgroundColor: 'backgroud.paper'
+                backgroundColor: 'background.paper'
             }}
         >
             <Autocomplete
@@ -74,8 +74,8 @@ export const StreamPicker = memo<StreamPickerProps>((props: StreamPickerProps): 
                         <InputBase
                             {...params.InputProps}
                             {...rest}
-                            sx={{ color: 'primary.contrastText' }}
-                            placeholder={props.selected.length === 0 ? 'select' : ''}
+                            sx={{ color: 'props.theme.palette.text.secondary' }}
+                            placeholder={props.selected.length === 0 ? '投稿先の選択…' : ''}
                         />
                     )
                 }}
