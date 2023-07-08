@@ -1,5 +1,15 @@
-import { useState, useContext, useEffect, useRef, memo, useMemo } from 'react'
-import { InputBase, Box, Button, useTheme, IconButton, Divider, CircularProgress, Popover } from '@mui/material'
+import { useState, useContext, useEffect, useRef, memo } from 'react'
+import {
+    InputBase,
+    Box,
+    Button,
+    useTheme,
+    IconButton,
+    Divider,
+    CircularProgress,
+    Popover,
+    Tooltip
+} from '@mui/material'
 import { ApplicationContext } from '../App'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import { StreamPicker } from './StreamPicker'
@@ -161,13 +171,15 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 >
                     <StreamPicker selected={destStreams} setSelected={setDestStreams} />
                 </Box>
-                <IconButton
-                    onClick={() => {
-                        setPostHome(!postHome)
-                    }}
-                >
-                    <HomeIcon color={postHome ? 'primary' : 'disabled'} />
-                </IconButton>
+                <Tooltip title={postHome ? 'ホーム同時投稿モード' : 'ストリーム限定投稿モード'} arrow placement="top">
+                    <IconButton
+                        onClick={() => {
+                            setPostHome(!postHome)
+                        }}
+                    >
+                        <HomeIcon color={postHome ? 'primary' : 'disabled'} />
+                    </IconButton>
+                </Tooltip>
             </Box>
             <Box
                 sx={{
@@ -240,68 +252,87 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 }}
             >
                 <Box>
-                    <IconButton
-                        sx={{
-                            color: theme.palette.text.secondary
-                        }}
-                        onClick={onFileUploadClick}
+                    <Tooltip
+                        title={pref.imgurClientID === '' ? '設定から画像投稿設定をしてください' : '画像の添付'}
+                        arrow
+                        placement="top"
+                        enterDelay={pref.imgurClientID === '' ? 0 : 500}
                     >
-                        <ImageIcon sx={{ fontSize: '80%' }} />
-                        <input
-                            hidden
-                            ref={inputRef}
-                            type="file"
-                            onChange={(e) => {
-                                onFileInputChange(e)
+                        <span>
+                            <IconButton
+                                sx={{
+                                    color: theme.palette.text.secondary
+                                }}
+                                onClick={onFileUploadClick}
+                                disabled={pref.imgurClientID === ''}
+                            >
+                                <ImageIcon sx={{ fontSize: '80%' }} />
+                                <input
+                                    hidden
+                                    ref={inputRef}
+                                    type="file"
+                                    onChange={(e) => {
+                                        onFileInputChange(e)
+                                    }}
+                                    accept={'.png, .jpg, .jpeg, .gif'}
+                                />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
+                    <Tooltip title="本文をプレビュー" arrow placement="top" enterDelay={500}>
+                        <IconButton
+                            sx={{
+                                color: theme.palette.text.secondary
                             }}
-                            accept={'.png, .jpg, .jpeg, .gif'}
-                        />
-                    </IconButton>
-                    <IconButton
-                        sx={{
-                            color: theme.palette.text.secondary
-                        }}
-                        onClick={() => {
-                            setOpenPreview(!openPreview)
-                        }}
-                    >
-                        <Splitscreen sx={{ transform: 'rotate(90deg)', fontSize: '80%' }} />
-                    </IconButton>
-                    <IconButton
-                        sx={{
-                            color: theme.palette.text.secondary
-                        }}
-                        onClick={(e) => {
-                            setSelectEmoji(!selectEmoji)
-                            setEmojiAnchor(e.currentTarget)
-                        }}
-                    >
-                        <EmojiEmotions sx={{ fontSize: '80%' }} />
-                    </IconButton>
-                    <IconButton
-                        sx={{
-                            color: theme.palette.text.secondary
-                        }}
-                        onClick={() => {
-                            if (draft.length === 0) return
-                            enqueueSnackbar('Draft Cleared.', {
-                                autoHideDuration: 5000,
-                                action: (key) => (
-                                    <Button
-                                        onClick={() => {
-                                            closeSnackbar(key)
-                                            setDraft(draft)
-                                        }}
-                                    >
-                                        undo
-                                    </Button>
-                                )
-                            })
-                            setDraft('')
-                        }}
-                    >
-                        <DeleteIcon sx={{ fontSize: '80%' }} />
-                    </IconButton>
+                            onClick={() => {
+                                setOpenPreview(!openPreview)
+                            }}
+                        >
+                            <Splitscreen sx={{ transform: 'rotate(90deg)', fontSize: '80%' }} />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="絵文字" arrow placement="top" enterDelay={500}>
+                        <IconButton
+                            sx={{
+                                color: theme.palette.text.secondary
+                            }}
+                            onClick={(e) => {
+                                setSelectEmoji(!selectEmoji)
+                                setEmojiAnchor(e.currentTarget)
+                            }}
+                        >
+                            <EmojiEmotions sx={{ fontSize: '80%' }} />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="下書きを削除" arrow placement="top" enterDelay={500}>
+                        <span>
+                            <IconButton
+                                sx={{
+                                    color: theme.palette.text.secondary
+                                }}
+                                onClick={() => {
+                                    if (draft.length === 0) return
+                                    enqueueSnackbar('Draft Cleared.', {
+                                        autoHideDuration: 5000,
+                                        action: (key) => (
+                                            <Button
+                                                onClick={() => {
+                                                    closeSnackbar(key)
+                                                    setDraft(draft)
+                                                }}
+                                            >
+                                                undo
+                                            </Button>
+                                        )
+                                    })
+                                    setDraft('')
+                                }}
+                                disabled={draft.length === 0}
+                            >
+                                <DeleteIcon sx={{ fontSize: '80%' }} />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
                 </Box>
                 <Box
                     sx={{
@@ -325,7 +356,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             }}
                             endIcon={<SendIcon />}
                         >
-                            {props.submitButtonLabel ?? 'SEND'}
+                            {props.submitButtonLabel ?? 'POST'}
                         </Button>
                         {sending && (
                             <CircularProgress
