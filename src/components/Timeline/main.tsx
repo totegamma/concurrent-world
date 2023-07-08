@@ -92,7 +92,8 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                                 case 'message':
                                     element = (
                                         <MessageContainer
-                                            message={e}
+                                            messageID={e.id}
+                                            messageOwner={e.author}
                                             lastUpdated={e.LastUpdated}
                                             after={
                                                 <Divider variant="inset" component="li" sx={{ margin: '8px 4px' }} />

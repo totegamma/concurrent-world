@@ -1,5 +1,5 @@
 import { Schemas } from '../../schemas'
-import type { Message as CCMessage, StreamElement } from '../../model'
+import type { Message } from '../../model'
 import { useApi } from '../../context/api'
 import { createContext, memo, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { MessageFrame } from './Message/MessageFrame'
@@ -31,7 +31,8 @@ export function useMessageService(): MessageServiceState {
 }
 
 interface MessageContainerProps {
-    message: StreamElement
+    messageID: string
+    messageOwner: string
     lastUpdated: number
     after: JSX.Element | undefined
 }
@@ -40,11 +41,12 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
     const api = useApi()
     const inspector = useInspector()
     const messageDetail = useMessageDetail()
-    const [message, setMessage] = useState<CCMessage<SimpleNote | ReplyMessage | ReRouteMessage> | undefined>()
+    const [message, setMessage] = useState<Message<SimpleNote | ReplyMessage | ReRouteMessage> | undefined>()
     const [isFetching, setIsFetching] = useState<boolean>(false)
 
     const loadMessage = useCallback((): void => {
-        api.fetchMessage(props.message.id, props.message.currenthost)
+        console.log(props.messageOwner)
+        api.fetchMessageWithAuthor(props.messageID, props.messageOwner)
             .then((msg) => {
                 if (!msg) return
                 setMessage(msg)
@@ -55,12 +57,12 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
             .finally(() => {
                 setIsFetching(false)
             })
-    }, [props.message.id, props.message.currenthost])
+    }, [props.messageID, props.messageOwner])
 
     const reloadMessage = useCallback((): void => {
-        api.invalidateMessage(props.message.id)
+        api.invalidateMessage(props.messageID)
         loadMessage()
-    }, [api, props.message.id])
+    }, [api, props.messageID])
 
     const addFavorite = useCallback(async () => {
         if (!message) return
@@ -119,7 +121,7 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
 
     useEffect(() => {
         loadMessage()
-    }, [props.message, props.lastUpdated])
+    }, [props.messageID, props.messageOwner, props.lastUpdated])
 
     const services = useMemo(() => {
         return {
