@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, memo } from 'react'
-import { ListItem, Typography, useTheme } from '@mui/material'
+import { useState, useEffect, useCallback } from 'react'
+import { useTheme } from '@mui/material'
 
 import type { Character, Message as CCMessage, ProfileWithAddress, Stream, CCID } from '../../../model'
 import type { Profile } from '../../../schemas/profile'
@@ -14,16 +14,16 @@ import { MessageSkeleton } from '../../MessageSkeleton'
 
 export interface MessageFrameProp {
     message: CCMessage<any>
+    reloadMessage: () => void
     lastUpdated: number
     variant?: 'default' | 'thin' | 'oneline'
 }
 
-export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JSX.Element => {
+export const MessageFrame = (props: MessageFrameProp): JSX.Element => {
     const api = useApi()
     const inspector = useInspector()
     const messageDetail = useMessageDetail()
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
-    const [message, setMessage] = useState<CCMessage<any> | undefined>()
     const [msgStreams, setStreams] = useState<Array<Stream<any>>>([])
     const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
     const [messageAnchor, setMessageAnchor] = useState<null | HTMLElement>(null)
@@ -34,10 +34,7 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
 
     const [hasOwnReaction, setHasOwnReaction] = useState<boolean>(false)
 
-    const [fetchSuccess, setFetchSucceed] = useState<boolean>(true)
-
     useEffect(() => {
-        setMessage(props.message)
         Promise.all(props.message.streams.map(async (id) => await api.readStream(id))).then((e) => {
             setStreams(e.filter((x) => x?.payload.body.name) as Array<Stream<any>>)
         })
@@ -54,7 +51,8 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
         // TODO: まとめてfetchする
         const fetchEmojiUsers = async (): Promise<any> => {
             const authors =
-                message?.associations.filter((e) => e.schema === Schemas.emojiAssociation).map((m) => m.author) ?? []
+                props.message?.associations.filter((e) => e.schema === Schemas.emojiAssociation).map((m) => m.author) ??
+                []
 
             const users = await Promise.all(
                 authors.map((ccaddress) =>
@@ -70,10 +68,11 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
         }
 
         const fetchUsers = async (): Promise<any> => {
-            const authors = message?.associations.filter((e) => e.schema === Schemas.like).map((m) => m.author) ?? []
+            const authors =
+                props.message?.associations.filter((e) => e.schema === Schemas.like).map((m) => m.author) ?? []
 
             if (
-                message?.associations
+                props.message?.associations
                     .filter((a) => a.schema === Schemas.like)
                     .find((e) => e.author === api.userAddress) != null
             ) {
@@ -96,43 +95,33 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
 
         fetchUsers()
         fetchEmojiUsers()
-    }, [message?.associations])
-
-    const reloadMessage = useCallback(async () => {
-        try {
-            console.log('reload message')
-            const newMessage = await api.fetchMessageWithAuthor(props.message.id, props.message.author)
-            setMessage(newMessage)
-            setFetchSucceed(true)
-        } catch (error) {
-            setFetchSucceed(false)
-        }
-    }, [props.message.id, props.message.author])
+    }, [props.message?.associations])
 
     const unfavorite = useCallback(async (deletekey: string | undefined, author: CCID): Promise<void> => {
         if (!deletekey) return
         await api.unFavoriteMessage(deletekey, author)
         // 後々消す
-        reloadMessage()
+        props.reloadMessage()
     }, [])
 
-    if (!fetchSuccess) {
-        return (
-            <ListItem sx={{ display: 'flex', justifyContent: 'center' }} disablePadding disableGutters>
-                <Typography variant="caption" color="text.disabled">
-                    404 not found
-                </Typography>
-            </ListItem>
-        )
-    }
+    const deleteMessage = useCallback(
+        (deletekey: string): void => {
+            api.deleteMessage(deletekey).then(() => {
+                api.invalidateMessage(deletekey)
+                props.reloadMessage()
+            })
+            setMessageAnchor(null)
+        },
+        [api]
+    )
 
-    if (!message?.payload?.body) return <MessageSkeleton />
+    if (!props.message?.payload?.body) return <MessageSkeleton />
 
     switch (props.variant) {
         case 'thin':
             return (
                 <ThinMessageView
-                    message={message}
+                    message={props.message}
                     author={author}
                     reactUsers={reactUsers}
                     theme={theme}
@@ -145,13 +134,12 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                     unfavorite={() => {}}
                     favorite={async () => {}}
                     setMessageAnchor={setMessageAnchor}
-                    setFetchSucceed={setFetchSucceed}
                 />
             )
         case 'oneline':
             return (
                 <OneLineMessageView
-                    message={message}
+                    message={props.message}
                     author={author}
                     reactUsers={reactUsers}
                     theme={theme}
@@ -164,14 +152,13 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                     unfavorite={() => {}}
                     favorite={async () => {}}
                     setMessageAnchor={setMessageAnchor}
-                    setFetchSucceed={setFetchSucceed}
                 />
             )
 
         default:
             return (
                 <MessageView
-                    message={message}
+                    message={props.message}
                     author={author}
                     reactUsers={reactUsers}
                     emojiUsers={emojiUsers}
@@ -182,25 +169,26 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                     messageAnchor={messageAnchor}
                     api={api}
                     inspectHandler={() => {
-                        inspector.inspectItem({ messageId: message.id, author: message.author })
+                        inspector.inspectItem({ messageId: props.message.id, author: props.message.author })
                     }}
                     handleReply={async () => {
-                        messageDetail.openAction('reply', message?.id || '', message?.author || '')
+                        messageDetail.openAction('reply', props.message?.id || '', props.message?.author || '')
                     }}
                     handleReRoute={async () => {
-                        messageDetail.openAction('reroute', message.id, message?.author)
+                        messageDetail.openAction('reroute', props.message.id, props.message?.author)
                     }}
                     unfavorite={() => {
                         unfavorite(
-                            message.associations.find((e) => e.author === api.userAddress && e.schema === Schemas.like)
-                                ?.id,
-                            message.author
+                            props.message.associations.find(
+                                (e) => e.author === api.userAddress && e.schema === Schemas.like
+                            )?.id,
+                            props.message.author
                         )
                     }}
                     favorite={async () => {
                         await api.favoriteMessage(props.message.id, props.message.author)
                         // 後々消す
-                        reloadMessage()
+                        props.reloadMessage()
                     }}
                     addMessageReaction={async (emoji) => {
                         await api.addMessageReaction(
@@ -210,19 +198,17 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
                             emoji.src
                         )
                         // 後々消す
-                        reloadMessage()
+                        props.reloadMessage()
                     }}
                     removeMessageReaction={async (id: string) => {
                         await api.unFavoriteMessage(id, props.message.author)
                         // 後々消す
-                        reloadMessage()
+                        props.reloadMessage()
                     }}
                     setMessageAnchor={setMessageAnchor}
                     setEmojiPickerAnchor={setEmojiPickerAnchor}
-                    setFetchSucceed={setFetchSucceed}
+                    deleteMessage={deleteMessage}
                 />
             )
     }
-})
-
-MessageFrame.displayName = 'MessageFrame'
+}

@@ -97,9 +97,9 @@ export const Default = (arg: Props): JSX.Element => {
                                         favorite={async () => {}}
                                         setMessageAnchor={setMessageAnchor}
                                         setEmojiPickerAnchor={setEmojiPickerAnchor}
-                                        setFetchSucceed={(success: boolean) => {}}
                                         addMessageReaction={async (emoji: EmojiProps) => {}}
                                         removeMessageReaction={async (_id: string) => {}}
+                                        deleteMessage={(_id) => {}}
                                     />
                                 </Paper>
                             </ThemeProvider>

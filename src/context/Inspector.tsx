@@ -118,7 +118,13 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                     >
                         <Typography variant="h1">Inspect</Typography>
                         <Paper sx={{ m: '10px 0', p: '0 20px' }} elevation={0} variant="outlined">
-                            <MessageFrame message={message} lastUpdated={0} />
+                            <MessageFrame
+                                message={message}
+                                lastUpdated={0}
+                                reloadMessage={() => {
+                                    /* TODO */
+                                }}
+                            />
                         </Paper>
                         {signatureIsValid ? (
                             <Alert severity="success">Signature is valid!</Alert>

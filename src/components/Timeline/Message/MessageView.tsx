@@ -47,8 +47,8 @@ export interface MessageViewProps {
     removeMessageReaction: (id: string) => Promise<void>
     setMessageAnchor: (anchor: null | HTMLElement) => void
     setEmojiPickerAnchor: (anchor: null | HTMLElement) => void
-    setFetchSucceed: (fetchSucceed: boolean) => void
     beforeMessage?: JSX.Element
+    deleteMessage: (id: string) => void
 }
 
 export const MessageView = (props: MessageViewProps): JSX.Element => {
@@ -158,10 +158,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                 {props.message.author === props.api.userAddress && (
                     <MenuItem
                         onClick={() => {
-                            props.api.deleteMessage(props.message.id)
-                            props.api.invalidateMessage(props.message.id)
-                            props.setFetchSucceed(false)
-                            props.setMessageAnchor(null)
+                            props.deleteMessage(props.message.id)
                         }}
                     >
                         <ListItemIcon>

@@ -2,7 +2,7 @@ import { Box, Divider, Paper, Typography } from '@mui/material'
 import { MessageFrame } from '../components/Timeline'
 import { useApi } from '../context/api'
 import { useParams } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { type Message } from '../model'
 
 export function MessagePage(): JSX.Element {
@@ -13,12 +13,22 @@ export function MessagePage(): JSX.Element {
 
     const [message, setMessage] = useState<Message<any> | undefined>()
 
-    useEffect(() => {
+    const loadMessage = useCallback(() => {
         if (!messageID || !authorID) return
         api.fetchMessageWithAuthor(messageID, authorID).then((msg) => {
             if (!msg) return
             setMessage(msg)
         })
+    }, [messageID, authorID])
+
+    const reloadMessage = useCallback(() => {
+        if (!messageID) return
+        api.invalidateMessage(messageID)
+        loadMessage()
+    }, [messageID, loadMessage])
+
+    useEffect(() => {
+        loadMessage()
     }, [messageID, authorID])
 
     return (
@@ -39,7 +49,7 @@ export function MessagePage(): JSX.Element {
             <Divider />
             {message ? (
                 <Paper sx={{ m: '10px 0', p: '0 20px' }} elevation={0} variant="outlined">
-                    <MessageFrame message={message} lastUpdated={0} />
+                    <MessageFrame message={message} lastUpdated={0} reloadMessage={reloadMessage} />
                 </Paper>
             ) : (
                 <Typography variant="body1" gutterBottom>

@@ -22,7 +22,6 @@ export interface MessageViewProps {
     unfavorite: () => void
     favorite: () => Promise<void>
     setMessageAnchor: (anchor: null | HTMLElement) => void
-    setFetchSucceed: (fetchSucceed: boolean) => void
 }
 
 export const OneLineMessageView = (props: MessageViewProps): JSX.Element => {

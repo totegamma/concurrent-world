@@ -299,7 +299,14 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
             return (
                 <>
                     {replyMessage && (
-                        <MessageFrame message={replyMessage} lastUpdated={1} variant="oneline"></MessageFrame>
+                        <MessageFrame
+                            message={replyMessage}
+                            lastUpdated={1}
+                            variant="oneline"
+                            reloadMessage={() => {
+                                /* TODO */
+                            }}
+                        ></MessageFrame>
                     )}
                     {message && (
                         <MessageView
@@ -334,12 +341,10 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                             favorite={() => favorite({ ...message })}
                             setMessageAnchor={setMessageAnchor}
                             setEmojiPickerAnchor={setEmojiPickerAnchor}
-                            setFetchSucceed={() => {
-                                return true
-                            }}
                             removeMessageReaction={async (id) => {
                                 api.unFavoriteMessage(id, message.author)
                             }}
+                            deleteMessage={(_id) => {}}
                         />
                     )}
                     {props.after}
@@ -357,7 +362,13 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
             }
             return (
                 <>
-                    <ReRouteMessageFrame message={reRouteMessage} lastUpdated={0} />
+                    <ReRouteMessageFrame
+                        message={reRouteMessage}
+                        lastUpdated={0}
+                        reloadMessage={() => {
+                            /* TODO */
+                        }}
+                    />
                     {props.after}
                 </>
             )

@@ -13,11 +13,12 @@ import { TimeDiff } from '../../TimeDiff'
 
 export interface ReRouteMessageFrameProp {
     message: CCMessage<any>
+    reloadMessage: () => void
     lastUpdated: number
     thin?: boolean
 }
 
-export const ReRouteMessageFrame = memo<ReRouteMessageFrameProp>((props: ReRouteMessageFrameProp): JSX.Element => {
+export const ReRouteMessageFrame = (props: ReRouteMessageFrameProp): JSX.Element => {
     const api = useApi()
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
 
@@ -89,7 +90,7 @@ export const ReRouteMessageFrame = memo<ReRouteMessageFrameProp>((props: ReRoute
             </Box>
             {reRouteMessage ? (
                 <Box>
-                    <MessageFrame message={reRouteMessage} lastUpdated={0}></MessageFrame>
+                    <MessageFrame message={reRouteMessage} lastUpdated={0} reloadMessage={props.reloadMessage} />
                 </Box>
             ) : (
                 <Typography color="text.disabled" fontWeight="700">
@@ -98,6 +99,4 @@ export const ReRouteMessageFrame = memo<ReRouteMessageFrameProp>((props: ReRoute
             )}
         </>
     )
-})
-
-ReRouteMessageFrame.displayName = 'ReRouteMessageFrame'
+}

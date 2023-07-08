@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, memo } from 'react'
-import { ListItem, Box, Typography, useTheme, Chip } from '@mui/material'
+import { useState, useEffect, useCallback } from 'react'
+import { Box, useTheme, Chip } from '@mui/material'
 
 import type { Character, Message as CCMessage, ProfileWithAddress, Stream, CCID } from '../../../model'
 import type { Profile } from '../../../schemas/profile'
@@ -13,15 +13,15 @@ import { MessageSkeleton } from '../../MessageSkeleton'
 
 export interface MessageFrameProp {
     message: CCMessage<any>
+    reloadMessage: () => void
     lastUpdated: number
 }
 
-export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JSX.Element => {
+export const ReplyMessageFrame = (props: MessageFrameProp): JSX.Element => {
     const api = useApi()
     const inspector = useInspector()
     const messageDetail = useMessageDetail()
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
-    const [message, setMessage] = useState<CCMessage<any> | undefined>()
     const [replyMessage, setReplyMessage] = useState<CCMessage<any> | undefined>()
     const [replyMessageAuthor, setReplyMessageAuthor] = useState<Character<Profile> | undefined>()
     const [msgStreams, setStreams] = useState<Array<Stream<any>>>([])
@@ -34,10 +34,7 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
 
     const [hasOwnReaction, setHasOwnReaction] = useState<boolean>(false)
 
-    const [fetchSuccess, setFetchSucceed] = useState<boolean>(true)
-
     useEffect(() => {
-        setMessage(props.message)
         Promise.all(props.message.streams.map(async (id) => await api.readStream(id))).then((e) => {
             setStreams(e.filter((x) => x?.payload.body.name) as Array<Stream<any>>)
         })
@@ -72,7 +69,8 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
         // TODO: まとめてfetchする
         const fetchEmojiUsers = async (): Promise<any> => {
             const authors =
-                message?.associations.filter((e) => e.schema === Schemas.emojiAssociation).map((m) => m.author) ?? []
+                props.message?.associations.filter((e) => e.schema === Schemas.emojiAssociation).map((m) => m.author) ??
+                []
 
             const users = await Promise.all(
                 authors.map((ccaddress) =>
@@ -88,10 +86,11 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
         }
 
         const fetchUsers = async (): Promise<any> => {
-            const authors = message?.associations.filter((e) => e.schema === Schemas.like).map((m) => m.author) ?? []
+            const authors =
+                props.message?.associations.filter((e) => e.schema === Schemas.like).map((m) => m.author) ?? []
 
             if (
-                message?.associations
+                props.message?.associations
                     .filter((a) => a.schema === Schemas.like)
                     .find((e) => e.author === api.userAddress) != null
             ) {
@@ -114,31 +113,28 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
 
         fetchUsers()
         fetchEmojiUsers()
-    }, [message?.associations, props.lastUpdated])
+    }, [props.message?.associations, props.lastUpdated])
 
     const unfavorite = useCallback(async (deletekey: string | undefined, author: CCID): Promise<void> => {
         if (!deletekey) return
         await api.unFavoriteMessage(deletekey, author)
     }, [])
 
-    if (!fetchSuccess) {
-        return (
-            <ListItem sx={{ display: 'flex', justifyContent: 'center' }} disablePadding disableGutters>
-                <Typography variant="caption" color="text.disabled">
-                    404 not found
-                </Typography>
-            </ListItem>
-        )
-    }
-
-    if (!message?.payload?.body) return <MessageSkeleton />
+    if (!props.message?.payload?.body) return <MessageSkeleton />
 
     return (
         <>
-            {replyMessage && <MessageFrame message={replyMessage} lastUpdated={1} variant="oneline"></MessageFrame>}
+            {replyMessage && (
+                <MessageFrame
+                    message={replyMessage}
+                    lastUpdated={1}
+                    variant="oneline"
+                    reloadMessage={props.reloadMessage}
+                ></MessageFrame>
+            )}
             <Box>
                 <MessageView
-                    message={message}
+                    message={props.message}
                     author={author}
                     reactUsers={reactUsers}
                     emojiUsers={emojiUsers}
@@ -148,16 +144,19 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
                     messageAnchor={messageAnchor}
                     api={api}
                     inspectHandler={() => {
-                        inspector.inspectItem({ messageId: message.id, author: message.author })
+                        inspector.inspectItem({ messageId: props.message.id, author: props.message.author })
                     }}
                     handleReply={async () => {
-                        messageDetail.openAction('reply', message?.id || '', message?.author || '')
+                        messageDetail.openAction('reply', props.message?.id || '', props.message?.author || '')
                     }}
                     handleReRoute={async () => {
-                        messageDetail.openAction('reroute', message.id, message?.author)
+                        messageDetail.openAction('reroute', props.message.id, props.message?.author)
                     }}
                     unfavorite={() => {
-                        unfavorite(message.associations.find((e) => e.author === api.userAddress)?.id, message.author)
+                        unfavorite(
+                            props.message.associations.find((e) => e.author === api.userAddress)?.id,
+                            props.message.author
+                        )
                     }}
                     favorite={() => api.favoriteMessage(props.message.id, props.message.author)}
                     addMessageReaction={async (emoji) => {
@@ -174,7 +173,6 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
                     emojiPickerAnchor={emojiPickerAnchor}
                     setMessageAnchor={setMessageAnchor}
                     setEmojiPickerAnchor={setEmojiPickerAnchor}
-                    setFetchSucceed={setFetchSucceed}
                     beforeMessage={
                         <Chip
                             label={`@${replyMessageAuthor?.payload.body.username || 'anonymous'}`}
@@ -182,10 +180,9 @@ export const ReplyMessageFrame = memo<MessageFrameProp>((props: MessageFrameProp
                             sx={{ width: 'fit-content', mb: 1 }}
                         />
                     }
+                    deleteMessage={() => {}}
                 />
             </Box>
         </>
     )
-})
-
-ReplyMessageFrame.displayName = 'MessageFrame'
+}

@@ -115,7 +115,14 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
                     }}
                 >
                     <Paper sx={style}>
-                        <MessageFrame variant="thin" message={message} lastUpdated={0}></MessageFrame>
+                        <MessageFrame
+                            variant="thin"
+                            message={message}
+                            lastUpdated={0}
+                            reloadMessage={() => {
+                                /* TODO */
+                            }}
+                        />
                         <Divider />
                         <Box sx={{ display: 'flex' }}>
                             <Draft
