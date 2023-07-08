@@ -51,11 +51,11 @@ export const ReplyMessageFrame = (props: ReplyMessageFrameProp): JSX.Element => 
                     message={replyMessage}
                     reloadMessage={props.reloadMessage}
                     variant="oneline"
-                    author={props.author}
+                    author={replyMessageAuthor}
                     userCCID={api.userAddress}
-                    streams={props.streams}
-                    favoriteUsers={props.favoriteUsers}
-                    reactionUsers={props.reactionUsers}
+                    streams={[]}
+                    favoriteUsers={[]}
+                    reactionUsers={[]}
                 ></MessageFrame>
             )}
             <Box>
