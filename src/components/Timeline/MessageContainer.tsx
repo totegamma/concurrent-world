@@ -46,7 +46,6 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
     const [isFetching, setIsFetching] = useState<boolean>(false)
 
     const loadMessage = useCallback((): void => {
-        console.log(props.messageOwner)
         api.fetchMessageWithAuthor(props.messageID, props.messageOwner)
             .then((msg) => {
                 if (!msg) return

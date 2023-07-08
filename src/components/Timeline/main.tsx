@@ -16,6 +16,8 @@ export interface TimelineProps {
     scrollParentRef: RefObject<HTMLDivElement>
 }
 
+const divider = <Divider variant="inset" component="li" sx={{ margin: '8px 4px' }} />
+
 export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element => {
     const api = useApi()
     const [hasMoreData, setHasMoreData] = useState<boolean>(false)
@@ -95,21 +97,13 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                                             messageID={e.id}
                                             messageOwner={e.author}
                                             lastUpdated={e.LastUpdated}
-                                            after={
-                                                <Divider variant="inset" component="li" sx={{ margin: '8px 4px' }} />
-                                            }
+                                            after={divider}
                                         />
                                     )
                                     break
                                 case 'association':
                                     element = (
-                                        <AssociationFrame
-                                            association={e}
-                                            lastUpdated={e.LastUpdated}
-                                            after={
-                                                <Divider variant="inset" component="li" sx={{ margin: '8px 4px' }} />
-                                            }
-                                        />
+                                        <AssociationFrame association={e} lastUpdated={e.LastUpdated} after={divider} />
                                     )
                                     break
                                 default:
