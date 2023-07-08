@@ -7,7 +7,7 @@ import type { StreamElement, StreamElementDated } from '../../model'
 import { useApi } from '../../context/api'
 import { InspectorProvider } from '../../context/Inspector'
 import { Loading } from '../Loading'
-import { MessageMultiplexer } from './Multiplexer'
+import { MessageContainer } from './MessageContainer'
 import { MessageDetailProvider } from '../../context/MessageDetail'
 
 export interface TimelineProps {
@@ -91,7 +91,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                             switch (e.type) {
                                 case 'message':
                                     element = (
-                                        <MessageMultiplexer
+                                        <MessageContainer
                                             message={e}
                                             lastUpdated={e.LastUpdated}
                                             after={

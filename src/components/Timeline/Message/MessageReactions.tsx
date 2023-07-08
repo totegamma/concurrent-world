@@ -6,7 +6,7 @@ import { Schemas } from '../../../schemas'
 import { useApi } from '../../../context/api'
 import { CCAvatar } from '../../CCAvatar'
 import { Fragment } from 'react'
-import { useMessageService } from '../Multiplexer'
+import { useMessageService } from '../MessageContainer'
 
 export interface MessageReactionsProps {
     message: CCMessage<TypeSimpleNote | ReplyMessage>

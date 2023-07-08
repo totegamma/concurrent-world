@@ -30,13 +30,13 @@ export function useMessageService(): MessageServiceState {
     return useContext(MessageServiceContext) as MessageServiceState
 }
 
-interface MultiplexerProps {
+interface MessageContainerProps {
     message: StreamElement
     lastUpdated: number
     after: JSX.Element | undefined
 }
 
-export const MessageMultiplexer = memo<MultiplexerProps>((props: MultiplexerProps): JSX.Element | null => {
+export const MessageContainer = memo<MessageContainerProps>((props: MessageContainerProps): JSX.Element | null => {
     const api = useApi()
     const inspector = useInspector()
     const messageDetail = useMessageDetail()
@@ -171,4 +171,4 @@ export const MessageMultiplexer = memo<MultiplexerProps>((props: MultiplexerProp
     )
 })
 
-MessageMultiplexer.displayName = 'MessageMultiplexer'
+MessageContainer.displayName = 'MessageContainer'
