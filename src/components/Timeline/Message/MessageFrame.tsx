@@ -11,7 +11,7 @@ import { MessageSkeleton } from '../../MessageSkeleton'
 export interface MessageFrameProp {
     message: CCMessage<any>
     reloadMessage: () => void
-    lastUpdated: number
+    lastUpdated?: number
     variant?: 'default' | 'thin' | 'oneline'
 }
 

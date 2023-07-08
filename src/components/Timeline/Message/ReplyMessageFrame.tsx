@@ -6,16 +6,16 @@ import type { Profile } from '../../../schemas/profile'
 import { Schemas } from '../../../schemas'
 import { useApi } from '../../../context/api'
 import { MessageView } from './MessageView'
-import { MessageFrame } from './MessageFrame'
 import { MessageSkeleton } from '../../MessageSkeleton'
+import { MessageFrame } from './MessageFrame'
 
-export interface MessageFrameProp {
+export interface ReplyMessageFrameProp {
     message: CCMessage<any>
     reloadMessage: () => void
-    lastUpdated: number
+    lastUpdated?: number
 }
 
-export const ReplyMessageFrame = (props: MessageFrameProp): JSX.Element => {
+export const ReplyMessageFrame = (props: ReplyMessageFrameProp): JSX.Element => {
     const api = useApi()
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [replyMessage, setReplyMessage] = useState<CCMessage<any> | undefined>()
@@ -114,9 +114,8 @@ export const ReplyMessageFrame = (props: MessageFrameProp): JSX.Element => {
             {replyMessage && (
                 <MessageFrame
                     message={replyMessage}
-                    lastUpdated={1}
-                    variant="oneline"
                     reloadMessage={props.reloadMessage}
+                    variant="oneline"
                 ></MessageFrame>
             )}
             <Box>

@@ -4,11 +4,11 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { useApi } from './api'
 import type { CCID, Message } from '../model'
 import { Schemas } from '../schemas'
-import { MessageFrame } from '../components/Timeline'
 import type { ReplyMessage } from '../schemas/replyMessage'
 import type { ReplyAssociation } from '../schemas/replyAssociation'
 import { ApplicationContext } from '../App'
 import { Draft } from '../components/Draft'
+import { MessageFrame } from '../components/Timeline/Message/MessageFrame'
 
 export interface MessageDetailState {
     showingMessage: { messageId: string; author: CCID } | null

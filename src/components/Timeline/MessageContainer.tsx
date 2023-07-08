@@ -33,8 +33,8 @@ export function useMessageService(): MessageServiceState {
 interface MessageContainerProps {
     messageID: string
     messageOwner: string
-    lastUpdated: number
-    after: JSX.Element | undefined
+    lastUpdated?: number
+    after?: JSX.Element | undefined
 }
 
 export const MessageContainer = memo<MessageContainerProps>((props: MessageContainerProps): JSX.Element | null => {
