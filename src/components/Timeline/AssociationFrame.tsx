@@ -11,6 +11,7 @@ import { MessageView } from './Message/MessageView'
 import { useInspector } from '../../context/Inspector'
 import { useMessageDetail } from '../../context/MessageDetail'
 import { ReRouteMessageFrame } from './Message/ReRouteMessageFrame'
+import { MessageSkeleton } from '../MessageSkeleton'
 
 export interface AssociationFrameProp {
     association: StreamElement
@@ -25,6 +26,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [message, setMessage] = useState<Message<any> | undefined>()
     const [association, setAssociation] = useState<Association<any> | undefined>()
+    const [fetching, setFetching] = useState<boolean>(true)
 
     // TODO いずれ消す
     const [replyMessage, setReplyMessage] = useState<Message<any> | undefined>()
@@ -41,45 +43,49 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     const [emojiUsers, setEmojiUsers] = useState<ProfileWithAddress[]>([])
 
     useEffect(() => {
-        api.fetchAssociation(props.association.id, props.association.currenthost).then((a) => {
-            if (!a) return
-            setAssociation(a)
+        api.fetchAssociation(props.association.id, props.association.currenthost)
+            .then((a) => {
+                if (!a) return
+                setAssociation(a)
 
-            if (a?.schema === Schemas.replyAssociation) {
-                console.log('as', a.payload.body)
+                if (a?.schema === Schemas.replyAssociation) {
+                    api.fetchMessageWithAuthor(a.payload.body.messageId, a.author).then((m) => {
+                        setMessage(m)
+                    })
 
-                api.fetchMessageWithAuthor(a.payload.body.messageId, a.author).then((m) => {
+                    api.fetchMessageWithAuthor(a.targetID, a.payload.body.messageAuthor).then((m) => {
+                        setReplyMessage(m)
+                    })
+
+                    api.readCharacter(a.payload.body.messageAuthor, Schemas.profile).then((author) => {
+                        setAuthor(author)
+                    })
+
+                    return
+                }
+
+                if (a?.schema === Schemas.reRouteAssociation) {
+                    api.fetchMessageWithAuthor(a.payload.body.messageId, a.payload.body.messageAuthor).then((m) => {
+                        setReRouteMessage(m)
+                    })
+                    return
+                }
+
+                api.fetchMessage(a.targetID, props.association.currenthost).then((m) => {
                     setMessage(m)
-                })
-
-                api.fetchMessageWithAuthor(a.targetID, a.payload.body.messageAuthor).then((m) => {
-                    setReplyMessage(m)
-                })
-
-                api.readCharacter(a.payload.body.messageAuthor, Schemas.profile).then((author) => {
-                    setAuthor(author)
-                })
-
-                return
-            }
-
-            if (a?.schema === Schemas.reRouteAssociation) {
-                console.log('ass', a)
-                api.fetchMessageWithAuthor(a.payload.body.messageId, a.payload.body.messageAuthor).then((m) => {
-                    setReRouteMessage(m)
-                })
-                return
-            }
-
-            api.fetchMessage(a.targetID, props.association.currenthost).then((m) => {
-                setMessage(m)
-                if (!m) return
-                const isMeToOther = a.author !== api.userAddress
-                api.readCharacter(isMeToOther ? a.author : m.author, Schemas.profile).then((author) => {
-                    setAuthor(author)
+                    if (!m) return
+                    const isMeToOther = a.author !== api.userAddress
+                    api.readCharacter(isMeToOther ? a.author : m.author, Schemas.profile).then((author) => {
+                        setAuthor(author)
+                    })
                 })
             })
-        })
+            .catch((_e) => {
+                setAssociation(undefined)
+            })
+            .finally(() => {
+                setFetching(false)
+            })
     }, [])
 
     useEffect(() => {
@@ -124,17 +130,16 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     const unfavorite = useCallback(
         (deletekey: string | undefined, author: string): void => {
             if (!deletekey) return
-            console.log(deletekey, author)
             api.unFavoriteMessage(deletekey, author).then(() => {
-                console.log('hogehoge!')
                 api.fetchMessageWithAuthor(association?.payload.body.messageId, association?.author ?? '').then((m) => {
-                    console.log('message', m)
                     setMessage(m)
                 })
             })
         },
         [association, message]
     )
+
+    if (fetching) return <MessageSkeleton />
 
     if (!association) {
         return (

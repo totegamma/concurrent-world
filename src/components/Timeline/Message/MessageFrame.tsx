@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, memo } from 'react'
-import { ListItem, Box, Typography, useTheme, Skeleton } from '@mui/material'
+import { ListItem, Typography, useTheme } from '@mui/material'
 
 import type { Character, Message as CCMessage, ProfileWithAddress, Stream, CCID } from '../../../model'
 import type { Profile } from '../../../schemas/profile'
@@ -10,6 +10,7 @@ import { MessageView } from './MessageView'
 import { ThinMessageView } from './ThinMessageView'
 import { OneLineMessageView } from './OneLineMessageView'
 import { useMessageDetail } from '../../../context/MessageDetail'
+import { MessageSkeleton } from '../../MessageSkeleton'
 
 export interface MessageFrameProp {
     message: CCMessage<any>
@@ -125,25 +126,7 @@ export const MessageFrame = memo<MessageFrameProp>((props: MessageFrameProp): JS
         )
     }
 
-    if (!message?.payload?.body) {
-        return (
-            <ListItem
-                sx={{
-                    alignItems: 'flex-start',
-                    flex: 1,
-                    p: { xs: '7px 0', sm: '10px 0' },
-                    height: 105,
-                    gap: '10px'
-                }}
-            >
-                <Skeleton animation="wave" variant="circular" width={40} height={40} />
-                <Box sx={{ flex: 1 }}>
-                    <Skeleton animation="wave" />
-                    <Skeleton animation="wave" height={80} />
-                </Box>
-            </ListItem>
-        )
-    }
+    if (!message?.payload?.body) return <MessageSkeleton />
 
     switch (props.variant) {
         case 'thin':

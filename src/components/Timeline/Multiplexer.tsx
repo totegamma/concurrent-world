@@ -8,6 +8,7 @@ import { type SimpleNote } from '../../schemas/simpleNote'
 import { type ReplyMessage } from '../../schemas/replyMessage'
 import { type ReRouteMessage } from '../../schemas/reRouteMessage'
 import { ReRouteMessageFrame } from './Message/ReRouteMessageFrame'
+import { MessageSkeleton } from '../MessageSkeleton'
 
 interface MultiplexerProps {
     message: StreamElement
@@ -29,7 +30,7 @@ export const MessageMultiplexer = (props: MultiplexerProps): JSX.Element => {
             })
     }, [props.message, props.lastUpdated])
 
-    if (!message) return <></>
+    if (!message) return <MessageSkeleton />
 
     switch (message?.schema) {
         case Schemas.simpleNote:
