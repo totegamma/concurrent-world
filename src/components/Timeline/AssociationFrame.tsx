@@ -8,8 +8,6 @@ import { Link as routerLink } from 'react-router-dom'
 import { CCAvatar } from '../CCAvatar'
 import { MessageFrame } from './Message/MessageFrame'
 import { MessageView } from './Message/MessageView'
-import { useInspector } from '../../context/Inspector'
-import { useMessageDetail } from '../../context/MessageDetail'
 import { ReRouteMessageFrame } from './Message/ReRouteMessageFrame'
 import { MessageSkeleton } from '../MessageSkeleton'
 
@@ -21,8 +19,6 @@ export interface AssociationFrameProp {
 
 export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFrameProp): JSX.Element | null => {
     const api = useApi()
-    const inspector = useInspector()
-    const messageDetail = useMessageDetail()
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [message, setMessage] = useState<Message<any> | undefined>()
     const [association, setAssociation] = useState<Association<any> | undefined>()
@@ -30,7 +26,6 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
 
     // TODO いずれ消す
     const [replyMessage, setReplyMessage] = useState<Message<any> | undefined>()
-    const [messageAnchor, setMessageAnchor] = useState<null | HTMLElement>(null)
 
     const isMeToOther = association?.author !== api.userAddress
 
@@ -39,7 +34,6 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     // TODO いずれ消す
     const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
     const [hasOwnReaction, setHasOwnReaction] = useState<boolean>(false)
-    const [emojiPickerAnchor, setEmojiPickerAnchor] = useState<null | HTMLElement>(null)
     const [emojiUsers, setEmojiUsers] = useState<ProfileWithAddress[]>([])
 
     useEffect(() => {
@@ -316,10 +310,6 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                             emojiUsers={emojiUsers}
                             hasOwnReaction={hasOwnReaction}
                             msgstreams={[]}
-                            messageAnchor={messageAnchor}
-                            emojiPickerAnchor={emojiPickerAnchor}
-                            setMessageAnchor={setMessageAnchor}
-                            setEmojiPickerAnchor={setEmojiPickerAnchor}
                         />
                     )}
                     {props.after}

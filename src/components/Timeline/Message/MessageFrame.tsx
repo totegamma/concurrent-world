@@ -1,14 +1,11 @@
 import { useState, useEffect } from 'react'
-
 import type { Character, Message as CCMessage, ProfileWithAddress, Stream } from '../../../model'
 import type { Profile } from '../../../schemas/profile'
 import { Schemas } from '../../../schemas'
 import { useApi } from '../../../context/api'
-import { useInspector } from '../../../context/Inspector'
 import { MessageView } from './MessageView'
 import { ThinMessageView } from './ThinMessageView'
 import { OneLineMessageView } from './OneLineMessageView'
-import { useMessageDetail } from '../../../context/MessageDetail'
 import { MessageSkeleton } from '../../MessageSkeleton'
 
 export interface MessageFrameProp {
@@ -20,13 +17,9 @@ export interface MessageFrameProp {
 
 export const MessageFrame = (props: MessageFrameProp): JSX.Element => {
     const api = useApi()
-    const inspector = useInspector()
-    const messageDetail = useMessageDetail()
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [msgStreams, setStreams] = useState<Array<Stream<any>>>([])
     const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
-    const [messageAnchor, setMessageAnchor] = useState<null | HTMLElement>(null)
-    const [emojiPickerAnchor, setEmojiPickerAnchor] = useState<null | HTMLElement>(null)
     const [emojiUsers, setEmojiUsers] = useState<ProfileWithAddress[]>([])
 
     const [hasOwnReaction, setHasOwnReaction] = useState<boolean>(false)
@@ -101,32 +94,24 @@ export const MessageFrame = (props: MessageFrameProp): JSX.Element => {
             return (
                 <ThinMessageView
                     message={props.message}
+                    userCCID={api.userAddress}
                     author={author}
                     reactUsers={reactUsers}
                     emojiUsers={emojiUsers}
                     hasOwnReaction={hasOwnReaction}
                     msgstreams={msgStreams}
-                    messageAnchor={messageAnchor}
-                    emojiPickerAnchor={emojiPickerAnchor}
-                    userCCID={api.userAddress}
-                    setMessageAnchor={setMessageAnchor}
-                    setEmojiPickerAnchor={setEmojiPickerAnchor}
                 />
             )
         case 'oneline':
             return (
                 <OneLineMessageView
                     message={props.message}
+                    userCCID={api.userAddress}
                     author={author}
                     reactUsers={reactUsers}
                     emojiUsers={emojiUsers}
                     hasOwnReaction={hasOwnReaction}
                     msgstreams={msgStreams}
-                    messageAnchor={messageAnchor}
-                    emojiPickerAnchor={emojiPickerAnchor}
-                    userCCID={api.userAddress}
-                    setMessageAnchor={setMessageAnchor}
-                    setEmojiPickerAnchor={setEmojiPickerAnchor}
                 />
             )
 
@@ -134,16 +119,12 @@ export const MessageFrame = (props: MessageFrameProp): JSX.Element => {
             return (
                 <MessageView
                     message={props.message}
+                    userCCID={api.userAddress}
                     author={author}
                     reactUsers={reactUsers}
                     emojiUsers={emojiUsers}
                     hasOwnReaction={hasOwnReaction}
                     msgstreams={msgStreams}
-                    messageAnchor={messageAnchor}
-                    emojiPickerAnchor={emojiPickerAnchor}
-                    userCCID={api.userAddress}
-                    setMessageAnchor={setMessageAnchor}
-                    setEmojiPickerAnchor={setEmojiPickerAnchor}
                 />
             )
     }

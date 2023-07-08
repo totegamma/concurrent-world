@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { Box, Chip } from '@mui/material'
 
-import type { Character, Message as CCMessage, ProfileWithAddress, Stream, CCID } from '../../../model'
+import type { Character, Message as CCMessage, ProfileWithAddress, Stream } from '../../../model'
 import type { Profile } from '../../../schemas/profile'
 import { Schemas } from '../../../schemas'
 import { useApi } from '../../../context/api'
@@ -23,8 +23,6 @@ export const ReplyMessageFrame = (props: MessageFrameProp): JSX.Element => {
     const [msgStreams, setStreams] = useState<Array<Stream<any>>>([])
     const [reactUsers, setReactUsers] = useState<ProfileWithAddress[]>([])
     const [emojiUsers, setEmojiUsers] = useState<ProfileWithAddress[]>([])
-    const [messageAnchor, setMessageAnchor] = useState<null | HTMLElement>(null)
-    const [emojiPickerAnchor, setEmojiPickerAnchor] = useState<null | HTMLElement>(null)
 
     const [hasOwnReaction, setHasOwnReaction] = useState<boolean>(false)
 
@@ -109,11 +107,6 @@ export const ReplyMessageFrame = (props: MessageFrameProp): JSX.Element => {
         fetchEmojiUsers()
     }, [props.message?.associations, props.lastUpdated])
 
-    const unfavorite = useCallback(async (deletekey: string | undefined, author: CCID): Promise<void> => {
-        if (!deletekey) return
-        await api.unFavoriteMessage(deletekey, author)
-    }, [])
-
     if (!props.message?.payload?.body) return <MessageSkeleton />
 
     return (
@@ -135,10 +128,6 @@ export const ReplyMessageFrame = (props: MessageFrameProp): JSX.Element => {
                     emojiUsers={emojiUsers}
                     hasOwnReaction={hasOwnReaction}
                     msgstreams={msgStreams}
-                    messageAnchor={messageAnchor}
-                    emojiPickerAnchor={emojiPickerAnchor}
-                    setMessageAnchor={setMessageAnchor}
-                    setEmojiPickerAnchor={setEmojiPickerAnchor}
                     beforeMessage={
                         <Chip
                             label={`@${replyMessageAuthor?.payload.body.username || 'anonymous'}`}

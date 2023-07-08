@@ -1,4 +1,16 @@
-import { Box, IconButton, Link, Tooltip, Typography } from '@mui/material'
+import {
+    Box,
+    IconButton,
+    Link,
+    ListItemIcon,
+    ListItemText,
+    Menu,
+    MenuItem,
+    Popover,
+    type PopoverActions,
+    Tooltip,
+    Typography
+} from '@mui/material'
 import ReplyIcon from '@mui/icons-material/Reply'
 import { CCAvatar } from '../../CCAvatar'
 import StarIcon from '@mui/icons-material/Star'
@@ -10,22 +22,28 @@ import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown'
 import type { Stream, Message as CCMessage, ProfileWithAddress } from '../../../model'
 import { Schemas } from '../../../schemas'
 import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Collapse from '@mui/material/Collapse'
 import Fade from '@mui/material/Fade'
 import { useMessageService } from '../Multiplexer'
+import ContentPasteIcon from '@mui/icons-material/ContentPaste'
+import ManageSearchIcon from '@mui/icons-material/ManageSearch'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import { EmojiPicker } from '../../EmojiPicker'
+
 export interface MessageActionsProps {
     reactUsers: ProfileWithAddress[]
     hasOwnReaction: boolean
     message: CCMessage<TypeSimpleNote>
-    setMessageAnchor: (anchor: null | HTMLElement) => void
-    setEmojiPickerAnchor: (anchor: null | HTMLElement) => void
     msgstreams: Array<Stream<any>>
+    userCCID: string
 }
 
 export const MessageActions = (props: MessageActionsProps): JSX.Element => {
     const [streamListOpen, setStreamListOpen] = useState<boolean>(false)
-
+    const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
+    const [emojiPickerAnchor, setEmojiPickerAnchor] = useState<null | HTMLElement>(null)
+    const repositionEmojiPicker = useRef<PopoverActions | null>(null)
     const service = useMessageService()
 
     return (
@@ -135,7 +153,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                             color: 'text.secondary'
                         }}
                         onClick={(e) => {
-                            props.setEmojiPickerAnchor(e.currentTarget)
+                            setEmojiPickerAnchor(e.currentTarget)
                         }}
                     >
                         <AddReactionIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
@@ -146,12 +164,77 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                             color: 'text.secondary'
                         }}
                         onClick={(e) => {
-                            props.setMessageAnchor(e.currentTarget)
+                            setMenuAnchor(e.currentTarget)
                         }}
                     >
                         <MoreHorizIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
                     </IconButton>
                 </Box>
+                <Menu
+                    anchorEl={menuAnchor}
+                    open={Boolean(menuAnchor)}
+                    onClose={() => {
+                        setMenuAnchor(null)
+                    }}
+                >
+                    <MenuItem
+                        onClick={() => {
+                            const target: CCMessage<TypeSimpleNote> = props.message
+                            navigator.clipboard.writeText(target.payload.body.body)
+                            setMenuAnchor(null)
+                        }}
+                    >
+                        <ListItemIcon>
+                            <ContentPasteIcon sx={{ color: 'text.primary' }} />
+                        </ListItemIcon>
+                        <ListItemText>ソースをコピー</ListItemText>
+                    </MenuItem>
+                    <MenuItem
+                        onClick={() => {
+                            service.openInspector()
+                            setMenuAnchor(null)
+                        }}
+                    >
+                        <ListItemIcon>
+                            <ManageSearchIcon sx={{ color: 'text.primary' }} />
+                        </ListItemIcon>
+                        <ListItemText>詳細</ListItemText>
+                    </MenuItem>
+                    {props.message.author === props.userCCID && (
+                        <MenuItem
+                            onClick={() => {
+                                service.deleteMessage()
+                            }}
+                        >
+                            <ListItemIcon>
+                                <DeleteForeverIcon sx={{ color: 'text.primary' }} />
+                            </ListItemIcon>
+                            <ListItemText>メッセージを削除</ListItemText>
+                        </MenuItem>
+                    )}
+                </Menu>
+                <Popover
+                    anchorEl={emojiPickerAnchor}
+                    open={Boolean(emojiPickerAnchor)}
+                    onClose={() => {
+                        setEmojiPickerAnchor(null)
+                    }}
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'center'
+                    }}
+                    action={repositionEmojiPicker}
+                >
+                    <EmojiPicker
+                        onSelected={(emoji) => {
+                            service.addReaction(emoji.shortcodes, emoji.src)
+                            setEmojiPickerAnchor(null)
+                        }}
+                        onMounted={() => {
+                            repositionEmojiPicker.current?.updatePosition()
+                        }}
+                    />
+                </Popover>
                 <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 0.5, ml: 'auto' }}>
                     {props.msgstreams.map((e) => (
                         <Link

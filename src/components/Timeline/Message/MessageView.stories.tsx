@@ -59,9 +59,6 @@ export default meta
 export const Default = (arg: Props): JSX.Element => {
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(arg.themeName ?? 'basic'))
 
-    const [messageAnchor, setMessageAnchor] = useState<null | HTMLElement>(null)
-    const [emojiPickerAnchor, setEmojiPickerAnchor] = useState<null | HTMLElement>(null)
-
     useEffect(() => {
         setTheme(createConcurrentTheme(arg.themeName ?? 'basic'))
     }, [arg.themeName])
@@ -84,10 +81,6 @@ export const Default = (arg: Props): JSX.Element => {
                                         emojiUsers={[]}
                                         hasOwnReaction={false}
                                         msgstreams={[StreamMock(arg.streamName)]}
-                                        messageAnchor={messageAnchor}
-                                        emojiPickerAnchor={emojiPickerAnchor}
-                                        setMessageAnchor={setMessageAnchor}
-                                        setEmojiPickerAnchor={setEmojiPickerAnchor}
                                     />
                                 </Paper>
                             </ThemeProvider>
