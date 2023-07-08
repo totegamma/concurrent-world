@@ -11,13 +11,15 @@ import { MessageView } from './Message/MessageView'
 import { useInspector } from '../../context/Inspector'
 import { useMessageDetail } from '../../context/MessageDetail'
 import { ReRouteMessageFrame } from './Message/ReRouteMessageFrame'
+import { MessageSkeleton } from '../MessageSkeleton'
 
 export interface AssociationFrameProp {
     association: StreamElement
     lastUpdated: number
+    after: JSX.Element | undefined
 }
 
-export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFrameProp): JSX.Element => {
+export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFrameProp): JSX.Element | null => {
     const api = useApi()
     const theme = useTheme()
     const inspector = useInspector()
@@ -25,6 +27,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [message, setMessage] = useState<Message<any> | undefined>()
     const [association, setAssociation] = useState<Association<any> | undefined>()
+    const [fetching, setFetching] = useState<boolean>(true)
 
     // TODO いずれ消す
     const [replyMessage, setReplyMessage] = useState<Message<any> | undefined>()
@@ -41,45 +44,49 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     const [emojiUsers, setEmojiUsers] = useState<ProfileWithAddress[]>([])
 
     useEffect(() => {
-        api.fetchAssociation(props.association.id, props.association.currenthost).then((a) => {
-            if (!a) return
-            setAssociation(a)
+        api.fetchAssociation(props.association.id, props.association.currenthost)
+            .then((a) => {
+                if (!a) return
+                setAssociation(a)
 
-            if (a?.schema === Schemas.replyAssociation) {
-                console.log('as', a.payload.body)
+                if (a?.schema === Schemas.replyAssociation) {
+                    api.fetchMessageWithAuthor(a.payload.body.messageId, a.author).then((m) => {
+                        setMessage(m)
+                    })
 
-                api.fetchMessageWithAuthor(a.payload.body.messageId, a.author).then((m) => {
+                    api.fetchMessageWithAuthor(a.targetID, a.payload.body.messageAuthor).then((m) => {
+                        setReplyMessage(m)
+                    })
+
+                    api.readCharacter(a.payload.body.messageAuthor, Schemas.profile).then((author) => {
+                        setAuthor(author)
+                    })
+
+                    return
+                }
+
+                if (a?.schema === Schemas.reRouteAssociation) {
+                    api.fetchMessageWithAuthor(a.payload.body.messageId, a.payload.body.messageAuthor).then((m) => {
+                        setReRouteMessage(m)
+                    })
+                    return
+                }
+
+                api.fetchMessage(a.targetID, props.association.currenthost).then((m) => {
                     setMessage(m)
-                })
-
-                api.fetchMessageWithAuthor(a.targetID, a.payload.body.messageAuthor).then((m) => {
-                    setReplyMessage(m)
-                })
-
-                api.readCharacter(a.payload.body.messageAuthor, Schemas.profile).then((author) => {
-                    setAuthor(author)
-                })
-
-                return
-            }
-
-            if (a?.schema === Schemas.reRouteAssociation) {
-                console.log('ass', a)
-                api.fetchMessageWithAuthor(a.payload.body.messageId, a.payload.body.messageAuthor).then((m) => {
-                    setReRouteMessage(m)
-                })
-                return
-            }
-
-            api.fetchMessage(a.targetID, props.association.currenthost).then((m) => {
-                setMessage(m)
-                if (!m) return
-                const isMeToOther = a.author !== api.userAddress
-                api.readCharacter(isMeToOther ? a.author : m.author, Schemas.profile).then((author) => {
-                    setAuthor(author)
+                    if (!m) return
+                    const isMeToOther = a.author !== api.userAddress
+                    api.readCharacter(isMeToOther ? a.author : m.author, Schemas.profile).then((author) => {
+                        setAuthor(author)
+                    })
                 })
             })
-        })
+            .catch((_e) => {
+                setAssociation(undefined)
+            })
+            .finally(() => {
+                setFetching(false)
+            })
     }, [])
 
     useEffect(() => {
@@ -124,11 +131,8 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     const unfavorite = useCallback(
         (deletekey: string | undefined, author: string): void => {
             if (!deletekey) return
-            console.log(deletekey, author)
             api.unFavoriteMessage(deletekey, author).then(() => {
-                console.log('hogehoge!')
                 api.fetchMessageWithAuthor(association?.payload.body.messageId, association?.author ?? '').then((m) => {
-                    console.log('message', m)
                     setMessage(m)
                 })
             })
@@ -136,160 +140,160 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
         [association, message]
     )
 
-    if (!association) {
-        return (
-            <ListItem sx={{ display: 'flex', justifyContent: 'center' }} disablePadding disableGutters>
-                <Typography variant="caption" color="text.disabled">
-                    404 not found
-                </Typography>
-            </ListItem>
-        )
-    }
+    if (fetching) return <MessageSkeleton />
+    if (!association) return null
 
     switch (association.schema) {
         case Schemas.like:
             return (
-                <ListItem
-                    sx={{
-                        alignItems: 'flex-start',
-                        wordBreak: 'break-word'
-                    }}
-                    disablePadding
-                >
-                    <ListItemButton
-                        disableGutters
-                        component={routerLink}
-                        to={`/message/${message?.id ?? ''}@${message?.author ?? ''}`}
+                <>
+                    <ListItem
                         sx={{
-                            display: 'flex',
                             alignItems: 'flex-start',
-                            flex: 1,
-                            gap: 2
+                            wordBreak: 'break-word'
                         }}
+                        disablePadding
                     >
-                        <IconButton
-                            sx={{
-                                width: { xs: '38px', sm: '48px' },
-                                height: { xs: '38px', sm: '48px' },
-                                mt: { xs: '3px', sm: '5px' }
-                            }}
+                        <ListItemButton
+                            disableGutters
                             component={routerLink}
-                            to={'/entity/' + association.author}
+                            to={`/message/${message?.id ?? ''}@${message?.author ?? ''}`}
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'flex-start',
+                                flex: 1,
+                                gap: 2
+                            }}
                         >
-                            <CCAvatar
-                                alt={author?.payload.body.username}
-                                avatarURL={author?.payload.body.avatar}
-                                identiconSource={isMeToOther ? association?.author : message?.author ?? ''}
+                            <IconButton
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
-                                    height: { xs: '38px', sm: '48px' }
+                                    height: { xs: '38px', sm: '48px' },
+                                    mt: { xs: '3px', sm: '5px' }
                                 }}
-                            />
-                        </IconButton>
-                        <Box
-                            sx={{
-                                flex: 1,
-                                flexDirection: 'column',
-                                width: '100%',
-                                overflow: 'auto',
-                                alignItems: 'flex-start'
-                            }}
-                        >
-                            <Typography>
-                                {isMeToOther ? (
-                                    <>
-                                        <b>{author?.payload.body.username ?? 'anonymous'}</b> favorited your message
-                                    </>
-                                ) : (
-                                    <>
-                                        You favorited <b>{author?.payload.body.username ?? 'anonymous'}</b>&apos;s
-                                        message
-                                    </>
-                                )}
-                            </Typography>
-                            <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
-                                {message?.payload.body.body}
-                            </blockquote>
-                        </Box>
-                    </ListItemButton>
-                </ListItem>
+                                component={routerLink}
+                                to={'/entity/' + association.author}
+                            >
+                                <CCAvatar
+                                    alt={author?.payload.body.username}
+                                    avatarURL={author?.payload.body.avatar}
+                                    identiconSource={isMeToOther ? association?.author : message?.author ?? ''}
+                                    sx={{
+                                        width: { xs: '38px', sm: '48px' },
+                                        height: { xs: '38px', sm: '48px' }
+                                    }}
+                                />
+                            </IconButton>
+                            <Box
+                                sx={{
+                                    flex: 1,
+                                    flexDirection: 'column',
+                                    width: '100%',
+                                    overflow: 'auto',
+                                    alignItems: 'flex-start'
+                                }}
+                            >
+                                <Typography>
+                                    {isMeToOther ? (
+                                        <>
+                                            <b>{author?.payload.body.username ?? 'anonymous'}</b> favorited your message
+                                        </>
+                                    ) : (
+                                        <>
+                                            You favorited <b>{author?.payload.body.username ?? 'anonymous'}</b>&apos;s
+                                            message
+                                        </>
+                                    )}
+                                </Typography>
+                                <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
+                                    {message?.payload.body.body}
+                                </blockquote>
+                            </Box>
+                        </ListItemButton>
+                    </ListItem>
+                    {props.after}
+                </>
             )
         case Schemas.emojiAssociation:
             return (
-                <ListItem
-                    sx={{
-                        alignItems: 'flex-start',
-                        wordBreak: 'break-word'
-                    }}
-                    disablePadding
-                >
-                    <ListItemButton
-                        disableGutters
-                        component={routerLink}
-                        to={`/message/${message?.id ?? ''}@${message?.author ?? ''}`}
+                <>
+                    <ListItem
                         sx={{
-                            display: 'flex',
                             alignItems: 'flex-start',
-                            flex: 1,
-                            gap: 2
+                            wordBreak: 'break-word'
                         }}
+                        disablePadding
                     >
-                        <IconButton
-                            sx={{
-                                width: { xs: '38px', sm: '48px' },
-                                height: { xs: '38px', sm: '48px' },
-                                mt: { xs: '3px', sm: '5px' }
-                            }}
+                        <ListItemButton
+                            disableGutters
                             component={routerLink}
-                            to={'/entity/' + association.author}
+                            to={`/message/${message?.id ?? ''}@${message?.author ?? ''}`}
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'flex-start',
+                                flex: 1,
+                                gap: 2
+                            }}
                         >
-                            <CCAvatar
-                                alt={author?.payload.body.username}
-                                avatarURL={author?.payload.body.avatar}
-                                identiconSource={isMeToOther ? association?.author : message?.author ?? ''}
+                            <IconButton
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
-                                    height: { xs: '38px', sm: '48px' }
+                                    height: { xs: '38px', sm: '48px' },
+                                    mt: { xs: '3px', sm: '5px' }
                                 }}
-                            />
-                        </IconButton>
-                        <Box
-                            sx={{
-                                flex: 1,
-                                flexDirection: 'column',
-                                width: '100%',
-                                overflow: 'auto',
-                                alignItems: 'flex-start'
-                            }}
-                        >
-                            <Typography>
-                                {isMeToOther ? (
-                                    <>
-                                        <b>{author?.payload.body.username ?? 'anonymous'}</b> reacted your message with{' '}
-                                        <img
-                                            height="13px"
-                                            src={association?.payload.body.imageUrl}
-                                            alt={association?.payload.body.shortcode}
-                                        />
-                                    </>
-                                ) : (
-                                    <>
-                                        You reacted <b>{author?.payload.body.username ?? 'anonymous'}</b>&apos;s message
-                                        with{' '}
-                                        <img
-                                            height="13px"
-                                            src={association?.payload.body.imageUrl}
-                                            alt={association?.payload.body.shortcode}
-                                        />
-                                    </>
-                                )}
-                            </Typography>
-                            <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
-                                {message?.payload.body.body}
-                            </blockquote>
-                        </Box>
-                    </ListItemButton>
-                </ListItem>
+                                component={routerLink}
+                                to={'/entity/' + association.author}
+                            >
+                                <CCAvatar
+                                    alt={author?.payload.body.username}
+                                    avatarURL={author?.payload.body.avatar}
+                                    identiconSource={isMeToOther ? association?.author : message?.author ?? ''}
+                                    sx={{
+                                        width: { xs: '38px', sm: '48px' },
+                                        height: { xs: '38px', sm: '48px' }
+                                    }}
+                                />
+                            </IconButton>
+                            <Box
+                                sx={{
+                                    flex: 1,
+                                    flexDirection: 'column',
+                                    width: '100%',
+                                    overflow: 'auto',
+                                    alignItems: 'flex-start'
+                                }}
+                            >
+                                <Typography>
+                                    {isMeToOther ? (
+                                        <>
+                                            <b>{author?.payload.body.username ?? 'anonymous'}</b> reacted your message
+                                            with{' '}
+                                            <img
+                                                height="13px"
+                                                src={association?.payload.body.imageUrl}
+                                                alt={association?.payload.body.shortcode}
+                                            />
+                                        </>
+                                    ) : (
+                                        <>
+                                            You reacted <b>{author?.payload.body.username ?? 'anonymous'}</b>&apos;s
+                                            message with{' '}
+                                            <img
+                                                height="13px"
+                                                src={association?.payload.body.imageUrl}
+                                                alt={association?.payload.body.shortcode}
+                                            />
+                                        </>
+                                    )}
+                                </Typography>
+                                <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
+                                    {message?.payload.body.body}
+                                </blockquote>
+                            </Box>
+                        </ListItemButton>
+                    </ListItem>
+                    {props.after}
+                </>
             )
         case Schemas.replyAssociation:
             return (
@@ -338,6 +342,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                             }}
                         />
                     )}
+                    {props.after}
                 </>
             )
         case Schemas.reRouteAssociation:
@@ -350,14 +355,22 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                     </ListItem>
                 )
             }
-            return <ReRouteMessageFrame message={reRouteMessage} lastUpdated={0} />
+            return (
+                <>
+                    <ReRouteMessageFrame message={reRouteMessage} lastUpdated={0} />
+                    {props.after}
+                </>
+            )
         default:
             return (
-                <ListItem sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <Typography variant="caption" color="text.disabled">
-                        Unknown association schema
-                    </Typography>
-                </ListItem>
+                <>
+                    <ListItem sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <Typography variant="caption" color="text.disabled">
+                            Unknown association schema
+                        </Typography>
+                    </ListItem>
+                    {props.after}
+                </>
             )
     }
 })

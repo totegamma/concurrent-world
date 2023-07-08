@@ -8,15 +8,19 @@ import { type SimpleNote } from '../../schemas/simpleNote'
 import { type ReplyMessage } from '../../schemas/replyMessage'
 import { type ReRouteMessage } from '../../schemas/reRouteMessage'
 import { ReRouteMessageFrame } from './Message/ReRouteMessageFrame'
+import { MessageSkeleton } from '../MessageSkeleton'
+import { Typography } from '@mui/material'
 
 interface MultiplexerProps {
     message: StreamElement
     lastUpdated: number
+    after: JSX.Element | undefined
 }
 
-export const MessageMultiplexer = (props: MultiplexerProps): JSX.Element => {
+export const MessageMultiplexer = (props: MultiplexerProps): JSX.Element | null => {
     const api = useApi()
     const [message, setMessage] = useState<CCMessage<SimpleNote | ReplyMessage | ReRouteMessage> | undefined>()
+    const [isFetching, setIsFetching] = useState<boolean>(false)
 
     useEffect(() => {
         api.fetchMessage(props.message.id, props.message.currenthost)
@@ -24,21 +28,44 @@ export const MessageMultiplexer = (props: MultiplexerProps): JSX.Element => {
                 if (!msg) return
                 setMessage(msg)
             })
-            .catch((error) => {
-                console.log(error)
+            .catch((_e) => {
+                setMessage(undefined)
+            })
+            .finally(() => {
+                setIsFetching(false)
             })
     }, [props.message, props.lastUpdated])
 
-    if (!message) return <></>
+    if (isFetching)
+        return (
+            <>
+                <MessageSkeleton />
+                {props.after}
+            </>
+        )
 
+    if (!message) return null
+
+    let body
     switch (message?.schema) {
         case Schemas.simpleNote:
-            return <MessageFrame message={message} lastUpdated={props.lastUpdated} />
+            body = <MessageFrame message={message} lastUpdated={props.lastUpdated} />
+            break
         case Schemas.replyMessage:
-            return <ReplyMessageFrame message={message} lastUpdated={props.lastUpdated} />
+            body = <ReplyMessageFrame message={message} lastUpdated={props.lastUpdated} />
+            break
         case Schemas.reRouteMessage:
-            return <ReRouteMessageFrame message={message} lastUpdated={props.lastUpdated} />
+            body = <ReRouteMessageFrame message={message} lastUpdated={props.lastUpdated} />
+            break
         default:
-            return <>unknown schema: {message?.schema}</>
+            body = <Typography>unknown schema: {message?.schema}</Typography>
+            break
     }
+
+    return (
+        <>
+            {body}
+            {props.after}
+        </>
+    )
 }
