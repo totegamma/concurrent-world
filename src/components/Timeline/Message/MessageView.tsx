@@ -14,10 +14,9 @@ export interface MessageViewProps {
     message: CCMessage<TypeSimpleNote | ReplyMessage>
     userCCID: string
     author: Character<Profile> | undefined
-    reactUsers: ProfileWithAddress[]
-    emojiUsers: ProfileWithAddress[]
-    hasOwnReaction: boolean
-    msgstreams: Array<Stream<any>>
+    favoriteUsers: ProfileWithAddress[]
+    reactionUsers: ProfileWithAddress[]
+    streams: Array<Stream<any>>
     beforeMessage?: JSX.Element
 }
 
@@ -70,12 +69,11 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                         />
                         {props.beforeMessage}
                         <SimpleNote message={props.message} />
-                        <MessageReactions message={props.message} emojiUsers={props.emojiUsers} />
+                        <MessageReactions message={props.message} emojiUsers={props.reactionUsers} />
                         <MessageActions
-                            reactUsers={props.reactUsers}
-                            hasOwnReaction={props.hasOwnReaction}
+                            favoriteUsers={props.favoriteUsers}
                             message={props.message}
-                            msgstreams={props.msgstreams}
+                            msgstreams={props.streams}
                             userCCID={props.userCCID}
                         />
                     </Box>

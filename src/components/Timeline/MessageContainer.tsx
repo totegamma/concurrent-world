@@ -1,5 +1,5 @@
 import { Schemas } from '../../schemas'
-import type { Message } from '../../model'
+import type { Character, Message, ProfileWithAddress, Stream } from '../../model'
 import { useApi } from '../../context/api'
 import { createContext, memo, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { MessageFrame } from './Message/MessageFrame'
@@ -12,6 +12,7 @@ import { MessageSkeleton } from '../MessageSkeleton'
 import { Typography } from '@mui/material'
 import { useInspector } from '../../context/Inspector'
 import { useMessageDetail } from '../../context/MessageDetail'
+import { type Profile } from '../../schemas/profile'
 
 export interface MessageServiceState {
     addFavorite: () => void
@@ -123,6 +124,64 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
         loadMessage()
     }, [props.messageID, props.messageOwner, props.lastUpdated])
 
+    const [author, setAuthor] = useState<Character<Profile> | undefined>()
+    const [streams, setStreams] = useState<Array<Stream<any>>>([])
+    const [favoriteUsers, setFavoriteUsers] = useState<ProfileWithAddress[]>([])
+    const [reactionUsers, setReactionUsers] = useState<ProfileWithAddress[]>([])
+
+    useEffect(() => {
+        if (!message) return
+        Promise.all(message.streams.map(async (id) => await api.readStream(id))).then((e) => {
+            setStreams(e.filter((x) => x?.payload.body.name) as Array<Stream<any>>)
+        })
+        api.readCharacter(message.author, Schemas.profile)
+            .then((author) => {
+                setAuthor(author)
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+    }, [message, props.lastUpdated])
+
+    useEffect(() => {
+        if (!message) return
+        const fetchEmojiUsers = async (): Promise<any> => {
+            const authors =
+                message.associations.filter((e) => e.schema === Schemas.emojiAssociation).map((m) => m.author) ?? []
+
+            const users = await Promise.all(
+                authors.map((ccaddress) =>
+                    api.readCharacter(ccaddress, Schemas.profile).then((e) => {
+                        return {
+                            ccaddress,
+                            ...e?.payload.body
+                        }
+                    })
+                )
+            )
+            setReactionUsers(users)
+        }
+
+        const fetchUsers = async (): Promise<any> => {
+            const authors = message.associations.filter((e) => e.schema === Schemas.like).map((m) => m.author)
+
+            const users = await Promise.all(
+                authors.map((ccaddress) =>
+                    api.readCharacter(ccaddress, Schemas.profile).then((e) => {
+                        return {
+                            ccaddress,
+                            ...e?.payload.body
+                        }
+                    })
+                )
+            )
+            setFavoriteUsers(users)
+        }
+
+        fetchUsers()
+        fetchEmojiUsers()
+    }, [message?.associations])
+
     const services = useMemo(() => {
         return {
             addFavorite,
@@ -150,10 +209,32 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
     let body
     switch (message?.schema) {
         case Schemas.simpleNote:
-            body = <MessageFrame message={message} lastUpdated={props.lastUpdated} reloadMessage={reloadMessage} />
+            body = (
+                <MessageFrame
+                    message={message}
+                    lastUpdated={props.lastUpdated}
+                    reloadMessage={reloadMessage}
+                    author={author}
+                    userCCID={api.userAddress}
+                    streams={streams}
+                    favoriteUsers={favoriteUsers}
+                    reactionUsers={reactionUsers}
+                />
+            )
             break
         case Schemas.replyMessage:
-            body = <ReplyMessageFrame message={message} lastUpdated={props.lastUpdated} reloadMessage={reloadMessage} />
+            body = (
+                <ReplyMessageFrame
+                    message={message}
+                    lastUpdated={props.lastUpdated}
+                    reloadMessage={reloadMessage}
+                    author={author}
+                    userCCID={api.userAddress}
+                    streams={streams}
+                    favoriteUsers={favoriteUsers}
+                    reactionUsers={reactionUsers}
+                />
+            )
             break
         case Schemas.reRouteMessage:
             body = (

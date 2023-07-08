@@ -32,8 +32,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { EmojiPicker } from '../../EmojiPicker'
 
 export interface MessageActionsProps {
-    reactUsers: ProfileWithAddress[]
-    hasOwnReaction: boolean
+    favoriteUsers: ProfileWithAddress[]
     message: CCMessage<TypeSimpleNote>
     msgstreams: Array<Stream<any>>
     userCCID: string
@@ -45,6 +44,8 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
     const [emojiPickerAnchor, setEmojiPickerAnchor] = useState<null | HTMLElement>(null)
     const repositionEmojiPicker = useRef<PopoverActions | null>(null)
     const service = useMessageService()
+
+    const hasOwnReaction = props.favoriteUsers.find((user) => user.ccaddress === props.userCCID)
 
     return (
         <>
@@ -95,7 +96,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                     gap: 1
                                 }}
                             >
-                                {props.reactUsers.map((user) => (
+                                {props.favoriteUsers.map((user) => (
                                     <Box
                                         key={user.ccaddress}
                                         sx={{
@@ -119,7 +120,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                             </Box>
                         }
                         placement="top"
-                        disableHoverListener={props.reactUsers.length === 0}
+                        disableHoverListener={props.favoriteUsers.length === 0}
                     >
                         <Box sx={{ display: 'flex' }}>
                             <IconButton
@@ -129,14 +130,14 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                 }}
                                 color="primary"
                                 onClick={() => {
-                                    if (props.hasOwnReaction) {
+                                    if (hasOwnReaction) {
                                         service.removeFavorite()
                                     } else {
                                         service.addFavorite()
                                     }
                                 }}
                             >
-                                {props.hasOwnReaction ? (
+                                {hasOwnReaction ? (
                                     <StarIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
                                 ) : (
                                     <StarOutlineIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />

@@ -77,10 +77,9 @@ export const Default = (arg: Props): JSX.Element => {
                                         userCCID={''}
                                         message={MessageMock(arg.body, arg.author, arg.cdate)}
                                         author={CharacterProfileMock(arg.username)}
-                                        reactUsers={[]}
-                                        emojiUsers={[]}
-                                        hasOwnReaction={false}
-                                        msgstreams={[StreamMock(arg.streamName)]}
+                                        reactionUsers={[]}
+                                        favoriteUsers={[]}
+                                        streams={[StreamMock(arg.streamName)]}
                                     />
                                 </Paper>
                             </ThemeProvider>
