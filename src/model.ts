@@ -22,6 +22,7 @@ export interface StreamElement {
     timestamp: string
     id: string
     type: string
+    author: string
     owner: string
     currenthost: string
 }

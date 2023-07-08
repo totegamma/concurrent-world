@@ -6,18 +6,17 @@ import { Schemas } from '../../../schemas'
 import { useApi } from '../../../context/api'
 import { CCAvatar } from '../../CCAvatar'
 import { Fragment } from 'react'
-import { type EmojiProps } from '../../EmojiPicker'
+import { useMessageService } from '../MessageContainer'
 
 export interface MessageReactionsProps {
     message: CCMessage<TypeSimpleNote | ReplyMessage>
     emojiUsers: ProfileWithAddress[]
-    addMessageReaction: (emoji: EmojiProps) => Promise<void>
-    removeMessageReaction: (id: string) => Promise<void>
 }
 
 export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
     const api = useApi()
     const theme = useTheme()
+    const service = useMessageService()
     const allReactions = props.message.associations.filter((m) => m.schema === Schemas.emojiAssociation)
     const filteredReactions = allReactions.reduce((acc: any, cur) => {
         cur.payload.body.shortcode in acc
@@ -87,16 +86,9 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                             variant="outlined"
                             onClick={() => {
                                 if (ownReaction) {
-                                    props.removeMessageReaction(ownReaction.id)
+                                    service.removeReaction(ownReaction.id)
                                 } else {
-                                    props.addMessageReaction({
-                                        id: '',
-                                        keywords: [],
-                                        name: shortcode,
-                                        native: '',
-                                        shortcodes: shortcode,
-                                        src: reaction[0].payload.body.imageUrl
-                                    })
+                                    service.addReaction(shortcode, reaction[0].payload.body.imageUrl)
                                 }
                             }}
                         >

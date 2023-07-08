@@ -1,35 +1,11 @@
 import { Box, Divider, Paper, Typography } from '@mui/material'
-import { MessageFrame } from '../components/Timeline'
-import { useApi } from '../context/api'
 import { useParams } from 'react-router-dom'
-import { useCallback, useEffect, useState } from 'react'
-import { type Message } from '../model'
+import { MessageContainer } from '../components/Timeline/MessageContainer'
 
 export function MessagePage(): JSX.Element {
-    const api = useApi()
     const { id } = useParams()
     const messageID = id?.split('@')[0]
     const authorID = id?.split('@')[1]
-
-    const [message, setMessage] = useState<Message<any> | undefined>()
-
-    const loadMessage = useCallback(() => {
-        if (!messageID || !authorID) return
-        api.fetchMessageWithAuthor(messageID, authorID).then((msg) => {
-            if (!msg) return
-            setMessage(msg)
-        })
-    }, [messageID, authorID])
-
-    const reloadMessage = useCallback(() => {
-        if (!messageID) return
-        api.invalidateMessage(messageID)
-        loadMessage()
-    }, [messageID, loadMessage])
-
-    useEffect(() => {
-        loadMessage()
-    }, [messageID, authorID])
 
     return (
         <Box
@@ -47,14 +23,14 @@ export function MessagePage(): JSX.Element {
                 Message
             </Typography>
             <Divider />
-            {message ? (
-                <Paper sx={{ m: '10px 0', p: '0 20px' }} elevation={0} variant="outlined">
-                    <MessageFrame message={message} lastUpdated={0} reloadMessage={reloadMessage} />
+            {messageID && authorID && (
+                <Paper
+                    sx={{
+                        padding: '20px'
+                    }}
+                >
+                    <MessageContainer messageID={messageID} messageOwner={authorID} />
                 </Paper>
-            ) : (
-                <Typography variant="body1" gutterBottom>
-                    Loading...
-                </Typography>
             )}
         </Box>
     )

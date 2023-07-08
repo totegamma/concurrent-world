@@ -7,7 +7,7 @@ import type { StreamElement, StreamElementDated } from '../../model'
 import { useApi } from '../../context/api'
 import { InspectorProvider } from '../../context/Inspector'
 import { Loading } from '../Loading'
-import { MessageMultiplexer } from './Multiplexer'
+import { MessageContainer } from './MessageContainer'
 import { MessageDetailProvider } from '../../context/MessageDetail'
 
 export interface TimelineProps {
@@ -15,6 +15,8 @@ export interface TimelineProps {
     timeline: IuseObjectList<StreamElementDated>
     scrollParentRef: RefObject<HTMLDivElement>
 }
+
+const divider = <Divider variant="inset" component="li" sx={{ margin: '8px 4px' }} />
 
 export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element => {
     const api = useApi()
@@ -91,24 +93,17 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                             switch (e.type) {
                                 case 'message':
                                     element = (
-                                        <MessageMultiplexer
-                                            message={e}
+                                        <MessageContainer
+                                            messageID={e.id}
+                                            messageOwner={e.author}
                                             lastUpdated={e.LastUpdated}
-                                            after={
-                                                <Divider variant="inset" component="li" sx={{ margin: '8px 4px' }} />
-                                            }
+                                            after={divider}
                                         />
                                     )
                                     break
                                 case 'association':
                                     element = (
-                                        <AssociationFrame
-                                            association={e}
-                                            lastUpdated={e.LastUpdated}
-                                            after={
-                                                <Divider variant="inset" component="li" sx={{ margin: '8px 4px' }} />
-                                            }
-                                        />
+                                        <AssociationFrame association={e} lastUpdated={e.LastUpdated} after={divider} />
                                     )
                                     break
                                 default:
