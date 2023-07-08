@@ -10,12 +10,17 @@ import type { ReRouteMessage } from '../../schemas/reRouteMessage'
 import { ReRouteMessageFrame } from './Message/ReRouteMessageFrame'
 import { MessageSkeleton } from '../MessageSkeleton'
 import { Typography } from '@mui/material'
+import { useInspector } from '../../context/Inspector'
+import { useMessageDetail } from '../../context/MessageDetail'
 
 export interface MessageServiceState {
     addFavorite: () => void
     removeFavorite: () => void
     addReaction: (shortcode: string, img: string) => void
     removeReaction: (id: string) => void
+    openInspector: () => void
+    openReply: () => void
+    openReroute: () => void
     deleteMessage: () => void
 }
 
@@ -33,6 +38,8 @@ interface MultiplexerProps {
 
 export const MessageMultiplexer = memo<MultiplexerProps>((props: MultiplexerProps): JSX.Element | null => {
     const api = useApi()
+    const inspector = useInspector()
+    const messageDetail = useMessageDetail()
     const [message, setMessage] = useState<CCMessage<SimpleNote | ReplyMessage | ReRouteMessage> | undefined>()
     const [isFetching, setIsFetching] = useState<boolean>(false)
 
@@ -95,6 +102,21 @@ export const MessageMultiplexer = memo<MultiplexerProps>((props: MultiplexerProp
         [api, message]
     )
 
+    const openInspector = useCallback(() => {
+        if (!message) return
+        inspector.inspectItem({ messageId: message.id, author: message.author })
+    }, [inspector, message])
+
+    const openReply = useCallback(() => {
+        if (!message) return
+        messageDetail.openAction('reply', message.id, message.author)
+    }, [message, messageDetail])
+
+    const openReroute = useCallback(() => {
+        if (!message) return
+        messageDetail.openAction('reroute', message.id, message.author)
+    }, [message, messageDetail])
+
     useEffect(() => {
         loadMessage()
     }, [props.message, props.lastUpdated])
@@ -105,9 +127,12 @@ export const MessageMultiplexer = memo<MultiplexerProps>((props: MultiplexerProp
             removeFavorite,
             addReaction,
             removeReaction,
+            openInspector,
+            openReply,
+            openReroute,
             deleteMessage
         }
-    }, [addFavorite, removeFavorite, addReaction, removeReaction, deleteMessage])
+    }, [addFavorite, removeFavorite, addReaction, removeReaction, openInspector, openReply, openReroute, deleteMessage])
 
     if (isFetching) {
         return (

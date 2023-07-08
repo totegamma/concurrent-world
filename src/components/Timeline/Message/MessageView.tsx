@@ -36,9 +36,6 @@ export interface MessageViewProps {
     messageAnchor: null | HTMLElement
     emojiPickerAnchor: null | HTMLElement
     userCCID: string
-    inspectHandler: () => void
-    handleReply: () => Promise<void>
-    handleReRoute: () => Promise<void>
     setMessageAnchor: (anchor: null | HTMLElement) => void
     setEmojiPickerAnchor: (anchor: null | HTMLElement) => void
     beforeMessage?: JSX.Element
@@ -99,8 +96,6 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                         <SimpleNote message={props.message} />
                         <MessageReactions message={props.message} emojiUsers={props.emojiUsers} />
                         <MessageActions
-                            handleReply={props.handleReply}
-                            handleReRoute={props.handleReRoute}
                             reactUsers={props.reactUsers}
                             hasOwnReaction={props.hasOwnReaction}
                             message={props.message}
@@ -132,7 +127,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                 </MenuItem>
                 <MenuItem
                     onClick={() => {
-                        props.inspectHandler()
+                        service.openInspector()
                         props.setMessageAnchor(null)
                     }}
                 >

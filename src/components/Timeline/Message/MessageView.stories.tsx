@@ -6,10 +6,8 @@ import { CssBaseline, ThemeProvider } from '@mui/material'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { MessageView } from './MessageView'
 import { CharacterProfileMock, MessageMock, StreamMock } from '../../../mock/modelmock'
-import { ApiMock } from '../../../mock/apimock'
 import { InspectorProvider } from '../../../context/Inspector'
 import Paper from '@mui/material/Paper'
-import { type EmojiProps } from '../../EmojiPicker'
 
 const ThemeList = Object.keys(Themes)
 
@@ -88,9 +86,6 @@ export const Default = (arg: Props): JSX.Element => {
                                         msgstreams={[StreamMock(arg.streamName)]}
                                         messageAnchor={messageAnchor}
                                         emojiPickerAnchor={emojiPickerAnchor}
-                                        inspectHandler={() => {}}
-                                        handleReply={async () => {}}
-                                        handleReRoute={async () => {}}
                                         setMessageAnchor={setMessageAnchor}
                                         setEmojiPickerAnchor={setEmojiPickerAnchor}
                                     />

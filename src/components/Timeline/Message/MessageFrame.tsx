@@ -109,15 +109,6 @@ export const MessageFrame = (props: MessageFrameProp): JSX.Element => {
                     messageAnchor={messageAnchor}
                     emojiPickerAnchor={emojiPickerAnchor}
                     userCCID={api.userAddress}
-                    inspectHandler={() => {
-                        inspector.inspectItem({ messageId: props.message.id, author: props.message.author })
-                    }}
-                    handleReply={async () => {
-                        messageDetail.openAction('reply', props.message?.id || '', props.message?.author || '')
-                    }}
-                    handleReRoute={async () => {
-                        messageDetail.openAction('reroute', props.message.id, props.message?.author)
-                    }}
                     setMessageAnchor={setMessageAnchor}
                     setEmojiPickerAnchor={setEmojiPickerAnchor}
                 />
@@ -134,15 +125,6 @@ export const MessageFrame = (props: MessageFrameProp): JSX.Element => {
                     messageAnchor={messageAnchor}
                     emojiPickerAnchor={emojiPickerAnchor}
                     userCCID={api.userAddress}
-                    inspectHandler={() => {
-                        inspector.inspectItem({ messageId: props.message.id, author: props.message.author })
-                    }}
-                    handleReply={async () => {
-                        messageDetail.openAction('reply', props.message?.id || '', props.message?.author || '')
-                    }}
-                    handleReRoute={async () => {
-                        messageDetail.openAction('reroute', props.message.id, props.message?.author)
-                    }}
                     setMessageAnchor={setMessageAnchor}
                     setEmojiPickerAnchor={setEmojiPickerAnchor}
                 />
@@ -160,15 +142,6 @@ export const MessageFrame = (props: MessageFrameProp): JSX.Element => {
                     messageAnchor={messageAnchor}
                     emojiPickerAnchor={emojiPickerAnchor}
                     userCCID={api.userAddress}
-                    inspectHandler={() => {
-                        inspector.inspectItem({ messageId: props.message.id, author: props.message.author })
-                    }}
-                    handleReply={async () => {
-                        messageDetail.openAction('reply', props.message?.id || '', props.message?.author || '')
-                    }}
-                    handleReRoute={async () => {
-                        messageDetail.openAction('reroute', props.message.id, props.message?.author)
-                    }}
                     setMessageAnchor={setMessageAnchor}
                     setEmojiPickerAnchor={setEmojiPickerAnchor}
                 />

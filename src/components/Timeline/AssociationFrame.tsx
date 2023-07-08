@@ -318,15 +318,6 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                             msgstreams={[]}
                             messageAnchor={messageAnchor}
                             emojiPickerAnchor={emojiPickerAnchor}
-                            inspectHandler={() => {
-                                inspector.inspectItem({ messageId: message.id, author: message.author })
-                            }}
-                            handleReply={async () => {
-                                messageDetail.openAction('reply', message?.id || '', message?.author || '')
-                            }}
-                            handleReRoute={async () => {
-                                messageDetail.openAction('reroute', message?.id || '', message?.author)
-                            }}
                             setMessageAnchor={setMessageAnchor}
                             setEmojiPickerAnchor={setEmojiPickerAnchor}
                         />

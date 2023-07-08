@@ -15,8 +15,6 @@ import Collapse from '@mui/material/Collapse'
 import Fade from '@mui/material/Fade'
 import { useMessageService } from '../Multiplexer'
 export interface MessageActionsProps {
-    handleReply: () => Promise<void>
-    handleReRoute: () => Promise<void>
     reactUsers: ProfileWithAddress[]
     hasOwnReaction: boolean
     message: CCMessage<TypeSimpleNote>
@@ -53,7 +51,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                             color: 'text.secondary'
                         }}
                         onClick={() => {
-                            props.handleReply()
+                            service.openReply()
                         }}
                     >
                         <ReplyIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
@@ -64,7 +62,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                             color: 'text.secondary'
                         }}
                         onClick={() => {
-                            props.handleReRoute()
+                            service.openReroute()
                         }}
                     >
                         <RepeatIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />

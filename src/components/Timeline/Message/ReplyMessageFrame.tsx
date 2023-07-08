@@ -5,10 +5,8 @@ import type { Character, Message as CCMessage, ProfileWithAddress, Stream, CCID 
 import type { Profile } from '../../../schemas/profile'
 import { Schemas } from '../../../schemas'
 import { useApi } from '../../../context/api'
-import { useInspector } from '../../../context/Inspector'
 import { MessageView } from './MessageView'
 import { MessageFrame } from './MessageFrame'
-import { useMessageDetail } from '../../../context/MessageDetail'
 import { MessageSkeleton } from '../../MessageSkeleton'
 
 export interface MessageFrameProp {
@@ -19,8 +17,6 @@ export interface MessageFrameProp {
 
 export const ReplyMessageFrame = (props: MessageFrameProp): JSX.Element => {
     const api = useApi()
-    const inspector = useInspector()
-    const messageDetail = useMessageDetail()
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
     const [replyMessage, setReplyMessage] = useState<CCMessage<any> | undefined>()
     const [replyMessageAuthor, setReplyMessageAuthor] = useState<Character<Profile> | undefined>()
@@ -140,15 +136,6 @@ export const ReplyMessageFrame = (props: MessageFrameProp): JSX.Element => {
                     hasOwnReaction={hasOwnReaction}
                     msgstreams={msgStreams}
                     messageAnchor={messageAnchor}
-                    inspectHandler={() => {
-                        inspector.inspectItem({ messageId: props.message.id, author: props.message.author })
-                    }}
-                    handleReply={async () => {
-                        messageDetail.openAction('reply', props.message?.id || '', props.message?.author || '')
-                    }}
-                    handleReRoute={async () => {
-                        messageDetail.openAction('reroute', props.message.id, props.message?.author)
-                    }}
                     emojiPickerAnchor={emojiPickerAnchor}
                     setMessageAnchor={setMessageAnchor}
                     setEmojiPickerAnchor={setEmojiPickerAnchor}
