@@ -124,7 +124,6 @@ export const MessageFrame = (props: MessageFrameProp): JSX.Element => {
                     hasOwnReaction={hasOwnReaction}
                     msgstreams={msgStreams}
                     messageAnchor={messageAnchor}
-                    api={api}
                     inspectHandler={() => {}}
                     handleReply={async () => {}}
                     unfavorite={() => {}}
@@ -141,7 +140,6 @@ export const MessageFrame = (props: MessageFrameProp): JSX.Element => {
                     hasOwnReaction={hasOwnReaction}
                     msgstreams={msgStreams}
                     messageAnchor={messageAnchor}
-                    api={api}
                     inspectHandler={() => {}}
                     handleReply={async () => {}}
                     unfavorite={() => {}}
@@ -153,6 +151,7 @@ export const MessageFrame = (props: MessageFrameProp): JSX.Element => {
         default:
             return (
                 <MessageView
+                    userCCID={api.userAddress}
                     message={props.message}
                     author={author}
                     reactUsers={reactUsers}
@@ -161,7 +160,6 @@ export const MessageFrame = (props: MessageFrameProp): JSX.Element => {
                     msgstreams={msgStreams}
                     emojiPickerAnchor={emojiPickerAnchor}
                     messageAnchor={messageAnchor}
-                    api={api}
                     inspectHandler={() => {
                         inspector.inspectItem({ messageId: props.message.id, author: props.message.author })
                     }}

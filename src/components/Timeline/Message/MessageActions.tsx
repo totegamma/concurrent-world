@@ -8,7 +8,6 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import RepeatIcon from '@mui/icons-material/Repeat'
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown'
 import type { Stream, Message as CCMessage, ProfileWithAddress } from '../../../model'
-import type ConcurrentApiClient from '../../../apiservice'
 import { Schemas } from '../../../schemas'
 import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
 import { useState } from 'react'
@@ -20,7 +19,6 @@ export interface MessageActionsProps {
     reactUsers: ProfileWithAddress[]
     hasOwnReaction: boolean
     unfavorite: () => void
-    api: ConcurrentApiClient
     message: CCMessage<TypeSimpleNote>
     favorite: () => Promise<void>
     setMessageAnchor: (anchor: null | HTMLElement) => void

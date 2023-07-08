@@ -309,6 +309,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                     )}
                     {message && (
                         <MessageView
+                            userCCID={api.userAddress}
                             message={message}
                             author={author}
                             reactUsers={reactUsers}
@@ -320,7 +321,6 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                             msgstreams={[]}
                             messageAnchor={messageAnchor}
                             emojiPickerAnchor={emojiPickerAnchor}
-                            api={api}
                             inspectHandler={() => {
                                 inspector.inspectItem({ messageId: message.id, author: message.author })
                             }}

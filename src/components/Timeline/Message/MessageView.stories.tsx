@@ -79,6 +79,7 @@ export const Default = (arg: Props): JSX.Element => {
                             <ThemeProvider theme={theme}>
                                 <Paper>
                                     <MessageView
+                                        userCCID={''}
                                         message={MessageMock(arg.body, arg.author, arg.cdate)}
                                         author={CharacterProfileMock(arg.username)}
                                         reactUsers={[]}
@@ -87,7 +88,6 @@ export const Default = (arg: Props): JSX.Element => {
                                         msgstreams={[StreamMock(arg.streamName)]}
                                         messageAnchor={messageAnchor}
                                         emojiPickerAnchor={emojiPickerAnchor}
-                                        api={new ApiMock()}
                                         inspectHandler={() => {}}
                                         handleReply={async () => {}}
                                         handleReRoute={async () => {}}

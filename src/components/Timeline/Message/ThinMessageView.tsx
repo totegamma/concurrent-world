@@ -5,7 +5,6 @@ import type { Character, Message as CCMessage, ProfileWithAddress, Stream } from
 import { SimpleNote } from '../SimpleNote'
 import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
 import type { Profile } from '../../../schemas/profile'
-import type ConcurrentApiClient from '../../../apiservice'
 import { MessageHeader } from './MessageHeader'
 import type { ReplyMessage } from '../../../schemas/replyMessage'
 
@@ -16,7 +15,6 @@ export interface MessageViewProps {
     hasOwnReaction: boolean
     msgstreams: Array<Stream<any>>
     messageAnchor: null | HTMLElement
-    api: ConcurrentApiClient
     inspectHandler: () => void
     handleReply: () => Promise<void>
     unfavorite: () => void

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Box, useTheme, Chip } from '@mui/material'
+import { Box, Chip } from '@mui/material'
 
 import type { Character, Message as CCMessage, ProfileWithAddress, Stream, CCID } from '../../../model'
 import type { Profile } from '../../../schemas/profile'
@@ -29,8 +29,6 @@ export const ReplyMessageFrame = (props: MessageFrameProp): JSX.Element => {
     const [emojiUsers, setEmojiUsers] = useState<ProfileWithAddress[]>([])
     const [messageAnchor, setMessageAnchor] = useState<null | HTMLElement>(null)
     const [emojiPickerAnchor, setEmojiPickerAnchor] = useState<null | HTMLElement>(null)
-
-    const theme = useTheme()
 
     const [hasOwnReaction, setHasOwnReaction] = useState<boolean>(false)
 
@@ -134,6 +132,7 @@ export const ReplyMessageFrame = (props: MessageFrameProp): JSX.Element => {
             )}
             <Box>
                 <MessageView
+                    userCCID={api.userAddress}
                     message={props.message}
                     author={author}
                     reactUsers={reactUsers}
@@ -141,7 +140,6 @@ export const ReplyMessageFrame = (props: MessageFrameProp): JSX.Element => {
                     hasOwnReaction={hasOwnReaction}
                     msgstreams={msgStreams}
                     messageAnchor={messageAnchor}
-                    api={api}
                     inspectHandler={() => {
                         inspector.inspectItem({ messageId: props.message.id, author: props.message.author })
                     }}

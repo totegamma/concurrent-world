@@ -18,7 +18,6 @@ import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import type { Profile } from '../../../schemas/profile'
-import type ConcurrentApiClient from '../../../apiservice'
 import { MessageHeader } from './MessageHeader'
 import { MessageActions } from './MessageActions'
 import { MessageReactions } from './MessageReactions'
@@ -35,7 +34,7 @@ export interface MessageViewProps {
     msgstreams: Array<Stream<any>>
     messageAnchor: null | HTMLElement
     emojiPickerAnchor: null | HTMLElement
-    api: ConcurrentApiClient
+    userCCID: string
     inspectHandler: () => void
     handleReply: () => Promise<void>
     handleReRoute: () => Promise<void>
@@ -112,7 +111,6 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                             reactUsers={props.reactUsers}
                             hasOwnReaction={props.hasOwnReaction}
                             unfavorite={props.unfavorite}
-                            api={props.api}
                             message={props.message}
                             favorite={props.favorite}
                             setMessageAnchor={props.setMessageAnchor}
@@ -152,7 +150,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                     </ListItemIcon>
                     <ListItemText>詳細</ListItemText>
                 </MenuItem>
-                {props.message.author === props.api.userAddress && (
+                {props.message.author === props.userCCID && (
                     <MenuItem
                         onClick={() => {
                             props.deleteMessage(props.message.id)
