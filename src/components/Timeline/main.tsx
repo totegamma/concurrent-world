@@ -86,18 +86,38 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                         useWindow={false}
                         getScrollParent={() => props.scrollParentRef.current}
                     >
-                        {props.timeline.current.map((e) => (
-                            <React.Fragment key={e.id}>
-                                {e.type === 'message' && <MessageMultiplexer message={e} lastUpdated={e.LastUpdated} />}
-                                {e.type === 'association' && (
-                                    <AssociationFrame association={e} lastUpdated={e.LastUpdated} />
-                                )}
-                                {e.type !== 'message' && e.type !== 'association' && (
-                                    <Typography>Unknown message type: {e.type}</Typography>
-                                )}
-                                <Divider variant="inset" component="li" sx={{ margin: '8px 4px' }} />
-                            </React.Fragment>
-                        ))}
+                        {props.timeline.current.map((e) => {
+                            let element
+                            switch (e.type) {
+                                case 'message':
+                                    element = (
+                                        <MessageMultiplexer
+                                            message={e}
+                                            lastUpdated={e.LastUpdated}
+                                            after={
+                                                <Divider variant="inset" component="li" sx={{ margin: '8px 4px' }} />
+                                            }
+                                        />
+                                    )
+                                    break
+                                case 'association':
+                                    element = (
+                                        <AssociationFrame
+                                            association={e}
+                                            lastUpdated={e.LastUpdated}
+                                            after={
+                                                <Divider variant="inset" component="li" sx={{ margin: '8px 4px' }} />
+                                            }
+                                        />
+                                    )
+                                    break
+                                default:
+                                    element = <Typography>Unknown message type: {e.type}</Typography>
+                                    break
+                            }
+
+                            return <React.Fragment key={e.id}>{element}</React.Fragment>
+                        })}
                     </InfiniteScroll>
                 </List>
             </MessageDetailProvider>
