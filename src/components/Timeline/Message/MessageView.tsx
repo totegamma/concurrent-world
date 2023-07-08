@@ -7,8 +7,7 @@ import {
     Menu,
     MenuItem,
     Popover,
-    type PopoverActions,
-    type Theme
+    type PopoverActions
 } from '@mui/material'
 import { Link as routerLink } from 'react-router-dom'
 import { CCAvatar } from '../../CCAvatar'
@@ -32,7 +31,6 @@ export interface MessageViewProps {
     author: Character<Profile> | undefined
     reactUsers: ProfileWithAddress[]
     emojiUsers: ProfileWithAddress[]
-    theme: Theme
     hasOwnReaction: boolean
     msgstreams: Array<Stream<any>>
     messageAnchor: null | HTMLElement
@@ -112,7 +110,6 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                             handleReply={props.handleReply}
                             handleReRoute={props.handleReRoute}
                             reactUsers={props.reactUsers}
-                            theme={props.theme}
                             hasOwnReaction={props.hasOwnReaction}
                             unfavorite={props.unfavorite}
                             api={props.api}

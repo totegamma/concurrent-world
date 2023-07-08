@@ -1,4 +1,4 @@
-import { Box, IconButton, Link, type Theme, Tooltip, Typography } from '@mui/material'
+import { Box, IconButton, Link, Tooltip, Typography } from '@mui/material'
 import ReplyIcon from '@mui/icons-material/Reply'
 import { CCAvatar } from '../../CCAvatar'
 import StarIcon from '@mui/icons-material/Star'
@@ -18,7 +18,6 @@ export interface MessageActionsProps {
     handleReply: () => Promise<void>
     handleReRoute: () => Promise<void>
     reactUsers: ProfileWithAddress[]
-    theme: Theme
     hasOwnReaction: boolean
     unfavorite: () => void
     api: ConcurrentApiClient
@@ -52,7 +51,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     <IconButton
                         sx={{
                             p: '0',
-                            color: props.theme.palette.text.secondary
+                            color: 'text.secondary'
                         }}
                         onClick={() => {
                             props.handleReply()
@@ -63,7 +62,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     <IconButton
                         sx={{
                             p: '0',
-                            color: props.theme.palette.text.secondary
+                            color: 'text.secondary'
                         }}
                         onClick={() => {
                             props.handleReRoute()
@@ -111,7 +110,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                             <IconButton
                                 sx={{
                                     p: '0',
-                                    color: props.theme.palette.text.secondary
+                                    color: 'text.secondary'
                                 }}
                                 color="primary"
                                 onClick={() => {
@@ -136,7 +135,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     <IconButton
                         sx={{
                             p: '0',
-                            color: props.theme.palette.text.secondary
+                            color: 'text.secondary'
                         }}
                         onClick={(e) => {
                             props.setEmojiPickerAnchor(e.currentTarget)
@@ -147,7 +146,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     <IconButton
                         sx={{
                             p: '0',
-                            color: props.theme.palette.text.secondary
+                            color: 'text.secondary'
                         }}
                         onClick={(e) => {
                             props.setMessageAnchor(e.currentTarget)
@@ -217,7 +216,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                             }}
                             sx={{
                                 p: '0',
-                                color: props.theme.palette.text.secondary,
+                                color: 'text.secondary',
                                 display: { sm: 'block', md: 'none' }
                             }}
                         >

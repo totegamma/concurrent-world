@@ -1,4 +1,4 @@
-import { Box, Link, IconButton, type Theme, Typography } from '@mui/material'
+import { Box, Link, IconButton, Typography } from '@mui/material'
 import { Link as routerLink } from 'react-router-dom'
 import { CCAvatar } from '../../CCAvatar'
 import type { Character, Message as CCMessage, ProfileWithAddress, Stream } from '../../../model'
@@ -12,7 +12,6 @@ export interface MessageViewProps {
     message: CCMessage<TypeSimpleNote | ReplyMessage>
     author: Character<Profile> | undefined
     reactUsers: ProfileWithAddress[]
-    theme: Theme
     hasOwnReaction: boolean
     msgstreams: Array<Stream<any>>
     messageAnchor: null | HTMLElement

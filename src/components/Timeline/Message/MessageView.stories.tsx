@@ -7,7 +7,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { MessageView } from './MessageView'
 import { CharacterProfileMock, MessageMock, StreamMock } from '../../../mock/modelmock'
 import { ApiMock } from '../../../mock/apimock'
-import { InspectorProvider, useInspector } from '../../../context/Inspector'
+import { InspectorProvider } from '../../../context/Inspector'
 import Paper from '@mui/material/Paper'
 import { type EmojiProps } from '../../EmojiPicker'
 
@@ -60,7 +60,6 @@ export default meta
 
 export const Default = (arg: Props): JSX.Element => {
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(arg.themeName ?? 'basic'))
-    const inspector = useInspector()
 
     const [messageAnchor, setMessageAnchor] = useState<null | HTMLElement>(null)
     const [emojiPickerAnchor, setEmojiPickerAnchor] = useState<null | HTMLElement>(null)
@@ -80,7 +79,6 @@ export const Default = (arg: Props): JSX.Element => {
                             <ThemeProvider theme={theme}>
                                 <Paper>
                                     <MessageView
-                                        theme={theme}
                                         message={MessageMock(arg.body, arg.author, arg.cdate)}
                                         author={CharacterProfileMock(arg.username)}
                                         reactUsers={[]}
@@ -97,7 +95,7 @@ export const Default = (arg: Props): JSX.Element => {
                                         favorite={async () => {}}
                                         setMessageAnchor={setMessageAnchor}
                                         setEmojiPickerAnchor={setEmojiPickerAnchor}
-                                        addMessageReaction={async (emoji: EmojiProps) => {}}
+                                        addMessageReaction={async (_emoji: EmojiProps) => {}}
                                         removeMessageReaction={async (_id: string) => {}}
                                         deleteMessage={(_id) => {}}
                                     />

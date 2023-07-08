@@ -138,7 +138,6 @@ export const ReplyMessageFrame = (props: MessageFrameProp): JSX.Element => {
                     author={author}
                     reactUsers={reactUsers}
                     emojiUsers={emojiUsers}
-                    theme={theme}
                     hasOwnReaction={hasOwnReaction}
                     msgstreams={msgStreams}
                     messageAnchor={messageAnchor}

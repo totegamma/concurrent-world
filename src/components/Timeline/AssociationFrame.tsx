@@ -2,7 +2,7 @@ import { memo, useCallback, useEffect, useState } from 'react'
 import type { Association, Character, Message, StreamElement, CCID, ProfileWithAddress } from '../../model'
 import { useApi } from '../../context/api'
 import { Schemas } from '../../schemas'
-import { Box, IconButton, ListItem, ListItemButton, Typography, useTheme } from '@mui/material'
+import { Box, IconButton, ListItem, ListItemButton, Typography } from '@mui/material'
 import type { Profile } from '../../schemas/profile'
 import { Link as routerLink } from 'react-router-dom'
 import { CCAvatar } from '../CCAvatar'
@@ -21,7 +21,6 @@ export interface AssociationFrameProp {
 
 export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFrameProp): JSX.Element | null => {
     const api = useApi()
-    const theme = useTheme()
     const inspector = useInspector()
     const messageDetail = useMessageDetail()
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
@@ -317,7 +316,6 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                             addMessageReaction={async (emoji) => {
                                 await api.addMessageReaction(message.id, message.author, emoji.shortcodes, emoji.src)
                             }}
-                            theme={theme}
                             hasOwnReaction={hasOwnReaction}
                             msgstreams={[]}
                             messageAnchor={messageAnchor}

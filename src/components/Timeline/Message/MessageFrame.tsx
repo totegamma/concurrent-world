@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useTheme } from '@mui/material'
 
 import type { Character, Message as CCMessage, ProfileWithAddress, Stream, CCID } from '../../../model'
 import type { Profile } from '../../../schemas/profile'
@@ -29,8 +28,6 @@ export const MessageFrame = (props: MessageFrameProp): JSX.Element => {
     const [messageAnchor, setMessageAnchor] = useState<null | HTMLElement>(null)
     const [emojiPickerAnchor, setEmojiPickerAnchor] = useState<null | HTMLElement>(null)
     const [emojiUsers, setEmojiUsers] = useState<ProfileWithAddress[]>([])
-
-    const theme = useTheme()
 
     const [hasOwnReaction, setHasOwnReaction] = useState<boolean>(false)
 
@@ -124,7 +121,6 @@ export const MessageFrame = (props: MessageFrameProp): JSX.Element => {
                     message={props.message}
                     author={author}
                     reactUsers={reactUsers}
-                    theme={theme}
                     hasOwnReaction={hasOwnReaction}
                     msgstreams={msgStreams}
                     messageAnchor={messageAnchor}
@@ -142,7 +138,6 @@ export const MessageFrame = (props: MessageFrameProp): JSX.Element => {
                     message={props.message}
                     author={author}
                     reactUsers={reactUsers}
-                    theme={theme}
                     hasOwnReaction={hasOwnReaction}
                     msgstreams={msgStreams}
                     messageAnchor={messageAnchor}
@@ -162,7 +157,6 @@ export const MessageFrame = (props: MessageFrameProp): JSX.Element => {
                     author={author}
                     reactUsers={reactUsers}
                     emojiUsers={emojiUsers}
-                    theme={theme}
                     hasOwnReaction={hasOwnReaction}
                     msgstreams={msgStreams}
                     emojiPickerAnchor={emojiPickerAnchor}
