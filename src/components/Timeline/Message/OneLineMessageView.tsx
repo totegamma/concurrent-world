@@ -1,25 +1,8 @@
 import { Box, Link, IconButton, Typography } from '@mui/material'
 import { Link as routerLink } from 'react-router-dom'
 import { CCAvatar } from '../../CCAvatar'
-import type { Character, Message as CCMessage, ProfileWithAddress, Stream } from '../../../model'
-import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
-import type { Profile } from '../../../schemas/profile'
-import type { ReplyMessage } from '../../../schemas/replyMessage'
 import { TimeDiff } from '../../TimeDiff'
-
-export interface MessageViewProps {
-    message: CCMessage<TypeSimpleNote | ReplyMessage>
-    author: Character<Profile> | undefined
-    reactUsers: ProfileWithAddress[]
-    hasOwnReaction: boolean
-    msgstreams: Array<Stream<any>>
-    messageAnchor: null | HTMLElement
-    inspectHandler: () => void
-    handleReply: () => Promise<void>
-    unfavorite: () => void
-    favorite: () => Promise<void>
-    setMessageAnchor: (anchor: null | HTMLElement) => void
-}
+import { type MessageViewProps } from './MessageView'
 
 export const OneLineMessageView = (props: MessageViewProps): JSX.Element => {
     if (!props.message?.payload?.body) return <>message not found</>

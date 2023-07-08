@@ -149,24 +149,6 @@ export const ReplyMessageFrame = (props: MessageFrameProp): JSX.Element => {
                     handleReRoute={async () => {
                         messageDetail.openAction('reroute', props.message.id, props.message?.author)
                     }}
-                    unfavorite={() => {
-                        unfavorite(
-                            props.message.associations.find((e) => e.author === api.userAddress)?.id,
-                            props.message.author
-                        )
-                    }}
-                    favorite={() => api.favoriteMessage(props.message.id, props.message.author)}
-                    addMessageReaction={async (emoji) => {
-                        await api.addMessageReaction(
-                            props.message.id,
-                            props.message.author,
-                            emoji.shortcodes,
-                            emoji.src
-                        )
-                    }}
-                    removeMessageReaction={async (id) => {
-                        await api.unFavoriteMessage(id, props.message.author)
-                    }}
                     emojiPickerAnchor={emojiPickerAnchor}
                     setMessageAnchor={setMessageAnchor}
                     setEmojiPickerAnchor={setEmojiPickerAnchor}
@@ -177,7 +159,6 @@ export const ReplyMessageFrame = (props: MessageFrameProp): JSX.Element => {
                             sx={{ width: 'fit-content', mb: 1 }}
                         />
                     }
-                    deleteMessage={() => {}}
                 />
             </Box>
         </>

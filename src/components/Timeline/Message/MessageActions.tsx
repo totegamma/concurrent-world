@@ -13,14 +13,13 @@ import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
 import { useState } from 'react'
 import Collapse from '@mui/material/Collapse'
 import Fade from '@mui/material/Fade'
+import { useMessageService } from '../Multiplexer'
 export interface MessageActionsProps {
     handleReply: () => Promise<void>
     handleReRoute: () => Promise<void>
     reactUsers: ProfileWithAddress[]
     hasOwnReaction: boolean
-    unfavorite: () => void
     message: CCMessage<TypeSimpleNote>
-    favorite: () => Promise<void>
     setMessageAnchor: (anchor: null | HTMLElement) => void
     setEmojiPickerAnchor: (anchor: null | HTMLElement) => void
     msgstreams: Array<Stream<any>>
@@ -28,6 +27,8 @@ export interface MessageActionsProps {
 
 export const MessageActions = (props: MessageActionsProps): JSX.Element => {
     const [streamListOpen, setStreamListOpen] = useState<boolean>(false)
+
+    const service = useMessageService()
 
     return (
         <>
@@ -113,9 +114,9 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                 color="primary"
                                 onClick={() => {
                                     if (props.hasOwnReaction) {
-                                        props.unfavorite()
+                                        service.removeFavorite()
                                     } else {
-                                        props.favorite()
+                                        service.addFavorite()
                                     }
                                 }}
                             >

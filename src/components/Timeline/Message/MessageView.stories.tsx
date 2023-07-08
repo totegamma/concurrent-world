@@ -91,13 +91,8 @@ export const Default = (arg: Props): JSX.Element => {
                                         inspectHandler={() => {}}
                                         handleReply={async () => {}}
                                         handleReRoute={async () => {}}
-                                        unfavorite={() => {}}
-                                        favorite={async () => {}}
                                         setMessageAnchor={setMessageAnchor}
                                         setEmojiPickerAnchor={setEmojiPickerAnchor}
-                                        addMessageReaction={async (_emoji: EmojiProps) => {}}
-                                        removeMessageReaction={async (_id: string) => {}}
-                                        deleteMessage={(_id) => {}}
                                     />
                                 </Paper>
                             </ThemeProvider>

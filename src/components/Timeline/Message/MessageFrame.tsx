@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 
-import type { Character, Message as CCMessage, ProfileWithAddress, Stream, CCID } from '../../../model'
+import type { Character, Message as CCMessage, ProfileWithAddress, Stream } from '../../../model'
 import type { Profile } from '../../../schemas/profile'
 import { Schemas } from '../../../schemas'
 import { useApi } from '../../../context/api'
@@ -94,24 +94,6 @@ export const MessageFrame = (props: MessageFrameProp): JSX.Element => {
         fetchEmojiUsers()
     }, [props.message?.associations])
 
-    const unfavorite = useCallback(async (deletekey: string | undefined, author: CCID): Promise<void> => {
-        if (!deletekey) return
-        await api.unFavoriteMessage(deletekey, author)
-        // 後々消す
-        props.reloadMessage()
-    }, [])
-
-    const deleteMessage = useCallback(
-        (deletekey: string): void => {
-            api.deleteMessage(deletekey).then(() => {
-                api.invalidateMessage(deletekey)
-                props.reloadMessage()
-            })
-            setMessageAnchor(null)
-        },
-        [api]
-    )
-
     if (!props.message?.payload?.body) return <MessageSkeleton />
 
     switch (props.variant) {
@@ -121,45 +103,12 @@ export const MessageFrame = (props: MessageFrameProp): JSX.Element => {
                     message={props.message}
                     author={author}
                     reactUsers={reactUsers}
-                    hasOwnReaction={hasOwnReaction}
-                    msgstreams={msgStreams}
-                    messageAnchor={messageAnchor}
-                    inspectHandler={() => {}}
-                    handleReply={async () => {}}
-                    unfavorite={() => {}}
-                    favorite={async () => {}}
-                    setMessageAnchor={setMessageAnchor}
-                />
-            )
-        case 'oneline':
-            return (
-                <OneLineMessageView
-                    message={props.message}
-                    author={author}
-                    reactUsers={reactUsers}
-                    hasOwnReaction={hasOwnReaction}
-                    msgstreams={msgStreams}
-                    messageAnchor={messageAnchor}
-                    inspectHandler={() => {}}
-                    handleReply={async () => {}}
-                    unfavorite={() => {}}
-                    favorite={async () => {}}
-                    setMessageAnchor={setMessageAnchor}
-                />
-            )
-
-        default:
-            return (
-                <MessageView
-                    userCCID={api.userAddress}
-                    message={props.message}
-                    author={author}
-                    reactUsers={reactUsers}
                     emojiUsers={emojiUsers}
                     hasOwnReaction={hasOwnReaction}
                     msgstreams={msgStreams}
-                    emojiPickerAnchor={emojiPickerAnchor}
                     messageAnchor={messageAnchor}
+                    emojiPickerAnchor={emojiPickerAnchor}
+                    userCCID={api.userAddress}
                     inspectHandler={() => {
                         inspector.inspectItem({ messageId: props.message.id, author: props.message.author })
                     }}
@@ -169,37 +118,59 @@ export const MessageFrame = (props: MessageFrameProp): JSX.Element => {
                     handleReRoute={async () => {
                         messageDetail.openAction('reroute', props.message.id, props.message?.author)
                     }}
-                    unfavorite={() => {
-                        unfavorite(
-                            props.message.associations.find(
-                                (e) => e.author === api.userAddress && e.schema === Schemas.like
-                            )?.id,
-                            props.message.author
-                        )
+                    setMessageAnchor={setMessageAnchor}
+                    setEmojiPickerAnchor={setEmojiPickerAnchor}
+                />
+            )
+        case 'oneline':
+            return (
+                <OneLineMessageView
+                    message={props.message}
+                    author={author}
+                    reactUsers={reactUsers}
+                    emojiUsers={emojiUsers}
+                    hasOwnReaction={hasOwnReaction}
+                    msgstreams={msgStreams}
+                    messageAnchor={messageAnchor}
+                    emojiPickerAnchor={emojiPickerAnchor}
+                    userCCID={api.userAddress}
+                    inspectHandler={() => {
+                        inspector.inspectItem({ messageId: props.message.id, author: props.message.author })
                     }}
-                    favorite={async () => {
-                        await api.favoriteMessage(props.message.id, props.message.author)
-                        // 後々消す
-                        props.reloadMessage()
+                    handleReply={async () => {
+                        messageDetail.openAction('reply', props.message?.id || '', props.message?.author || '')
                     }}
-                    addMessageReaction={async (emoji) => {
-                        await api.addMessageReaction(
-                            props.message.id,
-                            props.message.author,
-                            emoji.shortcodes,
-                            emoji.src
-                        )
-                        // 後々消す
-                        props.reloadMessage()
-                    }}
-                    removeMessageReaction={async (id: string) => {
-                        await api.unFavoriteMessage(id, props.message.author)
-                        // 後々消す
-                        props.reloadMessage()
+                    handleReRoute={async () => {
+                        messageDetail.openAction('reroute', props.message.id, props.message?.author)
                     }}
                     setMessageAnchor={setMessageAnchor}
                     setEmojiPickerAnchor={setEmojiPickerAnchor}
-                    deleteMessage={deleteMessage}
+                />
+            )
+
+        default:
+            return (
+                <MessageView
+                    message={props.message}
+                    author={author}
+                    reactUsers={reactUsers}
+                    emojiUsers={emojiUsers}
+                    hasOwnReaction={hasOwnReaction}
+                    msgstreams={msgStreams}
+                    messageAnchor={messageAnchor}
+                    emojiPickerAnchor={emojiPickerAnchor}
+                    userCCID={api.userAddress}
+                    inspectHandler={() => {
+                        inspector.inspectItem({ messageId: props.message.id, author: props.message.author })
+                    }}
+                    handleReply={async () => {
+                        messageDetail.openAction('reply', props.message?.id || '', props.message?.author || '')
+                    }}
+                    handleReRoute={async () => {
+                        messageDetail.openAction('reroute', props.message.id, props.message?.author)
+                    }}
+                    setMessageAnchor={setMessageAnchor}
+                    setEmojiPickerAnchor={setEmojiPickerAnchor}
                 />
             )
     }

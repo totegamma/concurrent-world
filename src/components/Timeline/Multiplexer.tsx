@@ -1,7 +1,7 @@
 import { Schemas } from '../../schemas'
 import type { Message as CCMessage, StreamElement } from '../../model'
 import { useApi } from '../../context/api'
-import { memo, useCallback, useEffect, useState } from 'react'
+import { createContext, memo, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { MessageFrame } from './Message/MessageFrame'
 import { ReplyMessageFrame } from './Message/ReplyMessageFrame'
 import type { SimpleNote } from '../../schemas/simpleNote'
@@ -10,6 +10,20 @@ import type { ReRouteMessage } from '../../schemas/reRouteMessage'
 import { ReRouteMessageFrame } from './Message/ReRouteMessageFrame'
 import { MessageSkeleton } from '../MessageSkeleton'
 import { Typography } from '@mui/material'
+
+export interface MessageServiceState {
+    addFavorite: () => void
+    removeFavorite: () => void
+    addReaction: (shortcode: string, img: string) => void
+    removeReaction: (id: string) => void
+    deleteMessage: () => void
+}
+
+const MessageServiceContext = createContext<MessageServiceState | undefined>(undefined)
+
+export function useMessageService(): MessageServiceState {
+    return useContext(MessageServiceContext) as MessageServiceState
+}
 
 interface MultiplexerProps {
     message: StreamElement
@@ -39,11 +53,61 @@ export const MessageMultiplexer = memo<MultiplexerProps>((props: MultiplexerProp
     const reloadMessage = useCallback((): void => {
         api.invalidateMessage(props.message.id)
         loadMessage()
-    }, [props.message.id])
+    }, [api, props.message.id])
+
+    const addFavorite = useCallback(async () => {
+        if (!message) return
+        await api.favoriteMessage(message.id, message.author)
+        reloadMessage()
+    }, [api, message])
+
+    const removeFavorite = useCallback(async () => {
+        const target = message?.associations.find((e) => e.author === api.userAddress && e.schema === Schemas.like)?.id
+        if (!message || !target) return
+        await api.unFavoriteMessage(target, message.author)
+        reloadMessage()
+    }, [api, message])
+
+    const deleteMessage = useCallback((): void => {
+        if (!message) return
+        api.deleteMessage(message.id).then(() => {
+            reloadMessage()
+        })
+    }, [api, message])
+
+    const addReaction = useCallback(
+        (shortcode: string, img: string) => {
+            if (!message) return
+            api.addMessageReaction(message.id, message.author, shortcode, img).then(() => {
+                reloadMessage()
+            })
+        },
+        [api, message]
+    )
+
+    const removeReaction = useCallback(
+        (id: string) => {
+            if (!message) return
+            api.unFavoriteMessage(id, message.author).then(() => {
+                reloadMessage()
+            })
+        },
+        [api, message]
+    )
 
     useEffect(() => {
         loadMessage()
     }, [props.message, props.lastUpdated])
+
+    const services = useMemo(() => {
+        return {
+            addFavorite,
+            removeFavorite,
+            addReaction,
+            removeReaction,
+            deleteMessage
+        }
+    }, [addFavorite, removeFavorite, addReaction, removeReaction, deleteMessage])
 
     if (isFetching) {
         return (
@@ -75,10 +139,10 @@ export const MessageMultiplexer = memo<MultiplexerProps>((props: MultiplexerProp
     }
 
     return (
-        <>
+        <MessageServiceContext.Provider value={services}>
             {body}
             {props.after}
-        </>
+        </MessageServiceContext.Provider>
     )
 })
 

@@ -314,9 +314,6 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                             author={author}
                             reactUsers={reactUsers}
                             emojiUsers={emojiUsers}
-                            addMessageReaction={async (emoji) => {
-                                await api.addMessageReaction(message.id, message.author, emoji.shortcodes, emoji.src)
-                            }}
                             hasOwnReaction={hasOwnReaction}
                             msgstreams={[]}
                             messageAnchor={messageAnchor}
@@ -330,19 +327,8 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                             handleReRoute={async () => {
                                 messageDetail.openAction('reroute', message?.id || '', message?.author)
                             }}
-                            unfavorite={() => {
-                                unfavorite(
-                                    message.associations.find((e) => e.author === api.userAddress)?.id,
-                                    message.author
-                                )
-                            }}
-                            favorite={() => favorite({ ...message })}
                             setMessageAnchor={setMessageAnchor}
                             setEmojiPickerAnchor={setEmojiPickerAnchor}
-                            removeMessageReaction={async (id) => {
-                                api.unFavoriteMessage(id, message.author)
-                            }}
-                            deleteMessage={(_id) => {}}
                         />
                     )}
                     {props.after}

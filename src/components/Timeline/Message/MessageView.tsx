@@ -22,8 +22,9 @@ import { MessageHeader } from './MessageHeader'
 import { MessageActions } from './MessageActions'
 import { MessageReactions } from './MessageReactions'
 import type { ReplyMessage } from '../../../schemas/replyMessage'
-import { EmojiPicker, type EmojiProps } from '../../EmojiPicker'
+import { EmojiPicker } from '../../EmojiPicker'
 import { useRef } from 'react'
+import { useMessageService } from '../Multiplexer'
 
 export interface MessageViewProps {
     message: CCMessage<TypeSimpleNote | ReplyMessage>
@@ -38,18 +39,15 @@ export interface MessageViewProps {
     inspectHandler: () => void
     handleReply: () => Promise<void>
     handleReRoute: () => Promise<void>
-    unfavorite: () => void
-    favorite: () => Promise<void>
-    addMessageReaction: (emoji: EmojiProps) => Promise<void>
-    removeMessageReaction: (id: string) => Promise<void>
     setMessageAnchor: (anchor: null | HTMLElement) => void
     setEmojiPickerAnchor: (anchor: null | HTMLElement) => void
     beforeMessage?: JSX.Element
-    deleteMessage: (id: string) => void
 }
 
 export const MessageView = (props: MessageViewProps): JSX.Element => {
     const repositionEmojiPicker = useRef<PopoverActions | null>(null)
+
+    const service = useMessageService()
 
     return (
         <ListItem
@@ -99,20 +97,13 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                         />
                         {props.beforeMessage}
                         <SimpleNote message={props.message} />
-                        <MessageReactions
-                            message={props.message}
-                            emojiUsers={props.emojiUsers}
-                            addMessageReaction={props.addMessageReaction}
-                            removeMessageReaction={props.removeMessageReaction}
-                        />
+                        <MessageReactions message={props.message} emojiUsers={props.emojiUsers} />
                         <MessageActions
                             handleReply={props.handleReply}
                             handleReRoute={props.handleReRoute}
                             reactUsers={props.reactUsers}
                             hasOwnReaction={props.hasOwnReaction}
-                            unfavorite={props.unfavorite}
                             message={props.message}
-                            favorite={props.favorite}
                             setMessageAnchor={props.setMessageAnchor}
                             setEmojiPickerAnchor={props.setEmojiPickerAnchor}
                             msgstreams={props.msgstreams}
@@ -153,7 +144,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                 {props.message.author === props.userCCID && (
                     <MenuItem
                         onClick={() => {
-                            props.deleteMessage(props.message.id)
+                            service.deleteMessage()
                         }}
                     >
                         <ListItemIcon>
@@ -177,7 +168,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
             >
                 <EmojiPicker
                     onSelected={(emoji) => {
-                        props.addMessageReaction(emoji)
+                        service.addReaction(emoji.shortcodes, emoji.src)
                         props.setEmojiPickerAnchor(null)
                     }}
                     onMounted={() => {
