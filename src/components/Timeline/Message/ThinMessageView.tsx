@@ -1,11 +1,19 @@
 import { Box, IconButton, ListItem } from '@mui/material'
 import { Link as routerLink } from 'react-router-dom'
 import { CCAvatar } from '../../CCAvatar'
-import { SimpleNote } from '../SimpleNote'
 import { MessageHeader } from './MessageHeader'
-import { type MessageViewProps } from './MessageView'
+import { type Character, type Message } from '../../../model'
+import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
+import { type ReplyMessage } from '../../../schemas/replyMessage'
+import { type Profile } from '../../../schemas/profile'
+import { SimpleNote } from '../SimpleNote'
 
-export const ThinMessageView = (props: MessageViewProps): JSX.Element => {
+export interface ThinMessageViewProps {
+    message: Message<TypeSimpleNote | ReplyMessage>
+    author: Character<Profile> | undefined
+}
+
+export const ThinMessageView = (props: ThinMessageViewProps): JSX.Element => {
     return (
         <ListItem
             sx={{

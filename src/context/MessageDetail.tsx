@@ -8,7 +8,6 @@ import type { ReplyMessage } from '../schemas/replyMessage'
 import type { ReplyAssociation } from '../schemas/replyAssociation'
 import { ApplicationContext } from '../App'
 import { Draft } from '../components/Draft'
-import { MessageFrame } from '../components/Timeline/Message/MessageFrame'
 import { MessageContainer } from '../components/Timeline/MessageContainer'
 
 export interface MessageDetailState {

@@ -2,7 +2,6 @@ import { Schemas } from '../../schemas'
 import type { Character, Message, ProfileWithAddress, Stream } from '../../model'
 import { useApi } from '../../context/api'
 import { createContext, memo, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { MessageFrame } from './Message/MessageFrame'
 import { ReplyMessageFrame } from './Message/ReplyMessageFrame'
 import type { SimpleNote } from '../../schemas/simpleNote'
 import type { ReplyMessage } from '../../schemas/replyMessage'
@@ -13,6 +12,7 @@ import { Typography } from '@mui/material'
 import { useInspector } from '../../context/Inspector'
 import { useMessageDetail } from '../../context/MessageDetail'
 import { type Profile } from '../../schemas/profile'
+import { MessageView } from './Message/MessageView'
 
 export interface MessageServiceState {
     addFavorite: () => void
@@ -209,12 +209,10 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
     switch (message?.schema) {
         case Schemas.simpleNote:
             body = (
-                <MessageFrame
-                    message={message}
-                    lastUpdated={props.lastUpdated}
-                    reloadMessage={reloadMessage}
-                    author={author}
+                <MessageView
+                    message={message as Message<SimpleNote>}
                     userCCID={api.userAddress}
+                    author={author}
                     streams={streams}
                     favoriteUsers={favoriteUsers}
                     reactionUsers={reactionUsers}
@@ -224,7 +222,7 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
         case Schemas.replyMessage:
             body = (
                 <ReplyMessageFrame
-                    message={message}
+                    message={message as Message<ReplyMessage>}
                     lastUpdated={props.lastUpdated}
                     reloadMessage={reloadMessage}
                     author={author}
@@ -237,7 +235,11 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
             break
         case Schemas.reRouteMessage:
             body = (
-                <ReRouteMessageFrame message={message} lastUpdated={props.lastUpdated} reloadMessage={reloadMessage} />
+                <ReRouteMessageFrame
+                    message={message as Message<ReRouteMessage>}
+                    lastUpdated={props.lastUpdated}
+                    reloadMessage={reloadMessage}
+                />
             )
             break
         default:
