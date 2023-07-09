@@ -13,7 +13,6 @@ import { HomeSettings } from '../components/HomeSettings'
 import { ApplicationContext } from '../App'
 import type { SimpleNote } from '../schemas/simpleNote'
 import { Schemas } from '../schemas'
-import { usePersistent } from '../hooks/usePersistent'
 import { usePreference } from '../context/PreferenceContext'
 
 export interface TimelinePageProps {
@@ -32,15 +31,14 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
     const [mode, setMode] = useState<string>('compose')
     const [writeable, setWriteable] = useState<boolean>(true)
 
-    const [defaultPostHome] = usePersistent<string[]>('defaultPostHome', [])
-    const [defaultPostNonHome] = usePersistent<string[]>('defaultPostNonHome', [])
     const queriedStreams = reactlocation.hash
         .replace('#', '')
         .split(',')
         .filter((e) => e !== '')
+
     const streamPickerInitial = [
         ...new Set([
-            ...(reactlocation.hash && reactlocation.hash !== '' ? defaultPostNonHome : defaultPostHome),
+            ...(reactlocation.hash && reactlocation.hash !== '' ? pref.defaultPostNonHome : pref.defaultPostHome),
             ...queriedStreams
         ])
     ]

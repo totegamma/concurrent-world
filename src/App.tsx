@@ -32,6 +32,7 @@ import ConcurrentApiClient from './apiservice'
 import type { Profile } from './schemas/profile'
 import type { Userstreams } from './schemas/userstreams'
 import { PreferenceProvider } from './context/PreferenceContext'
+import { GlobalActionsProvider } from './context/GlobalActions'
 
 export const ApplicationContext = createContext<appData>({
     profile: undefined,
@@ -322,7 +323,7 @@ function App(): JSX.Element {
                         <ApiProvider api={api}>
                             <PreferenceProvider>
                                 <ApplicationContext.Provider value={applicationContext}>
-                                    {childs}
+                                    <GlobalActionsProvider>{childs}</GlobalActionsProvider>
                                 </ApplicationContext.Provider>
                             </PreferenceProvider>
                         </ApiProvider>
