@@ -14,6 +14,7 @@ export interface TimelineProps {
     streams: string[]
     timeline: IuseObjectList<StreamElementDated>
     scrollParentRef: RefObject<HTMLDivElement>
+    perspective?: string
 }
 
 const divider = <Divider variant="inset" component="li" sx={{ margin: '8px 4px' }} />
@@ -103,7 +104,12 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                                     break
                                 case 'association':
                                     element = (
-                                        <AssociationFrame association={e} lastUpdated={e.LastUpdated} after={divider} />
+                                        <AssociationFrame
+                                            association={e}
+                                            lastUpdated={e.LastUpdated}
+                                            after={divider}
+                                            perspective={props.perspective}
+                                        />
                                     )
                                     break
                                 default:
