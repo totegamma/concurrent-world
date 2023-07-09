@@ -436,7 +436,6 @@ function App(): JSX.Element {
                     onClick={() => {
                         setMobileMenuOpen(false)
                     }}
-                    hideMenu
                 />
             </Drawer>
         </>
