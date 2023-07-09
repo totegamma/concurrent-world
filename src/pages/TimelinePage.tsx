@@ -1,5 +1,6 @@
 import { memo, useContext, useEffect, useRef, useState } from 'react'
 import { Box, Collapse, Divider } from '@mui/material'
+import ExploreIcon from '@mui/icons-material/Explore'
 import type { StreamElementDated } from '../model'
 import type { IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'
@@ -137,7 +138,11 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                 {(reactlocation.hash === '' || reactlocation.hash === '#') &&
                 pref.followingStreams.length === 0 &&
                 pref.followingUsers.length === 0 ? (
-                    <Box>まだ誰も、どのストリームもフォローしていません。Explorerタブから探しに行きましょう。</Box>
+                    <Box>
+                        まだ誰も、どのストリームもフォローしていません。
+                        <ExploreIcon sx={{ fontSize: '1.2rem', verticalAlign: 'middle' }} />
+                        Explorerタブから探しに行きましょう。
+                    </Box>
                 ) : (
                     <Box sx={{ display: 'flex', flex: 1, py: { xs: 1, sm: 1 }, px: { xs: 1, sm: 2 } }}>
                         <Timeline
