@@ -1,6 +1,6 @@
 import { Box, Button, Collapse, IconButton, Paper, Typography, Zoom, alpha, useTheme } from '@mui/material'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 import { useApi } from '../context/api'
 import type { Character, Entity, StreamElementDated } from '../model'
 import type { Userstreams } from '../schemas/userstreams'
@@ -12,7 +12,6 @@ import { useObjectList } from '../hooks/useObjectList'
 import Background from '../resources/defaultbg.png'
 import InfoIcon from '@mui/icons-material/Info'
 import CreateIcon from '@mui/icons-material/Create'
-import { ProfileEditor } from '../components/ProfileEditor'
 import { useSnackbar } from 'notistack'
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1'
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove'
@@ -253,12 +252,7 @@ export function EntityPage(): JSX.Element {
                             </Box>
                         </Paper>
                     </Collapse>
-                    <Collapse in={mode === 'edit'}>
-                        <ProfileEditor
-                            initial={profile}
-                            onSubmit={() => enqueueSnackbar('プロフィールを更新しました', { variant: 'success' })}
-                        />
-                    </Collapse>
+                    {mode === 'edit' && <Navigate to="/settings" />}
                 </Box>
                 <Box /* timeline */
                     sx={{

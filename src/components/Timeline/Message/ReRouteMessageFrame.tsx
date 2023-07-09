@@ -1,4 +1,4 @@
-import { useState, useEffect, memo } from 'react'
+import { useState, useEffect } from 'react'
 import { Box, IconButton, Typography } from '@mui/material'
 
 import type { Character, Message as CCMessage } from '../../../model'
@@ -6,33 +6,25 @@ import RepeatIcon from '@mui/icons-material/Repeat'
 import type { Profile } from '../../../schemas/profile'
 import { Schemas } from '../../../schemas'
 import { useApi } from '../../../context/api'
-import { MessageFrame } from './MessageFrame'
 import { CCAvatar } from '../../CCAvatar'
 import { Link as routerLink } from 'react-router-dom'
 import { TimeDiff } from '../../TimeDiff'
+import { MessageContainer } from '../MessageContainer'
 
 export interface ReRouteMessageFrameProp {
     message: CCMessage<any>
-    lastUpdated: number
+    reloadMessage: () => void
+    lastUpdated?: number
     thin?: boolean
 }
 
-export const ReRouteMessageFrame = memo<ReRouteMessageFrameProp>((props: ReRouteMessageFrameProp): JSX.Element => {
+export const ReRouteMessageFrame = (props: ReRouteMessageFrameProp): JSX.Element => {
     const api = useApi()
     const [author, setAuthor] = useState<Character<Profile> | undefined>()
-
-    const [reRouteMessage, setReRouteMessage] = useState<CCMessage<any> | undefined>()
 
     useEffect(() => {
         api.readCharacter(props.message.author, Schemas.profile).then((e) => {
             setAuthor(e)
-        })
-
-        api.fetchMessageWithAuthor(
-            props.message.payload.body.rerouteMessageId,
-            props.message.payload.body.rerouteMessageAuthor
-        ).then((e) => {
-            setReRouteMessage(e)
         })
     }, [props.message, props.lastUpdated])
 
@@ -87,17 +79,10 @@ export const ReRouteMessageFrame = memo<ReRouteMessageFrameProp>((props: ReRoute
                     <TimeDiff date={new Date(props.message.cdate)} />
                 </Box>
             </Box>
-            {reRouteMessage ? (
-                <Box>
-                    <MessageFrame message={reRouteMessage} lastUpdated={0}></MessageFrame>
-                </Box>
-            ) : (
-                <Typography color="text.disabled" fontWeight="700">
-                    But now it&apos;s gone...
-                </Typography>
-            )}
+            <MessageContainer
+                messageID={props.message.payload.body.rerouteMessageId}
+                messageOwner={props.message.payload.body.rerouteMessageAuthor}
+            />
         </>
     )
-})
-
-ReRouteMessageFrame.displayName = 'ReRouteMessageFrame'
+}

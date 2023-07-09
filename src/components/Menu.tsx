@@ -12,7 +12,6 @@ import {
 import { Link } from 'react-router-dom'
 
 import HomeIcon from '@mui/icons-material/Home'
-import BadgeIcon from '@mui/icons-material/Badge'
 import BuildIcon from '@mui/icons-material/Build'
 import MessageIcon from '@mui/icons-material/Message'
 import ExploreIcon from '@mui/icons-material/Explore'
@@ -21,7 +20,6 @@ import NotificationsIcon from '@mui/icons-material/Notifications'
 import { memo, useContext } from 'react'
 import { ApplicationContext } from '../App'
 import type { ConcurrentTheme } from '../model'
-
 // @ts-expect-error vite dynamic import
 import buildTime from '~build/time'
 // @ts-expect-error vite dynamic import
@@ -34,7 +32,6 @@ import { ConcurrentWordmark } from './ConcurrentWordmark'
 const branchName = branch || window.location.host.split('.')[0]
 
 export interface MenuProps {
-    hideMenu?: boolean
     onClick?: () => void
 }
 
@@ -83,98 +80,86 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                     sha: {sha.slice(0, 7)}
                 </Box>
                 <Divider />
-                {!props.hideMenu && (
-                    <>
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: 1
-                            }}
-                        >
-                            <List dense sx={{ width: '100%' }}>
-                                <ListItem disablePadding>
-                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/">
-                                        <HomeIcon
-                                            sx={{
-                                                color: 'background.contrastText'
-                                            }}
-                                        />
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 1
+                    }}
+                >
+                    <List dense sx={{ width: '100%' }}>
+                        <ListItem disablePadding>
+                            <ListItemButton sx={{ gap: 1 }} component={Link} to="/" onClick={props.onClick}>
+                                <HomeIcon
+                                    sx={{
+                                        color: 'background.contrastText'
+                                    }}
+                                />
+                                <ListItemText primary="Home" />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton
+                                sx={{ gap: 1 }}
+                                component={Link}
+                                to="/notifications"
+                                onClick={props.onClick}
+                            >
+                                <NotificationsIcon
+                                    sx={{
+                                        color: 'background.contrastText'
+                                    }}
+                                />
 
-                                        <ListItemText primary="Home" />
-                                    </ListItemButton>
-                                </ListItem>
-                                <ListItem disablePadding>
-                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/notifications">
-                                        <NotificationsIcon
-                                            sx={{
-                                                color: 'background.contrastText'
-                                            }}
-                                        />
+                                <ListItemText primary="Notifications" />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton sx={{ gap: 1 }} component={Link} to="/associations" onClick={props.onClick}>
+                                <MessageIcon
+                                    sx={{
+                                        color: 'background.contrastText'
+                                    }}
+                                />
 
-                                        <ListItemText primary="Notifications" />
-                                    </ListItemButton>
-                                </ListItem>
-                                <ListItem disablePadding>
-                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/associations">
-                                        <MessageIcon
-                                            sx={{
-                                                color: 'background.contrastText'
-                                            }}
-                                        />
+                                <ListItemText primary="Associations" />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton sx={{ gap: 1 }} component={Link} to="/explorer" onClick={props.onClick}>
+                                <ExploreIcon
+                                    sx={{
+                                        color: 'background.contrastText'
+                                    }}
+                                />
 
-                                        <ListItemText primary="Associations" />
-                                    </ListItemButton>
-                                </ListItem>
-                                <ListItem disablePadding>
-                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/explorer">
-                                        <ExploreIcon
-                                            sx={{
-                                                color: 'background.contrastText'
-                                            }}
-                                        />
+                                <ListItemText primary="Explorer" />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton sx={{ gap: 1 }} component={Link} to="/devtool" onClick={props.onClick}>
+                                <BuildIcon
+                                    sx={{
+                                        color: 'background.contrastText'
+                                    }}
+                                />
 
-                                        <ListItemText primary="Explorer" />
-                                    </ListItemButton>
-                                </ListItem>
-                                <ListItem disablePadding>
-                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/identity">
-                                        <BadgeIcon
-                                            sx={{
-                                                color: 'background.contrastText'
-                                            }}
-                                        />
-
-                                        <ListItemText primary="Identity" />
-                                    </ListItemButton>
-                                </ListItem>
-                                <ListItem disablePadding>
-                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/settings">
-                                        <SettingsIcon
-                                            sx={{
-                                                color: 'background.contrastText'
-                                            }}
-                                        />
-
-                                        <ListItemText primary="Settings" />
-                                    </ListItemButton>
-                                </ListItem>
-                                <ListItem disablePadding>
-                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/devtool">
-                                        <BuildIcon
-                                            sx={{
-                                                color: 'background.contrastText'
-                                            }}
-                                        />
-
-                                        <ListItemText primary="DevTool" />
-                                    </ListItemButton>
-                                </ListItem>
-                            </List>
-                        </Box>
-                        <Divider />
-                    </>
-                )}
+                                <ListItemText primary="DevTool" />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton sx={{ gap: 1 }} component={Link} to="/settings" onClick={props.onClick}>
+                                <SettingsIcon
+                                    sx={{
+                                        color: 'background.contrastText'
+                                    }}
+                                />
+                                <ListItemText primary="Settings" />
+                            </ListItemButton>
+                        </ListItem>
+                    </List>
+                </Box>
+                <Divider />
                 <Box
                     sx={{
                         flex: 1,
@@ -188,34 +173,37 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                 >
                     <StreamList onClick={props.onClick} />
                 </Box>
-                <ButtonBase
-                    component={Link}
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'left',
-                        gap: 1
-                    }}
-                    to={'/entity/' + (appData.profile?.author ?? '')}
-                >
-                    <CCAvatar
-                        alt={appData.profile?.payload.body.username}
-                        avatarURL={appData.profile?.payload.body.avatar}
-                        identiconSource={api.userAddress}
+                <Box sx={{ p: 1, mb: 'env(safe-area-inset-bottom)' }}>
+                    <ButtonBase
+                        component={Link}
                         sx={{
-                            width: '40px',
-                            height: '40px'
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'left',
+                            gap: 1
                         }}
-                    />
-                    <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', flexFlow: 'column' }}>
-                        <Typography color={theme.palette.background.contrastText}>
-                            {appData.profile?.payload.body.username}
-                        </Typography>
-                        <Typography variant="caption" color={theme.palette.background.contrastText}>
-                            {api.host}
-                        </Typography>
-                    </Box>
-                </ButtonBase>
+                        to={'/entity/' + (appData.profile?.author ?? '')}
+                        onClick={props.onClick}
+                    >
+                        <CCAvatar
+                            alt={appData.profile?.payload.body.username}
+                            avatarURL={appData.profile?.payload.body.avatar}
+                            identiconSource={api.userAddress}
+                            sx={{
+                                width: '40px',
+                                height: '40px'
+                            }}
+                        />
+                        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', flexFlow: 'column' }}>
+                            <Typography color={theme.palette.background.contrastText}>
+                                {appData.profile?.payload.body.username}
+                            </Typography>
+                            <Typography variant="caption" color={theme.palette.background.contrastText}>
+                                {api.host}
+                            </Typography>
+                        </Box>
+                    </ButtonBase>
+                </Box>
             </Box>
         </Box>
     )

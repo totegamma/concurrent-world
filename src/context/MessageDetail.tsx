@@ -4,11 +4,12 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { useApi } from './api'
 import type { CCID, Message } from '../model'
 import { Schemas } from '../schemas'
-import { MessageFrame } from '../components/Timeline'
 import type { ReplyMessage } from '../schemas/replyMessage'
 import type { ReplyAssociation } from '../schemas/replyAssociation'
 import { ApplicationContext } from '../App'
 import { Draft } from '../components/Draft'
+import { MessageFrame } from '../components/Timeline/Message/MessageFrame'
+import { MessageContainer } from '../components/Timeline/MessageContainer'
 
 export interface MessageDetailState {
     showingMessage: { messageId: string; author: CCID } | null
@@ -115,7 +116,7 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
                     }}
                 >
                     <Paper sx={style}>
-                        <MessageFrame variant="thin" message={message} lastUpdated={0}></MessageFrame>
+                        <MessageContainer messageID={message.id} messageOwner={message.author} />
                         <Divider />
                         <Box sx={{ display: 'flex' }}>
                             <Draft

@@ -18,10 +18,10 @@ import { useApi } from './api'
 import type { Character, Message } from '../model'
 import { Schemas } from '../schemas'
 import type { Profile } from '../schemas/profile'
-import { MessageFrame } from '../components/Timeline'
 import { validateSignature } from '../util'
 import grey from '@mui/material/colors/grey'
 import { Codeblock } from '../components/Codeblock'
+import { MessageContainer } from '../components/Timeline/MessageContainer'
 
 export interface InspectorState {
     inspectingItem: { messageId: string; author: string } | null
@@ -118,7 +118,7 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                     >
                         <Typography variant="h1">Inspect</Typography>
                         <Paper sx={{ m: '10px 0', p: '0 20px' }} elevation={0} variant="outlined">
-                            <MessageFrame message={message} lastUpdated={0} />
+                            <MessageContainer messageID={message.id} messageOwner={message.author} />
                         </Paper>
                         {signatureIsValid ? (
                             <Alert severity="success">Signature is valid!</Alert>

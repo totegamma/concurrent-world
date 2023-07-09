@@ -1,7 +1,6 @@
 export * from './Associations'
 export * from './Explorer'
 export * from './Notifications'
-export * from './Identity'
 export * from './Settings'
 export * from './TimelinePage'
 export * from './Entity'
