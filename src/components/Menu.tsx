@@ -188,6 +188,9 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         onClick={() => {
                             actions.openDraft()
                         }}
+                        sx={{
+                            display: { xs: 'none', sm: 'flex' }
+                        }}
                     >
                         投稿する
                     </Button>
