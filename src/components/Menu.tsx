@@ -2,19 +2,16 @@ import {
     Box,
     ButtonBase,
     Divider,
-    IconButton,
     List,
     ListItem,
     ListItemButton,
     ListItemText,
     Typography,
-    useTheme,
-    Tooltip
+    useTheme
 } from '@mui/material'
 import { Link } from 'react-router-dom'
 
 import HomeIcon from '@mui/icons-material/Home'
-import BadgeIcon from '@mui/icons-material/Badge'
 import BuildIcon from '@mui/icons-material/Build'
 import MessageIcon from '@mui/icons-material/Message'
 import ExploreIcon from '@mui/icons-material/Explore'
@@ -149,6 +146,16 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                         <ListItemText primary="DevTool" />
                                     </ListItemButton>
                                 </ListItem>
+                                <ListItem disablePadding>
+                                    <ListItemButton sx={{ gap: 1 }} component={Link} to="/settings">
+                                        <SettingsIcon
+                                            sx={{
+                                                color: 'background.contrastText'
+                                            }}
+                                        />
+                                        <ListItemText primary="Settings" />
+                                    </ListItemButton>
+                                </ListItem>
                             </List>
                         </Box>
                         <Divider />
@@ -167,43 +174,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                 >
                     <StreamList onClick={props.onClick} />
                 </Box>
-                <Box sx={{ p: 1 }}>
-                    <List
-                        onClick={props.onClick}
-                        disablePadding
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            gap: 1,
-                            justifyContent: 'space-around',
-                            pb: 1
-                        }}
-                    >
-                        <ListItem disablePadding>
-                            <ListItemButton sx={{ gap: 1, padding: 0 }} component={Link} to="/identity">
-                                <Tooltip title="Identity">
-                                    <BadgeIcon
-                                        sx={{
-                                            color: 'background.contrastText'
-                                        }}
-                                    />
-                                </Tooltip>
-                                <ListItemText primary="Identity" primaryTypographyProps={{ fontSize: 13 }} />
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton sx={{ gap: 1, padding: 0 }} component={Link} to="/settings">
-                                <Tooltip title="Settings">
-                                    <SettingsIcon
-                                        sx={{
-                                            color: 'background.contrastText'
-                                        }}
-                                    />
-                                </Tooltip>
-                                <ListItemText primary="Settings" primaryTypographyProps={{ fontSize: 13 }} />
-                            </ListItemButton>
-                        </ListItem>
-                    </List>
+                <Box sx={{ p: 1, mb: 'env(safe-area-inset-bottom)' }}>
                     <ButtonBase
                         component={Link}
                         sx={{

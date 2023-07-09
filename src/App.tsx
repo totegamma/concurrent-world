@@ -16,7 +16,6 @@ import {
     Associations,
     Explorer,
     Notifications,
-    Identity,
     Settings,
     TimelinePage,
     EntityPage,
@@ -398,7 +397,6 @@ function App(): JSX.Element {
                                 <Route path="/associations" element={<Associations messages={messages} />} />
                                 <Route path="/explorer" element={<Explorer />} />
                                 <Route path="/notifications" element={<Notifications messages={messages} />} />
-                                <Route path="/identity" element={<Identity />} />
                                 <Route path="/settings" element={<Settings setThemeName={setThemeName} />} />
                                 <Route path="/message/:id" element={<MessagePage />} />
                                 <Route path="/entity/:id" element={<EntityPage />} />

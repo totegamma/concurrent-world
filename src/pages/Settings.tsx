@@ -1,9 +1,17 @@
-import { Button, Divider, Typography, Box, useTheme } from '@mui/material'
+import { Button, Divider, Typography, Box, useTheme, Tabs, Tab, IconButton } from '@mui/material'
 import { LogoutButton } from '../components/Settings/LogoutButton'
 import { ThemeSelect } from '../components/Settings/ThemeSelect'
 import { ImgurSettings } from '../components/Settings/Imgur'
 import { useApi } from '../context/api'
 import { useSnackbar } from 'notistack'
+import { useContext, useState } from 'react'
+import { APSettings } from '../components/APSettings'
+import { Passport } from '../components/Passport'
+import Tilt from 'react-parallax-tilt'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
+import { ProfileEditor } from '../components/ProfileEditor'
+import { ApplicationContext } from '../App'
 
 export interface SettingsProp {
     setThemeName: (themeName: string) => void
@@ -11,6 +19,7 @@ export interface SettingsProp {
 
 export function Settings(props: SettingsProp): JSX.Element {
     const api = useApi()
+    const appData = useContext(ApplicationContext)
     const theme = useTheme()
     const { enqueueSnackbar } = useSnackbar()
 
@@ -28,23 +37,36 @@ export function Settings(props: SettingsProp): JSX.Element {
         }
     }
 
+    const [tab, setTab] = useState(0)
+    const [showPrivateKey, setShowPrivateKey] = useState(false)
+
     return (
-        <>
-            <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 1,
-                    padding: '20px',
-                    background: theme.palette.background.paper,
-                    minHeight: '100%',
-                    overflowY: 'scroll'
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 1,
+                padding: '20px',
+                background: theme.palette.background.paper,
+                minHeight: '100%',
+                overflowY: 'scroll'
+            }}
+        >
+            <Typography variant="h2" gutterBottom>
+                Settings
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
+            <Tabs
+                value={tab}
+                onChange={(_, index) => {
+                    setTab(index)
                 }}
             >
-                <Typography variant="h2" gutterBottom>
-                    Settings
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
+                <Tab label="基本設定" />
+                <Tab label="アカウント詳細" />
+                <Tab label="Activitypub" />
+            </Tabs>
+            {tab === 0 && (
                 <Box
                     sx={{
                         display: 'flex',
@@ -52,6 +74,23 @@ export function Settings(props: SettingsProp): JSX.Element {
                         gap: '30px'
                     }}
                 >
+                    <Typography variant="h3">プロフィール</Typography>
+                    <Box
+                        sx={{
+                            width: '100%',
+                            borderRadius: 1,
+                            overflow: 'hidden'
+                        }}
+                    >
+                        <ProfileEditor
+                            initial={appData.profile}
+                            onSubmit={(_profile) => {
+                                enqueueSnackbar('更新しました', { variant: 'success' })
+                            }}
+                        />
+                    </Box>
+                    <ThemeSelect setThemeName={props.setThemeName} />
+                    <ImgurSettings />
                     <Box
                         sx={{
                             display: 'flex',
@@ -59,7 +98,7 @@ export function Settings(props: SettingsProp): JSX.Element {
                             gap: '5px'
                         }}
                     >
-                        <Typography variant="h3">Basic</Typography>
+                        <Typography variant="h3">便利ボタン</Typography>
                         <Button
                             variant="contained"
                             onClick={(_) => {
@@ -76,24 +115,8 @@ export function Settings(props: SettingsProp): JSX.Element {
                         >
                             Force Reload
                         </Button>
-                        <Button
-                            variant="contained"
-                            onClick={(_) => {
-                                if (api.host === undefined) {
-                                    return
-                                }
-                                const jwt = api.constructJWT({
-                                    exp: Math.floor((new Date().getTime() + 60 * 60 * 1000) / 1000).toString()
-                                }) // 1h validity
-                                window.location.href = `https://${api.host}/login?token=${jwt}`
-                            }}
-                        >
-                            Goto Domain Home
-                        </Button>
                     </Box>
 
-                    <ThemeSelect setThemeName={props.setThemeName} />
-                    <ImgurSettings />
                     <Box
                         sx={{
                             display: 'flex',
@@ -107,7 +130,70 @@ export function Settings(props: SettingsProp): JSX.Element {
                         <LogoutButton />
                     </Box>
                 </Box>
-            </Box>
-        </>
+            )}
+            {tab === 1 && (
+                <>
+                    <Box
+                        sx={{
+                            padding: { xs: '10px', sm: '10px 50px' }
+                        }}
+                    >
+                        <Tilt glareEnable={true} glareBorderRadius="5%">
+                            <Passport />
+                        </Tilt>
+                    </Box>
+                    <Divider />
+                    <Typography variant="h3" gutterBottom>
+                        CCID
+                    </Typography>
+                    <Typography>{api.userAddress}</Typography>
+
+                    <Typography variant="h3" gutterBottom>
+                        Host
+                    </Typography>
+                    <Typography>{api.host}</Typography>
+
+                    <Typography variant="h3" gutterBottom>
+                        Privatekey
+                    </Typography>
+                    <Typography
+                        sx={{
+                            wordBreak: 'break-all',
+                            display: 'flex',
+                            alignItems: 'center'
+                        }}
+                    >
+                        {showPrivateKey ? api.privatekey : '•••••••••••••••••••••••••••••••••••••••••••••••••'}
+                        <IconButton
+                            sx={{ ml: 'auto' }}
+                            onClick={() => {
+                                setShowPrivateKey(!showPrivateKey)
+                            }}
+                        >
+                            {!showPrivateKey ? (
+                                <VisibilityIcon sx={{ color: theme.palette.text.primary }} />
+                            ) : (
+                                <VisibilityOffIcon sx={{ color: theme.palette.text.primary }} />
+                            )}
+                        </IconButton>
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        onClick={(_) => {
+                            if (api.host === undefined) {
+                                return
+                            }
+                            const jwt = api.constructJWT({
+                                exp: Math.floor((new Date().getTime() + 60 * 60 * 1000) / 1000).toString()
+                            }) // 1h validity
+                            window.location.href = `https://${api.host}/login?token=${jwt}`
+                        }}
+                    >
+                        Goto Domain Home
+                    </Button>
+                </>
+            )}
+            {tab === 2 && <APSettings />}
+        </Box>
     )
 }
