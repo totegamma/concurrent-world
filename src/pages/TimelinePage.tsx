@@ -147,7 +147,16 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                             flexDirection: 'column'
                         }}
                     >
-                        <Box style={{ display: 'flex', marginTop: 8, flexDirection: 'column', alignItems: 'center' }}>
+                        <Box
+                            style={{
+                                display: 'flex',
+                                marginTop: 8,
+                                marginLeft: 8,
+                                marginRight: 8,
+                                flexDirection: 'column',
+                                alignItems: 'center'
+                            }}
+                        >
                             <Button variant="contained" component={NavLink} to="/explorer">
                                 <Typography variant="h1" sx={{ fontWeight: 600, mx: 1 }}>
                                     Go Explore
