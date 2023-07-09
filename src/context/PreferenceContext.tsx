@@ -26,6 +26,9 @@ interface PreferenceState {
     setDefaultPostHome: (_: string[]) => void
     defaultPostNonHome: string[]
     setDefaultPostNonHome: (_: string[]) => void
+
+    devMode: boolean
+    setDevMode: (_: boolean) => void
 }
 
 const PreferenceContext = createContext<PreferenceState | undefined>(undefined)
@@ -46,6 +49,7 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
     const [bookmarkingStreams, setBookmarkingStreams] = usePersistent<string[]>('bookmarkingStreams', [])
     const [defaultPostHome, setDefaultPostHome] = usePersistent<string[]>('defaultPostHome', [])
     const [defaultPostNonHome, setDefaultPostNonHome] = usePersistent<string[]>('defaultPostNonHome', [])
+    const [devMode, setDevMode] = usePersistent<boolean>('devMode', false)
 
     const followUser = useCallback(
         (ccaddr: string): void => {
@@ -107,6 +111,7 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
                 setBookmarkingStreams(parsed.bookmarkingStreams)
                 setDefaultPostHome(parsed.defaultPostHome)
                 setDefaultPostNonHome(parsed.defaultPostNonHome)
+                setDevMode(parsed.devMode)
             })
             .catch((e) => {
                 setInitialized(true)
@@ -124,7 +129,8 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
             followingStreams,
             bookmarkingStreams,
             defaultPostHome,
-            defaultPostNonHome
+            defaultPostNonHome,
+            devMode
         })
         api.writeKV('world.concurrent.preference', storage)
     }, [
@@ -134,7 +140,8 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
         followingStreams,
         bookmarkingStreams,
         defaultPostHome,
-        defaultPostNonHome
+        defaultPostNonHome,
+        devMode
     ])
 
     const value = useMemo(() => {
@@ -156,7 +163,9 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
             defaultPostHome,
             setDefaultPostHome,
             defaultPostNonHome,
-            setDefaultPostNonHome
+            setDefaultPostNonHome,
+            devMode,
+            setDevMode
         }
     }, [
         themeName,
@@ -176,7 +185,9 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
         defaultPostHome,
         setDefaultPostHome,
         defaultPostNonHome,
-        setDefaultPostNonHome
+        setDefaultPostNonHome,
+        devMode,
+        setDevMode
     ])
 
     return <PreferenceContext.Provider value={value}>{props.children}</PreferenceContext.Provider>

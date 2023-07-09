@@ -28,6 +28,7 @@ import { StreamList } from './StreamList'
 import { CCAvatar } from './CCAvatar'
 import { useApi } from '../context/api'
 import { ConcurrentWordmark } from './ConcurrentWordmark'
+import { usePreference } from '../context/PreferenceContext'
 
 const branchName = branch || window.location.host.split('.')[0]
 
@@ -37,6 +38,7 @@ export interface MenuProps {
 
 export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
     const api = useApi()
+    const pref = usePreference()
     const appData = useContext(ApplicationContext)
 
     const theme = useTheme<ConcurrentTheme>()
@@ -136,17 +138,19 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                 <ListItemText primary="Explorer" />
                             </ListItemButton>
                         </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton sx={{ gap: 1 }} component={Link} to="/devtool" onClick={props.onClick}>
-                                <BuildIcon
-                                    sx={{
-                                        color: 'background.contrastText'
-                                    }}
-                                />
+                        {pref.devMode && (
+                            <ListItem disablePadding>
+                                <ListItemButton sx={{ gap: 1 }} component={Link} to="/devtool" onClick={props.onClick}>
+                                    <BuildIcon
+                                        sx={{
+                                            color: 'background.contrastText'
+                                        }}
+                                    />
 
-                                <ListItemText primary="DevTool" />
-                            </ListItemButton>
-                        </ListItem>
+                                    <ListItemText primary="DevTool" />
+                                </ListItemButton>
+                            </ListItem>
+                        )}
                         <ListItem disablePadding>
                             <ListItemButton sx={{ gap: 1 }} component={Link} to="/settings" onClick={props.onClick}>
                                 <SettingsIcon
