@@ -29,6 +29,12 @@ interface PreferenceState {
 
     devMode: boolean
     setDevMode: (_: boolean) => void
+
+    showEditorOnTop: boolean
+    setShowEditorOnTop: (_: boolean) => void
+
+    showEditorOnTopMobile: boolean
+    setShowEditorOnTopMobile: (_: boolean) => void
 }
 
 const PreferenceContext = createContext<PreferenceState | undefined>(undefined)
@@ -50,6 +56,8 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
     const [defaultPostHome, setDefaultPostHome] = usePersistent<string[]>('defaultPostHome', [])
     const [defaultPostNonHome, setDefaultPostNonHome] = usePersistent<string[]>('defaultPostNonHome', [])
     const [devMode, setDevMode] = usePersistent<boolean>('devMode', false)
+    const [showEditorOnTop, setShowEditorOnTop] = usePersistent<boolean>('showEditorOnTop', false)
+    const [showEditorOnTopMobile, setShowEditorOnTopMobile] = usePersistent<boolean>('showEditorOnTopMobile', false)
 
     const followUser = useCallback(
         (ccaddr: string): void => {
@@ -112,6 +120,8 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
                 setDefaultPostHome(parsed.defaultPostHome)
                 setDefaultPostNonHome(parsed.defaultPostNonHome)
                 setDevMode(parsed.devMode)
+                setShowEditorOnTop(parsed.showEditorOnTop)
+                setShowEditorOnTopMobile(parsed.showEditorOnTopMobile)
             })
             .catch((e) => {
                 setInitialized(true)
@@ -130,7 +140,9 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
             bookmarkingStreams,
             defaultPostHome,
             defaultPostNonHome,
-            devMode
+            devMode,
+            showEditorOnTop,
+            showEditorOnTopMobile
         })
         api.writeKV('world.concurrent.preference', storage)
     }, [
@@ -141,7 +153,9 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
         bookmarkingStreams,
         defaultPostHome,
         defaultPostNonHome,
-        devMode
+        devMode,
+        showEditorOnTop,
+        showEditorOnTopMobile
     ])
 
     const value = useMemo(() => {
@@ -165,7 +179,11 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
             defaultPostNonHome,
             setDefaultPostNonHome,
             devMode,
-            setDevMode
+            setDevMode,
+            showEditorOnTop,
+            setShowEditorOnTop,
+            showEditorOnTopMobile,
+            setShowEditorOnTopMobile
         }
     }, [
         themeName,
@@ -187,7 +205,11 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
         defaultPostNonHome,
         setDefaultPostNonHome,
         devMode,
-        setDevMode
+        setDevMode,
+        showEditorOnTop,
+        setShowEditorOnTop,
+        showEditorOnTopMobile,
+        setShowEditorOnTopMobile
     ])
 
     return <PreferenceContext.Provider value={value}>{props.children}</PreferenceContext.Provider>

@@ -112,7 +112,15 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                         <StreamInfo id={queriedStreams[0]} />
                     </Collapse>
                     <Collapse in={mode === 'compose' || mode === 'home'}>
-                        <Box sx={{ padding: { xs: '8px', sm: '8px 16px' } }}>
+                        <Box
+                            sx={{
+                                padding: { xs: '8px', sm: '8px 16px' },
+                                display: {
+                                    xs: pref.showEditorOnTopMobile ? 'block' : 'none',
+                                    sm: pref.showEditorOnTop ? 'block' : 'none'
+                                }
+                            }}
+                        >
                             <Draft
                                 streamPickerInitial={streamPickerInitial}
                                 onSubmit={async (text: string, destinations: string[]) => {

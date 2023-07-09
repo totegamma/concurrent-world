@@ -119,6 +119,28 @@ export function Settings(props: SettingsProp): JSX.Element {
                                 }
                                 label="開発者モード"
                             />
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={pref.showEditorOnTop}
+                                        onChange={(e) => {
+                                            pref.setShowEditorOnTop(e.target.checked)
+                                        }}
+                                    />
+                                }
+                                label="投稿エディタを上部に表示"
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={pref.showEditorOnTopMobile}
+                                        onChange={(e) => {
+                                            pref.setShowEditorOnTopMobile(e.target.checked)
+                                        }}
+                                    />
+                                }
+                                label="投稿エディタを上部に表示 (モバイル)"
+                            />
                         </FormGroup>
                     </Box>
                     <ThemeSelect setThemeName={props.setThemeName} />
