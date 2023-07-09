@@ -20,7 +20,7 @@ interface GlobalActionsProps {
 
 const style = {
     position: 'absolute',
-    top: '50%',
+    top: '30%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: '700px',
@@ -68,6 +68,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                 <Paper sx={style}>
                     <Box sx={{ display: 'flex' }}>
                         <Draft
+                            autoFocus
                             streamPickerInitial={streamPickerInitial}
                             onSubmit={async (text: string, destinations: string[]) => {
                                 const body = {
