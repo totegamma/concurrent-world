@@ -1,4 +1,4 @@
-import { memo, useContext, useEffect, useRef, useState } from 'react'
+import { memo, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { Box, Button, Collapse, Divider, Typography } from '@mui/material'
 import ExploreIcon from '@mui/icons-material/Explore'
 import type { StreamElementDated } from '../model'
@@ -31,17 +31,24 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
     const [mode, setMode] = useState<string>('compose')
     const [writeable, setWriteable] = useState<boolean>(true)
 
-    const queriedStreams = reactlocation.hash
-        .replace('#', '')
-        .split(',')
-        .filter((e) => e !== '')
+    const queriedStreams = useMemo(
+        () =>
+            reactlocation.hash
+                .replace('#', '')
+                .split(',')
+                .filter((e) => e !== ''),
+        [reactlocation.hash]
+    )
 
-    const streamPickerInitial = [
-        ...new Set([
-            ...(reactlocation.hash && reactlocation.hash !== '' ? pref.defaultPostNonHome : pref.defaultPostHome),
-            ...queriedStreams
-        ])
-    ]
+    const streamPickerInitial = useMemo(
+        () => [
+            ...new Set([
+                ...(reactlocation.hash && reactlocation.hash !== '' ? pref.defaultPostNonHome : pref.defaultPostHome),
+                ...queriedStreams
+            ])
+        ],
+        [reactlocation.hash, pref.defaultPostHome, pref.defaultPostNonHome, queriedStreams]
+    )
 
     useEffect(() => {
         let mode = 'compose'
