@@ -51,6 +51,9 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     ]
 
     const handleKeyPress = useCallback((event: KeyboardEvent) => {
+        if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
+            return
+        }
         switch (event.key) {
             case 'n':
                 setTimeout(() => {
