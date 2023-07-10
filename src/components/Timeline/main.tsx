@@ -81,6 +81,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     // WORKAROUND: fill the screen with messages if there are not enough messages to fill the screen
     // to work react-infinite-scroller properly
     useEffect(() => {
+        if (!hasMoreData) return
         if (scrollable) return
         const timer = setTimeout(() => {
             if (scrollable) return
@@ -90,7 +91,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
         return () => {
             clearTimeout(timer)
         }
-    }, [api.host, scrollable, loadMore, props.timeline.current])
+    }, [scrollable, loadMore, props.timeline.current, hasMoreData])
 
     useEffect(() => {
         setIsFetching(false)
