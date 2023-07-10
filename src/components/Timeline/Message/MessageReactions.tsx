@@ -27,7 +27,7 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
     }, {})
 
     return (
-        <Box display="flex" gap={1}>
+        <Box display="flex" flexWrap="wrap" gap={1}>
             {Object.entries(filteredReactions).map((r) => {
                 const [shortcode, reaction]: [string, any] = r
                 const ownReaction = reaction.find((x: any) => x.author === api.userAddress)
