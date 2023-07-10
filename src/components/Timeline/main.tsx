@@ -25,6 +25,10 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     const [isFetching, setIsFetching] = useState<boolean>(false)
     const theme = useTheme()
 
+    const scrollable = props.scrollParentRef.current
+        ? props.scrollParentRef.current.scrollHeight > props.scrollParentRef.current.clientHeight
+        : true
+
     useEffect(() => {
         if (!api.host) return
         props.timeline.clear()
@@ -38,7 +42,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                 return { ...e, LastUpdated: current }
             })
             props.timeline.set(dated)
-            setHasMoreData(true)
+            setHasMoreData(data.length > 0)
         })
         return () => {
             unmounted = true
@@ -48,7 +52,10 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     const loadMore = useCallback(() => {
         if (!api.host) return
         if (isFetching) return
-        if (!props.timeline.current[props.timeline.current.length - 1]?.timestamp) return
+        if (!props.timeline.current[props.timeline.current.length - 1]?.timestamp) {
+            setHasMoreData(false)
+            return
+        }
         if (!hasMoreData) return
         let unmounted = false
         setIsFetching(true)
@@ -70,6 +77,20 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
             unmounted = true
         }
     }, [api, props.streams, props.timeline, hasMoreData, isFetching])
+
+    // WORKAROUND: fill the screen with messages if there are not enough messages to fill the screen
+    // to work react-infinite-scroller properly
+    useEffect(() => {
+        if (scrollable) return
+        const timer = setTimeout(() => {
+            if (scrollable) return
+            loadMore()
+        }, 1000)
+
+        return () => {
+            clearTimeout(timer)
+        }
+    }, [api.host, scrollable, loadMore, props.timeline.current])
 
     useEffect(() => {
         setIsFetching(false)
