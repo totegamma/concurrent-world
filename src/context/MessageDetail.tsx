@@ -28,7 +28,7 @@ const style = {
     transform: 'translate(-50%, -50%)',
     width: '700px',
     maxWidth: '90vw',
-    p: 2
+    p: 1
 }
 
 export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element => {

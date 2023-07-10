@@ -1,6 +1,6 @@
 import { Box, Paper, Modal } from '@mui/material'
 
-import { createContext, useCallback, useContext, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
 import { Schemas } from '../schemas'
 import { Draft } from '../components/Draft'
@@ -25,7 +25,7 @@ const style = {
     transform: 'translate(-50%, -50%)',
     width: '700px',
     maxWidth: '90vw',
-    p: 2
+    p: 1
 }
 
 export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element => {
@@ -49,6 +49,27 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
             ...queriedStreams
         ])
     ]
+
+    const handleKeyPress = useCallback((event: KeyboardEvent) => {
+        switch (event.key) {
+            case 'n':
+                setTimeout(() => {
+                    // XXX: this is a hack to prevent the keypress from being captured by the draft
+                    openDraft()
+                }, 0)
+                break
+        }
+    }, [])
+
+    useEffect(() => {
+        // attach the event listener
+        document.addEventListener('keydown', handleKeyPress)
+
+        // remove the event listener
+        return () => {
+            document.removeEventListener('keydown', handleKeyPress)
+        }
+    }, [handleKeyPress])
 
     return (
         <GlobalActionsContext.Provider
