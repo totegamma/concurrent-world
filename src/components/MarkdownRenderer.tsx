@@ -159,7 +159,15 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                         }
                         return (
                             <a href={props.src} target="_blank" rel="noreferrer">
-                                <Box {...props} component="img" maxWidth="100%" borderRadius={1} />
+                                <Box
+                                    {...props}
+                                    component="img"
+                                    maxWidth="100%"
+                                    borderRadius={1}
+                                    sx={{
+                                        maxHeight: '20vh'
+                                    }}
+                                />
                             </a>
                         )
                     }
