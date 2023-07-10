@@ -1,16 +1,4 @@
-import {
-    Box,
-    IconButton,
-    Link,
-    ListItemIcon,
-    ListItemText,
-    Menu,
-    MenuItem,
-    Popover,
-    type PopoverActions,
-    Tooltip,
-    Typography
-} from '@mui/material'
+import { Box, IconButton, Link, ListItemIcon, ListItemText, Menu, MenuItem, Tooltip, Typography } from '@mui/material'
 import ReplyIcon from '@mui/icons-material/Reply'
 import { CCAvatar } from '../../CCAvatar'
 import StarIcon from '@mui/icons-material/Star'
@@ -22,14 +10,14 @@ import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown'
 import type { Stream, Message as CCMessage, ProfileWithAddress } from '../../../model'
 import { Schemas } from '../../../schemas'
 import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import Collapse from '@mui/material/Collapse'
 import Fade from '@mui/material/Fade'
 import { useMessageService } from '../MessageContainer'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-import { EmojiPicker } from '../../EmojiPicker'
+import { useEmojiPicker } from '../../../context/EmojiPickerContext'
 
 export interface MessageActionsProps {
     favoriteUsers: ProfileWithAddress[]
@@ -41,11 +29,11 @@ export interface MessageActionsProps {
 export const MessageActions = (props: MessageActionsProps): JSX.Element => {
     const [streamListOpen, setStreamListOpen] = useState<boolean>(false)
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
-    const [emojiPickerAnchor, setEmojiPickerAnchor] = useState<null | HTMLElement>(null)
-    const repositionEmojiPicker = useRef<PopoverActions | null>(null)
     const service = useMessageService()
 
     const hasOwnReaction = props.favoriteUsers.find((user) => user.ccaddress === props.userCCID)
+
+    const emojiPicker = useEmojiPicker()
 
     return (
         <>
@@ -154,7 +142,10 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                             color: 'text.secondary'
                         }}
                         onClick={(e) => {
-                            setEmojiPickerAnchor(e.currentTarget)
+                            emojiPicker.open(e.currentTarget, (emoji) => {
+                                service.addReaction(emoji.shortcodes, emoji.src)
+                                emojiPicker.close()
+                            })
                         }}
                     >
                         <AddReactionIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
@@ -214,28 +205,6 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         </MenuItem>
                     )}
                 </Menu>
-                <Popover
-                    anchorEl={emojiPickerAnchor}
-                    open={Boolean(emojiPickerAnchor)}
-                    onClose={() => {
-                        setEmojiPickerAnchor(null)
-                    }}
-                    anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'center'
-                    }}
-                    action={repositionEmojiPicker}
-                >
-                    <EmojiPicker
-                        onSelected={(emoji) => {
-                            service.addReaction(emoji.shortcodes, emoji.src)
-                            setEmojiPickerAnchor(null)
-                        }}
-                        onMounted={() => {
-                            repositionEmojiPicker.current?.updatePosition()
-                        }}
-                    />
-                </Popover>
                 <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 0.5, ml: 'auto' }}>
                     {props.msgstreams.map((e) => (
                         <Link

@@ -33,6 +33,7 @@ import type { Profile } from './schemas/profile'
 import type { Userstreams } from './schemas/userstreams'
 import { PreferenceProvider } from './context/PreferenceContext'
 import { GlobalActionsProvider } from './context/GlobalActions'
+import { EmojiPickerProvider } from './context/EmojiPickerContext'
 
 export const ApplicationContext = createContext<appData>({
     profile: undefined,
@@ -324,7 +325,9 @@ function App(): JSX.Element {
                         <ApiProvider api={api}>
                             <PreferenceProvider>
                                 <ApplicationContext.Provider value={applicationContext}>
-                                    <GlobalActionsProvider>{childs}</GlobalActionsProvider>
+                                    <EmojiPickerProvider>
+                                        <GlobalActionsProvider>{childs}</GlobalActionsProvider>
+                                    </EmojiPickerProvider>
                                 </ApplicationContext.Provider>
                             </PreferenceProvider>
                         </ApiProvider>
