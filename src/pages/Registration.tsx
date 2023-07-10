@@ -11,6 +11,8 @@ import ConcurrentApiClient from '../apiservice'
 import ApiProvider from '../context/api'
 import type { Character, ConcurrentTheme, Host } from '../model'
 import {
+    Alert,
+    AlertTitle,
     Avatar,
     CssBaseline,
     Fade,
@@ -337,13 +339,13 @@ export function Registration(): JSX.Element {
                             setActiveStep(4)
                         }}
                     >
-                        Next: ホストサーバーの選択
+                        Next: ドメインの選択
                     </Button>
                 </Box>
             )
         },
         {
-            title: 'ホストサーバーの選択',
+            title: 'ドメインの選択',
             component: (
                 <Box
                     sx={{
@@ -353,8 +355,17 @@ export function Registration(): JSX.Element {
                         gap: '20px'
                     }}
                 >
-                    あなたのメッセージを保存・配信してくれるホストサーバーを探しましょう。
-                    どのホストサーバーを選択しても、だれとでもつながる事ができます。
+                    <Typography>
+                        あなたのメッセージを保存・配信してくれるドメインを探しましょう。
+                        <br />
+                        どのドメインを選択しても、だれとでもつながる事ができます。
+                        <br />
+                        また、(鯖管が頑張れば)いつでも別のドメインに移行する事ができます。
+                    </Typography>
+                    <Alert severity="info">
+                        <AlertTitle>ここで一度concurrent.worldからドメイン管轄サイトへ移動します</AlertTitle>
+                        ドメインでのアカウント作成後、またこのページに戻ってくる必要があります。このタブを閉じないでください。
+                    </Alert>
                     <Box width="100%" display="flex" flexDirection="column">
                         <Typography variant="h3">リストから選択</Typography>
                         <List>
@@ -391,7 +402,7 @@ export function Registration(): JSX.Element {
                         <Box flex="1" />
                         <Box sx={{ display: 'flex', gap: '10px' }}>
                             <TextField
-                                placeholder="https://example.tld/"
+                                placeholder="concurrent.example.tld"
                                 value={server}
                                 onChange={(e) => {
                                     setServer(e.target.value)
@@ -418,7 +429,7 @@ export function Registration(): JSX.Element {
                             checkRegistration()
                         }}
                     >
-                        サーバーの登録状況を確認
+                        ドメインの登録状況を確認
                     </Button>
                     <Button
                         variant="contained"

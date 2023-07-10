@@ -1,4 +1,4 @@
-import { Box, Paper, Modal } from '@mui/material'
+import { Box, Paper, Modal, Typography } from '@mui/material'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
@@ -7,6 +7,10 @@ import { Draft } from '../components/Draft'
 import { type SimpleNote } from '../schemas/simpleNote'
 import { useLocation } from 'react-router-dom'
 import { usePreference } from './PreferenceContext'
+import { ApplicationContext } from '../App'
+import { ProfileEditor } from '../components/ProfileEditor'
+import { type Character } from '../model'
+import { type DomainProfile } from '../schemas/domainProfile'
 
 export interface GlobalActionsState {
     openDraft: () => void
@@ -32,7 +36,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const api = useApi()
     const pref = usePreference()
     const reactlocation = useLocation()
+    const appData = useContext(ApplicationContext)
     const [mode, setMode] = useState<'compose' | 'none'>('none')
+
+    const accountIsOK = appData.profile !== null && appData.userstreams !== null
 
     const openDraft = useCallback(() => {
         setMode('compose')
@@ -51,6 +58,9 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     ]
 
     const handleKeyPress = useCallback((event: KeyboardEvent) => {
+        if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
+            return
+        }
         switch (event.key) {
             case 'n':
                 setTimeout(() => {
@@ -108,6 +118,61 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                     })
                             }}
                         />
+                    </Box>
+                </Paper>
+            </Modal>
+            <Modal open={!accountIsOK} onClose={() => {}}>
+                <Paper sx={style}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }}
+                    >
+                        <Typography variant="h2" component="div">
+                            アカウント設定を完了させましょう！
+                        </Typography>
+                        <ProfileEditor
+                            onSubmit={(_) => {
+                                api?.setupUserstreams().then(() => {
+                                    api.getHostProfile(api.host).then((host) => {
+                                        api.readCharacter(host.ccaddr, Schemas.domainProfile).then(
+                                            (profile: Character<DomainProfile> | undefined) => {
+                                                console.log(profile)
+                                                try {
+                                                    if (profile) {
+                                                        if (profile.payload.body.defaultBookmarkStreams)
+                                                            localStorage.setItem(
+                                                                'bookmarkingStreams',
+                                                                JSON.stringify(
+                                                                    profile.payload.body.defaultBookmarkStreams
+                                                                )
+                                                            )
+                                                        if (profile.payload.body.defaultFollowingStreams)
+                                                            localStorage.setItem(
+                                                                'followingStreams',
+                                                                JSON.stringify(
+                                                                    profile.payload.body.defaultFollowingStreams
+                                                                )
+                                                            )
+                                                        if (profile.payload.body.defaultPostStreams)
+                                                            localStorage.setItem(
+                                                                'defaultPostHome',
+                                                                JSON.stringify(profile.payload.body.defaultPostStreams)
+                                                            )
+                                                    }
+                                                } catch (e) {
+                                                    console.error(e)
+                                                }
+                                                window.location.reload()
+                                            }
+                                        )
+                                    })
+                                })
+                            }}
+                        />
+                        以前は使えていたのにこの画面が出る場合は上のUPDATEを押さずに、
+                        再度通信環境の良い場所でリロードしてみてください。
                     </Box>
                 </Paper>
             </Modal>

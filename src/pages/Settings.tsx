@@ -98,7 +98,7 @@ export function Settings(props: SettingsProp): JSX.Element {
                             }}
                         >
                             <ProfileEditor
-                                initial={appData.profile}
+                                initial={appData.profile!}
                                 onSubmit={(_profile) => {
                                     enqueueSnackbar('更新しました', { variant: 'success' })
                                 }}
@@ -108,17 +108,6 @@ export function Settings(props: SettingsProp): JSX.Element {
                     <Box>
                         <Typography variant="h3">基本</Typography>
                         <FormGroup>
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        checked={pref.devMode}
-                                        onChange={(e) => {
-                                            pref.setDevMode(e.target.checked)
-                                        }}
-                                    />
-                                }
-                                label="開発者モード"
-                            />
                             <FormControlLabel
                                 control={
                                     <Switch
@@ -140,6 +129,17 @@ export function Settings(props: SettingsProp): JSX.Element {
                                     />
                                 }
                                 label="投稿エディタを上部に表示 (モバイル)"
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={pref.devMode}
+                                        onChange={(e) => {
+                                            pref.setDevMode(e.target.checked)
+                                        }}
+                                    />
+                                }
+                                label="開発者モード"
                             />
                         </FormGroup>
                     </Box>

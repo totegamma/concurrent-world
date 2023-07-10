@@ -335,7 +335,7 @@ export default class ConcurrentApiClient extends ApiService {
         ).then(async (res) => {
             const data = await res.json()
             if (data.characters.length === 0) {
-                return undefined
+                return null
             }
             const character = data.characters[0]
             character.payload = JSON.parse(character.payload)

@@ -191,7 +191,7 @@ export function AccountImport(): JSX.Element {
                         }}
                     />
                     <Divider sx={{ my: '30px' }} />
-                    <Typography variant="h3">ホストサーバーアドレス</Typography>
+                    <Typography variant="h3">ドメイン</Typography>
                     <TextField
                         placeholder="https://example.tld/"
                         value={server}

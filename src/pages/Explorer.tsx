@@ -10,6 +10,7 @@ import {
     MenuItem,
     Select,
     TextField,
+    Tooltip,
     Typography,
     useTheme
 } from '@mui/material'
@@ -18,10 +19,14 @@ import { useApi } from '../context/api'
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import type { Stream } from '../model'
-import StarIcon from '@mui/icons-material/Star'
-import StarBorderIcon from '@mui/icons-material/StarBorder'
 import type { Commonstream } from '../schemas/commonstream'
 import { usePreference } from '../context/PreferenceContext'
+
+import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd'
+import BookmarkRemoveIcon from '@mui/icons-material/BookmarkRemove'
+
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
+import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove'
 
 export function Explorer(): JSX.Element {
     const api = useApi()
@@ -131,30 +136,72 @@ export function Explorer(): JSX.Element {
                             key={value.id}
                             disablePadding
                             secondaryAction={
-                                <IconButton
-                                    sx={{ flexGrow: 0 }}
-                                    onClick={() => {
-                                        if (pref.bookmarkingStreams.includes(value.id)) {
-                                            pref.unbookmarkStream(value.id)
-                                        } else {
-                                            pref.bookmarkStream(value.id)
+                                <>
+                                    <Tooltip
+                                        title={
+                                            pref.bookmarkingStreams.includes(value.id)
+                                                ? 'サイドバーから削除'
+                                                : 'サイドバーに追加'
                                         }
-                                    }}
-                                >
-                                    {pref.bookmarkingStreams.includes(value.id) ? (
-                                        <StarIcon
-                                            sx={{
-                                                color: theme.palette.text.primary
+                                        placement="top"
+                                        arrow
+                                    >
+                                        <IconButton
+                                            sx={{ flexGrow: 0 }}
+                                            onClick={() => {
+                                                if (pref.bookmarkingStreams.includes(value.id)) {
+                                                    pref.unbookmarkStream(value.id)
+                                                } else {
+                                                    pref.bookmarkStream(value.id)
+                                                }
                                             }}
-                                        />
-                                    ) : (
-                                        <StarBorderIcon
-                                            sx={{
-                                                color: theme.palette.text.primary
+                                        >
+                                            {pref.bookmarkingStreams.includes(value.id) ? (
+                                                <BookmarkRemoveIcon
+                                                    sx={{
+                                                        color: theme.palette.text.primary
+                                                    }}
+                                                />
+                                            ) : (
+                                                <BookmarkAddIcon
+                                                    sx={{
+                                                        color: theme.palette.text.primary
+                                                    }}
+                                                />
+                                            )}
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip
+                                        title={pref.followingStreams.includes(value.id) ? 'フォロー解除' : 'フォロー'}
+                                        placement="top"
+                                        arrow
+                                    >
+                                        <IconButton
+                                            sx={{ flexGrow: 0 }}
+                                            onClick={() => {
+                                                if (pref.followingStreams.includes(value.id)) {
+                                                    pref.unfollowStream(value.id)
+                                                } else {
+                                                    pref.followStream(value.id)
+                                                }
                                             }}
-                                        />
-                                    )}
-                                </IconButton>
+                                        >
+                                            {pref.followingStreams.includes(value.id) ? (
+                                                <PlaylistRemoveIcon
+                                                    sx={{
+                                                        color: theme.palette.text.primary
+                                                    }}
+                                                />
+                                            ) : (
+                                                <PlaylistAddIcon
+                                                    sx={{
+                                                        color: theme.palette.text.primary
+                                                    }}
+                                                />
+                                            )}
+                                        </IconButton>
+                                    </Tooltip>
+                                </>
                             }
                         >
                             <ListItemButton
