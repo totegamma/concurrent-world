@@ -1,7 +1,7 @@
 import Picker from '@emoji-mart/react'
-import { createContext, useContext, useMemo, useRef, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { ApplicationContext } from '../App'
-import { Popover } from '@mui/material'
+import { Popover, type PopoverActions } from '@mui/material'
 
 export interface EmojiPickerState {
     open: (anchor: HTMLElement, onSelected: (selected: EmojiProps) => void) => void
@@ -46,8 +46,8 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
     const appData = useContext(ApplicationContext)
 
     const [anchor, setAnchor] = useState<HTMLElement | null>(null)
-
     const onSelectedRef = useRef<((selected: EmojiProps) => void) | null>(null)
+    const repositionEmojiPicker = useRef<PopoverActions | null>(null)
 
     const open = useMemo(
         () => (anchor: HTMLElement, onSelected: (selected: EmojiProps) => void) => {
@@ -81,6 +81,16 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
         [appData.emojiDict]
     )
 
+    useEffect(() => {
+        // XXX: this is a hack to make sure the emoji picker is repositioned after it is opened
+        const timer = setTimeout(() => {
+            repositionEmojiPicker.current?.updatePosition()
+        }, 0)
+        return () => {
+            clearTimeout(timer)
+        }
+    }, [repositionEmojiPicker.current, anchor])
+
     return (
         <EmojiPickerContext.Provider
             value={useMemo(() => {
@@ -102,6 +112,11 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                         vertical: 'bottom',
                         horizontal: 'center'
                     }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center'
+                    }}
+                    action={repositionEmojiPicker}
                 >
                     <Picker
                         categories={['frequent', 'fluffy']}
