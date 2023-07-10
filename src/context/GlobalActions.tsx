@@ -9,6 +9,8 @@ import { useLocation } from 'react-router-dom'
 import { usePreference } from './PreferenceContext'
 import { ApplicationContext } from '../App'
 import { ProfileEditor } from '../components/ProfileEditor'
+import { type Character } from '../model'
+import { type DomainProfile } from '../schemas/domainProfile'
 
 export interface GlobalActionsState {
     openDraft: () => void
@@ -133,7 +135,39 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                         <ProfileEditor
                             onSubmit={(_) => {
                                 api?.setupUserstreams().then(() => {
-                                    window.location.reload()
+                                    api.getHostProfile(api.host).then((host) => {
+                                        api.readCharacter(host.ccaddr, Schemas.domainProfile).then(
+                                            (profile: Character<DomainProfile> | undefined) => {
+                                                console.log(profile)
+                                                try {
+                                                    if (profile) {
+                                                        if (profile.payload.body.defaultBookmarkStreams)
+                                                            localStorage.setItem(
+                                                                'bookmarkingStreams',
+                                                                JSON.stringify(
+                                                                    profile.payload.body.defaultBookmarkStreams
+                                                                )
+                                                            )
+                                                        if (profile.payload.body.defaultFollowingStreams)
+                                                            localStorage.setItem(
+                                                                'followingStreams',
+                                                                JSON.stringify(
+                                                                    profile.payload.body.defaultFollowingStreams
+                                                                )
+                                                            )
+                                                        if (profile.payload.body.defaultPostStreams)
+                                                            localStorage.setItem(
+                                                                'defaultPostHome',
+                                                                JSON.stringify(profile.payload.body.defaultPostStreams)
+                                                            )
+                                                    }
+                                                } catch (e) {
+                                                    console.error(e)
+                                                }
+                                                window.location.reload()
+                                            }
+                                        )
+                                    })
                                 })
                             }}
                         />
