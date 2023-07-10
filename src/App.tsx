@@ -43,8 +43,8 @@ export const ApplicationContext = createContext<appData>({
 })
 
 export interface appData {
-    profile: Character<Profile> | undefined
-    userstreams: Character<Userstreams> | undefined
+    profile: Character<Profile> | null | undefined
+    userstreams: Character<Userstreams> | null | undefined
     emojiDict: Record<string, Emoji>
     websocketState: ReadyState
     displayingStream: string[]
@@ -66,7 +66,9 @@ function App(): JSX.Element {
 
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
     const messages = useObjectList<StreamElementDated>()
-    const [userstreams, setUserstreams] = useState<Character<Userstreams>>()
+
+    const [profile, setProfile] = useState<Character<Profile> | null | undefined>(undefined)
+    const [userstreams, setUserstreams] = useState<Character<Userstreams> | null | undefined>(undefined)
 
     const [followingUserStreams, setFollowingUserStreams] = useState<string[]>([])
     useEffect(() => {
@@ -118,7 +120,6 @@ function App(): JSX.Element {
     const [playNotification] = useSound(NotificationSound, { volume: 0.3 })
     const playBubbleRef = useRef(playBubble)
     const playNotificationRef = useRef(playNotification)
-    const [profile, setProfile] = useState<Character<Profile>>()
     useEffect(() => {
         playBubbleRef.current = playBubble
         playNotificationRef.current = playNotification
