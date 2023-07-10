@@ -13,16 +13,25 @@ export interface AssociationFrameProp {
     association: StreamElement
     lastUpdated: number
     after: JSX.Element | undefined
+    perspective?: string
 }
 
 export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFrameProp): JSX.Element | null => {
     const api = useApi()
-    const [author, setAuthor] = useState<Character<Profile> | undefined>()
+    const [associationAuthor, setAssociationAuthor] = useState<Character<Profile> | undefined>()
     const [message, setMessage] = useState<Message<any> | undefined>()
+    const [messageAuthor, setMessageAuthor] = useState<Character<Profile> | undefined>()
     const [association, setAssociation] = useState<Association<any> | undefined>()
     const [fetching, setFetching] = useState<boolean>(true)
 
-    const isMeToOther = association?.author !== api.userAddress
+    const perspective = props.perspective ?? api.userAddress
+    const isMeToOther = association?.author !== perspective
+
+    const Nominative = perspective === api.userAddress ? 'You' : associationAuthor?.payload.body.username ?? 'anonymous'
+    const Possessive =
+        perspective === api.userAddress ? 'your' : (messageAuthor?.payload.body.username ?? 'anonymous') + "'s"
+
+    const actionUser = isMeToOther ? associationAuthor : messageAuthor
 
     useEffect(() => {
         api.fetchAssociation(props.association.id, props.association.currenthost)
@@ -32,9 +41,11 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                 api.fetchMessage(a.targetID, props.association.currenthost).then((m) => {
                     setMessage(m)
                     if (!m) return
-                    const isMeToOther = a.author !== api.userAddress
-                    api.readCharacter(isMeToOther ? a.author : m.author, Schemas.profile).then((author) => {
-                        setAuthor(author)
+                    api.readCharacter(a.author, Schemas.profile).then((author) => {
+                        setAssociationAuthor(author)
+                    })
+                    api.readCharacter(m.author, Schemas.profile).then((author) => {
+                        setMessageAuthor(author)
                     })
                 })
             })
@@ -81,9 +92,9 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                 to={'/entity/' + association.author}
                             >
                                 <CCAvatar
-                                    alt={author?.payload.body.username}
-                                    avatarURL={author?.payload.body.avatar}
-                                    identiconSource={isMeToOther ? association?.author : message?.author ?? ''}
+                                    alt={actionUser?.payload.body.username}
+                                    avatarURL={actionUser?.payload.body.avatar}
+                                    identiconSource={actionUser?.id ?? ''}
                                     sx={{
                                         width: { xs: '38px', sm: '48px' },
                                         height: { xs: '38px', sm: '48px' }
@@ -102,12 +113,13 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                 <Typography>
                                     {isMeToOther ? (
                                         <>
-                                            <b>{author?.payload.body.username ?? 'anonymous'}</b> favorited your message
+                                            <b>{associationAuthor?.payload.body.username ?? 'anonymous'}</b> favorited{' '}
+                                            {Possessive} message
                                         </>
                                     ) : (
                                         <>
-                                            You favorited <b>{author?.payload.body.username ?? 'anonymous'}</b>&apos;s
-                                            message
+                                            {Nominative} favorited{' '}
+                                            <b>{messageAuthor?.payload.body.username ?? 'anonymous'}</b>&apos;s message
                                         </>
                                     )}
                                 </Typography>
@@ -151,9 +163,9 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                 to={'/entity/' + association.author}
                             >
                                 <CCAvatar
-                                    alt={author?.payload.body.username}
-                                    avatarURL={author?.payload.body.avatar}
-                                    identiconSource={isMeToOther ? association?.author : message?.author ?? ''}
+                                    alt={actionUser?.payload.body.username}
+                                    avatarURL={actionUser?.payload.body.avatar}
+                                    identiconSource={actionUser?.id ?? ''}
                                     sx={{
                                         width: { xs: '38px', sm: '48px' },
                                         height: { xs: '38px', sm: '48px' }
@@ -172,8 +184,8 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                 <Typography>
                                     {isMeToOther ? (
                                         <>
-                                            <b>{author?.payload.body.username ?? 'anonymous'}</b> reacted your message
-                                            with{' '}
+                                            <b>{associationAuthor?.payload.body.username ?? 'anonymous'}</b> reacted{' '}
+                                            {Possessive} message with{' '}
                                             <img
                                                 height="13px"
                                                 src={association?.payload.body.imageUrl}
@@ -182,8 +194,9 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                         </>
                                     ) : (
                                         <>
-                                            You reacted <b>{author?.payload.body.username ?? 'anonymous'}</b>&apos;s
-                                            message with{' '}
+                                            {Nominative} reacted{' '}
+                                            <b>{messageAuthor?.payload.body.username ?? 'anonymous'}</b>&apos;s message
+                                            with{' '}
                                             <img
                                                 height="13px"
                                                 src={association?.payload.body.imageUrl}

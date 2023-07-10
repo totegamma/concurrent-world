@@ -1,4 +1,4 @@
-import { Box, Button, useTheme } from '@mui/material'
+import { Box, Button } from '@mui/material'
 
 import HomeIcon from '@mui/icons-material/Home'
 import MessageIcon from '@mui/icons-material/Message'
@@ -7,70 +7,75 @@ import CreateIcon from '@mui/icons-material/Create'
 import MenuIcon from '@mui/icons-material/Menu'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import { NavLink } from 'react-router-dom'
+import { useGlobalActions } from '../context/GlobalActions'
 
 export interface MobileMenuProps {
     setMobileMenuOpen: (state: boolean) => void
 }
 
 export const MobileMenu = (props: MobileMenuProps): JSX.Element => {
-    const theme = useTheme()
+    const actions = useGlobalActions()
+
     return (
-        <>
-            <Box
+        <Box
+            sx={{
+                display: 'flex',
+                height: 49,
+                color: 'white',
+                justifyContent: 'space-around',
+                marginBottom: 'env(safe-area-inset-bottom)'
+            }}
+        >
+            <Button
+                disableRipple
+                onClick={() => {
+                    props.setMobileMenuOpen(true)
+                }}
                 sx={{
-                    display: 'flex',
-                    height: 49,
-                    color: 'white',
-                    justifyContent: 'space-around',
-                    marginBottom: 'env(safe-area-inset-bottom)'
+                    color: 'divider',
+                    minWidth: 0,
+                    width: 0.5
                 }}
             >
-                <Button
-                    disableRipple
-                    onClick={() => {
-                        props.setMobileMenuOpen(true)
-                    }}
+                <MenuIcon
+                    fontSize="large"
                     sx={{
-                        color: 'divider',
-                        minWidth: 0,
-                        width: 0.5
+                        borderRadius: 1,
+                        border: '1px solid',
+                        padding: 0.3
                     }}
-                >
-                    <MenuIcon
-                        fontSize="large"
-                        sx={{
-                            borderRadius: 1,
-                            border: '1px solid',
-                            padding: 0.3
-                        }}
-                    />
-                </Button>
-                <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/">
-                    <HomeIcon />
-                </Button>
-                <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/notifications">
-                    <NotificationsIcon />
-                </Button>
-                <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/associations">
-                    <MessageIcon />
-                </Button>
-                <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/explorer">
-                    <ExploreIcon />
-                </Button>
-                {/*
-                未実装の新規投稿モーダルダイアログ呼び出しボタン
-                <Button
+                />
+            </Button>
+            <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/">
+                <HomeIcon />
+            </Button>
+            <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/notifications">
+                <NotificationsIcon />
+            </Button>
+            <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/associations">
+                <MessageIcon />
+            </Button>
+            <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/explorer">
+                <ExploreIcon />
+            </Button>
+            <Button
+                sx={{
+                    height: 36,
+                    my: 'auto',
+                    width: 0.5,
+                    borderRadius: `20px 0 0 20px`,
+                    backgroundColor: 'background.contrastText'
+                }}
+                onClick={() => {
+                    actions.openDraft()
+                }}
+            >
+                <CreateIcon
                     sx={{
-                        height: 36,
-                        my: 'auto',
-                        width: 0.5,
-                        特別なボタンなので固有の値を与えたい 
-                        borderRadius: `20px 0 0 20px`,
+                        color: 'background.default'
                     }}
-                    <CreateIcon />
-                </Button>
-                */}
-            </Box>
-        </>
+                />
+            </Button>
+        </Box>
     )
 }

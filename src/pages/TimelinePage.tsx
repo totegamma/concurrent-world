@@ -1,9 +1,10 @@
 import { memo, useContext, useEffect, useRef, useState } from 'react'
-import { Box, Collapse, Divider } from '@mui/material'
+import { Box, Button, Collapse, Divider, Typography } from '@mui/material'
+import ExploreIcon from '@mui/icons-material/Explore'
 import type { StreamElementDated } from '../model'
 import type { IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'
-import { useLocation } from 'react-router-dom'
+import { useLocation, NavLink } from 'react-router-dom'
 import { TimelineHeader } from '../components/TimelineHeader'
 import { useApi } from '../context/api'
 import { Timeline } from '../components/Timeline/main'
@@ -12,7 +13,6 @@ import { HomeSettings } from '../components/HomeSettings'
 import { ApplicationContext } from '../App'
 import type { SimpleNote } from '../schemas/simpleNote'
 import { Schemas } from '../schemas'
-import { usePersistent } from '../hooks/usePersistent'
 import { usePreference } from '../context/PreferenceContext'
 
 export interface TimelinePageProps {
@@ -31,15 +31,14 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
     const [mode, setMode] = useState<string>('compose')
     const [writeable, setWriteable] = useState<boolean>(true)
 
-    const [defaultPostHome] = usePersistent<string[]>('defaultPostHome', [])
-    const [defaultPostNonHome] = usePersistent<string[]>('defaultPostNonHome', [])
     const queriedStreams = reactlocation.hash
         .replace('#', '')
         .split(',')
         .filter((e) => e !== '')
+
     const streamPickerInitial = [
         ...new Set([
-            ...(reactlocation.hash && reactlocation.hash !== '' ? defaultPostNonHome : defaultPostHome),
+            ...(reactlocation.hash && reactlocation.hash !== '' ? pref.defaultPostNonHome : pref.defaultPostHome),
             ...queriedStreams
         ])
     ]
@@ -113,7 +112,15 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                         <StreamInfo id={queriedStreams[0]} />
                     </Collapse>
                     <Collapse in={mode === 'compose' || mode === 'home'}>
-                        <Box sx={{ padding: { xs: '8px', sm: '8px 16px' } }}>
+                        <Box
+                            sx={{
+                                padding: { xs: '8px', sm: '8px 16px' },
+                                display: {
+                                    xs: pref.showEditorOnTopMobile ? 'block' : 'none',
+                                    sm: pref.showEditorOnTop ? 'block' : 'none'
+                                }
+                            }}
+                        >
                             <Draft
                                 streamPickerInitial={streamPickerInitial}
                                 onSubmit={async (text: string, destinations: string[]) => {
@@ -137,7 +144,34 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                 {(reactlocation.hash === '' || reactlocation.hash === '#') &&
                 pref.followingStreams.length === 0 &&
                 pref.followingUsers.length === 0 ? (
-                    <Box>まだ誰も、どのストリームもフォローしていません。Explorerタブから探しに行きましょう。</Box>
+                    <Box
+                        sx={{
+                            marginTop: 4,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }}
+                    >
+                        <Box
+                            style={{
+                                display: 'flex',
+                                marginTop: 8,
+                                marginLeft: 8,
+                                marginRight: 8,
+                                flexDirection: 'column',
+                                alignItems: 'center'
+                            }}
+                        >
+                            <Button variant="contained" component={NavLink} to="/explorer">
+                                <Typography variant="h1" sx={{ fontWeight: 600, mx: 1 }}>
+                                    Go Explore
+                                </Typography>
+                                <ExploreIcon sx={{ fontSize: '10rem', verticalAlign: 'middle' }} />
+                            </Button>
+                            <p>フォローするユーザー・ストリームを探しに行く</p>
+                        </Box>
+                    </Box>
                 ) : (
                     <Box sx={{ display: 'flex', flex: 1, py: { xs: 1, sm: 1 }, px: { xs: 1, sm: 2 } }}>
                         <Timeline

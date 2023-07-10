@@ -8,7 +8,6 @@ import type { ReplyMessage } from '../schemas/replyMessage'
 import type { ReplyAssociation } from '../schemas/replyAssociation'
 import { ApplicationContext } from '../App'
 import { Draft } from '../components/Draft'
-import { MessageFrame } from '../components/Timeline/Message/MessageFrame'
 import { MessageContainer } from '../components/Timeline/MessageContainer'
 
 export interface MessageDetailState {
@@ -24,12 +23,12 @@ interface MessageDetailProps {
 
 const style = {
     position: 'absolute',
-    top: '50%',
+    top: '30%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: '700px',
     maxWidth: '90vw',
-    p: 2
+    p: 1
 }
 
 export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element => {
@@ -120,6 +119,7 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
                         <Divider />
                         <Box sx={{ display: 'flex' }}>
                             <Draft
+                                autoFocus
                                 allowEmpty={mode === 'reroute'}
                                 submitButtonLabel={mode === 'reply' ? 'Reply' : 'Reroute'}
                                 streamPickerInitial={messageStreamWithoutHome}

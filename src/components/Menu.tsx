@@ -1,5 +1,6 @@
 import {
     Box,
+    Button,
     ButtonBase,
     Divider,
     List,
@@ -9,6 +10,7 @@ import {
     Typography,
     useTheme
 } from '@mui/material'
+import CreateIcon from '@mui/icons-material/Create'
 import { Link } from 'react-router-dom'
 
 import HomeIcon from '@mui/icons-material/Home'
@@ -28,6 +30,8 @@ import { StreamList } from './StreamList'
 import { CCAvatar } from './CCAvatar'
 import { useApi } from '../context/api'
 import { ConcurrentWordmark } from './ConcurrentWordmark'
+import { usePreference } from '../context/PreferenceContext'
+import { useGlobalActions } from '../context/GlobalActions'
 
 const branchName = branch || window.location.host.split('.')[0]
 
@@ -37,7 +41,9 @@ export interface MenuProps {
 
 export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
     const api = useApi()
+    const pref = usePreference()
     const appData = useContext(ApplicationContext)
+    const actions = useGlobalActions()
 
     const theme = useTheme<ConcurrentTheme>()
 
@@ -136,17 +142,19 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                 <ListItemText primary="Explorer" />
                             </ListItemButton>
                         </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton sx={{ gap: 1 }} component={Link} to="/devtool" onClick={props.onClick}>
-                                <BuildIcon
-                                    sx={{
-                                        color: 'background.contrastText'
-                                    }}
-                                />
+                        {pref.devMode && (
+                            <ListItem disablePadding>
+                                <ListItemButton sx={{ gap: 1 }} component={Link} to="/devtool" onClick={props.onClick}>
+                                    <BuildIcon
+                                        sx={{
+                                            color: 'background.contrastText'
+                                        }}
+                                    />
 
-                                <ListItemText primary="DevTool" />
-                            </ListItemButton>
-                        </ListItem>
+                                    <ListItemText primary="DevTool" />
+                                </ListItemButton>
+                            </ListItem>
+                        )}
                         <ListItem disablePadding>
                             <ListItemButton sx={{ gap: 1 }} component={Link} to="/settings" onClick={props.onClick}>
                                 <SettingsIcon
@@ -173,6 +181,20 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                 >
                     <StreamList onClick={props.onClick} />
                 </Box>
+                {!pref.showEditorOnTop && (
+                    <Button
+                        variant="contained"
+                        endIcon={<CreateIcon />}
+                        onClick={() => {
+                            actions.openDraft()
+                        }}
+                        sx={{
+                            display: { xs: 'none', sm: 'flex' }
+                        }}
+                    >
+                        投稿する
+                    </Button>
+                )}
                 <Box sx={{ p: 1, mb: 'env(safe-area-inset-bottom)' }}>
                     <ButtonBase
                         component={Link}

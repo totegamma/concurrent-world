@@ -68,6 +68,7 @@ export const EmojiPicker = ({ onSelected, onMounted }: EmojiPickerProps): JSX.El
                 searchPosition: 'static',
                 data,
                 custom: emojis,
+                autoFocus: true,
                 onEmojiSelect: (emoji: EmojiProps) => {
                     onSelectedRef.current(emoji)
                 },

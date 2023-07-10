@@ -6,7 +6,7 @@ import type { Profile } from '../../../schemas/profile'
 import { Schemas } from '../../../schemas'
 import { useApi } from '../../../context/api'
 import { MessageView } from './MessageView'
-import { MessageFrame } from './MessageFrame'
+import { OneLineMessageView } from './OneLineMessageView'
 
 export interface ReplyMessageFrameProp {
     message: CCMessage<any>
@@ -46,18 +46,7 @@ export const ReplyMessageFrame = (props: ReplyMessageFrameProp): JSX.Element => 
 
     return (
         <>
-            {replyMessage && (
-                <MessageFrame
-                    message={replyMessage}
-                    reloadMessage={props.reloadMessage}
-                    variant="oneline"
-                    author={replyMessageAuthor}
-                    userCCID={api.userAddress}
-                    streams={[]}
-                    favoriteUsers={[]}
-                    reactionUsers={[]}
-                ></MessageFrame>
-            )}
+            {replyMessage && <OneLineMessageView message={replyMessage} author={replyMessageAuthor} />}
             <Box>
                 <MessageView
                     userCCID={api.userAddress}

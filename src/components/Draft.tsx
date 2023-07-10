@@ -30,6 +30,7 @@ export interface DraftProps {
     streamPickerInitial: string[]
     onSubmit: (text: string, destinations: string[]) => Promise<Error | null>
     allowEmpty?: boolean
+    autoFocus?: boolean
 }
 
 export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
@@ -200,6 +201,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     }}
                     onPaste={handlePasteImage}
                     placeholder="今、なにしてる？"
+                    autoFocus={props.autoFocus}
                     sx={{
                         width: 1,
                         fontSize: '0.95rem'

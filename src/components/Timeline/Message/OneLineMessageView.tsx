@@ -2,9 +2,17 @@ import { Box, Link, IconButton, Typography } from '@mui/material'
 import { Link as routerLink } from 'react-router-dom'
 import { CCAvatar } from '../../CCAvatar'
 import { TimeDiff } from '../../TimeDiff'
-import { type MessageViewProps } from './MessageView'
+import { type SimpleNote } from '../../../schemas/simpleNote'
+import { type ReplyMessage } from '../../../schemas/replyMessage'
+import { type Character, type Message } from '../../../model'
+import { type Profile } from '../../../schemas/profile'
 
-export const OneLineMessageView = (props: MessageViewProps): JSX.Element => {
+export interface OneLineMessageViewProps {
+    message: Message<SimpleNote | ReplyMessage>
+    author: Character<Profile> | undefined
+}
+
+export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element => {
     if (!props.message?.payload?.body) return <>message not found</>
     return (
         <Box

@@ -1,4 +1,16 @@
-import { Button, Divider, Typography, Box, useTheme, Tabs, Tab, IconButton } from '@mui/material'
+import {
+    Button,
+    Divider,
+    Typography,
+    Box,
+    useTheme,
+    Tabs,
+    Tab,
+    IconButton,
+    FormGroup,
+    FormControlLabel,
+    Switch
+} from '@mui/material'
 import { LogoutButton } from '../components/Settings/LogoutButton'
 import { ThemeSelect } from '../components/Settings/ThemeSelect'
 import { ImgurSettings } from '../components/Settings/Imgur'
@@ -12,6 +24,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import { ProfileEditor } from '../components/ProfileEditor'
 import { ApplicationContext } from '../App'
+import { usePreference } from '../context/PreferenceContext'
 
 export interface SettingsProp {
     setThemeName: (themeName: string) => void
@@ -19,8 +32,9 @@ export interface SettingsProp {
 
 export function Settings(props: SettingsProp): JSX.Element {
     const api = useApi()
-    const appData = useContext(ApplicationContext)
     const theme = useTheme()
+    const pref = usePreference()
+    const appData = useContext(ApplicationContext)
     const { enqueueSnackbar } = useSnackbar()
 
     const deleteAllCache = (): void => {
@@ -55,7 +69,7 @@ export function Settings(props: SettingsProp): JSX.Element {
             <Typography variant="h2" gutterBottom>
                 Settings
             </Typography>
-            <Divider sx={{ mb: 2 }} />
+            <Divider />
             <Tabs
                 value={tab}
                 onChange={(_, index) => {
@@ -74,20 +88,60 @@ export function Settings(props: SettingsProp): JSX.Element {
                         gap: '30px'
                     }}
                 >
-                    <Typography variant="h3">プロフィール</Typography>
-                    <Box
-                        sx={{
-                            width: '100%',
-                            borderRadius: 1,
-                            overflow: 'hidden'
-                        }}
-                    >
-                        <ProfileEditor
-                            initial={appData.profile}
-                            onSubmit={(_profile) => {
-                                enqueueSnackbar('更新しました', { variant: 'success' })
+                    <Box>
+                        <Typography variant="h3">プロフィール</Typography>
+                        <Box
+                            sx={{
+                                width: '100%',
+                                borderRadius: 1,
+                                overflow: 'hidden'
                             }}
-                        />
+                        >
+                            <ProfileEditor
+                                initial={appData.profile}
+                                onSubmit={(_profile) => {
+                                    enqueueSnackbar('更新しました', { variant: 'success' })
+                                }}
+                            />
+                        </Box>
+                    </Box>
+                    <Box>
+                        <Typography variant="h3">基本</Typography>
+                        <FormGroup>
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={pref.devMode}
+                                        onChange={(e) => {
+                                            pref.setDevMode(e.target.checked)
+                                        }}
+                                    />
+                                }
+                                label="開発者モード"
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={pref.showEditorOnTop}
+                                        onChange={(e) => {
+                                            pref.setShowEditorOnTop(e.target.checked)
+                                        }}
+                                    />
+                                }
+                                label="投稿エディタを上部に表示"
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={pref.showEditorOnTopMobile}
+                                        onChange={(e) => {
+                                            pref.setShowEditorOnTopMobile(e.target.checked)
+                                        }}
+                                    />
+                                }
+                                label="投稿エディタを上部に表示 (モバイル)"
+                            />
+                        </FormGroup>
                     </Box>
                     <ThemeSelect setThemeName={props.setThemeName} />
                     <ImgurSettings />

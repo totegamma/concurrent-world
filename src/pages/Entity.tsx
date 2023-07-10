@@ -1,4 +1,4 @@
-import { Box, Button, Collapse, IconButton, Paper, Typography, Zoom, alpha, useTheme } from '@mui/material'
+import { Box, Button, Collapse, IconButton, Paper, Tab, Tabs, Typography, Zoom, alpha, useTheme } from '@mui/material'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 import { useApi } from '../context/api'
@@ -32,6 +32,8 @@ export function EntityPage(): JSX.Element {
     const self = id === api.userAddress
     const following = id && pref.followingUsers.includes(id)
 
+    const [tab, setTab] = useState(0)
+
     useEffect(() => {
         if (!id) return
         api.readEntity(id).then((e) => {
@@ -46,8 +48,17 @@ export function EntityPage(): JSX.Element {
     }, [id])
 
     const targetStreams = useMemo(() => {
-        return streams?.payload.body.homeStream ? [streams.payload.body.homeStream] : []
-    }, [streams])
+        let target
+        switch (tab) {
+            case 0:
+                target = streams?.payload.body.homeStream
+                break
+            case 1:
+                target = streams?.payload.body.associationStream
+                break
+        }
+        return target ? [target] : []
+    }, [streams, tab])
 
     const transitionDuration = {
         enter: theme.transitions.duration.enteringScreen,
@@ -254,12 +265,26 @@ export function EntityPage(): JSX.Element {
                     </Collapse>
                     {mode === 'edit' && <Navigate to="/settings" />}
                 </Box>
+                <Tabs
+                    value={tab}
+                    onChange={(_, index) => {
+                        setTab(index)
+                    }}
+                >
+                    <Tab label="カレント" />
+                    <Tab label="アクティビティ" />
+                </Tabs>
                 <Box /* timeline */
                     sx={{
                         padding: { xs: '8px', sm: '8px 16px' }
                     }}
                 >
-                    <Timeline streams={targetStreams} timeline={messages} scrollParentRef={scrollParentRef} />
+                    <Timeline
+                        streams={targetStreams}
+                        timeline={messages}
+                        scrollParentRef={scrollParentRef}
+                        perspective={entity.ccaddr}
+                    />
                 </Box>
             </Box>
         </Box>
