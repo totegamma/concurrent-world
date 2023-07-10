@@ -64,8 +64,9 @@ export const EmojiPicker = ({ onSelected, onMounted }: EmojiPickerProps): JSX.El
             const data = (await import('@emoji-mart/data')).default
             if (unmounted) return
             instance.current = new Picker({
-                categories: ['fluffy'],
+                categories: ['frequent', 'fluffy'],
                 searchPosition: 'static',
+                maxFrequentRows: 1,
                 data,
                 custom: emojis,
                 autoFocus: true,
