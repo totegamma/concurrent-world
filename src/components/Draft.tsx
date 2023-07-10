@@ -1,20 +1,9 @@
 import { useState, useContext, useEffect, useRef, memo } from 'react'
-import {
-    InputBase,
-    Box,
-    Button,
-    useTheme,
-    IconButton,
-    Divider,
-    CircularProgress,
-    Popover,
-    Tooltip
-} from '@mui/material'
+import { InputBase, Box, Button, useTheme, IconButton, Divider, CircularProgress, Tooltip } from '@mui/material'
 import { ApplicationContext } from '../App'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import { StreamPicker } from './StreamPicker'
 import { closeSnackbar, useSnackbar } from 'notistack'
-import { EmojiPicker } from './EmojiPicker'
 import { usePreference } from '../context/PreferenceContext'
 import { usePersistent } from '../hooks/usePersistent'
 
@@ -24,6 +13,7 @@ import ImageIcon from '@mui/icons-material/Image'
 import DeleteIcon from '@mui/icons-material/Delete'
 import Splitscreen from '@mui/icons-material/Splitscreen'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
+import { useEmojiPicker } from '../context/EmojiPickerContext'
 
 export interface DraftProps {
     submitButtonLabel?: string
@@ -37,10 +27,9 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const appData = useContext(ApplicationContext)
     const theme = useTheme()
     const pref = usePreference()
+    const emojiPicker = useEmojiPicker()
 
     const [destStreams, setDestStreams] = useState<string[]>(props.streamPickerInitial)
-    const [selectEmoji, setSelectEmoji] = useState<boolean>(false)
-    const [emojiAnchor, setEmojiAnchor] = useState<null | HTMLElement>(null)
 
     const [draft, setDraft] = usePersistent<string>('draft', '')
     const [openPreview, setOpenPreview] = useState<boolean>(false)
@@ -229,23 +218,6 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     </>
                 )}
             </Box>
-            <Popover
-                open={selectEmoji}
-                anchorEl={emojiAnchor}
-                onClose={() => {
-                    setSelectEmoji(false)
-                }}
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'left'
-                }}
-            >
-                <EmojiPicker
-                    onSelected={(emoji) => {
-                        setDraft(draft + emoji.shortcodes)
-                    }}
-                />
-            </Popover>
             <Box
                 sx={{
                     display: 'flex',
@@ -299,8 +271,10 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                 color: theme.palette.text.secondary
                             }}
                             onClick={(e) => {
-                                setSelectEmoji(!selectEmoji)
-                                setEmojiAnchor(e.currentTarget)
+                                emojiPicker.open(e.currentTarget, (emoji) => {
+                                    setDraft(draft + emoji.shortcodes)
+                                    emojiPicker.close()
+                                })
                             }}
                         >
                             <EmojiEmotions sx={{ fontSize: '80%' }} />
