@@ -187,6 +187,7 @@ export default function Welcome(): JSX.Element {
                         どのサーバーにアカウントを作っても、すべての(公開)ストリームに書き込むことができるため、ローカルタイムラインのためにそれぞれのサーバーごとにアカウントを作成する必要はありません。
                         純粋に、そのサーバーがどの程度信用できるか、どの国に設置されていてどのような法的な制限を受けるのかということだけに集中してサーバーを選ぶことができます。
                     </Typography>
+                    {/*
                     <Typography variant="h2" sx={{ color: 'background.contrastText' }}>
                         フォロー数・フォロワー数は見れないの？
                     </Typography>
@@ -196,6 +197,7 @@ export default function Welcome(): JSX.Element {
                         また、発言をフォロワーだけでなくストリームを見ている人にも届けられるConcurrentでは、フォロワー数はほとんど意味のない数字です。
                         代わりに、すてきな人を応援する気持ちとして、プロフィールにいいねを送ることができます。
                     </Typography>
+                    */}
                 </Paper>
             </Box>
         </ThemeProvider>
