@@ -62,8 +62,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     highcontrast_bw: {
         palette: {
             primary: {
-                main: '#ffffff',
-                contrastText: '#000' // WORKAROUND: わおちゃんへ 適当に入れちゃったので、後で直して～ ととがんまより
+                main: '#ffffff'
             },
             secondary: {
                 main: '#ffffff'
@@ -100,8 +99,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     highcontrast_yb: {
         palette: {
             primary: {
-                main: '#f7cd12',
-                contrastText: '#000' // WORKAROUND: わおちゃんへ 適当に入れちゃったので、後で直して～ ととがんまより
+                main: '#f7cd12'
             },
             secondary: {
                 main: '#f7cd12'
@@ -522,6 +520,6 @@ export function deepMerge(target: Record<string, any>, source: Record<string, an
 }
 
 export const createConcurrentTheme = (name: string): ConcurrentTheme => {
-    const theme: ConcurrentTheme = deepMerge(createTheme(), deepMerge(ConcurrentDefaultTheme, Themes[name]))
+    const theme: ConcurrentTheme = deepMerge(ConcurrentDefaultTheme, Themes[name])
     return createTheme(theme) as ConcurrentTheme
 }
