@@ -1,6 +1,6 @@
-import { Box, Button, Collapse, IconButton, Paper, Tab, Tabs, Typography, Zoom, alpha, useTheme } from '@mui/material'
+import { Box, Button, Paper, Tab, Tabs, Typography, alpha, useTheme } from '@mui/material'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Navigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useApi } from '../context/api'
 import type { Character, Entity, StreamElementDated } from '../model'
 import type { Userstreams } from '../schemas/userstreams'
@@ -10,27 +10,17 @@ import { CCAvatar } from '../components/CCAvatar'
 import { Timeline } from '../components/Timeline'
 import { useObjectList } from '../hooks/useObjectList'
 import Background from '../resources/defaultbg.png'
-import InfoIcon from '@mui/icons-material/Info'
-import CreateIcon from '@mui/icons-material/Create'
-import { useSnackbar } from 'notistack'
-import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1'
-import PersonRemoveIcon from '@mui/icons-material/PersonRemove'
-import { usePreference } from '../context/PreferenceContext'
+import { FollowButton } from '../components/FollowButton'
 
 export function EntityPage(): JSX.Element {
     const api = useApi()
     const theme = useTheme()
-    const pref = usePreference()
-    const { enqueueSnackbar } = useSnackbar()
     const { id } = useParams()
     const [entity, setEntity] = useState<Entity>()
     const [profile, setProfile] = useState<Character<Profile>>()
     const [streams, setStreams] = useState<Character<Userstreams>>()
-    const [mode, setMode] = useState<'info' | 'edit'>('info')
     const messages = useObjectList<StreamElementDated>()
     const scrollParentRef = useRef<HTMLDivElement>(null)
-    const self = id === api.userAddress
-    const following = id && pref.followingUsers.includes(id)
 
     const [tab, setTab] = useState(0)
 
@@ -59,11 +49,6 @@ export function EntityPage(): JSX.Element {
         }
         return target ? [target] : []
     }, [streams, tab])
-
-    const transitionDuration = {
-        enter: theme.transitions.duration.enteringScreen,
-        exit: theme.transitions.duration.leavingScreen
-    }
 
     if (!entity || !profile || !streams) {
         return <>loading...</>
@@ -103,90 +88,7 @@ export function EntityPage(): JSX.Element {
                 >
                     <b>{profile.payload.body.username || 'anonymous'}</b>
                 </Button>
-                <Box
-                    sx={{
-                        position: 'relative',
-                        width: '40px',
-                        height: '40px',
-                        mr: '8px'
-                    }}
-                >
-                    {self ? (
-                        <>
-                            <Zoom
-                                in={mode === 'info'}
-                                timeout={transitionDuration}
-                                style={{
-                                    transitionDelay: `${mode === 'info' ? transitionDuration.exit : 0}ms`
-                                }}
-                                unmountOnExit
-                            >
-                                <IconButton
-                                    sx={{ p: '8px', position: 'absolute' }}
-                                    onClick={() => {
-                                        setMode('edit')
-                                    }}
-                                >
-                                    <CreateIcon sx={{ color: 'primary.contrastText' }} />
-                                </IconButton>
-                            </Zoom>
-                            <Zoom
-                                in={mode === 'edit'}
-                                timeout={transitionDuration}
-                                style={{
-                                    transitionDelay: `${mode === 'edit' ? transitionDuration.exit : 0}ms`
-                                }}
-                                unmountOnExit
-                            >
-                                <IconButton
-                                    sx={{ p: '8px', position: 'absolute' }}
-                                    onClick={() => {
-                                        setMode('info')
-                                    }}
-                                >
-                                    <InfoIcon sx={{ color: 'primary.contrastText' }} />
-                                </IconButton>
-                            </Zoom>
-                        </>
-                    ) : (
-                        <>
-                            <Zoom
-                                in={following || false}
-                                timeout={transitionDuration}
-                                style={{
-                                    transitionDelay: `${following ? transitionDuration.exit : 0}ms`
-                                }}
-                                unmountOnExit
-                            >
-                                <IconButton
-                                    onClick={() => {
-                                        id && pref.unfollowUser(id)
-                                        enqueueSnackbar('Unfollowed', { variant: 'success' })
-                                    }}
-                                >
-                                    <PersonRemoveIcon sx={{ color: 'primary.contrastText' }} />
-                                </IconButton>
-                            </Zoom>
-                            <Zoom
-                                in={!following}
-                                timeout={transitionDuration}
-                                style={{
-                                    transitionDelay: `${following ? 0 : transitionDuration.exit}ms`
-                                }}
-                                unmountOnExit
-                            >
-                                <IconButton
-                                    onClick={() => {
-                                        id && pref.followUser(id)
-                                        enqueueSnackbar('Followed', { variant: 'success' })
-                                    }}
-                                >
-                                    <PersonAddAlt1Icon sx={{ color: 'primary.contrastText' }} />
-                                </IconButton>
-                            </Zoom>
-                        </>
-                    )}
-                </Box>
+                <FollowButton userCCID={id} />
             </Box>
             <Box /* body */
                 sx={{
@@ -204,66 +106,63 @@ export function EntityPage(): JSX.Element {
                         backgroundSize: 'cover'
                     }}
                 >
-                    <Collapse in={mode === 'info'}>
-                        <Paper
+                    <Paper
+                        sx={{
+                            position: 'relative',
+                            margin: '50px',
+                            backgroundColor: alpha(theme.palette.background.paper, 0.8)
+                        }}
+                    >
+                        <CCAvatar
+                            alt={profile.payload.body.username}
+                            avatarURL={profile.payload.body.avatar}
+                            identiconSource={entity.ccaddr}
                             sx={{
-                                position: 'relative',
-                                margin: '50px',
-                                backgroundColor: alpha(theme.palette.background.paper, 0.8)
+                                width: '80px',
+                                height: '80px',
+                                position: 'absolute',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)'
+                            }}
+                        />
+                        <Box
+                            sx={{
+                                p: '10px',
+                                display: 'flex',
+                                flexFlow: 'column',
+                                gap: '15px'
                             }}
                         >
-                            <CCAvatar
-                                alt={profile.payload.body.username}
-                                avatarURL={profile.payload.body.avatar}
-                                identiconSource={entity.ccaddr}
-                                sx={{
-                                    width: '80px',
-                                    height: '80px',
-                                    position: 'absolute',
-                                    left: '50%',
-                                    transform: 'translate(-50%, -50%)'
-                                }}
-                            />
                             <Box
                                 sx={{
-                                    p: '10px',
+                                    height: '32px',
+                                    display: 'flex',
+                                    flexFlow: 'row-reverse'
+                                }}
+                            ></Box>
+                            <Box
+                                sx={{
                                     display: 'flex',
                                     flexFlow: 'column',
-                                    gap: '15px'
+                                    alignItems: 'center'
                                 }}
                             >
-                                <Box
-                                    sx={{
-                                        height: '32px',
-                                        display: 'flex',
-                                        flexFlow: 'row-reverse'
-                                    }}
-                                ></Box>
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        flexFlow: 'column',
-                                        alignItems: 'center'
-                                    }}
-                                >
-                                    <Typography>{profile.payload.body.description}</Typography>
-                                </Box>
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        flexFlow: 'column',
-                                        alignItems: 'flex-end'
-                                    }}
-                                >
-                                    <Typography variant="caption">
-                                        現住所: {entity.host !== '' ? entity.host : api.host}
-                                    </Typography>
-                                    <Typography variant="caption">{entity.ccaddr}</Typography>
-                                </Box>
+                                <Typography>{profile.payload.body.description}</Typography>
                             </Box>
-                        </Paper>
-                    </Collapse>
-                    {mode === 'edit' && <Navigate to="/settings" />}
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexFlow: 'column',
+                                    alignItems: 'flex-end'
+                                }}
+                            >
+                                <Typography variant="caption">
+                                    現住所: {entity.host !== '' ? entity.host : api.host}
+                                </Typography>
+                                <Typography variant="caption">{entity.ccaddr}</Typography>
+                            </Box>
+                        </Box>
+                    </Paper>
                 </Box>
                 <Tabs
                     value={tab}
