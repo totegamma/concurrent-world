@@ -25,10 +25,6 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     const [isFetching, setIsFetching] = useState<boolean>(false)
     const theme = useTheme()
 
-    const scrollable = props.scrollParentRef.current
-        ? props.scrollParentRef.current.scrollHeight > props.scrollParentRef.current.clientHeight
-        : true
-
     useEffect(() => {
         if (!api.host) return
         props.timeline.clear()
@@ -82,16 +78,17 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     // to work react-infinite-scroller properly
     useEffect(() => {
         if (!hasMoreData) return
-        if (scrollable) return
         const timer = setTimeout(() => {
-            if (scrollable) return
+            if (!props.scrollParentRef.current) return
+            if (props.scrollParentRef.current.scrollHeight > props.scrollParentRef.current.clientHeight) return
+            console.log('filling screen')
             loadMore()
         }, 1000)
 
         return () => {
             clearTimeout(timer)
         }
-    }, [scrollable, loadMore, props.timeline.current, hasMoreData])
+    }, [loadMore, props.timeline.current, hasMoreData])
 
     useEffect(() => {
         setIsFetching(false)
