@@ -66,7 +66,10 @@ export const MobileMenu = (props: MobileMenuProps): JSX.Element => {
                     my: 'auto',
                     width: 0.5,
                     borderRadius: `20px 0 0 20px`,
-                    backgroundColor: alpha(theme.palette.background.contrastText, 0.9)
+                    backgroundColor: alpha(theme.palette.background.contrastText, 0.9),
+                    ':hover': {
+                        backgroundColor: alpha(theme.palette.background.contrastText, 1)
+                    }
                 }}
                 onClick={() => {
                     actions.openDraft()
