@@ -1,5 +1,7 @@
-import { Box, IconButton, ListItem } from '@mui/material'
+import { Box, IconButton, ListItem, Typography, Grid, Chip, styled } from '@mui/material'
+import Tooltip, { type TooltipProps, tooltipClasses } from '@mui/material/Tooltip'
 import { Link as routerLink } from 'react-router-dom'
+import { useApi } from '../../../context/api'
 import { CCAvatar } from '../../CCAvatar'
 import type { Character, Message as CCMessage, ProfileWithAddress, Stream } from '../../../model'
 import { SimpleNote } from '../SimpleNote'
@@ -9,6 +11,8 @@ import { MessageHeader } from './MessageHeader'
 import { MessageActions } from './MessageActions'
 import { MessageReactions } from './MessageReactions'
 import type { ReplyMessage } from '../../../schemas/replyMessage'
+import { useSnackbar } from 'notistack'
+import { FollowButton } from '../../FollowButton'
 
 export interface MessageViewProps {
     message: CCMessage<TypeSimpleNote | ReplyMessage>
@@ -20,7 +24,19 @@ export interface MessageViewProps {
     beforeMessage?: JSX.Element
 }
 
+const CCAvatarTooltip = styled(({ className, ...props }: TooltipProps) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+))({
+    [`& .${tooltipClasses.tooltip}`]: {
+        minWidth: 300
+    }
+})
+
 export const MessageView = (props: MessageViewProps): JSX.Element => {
+    const api = useApi()
+    const { enqueueSnackbar } = useSnackbar()
+    const isSelf = props.message.author === api.userAddress
+
     return (
         <ListItem
             sx={{
@@ -33,25 +49,62 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
         >
             {props.message?.payload?.body && (
                 <>
-                    <IconButton
-                        sx={{
-                            width: { xs: '38px', sm: '48px' },
-                            height: { xs: '38px', sm: '48px' },
-                            mt: { xs: '3px', sm: '5px' }
-                        }}
-                        component={routerLink}
-                        to={'/entity/' + props.message.author}
+                    <CCAvatarTooltip
+                        title={
+                            <Box display="flex" flexDirection="column" alignItems="left" sx={{ m: 1 }} gap={1}>
+                                <Grid container>
+                                    <Grid item xs={10}>
+                                        <CCAvatar
+                                            alt={props.author?.payload.body.username}
+                                            avatarURL={props.author?.payload.body.avatar}
+                                            identiconSource={props.message.author}
+                                            sx={{
+                                                width: { xs: '38px', sm: '48px' },
+                                                height: { xs: '38px', sm: '48px' }
+                                            }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={1}>
+                                        {!isSelf && <FollowButton userCCID={props.message.author} />}
+                                    </Grid>
+                                </Grid>
+                                <Typography variant="h2">{props.author?.payload.body.username}</Typography>
+                                <Typography variant="body1">{props.author?.payload.body.description}</Typography>
+                                <></>
+                                <Box>
+                                    <Chip
+                                        label={props.message.author.slice(0, 10) + '...'}
+                                        color="primary"
+                                        size="small"
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(props.message.author)
+                                            enqueueSnackbar('Copied', { variant: 'info' })
+                                        }}
+                                    />
+                                </Box>
+                            </Box>
+                        }
                     >
-                        <CCAvatar
-                            alt={props.author?.payload.body.username}
-                            avatarURL={props.author?.payload.body.avatar}
-                            identiconSource={props.message.author}
+                        <IconButton
                             sx={{
                                 width: { xs: '38px', sm: '48px' },
-                                height: { xs: '38px', sm: '48px' }
+                                height: { xs: '38px', sm: '48px' },
+                                mt: { xs: '3px', sm: '5px' }
                             }}
-                        />
-                    </IconButton>
+                            component={routerLink}
+                            to={'/entity/' + props.message.author}
+                        >
+                            <CCAvatar
+                                alt={props.author?.payload.body.username}
+                                avatarURL={props.author?.payload.body.avatar}
+                                identiconSource={props.message.author}
+                                sx={{
+                                    width: { xs: '38px', sm: '48px' },
+                                    height: { xs: '38px', sm: '48px' }
+                                }}
+                            />
+                        </IconButton>
+                    </CCAvatarTooltip>
                     <Box
                         sx={{
                             display: 'flex',
