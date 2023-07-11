@@ -21,7 +21,7 @@ const sanitizeOption = {
     attributes: {
         ...defaultSchema.attributes,
         marquee: [...(defaultSchema.attributes?.marquee ?? []), 'direction', 'behavior', 'scrollamount'],
-        video: [...(defaultSchema.attributes?.video ?? []), 'width', 'height', 'poster', 'loop', 'muted'],
+        video: [...(defaultSchema.attributes?.video ?? []), 'width', 'height', 'poster', 'loop'],
         source: [...(defaultSchema.attributes?.source ?? []), 'src', 'type']
     }
 }
