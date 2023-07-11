@@ -1,6 +1,6 @@
 import { createTheme } from '@mui/material'
 import type { ConcurrentTheme } from './model'
-import type { DeepPartial } from './util'
+import { type DeepPartial } from './util'
 
 export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     basic: {
@@ -151,7 +151,8 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     gammalab: {
         palette: {
             primary: {
-                main: '#FFF'
+                main: '#FFF',
+                contrastText: '#000'
             },
             secondary: {
                 main: '#156a84'
@@ -438,23 +439,32 @@ export const ConcurrentDefaultTheme = {
     },
     typography: {
         fontSize: 14,
+        body1: {
+            fontSize: '1rem'
+        },
         h1: {
-            fontSize: 32
+            fontSize: 32,
+            fontWeight: 700
         },
         h2: {
-            fontSize: 24
+            fontSize: 24,
+            fontWeight: 700
         },
         h3: {
-            fontSize: 19.2
+            fontSize: 19.2,
+            fontWeight: 700
         },
         h4: {
-            fontSize: 16
+            fontSize: 16,
+            fontWeight: 700
         },
         h5: {
-            fontSize: 12.8
+            fontSize: 12.8,
+            fontWeight: 700
         },
         h6: {
-            fontSize: 11.2
+            fontSize: 11.2,
+            fontWeight: 700
         }
     },
     transitions: {
@@ -464,6 +474,13 @@ export const ConcurrentDefaultTheme = {
         }
     },
     components: {
+        MuiButton: {
+            styleOverrides: {
+                root: {
+                    padding: '4px 16px'
+                }
+            }
+        },
         MuiCssBaseline: {
             styleOverrides: `
             ::-webkit-scrollbar{
@@ -482,7 +499,27 @@ export const ConcurrentDefaultTheme = {
     }
 }
 
+function isObject(item: any): item is object {
+    return item && typeof item === 'object' && !Array.isArray(item)
+}
+
+export function deepMerge(target: Record<string, any>, source: Record<string, any>): ConcurrentTheme {
+    const output = { ...target }
+
+    if (isObject(target) && isObject(source)) {
+        Object.keys(source).forEach((key: string) => {
+            if (isObject(source[key])) {
+                if (!(key in target)) Object.assign(output, { [key]: source[key] })
+                else output[key] = deepMerge(target[key], source[key])
+            } else {
+                Object.assign(output, { [key]: source[key] })
+            }
+        })
+    }
+    return output as ConcurrentTheme
+}
+
 export const createConcurrentTheme = (name: string): ConcurrentTheme => {
-    const theme: ConcurrentTheme = Object.assign(createTheme(), Object.assign(ConcurrentDefaultTheme, Themes[name]))
+    const theme: ConcurrentTheme = deepMerge(ConcurrentDefaultTheme, Themes[name])
     return createTheme(theme) as ConcurrentTheme
 }

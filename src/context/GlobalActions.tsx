@@ -45,17 +45,24 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         setMode('compose')
     }, [])
 
-    const queriedStreams = reactlocation.hash
-        .replace('#', '')
-        .split(',')
-        .filter((e) => e !== '')
+    const queriedStreams = useMemo(
+        () =>
+            reactlocation.hash
+                .replace('#', '')
+                .split(',')
+                .filter((e) => e !== ''),
+        [reactlocation.hash]
+    )
 
-    const streamPickerInitial = [
-        ...new Set([
-            ...(reactlocation.hash && reactlocation.hash !== '' ? pref.defaultPostNonHome : pref.defaultPostHome),
-            ...queriedStreams
-        ])
-    ]
+    const streamPickerInitial = useMemo(
+        () => [
+            ...new Set([
+                ...(reactlocation.hash && reactlocation.hash !== '' ? pref.defaultPostNonHome : pref.defaultPostHome),
+                ...queriedStreams
+            ])
+        ],
+        [reactlocation.hash, pref.defaultPostHome, pref.defaultPostNonHome, queriedStreams]
+    )
 
     const handleKeyPress = useCallback((event: KeyboardEvent) => {
         if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
