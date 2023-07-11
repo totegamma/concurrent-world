@@ -70,7 +70,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                                 <></>
                                 <Box>
                                     <Chip
-                                        label={props.author?.author.slice(0, 10).concat('...')}
+                                        label={String(props.author?.author.slice(0, 10)) + '...'}
                                         color="primary"
                                         size="small"
                                         onClick={() => {
