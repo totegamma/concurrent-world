@@ -1,6 +1,7 @@
 import { Box, IconButton, ListItem, Typography, Grid, Chip, styled } from '@mui/material'
 import Tooltip, { type TooltipProps, tooltipClasses } from '@mui/material/Tooltip'
 import { Link as routerLink } from 'react-router-dom'
+import { useApi } from '../../../context/api'
 import { CCAvatar } from '../../CCAvatar'
 import type { Character, Message as CCMessage, ProfileWithAddress, Stream } from '../../../model'
 import { SimpleNote } from '../SimpleNote'
@@ -32,7 +33,9 @@ const CCAvatarTooltip = styled(({ className, ...props }: TooltipProps) => (
 })
 
 export const MessageView = (props: MessageViewProps): JSX.Element => {
+    const api = useApi()
     const { enqueueSnackbar } = useSnackbar()
+    const isSelf = props.message.author === api.userAddress
 
     return (
         <ListItem
@@ -62,7 +65,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                                         />
                                     </Grid>
                                     <Grid item xs={1}>
-                                        <FollowButton userCCID={props.message.author} />
+                                        {!isSelf && <FollowButton userCCID={props.message.author} />}
                                     </Grid>
                                 </Grid>
                                 <Typography variant="h2">{props.author?.payload.body.username}</Typography>
