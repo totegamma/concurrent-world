@@ -1,4 +1,4 @@
-import { Box, Button, alpha } from '@mui/material'
+import { Box, Button, alpha, useTheme } from '@mui/material'
 
 import HomeIcon from '@mui/icons-material/Home'
 import MessageIcon from '@mui/icons-material/Message'
@@ -8,6 +8,7 @@ import MenuIcon from '@mui/icons-material/Menu'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import { NavLink } from 'react-router-dom'
 import { useGlobalActions } from '../context/GlobalActions'
+import type { ConcurrentTheme } from '../model'
 
 export interface MobileMenuProps {
     setMobileMenuOpen: (state: boolean) => void
@@ -15,6 +16,7 @@ export interface MobileMenuProps {
 
 export const MobileMenu = (props: MobileMenuProps): JSX.Element => {
     const actions = useGlobalActions()
+    const theme = useTheme<ConcurrentTheme>()
 
     return (
         <Box
@@ -64,7 +66,7 @@ export const MobileMenu = (props: MobileMenuProps): JSX.Element => {
                     my: 'auto',
                     width: 0.5,
                     borderRadius: `20px 0 0 20px`,
-                    backgroundColor: (theme) => alpha(theme.palette.background.contrastText, 0.9)
+                    backgroundColor: alpha(theme.palette.background.contrastText, 0.9)
                 }}
                 onClick={() => {
                     actions.openDraft()
