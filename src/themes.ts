@@ -1,6 +1,6 @@
 import { createTheme } from '@mui/material'
 import type { ConcurrentTheme } from './model'
-import type { DeepPartial } from './util'
+import { type DeepPartial } from './util'
 
 export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     basic: {
@@ -62,7 +62,8 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     highcontrast_bw: {
         palette: {
             primary: {
-                main: '#ffffff'
+                main: '#ffffff',
+                contrastText: '#000' // WORKAROUND: わおちゃんへ 適当に入れちゃったので、後で直して～ ととがんまより
             },
             secondary: {
                 main: '#ffffff'
@@ -99,7 +100,8 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     highcontrast_yb: {
         palette: {
             primary: {
-                main: '#f7cd12'
+                main: '#f7cd12',
+                contrastText: '#000' // WORKAROUND: わおちゃんへ 適当に入れちゃったので、後で直して～ ととがんまより
             },
             secondary: {
                 main: '#f7cd12'
@@ -151,7 +153,8 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     gammalab: {
         palette: {
             primary: {
-                main: '#FFF'
+                main: '#FFF',
+                contrastText: '#000'
             },
             secondary: {
                 main: '#156a84'
@@ -498,7 +501,27 @@ export const ConcurrentDefaultTheme = {
     }
 }
 
+function isObject(item: any): item is object {
+    return item && typeof item === 'object' && !Array.isArray(item)
+}
+
+export function deepMerge(target: Record<string, any>, source: Record<string, any>): ConcurrentTheme {
+    const output = { ...target }
+
+    if (isObject(target) && isObject(source)) {
+        Object.keys(source).forEach((key: string) => {
+            if (isObject(source[key])) {
+                if (!(key in target)) Object.assign(output, { [key]: source[key] })
+                else output[key] = deepMerge(target[key], source[key])
+            } else {
+                Object.assign(output, { [key]: source[key] })
+            }
+        })
+    }
+    return output as ConcurrentTheme
+}
+
 export const createConcurrentTheme = (name: string): ConcurrentTheme => {
-    const theme: ConcurrentTheme = Object.assign(createTheme(), Object.assign(ConcurrentDefaultTheme, Themes[name]))
+    const theme: ConcurrentTheme = deepMerge(createTheme(), deepMerge(ConcurrentDefaultTheme, Themes[name]))
     return createTheme(theme) as ConcurrentTheme
 }
