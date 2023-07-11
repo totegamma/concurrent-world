@@ -17,10 +17,12 @@ export interface MarkdownRendererProps {
 
 const sanitizeOption = {
     ...defaultSchema,
-    tagNames: [...(defaultSchema.tagNames ?? []), 'marquee'],
+    tagNames: [...(defaultSchema.tagNames ?? []), 'marquee', 'video', 'source'],
     attributes: {
         ...defaultSchema.attributes,
-        marquee: [...(defaultSchema.attributes?.marquee ?? []), 'direction', 'behavior', 'scrollamount']
+        marquee: [...(defaultSchema.attributes?.marquee ?? []), 'direction', 'behavior', 'scrollamount'],
+        video: [...(defaultSchema.attributes?.video ?? []), 'width', 'height', 'poster', 'loop'],
+        source: [...(defaultSchema.attributes?.source ?? []), 'src', 'type']
     }
 }
 
@@ -240,6 +242,21 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                                     }}
                                 />
                             </a>
+                        )
+                    },
+                    video: (props) => {
+                        return (
+                            <Box
+                                {...props}
+                                component="video"
+                                maxWidth="100%"
+                                borderRadius={1}
+                                sx={{
+                                    maxHeight: '20vh'
+                                }}
+                                controls
+                                preload="metadata"
+                            />
                         )
                     }
                 }}
