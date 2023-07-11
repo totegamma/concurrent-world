@@ -27,7 +27,7 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                     component="span"
                     sx={{
                         fontWeight: '700',
-                        fontSize: { xs: '0.75rem', sm: '0.85rem' }
+                        fontSize: { xs: '0.9rem', sm: '0.95rem' }
                     }}
                 >
                     {props.username || 'anonymous'}
