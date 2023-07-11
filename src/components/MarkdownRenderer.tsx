@@ -10,7 +10,6 @@ import { Codeblock } from './Codeblock'
 
 import type { Emoji } from '../model'
 import { ApplicationContext } from '../App'
-import { LineWeightOutlined } from '@mui/icons-material'
 
 export interface MarkdownRendererProps {
     messagebody: string
