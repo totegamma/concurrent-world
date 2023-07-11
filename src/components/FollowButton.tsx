@@ -5,6 +5,7 @@ import PersonRemoveIcon from '@mui/icons-material/PersonRemove'
 import { usePreference } from '../context/PreferenceContext'
 
 export interface FollowButtonProps {
+    color?: string
     userCCID: string
 }
 
@@ -35,7 +36,7 @@ export const FollowButton = (props: FollowButtonProps): JSX.Element => {
                         enqueueSnackbar('Unfollowed', { variant: 'success' })
                     }}
                 >
-                    <PersonRemoveIcon sx={{ color: 'primary.contrastText' }} />
+                    <PersonRemoveIcon sx={{ color: props.color ?? 'primary.contrastText' }} />
                 </IconButton>
             </Zoom>
             <Zoom
@@ -52,7 +53,7 @@ export const FollowButton = (props: FollowButtonProps): JSX.Element => {
                         enqueueSnackbar('Followed', { variant: 'success' })
                     }}
                 >
-                    <PersonAddAlt1Icon sx={{ color: 'primary.contrastText' }} />
+                    <PersonAddAlt1Icon sx={{ color: props.color ?? 'primary.contrastText' }} />
                 </IconButton>
             </Zoom>
         </>

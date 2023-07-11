@@ -161,7 +161,9 @@ export function EntityPage(): JSX.Element {
                     sx={{
                         backgroundImage: `url(${profile.payload.body.banner || Background})`,
                         backgroundPosition: 'center',
-                        backgroundSize: 'cover'
+                        backgroundSize: 'cover',
+                        display: 'flex',
+                        flexDirection: 'column'
                     }}
                 >
                     <Paper
