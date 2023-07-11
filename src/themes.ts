@@ -481,16 +481,16 @@ export const ConcurrentDefaultTheme = {
             }
         },
         MuiCssBaseline: {
-            styleOverrides: {
-                '::-webkit-scrollbar': {
-                    width: '10px',
-                    height: '10px'
-                },
-                '::-webkit-scrollbar-thumb': {
-                    backgroundColor: 'rgba(0, 0, 0, 0.2)',
-                    borderRadius: '10px'
-                }
+            styleOverrides: `
+            ::-webkit-scrollbar{
+                width: 10px;
+                height: 10px;
+            },
+            ::-webkit-scrollbar-thumb {
+                background-color: rgba(0, 0, 0, 0.2);
+                border-radius: 10px;
             }
+            `
         }
     },
     shape: {
