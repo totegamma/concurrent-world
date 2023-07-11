@@ -78,7 +78,13 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                                     />
                                     {!isSelf && <FollowButton userCCID={props.message.author} color="primary.main" />}
                                 </Box>
-                                <Box display="flex" flexDirection="row" alignItems="baseline" gap={1}>
+                                <Box
+                                    display="flex"
+                                    flexDirection="row"
+                                    alignItems="center"
+                                    gap={1}
+                                    justifyContent="space-between"
+                                >
                                     <Typography variant="h2">{props.author?.payload.body.username}</Typography>
                                     <Chip
                                         size="small"
