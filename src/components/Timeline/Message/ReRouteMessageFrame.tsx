@@ -59,8 +59,8 @@ export const ReRouteMessageFrame = (props: ReRouteMessageFrameProp): JSX.Element
                 <Typography
                     sx={{
                         fontSize: {
-                            xs: '0.8rem',
-                            sm: '0.9rem'
+                            xs: '0.9rem',
+                            sm: '1rem'
                         },
                         color: 'text.disabled',
                         fontWeight: 700,
@@ -69,13 +69,7 @@ export const ReRouteMessageFrame = (props: ReRouteMessageFrameProp): JSX.Element
                 >
                     {author?.payload.body.username || 'Anonymous'} rerouted
                 </Typography>
-                <Box
-                    color="text.disabled"
-                    fontSize={{
-                        xs: '0.7rem',
-                        sm: '0.8rem'
-                    }}
-                >
+                <Box color="text.disabled" fontSize="0.75rem">
                     <TimeDiff date={new Date(props.message.cdate)} />
                 </Box>
             </Box>
