@@ -70,11 +70,11 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                                 <></>
                                 <Box>
                                     <Chip
-                                        label={String(props.author?.author.slice(0, 10)) + '...'}
+                                        label={props.message.author.slice(0, 10) + '...'}
                                         color="primary"
                                         size="small"
                                         onClick={() => {
-                                            navigator.clipboard.writeText(String(props.author?.author))
+                                            navigator.clipboard.writeText(props.message.author)
                                             enqueueSnackbar('Copied', { variant: 'info' })
                                         }}
                                     />
