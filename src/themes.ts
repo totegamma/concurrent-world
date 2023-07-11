@@ -438,23 +438,32 @@ export const ConcurrentDefaultTheme = {
     },
     typography: {
         fontSize: 14,
+        body1: {
+            fontSize: '1rem'
+        },
         h1: {
-            fontSize: 32
+            fontSize: 32,
+            fontWeight: 700
         },
         h2: {
-            fontSize: 24
+            fontSize: 24,
+            fontWeight: 700
         },
         h3: {
-            fontSize: 19.2
+            fontSize: 19.2,
+            fontWeight: 700
         },
         h4: {
-            fontSize: 16
+            fontSize: 16,
+            fontWeight: 700
         },
         h5: {
-            fontSize: 12.8
+            fontSize: 12.8,
+            fontWeight: 700
         },
         h6: {
-            fontSize: 11.2
+            fontSize: 11.2,
+            fontWeight: 700
         }
     },
     transitions: {
@@ -464,17 +473,24 @@ export const ConcurrentDefaultTheme = {
         }
     },
     components: {
-        MuiCssBaseline: {
-            styleOverrides: `
-            ::-webkit-scrollbar{
-                width: 10px;
-                height: 10px;
-            },
-            ::-webkit-scrollbar-thumb {
-                background-color: rgba(0, 0, 0, 0.2);
-                border-radius: 10px;
+        MuiButton: {
+            styleOverrides: {
+                root: {
+                    padding: '4px 16px'
+                }
             }
-            `
+        },
+        MuiCssBaseline: {
+            styleOverrides: {
+                '::-webkit-scrollbar': {
+                    width: '10px',
+                    height: '10px'
+                },
+                '::-webkit-scrollbar-thumb': {
+                    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                    borderRadius: '10px'
+                }
+            }
         }
     },
     shape: {
