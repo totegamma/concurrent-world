@@ -50,6 +50,10 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                     listStyle: 'none',
                     marginLeft: '0.8rem',
                     paddingLeft: 0,
+                    fontSize: {
+                        xs: '0.9rem',
+                        sm: '1rem'
+                    },
                     '&:first-child': {
                         marginTop: 0
                     },
@@ -63,16 +67,29 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                             width: '1em',
                             marginLeft: '-1em',
                             textAlign: 'center',
-                            fontSize: '0.8rem',
-                            lineHeight: '1rem'
+                            fontSize: {
+                                xs: '0.7rem',
+                                sm: '0.8rem'
+                            },
+                            lineHeight: {
+                                xs: '0.9rem',
+                                sm: '1rem'
+                            }
                         }
                     }
                 },
                 '& ol': {
                     marginTop: 1,
                     marginBottom: 1,
-                    marginLeft: '1.5rem',
+                    marginLeft: {
+                        xs: '1.3rem',
+                        sm: '1.4rem'
+                    },
                     paddingLeft: 0,
+                    fontSize: {
+                        xs: '0.9rem',
+                        sm: '1rem'
+                    },
                     '&:first-child': {
                         marginTop: 0
                     },
