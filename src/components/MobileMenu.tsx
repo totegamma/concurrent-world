@@ -1,4 +1,4 @@
-import { Box, Button } from '@mui/material'
+import { Box, Button, alpha } from '@mui/material'
 
 import HomeIcon from '@mui/icons-material/Home'
 import MessageIcon from '@mui/icons-material/Message'
@@ -64,7 +64,7 @@ export const MobileMenu = (props: MobileMenuProps): JSX.Element => {
                     my: 'auto',
                     width: 0.5,
                     borderRadius: `20px 0 0 20px`,
-                    backgroundColor: 'background.contrastText'
+                    backgroundColor: (theme) => alpha(theme.palette.background.contrastText, 0.9)
                 }}
                 onClick={() => {
                     actions.openDraft()
