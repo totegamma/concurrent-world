@@ -79,7 +79,10 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                 '& ol': {
                     marginTop: 1,
                     marginBottom: 1,
-                    marginLeft: '1.4rem',
+                    marginLeft: {
+                        xs: '1.3rem',
+                        sm: '1.4rem'
+                    },
                     paddingLeft: 0,
                     fontSize: {
                         xs: '0.9rem',
