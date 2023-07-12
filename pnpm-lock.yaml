@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@concurrent-world/client':
+    specifier: ^0.0.1
+    version: 0.0.1
   '@emoji-mart/react':
     specifier: ^1.1.1
     version: 1.1.1(emoji-mart@5.5.2)(react@18.2.0)
@@ -1639,6 +1642,12 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /@concurrent-world/client@0.0.1:
+    resolution: {integrity: sha512-MoJFeILWpcO/+m9kpp2ZuGJCu4xbNGzmM8iXDCyhh59oJTwtjI1/EqndDHTNY3zyFfUDNQyyTZe/tNmsmZAo9g==}
+    dependencies:
+      typescript: 5.1.6
+    dev: false
 
   /@discoveryjs/json-ext@0.5.7:
     resolution: {integrity: sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==}
@@ -10585,6 +10594,12 @@ packages:
     engines: {node: '>=12.20'}
     hasBin: true
     dev: true
+
+  /typescript@5.1.6:
+    resolution: {integrity: sha512-zaWCozRZ6DLEWAWFrVDz1H6FVXzUSfTy5FUMWsQlU8Ym5JP9eO4xkTIROFCQvhQf61z6O/G6ugw3SgAnvvm+HA==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+    dev: false
 
   /uglify-js@3.17.4:
     resolution: {integrity: sha512-T9q82TJI9e/C1TAxYvfb16xO120tMVFZrGA3f9/P4424DNu6ypK103y0GPFVa17yotwSyZW5iYXgjYHkGrJW/g==}

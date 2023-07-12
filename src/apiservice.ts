@@ -6,10 +6,10 @@ import type {
     Host,
     StreamElement,
     Message,
-    Entity,
     Association,
     CCID
 } from './model'
+import type { Entity } from '@concurrent-world/client'
 import { v4 as uuidv4 } from 'uuid'
 // @ts-expect-error vite dynamic import
 import { branch, sha } from '~build/info'

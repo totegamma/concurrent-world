@@ -1,4 +1,5 @@
-import type { Association, CCID, Character, Entity, Host, Message, Stream, StreamElement } from '../model'
+import type { Association, CCID, Character, Host, Message, Stream, StreamElement } from '../model'
+import type { Entity } from '@concurrent-world/client'
 
 export abstract class ApiService {
     abstract host: string | undefined

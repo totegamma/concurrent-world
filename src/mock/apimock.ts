@@ -1,5 +1,6 @@
 import { ApiService } from '../abstraction/apiservice'
-import type { Association, Character, Entity, Host, Message, Stream, StreamElement, CCID } from '../model'
+import type { Association, Character, Host, Message, Stream, StreamElement, CCID } from '../model'
+import type { Entity } from '@concurrent-world/client'
 import { StreamMock } from './modelmock'
 
 export class ApiMock extends ApiService {
