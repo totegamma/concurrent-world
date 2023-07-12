@@ -7,11 +7,13 @@ export const UserJWT = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
 
     const [issuedJwt, setIssuedJwt] = useState<string>('')
     const [audience, setAudience] = useState<string>(api?.host ?? '')
+    const [subject, setSubject] = useState<string>('')
 
     const issueJwt = (): void => {
         setIssuedJwt(
             api.constructJWT({
-                aud: audience
+                aud: audience,
+                sub: subject
             })
         )
     }
@@ -33,6 +35,15 @@ export const UserJWT = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
                     value={audience}
                     onChange={(e: any) => {
                         setAudience(e.target.value)
+                    }}
+                />
+                <Typography variant="h4">subject</Typography>
+                <TextField
+                    label="subject"
+                    multiline
+                    value={subject}
+                    onChange={(e: any) => {
+                        setSubject(e.target.value)
                     }}
                 />
                 <Button variant="contained" onClick={issueJwt}>
