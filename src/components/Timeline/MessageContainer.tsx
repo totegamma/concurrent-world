@@ -1,5 +1,5 @@
-import { Schemas } from '../../schemas'
-import type { Character, Message, ProfileWithAddress, Stream } from '../../model'
+import { type Character, type Message, Schemas, type Stream } from '@concurrent-world/client'
+import type { ProfileWithAddress } from '../../model'
 import { useApi } from '../../context/api'
 import { createContext, memo, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { ReplyMessageFrame } from './Message/ReplyMessageFrame'
@@ -233,7 +233,7 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
                 />
             )
             break
-        case Schemas.reRouteMessage:
+        case Schemas.rerouteMessage:
             body = (
                 <ReRouteMessageFrame
                     message={message as Message<ReRouteMessage>}

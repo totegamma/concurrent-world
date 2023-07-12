@@ -4,7 +4,7 @@ import type { ConcurrentTheme, StreamElementDated } from '../model'
 import { useObjectList } from '../hooks/useObjectList'
 import { Link, useLocation } from 'react-router-dom'
 import { Timeline } from '../components/Timeline/main'
-import ConcurrentApiClient from '../apiservice'
+import { Client } from '@concurrent-world/client'
 import { FullScreenLoading } from '../components/FullScreenLoading'
 import ApiProvider from '../context/api'
 import { ClockContext } from '../App'
@@ -17,7 +17,7 @@ export function GuestTimelinePage(): JSX.Element {
     const [queriedStreams, setQueriedStreams] = useState<string[]>([])
     const [title, setTitle] = useState<string>('')
 
-    const [api, initializeApi] = useState<ConcurrentApiClient>()
+    const [api, initializeApi] = useState<Client>()
     useEffect(() => {
         const queriedStreams = reactlocation.hash
             .replace('#', '')
@@ -27,7 +27,7 @@ export function GuestTimelinePage(): JSX.Element {
 
         const resolver = queriedStreams[0].split('@')[1]
 
-        const api = new ConcurrentApiClient('', '', resolver)
+        const api = new Client('', '', resolver)
 
         initializeApi(api)
     }, [])

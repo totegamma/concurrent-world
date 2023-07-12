@@ -5,7 +5,7 @@ import { createConcurrentTheme, Themes } from '../../../themes'
 import { CssBaseline, ThemeProvider } from '@mui/material'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { MessageView } from './MessageView'
-import { CharacterProfileMock, MessageMock, StreamMock } from '../../../mock/modelmock'
+import { CharacterProfileMock, MessageMock, StreamMock } from '@concurrent-world/client'
 import { InspectorProvider } from '../../../context/Inspector'
 import Paper from '@mui/material/Paper'
 

@@ -14,11 +14,10 @@ import {
     Typography,
     useTheme
 } from '@mui/material'
-import { Schemas } from '../schemas'
+import { Schemas, type Stream } from '@concurrent-world/client'
 import { useApi } from '../context/api'
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import type { Stream } from '../model'
 import type { Commonstream } from '../schemas/commonstream'
 import { usePreference } from '../context/PreferenceContext'
 

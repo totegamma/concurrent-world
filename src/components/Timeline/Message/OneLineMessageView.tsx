@@ -4,7 +4,7 @@ import { CCAvatar } from '../../CCAvatar'
 import { TimeDiff } from '../../TimeDiff'
 import { type SimpleNote } from '../../../schemas/simpleNote'
 import { type ReplyMessage } from '../../../schemas/replyMessage'
-import { type Character, type Message } from '../../../model'
+import { type Character, type Message } from '@concurrent-world/client'
 import { type Profile } from '../../../schemas/profile'
 
 export interface OneLineMessageViewProps {

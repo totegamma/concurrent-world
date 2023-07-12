@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Box, Chip } from '@mui/material'
 
-import type { Character, Message as CCMessage, ProfileWithAddress, Stream } from '../../../model'
+import type { ProfileWithAddress } from '../../../model'
+import { type Character, type Message as CCMessage, type Stream, Schemas } from '@concurrent-world/client'
 import type { Profile } from '../../../schemas/profile'
-import { Schemas } from '../../../schemas'
 import { useApi } from '../../../context/api'
 import { MessageView } from './MessageView'
 import { OneLineMessageView } from './OneLineMessageView'

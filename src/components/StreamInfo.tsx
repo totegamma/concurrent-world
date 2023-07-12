@@ -2,10 +2,9 @@ import { Box, Button, Divider, Modal, Paper, TextField, Typography } from '@mui/
 import type { Commonstream } from '../schemas/commonstream'
 import { useCallback, useEffect, useState } from 'react'
 import { useApi } from '../context/api'
-import type { Stream } from '../model'
+import { type Stream, Schemas } from '@concurrent-world/client'
 import Background from '../resources/defaultbg.png'
 import { CCEditor } from './cceditor'
-import { Schemas } from '../schemas'
 import { useSnackbar } from 'notistack'
 import { usePreference } from '../context/PreferenceContext'
 

@@ -1,7 +1,6 @@
 import { memo, useEffect, useState } from 'react'
-import type { Association, Character, Message, StreamElement } from '../../model'
+import { type Association, type Character, type Message, type StreamElement, Schemas } from '@concurrent-world/client'
 import { useApi } from '../../context/api'
-import { Schemas } from '../../schemas'
 import { Box, IconButton, ListItem, ListItemButton, Typography } from '@mui/material'
 import type { Profile } from '../../schemas/profile'
 import { Link as routerLink } from 'react-router-dom'
@@ -222,7 +221,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                     after={props.after}
                 />
             )
-        case Schemas.reRouteAssociation:
+        case Schemas.rerouteAssociation:
             return (
                 <MessageContainer
                     messageID={association.payload.body.messageId}

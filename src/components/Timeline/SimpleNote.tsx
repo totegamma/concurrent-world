@@ -1,4 +1,4 @@
-import type { Message } from '../../model'
+import type { Message } from '@concurrent-world/client'
 import type { SimpleNote as SimpleNoteSchema } from '../../schemas/simpleNote'
 import { MarkdownRenderer } from '../MarkdownRenderer'
 

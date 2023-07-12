@@ -9,8 +9,8 @@ import { LoadKey, isValid256k1PrivateKey } from '../util'
 import { useNavigate } from 'react-router-dom'
 import { HDNodeWallet } from 'ethers'
 import { LangJa } from '../utils/lang-ja'
-import ConcurrentApiClient from '../apiservice'
-import type { ConcurrentTheme, Host } from '../model'
+import { Client, type Host } from '@concurrent-world/client'
+import type { ConcurrentTheme } from '../model'
 import { usePersistent } from '../hooks/usePersistent'
 import { Themes, createConcurrentTheme } from '../themes'
 import { ThemeProvider } from '@emotion/react'
@@ -35,7 +35,7 @@ export function AccountImport(): JSX.Element {
     const [server, setServer] = useState<string>('')
     const [host, setHost] = useState<Host>()
     const [entityFound, setEntityFound] = useState<boolean>(false)
-    const [api, initializeApi] = useState<ConcurrentApiClient>()
+    const [api, initializeApi] = useState<Client>()
     const [errorMessage, setErrorMessage] = useState<string>('')
 
     const [privatekey, setPrivatekey] = useState<string>('')
@@ -71,7 +71,7 @@ export function AccountImport(): JSX.Element {
         setPrivatekey(privatekey)
         setCcid(ccid)
 
-        const hubApi = new ConcurrentApiClient(ccid, privatekey, 'hub.concurrent.world')
+        const hubApi = new Client(ccid, privatekey, 'hub.concurrent.world')
 
         hubApi.readEntity(ccid).then((entity) => {
             console.log(entity)
@@ -87,7 +87,7 @@ export function AccountImport(): JSX.Element {
     useEffect(() => {
         let unmounted = false
         const fqdn = server.replace('https://', '').replace('/', '')
-        const api = new ConcurrentApiClient(ccid, privatekey, fqdn)
+        const api = new Client(ccid, privatekey, fqdn)
         api.getHostProfile(fqdn)
             .then((e: any) => {
                 if (unmounted) return

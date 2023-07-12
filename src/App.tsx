@@ -8,10 +8,10 @@ import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
 
-import { Schemas } from './schemas'
+import { Client, Schemas, type ServerEvent, type Character } from '@concurrent-world/client'
 import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu'
-import type { StreamElementDated, ServerEvent, Emoji, ConcurrentTheme, Character } from './model'
+import type { StreamElementDated, Emoji, ConcurrentTheme } from './model'
 import {
     Associations,
     Explorer,
@@ -28,7 +28,6 @@ import NotificationSound from './resources/Notification.wav'
 import useSound from 'use-sound'
 import { MobileMenu } from './components/MobileMenu'
 import ApiProvider from './context/api'
-import ConcurrentApiClient from './apiservice'
 import type { Profile } from './schemas/profile'
 import type { Userstreams } from './schemas/userstreams'
 import { PreferenceProvider } from './context/PreferenceContext'
@@ -58,9 +57,9 @@ function App(): JSX.Element {
     const [domain] = usePersistent<string>('Domain', '')
     const [prvkey] = usePersistent<string>('PrivateKey', '')
     const [address] = usePersistent<string>('Address', '')
-    const [api, initializeApi] = useState<ConcurrentApiClient>()
+    const [api, initializeApi] = useState<Client>()
     useEffect(() => {
-        const api = new ConcurrentApiClient(address, prvkey, domain)
+        const api = new Client(address, prvkey, domain, 'cc-client')
         initializeApi(api)
     }, [domain, address, prvkey])
 
@@ -218,7 +217,7 @@ function App(): JSX.Element {
                                     return
                                 }
 
-                                if (a.schema === Schemas.reRouteAssociation) {
+                                if (a.schema === Schemas.rerouteAssociation) {
                                     api?.readCharacter(a.author, Schemas.profile).then(
                                         (c: Character<Profile> | undefined) => {
                                             enqueueSnackbar(

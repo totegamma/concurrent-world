@@ -7,9 +7,9 @@ import muiLink from '@mui/material/Link'
 import TextField from '@mui/material/TextField'
 import Divider from '@mui/material/Divider'
 import { ProfileEditor } from '../components/ProfileEditor'
-import ConcurrentApiClient from '../apiservice'
+import { Client, type Character, type Host, Schemas } from '@concurrent-world/client'
 import ApiProvider from '../context/api'
-import type { Character, ConcurrentTheme, Host } from '../model'
+import type { ConcurrentTheme } from '../model'
 import {
     Alert,
     AlertTitle,
@@ -39,7 +39,6 @@ import { ConcurrentWordmark } from '../components/ConcurrentWordmark'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
-import { Schemas } from '../schemas'
 import { type DomainProfile } from '../schemas/domainProfile'
 
 export function Registration(): JSX.Element {
@@ -63,7 +62,7 @@ export function Registration(): JSX.Element {
     const [CCID, setCCID] = useState<string>('')
     const [privateKey, setPrivateKey] = useState<string>('')
     const [publicKey, setPublicKey] = useState<string>('')
-    const [api, initializeApi] = useState<ConcurrentApiClient>()
+    const [api, initializeApi] = useState<Client>()
 
     useEffect(() => {
         const identity = generateIdentity()
@@ -71,7 +70,7 @@ export function Registration(): JSX.Element {
         setCCID(identity.CCID)
         setPrivateKey(identity.privateKey)
         setPublicKey(identity.publicKey)
-        initializeApi(new ConcurrentApiClient(identity.CCID, identity.privateKey, 'hub.concurrent.world'))
+        initializeApi(new Client(identity.CCID, identity.privateKey, 'hub.concurrent.world'))
     }, [])
 
     const [server, setServer] = useState<string>('')
@@ -80,7 +79,7 @@ export function Registration(): JSX.Element {
 
     useEffect(() => {
         if (!CCID || !privateKey || !host) return
-        const api = new ConcurrentApiClient(CCID, privateKey, host.fqdn)
+        const api = new Client(CCID, privateKey, host.fqdn)
         initializeApi(api)
     }, [host, CCID, privateKey])
 

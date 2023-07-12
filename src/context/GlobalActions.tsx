@@ -2,14 +2,13 @@ import { Box, Paper, Modal, Typography } from '@mui/material'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
-import { Schemas } from '../schemas'
+import { Schemas, type Character } from '@concurrent-world/client'
 import { Draft } from '../components/Draft'
 import { type SimpleNote } from '../schemas/simpleNote'
 import { useLocation } from 'react-router-dom'
 import { usePreference } from './PreferenceContext'
 import { ApplicationContext } from '../App'
 import { ProfileEditor } from '../components/ProfileEditor'
-import { type Character } from '../model'
 import { type DomainProfile } from '../schemas/domainProfile'
 
 export interface GlobalActionsState {

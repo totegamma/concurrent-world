@@ -16,7 +16,7 @@ import { StreamPicker } from '../components/StreamPicker'
 import type { ProfileWithAddress } from '../model'
 import { CCAvatar } from '../components/CCAvatar'
 import { useApi } from '../context/api'
-import { Schemas } from '../schemas'
+import { Schemas } from '@concurrent-world/client'
 import { Link } from 'react-router-dom'
 import { usePreference } from '../context/PreferenceContext'
 
