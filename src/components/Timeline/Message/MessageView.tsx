@@ -2,15 +2,19 @@ import { Box, IconButton, ListItem, Typography, Chip, Paper, Tooltip } from '@mu
 import { Link as routerLink } from 'react-router-dom'
 import { useApi } from '../../../context/api'
 import { CCAvatar } from '../../CCAvatar'
-import type { Character, Message as CCMessage, Stream } from '@concurrent-world/client'
+import type {
+    Character,
+    Message as CCMessage,
+    Stream,
+    SimpleNote as TypeSimpleNote,
+    Profile,
+    ReplyMessage
+} from '@concurrent-world/client'
 import type { ProfileWithAddress } from '../../../model'
 import { SimpleNote } from '../SimpleNote'
-import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
-import type { Profile } from '../../../schemas/profile'
 import { MessageHeader } from './MessageHeader'
 import { MessageActions } from './MessageActions'
 import { MessageReactions } from './MessageReactions'
-import type { ReplyMessage } from '../../../schemas/replyMessage'
 import { useSnackbar } from 'notistack'
 import { FollowButton } from '../../FollowButton'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'

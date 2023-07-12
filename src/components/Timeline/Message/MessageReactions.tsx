@@ -1,7 +1,10 @@
-import { type Message as CCMessage, Schemas } from '@concurrent-world/client'
+import {
+    type Message as CCMessage,
+    Schemas,
+    type SimpleNote as TypeSimpleNote,
+    type ReplyMessage
+} from '@concurrent-world/client'
 import { type ProfileWithAddress } from '../../../model'
-import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
-import type { ReplyMessage } from '../../../schemas/replyMessage'
 import { Box, Button, Divider, Tooltip, Typography, alpha, useTheme } from '@mui/material'
 import { useApi } from '../../../context/api'
 import { CCAvatar } from '../../CCAvatar'

@@ -11,8 +11,7 @@ import { Timeline } from '../components/Timeline/main'
 import { StreamInfo } from '../components/StreamInfo'
 import { HomeSettings } from '../components/HomeSettings'
 import { ApplicationContext } from '../App'
-import type { SimpleNote } from '../schemas/simpleNote'
-import { Schemas } from '@concurrent-world/client'
+import { Schemas, type SimpleNote } from '@concurrent-world/client'
 import { usePreference } from '../context/PreferenceContext'
 
 export interface TimelinePageProps {

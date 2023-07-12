@@ -1,5 +1,4 @@
-import type { Message } from '@concurrent-world/client'
-import type { SimpleNote as SimpleNoteSchema } from '../../schemas/simpleNote'
+import type { Message, SimpleNote as SimpleNoteSchema } from '@concurrent-world/client'
 import { MarkdownRenderer } from '../MarkdownRenderer'
 
 interface SimpleNoteProps {

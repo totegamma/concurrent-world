@@ -15,8 +15,7 @@ import {
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
-import { type Character, type Message, Schemas, validateSignature } from '@concurrent-world/client'
-import type { Profile } from '../schemas/profile'
+import { type Character, type Message, Schemas, validateSignature, type Profile } from '@concurrent-world/client'
 import grey from '@mui/material/colors/grey'
 import { Codeblock } from '../components/Codeblock'
 import { MessageContainer } from '../components/Timeline/MessageContainer'

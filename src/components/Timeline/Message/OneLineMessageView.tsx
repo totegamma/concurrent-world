@@ -2,10 +2,13 @@ import { Box, Link, IconButton, Typography } from '@mui/material'
 import { Link as routerLink } from 'react-router-dom'
 import { CCAvatar } from '../../CCAvatar'
 import { TimeDiff } from '../../TimeDiff'
-import { type SimpleNote } from '../../../schemas/simpleNote'
-import { type ReplyMessage } from '../../../schemas/replyMessage'
-import { type Character, type Message } from '@concurrent-world/client'
-import { type Profile } from '../../../schemas/profile'
+import {
+    type Character,
+    type Message,
+    type SimpleNote,
+    type ReplyMessage,
+    type Profile
+} from '@concurrent-world/client'
 
 export interface OneLineMessageViewProps {
     message: Message<SimpleNote | ReplyMessage>

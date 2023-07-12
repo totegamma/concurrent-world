@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Box, IconButton, Typography } from '@mui/material'
 
-import { type Character, type Message as CCMessage, Schemas } from '@concurrent-world/client'
+import { type Character, type Message as CCMessage, Schemas, type Profile } from '@concurrent-world/client'
 import RepeatIcon from '@mui/icons-material/Repeat'
-import type { Profile } from '../../../schemas/profile'
 import { useApi } from '../../../context/api'
 import { CCAvatar } from '../../CCAvatar'
 import { Link as routerLink } from 'react-router-dom'

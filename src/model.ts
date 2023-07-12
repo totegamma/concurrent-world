@@ -9,8 +9,7 @@ import type {
     TypeText
 } from '@mui/material/styles/createPalette'
 
-import type { StreamElement } from '@concurrent-world/client'
-import type { Profile } from './schemas/profile'
+import type { StreamElement, Profile } from '@concurrent-world/client'
 
 export interface StreamElementDated extends StreamElement {
     LastUpdated: number

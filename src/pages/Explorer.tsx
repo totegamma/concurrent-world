@@ -14,11 +14,10 @@ import {
     Typography,
     useTheme
 } from '@mui/material'
-import { Schemas, type Stream } from '@concurrent-world/client'
+import { Schemas, type Stream, type Commonstream } from '@concurrent-world/client'
 import { useApi } from '../context/api'
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import type { Commonstream } from '../schemas/commonstream'
 import { usePreference } from '../context/PreferenceContext'
 
 import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd'

@@ -1,8 +1,14 @@
 import { memo, useEffect, useState } from 'react'
-import { type Association, type Character, type Message, type StreamElement, Schemas } from '@concurrent-world/client'
+import {
+    type Association,
+    type Character,
+    type Message,
+    type StreamElement,
+    Schemas,
+    type Profile
+} from '@concurrent-world/client'
 import { useApi } from '../../context/api'
 import { Box, IconButton, ListItem, ListItemButton, Typography } from '@mui/material'
-import type { Profile } from '../../schemas/profile'
 import { Link as routerLink } from 'react-router-dom'
 import { CCAvatar } from '../CCAvatar'
 import { MessageSkeleton } from '../MessageSkeleton'

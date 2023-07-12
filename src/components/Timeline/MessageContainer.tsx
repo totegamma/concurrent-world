@@ -1,17 +1,22 @@
-import { type Character, type Message, Schemas, type Stream } from '@concurrent-world/client'
+import {
+    type Character,
+    type Message,
+    Schemas,
+    type Stream,
+    type SimpleNote,
+    type ReplyMessage,
+    type RerouteMessage,
+    type Profile
+} from '@concurrent-world/client'
 import type { ProfileWithAddress } from '../../model'
 import { useApi } from '../../context/api'
 import { createContext, memo, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { ReplyMessageFrame } from './Message/ReplyMessageFrame'
-import type { SimpleNote } from '../../schemas/simpleNote'
-import type { ReplyMessage } from '../../schemas/replyMessage'
-import type { ReRouteMessage } from '../../schemas/reRouteMessage'
 import { ReRouteMessageFrame } from './Message/ReRouteMessageFrame'
 import { MessageSkeleton } from '../MessageSkeleton'
 import { Typography } from '@mui/material'
 import { useInspector } from '../../context/Inspector'
 import { useMessageDetail } from '../../context/MessageDetail'
-import { type Profile } from '../../schemas/profile'
 import { MessageView } from './Message/MessageView'
 
 export interface MessageServiceState {
@@ -42,7 +47,7 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
     const api = useApi()
     const inspector = useInspector()
     const messageDetail = useMessageDetail()
-    const [message, setMessage] = useState<Message<SimpleNote | ReplyMessage | ReRouteMessage> | undefined>()
+    const [message, setMessage] = useState<Message<SimpleNote | ReplyMessage | RerouteMessage> | undefined>()
     const [isFetching, setIsFetching] = useState<boolean>(false)
 
     const loadMessage = useCallback((): void => {
@@ -236,7 +241,7 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
         case Schemas.rerouteMessage:
             body = (
                 <ReRouteMessageFrame
-                    message={message as Message<ReRouteMessage>}
+                    message={message as Message<RerouteMessage>}
                     lastUpdated={props.lastUpdated}
                     reloadMessage={reloadMessage}
                 />

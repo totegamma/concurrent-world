@@ -8,7 +8,14 @@ import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
 
-import { Client, Schemas, type ServerEvent, type Character } from '@concurrent-world/client'
+import {
+    Client,
+    Schemas,
+    type ServerEvent,
+    type Character,
+    type Profile,
+    type Userstreams
+} from '@concurrent-world/client'
 import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu'
 import type { StreamElementDated, Emoji, ConcurrentTheme } from './model'
@@ -28,8 +35,6 @@ import NotificationSound from './resources/Notification.wav'
 import useSound from 'use-sound'
 import { MobileMenu } from './components/MobileMenu'
 import ApiProvider from './context/api'
-import type { Profile } from './schemas/profile'
-import type { Userstreams } from './schemas/userstreams'
 import { PreferenceProvider } from './context/PreferenceContext'
 import { GlobalActionsProvider } from './context/GlobalActions'
 import { EmojiPickerProvider } from './context/EmojiPickerContext'

@@ -7,7 +7,7 @@ import muiLink from '@mui/material/Link'
 import TextField from '@mui/material/TextField'
 import Divider from '@mui/material/Divider'
 import { ProfileEditor } from '../components/ProfileEditor'
-import { Client, type Character, type Host, Schemas } from '@concurrent-world/client'
+import { Client, type Character, type Host, Schemas, type Profile, type DomainProfile } from '@concurrent-world/client'
 import ApiProvider from '../context/api'
 import type { ConcurrentTheme } from '../model'
 import {
@@ -33,13 +33,11 @@ import Tilt from 'react-parallax-tilt'
 import { PassportRenderer } from '../components/Passport'
 import { CCAvatar } from '../components/CCAvatar'
 import { generateIdentity } from '../util'
-import { type Profile } from '../schemas/profile'
 import { ConcurrentWordmark } from '../components/ConcurrentWordmark'
 
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
-import { type DomainProfile } from '../schemas/domainProfile'
 
 export function Registration(): JSX.Element {
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue2')

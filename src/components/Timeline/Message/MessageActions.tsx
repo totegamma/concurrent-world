@@ -7,9 +7,13 @@ import AddReactionIcon from '@mui/icons-material/AddReaction'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import RepeatIcon from '@mui/icons-material/Repeat'
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown'
-import { type Stream, type Message as CCMessage, Schemas } from '@concurrent-world/client'
+import {
+    type Stream,
+    type Message as CCMessage,
+    Schemas,
+    type SimpleNote as TypeSimpleNote
+} from '@concurrent-world/client'
 import { type ProfileWithAddress } from '../../../model'
-import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
 import { useState } from 'react'
 import Collapse from '@mui/material/Collapse'
 import Fade from '@mui/material/Fade'
