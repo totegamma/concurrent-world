@@ -1,5 +1,19 @@
 import { useState, useContext, useEffect, useRef, memo } from 'react'
-import { InputBase, Box, Button, useTheme, IconButton, Divider, CircularProgress, Tooltip } from '@mui/material'
+import {
+    InputBase,
+    Box,
+    Button,
+    useTheme,
+    IconButton,
+    Divider,
+    CircularProgress,
+    Tooltip,
+    Paper,
+    List,
+    ListItem,
+    ListItemIcon,
+    ListItemText
+} from '@mui/material'
 import { ApplicationContext } from '../App'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import { StreamPicker } from './StreamPicker'
@@ -13,7 +27,8 @@ import ImageIcon from '@mui/icons-material/Image'
 import DeleteIcon from '@mui/icons-material/Delete'
 import Splitscreen from '@mui/icons-material/Splitscreen'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
-import { useEmojiPicker } from '../context/EmojiPickerContext'
+import { type Emoji, useEmojiPicker } from '../context/EmojiPickerContext'
+import caretPosition from 'textarea-caret'
 
 export interface DraftProps {
     submitButtonLabel?: string
@@ -34,10 +49,18 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const [draft, setDraft] = usePersistent<string>('draft', '')
     const [openPreview, setOpenPreview] = useState<boolean>(false)
 
-    const inputRef = useRef<HTMLInputElement>(null)
+    const textInputRef = useRef<HTMLInputElement>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
     const [postHome, setPostHome] = useState<boolean>(true)
     const [sending, setSending] = useState<boolean>(false)
+
+    const [caretPos, setCaretPos] = useState<{ left: number; top: number }>({ left: 0, top: 0 })
+
+    const [enableSuggestions, setEnableSuggestions] = useState<boolean>(false)
+    const [emojiSuggestions, setEmojiSuggestions] = useState<Emoji[]>([])
+
+    const [selectedSuggestions, setSelectedSuggestions] = useState<number>(0)
 
     const { enqueueSnackbar } = useSnackbar()
 
@@ -135,8 +158,8 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     }
 
     const onFileUploadClick = (): void => {
-        if (inputRef.current) {
-            inputRef.current.click()
+        if (fileInputRef.current) {
+            fileInputRef.current.click()
         }
     }
 
@@ -151,6 +174,35 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 width: '100%'
             }}
         >
+            <Paper
+                sx={{
+                    top: `${caretPos.top}px`,
+                    left: `${caretPos.left}px`,
+                    position: 'fixed',
+                    display: enableSuggestions ? 'flex' : 'none',
+                    zIndex: 1000
+                }}
+            >
+                <List>
+                    {emojiSuggestions.map((emoji, index) => (
+                        <ListItem key={emoji.name} selected={index === selectedSuggestions}>
+                            <ListItemIcon>
+                                {emoji.skins[0]?.native ? (
+                                    <Box>{emoji.skins[0]?.native}</Box>
+                                ) : (
+                                    <Box
+                                        component="img"
+                                        src={emoji.skins[0]?.src}
+                                        sx={{ width: '1em', height: '1em' }}
+                                    />
+                                )}
+                            </ListItemIcon>
+                            <ListItemText>{emoji.name}</ListItemText>
+                        </ListItem>
+                    ))}
+                </List>
+            </Paper>
+
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Box
                     sx={{
@@ -187,6 +239,30 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     value={draft}
                     onChange={(e) => {
                         setDraft(e.target.value)
+
+                        if (!enableSuggestions) return
+
+                        const pos = caretPosition(e.target, e.target.selectionEnd ?? 0, {})
+                        const parent = textInputRef.current?.getBoundingClientRect()
+                        const offset = 10
+                        if (pos && parent) {
+                            setCaretPos({
+                                top: parent.top + pos.top + offset,
+                                left: parent.left + pos.left + offset
+                            })
+                            console.log(pos)
+                        }
+                        let query: string | undefined = draft
+                        if (e.target.selectionEnd) {
+                            query = draft.slice(0, e.target.selectionEnd)
+                        }
+                        query = query.split(':').at(-1)
+                        if (query) {
+                            emojiPicker.search(query).then((result) => {
+                                console.log(result)
+                                setEmojiSuggestions(result ?? [])
+                            })
+                        }
                     }}
                     onPaste={handlePasteImage}
                     placeholder="今、なにしてる？"
@@ -196,11 +272,49 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         fontSize: '0.95rem'
                     }}
                     onKeyDown={(e: any) => {
+                        if (e.key === ':') {
+                            setEnableSuggestions(!enableSuggestions)
+                        }
+                        if (enableSuggestions) {
+                            if (e.key === 'Enter') {
+                                e.preventDefault()
+                                const before = draft.slice(0, e.target.selectionEnd) ?? ''
+                                const colonPos = before.lastIndexOf(':')
+                                if (colonPos === -1) return
+                                const after = draft.slice(e.target.selectionEnd) ?? ''
+
+                                const emoji = emojiSuggestions[selectedSuggestions].skins[0].native
+                                    ? emojiSuggestions[selectedSuggestions].skins[0].native ?? ''
+                                    : ':' + emojiSuggestions[selectedSuggestions].name + ':'
+
+                                setDraft(before.slice(0, colonPos) + emoji + after)
+                                setEnableSuggestions(false)
+                                return
+                            }
+                            if (e.key === 'ArrowUp') {
+                                e.preventDefault()
+                                setSelectedSuggestions(
+                                    (selectedSuggestions - 1 + emojiSuggestions.length) % emojiSuggestions.length
+                                )
+                                return
+                            }
+                            if (e.key === 'ArrowDown') {
+                                e.preventDefault()
+                                setSelectedSuggestions((selectedSuggestions + 1) % emojiSuggestions.length)
+                                return
+                            }
+                        }
                         if (draft.length === 0 || draft.trim().length === 0) return
                         if (e.key === 'Enter' && (e.ctrlKey === true || e.metaKey === true)) {
                             post()
                         }
                     }}
+                    onBlur={() => {
+                        if (enableSuggestions) {
+                            setEnableSuggestions(false)
+                        }
+                    }}
+                    inputRef={textInputRef}
                 />
                 {openPreview && (
                     <>
@@ -243,7 +357,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                 <ImageIcon sx={{ fontSize: '80%' }} />
                                 <input
                                     hidden
-                                    ref={inputRef}
+                                    ref={fileInputRef}
                                     type="file"
                                     onChange={(e) => {
                                         onFileInputChange(e)

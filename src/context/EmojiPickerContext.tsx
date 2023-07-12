@@ -1,11 +1,13 @@
 import Picker from '@emoji-mart/react'
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { init, SearchIndex } from 'emoji-mart'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { ApplicationContext } from '../App'
 import { Popover, type PopoverActions } from '@mui/material'
 
 export interface EmojiPickerState {
     open: (anchor: HTMLElement, onSelected: (selected: EmojiProps) => void) => void
     close: () => void
+    search: (input: string) => Promise<Emoji[]>
 }
 
 const EmojiPickerContext = createContext<EmojiPickerState | undefined>(undefined)
@@ -26,6 +28,7 @@ export interface EmojiProps {
 
 export interface Skin {
     src: string
+    native?: string
 }
 
 export interface Emoji {
@@ -65,8 +68,9 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
         []
     )
 
-    const emojis: CustomEmoji[] = useMemo(
-        () => [
+    const emojis: CustomEmoji[] = useMemo(() => {
+        if (!appData.emojiDict) return []
+        const data = [
             {
                 id: 'fluffy',
                 name: 'Fluffy Social',
@@ -77,9 +81,15 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                     skins: [{ src: value.publicUrl }]
                 }))
             }
-        ],
-        [appData.emojiDict]
-    )
+        ]
+        init({ custom: data })
+        return data
+    }, [appData.emojiDict])
+
+    const search = useCallback((input: string) => {
+        console.log('search!', input)
+        return SearchIndex.search(input, { maxResults: 6, caller: self })
+    }, [])
 
     useEffect(() => {
         // XXX: this is a hack to make sure the emoji picker is repositioned after it is opened
@@ -96,9 +106,10 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
             value={useMemo(() => {
                 return {
                     open,
-                    close
+                    close,
+                    search
                 }
-            }, [open])}
+            }, [open, close, search])}
         >
             <>
                 {props.children}
