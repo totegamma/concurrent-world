@@ -33,6 +33,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
 
     const hasOwnReaction = props.favoriteUsers.find((user) => user.ccaddress === props.userCCID)
 
+    const replyCount = props.message.associations.filter((e) => e.schema === Schemas.replyAssociation).length
     const likeCount = props.message.associations.filter((e) => e.schema === Schemas.like).length
     const rerouteCount = props.message.associations.filter((e) => e.schema === Schemas.reRouteAssociation).length
 
@@ -72,6 +73,9 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         >
                             <ReplyIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
                         </IconButton>
+                        <Typography sx={{ m: 'auto', size: '16px', fontSize: '13px' }}>
+                            {replyCount > 0 ? replyCount : <></>}
+                        </Typography>
                     </Box>
                     <Box
                         sx={{
