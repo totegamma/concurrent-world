@@ -183,9 +183,9 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     zIndex: 1000
                 }}
             >
-                <List>
+                <List dense>
                     {emojiSuggestions.map((emoji, index) => (
-                        <ListItem key={emoji.name} selected={index === selectedSuggestions}>
+                        <ListItem dense key={emoji.name} selected={index === selectedSuggestions}>
                             <ListItemIcon>
                                 {emoji.skins[0]?.native ? (
                                     <Box>{emoji.skins[0]?.native}</Box>
@@ -288,6 +288,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                     : ':' + emojiSuggestions[selectedSuggestions].name + ':'
 
                                 setDraft(before.slice(0, colonPos) + emoji + after)
+                                setSelectedSuggestions(0)
                                 setEnableSuggestions(false)
                                 return
                             }
@@ -312,6 +313,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     onBlur={() => {
                         if (enableSuggestions) {
                             setEnableSuggestions(false)
+                            setSelectedSuggestions(0)
                         }
                     }}
                     inputRef={textInputRef}
