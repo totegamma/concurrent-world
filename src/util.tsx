@@ -61,6 +61,13 @@ export const validateSignature = (body: string, signature: string, expectedAutho
     return recovered.slice(2) === expectedAuthor.slice(2)
 }
 
+export const isValid256k1PrivateKey = (key: string): boolean => {
+    if (!/^[0-9a-f]{64}$/i.test(key)) return false
+    const privateKey = BigInt(`0x${key}`)
+    const n = BigInt('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141')
+    return privateKey > BigInt(0) && privateKey < n
+}
+
 export const Sign = (privatekey: string, payload: string): string => {
     const ellipsis = new Ec('secp256k1')
     const keyPair = ellipsis.keyFromPrivate(privatekey)
@@ -112,17 +119,21 @@ export const Keygen = (): key => {
 }
 
 export const LoadKey = (privateKey: string): key | null => {
-    const ellipsis = new Ec('secp256k1')
-    const keyPair = ellipsis.keyFromPrivate(privateKey)
-    if (!keyPair.getPrivate()) return null
-    const privatekey = keyPair.getPrivate().toString('hex')
-    const publickey = keyPair.getPublic().encode('hex', false)
-    const ethAddress = computeAddress('0x' + publickey)
-    const ccaddress = 'CC' + ethAddress.slice(2)
-    return {
-        privatekey,
-        publickey,
-        ccaddress
+    try {
+        const ellipsis = new Ec('secp256k1')
+        const keyPair = ellipsis.keyFromPrivate(privateKey)
+        if (!keyPair.getPrivate()) return null
+        const privatekey = keyPair.getPrivate().toString('hex')
+        const publickey = keyPair.getPublic().encode('hex', false)
+        const ethAddress = computeAddress('0x' + publickey)
+        const ccaddress = 'CC' + ethAddress.slice(2)
+        return {
+            privatekey,
+            publickey,
+            ccaddress
+        }
+    } catch (error) {
+        return null
     }
 }
 
