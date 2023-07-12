@@ -82,7 +82,9 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                 }))
             }
         ]
-        init({ custom: data })
+        init({
+            custom: data
+        })
         return data
     }, [appData.emojiDict])
 
