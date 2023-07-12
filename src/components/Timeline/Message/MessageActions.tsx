@@ -39,7 +39,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
 
     const replyCount = props.message.associations.filter((e) => e.schema === Schemas.replyAssociation).length
     const likeCount = props.message.associations.filter((e) => e.schema === Schemas.like).length
-    const rerouteCount = props.message.associations.filter((e) => e.schema === Schemas.reRouteAssociation).length
+    const rerouteCount = props.message.associations.filter((e) => e.schema === Schemas.rerouteAssociation).length
 
     const emojiPicker = useEmojiPicker()
 
