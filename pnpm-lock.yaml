@@ -5,9 +5,6 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
-  '@emoji-mart/data':
-    specifier: ^1.1.2
-    version: 1.1.2
   '@emoji-mart/react':
     specifier: ^1.1.1
     version: 1.1.1(emoji-mart@5.5.2)(react@18.2.0)
@@ -41,18 +38,6 @@ dependencies:
   '@rjsf/validator-ajv8':
     specifier: ^5.7.3
     version: 5.7.3(@rjsf/utils@5.7.3)
-  '@types/emoji-mart':
-    specifier: ^3.0.9
-    version: 3.0.9
-  '@types/react-infinite-scroller':
-    specifier: ^1.2.3
-    version: 1.2.3
-  '@types/react-syntax-highlighter':
-    specifier: ^15.5.6
-    version: 15.5.6
-  '@types/textarea-caret':
-    specifier: ^3.0.1
-    version: 3.0.1
   '@vitejs/plugin-basic-ssl':
     specifier: ^1.0.1
     version: 1.0.1(vite@4.0.0)
@@ -151,6 +136,9 @@ devDependencies:
   '@types/elliptic':
     specifier: ^6.4.14
     version: 6.4.14
+  '@types/emoji-mart':
+    specifier: ^3.0.9
+    version: 3.0.9
   '@types/node-forge':
     specifier: ^1.3.1
     version: 1.3.1
@@ -160,6 +148,15 @@ devDependencies:
   '@types/react-dom':
     specifier: ^18.0.9
     version: 18.0.9
+  '@types/react-infinite-scroller':
+    specifier: ^1.2.3
+    version: 1.2.3
+  '@types/react-syntax-highlighter':
+    specifier: ^15.5.6
+    version: 15.5.6
+  '@types/textarea-caret':
+    specifier: ^3.0.1
+    version: 3.0.1
   '@types/uuid':
     specifier: ^9.0.1
     version: 9.0.1
@@ -1647,10 +1644,6 @@ packages:
     resolution: {integrity: sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==}
     engines: {node: '>=10.0.0'}
     dev: true
-
-  /@emoji-mart/data@1.1.2:
-    resolution: {integrity: sha512-1HP8BxD2azjqWJvxIaWAMyTySeZY0Osr83ukYjltPVkNXeJvTz7yDrPLBtnrD5uqJ3tg4CcLuuBW09wahqL/fg==}
-    dev: false
 
   /@emoji-mart/react@1.1.1(emoji-mart@5.5.2)(react@18.2.0):
     resolution: {integrity: sha512-NMlFNeWgv1//uPsvLxvGQoIerPuVdXwK/EUek8OOkJ6wVOWPUizRBJU0hDqWZCOROVpfBgCemaC3m6jDOXi03g==}
@@ -3942,7 +3935,7 @@ packages:
     resolution: {integrity: sha512-qdBo/2Y8MXaJ/2spKjDZocuq79GpnOhkwMHnK2GnVFa8WYFgfA+ei6sil3aeWQPCreOKIx9ogPpR5+7MaOqYAA==}
     dependencies:
       '@types/react': 18.0.26
-    dev: false
+    dev: true
 
   /@types/escodegen@0.0.6:
     resolution: {integrity: sha512-AjwI4MvWx3HAOaZqYsjKWyEObT9lcVV0Y0V8nXo6cXzN8ZiMxVhf6F3d/UNvXVGKrEzL/Dluc5p+y9GkzlTWig==}
@@ -4127,7 +4120,7 @@ packages:
     resolution: {integrity: sha512-l60JckVoO+dxmKW2eEG7jbliEpITsTJvRPTe97GazjF5+ylagAuyYdXl8YY9DQsTP9QjhqGKZROknzgscGJy0A==}
     dependencies:
       '@types/react': 18.0.26
-    dev: false
+    dev: true
 
   /@types/react-is@18.2.0:
     resolution: {integrity: sha512-1vz2yObaQkLL7YFe/pme2cpvDsCwI1WXIfL+5eLz0MI9gFG24Re16RzUsI8t9XZn9ZWvgLNDrJBmrqXJO7GNQQ==}
@@ -4139,7 +4132,7 @@ packages:
     resolution: {integrity: sha512-i7wFuLbIAFlabTeD2I1cLjEOrG/xdMa/rpx2zwzAoGHuXJDhSqp9BSfDlMHSh9JSuNfxHk9eEmMX6D55GiyjGg==}
     dependencies:
       '@types/react': 18.0.26
-    dev: false
+    dev: true
 
   /@types/react-transition-group@4.4.6:
     resolution: {integrity: sha512-VnCdSxfcm08KjsJVQcfBmhEQAPnLB8G08hAxn39azX1qYBQ/5RVQuoHuKIcfKOdncuaUvEpFKFzEvbtIMsfVew==}
@@ -4183,7 +4176,7 @@ packages:
 
   /@types/textarea-caret@3.0.1:
     resolution: {integrity: sha512-JjrXYzk4t6dM/5nz1hHkZXmd3xSdJM6mOIDSBUrpg4xThwKNryiu4CqHx81LwUJHxEEoQWHTu4fMV4em+c5bXg==}
-    dev: false
+    dev: true
 
   /@types/trusted-types@2.0.3:
     resolution: {integrity: sha512-NfQ4gyz38SL8sDNrSixxU2Os1a5xcdFxipAFxYEuLUlvU2uDwS4NUpsImcf1//SlWItCVMMLiylsxbmNMToV/g==}
