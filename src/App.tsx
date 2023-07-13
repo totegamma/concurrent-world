@@ -34,6 +34,7 @@ import type { Userstreams } from './schemas/userstreams'
 import { PreferenceProvider } from './context/PreferenceContext'
 import { GlobalActionsProvider } from './context/GlobalActions'
 import { EmojiPickerProvider } from './context/EmojiPickerContext'
+import { ConcurrentLogo } from './components/ConcurrentLogo'
 
 export const ApplicationContext = createContext<appData>({
     profile: undefined,
@@ -343,15 +344,14 @@ function App(): JSX.Element {
                 sx={{
                     display: 'flex',
                     justifyContent: 'center',
-                    background: [
+                    background: `${theme.palette.background.default}, 
+                                 linear-gradient(${theme.palette.background.default}, ${darken(
                         theme.palette.background.default,
-                        `linear-gradient(${theme.palette.background.default}, ${darken(
-                            theme.palette.background.default,
-                            0.1
-                        )})`
-                    ],
+                        0.1
+                    )})`,
                     width: '100vw',
-                    height: '100dvh'
+                    height: '100dvh',
+                    overflow: 'hidden'
                 }}
             >
                 <Box
@@ -430,8 +430,8 @@ function App(): JSX.Element {
                 PaperProps={{
                     sx: {
                         width: '200px',
-                        padding: '0 5px 0 0',
-                        borderRadius: '0 20px 20px 0',
+                        pt: 1,
+                        borderRadius: 2,
                         overflow: 'hidden',
                         backgroundColor: 'background.default'
                     }
