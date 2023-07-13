@@ -2,10 +2,10 @@ import { Box, Button, Divider, MenuItem, Select, TextField, Typography } from '@
 import { forwardRef, useState } from 'react'
 import { useApi } from '../../context/api'
 import { CCEditor } from '../../components/cceditor'
-import { type CoreCharacter } from '@concurrent-world/client'
+import { type Character } from '../../model'
 
 export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
-    const client = useApi()
+    const api = useApi()
 
     const [cctype, setcctype] = useState<'message' | 'association' | 'character'>('message')
     const [schemaURL, setSchemaURL] = useState<string>('')
@@ -17,14 +17,14 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
     const [associationTargetAuthor, setAssociationTargetAuthor] = useState<string>('')
     const [associationTargetType, setAssociationTargetType] = useState<string>('message')
 
-    const [character, setCharacter] = useState<CoreCharacter<any>>()
+    const [character, setCharacter] = useState<Character<any>>()
 
     const createMessage = async (e: any): Promise<void> => {
-        client.api.createMessage(schemaURL, e, streams.split(','))
+        api.createMessage(schemaURL, e, streams.split(','))
     }
 
     const createAssociation = async (e: any): Promise<void> => {
-        client.api.createAssociation(
+        api.createAssociation(
             schemaURL,
             e,
             associationTarget,
@@ -36,9 +36,9 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
 
     const createCharacter = async (e: any): Promise<void> => {
         if (character) {
-            client.api.upsertCharacter(schemaURL, e, character.id)
+            api.upsertCharacter(schemaURL, e, character.id)
         } else {
-            client.api.upsertCharacter(schemaURL, e)
+            api.upsertCharacter(schemaURL, e)
         }
     }
 
@@ -125,7 +125,7 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
                     variant="contained"
                     onClick={() => {
                         if (cctype === 'character') {
-                            client.api.readCharacter(client.ccid, schemaURLDraft).then((e) => {
+                            api.readCharacter(api.userAddress, schemaURLDraft).then((e) => {
                                 setCharacter(e)
                                 setSchemaURL(schemaURLDraft)
                             })

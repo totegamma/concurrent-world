@@ -20,7 +20,7 @@ export interface TimelineHeaderProps {
 }
 
 export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderProps): JSX.Element => {
-    const client = useApi()
+    const api = useApi()
     const appData = useContext(ApplicationContext)
     const theme = useTheme<ConcurrentTheme>()
 
@@ -35,7 +35,7 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
             props.location.hash
                 .replace('#', '')
                 .split(',')
-                .map((e) => client.api.readStream(e))
+                .map((e) => api.readStream(e))
         ).then((a) => {
             setTitle(
                 a

@@ -5,7 +5,7 @@ import { createConcurrentTheme, Themes } from '../../../themes'
 import { CssBaseline, ThemeProvider } from '@mui/material'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { MessageView } from './MessageView'
-import { CharacterProfileMock, MessageMock, StreamMock } from '@concurrent-world/client'
+import { CharacterProfileMock, MessageMock, StreamMock } from '../../../mock/modelmock'
 import { InspectorProvider } from '../../../context/Inspector'
 import Paper from '@mui/material/Paper'
 
@@ -73,7 +73,6 @@ export const Default = (arg: Props): JSX.Element => {
                             <CssBaseline />
                             <ThemeProvider theme={theme}>
                                 <Paper>
-                                    {/*
                                     <MessageView
                                         userCCID={''}
                                         message={MessageMock(arg.body, arg.author, arg.cdate)}
@@ -82,7 +81,6 @@ export const Default = (arg: Props): JSX.Element => {
                                         favoriteUsers={[]}
                                         streams={[StreamMock(arg.streamName)]}
                                     />
-                                */}
                                 </Paper>
                             </ThemeProvider>
                         </InspectorProvider>

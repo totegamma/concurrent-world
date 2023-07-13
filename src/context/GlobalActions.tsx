@@ -2,12 +2,15 @@ import { Box, Paper, Modal, Typography } from '@mui/material'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
-import { Schemas, type DomainProfile, type CoreCharacter } from '@concurrent-world/client'
+import { Schemas } from '../schemas'
 import { Draft } from '../components/Draft'
+import { type SimpleNote } from '../schemas/simpleNote'
 import { useLocation } from 'react-router-dom'
 import { usePreference } from './PreferenceContext'
 import { ApplicationContext } from '../App'
 import { ProfileEditor } from '../components/ProfileEditor'
+import { type Character } from '../model'
+import { type DomainProfile } from '../schemas/domainProfile'
 
 export interface GlobalActionsState {
     openDraft: () => void
@@ -30,13 +33,13 @@ const style = {
 }
 
 export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element => {
-    const client = useApi()
+    const api = useApi()
     const pref = usePreference()
     const reactlocation = useLocation()
     const appData = useContext(ApplicationContext)
     const [mode, setMode] = useState<'compose' | 'none'>('none')
 
-    const accountIsOK = appData.user?.profile !== null && appData.user?.userstreams !== null
+    const accountIsOK = appData.profile !== null && appData.userstreams !== null
 
     const openDraft = useCallback(() => {
         setMode('compose')
@@ -106,9 +109,12 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                             autoFocus
                             streamPickerInitial={streamPickerInitial}
                             onSubmit={async (text: string, destinations: string[]) => {
-                                client
-                                    .createCurrent(text, destinations)
-                                    .then(() => {
+                                const body = {
+                                    body: text
+                                }
+                                return await api
+                                    .createMessage<SimpleNote>(Schemas.simpleNote, body, destinations)
+                                    .then((_) => {
                                         return null
                                     })
                                     .catch((e) => {
@@ -117,7 +123,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                     .finally(() => {
                                         setMode('none')
                                     })
-                                return await Promise.resolve(null)
                             }}
                         />
                     </Box>
@@ -136,11 +141,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                         </Typography>
                         <ProfileEditor
                             onSubmit={(_) => {
-                                client.setupUserstreams().then(() => {
-                                    client.api.getHostProfile(client.api.host).then((host) => {
-                                        client.api
-                                            .readCharacter(host.ccaddr, Schemas.domainProfile)
-                                            .then((profile: CoreCharacter<DomainProfile> | undefined) => {
+                                api?.setupUserstreams().then(() => {
+                                    api.getHostProfile(api.host).then((host) => {
+                                        api.readCharacter(host.ccaddr, Schemas.domainProfile).then(
+                                            (profile: Character<DomainProfile> | undefined) => {
                                                 console.log(profile)
                                                 try {
                                                     if (profile) {
@@ -168,7 +172,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                     console.error(e)
                                                 }
                                                 window.location.reload()
-                                            })
+                                            }
+                                        )
                                     })
                                 })
                             }}

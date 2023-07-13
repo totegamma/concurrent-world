@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Typography from '@mui/material/Typography'
 import ArrowRightIcon from '@mui/icons-material/ArrowRight'
 import EditIcon from '@mui/icons-material/Edit'
@@ -7,7 +7,7 @@ import CheckIcon from '@mui/icons-material/Check'
 
 import styles from './CustomNode.module.css'
 import type { NodeModel } from '@minoru/react-dnd-treeview'
-import { type CoreStream } from '@concurrent-world/client'
+import type { Stream } from '../../model'
 import type { WatchStream } from './index'
 import { useNavigate } from 'react-router-dom'
 import { styled } from '@mui/material/styles'
@@ -16,7 +16,7 @@ import { useApi } from '../../context/api'
 const CustomNodeText = styled('div')(({ theme }) => ({}))
 
 interface CustomNodeProps {
-    node: NodeModel<CoreStream<any>>
+    node: NodeModel<Stream<any>>
     depth: number
     isOpen: boolean
     onToggle: (id: string | number) => void
@@ -95,7 +95,7 @@ export const CustomNode = (props: CustomNodeProps): JSX.Element => {
     const api = useApi()
     useEffect(() => {
         if (!props.node.data) return
-        api.api.readStream(props.node.data.id).then((stream) => {
+        api?.readStream(props.node.data.id).then((stream) => {
             setStreamName(stream?.payload.body.name ?? props.node.data)
         })
     }, [props.node.id, api])

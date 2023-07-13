@@ -4,7 +4,7 @@ import type { ConcurrentTheme, StreamElementDated } from '../model'
 import { useObjectList } from '../hooks/useObjectList'
 import { Link, useLocation } from 'react-router-dom'
 import { Timeline } from '../components/Timeline/main'
-import { Client } from '@concurrent-world/client'
+import ConcurrentApiClient from '../apiservice'
 import { FullScreenLoading } from '../components/FullScreenLoading'
 import ApiProvider from '../context/api'
 import { ClockContext } from '../App'
@@ -17,7 +17,7 @@ export function GuestTimelinePage(): JSX.Element {
     const [queriedStreams, setQueriedStreams] = useState<string[]>([])
     const [title, setTitle] = useState<string>('')
 
-    const [client, initializeClient] = useState<Client>()
+    const [api, initializeApi] = useState<ConcurrentApiClient>()
     useEffect(() => {
         const queriedStreams = reactlocation.hash
             .replace('#', '')
@@ -27,14 +27,14 @@ export function GuestTimelinePage(): JSX.Element {
 
         const resolver = queriedStreams[0].split('@')[1]
 
-        const client = new Client('', '', resolver)
+        const api = new ConcurrentApiClient('', '', resolver)
 
-        initializeClient(client)
+        initializeApi(api)
     }, [])
 
     useEffect(() => {
-        if (!client) return
-        Promise.all(queriedStreams.map((e) => client.api.readStream(e))).then((a) => {
+        if (!api) return
+        Promise.all(queriedStreams.map((e) => api.readStream(e))).then((a) => {
             setTitle(
                 a
                     .map((e) => e?.payload.body.name)
@@ -42,7 +42,7 @@ export function GuestTimelinePage(): JSX.Element {
                     .join(', ')
             )
         })
-    }, [client, queriedStreams])
+    }, [api, queriedStreams])
 
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'sacher')
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
@@ -68,13 +68,13 @@ export function GuestTimelinePage(): JSX.Element {
         }
     }, [setClock])
 
-    if (!client) return <FullScreenLoading message="Loading..." />
+    if (!api) return <FullScreenLoading message="Loading..." />
 
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <ClockContext.Provider value={clock}>
-                <ApiProvider api={client}>
+                <ApiProvider api={api}>
                     <Box
                         sx={{
                             display: 'flex',

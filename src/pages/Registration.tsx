@@ -7,8 +7,9 @@ import muiLink from '@mui/material/Link'
 import TextField from '@mui/material/TextField'
 import Divider from '@mui/material/Divider'
 import { ProfileEditor } from '../components/ProfileEditor'
+import ConcurrentApiClient from '../apiservice'
 import ApiProvider from '../context/api'
-import type { ConcurrentTheme } from '../model'
+import type { Character, ConcurrentTheme, Host } from '../model'
 import {
     Alert,
     AlertTitle,
@@ -32,13 +33,14 @@ import Tilt from 'react-parallax-tilt'
 import { PassportRenderer } from '../components/Passport'
 import { CCAvatar } from '../components/CCAvatar'
 import { generateIdentity } from '../util'
+import { type Profile } from '../schemas/profile'
 import { ConcurrentWordmark } from '../components/ConcurrentWordmark'
 
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
-import { Client, type DomainProfile, type Profile, Schemas } from '@concurrent-world/client'
-import { type Character, type Host } from '@concurrent-world/client/dist/model/core'
+import { Schemas } from '../schemas'
+import { type DomainProfile } from '../schemas/domainProfile'
 
 export function Registration(): JSX.Element {
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue2')
@@ -61,7 +63,7 @@ export function Registration(): JSX.Element {
     const [CCID, setCCID] = useState<string>('')
     const [privateKey, setPrivateKey] = useState<string>('')
     const [publicKey, setPublicKey] = useState<string>('')
-    const [client, initializeClient] = useState<Client>()
+    const [api, initializeApi] = useState<ConcurrentApiClient>()
 
     useEffect(() => {
         const identity = generateIdentity()
@@ -69,7 +71,7 @@ export function Registration(): JSX.Element {
         setCCID(identity.CCID)
         setPrivateKey(identity.privateKey)
         setPublicKey(identity.publicKey)
-        initializeClient(new Client(identity.CCID, identity.privateKey, 'hub.concurrent.world'))
+        initializeApi(new ConcurrentApiClient(identity.CCID, identity.privateKey, 'hub.concurrent.world'))
     }, [])
 
     const [server, setServer] = useState<string>('')
@@ -78,21 +80,21 @@ export function Registration(): JSX.Element {
 
     useEffect(() => {
         if (!CCID || !privateKey || !host) return
-        const api = new Client(CCID, privateKey, host.fqdn)
-        initializeClient(api)
+        const api = new ConcurrentApiClient(CCID, privateKey, host.fqdn)
+        initializeApi(api)
     }, [host, CCID, privateKey])
 
     useEffect(() => {
-        if (!client) return
+        if (!api) return
         const fqdn = server.replace('https://', '').replace('/', '')
-        client.api.getHostProfile(fqdn).then((e) => {
+        api.getHostProfile(fqdn).then((e) => {
             setHost(e)
         })
         console.log(fqdn)
     }, [server])
 
     const setupAccount = (): void => {
-        if (!client) return
+        if (!api) return
         if (!host) return
         localStorage.setItem('Domain', JSON.stringify(host.fqdn))
         localStorage.setItem('PublicKey', JSON.stringify(publicKey))
@@ -100,31 +102,29 @@ export function Registration(): JSX.Element {
         localStorage.setItem('Address', JSON.stringify(CCID))
         localStorage.setItem('Mnemonic', JSON.stringify(mnemonic))
 
-        client?.api
-            .readCharacter(host.ccaddr, Schemas.domainProfile)
-            .then((profile: Character<DomainProfile> | undefined) => {
-                console.log(profile)
-                if (profile) {
-                    if (profile.payload.body.defaultBookmarkStreams)
-                        localStorage.setItem(
-                            'bookmarkingStreams',
-                            JSON.stringify(profile.payload.body.defaultBookmarkStreams)
-                        )
-                    if (profile.payload.body.defaultFollowingStreams)
-                        localStorage.setItem(
-                            'followingStreams',
-                            JSON.stringify(profile.payload.body.defaultFollowingStreams)
-                        )
-                    if (profile.payload.body.defaultPostStreams)
-                        localStorage.setItem('defaultPostHome', JSON.stringify(profile.payload.body.defaultPostStreams))
-                }
-                navigate('/')
-            })
+        api?.readCharacter(host.ccaddr, Schemas.domainProfile).then((profile: Character<DomainProfile> | undefined) => {
+            console.log(profile)
+            if (profile) {
+                if (profile.payload.body.defaultBookmarkStreams)
+                    localStorage.setItem(
+                        'bookmarkingStreams',
+                        JSON.stringify(profile.payload.body.defaultBookmarkStreams)
+                    )
+                if (profile.payload.body.defaultFollowingStreams)
+                    localStorage.setItem(
+                        'followingStreams',
+                        JSON.stringify(profile.payload.body.defaultFollowingStreams)
+                    )
+                if (profile.payload.body.defaultPostStreams)
+                    localStorage.setItem('defaultPostHome', JSON.stringify(profile.payload.body.defaultPostStreams))
+            }
+            navigate('/')
+        })
     }
 
     const checkRegistration = async (): Promise<void> => {
         console.log('check!!!')
-        const entity = await client?.api.readEntity(CCID)
+        const entity = await api?.readEntity(CCID)
         console.log(entity)
         setEntityFound(!!entity && entity.ccaddr != null)
     }
@@ -372,7 +372,7 @@ export function Registration(): JSX.Element {
                             <ListItemButton
                                 component={Link}
                                 to={`https://hub.concurrent.world/register?token=${
-                                    client?.api.constructJWT({ aud: 'hub.concurrent.world' }) ?? ''
+                                    api?.constructJWT({ aud: 'hub.concurrent.world' }) ?? ''
                                 }`}
                                 target="_blank"
                                 onClick={() => {
@@ -414,12 +414,7 @@ export function Registration(): JSX.Element {
                             <Button
                                 variant="contained"
                                 component={Link}
-                                to={
-                                    'http://' +
-                                    (host?.fqdn ?? '') +
-                                    '/register?token=' +
-                                    (client?.api.constructJWT({}) ?? '')
-                                }
+                                to={'http://' + (host?.fqdn ?? '') + '/register?token=' + (api?.constructJWT({}) ?? '')}
                                 target="_blank"
                                 disabled={!host}
                             >
@@ -470,7 +465,7 @@ export function Registration(): JSX.Element {
                         <ProfileEditor
                             onSubmit={(newprofile) => {
                                 setProfile(newprofile)
-                                client?.setupUserstreams().then(() => {
+                                api?.setupUserstreams().then(() => {
                                     setActiveStep(6)
                                 })
                             }}
@@ -520,12 +515,12 @@ export function Registration(): JSX.Element {
         }
     ]
 
-    if (!client) return <>api constructing...</>
+    if (!api) return <>api constructing...</>
 
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <ApiProvider api={client}>
+            <ApiProvider api={api}>
                 <Box
                     sx={{
                         padding: '20px',

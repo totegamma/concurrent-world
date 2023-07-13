@@ -5,7 +5,7 @@ import CreateNewFolder from '@mui/icons-material/CreateNewFolder'
 import styles from './index.module.css'
 import { IconButton, Typography } from '@mui/material'
 import Box from '@mui/material/Box'
-import { type CoreStream } from '@concurrent-world/client'
+import type { Stream } from '../../model'
 import { CustomNode } from './CustomNode'
 import { CustomDragPreview } from './CustomDragPreview'
 import { Placeholder } from './Placeholder'
@@ -20,7 +20,7 @@ export interface WatchStream {
     parent: number
     droppable: boolean
     text: string
-    data: CoreStream<any> | undefined
+    data: Stream<any> | undefined
 }
 
 interface StreamListProps {
@@ -28,15 +28,13 @@ interface StreamListProps {
 }
 
 export function StreamList(props: StreamListProps): JSX.Element {
-    const client = useApi()
+    const api = useApi()
     const pref = usePreference()
     const [watchStreamTree, setWatchStreamTree] = usePersistent<WatchStream[]>('watchStreamTree', [])
 
     useEffect(() => {
         ;(async () => {
-            const streams = await Promise.all(
-                pref.bookmarkingStreams.map(async (id) => await client.api.readStream(id))
-            )
+            const streams = await Promise.all(pref.bookmarkingStreams.map(async (id) => await api.readStream(id)))
             if (watchStreamTree.length === 0) {
                 // init watch stream tree
                 console.log('init watch stream tree')

@@ -14,10 +14,12 @@ import {
     Typography,
     useTheme
 } from '@mui/material'
-import { type Stream } from '@concurrent-world/client'
+import { Schemas } from '../schemas'
 import { useApi } from '../context/api'
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import type { Stream } from '../model'
+import type { Commonstream } from '../schemas/commonstream'
 import { usePreference } from '../context/PreferenceContext'
 
 import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd'
@@ -27,30 +29,36 @@ import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove'
 
 export function Explorer(): JSX.Element {
-    const client = useApi()
+    const api = useApi()
     const theme = useTheme()
     const pref = usePreference()
 
-    const [hosts, setHosts] = useState<string[]>([...(client.api.host ? [client.api.host] : [])])
-    const [currentHost, setCurrentHost] = useState<string>(client.api.host ?? '')
-    const [streams, setStreams] = useState<Stream[]>([])
+    const [hosts, setHosts] = useState<string[]>([...(api.host ? [api.host] : [])])
+    const [currentHost, setCurrentHost] = useState<string>(api.host ?? '')
+    const [streams, setStreams] = useState<Array<Stream<any>>>([])
     const [newStreamName, setNewStreamName] = useState<string>('')
 
     const loadHosts = (): void => {
-        client.api.getKnownHosts().then((e) => {
-            if (!client.api.host) return
-            setHosts([client.api.host, ...e.filter((e) => e.fqdn !== client.api.host).map((e) => e.fqdn)])
+        api.getKnownHosts().then((e) => {
+            if (!api.host) return
+            setHosts([api.host, ...e.filter((e) => e.fqdn !== api.host).map((e) => e.fqdn)])
         })
     }
 
     const loadStreams = (): void => {
-        client.getCommonStreams(currentHost).then((e) => {
+        api.getStreamListBySchema(Schemas.commonstream, currentHost).then((e) => {
             setStreams(e)
         })
     }
 
     const createNewStream = (name: string): void => {
-        client.createCommonStream(currentHost, name).then((_) => {})
+        api.createStream<Commonstream>(Schemas.commonstream, {
+            name,
+            shortname: name,
+            description: ''
+        }).then((_) => {
+            loadStreams()
+        })
     }
 
     useEffect(() => {
@@ -62,7 +70,7 @@ export function Explorer(): JSX.Element {
         loadStreams()
     }, [currentHost])
 
-    if (!client.api.host) return <>loading...</>
+    if (!api.host) return <>loading...</>
 
     return (
         <Box
@@ -89,7 +97,7 @@ export function Explorer(): JSX.Element {
                 onChange={(e) => {
                     setCurrentHost(e.target.value)
                 }}
-                defaultValue={client.api.host}
+                defaultValue={api.host}
             >
                 {hosts.map((e) => (
                     <MenuItem key={e} value={e}>
@@ -203,7 +211,7 @@ export function Explorer(): JSX.Element {
                                     height: '40px'
                                 }}
                             >
-                                <ListItemText id={labelId} primary={`%${value.name}`} />
+                                <ListItemText id={labelId} primary={`%${value.payload.body.name as string}`} />
                             </ListItemButton>
                         </ListItem>
                     )
