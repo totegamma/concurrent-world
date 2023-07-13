@@ -2,10 +2,14 @@ import { Box, Paper, Modal, Divider } from '@mui/material'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
-import type { CCID, Message } from '../model'
-import { Schemas } from '../schemas'
-import type { ReplyMessage } from '../schemas/replyMessage'
-import type { ReplyAssociation } from '../schemas/replyAssociation'
+import {
+    type CCID,
+    type Message,
+    Schemas,
+    type ReplyMessage,
+    type ReplyAssociation,
+    type CoreMessage
+} from '@concurrent-world/client'
 import { ApplicationContext } from '../App'
 import { Draft } from '../components/Draft'
 import { MessageContainer } from '../components/Timeline/MessageContainer'
@@ -32,10 +36,10 @@ const style = {
 }
 
 export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element => {
-    const api = useApi()
+    const client = useApi()
     const appData = useContext(ApplicationContext)
     const [showingMessage, showMessage] = useState<{ messageId: string; author: CCID } | null>(null)
-    const [message, setMessage] = useState<Message<any> | undefined>()
+    const [message, setMessage] = useState<CoreMessage<any> | undefined>()
     const [messageStreamWithoutHome, setMessageStreamWithoutHome] = useState<string[]>([])
     const [mode, setMode] = useState<'reply' | 'reroute' | 'none'>('none')
 
@@ -48,10 +52,10 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
         console.log('MessageDetailProvider useEffect', showingMessage)
         if (!showingMessage?.messageId || !showingMessage.author) return
 
-        api.fetchMessageWithAuthor(showingMessage.messageId, showingMessage.author).then((msg) => {
+        client.api.readMessageWithAuthor(showingMessage.messageId, showingMessage.author).then((msg) => {
             setMessage(msg)
             if (!msg) return
-            api.readCharacter(showingMessage.author, Schemas.userstreams).then((userstreams) => {
+            client.api.readCharacter(showingMessage.author, Schemas.userstreams).then((userstreams) => {
                 setMessageStreamWithoutHome(
                     msg.streams.filter((e: string) => e !== userstreams?.payload.body.homeStream)
                 )
@@ -60,7 +64,7 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
     }, [showingMessage])
 
     const sendReply = async (replyText: string, messageStream: string[]): Promise<void> => {
-        const data = await api?.createMessage<ReplyMessage>(
+        const data = await client.api.createMessage<ReplyMessage>(
             Schemas.replyMessage,
             {
                 replyToMessageId: message?.id || '',
@@ -70,17 +74,15 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
             messageStream
         )
 
-        const authorInbox = (await api.readCharacter(message?.author || '', Schemas.userstreams))?.payload.body
+        const authorInbox = (await client.api.readCharacter(message?.author || '', Schemas.userstreams))?.payload.body
             .notificationStream
-        const targetStream = [authorInbox, appData.userstreams?.payload.body.associationStream].filter(
-            (e) => e
-        ) as string[]
+        const targetStream = [authorInbox, appData.user?.userstreams.associationStream].filter((e) => e) as string[]
 
         console.log('assosiation', targetStream)
 
-        await api?.createAssociation<ReplyAssociation>(
+        await client.api.createAssociation<ReplyAssociation>(
             Schemas.replyAssociation,
-            { messageId: data.content.id, messageAuthor: api.userAddress },
+            { messageId: data.content.id, messageAuthor: client.ccid },
             message?.id || '',
             message?.author || '',
             'messages',
@@ -125,7 +127,7 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
                                 streamPickerInitial={messageStreamWithoutHome}
                                 onSubmit={async (text, streams): Promise<Error | null> => {
                                     if (mode === 'reroute')
-                                        await api.reRouteMessage(message.id, message.author, streams, text)
+                                        await client.reroute(message.id, message.author, streams, text)
                                     else await handleReply(text, streams)
                                     setMode('none')
                                     return null

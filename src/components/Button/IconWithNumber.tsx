@@ -1,8 +1,6 @@
 import { Box, IconButton, Typography, useTheme } from '@mui/material'
 import StarIcon from '@mui/icons-material/Star'
 import StarOutlineIcon from '@mui/icons-material/StarOutline'
-import { Schemas } from '../../schemas'
-import React from 'react'
 
 export interface IconWithNumberProps {
     icon: JSX.Element

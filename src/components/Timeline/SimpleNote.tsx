@@ -1,11 +1,10 @@
-import type { Message } from '../../model'
-import type { SimpleNote as SimpleNoteSchema } from '../../schemas/simpleNote'
+import type { M_Current, M_Reply, M_Reroute } from '@concurrent-world/client'
 import { MarkdownRenderer } from '../MarkdownRenderer'
 
 interface SimpleNoteProps {
-    message: Message<SimpleNoteSchema>
+    message: M_Current | M_Reply | M_Reroute
 }
 
 export const SimpleNote = (props: SimpleNoteProps): JSX.Element => {
-    return <MarkdownRenderer messagebody={props.message.payload.body.body} />
+    return <MarkdownRenderer messagebody={props.message.body ?? 'no content'} />
 }

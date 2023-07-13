@@ -41,7 +41,7 @@ export interface MenuProps {
 }
 
 export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
-    const api = useApi()
+    const client = useApi()
     const pref = usePreference()
     const appData = useContext(ApplicationContext)
     const actions = useGlobalActions()
@@ -78,13 +78,12 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                             justifyContent: 'left',
                             gap: 1
                         }}
-                        to={'/entity/' + (appData.profile?.author ?? '')}
+                        to={'/entity/' + (client.ccid ?? '')}
                         onClick={props.onClick}
                     >
                         <CCAvatar
-                            alt={appData.profile?.payload.body.username}
-                            avatarURL={appData.profile?.payload.body.avatar}
-                            identiconSource={api.userAddress}
+                            avatarURL={appData.user?.profile.avatar}
+                            identiconSource={client.ccid}
                             sx={{
                                 width: '40px',
                                 height: '40px'
@@ -92,10 +91,10 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         />
                         <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', flexFlow: 'column' }}>
                             <Typography color={theme.palette.background.contrastText}>
-                                {appData.profile?.payload.body.username}
+                                {appData.user?.profile.username}
                             </Typography>
                             <Typography variant="caption" color={theme.palette.background.contrastText}>
-                                {api.host}
+                                {client.api.host}
                             </Typography>
                         </Box>
                     </ButtonBase>
