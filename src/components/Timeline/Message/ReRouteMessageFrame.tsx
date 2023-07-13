@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { Box, IconButton, Typography } from '@mui/material'
 
-import { type M_Reroute } from '@concurrent-world/client'
+import type { Character, Message as CCMessage } from '../../../model'
 import RepeatIcon from '@mui/icons-material/Repeat'
+import type { Profile } from '../../../schemas/profile'
+import { Schemas } from '../../../schemas'
 import { useApi } from '../../../context/api'
 import { CCAvatar } from '../../CCAvatar'
 import { Link as routerLink } from 'react-router-dom'
@@ -10,12 +12,22 @@ import { TimeDiff } from '../../TimeDiff'
 import { MessageContainer } from '../MessageContainer'
 
 export interface ReRouteMessageFrameProp {
-    message: M_Reroute
+    message: CCMessage<any>
     reloadMessage: () => void
     lastUpdated?: number
+    thin?: boolean
 }
 
 export const ReRouteMessageFrame = (props: ReRouteMessageFrameProp): JSX.Element => {
+    const api = useApi()
+    const [author, setAuthor] = useState<Character<Profile> | undefined>()
+
+    useEffect(() => {
+        api.readCharacter(props.message.author, Schemas.profile).then((e) => {
+            setAuthor(e)
+        })
+    }, [props.message, props.lastUpdated])
+
     return (
         <>
             <Box display="flex" alignItems="center" gap={1}>
@@ -32,11 +44,11 @@ export const ReRouteMessageFrame = (props: ReRouteMessageFrameProp): JSX.Element
                             height: { xs: '12px', sm: '18px' }
                         }}
                         component={routerLink}
-                        to={'/entity/' + props.message.author.ccaddr}
+                        to={'/entity/' + props.message.author}
                     >
                         <CCAvatar
-                            avatarURL={props.message.author.profile.avatar}
-                            identiconSource={props.message.author.ccaddr}
+                            avatarURL={author?.payload.body.avatar}
+                            identiconSource={props.message.author}
                             sx={{
                                 width: { xs: '12px', sm: '18px' },
                                 height: { xs: '12px', sm: '18px' }
@@ -55,15 +67,15 @@ export const ReRouteMessageFrame = (props: ReRouteMessageFrameProp): JSX.Element
                         flex: 1
                     }}
                 >
-                    {props.message.author.profile.username || 'Anonymous'} rerouted
+                    {author?.payload.body.username || 'Anonymous'} rerouted
                 </Typography>
                 <Box color="text.disabled" fontSize="0.75rem">
                     <TimeDiff date={new Date(props.message.cdate)} />
                 </Box>
             </Box>
             <MessageContainer
-                messageID={props.message.rerouteMessageId}
-                messageOwner={props.message.rerouteMessageAuthor}
+                messageID={props.message.payload.body.rerouteMessageId}
+                messageOwner={props.message.payload.body.rerouteMessageAuthor}
             />
         </>
     )

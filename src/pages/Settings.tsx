@@ -31,7 +31,7 @@ export interface SettingsProp {
 }
 
 export function Settings(props: SettingsProp): JSX.Element {
-    const client = useApi()
+    const api = useApi()
     const theme = useTheme()
     const pref = usePreference()
     const appData = useContext(ApplicationContext)
@@ -98,7 +98,7 @@ export function Settings(props: SettingsProp): JSX.Element {
                             }}
                         >
                             <ProfileEditor
-                                initial={appData.user?.profile}
+                                initial={appData.profile!}
                                 onSubmit={(_profile) => {
                                     enqueueSnackbar('更新しました', { variant: 'success' })
                                 }}
@@ -200,12 +200,12 @@ export function Settings(props: SettingsProp): JSX.Element {
                     <Typography variant="h3" gutterBottom>
                         CCID
                     </Typography>
-                    <Typography>{client.ccid}</Typography>
+                    <Typography>{api.userAddress}</Typography>
 
                     <Typography variant="h3" gutterBottom>
                         Host
                     </Typography>
-                    <Typography>{client.api.host}</Typography>
+                    <Typography>{api.host}</Typography>
 
                     <Typography variant="h3" gutterBottom>
                         Privatekey
@@ -217,7 +217,7 @@ export function Settings(props: SettingsProp): JSX.Element {
                             alignItems: 'center'
                         }}
                     >
-                        {showPrivateKey ? client.api.privatekey : '•••••••••••••••••••••••••••••••••••••••••••••••••'}
+                        {showPrivateKey ? api.privatekey : '•••••••••••••••••••••••••••••••••••••••••••••••••'}
                         <IconButton
                             sx={{ ml: 'auto' }}
                             onClick={() => {
@@ -234,13 +234,13 @@ export function Settings(props: SettingsProp): JSX.Element {
                     <Button
                         variant="contained"
                         onClick={(_) => {
-                            if (client.api.host === undefined) {
+                            if (api.host === undefined) {
                                 return
                             }
-                            const jwt = client.api.constructJWT({
+                            const jwt = api.constructJWT({
                                 exp: Math.floor((new Date().getTime() + 60 * 60 * 1000) / 1000).toString()
                             }) // 1h validity
-                            window.location.href = `https://${client.api.host}/login?token=${jwt}`
+                            window.location.href = `https://${api.host}/login?token=${jwt}`
                         }}
                     >
                         Goto Domain Home

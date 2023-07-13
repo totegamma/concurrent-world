@@ -6,7 +6,7 @@ export interface MessageHeaderProps {
     username?: string
     messageID: string
     authorID: string
-    cdate: Date
+    cdate: string
 }
 
 export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {

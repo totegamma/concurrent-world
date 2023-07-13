@@ -3,15 +3,15 @@ import { useApi } from '../../context/api'
 import { Box, Button, TextField, Typography } from '@mui/material'
 
 export const UserJWT = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
-    const client = useApi()
+    const api = useApi()
 
     const [issuedJwt, setIssuedJwt] = useState<string>('')
-    const [audience, setAudience] = useState<string>(client?.api.host ?? '')
+    const [audience, setAudience] = useState<string>(api?.host ?? '')
     const [subject, setSubject] = useState<string>('')
 
     const issueJwt = (): void => {
         setIssuedJwt(
-            client.api.constructJWT({
+            api.constructJWT({
                 aud: audience,
                 sub: subject
             })

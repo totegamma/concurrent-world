@@ -8,17 +8,10 @@ import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
 
-import {
-    Client,
-    Schemas,
-    type User,
-    type CoreServerEvent,
-    type CoreCharacter,
-    type Profile
-} from '@concurrent-world/client'
+import { Schemas } from './schemas'
 import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu'
-import type { StreamElementDated, Emoji, ConcurrentTheme } from './model'
+import type { StreamElementDated, ServerEvent, Emoji, ConcurrentTheme, Character } from './model'
 import {
     Associations,
     Explorer,
@@ -35,20 +28,25 @@ import NotificationSound from './resources/Notification.wav'
 import useSound from 'use-sound'
 import { MobileMenu } from './components/MobileMenu'
 import ApiProvider from './context/api'
+import ConcurrentApiClient from './apiservice'
+import type { Profile } from './schemas/profile'
+import type { Userstreams } from './schemas/userstreams'
 import { PreferenceProvider } from './context/PreferenceContext'
 import { GlobalActionsProvider } from './context/GlobalActions'
 import { EmojiPickerProvider } from './context/EmojiPickerContext'
 import { ConcurrentLogo } from './components/ConcurrentLogo'
 
 export const ApplicationContext = createContext<appData>({
-    user: null,
+    profile: undefined,
+    userstreams: undefined,
     emojiDict: {},
     websocketState: -1,
     displayingStream: []
 })
 
 export interface appData {
-    user: User | null
+    profile: Character<Profile> | null | undefined
+    userstreams: Character<Userstreams> | null | undefined
     emojiDict: Record<string, Emoji>
     websocketState: ReadyState
     displayingStream: string[]
@@ -60,10 +58,10 @@ function App(): JSX.Element {
     const [domain] = usePersistent<string>('Domain', '')
     const [prvkey] = usePersistent<string>('PrivateKey', '')
     const [address] = usePersistent<string>('Address', '')
-    const [client, initializeClient] = useState<Client>()
+    const [api, initializeApi] = useState<ConcurrentApiClient>()
     useEffect(() => {
-        const client = new Client(address, prvkey, domain, 'cc-client')
-        initializeClient(client)
+        const api = new ConcurrentApiClient(address, prvkey, domain)
+        initializeApi(api)
     }, [domain, address, prvkey])
 
     const [themeName, setThemeName] = usePersistent<string>('Theme', Object.keys(Themes)[0])
@@ -71,15 +69,16 @@ function App(): JSX.Element {
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
     const messages = useObjectList<StreamElementDated>()
 
-    const [user, setUser] = useState<User | null>(null)
+    const [profile, setProfile] = useState<Character<Profile> | null | undefined>(undefined)
+    const [userstreams, setUserstreams] = useState<Character<Userstreams> | null | undefined>(undefined)
 
     const [followingUserStreams, setFollowingUserStreams] = useState<string[]>([])
     useEffect(() => {
         const followingUsers = JSON.parse(localStorage.getItem('followingUsers') ?? '[]')
-        client?.getUserHomeStreams(followingUsers).then((streams) => {
+        api?.getUserHomeStreams(followingUsers).then((streams) => {
             setFollowingUserStreams(streams)
         })
-    }, [client])
+    }, [api])
 
     const path = useLocation()
     const displayingStream: string[] = useMemo(() => {
@@ -94,12 +93,12 @@ function App(): JSX.Element {
                 return query
             }
             case '/notifications': {
-                const notifications = user?.userstreams.notificationStream
+                const notifications = userstreams?.payload.body.notificationStream
                 if (!notifications) return []
                 return [notifications]
             }
             case '/associations': {
-                const associations = user?.userstreams.associationStream
+                const associations = userstreams?.payload.body.associationStream
                 if (!associations) return []
                 return [associations]
             }
@@ -107,7 +106,7 @@ function App(): JSX.Element {
                 return []
             }
         }
-    }, [path, user, followingUserStreams])
+    }, [path, userstreams, followingUserStreams])
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
 
@@ -149,23 +148,26 @@ function App(): JSX.Element {
     }, [])
 
     useEffect(() => {
-        client?.getUser(address).then((user) => {
-            setUser(user)
+        api?.readCharacter(address, Schemas.profile).then((profile) => {
+            setProfile(profile)
         })
-    }, [address, client])
+        api?.readCharacter(address, Schemas.userstreams).then((userstreams) => {
+            setUserstreams(userstreams)
+        })
+    }, [address, api])
 
     useEffect(() => {
         sendJsonMessage({
             channels: [
                 ...displayingStream,
-                ...(user?.userstreams.notificationStream ? [user?.userstreams.notificationStream] : [])
+                ...(userstreams?.payload.body.notificationStream ? [userstreams.payload.body.notificationStream] : [])
             ]
         })
-    }, [displayingStream, user])
+    }, [displayingStream, userstreams])
 
     useEffect(() => {
         if (!lastMessage) return
-        const event: CoreServerEvent = JSON.parse(lastMessage.data)
+        const event: ServerEvent = JSON.parse(lastMessage.data)
         if (!event) return
         switch (event.type) {
             case 'message': {
@@ -195,44 +197,44 @@ function App(): JSX.Element {
             case 'association': {
                 switch (event.action) {
                     case 'create': {
-                        client?.api.invalidateMessage(event.body.id)
+                        api?.invalidateMessage(event.body.id)
                         const target = messages.current.find((e) => e.id === event.body.id)
                         if (target) {
                             target.LastUpdated = new Date().getTime()
                             messages.update((e) => [...e])
                         }
-                        if (event.stream === user?.userstreams.notificationStream) {
+                        if (event.stream === userstreams?.payload.body.notificationStream) {
                             playNotificationRef.current()
-                            client?.api.readAssociation(event.body.id, event.body.currenthost).then((a) => {
+                            api?.fetchAssociation(event.body.id, event.body.currenthost).then((a) => {
                                 if (!a) return
                                 if (a.schema === Schemas.replyAssociation) {
-                                    client?.api
-                                        .readCharacter(a.author, Schemas.profile)
-                                        .then((c: CoreCharacter<Profile> | undefined) => {
+                                    api?.readCharacter(a.author, Schemas.profile).then(
+                                        (c: Character<Profile> | undefined) => {
                                             enqueueSnackbar(
                                                 `${c?.payload.body.username ?? 'anonymous'} replied to your message.`
                                             )
-                                        })
+                                        }
+                                    )
                                     return
                                 }
 
-                                if (a.schema === Schemas.rerouteAssociation) {
-                                    client?.api
-                                        .readCharacter(a.author, Schemas.profile)
-                                        .then((c: CoreCharacter<Profile> | undefined) => {
+                                if (a.schema === Schemas.reRouteAssociation) {
+                                    api?.readCharacter(a.author, Schemas.profile).then(
+                                        (c: Character<Profile> | undefined) => {
                                             enqueueSnackbar(
                                                 `${c?.payload.body.username ?? 'anonymous'} rerouted to your message.`
                                             )
-                                        })
+                                        }
+                                    )
                                     return
                                 }
 
                                 if (a.schema === Schemas.like) {
-                                    client?.api.readMessage(a.targetID).then((m) => {
+                                    api.fetchMessage(a.targetID).then((m) => {
                                         m &&
-                                            client.api
+                                            api
                                                 .readCharacter(a.author, Schemas.profile)
-                                                .then((c: CoreCharacter<Profile> | undefined) => {
+                                                .then((c: Character<Profile> | undefined) => {
                                                     enqueueSnackbar(
                                                         `${c?.payload.body.username ?? 'anonymous'} favorited "${
                                                             (m.payload.body.body as string) ?? 'your message.'
@@ -244,12 +246,12 @@ function App(): JSX.Element {
                                 }
 
                                 if (a.schema === Schemas.emojiAssociation) {
-                                    client.api.readMessage(a.targetID).then((m) => {
+                                    api.fetchMessage(a.targetID).then((m) => {
                                         console.log(m)
                                         m &&
-                                            client.api
+                                            api
                                                 .readCharacter(a.author, Schemas.profile)
-                                                .then((c: CoreCharacter<Profile> | undefined) => {
+                                                .then((c: Character<Profile> | undefined) => {
                                                     enqueueSnackbar(
                                                         `${c?.payload.body.username ?? 'anonymous'} reacted to "${
                                                             (m.payload.body.body as string) ?? 'your message.'
@@ -269,7 +271,7 @@ function App(): JSX.Element {
                         break
                     }
                     case 'delete': {
-                        client?.api.invalidateMessage(event.body.id)
+                        api?.invalidateMessage(event.body.id)
                         const target = messages.current.find((e) => e.id === event.body.id)
                         if (target) {
                             target.LastUpdated = new Date().getTime()
@@ -304,13 +306,14 @@ function App(): JSX.Element {
     const applicationContext = useMemo(() => {
         return {
             emojiDict,
-            user,
+            profile,
+            userstreams,
             websocketState: readyState,
             displayingStream
         }
-    }, [emojiDict, user, readyState, displayingStream])
+    }, [emojiDict, profile, userstreams, readyState, displayingStream])
 
-    if (!client) {
+    if (!api) {
         return <>building api service...</>
     }
 
@@ -320,7 +323,7 @@ function App(): JSX.Element {
                 <ThemeProvider theme={theme}>
                     <CssBaseline />
                     <ClockContext.Provider value={clock}>
-                        <ApiProvider api={client}>
+                        <ApiProvider api={api}>
                             <PreferenceProvider>
                                 <ApplicationContext.Provider value={applicationContext}>
                                     <EmojiPickerProvider>

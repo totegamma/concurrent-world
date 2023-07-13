@@ -1,26 +1,27 @@
+import type { Message as CCMessage, ProfileWithAddress } from '../../../model'
+import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
+import type { ReplyMessage } from '../../../schemas/replyMessage'
 import { Box, Button, Divider, Tooltip, Typography, alpha, useTheme } from '@mui/material'
+import { Schemas } from '../../../schemas'
 import { useApi } from '../../../context/api'
 import { CCAvatar } from '../../CCAvatar'
 import { Fragment } from 'react'
 import { useMessageService } from '../MessageContainer'
 
-import { type M_Reply, type M_Current, type M_Reroute, type User } from '@concurrent-world/client'
-
 export interface MessageReactionsProps {
-    message: M_Current | M_Reply | M_Reroute
+    message: CCMessage<TypeSimpleNote | ReplyMessage>
+    emojiUsers: ProfileWithAddress[]
 }
 
 export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
-    const client = useApi()
+    const api = useApi()
     const theme = useTheme()
     const service = useMessageService()
-
-    const filteredReactions = props.message.reactions.reduce((acc: any, cur) => {
-        if (cur.shortcode in acc) {
-            acc[cur.shortcode].push(cur)
-        } else {
-            acc[cur.shortcode] = [cur]
-        }
+    const allReactions = props.message.associations.filter((m) => m.schema === Schemas.emojiAssociation)
+    const filteredReactions = allReactions.reduce((acc: any, cur) => {
+        cur.payload.body.shortcode in acc
+            ? acc[cur.payload.body.shortcode].push(cur)
+            : (acc[cur.payload.body.shortcode] = [cur])
 
         return acc
     }, {})
@@ -29,11 +30,13 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
         <Box display="flex" flexWrap="wrap" gap={1}>
             {Object.entries(filteredReactions).map((r) => {
                 const [shortcode, reaction]: [string, any] = r
-                const ownReaction = reaction.find((x: any) => x.author.ccaddr === client.ccid)
-                const reactedUsersList = reaction.map((value: { author: User }) => {
-                    return value !== undefined ? (
+                const ownReaction = reaction.find((x: any) => x.author === api.userAddress)
+                const reactedUsers =
+                    reaction.map((x: any) => props.emojiUsers.find((u) => u.ccaddress === x.author)) ?? []
+                const reactedUsersList = reactedUsers.map((user: ProfileWithAddress | undefined) => {
+                    return user !== undefined ? (
                         <Box
-                            key={value.author.ccaddr}
+                            key={user.ccaddress}
                             sx={{
                                 display: 'flex',
                                 alignItems: 'center',
@@ -45,11 +48,11 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                                     height: '20px',
                                     width: '20px'
                                 }}
-                                avatarURL={value.author.profile.avatar}
-                                identiconSource={value.author.ccaddr}
-                                alt={value.author.ccaddr}
+                                avatarURL={user.avatar}
+                                identiconSource={user.ccaddress}
+                                alt={user.ccaddress}
                             />
-                            {value.author.profile.username ?? 'anonymous'}
+                            {user.username ?? 'anonymous'}
                         </Box>
                     ) : (
                         <Fragment key={0} />
@@ -63,7 +66,7 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                         title={
                             <Box display="flex" flexDirection="column" alignItems="right" gap={1}>
                                 <Box display="flex" alignItems="center" gap={1}>
-                                    <Box component="img" height="20px" src={reaction[0].imageUrl}></Box>
+                                    <Box component="img" height="20px" src={reaction[0].payload.body.imageUrl}></Box>
                                     {shortcode}
                                 </Box>
                                 <Divider flexItem></Divider>
@@ -85,11 +88,11 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                                 if (ownReaction) {
                                     service.removeReaction(ownReaction.id)
                                 } else {
-                                    service.addReaction(shortcode, reaction[0].imageUrl)
+                                    service.addReaction(shortcode, reaction[0].payload.body.imageUrl)
                                 }
                             }}
                         >
-                            <Box component="img" height="20px" src={reaction[0].imageUrl} />
+                            <Box component="img" height="20px" src={reaction[0].payload.body.imageUrl} />
                             <Typography color={ownReaction ? 'primary.contrastText' : 'text.primary'}>
                                 {reaction.length}
                             </Typography>

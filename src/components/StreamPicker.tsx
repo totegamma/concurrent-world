@@ -15,13 +15,13 @@ interface StreamOption {
 }
 
 export const StreamPicker = memo<StreamPickerProps>((props: StreamPickerProps): JSX.Element => {
-    const client = useApi()
+    const api = useApi()
     const pref = usePreference()
     const [options, setOptions] = useState<StreamOption[]>([])
     const [selectedStreams, setSelectedStreams] = useState<StreamOption[]>([])
 
     useEffect(() => {
-        Promise.all(pref.bookmarkingStreams.map((e) => client.api.readStream(e))).then((a) => {
+        Promise.all(pref.bookmarkingStreams.map((e) => api.readStream(e))).then((a) => {
             setOptions(
                 a
                     .filter((e) => e?.payload)
@@ -36,7 +36,7 @@ export const StreamPicker = memo<StreamPickerProps>((props: StreamPickerProps): 
     }, [])
 
     useEffect(() => {
-        Promise.all(props.selected.map((e) => client.api.readStream(e))).then((a) => {
+        Promise.all(props.selected.map((e) => api.readStream(e))).then((a) => {
             setSelectedStreams(
                 a
                     .filter((e) => e?.payload)

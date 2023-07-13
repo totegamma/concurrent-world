@@ -2,13 +2,18 @@ import { Box, Link, IconButton, Typography } from '@mui/material'
 import { Link as routerLink } from 'react-router-dom'
 import { CCAvatar } from '../../CCAvatar'
 import { TimeDiff } from '../../TimeDiff'
-import { type M_Current } from '@concurrent-world/client'
+import { type SimpleNote } from '../../../schemas/simpleNote'
+import { type ReplyMessage } from '../../../schemas/replyMessage'
+import { type Character, type Message } from '../../../model'
+import { type Profile } from '../../../schemas/profile'
 
 export interface OneLineMessageViewProps {
-    message: M_Current
+    message: Message<SimpleNote | ReplyMessage>
+    author: Character<Profile> | undefined
 }
 
 export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element => {
+    if (!props.message?.payload?.body) return <>message not found</>
     return (
         <Box
             sx={{
@@ -26,12 +31,12 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                     height: { xs: '12px', sm: '18px' }
                 }}
                 component={routerLink}
-                to={'/entity/' + props.message.author.ccaddr}
+                to={'/entity/' + props.message.author}
             >
                 <CCAvatar
-                    alt={props.message.author.profile.username}
-                    avatarURL={props.message.author.profile.avatar}
-                    identiconSource={props.message.author.ccaddr}
+                    alt={props.author?.payload.body.username}
+                    avatarURL={props.author?.payload.body.avatar}
+                    identiconSource={props.message.author}
                     sx={{
                         width: { xs: '38px', sm: '48px' },
                         height: { xs: '12px', sm: '18px' }
@@ -46,7 +51,7 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                     minWidth={0}
                     sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
                 >
-                    {props.message.body}
+                    {props.message.payload.body.body}
                 </Typography>
             </Box>
             <Link
