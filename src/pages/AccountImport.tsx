@@ -5,7 +5,7 @@ import Paper from '@mui/material/Paper'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
-import { LoadKey } from '../util'
+import { LoadKey, isValid256k1PrivateKey } from '../util'
 import { useNavigate } from 'react-router-dom'
 import { HDNodeWallet } from 'ethers'
 import { LangJa } from '../utils/lang-ja'
@@ -48,6 +48,10 @@ export function AccountImport(): JSX.Element {
         setErrorMessage('')
         setEntityFound(false)
         if (mnemonic === '') {
+            if (!isValid256k1PrivateKey(secret)) {
+                setErrorMessage('秘密鍵の要件を満たしていません。秘密鍵でないか入力に誤りがあります。')
+                return
+            }
             const key = LoadKey(secret)
             if (!key) return
             privatekey = key.privatekey

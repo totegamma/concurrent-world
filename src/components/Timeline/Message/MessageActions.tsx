@@ -33,6 +33,10 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
 
     const hasOwnReaction = props.favoriteUsers.find((user) => user.ccaddress === props.userCCID)
 
+    const replyCount = props.message.associations.filter((e) => e.schema === Schemas.replyAssociation).length
+    const likeCount = props.message.associations.filter((e) => e.schema === Schemas.like).length
+    const rerouteCount = props.message.associations.filter((e) => e.schema === Schemas.reRouteAssociation).length
+
     const emojiPicker = useEmojiPicker()
 
     return (
@@ -52,28 +56,48 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     }}
                 >
                     {/* left */}
-                    <IconButton
+                    <Box
                         sx={{
-                            p: '0',
-                            color: 'text.secondary'
-                        }}
-                        onClick={() => {
-                            service.openReply()
+                            display: 'flex',
+                            width: '3rem'
                         }}
                     >
-                        <ReplyIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
-                    </IconButton>
-                    <IconButton
+                        <IconButton
+                            sx={{
+                                p: '0',
+                                color: 'text.secondary'
+                            }}
+                            onClick={() => {
+                                service.openReply()
+                            }}
+                        >
+                            <ReplyIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
+                        </IconButton>
+                        <Typography sx={{ m: 'auto', size: '16px', fontSize: '13px' }}>
+                            {replyCount > 0 ? replyCount : <></>}
+                        </Typography>
+                    </Box>
+                    <Box
                         sx={{
-                            p: '0',
-                            color: 'text.secondary'
-                        }}
-                        onClick={() => {
-                            service.openReroute()
+                            display: 'flex',
+                            width: '3rem'
                         }}
                     >
-                        <RepeatIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
-                    </IconButton>
+                        <IconButton
+                            sx={{
+                                p: '0',
+                                color: 'text.secondary'
+                            }}
+                            onClick={() => {
+                                service.openReroute()
+                            }}
+                        >
+                            <RepeatIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
+                        </IconButton>
+                        <Typography sx={{ m: 'auto', size: '16px', fontSize: '13px' }}>
+                            {rerouteCount > 0 ? rerouteCount : <></>}
+                        </Typography>
+                    </Box>
                     <Tooltip
                         arrow
                         title={
@@ -110,7 +134,12 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         placement="top"
                         disableHoverListener={props.favoriteUsers.length === 0}
                     >
-                        <Box sx={{ display: 'flex' }}>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                width: '3rem'
+                            }}
+                        >
                             <IconButton
                                 sx={{
                                     p: '0',
@@ -132,7 +161,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                 )}
                             </IconButton>
                             <Typography sx={{ m: 'auto', size: '16px', fontSize: '13px' }}>
-                                {props.message.associations.filter((e) => e.schema === Schemas.like).length}
+                                {likeCount > 0 ? likeCount : <></>}
                             </Typography>
                         </Box>
                     </Tooltip>

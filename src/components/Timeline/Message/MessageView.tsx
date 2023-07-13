@@ -44,6 +44,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                     <Tooltip
                         enterDelay={500}
                         enterNextDelay={500}
+                        leaveDelay={300}
                         placement="top"
                         components={{
                             Tooltip: Paper
