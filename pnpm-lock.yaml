@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@concurrent-world/client':
-    specifier: file:../concurrent-client
-    version: file:../concurrent-client
+    specifier: ^1.0.0
+    version: 1.0.0
   '@emoji-mart/react':
     specifier: ^1.1.1
     version: 1.1.1(emoji-mart@5.5.2)(react@18.2.0)
@@ -1646,6 +1646,17 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /@concurrent-world/client@1.0.0:
+    resolution: {integrity: sha512-n2ax2XHgRvchyrsm4KBtEQpj9tsnjiZ37Nqc5L7XB08J9eQixULc3FBNu/LqjcppkkyEbLzQzVZi0JlvVqz1kA==}
+    dependencies:
+      elliptic: 6.5.4
+      ethers: 6.6.3
+      uuid: 9.0.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+    dev: false
 
   /@discoveryjs/json-ext@0.5.7:
     resolution: {integrity: sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==}
@@ -11356,19 +11367,6 @@ packages:
 
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
-    dev: false
-
-  file:../concurrent-client:
-    resolution: {directory: ../concurrent-client, type: directory}
-    name: '@concurrent-world/client'
-    version: 0.2.2
-    dependencies:
-      elliptic: 6.5.4
-      ethers: 6.6.3
-      uuid: 9.0.0
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
     dev: false
 
   github.com/rassi0429/vite-plugin-info/384ee94fab7ad39221fb036c3b3f73563b7294ec(vite@4.0.0):
