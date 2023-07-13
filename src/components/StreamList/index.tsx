@@ -12,7 +12,7 @@ import { Placeholder } from './Placeholder'
 import { usePersistent } from '../../hooks/usePersistent'
 
 import { v4 as uuidv4 } from 'uuid'
-import PercentIcon from '@mui/icons-material/Percent'
+import BookmarkIcon from '@mui/icons-material/Bookmark'
 import { useApi } from '../../context/api'
 import { usePreference } from '../../context/PreferenceContext'
 export interface WatchStream {
@@ -100,13 +100,13 @@ export function StreamList(props: StreamListProps): JSX.Element {
     return (
         <>
             <Box display={'flex'} flexDirection={'row'} gap={'8px'} sx={{ paddingLeft: '16px', paddingTop: '8px' }}>
-                <PercentIcon
+                <BookmarkIcon
                     sx={{
                         color: 'background.contrastText'
                     }}
                 />
                 <Typography flex={1} fontSize={'0.875rem'} justifyContent={'center'} marginY={'3px'}>
-                    Streams
+                    Bookmarks
                 </Typography>
 
                 <IconButton

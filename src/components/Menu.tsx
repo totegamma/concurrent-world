@@ -32,6 +32,7 @@ import { useApi } from '../context/api'
 import { ConcurrentWordmark } from './ConcurrentWordmark'
 import { usePreference } from '../context/PreferenceContext'
 import { useGlobalActions } from '../context/GlobalActions'
+import { ConcurrentLogo } from './ConcurrentLogo'
 
 const branchName = branch || window.location.host.split('.')[0]
 
@@ -65,25 +66,39 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                     display: 'flex',
                     flexDirection: 'column',
                     height: '100%',
-                    pt: '25px',
                     color: 'background.contrastText'
                 }}
             >
-                <ConcurrentWordmark color={iconColor} />
-                <Box sx={{ textAlign: 'center', fontWeight: 600 }}>開発中α版</Box>
-                <Box
-                    sx={{
-                        textAlign: 'center',
-                        fontWeight: 400,
-                        fontSize: '0.7rem',
-                        marginBottom: '10px'
-                    }}
-                >
-                    buildTime: {buildTime.toLocaleString()}
-                    <br />
-                    branch: {branchName}
-                    <br />
-                    sha: {sha.slice(0, 7)}
+                <Box sx={{ px: 2, pb: 1 }}>
+                    <ButtonBase
+                        component={Link}
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'left',
+                            gap: 1
+                        }}
+                        to={'/entity/' + (appData.profile?.author ?? '')}
+                        onClick={props.onClick}
+                    >
+                        <CCAvatar
+                            alt={appData.profile?.payload.body.username}
+                            avatarURL={appData.profile?.payload.body.avatar}
+                            identiconSource={api.userAddress}
+                            sx={{
+                                width: '40px',
+                                height: '40px'
+                            }}
+                        />
+                        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', flexFlow: 'column' }}>
+                            <Typography color={theme.palette.background.contrastText}>
+                                {appData.profile?.payload.body.username}
+                            </Typography>
+                            <Typography variant="caption" color={theme.palette.background.contrastText}>
+                                {api.host}
+                            </Typography>
+                        </Box>
+                    </ButtonBase>
                 </Box>
                 <Divider />
                 <Box
@@ -93,7 +108,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         gap: 1
                     }}
                 >
-                    <List dense sx={{ width: '100%' }}>
+                    <List dense sx={{ py: 0.5, width: '100%' }}>
                         <ListItem disablePadding>
                             <ListItemButton sx={{ gap: 1 }} component={Link} to="/" onClick={props.onClick}>
                                 <HomeIcon
@@ -195,36 +210,35 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         投稿する
                     </Button>
                 )}
-                <Box sx={{ p: 1, mb: 'env(safe-area-inset-bottom)' }}>
-                    <ButtonBase
-                        component={Link}
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'left',
-                            gap: 1
-                        }}
-                        to={'/entity/' + (appData.profile?.author ?? '')}
-                        onClick={props.onClick}
-                    >
-                        <CCAvatar
-                            alt={appData.profile?.payload.body.username}
-                            avatarURL={appData.profile?.payload.body.avatar}
-                            identiconSource={api.userAddress}
-                            sx={{
-                                width: '40px',
-                                height: '40px'
-                            }}
-                        />
-                        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', flexFlow: 'column' }}>
-                            <Typography color={theme.palette.background.contrastText}>
-                                {appData.profile?.payload.body.username}
-                            </Typography>
-                            <Typography variant="caption" color={theme.palette.background.contrastText}>
-                                {api.host}
-                            </Typography>
-                        </Box>
-                    </ButtonBase>
+                <Divider />
+                <Box
+                    sx={{
+                        textAlign: 'left',
+                        fontWeight: 400,
+                        fontSize: '0.7rem',
+                        marginBottom: '10px',
+                        p: 1
+                    }}
+                >
+                    <Box sx={{ textAlign: 'center', fontWeight: 600, mb: 'env(safe-area-inset-bottom)' }}>
+                        開発中α版
+                    </Box>
+                    buildTime: {buildTime.toLocaleString()}
+                    <br />
+                    branch: {branchName}
+                    <br />
+                    sha: {sha.slice(0, 7)}
+                </Box>
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        zIndex: '-1',
+                        opacity: { xs: '0.2', sm: '0.1' },
+                        marginLeft: '-50px',
+                        bottom: '-30px'
+                    }}
+                >
+                    <ConcurrentLogo size="300px" upperColor={iconColor} lowerColor={iconColor} frameColor={iconColor} />
                 </Box>
             </Box>
         </Box>
