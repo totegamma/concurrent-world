@@ -2,7 +2,7 @@ import { Box, Paper, Modal, Typography } from '@mui/material'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
-import { Schemas, type Character, type SimpleNote, type DomainProfile } from '@concurrent-world/client'
+import { Schemas, type DomainProfile, type CoreCharacter } from '@concurrent-world/client'
 import { Draft } from '../components/Draft'
 import { useLocation } from 'react-router-dom'
 import { usePreference } from './PreferenceContext'
@@ -30,13 +30,13 @@ const style = {
 }
 
 export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element => {
-    const api = useApi()
+    const client = useApi()
     const pref = usePreference()
     const reactlocation = useLocation()
     const appData = useContext(ApplicationContext)
     const [mode, setMode] = useState<'compose' | 'none'>('none')
 
-    const accountIsOK = appData.profile !== null && appData.userstreams !== null
+    const accountIsOK = appData.user?.profile !== null && appData.user?.userstreams !== null
 
     const openDraft = useCallback(() => {
         setMode('compose')
@@ -106,20 +106,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                             autoFocus
                             streamPickerInitial={streamPickerInitial}
                             onSubmit={async (text: string, destinations: string[]) => {
-                                const body = {
-                                    body: text
-                                }
-                                return await api
-                                    .createMessage<SimpleNote>(Schemas.simpleNote, body, destinations)
-                                    .then((_) => {
-                                        return null
-                                    })
-                                    .catch((e) => {
-                                        return e
-                                    })
-                                    .finally(() => {
-                                        setMode('none')
-                                    })
+                                return await client.createCurrent(text, destinations)
                             }}
                         />
                     </Box>
@@ -138,10 +125,11 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                         </Typography>
                         <ProfileEditor
                             onSubmit={(_) => {
-                                api?.setupUserstreams().then(() => {
-                                    api.getHostProfile(api.host).then((host) => {
-                                        api.readCharacter(host.ccaddr, Schemas.domainProfile).then(
-                                            (profile: Character<DomainProfile> | undefined) => {
+                                client.setupUserstreams().then(() => {
+                                    client.api.getHostProfile(client.api.host).then((host) => {
+                                        client.api
+                                            .readCharacter(host.ccaddr, Schemas.domainProfile)
+                                            .then((profile: CoreCharacter<DomainProfile> | undefined) => {
                                                 console.log(profile)
                                                 try {
                                                     if (profile) {
@@ -169,8 +157,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                     console.error(e)
                                                 }
                                                 window.location.reload()
-                                            }
-                                        )
+                                            })
                                     })
                                 })
                             }}

@@ -21,7 +21,7 @@ import { Link } from 'react-router-dom'
 import { usePreference } from '../context/PreferenceContext'
 
 export function HomeSettings(): JSX.Element {
-    const api = useApi()
+    const client = useApi()
     const pref = usePreference()
     const [tab, setTab] = useState(0)
 
@@ -30,7 +30,7 @@ export function HomeSettings(): JSX.Element {
     useEffect(() => {
         Promise.all(
             pref.followingUsers.map((ccaddress: string) =>
-                api.readCharacter(ccaddress, Schemas.profile).then((e) => {
+                client.api.readCharacter(ccaddress, Schemas.profile).then((e) => {
                     return {
                         ccaddress,
                         ...e?.payload.body

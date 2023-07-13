@@ -1,11 +1,11 @@
 import { memo, useEffect, useState } from 'react'
 import {
-    type Association,
-    type Character,
-    type Message,
-    type StreamElement,
+    type CoreCharacter,
+    type CoreMessage,
+    type CoreStreamElement,
     Schemas,
-    type Profile
+    type Profile,
+    type CoreAssociation
 } from '@concurrent-world/client'
 import { useApi } from '../../context/api'
 import { Box, IconButton, ListItem, ListItemButton, Typography } from '@mui/material'
@@ -15,41 +15,42 @@ import { MessageSkeleton } from '../MessageSkeleton'
 import { MessageContainer } from './MessageContainer'
 
 export interface AssociationFrameProp {
-    association: StreamElement
+    association: CoreStreamElement
     lastUpdated: number
     after: JSX.Element | undefined
     perspective?: string
 }
 
 export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFrameProp): JSX.Element | null => {
-    const api = useApi()
-    const [associationAuthor, setAssociationAuthor] = useState<Character<Profile> | undefined>()
-    const [message, setMessage] = useState<Message<any> | undefined>()
-    const [messageAuthor, setMessageAuthor] = useState<Character<Profile> | undefined>()
-    const [association, setAssociation] = useState<Association<any> | undefined>()
+    const client = useApi()
+    const [associationAuthor, setAssociationAuthor] = useState<CoreCharacter<Profile> | undefined>()
+    const [message, setMessage] = useState<CoreMessage<any> | undefined>()
+    const [messageAuthor, setMessageAuthor] = useState<CoreCharacter<Profile> | undefined>()
+    const [association, setAssociation] = useState<CoreAssociation<any> | undefined>()
     const [fetching, setFetching] = useState<boolean>(true)
 
-    const perspective = props.perspective ?? api.userAddress
+    const perspective = props.perspective ?? client.ccid
     const isMeToOther = association?.author !== perspective
 
-    const Nominative = perspective === api.userAddress ? 'You' : associationAuthor?.payload.body.username ?? 'anonymous'
+    const Nominative = perspective === client.ccid ? 'You' : associationAuthor?.payload.body.username ?? 'anonymous'
     const Possessive =
-        perspective === api.userAddress ? 'your' : (messageAuthor?.payload.body.username ?? 'anonymous') + "'s"
+        perspective === client.ccid ? 'your' : (messageAuthor?.payload.body.username ?? 'anonymous') + "'s"
 
     const actionUser = isMeToOther ? associationAuthor : messageAuthor
 
     useEffect(() => {
-        api.fetchAssociation(props.association.id, props.association.currenthost)
+        client.api
+            .readAssociation(props.association.id, props.association.currenthost)
             .then((a) => {
                 if (!a) return
                 setAssociation(a)
-                api.fetchMessage(a.targetID, props.association.currenthost).then((m) => {
+                client.api.readMessage(a.targetID, props.association.currenthost).then((m) => {
                     setMessage(m)
                     if (!m) return
-                    api.readCharacter(a.author, Schemas.profile).then((author) => {
+                    client.api.readCharacter(a.author, Schemas.profile).then((author) => {
                         setAssociationAuthor(author)
                     })
-                    api.readCharacter(m.author, Schemas.profile).then((author) => {
+                    client.api.readCharacter(m.author, Schemas.profile).then((author) => {
                         setMessageAuthor(author)
                     })
                 })

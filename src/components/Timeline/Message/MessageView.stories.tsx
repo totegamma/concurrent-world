@@ -73,6 +73,7 @@ export const Default = (arg: Props): JSX.Element => {
                             <CssBaseline />
                             <ThemeProvider theme={theme}>
                                 <Paper>
+                                    {/*
                                     <MessageView
                                         userCCID={''}
                                         message={MessageMock(arg.body, arg.author, arg.cdate)}
@@ -81,6 +82,7 @@ export const Default = (arg: Props): JSX.Element => {
                                         favoriteUsers={[]}
                                         streams={[StreamMock(arg.streamName)]}
                                     />
+                                */}
                                 </Paper>
                             </ThemeProvider>
                         </InspectorProvider>

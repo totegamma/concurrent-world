@@ -44,7 +44,7 @@ interface PreferenceProviderProps {
 }
 
 export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element => {
-    const api = useApi()
+    const client = useApi()
 
     const [initialized, setInitialized] = useState<boolean>(false)
 
@@ -105,9 +105,10 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
     )
 
     useEffect(() => {
-        if (!api) return
+        if (!client) return
         if (initialized) return
-        api.readKV('world.concurrent.preference')
+        client.api
+            .readKV('world.concurrent.preference')
             .then((storage: string | undefined) => {
                 setInitialized(true)
                 if (!storage) return
@@ -130,7 +131,7 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
     }, [])
 
     useEffect(() => {
-        if (!api) return
+        if (!client) return
         if (!initialized) return
         const storage = JSON.stringify({
             themeName,
@@ -144,7 +145,7 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
             showEditorOnTop,
             showEditorOnTopMobile
         })
-        api.writeKV('world.concurrent.preference', storage)
+        client.api.writeKV('world.concurrent.preference', storage)
     }, [
         themeName,
         imgurClientID,

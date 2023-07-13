@@ -7,7 +7,6 @@ import muiLink from '@mui/material/Link'
 import TextField from '@mui/material/TextField'
 import Divider from '@mui/material/Divider'
 import { ProfileEditor } from '../components/ProfileEditor'
-import { Client, type Character, type Host, Schemas, type Profile, type DomainProfile } from '@concurrent-world/client'
 import ApiProvider from '../context/api'
 import type { ConcurrentTheme } from '../model'
 import {
@@ -38,6 +37,8 @@ import { ConcurrentWordmark } from '../components/ConcurrentWordmark'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
+import { Client, type DomainProfile, type Profile, Schemas } from '@concurrent-world/client'
+import { type Character, type Host } from '@concurrent-world/client/dist/model/core'
 
 export function Registration(): JSX.Element {
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue2')
@@ -60,7 +61,7 @@ export function Registration(): JSX.Element {
     const [CCID, setCCID] = useState<string>('')
     const [privateKey, setPrivateKey] = useState<string>('')
     const [publicKey, setPublicKey] = useState<string>('')
-    const [api, initializeApi] = useState<Client>()
+    const [client, initializeClient] = useState<Client>()
 
     useEffect(() => {
         const identity = generateIdentity()
@@ -68,7 +69,7 @@ export function Registration(): JSX.Element {
         setCCID(identity.CCID)
         setPrivateKey(identity.privateKey)
         setPublicKey(identity.publicKey)
-        initializeApi(new Client(identity.CCID, identity.privateKey, 'hub.concurrent.world'))
+        initializeClient(new Client(identity.CCID, identity.privateKey, 'hub.concurrent.world'))
     }, [])
 
     const [server, setServer] = useState<string>('')
@@ -78,20 +79,20 @@ export function Registration(): JSX.Element {
     useEffect(() => {
         if (!CCID || !privateKey || !host) return
         const api = new Client(CCID, privateKey, host.fqdn)
-        initializeApi(api)
+        initializeClient(api)
     }, [host, CCID, privateKey])
 
     useEffect(() => {
-        if (!api) return
+        if (!client) return
         const fqdn = server.replace('https://', '').replace('/', '')
-        api.getHostProfile(fqdn).then((e) => {
+        client.api.getHostProfile(fqdn).then((e) => {
             setHost(e)
         })
         console.log(fqdn)
     }, [server])
 
     const setupAccount = (): void => {
-        if (!api) return
+        if (!client) return
         if (!host) return
         localStorage.setItem('Domain', JSON.stringify(host.fqdn))
         localStorage.setItem('PublicKey', JSON.stringify(publicKey))
@@ -99,29 +100,31 @@ export function Registration(): JSX.Element {
         localStorage.setItem('Address', JSON.stringify(CCID))
         localStorage.setItem('Mnemonic', JSON.stringify(mnemonic))
 
-        api?.readCharacter(host.ccaddr, Schemas.domainProfile).then((profile: Character<DomainProfile> | undefined) => {
-            console.log(profile)
-            if (profile) {
-                if (profile.payload.body.defaultBookmarkStreams)
-                    localStorage.setItem(
-                        'bookmarkingStreams',
-                        JSON.stringify(profile.payload.body.defaultBookmarkStreams)
-                    )
-                if (profile.payload.body.defaultFollowingStreams)
-                    localStorage.setItem(
-                        'followingStreams',
-                        JSON.stringify(profile.payload.body.defaultFollowingStreams)
-                    )
-                if (profile.payload.body.defaultPostStreams)
-                    localStorage.setItem('defaultPostHome', JSON.stringify(profile.payload.body.defaultPostStreams))
-            }
-            navigate('/')
-        })
+        client?.api
+            .readCharacter(host.ccaddr, Schemas.domainProfile)
+            .then((profile: Character<DomainProfile> | undefined) => {
+                console.log(profile)
+                if (profile) {
+                    if (profile.payload.body.defaultBookmarkStreams)
+                        localStorage.setItem(
+                            'bookmarkingStreams',
+                            JSON.stringify(profile.payload.body.defaultBookmarkStreams)
+                        )
+                    if (profile.payload.body.defaultFollowingStreams)
+                        localStorage.setItem(
+                            'followingStreams',
+                            JSON.stringify(profile.payload.body.defaultFollowingStreams)
+                        )
+                    if (profile.payload.body.defaultPostStreams)
+                        localStorage.setItem('defaultPostHome', JSON.stringify(profile.payload.body.defaultPostStreams))
+                }
+                navigate('/')
+            })
     }
 
     const checkRegistration = async (): Promise<void> => {
         console.log('check!!!')
-        const entity = await api?.readEntity(CCID)
+        const entity = await client?.api.readEntity(CCID)
         console.log(entity)
         setEntityFound(!!entity && entity.ccaddr != null)
     }
@@ -369,7 +372,7 @@ export function Registration(): JSX.Element {
                             <ListItemButton
                                 component={Link}
                                 to={`https://hub.concurrent.world/register?token=${
-                                    api?.constructJWT({ aud: 'hub.concurrent.world' }) ?? ''
+                                    client?.api.constructJWT({ aud: 'hub.concurrent.world' }) ?? ''
                                 }`}
                                 target="_blank"
                                 onClick={() => {
@@ -411,7 +414,12 @@ export function Registration(): JSX.Element {
                             <Button
                                 variant="contained"
                                 component={Link}
-                                to={'http://' + (host?.fqdn ?? '') + '/register?token=' + (api?.constructJWT({}) ?? '')}
+                                to={
+                                    'http://' +
+                                    (host?.fqdn ?? '') +
+                                    '/register?token=' +
+                                    (client?.api.constructJWT({}) ?? '')
+                                }
                                 target="_blank"
                                 disabled={!host}
                             >
@@ -462,7 +470,7 @@ export function Registration(): JSX.Element {
                         <ProfileEditor
                             onSubmit={(newprofile) => {
                                 setProfile(newprofile)
-                                api?.setupUserstreams().then(() => {
+                                client?.setupUserstreams().then(() => {
                                     setActiveStep(6)
                                 })
                             }}
@@ -512,12 +520,12 @@ export function Registration(): JSX.Element {
         }
     ]
 
-    if (!api) return <>api constructing...</>
+    if (!client) return <>api constructing...</>
 
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <ApiProvider api={api}>
+            <ApiProvider api={client}>
                 <Box
                     sx={{
                         padding: '20px',

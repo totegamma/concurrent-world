@@ -2,15 +2,7 @@ import { Box, IconButton, ListItem, Typography, Chip, Paper, Tooltip } from '@mu
 import { Link as routerLink } from 'react-router-dom'
 import { useApi } from '../../../context/api'
 import { CCAvatar } from '../../CCAvatar'
-import type {
-    Character,
-    Message as CCMessage,
-    Stream,
-    SimpleNote as TypeSimpleNote,
-    Profile,
-    ReplyMessage
-} from '@concurrent-world/client'
-import type { ProfileWithAddress } from '../../../model'
+import type { M_Current } from '@concurrent-world/client'
 import { SimpleNote } from '../SimpleNote'
 import { MessageHeader } from './MessageHeader'
 import { MessageActions } from './MessageActions'
@@ -20,19 +12,16 @@ import { FollowButton } from '../../FollowButton'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 
 export interface MessageViewProps {
-    message: CCMessage<TypeSimpleNote | ReplyMessage>
+    message: M_Current
     userCCID: string
-    author: Character<Profile> | undefined
-    favoriteUsers: ProfileWithAddress[]
-    reactionUsers: ProfileWithAddress[]
-    streams: Array<Stream<any>>
     beforeMessage?: JSX.Element
+    lastUpdated?: number
 }
 
 export const MessageView = (props: MessageViewProps): JSX.Element => {
-    const api = useApi()
+    const client = useApi()
     const { enqueueSnackbar } = useSnackbar()
-    const isSelf = props.message.author === api.userAddress
+    const isSelf = props.message.author.ccaddr === client.ccid
 
     return (
         <ListItem
@@ -44,7 +33,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
             }}
             disablePadding
         >
-            {props.message?.payload?.body && (
+            {props.message.body && (
                 <>
                     <Tooltip
                         enterDelay={500}
@@ -74,15 +63,17 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                                     justifyContent="space-between"
                                 >
                                     <CCAvatar
-                                        alt={props.author?.payload.body.username}
-                                        avatarURL={props.author?.payload.body.avatar}
-                                        identiconSource={props.message.author}
+                                        alt={props.message.author.profile.username}
+                                        avatarURL={props.message.author.profile.avatar}
+                                        identiconSource={props.message.author.ccaddr}
                                         sx={{
                                             width: { xs: '38px', sm: '48px' },
                                             height: { xs: '38px', sm: '48px' }
                                         }}
                                     />
-                                    {!isSelf && <FollowButton userCCID={props.message.author} color="primary.main" />}
+                                    {!isSelf && (
+                                        <FollowButton userCCID={props.message.author.ccaddr} color="primary.main" />
+                                    )}
                                 </Box>
                                 <Box
                                     display="flex"
@@ -91,18 +82,18 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                                     gap={1}
                                     justifyContent="space-between"
                                 >
-                                    <Typography variant="h2">{props.author?.payload.body.username}</Typography>
+                                    <Typography variant="h2">{props.message.author.profile.username}</Typography>
                                     <Chip
                                         size="small"
-                                        label={`${props.message.author.slice(0, 9)}...`}
+                                        label={`${props.message.author.ccaddr.slice(0, 9)}...`}
                                         deleteIcon={<ContentPasteIcon />}
                                         onDelete={() => {
-                                            navigator.clipboard.writeText(props.message.author)
+                                            navigator.clipboard.writeText(props.message.author.ccaddr)
                                             enqueueSnackbar('Copied', { variant: 'info' })
                                         }}
                                     />
                                 </Box>
-                                <Typography variant="body1">{props.author?.payload.body.description}</Typography>
+                                <Typography variant="body1">{props.message.author.profile.description}</Typography>
                             </Box>
                         }
                     >
@@ -113,12 +104,12 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                                 mt: { xs: '3px', sm: '5px' }
                             }}
                             component={routerLink}
-                            to={'/entity/' + props.message.author}
+                            to={'/entity/' + props.message.author.ccaddr}
                         >
                             <CCAvatar
-                                alt={props.author?.payload.body.username}
-                                avatarURL={props.author?.payload.body.avatar}
-                                identiconSource={props.message.author}
+                                alt={props.message.author.profile.username}
+                                avatarURL={props.message.author.profile.avatar}
+                                identiconSource={props.message.author.ccaddr}
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
                                     height: { xs: '38px', sm: '48px' }
@@ -136,20 +127,15 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                         }}
                     >
                         <MessageHeader
-                            authorID={props.message.author}
+                            authorID={props.message.author.ccaddr}
                             messageID={props.message.id}
                             cdate={props.message.cdate}
-                            username={props.author?.payload.body.username}
+                            username={props.message.author.profile.username}
                         />
                         {props.beforeMessage}
                         <SimpleNote message={props.message} />
-                        <MessageReactions message={props.message} emojiUsers={props.reactionUsers} />
-                        <MessageActions
-                            favoriteUsers={props.favoriteUsers}
-                            message={props.message}
-                            msgstreams={props.streams}
-                            userCCID={props.userCCID}
-                        />
+                        <MessageReactions message={props.message} />
+                        <MessageActions message={props.message} userCCID={props.userCCID} />
                     </Box>
                 </>
             )}

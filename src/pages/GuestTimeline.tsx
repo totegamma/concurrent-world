@@ -17,7 +17,7 @@ export function GuestTimelinePage(): JSX.Element {
     const [queriedStreams, setQueriedStreams] = useState<string[]>([])
     const [title, setTitle] = useState<string>('')
 
-    const [api, initializeApi] = useState<Client>()
+    const [client, initializeClient] = useState<Client>()
     useEffect(() => {
         const queriedStreams = reactlocation.hash
             .replace('#', '')
@@ -27,14 +27,14 @@ export function GuestTimelinePage(): JSX.Element {
 
         const resolver = queriedStreams[0].split('@')[1]
 
-        const api = new Client('', '', resolver)
+        const client = new Client('', '', resolver)
 
-        initializeApi(api)
+        initializeClient(client)
     }, [])
 
     useEffect(() => {
-        if (!api) return
-        Promise.all(queriedStreams.map((e) => api.readStream(e))).then((a) => {
+        if (!client) return
+        Promise.all(queriedStreams.map((e) => client.api.readStream(e))).then((a) => {
             setTitle(
                 a
                     .map((e) => e?.payload.body.name)
@@ -42,7 +42,7 @@ export function GuestTimelinePage(): JSX.Element {
                     .join(', ')
             )
         })
-    }, [api, queriedStreams])
+    }, [client, queriedStreams])
 
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'sacher')
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
@@ -68,13 +68,13 @@ export function GuestTimelinePage(): JSX.Element {
         }
     }, [setClock])
 
-    if (!api) return <FullScreenLoading message="Loading..." />
+    if (!client) return <FullScreenLoading message="Loading..." />
 
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <ClockContext.Provider value={clock}>
-                <ApiProvider api={api}>
+                <ApiProvider api={client}>
                     <Box
                         sx={{
                             display: 'flex',

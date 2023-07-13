@@ -3,7 +3,7 @@ import React, { type RefObject, memo, useCallback, useEffect, useState } from 'r
 import InfiniteScroll from 'react-infinite-scroller'
 import { AssociationFrame } from './AssociationFrame'
 import type { IuseObjectList } from '../../hooks/useObjectList'
-import type { StreamElement } from '@concurrent-world/client'
+import type { CoreStreamElement } from '@concurrent-world/client'
 import type { StreamElementDated } from '../../model'
 import { useApi } from '../../context/api'
 import { InspectorProvider } from '../../context/Inspector'
@@ -21,18 +21,18 @@ export interface TimelineProps {
 const divider = <Divider variant="inset" component="li" sx={{ margin: '8px 4px' }} />
 
 export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element => {
-    const api = useApi()
+    const client = useApi()
     const [hasMoreData, setHasMoreData] = useState<boolean>(false)
     const [isFetching, setIsFetching] = useState<boolean>(false)
     const theme = useTheme()
 
     useEffect(() => {
-        if (!api.host) return
+        if (!client.api.host) return
         props.timeline.clear()
         let unmounted = false
         setIsFetching(true)
         setHasMoreData(true)
-        api?.readStreamRecent(props.streams).then((data: StreamElement[]) => {
+        client.api?.readStreamRecent(props.streams).then((data: CoreStreamElement[]) => {
             if (unmounted) return
             const current = new Date().getTime()
             const dated = data.map((e) => {
@@ -47,7 +47,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     }, [props.streams])
 
     const loadMore = useCallback(() => {
-        if (!api.host) return
+        if (!client.api.host) return
         if (isFetching) return
         if (!props.timeline.current[props.timeline.current.length - 1]?.timestamp) {
             setHasMoreData(false)
@@ -56,8 +56,9 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
         if (!hasMoreData) return
         let unmounted = false
         setIsFetching(true)
-        api?.readStreamRanged(props.streams, props.timeline.current[props.timeline.current.length - 1].timestamp).then(
-            (data: StreamElement[]) => {
+        client.api
+            ?.readStreamRanged(props.streams, props.timeline.current[props.timeline.current.length - 1].timestamp)
+            .then((data: CoreStreamElement[]) => {
                 if (unmounted) return
                 const idtable = props.timeline.current.map((e) => e.id)
                 const newdata = data.filter((e) => !idtable.includes(e.id))
@@ -68,12 +69,11 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                     })
                     props.timeline.concat(dated)
                 } else setHasMoreData(false)
-            }
-        )
+            })
         return () => {
             unmounted = true
         }
-    }, [api, props.streams, props.timeline, hasMoreData, isFetching])
+    }, [client.api, props.streams, props.timeline, hasMoreData, isFetching])
 
     // WORKAROUND: fill the screen with messages if there are not enough messages to fill the screen
     // to work react-infinite-scroller properly

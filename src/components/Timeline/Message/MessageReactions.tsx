@@ -1,9 +1,3 @@
-import {
-    type Message as CCMessage,
-    Schemas,
-    type SimpleNote as TypeSimpleNote,
-    type ReplyMessage
-} from '@concurrent-world/client'
 import { type ProfileWithAddress } from '../../../model'
 import { Box, Button, Divider, Tooltip, Typography, alpha, useTheme } from '@mui/material'
 import { useApi } from '../../../context/api'
@@ -11,20 +5,18 @@ import { CCAvatar } from '../../CCAvatar'
 import { Fragment } from 'react'
 import { useMessageService } from '../MessageContainer'
 
+import { type M_Reply, type M_Current, type M_Reroute } from '@concurrent-world/client'
+
 export interface MessageReactionsProps {
-    message: CCMessage<TypeSimpleNote | ReplyMessage>
-    emojiUsers: ProfileWithAddress[]
+    message: M_Current | M_Reply | M_Reroute
 }
 
 export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
-    const api = useApi()
+    const client = useApi()
     const theme = useTheme()
     const service = useMessageService()
-    const allReactions = props.message.associations.filter((m) => m.schema === Schemas.emojiAssociation)
-    const filteredReactions = allReactions.reduce((acc: any, cur) => {
-        cur.payload.body.shortcode in acc
-            ? acc[cur.payload.body.shortcode].push(cur)
-            : (acc[cur.payload.body.shortcode] = [cur])
+    const filteredReactions = props.message.reactions.reduce((acc: any, cur) => {
+        cur.shortcode in acc ? acc[cur.shortcode].push(cur) : (acc[cur.shortcode] = [cur])
 
         return acc
     }, {})
@@ -33,9 +25,9 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
         <Box display="flex" flexWrap="wrap" gap={1}>
             {Object.entries(filteredReactions).map((r) => {
                 const [shortcode, reaction]: [string, any] = r
-                const ownReaction = reaction.find((x: any) => x.author === api.userAddress)
+                const ownReaction = reaction.find((x: any) => x.author === client.ccid)
                 const reactedUsers =
-                    reaction.map((x: any) => props.emojiUsers.find((u) => u.ccaddress === x.author)) ?? []
+                    reaction.map((x: any) => props.message.reactions.find((u) => u.author.ccaddr === x.author)) ?? []
                 const reactedUsersList = reactedUsers.map((user: ProfileWithAddress | undefined) => {
                     return user !== undefined ? (
                         <Box
@@ -69,7 +61,7 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                         title={
                             <Box display="flex" flexDirection="column" alignItems="right" gap={1}>
                                 <Box display="flex" alignItems="center" gap={1}>
-                                    <Box component="img" height="20px" src={reaction[0].payload.body.imageUrl}></Box>
+                                    <Box component="img" height="20px" src={reaction[0].imageUrl}></Box>
                                     {shortcode}
                                 </Box>
                                 <Divider flexItem></Divider>
@@ -91,11 +83,11 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                                 if (ownReaction) {
                                     service.removeReaction(ownReaction.id)
                                 } else {
-                                    service.addReaction(shortcode, reaction[0].payload.body.imageUrl)
+                                    service.addReaction(shortcode, reaction[0].imageUrl)
                                 }
                             }}
                         >
-                            <Box component="img" height="20px" src={reaction[0].payload.body.imageUrl} />
+                            <Box component="img" height="20px" src={reaction[0].imageUrl} />
                             <Typography color={ownReaction ? 'primary.contrastText' : 'text.primary'}>
                                 {reaction.length}
                             </Typography>

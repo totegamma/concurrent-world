@@ -3,11 +3,11 @@ import { forwardRef, useState } from 'react'
 import { useApi } from '../../context/api'
 
 export const ServerJWT = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
-    const api = useApi()
+    const client = useApi()
     const [serverSignedJwt, setServerSignedJwt] = useState<string>('')
 
     const getServersignedJwt = (): void => {
-        api.getJWT().then((e) => {
+        client.api.getJWT().then((e) => {
             setServerSignedJwt(e)
         })
     }

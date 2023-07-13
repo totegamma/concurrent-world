@@ -11,7 +11,6 @@ import { Timeline } from '../components/Timeline/main'
 import { StreamInfo } from '../components/StreamInfo'
 import { HomeSettings } from '../components/HomeSettings'
 import { ApplicationContext } from '../App'
-import { Schemas, type SimpleNote } from '@concurrent-world/client'
 import { usePreference } from '../context/PreferenceContext'
 
 export interface TimelinePageProps {
@@ -20,7 +19,7 @@ export interface TimelinePageProps {
 }
 
 export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): JSX.Element => {
-    const api = useApi()
+    const client = useApi()
     const appData = useContext(ApplicationContext)
     const pref = usePreference()
 
@@ -61,11 +60,11 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                 // check writeable
                 const writeable = await Promise.all(
                     queriedStreams.map(async (e) => {
-                        const stream = await api.readStream(e)
+                        const stream = await client.api.readStream(e)
                         if (!stream) return false
-                        if (stream.author === api.userAddress) return true
+                        if (stream.author === client.ccid) return true
                         if (stream.writer.length === 0) return true
-                        return stream.writer.includes(api.userAddress)
+                        return stream.writer.includes(client.ccid)
                     })
                 )
                 const result = writeable.every((e) => e)
@@ -130,17 +129,7 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                             <Draft
                                 streamPickerInitial={streamPickerInitial}
                                 onSubmit={async (text: string, destinations: string[]) => {
-                                    const body = {
-                                        body: text
-                                    }
-                                    return await api
-                                        .createMessage<SimpleNote>(Schemas.simpleNote, body, destinations)
-                                        .then((_) => {
-                                            return null
-                                        })
-                                        .catch((e) => {
-                                            return e
-                                        })
+                                    return await client.createCurrent(text, destinations)
                                 }}
                             />
                         </Box>
