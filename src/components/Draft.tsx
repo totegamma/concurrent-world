@@ -77,15 +77,18 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             (e) => e
         ) as string[]
         setSending(true)
-        props.onSubmit(draft, dest).then((error) => {
-            if (error) {
-                enqueueSnackbar(`Failed to post message: ${error.message}`, { variant: 'error' })
+        props
+            .onSubmit(draft, dest)
+            .then((error) => {
+                if (error) {
+                    enqueueSnackbar(`Failed to post message: ${error.message}`, { variant: 'error' })
+                } else {
+                    setDraft('')
+                }
+            })
+            .finally(() => {
                 setSending(false)
-            } else {
-                setDraft('')
-                setSending(false)
-            }
-        })
+            })
     }
 
     const uploadToImgur = async (base64Data: string): Promise<string> => {

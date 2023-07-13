@@ -106,7 +106,18 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                             autoFocus
                             streamPickerInitial={streamPickerInitial}
                             onSubmit={async (text: string, destinations: string[]) => {
-                                return await client.createCurrent(text, destinations)
+                                client
+                                    .createCurrent(text, destinations)
+                                    .then(() => {
+                                        return null
+                                    })
+                                    .catch((e) => {
+                                        return e
+                                    })
+                                    .finally(() => {
+                                        setMode('none')
+                                    })
+                                return await Promise.resolve(null)
                             }}
                         />
                     </Box>

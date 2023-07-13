@@ -128,8 +128,16 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
                         >
                             <Draft
                                 streamPickerInitial={streamPickerInitial}
-                                onSubmit={async (text: string, destinations: string[]) => {
-                                    return await client.createCurrent(text, destinations)
+                                onSubmit={(text: string, destinations: string[]): Promise<Error | null> => {
+                                    client
+                                        .createCurrent(text, destinations)
+                                        .then(() => {
+                                            return null
+                                        })
+                                        .catch((e) => {
+                                            return e
+                                        })
+                                    return Promise.resolve(null)
                                 }}
                             />
                         </Box>
