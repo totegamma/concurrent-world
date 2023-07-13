@@ -21,7 +21,7 @@ const schema: RJSFSchema = {
 }
 
 export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
-    const api = useApi()
+    const client = useApi()
     const appData = useContext(ApplicationContext)
     const [loading, setLoading] = useState(false)
     const [registered, setRegistered] = useState(false)
@@ -36,7 +36,8 @@ export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
             }
         }
 
-        api.fetchWithCredential(`https://${api.host!}/api/v1/ap/entity/${api.userAddress}`, requestOptions)
+        client.api
+            .fetchWithCredential(`https://${client.api.host}/api/v1/ap/entity/${client.ccid}`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 console.log(data)
@@ -50,7 +51,7 @@ export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
     }, [])
 
     useEffect(() => {
-        if (!api) return
+        if (!client) return
         if (!userID) return
         const requestOptions = {
             method: 'GET',
@@ -58,9 +59,10 @@ export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
                 'content-type': 'application/json'
             }
         }
-        const profile = window.location.protocol + '//' + window.location.host + '/entity/' + api.userAddress
-        const home = appData.userstreams?.payload.body.homeStream
-        api.fetchWithCredential(`https://${api.host!}/api/v1/ap/person/${userID}`, requestOptions)
+        const profile = window.location.protocol + '//' + window.location.host + '/entity/' + client.ccid
+        const home = appData.user?.userstreams.homeStream
+        client.api
+            .fetchWithCredential(`https://${client.api.host}/api/v1/ap/person/${userID}`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 console.log(data)
@@ -74,17 +76,17 @@ export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
             })
             .catch((_) => {
                 setForm({
-                    name: appData.profile?.payload.body.username,
-                    summary: appData.profile?.payload.body.description,
+                    name: appData.user?.profile.username,
+                    summary: appData.user?.profile.description,
                     profile_url: profile,
-                    icon_url: appData.profile?.payload.body.avatar,
+                    icon_url: appData.user?.profile.avatar,
                     homestream: home
                 })
             })
     }, [userID])
 
     const register = (): void => {
-        if (!api) {
+        if (!client) {
             return
         }
         setLoading(true)
@@ -98,7 +100,8 @@ export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
             })
         }
 
-        api.fetchWithCredential(`https://${api.host!}/api/v1/ap/entity`, requestOptions)
+        client.api
+            .fetchWithCredential(`https://${client.api.host}/api/v1/ap/entity`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 console.log(data)
@@ -112,7 +115,7 @@ export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
     }
 
     const updateProfile = (form: any): void => {
-        if (!api) {
+        if (!client.api) {
             return
         }
         setLoading(true)
@@ -127,7 +130,8 @@ export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
             })
         }
 
-        api.fetchWithCredential(`https://${api.host!}/api/v1/ap/person`, requestOptions)
+        client.api
+            .fetchWithCredential(`https://${client.api.host}/api/v1/ap/person`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
                 console.log(data)
