@@ -1,11 +1,10 @@
-import { type ProfileWithAddress } from '../../../model'
 import { Box, Button, Divider, Tooltip, Typography, alpha, useTheme } from '@mui/material'
 import { useApi } from '../../../context/api'
 import { CCAvatar } from '../../CCAvatar'
 import { Fragment } from 'react'
 import { useMessageService } from '../MessageContainer'
 
-import { type M_Reply, type M_Current, type M_Reroute } from '@concurrent-world/client'
+import { type M_Reply, type M_Current, type M_Reroute, type User } from '@concurrent-world/client'
 
 export interface MessageReactionsProps {
     message: M_Current | M_Reply | M_Reroute
@@ -15,8 +14,13 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
     const client = useApi()
     const theme = useTheme()
     const service = useMessageService()
+
     const filteredReactions = props.message.reactions.reduce((acc: any, cur) => {
-        cur.shortcode in acc ? acc[cur.shortcode].push(cur) : (acc[cur.shortcode] = [cur])
+        if (cur.shortcode in acc) {
+            acc[cur.shortcode].push(cur)
+        } else {
+            acc[cur.shortcode] = [cur]
+        }
 
         return acc
     }, {})
@@ -25,13 +29,11 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
         <Box display="flex" flexWrap="wrap" gap={1}>
             {Object.entries(filteredReactions).map((r) => {
                 const [shortcode, reaction]: [string, any] = r
-                const ownReaction = reaction.find((x: any) => x.author === client.ccid)
-                const reactedUsers =
-                    reaction.map((x: any) => props.message.reactions.find((u) => u.author.ccaddr === x.author)) ?? []
-                const reactedUsersList = reactedUsers.map((user: ProfileWithAddress | undefined) => {
-                    return user !== undefined ? (
+                const ownReaction = reaction.find((x: any) => x.author.ccaddr === client.ccid)
+                const reactedUsersList = reaction.map((value: { author: User }) => {
+                    return value !== undefined ? (
                         <Box
-                            key={user.ccaddress}
+                            key={value.author.ccaddr}
                             sx={{
                                 display: 'flex',
                                 alignItems: 'center',
@@ -43,11 +45,11 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                                     height: '20px',
                                     width: '20px'
                                 }}
-                                avatarURL={user.avatar}
-                                identiconSource={user.ccaddress}
-                                alt={user.ccaddress}
+                                avatarURL={value.author.profile.avatar}
+                                identiconSource={value.author.ccaddr}
+                                alt={value.author.ccaddr}
                             />
-                            {user.username ?? 'anonymous'}
+                            {value.author.profile.username ?? 'anonymous'}
                         </Box>
                     ) : (
                         <Fragment key={0} />
