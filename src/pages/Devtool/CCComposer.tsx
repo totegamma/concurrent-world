@@ -2,7 +2,7 @@ import { Box, Button, Divider, MenuItem, Select, TextField, Typography } from '@
 import { forwardRef, useState } from 'react'
 import { useApi } from '../../context/api'
 import { CCEditor } from '../../components/cceditor'
-import { type CoreCharacter } from '@concurrent-world/client'
+import { type Schema, type CoreCharacter } from '@concurrent-world/client'
 
 export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
     const client = useApi()
@@ -20,12 +20,12 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
     const [character, setCharacter] = useState<CoreCharacter<any>>()
 
     const createMessage = async (e: any): Promise<void> => {
-        client.api.createMessage(schemaURL, e, streams.split(','))
+        client.api.createMessage(schemaURL as Schema, e, streams.split(','))
     }
 
     const createAssociation = async (e: any): Promise<void> => {
         client.api.createAssociation(
-            schemaURL,
+            schemaURL as Schema,
             e,
             associationTarget,
             associationTargetAuthor,
@@ -36,9 +36,9 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
 
     const createCharacter = async (e: any): Promise<void> => {
         if (character) {
-            client.api.upsertCharacter(schemaURL, e, character.id)
+            client.api.upsertCharacter(schemaURL as Schema, e, character.id)
         } else {
-            client.api.upsertCharacter(schemaURL, e)
+            client.api.upsertCharacter(schemaURL as Schema, e)
         }
     }
 

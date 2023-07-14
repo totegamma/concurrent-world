@@ -1,11 +1,14 @@
 import { memo, useEffect, useState } from 'react'
 import {
-    type CoreCharacter,
-    type CoreMessage,
     type CoreStreamElement,
     Schemas,
-    type Profile,
-    type CoreAssociation
+    type A_Unknown,
+    type A_Reroute,
+    type A_Reply,
+    type A_Reaction,
+    type A_Favorite,
+    type User,
+    type M_Current
 } from '@concurrent-world/client'
 import { useApi } from '../../context/api'
 import { Box, IconButton, ListItem, ListItemButton, Typography } from '@mui/material'
@@ -23,48 +26,42 @@ export interface AssociationFrameProp {
 
 export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFrameProp): JSX.Element | null => {
     const client = useApi()
-    const [associationAuthor, setAssociationAuthor] = useState<CoreCharacter<Profile> | undefined>()
-    const [message, setMessage] = useState<CoreMessage<any> | undefined>()
-    const [messageAuthor, setMessageAuthor] = useState<CoreCharacter<Profile> | undefined>()
-    const [association, setAssociation] = useState<CoreAssociation<any> | undefined>()
+    const [association, setAssociation] = useState<A_Favorite | A_Reaction | A_Reply | A_Reroute | A_Unknown | null>(
+        null
+    )
     const [fetching, setFetching] = useState<boolean>(true)
 
     const perspective = props.perspective ?? client.ccid
-    const isMeToOther = association?.author !== perspective
+    const isMeToOther = association?.author.ccaddr !== perspective
 
-    const Nominative = perspective === client.ccid ? 'You' : associationAuthor?.payload.body.username ?? 'anonymous'
+    const Nominative = perspective === client.ccid ? 'You' : association?.author.profile.username ?? 'anonymous'
     const Possessive =
-        perspective === client.ccid ? 'your' : (messageAuthor?.payload.body.username ?? 'anonymous') + "'s"
+        perspective === client.ccid ? 'your' : (association?.target.author.profile.username ?? 'anonymous') + "'s"
 
-    const actionUser = isMeToOther ? associationAuthor : messageAuthor
+    const actionUser: User | undefined = isMeToOther ? association?.author : association?.target.author
 
     useEffect(() => {
-        client.api
-            .readAssociation(props.association.id, props.association.currenthost)
+        console.log(props.association)
+        client
+            .getAssociation(props.association.id, props.association.author)
             .then((a) => {
-                if (!a) return
                 setAssociation(a)
-                client.api.readMessage(a.targetID, props.association.currenthost).then((m) => {
-                    setMessage(m)
-                    if (!m) return
-                    client.api.readCharacter(a.author, Schemas.profile).then((author) => {
-                        setAssociationAuthor(author)
-                    })
-                    client.api.readCharacter(m.author, Schemas.profile).then((author) => {
-                        setMessageAuthor(author)
-                    })
-                })
             })
-            .catch((_e) => {
-                setAssociation(undefined)
+            .catch((e) => {
+                console.warn(e)
             })
             .finally(() => {
                 setFetching(false)
             })
-    }, [])
+    }, [props.association, props.lastUpdated])
 
     if (fetching) return <MessageSkeleton />
-    if (!association) return null
+    if (!association)
+        return (
+            <ListItem>
+                <Typography>failed to load {props.association.id}</Typography>
+            </ListItem>
+        ) // TODO: あとで消す
 
     switch (association.schema) {
         case Schemas.like:
@@ -80,7 +77,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                         <ListItemButton
                             disableGutters
                             component={routerLink}
-                            to={`/message/${message?.id ?? ''}@${message?.author ?? ''}`}
+                            to={`/message/${association.target.id ?? ''}@${association.target.author.ccaddr ?? ''}`}
                             sx={{
                                 display: 'flex',
                                 alignItems: 'flex-start',
@@ -95,12 +92,11 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                     mt: { xs: '3px', sm: '5px' }
                                 }}
                                 component={routerLink}
-                                to={'/entity/' + association.author}
+                                to={'/entity/' + (association.author.ccaddr ?? '')}
                             >
                                 <CCAvatar
-                                    alt={actionUser?.payload.body.username}
-                                    avatarURL={actionUser?.payload.body.avatar}
-                                    identiconSource={actionUser?.id ?? ''}
+                                    avatarURL={actionUser?.profile.avatar}
+                                    identiconSource={actionUser?.ccaddr ?? ''}
                                     sx={{
                                         width: { xs: '38px', sm: '48px' },
                                         height: { xs: '38px', sm: '48px' }
@@ -119,18 +115,19 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                 <Typography>
                                     {isMeToOther ? (
                                         <>
-                                            <b>{associationAuthor?.payload.body.username ?? 'anonymous'}</b> favorited{' '}
+                                            <b>{association.author.profile.username ?? 'anonymous'}</b> favorited{' '}
                                             {Possessive} message
                                         </>
                                     ) : (
                                         <>
                                             {Nominative} favorited{' '}
-                                            <b>{messageAuthor?.payload.body.username ?? 'anonymous'}</b>&apos;s message
+                                            <b>{association.target.author.profile.username ?? 'anonymous'}</b>&apos;s
+                                            message
                                         </>
                                     )}
                                 </Typography>
                                 <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
-                                    {message?.payload.body.body}
+                                    {(association.target as M_Current)?.body}
                                 </blockquote>
                             </Box>
                         </ListItemButton>
@@ -151,7 +148,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                         <ListItemButton
                             disableGutters
                             component={routerLink}
-                            to={`/message/${message?.id ?? ''}@${message?.author ?? ''}`}
+                            to={`/message/${association.target.id ?? ''}@${association.target.author.ccaddr ?? ''}`}
                             sx={{
                                 display: 'flex',
                                 alignItems: 'flex-start',
@@ -166,12 +163,11 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                     mt: { xs: '3px', sm: '5px' }
                                 }}
                                 component={routerLink}
-                                to={'/entity/' + association.author}
+                                to={'/entity/' + (association.author.ccaddr ?? '')}
                             >
                                 <CCAvatar
-                                    alt={actionUser?.payload.body.username}
-                                    avatarURL={actionUser?.payload.body.avatar}
-                                    identiconSource={actionUser?.id ?? ''}
+                                    avatarURL={actionUser?.profile.avatar}
+                                    identiconSource={actionUser?.ccaddr ?? ''}
                                     sx={{
                                         width: { xs: '38px', sm: '48px' },
                                         height: { xs: '38px', sm: '48px' }
@@ -190,29 +186,29 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                 <Typography>
                                     {isMeToOther ? (
                                         <>
-                                            <b>{associationAuthor?.payload.body.username ?? 'anonymous'}</b> reacted{' '}
+                                            <b>{association.author.profile.username ?? 'anonymous'}</b> reacted{' '}
                                             {Possessive} message with{' '}
                                             <img
                                                 height="13px"
-                                                src={association?.payload.body.imageUrl}
-                                                alt={association?.payload.body.shortcode}
+                                                src={(association as A_Reaction).imageUrl}
+                                                alt={(association as A_Reaction).shortcode}
                                             />
                                         </>
                                     ) : (
                                         <>
                                             {Nominative} reacted{' '}
-                                            <b>{messageAuthor?.payload.body.username ?? 'anonymous'}</b>&apos;s message
-                                            with{' '}
+                                            <b>{association.target.author.profile.username ?? 'anonymous'}</b>&apos;s
+                                            message with{' '}
                                             <img
                                                 height="13px"
-                                                src={association?.payload.body.imageUrl}
-                                                alt={association?.payload.body.shortcode}
+                                                src={(association as A_Reaction).imageUrl}
+                                                alt={(association as A_Reaction).shortcode}
                                             />
                                         </>
                                     )}
                                 </Typography>
                                 <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
-                                    {message?.payload.body.body}
+                                    {(association.target as M_Current).body}
                                 </blockquote>
                             </Box>
                         </ListItemButton>
@@ -223,16 +219,17 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
         case Schemas.replyAssociation:
             return (
                 <MessageContainer
-                    messageID={association.payload.body.messageId}
-                    messageOwner={association.author}
+                    messageID={(association as A_Reply).replyBody.id}
+                    messageOwner={(association as A_Reply).replyBody.author.ccaddr}
                     after={props.after}
                 />
             )
         case Schemas.rerouteAssociation:
+            console.log('reroute', association)
             return (
                 <MessageContainer
-                    messageID={association.payload.body.messageId}
-                    messageOwner={association.payload.body.messageAuthor}
+                    messageID={(association as A_Reroute).rerouteBody.id}
+                    messageOwner={(association as A_Reroute).rerouteBody.author.ccaddr}
                     after={props.after}
                 />
             )

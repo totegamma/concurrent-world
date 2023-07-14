@@ -1,4 +1,4 @@
-import { Divider, List, Typography, useTheme } from '@mui/material'
+import { Divider, List, ListItem, ListItemIcon, ListItemText, Typography, useTheme } from '@mui/material'
 import React, { type RefObject, memo, useCallback, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroller'
 import { AssociationFrame } from './AssociationFrame'
@@ -10,6 +10,8 @@ import { InspectorProvider } from '../../context/Inspector'
 import { Loading } from '../Loading'
 import { MessageContainer } from './MessageContainer'
 import { MessageDetailProvider } from '../../context/MessageDetail'
+import { ErrorBoundary } from 'react-error-boundary'
+import HeartBrokenIcon from '@mui/icons-material/HeartBroken'
 
 export interface TimelineProps {
     streams: string[]
@@ -137,7 +139,22 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                                     break
                             }
 
-                            return <React.Fragment key={e.id}>{element}</React.Fragment>
+                            return (
+                                <React.Fragment key={e.id}>
+                                    <ErrorBoundary
+                                        fallback={
+                                            <ListItem>
+                                                <ListItemIcon>
+                                                    <HeartBrokenIcon />
+                                                </ListItemIcon>
+                                                <ListItemText>この要素の描画中に問題が発生しました</ListItemText>
+                                            </ListItem>
+                                        }
+                                    >
+                                        {element}
+                                    </ErrorBoundary>
+                                </React.Fragment>
+                            )
                         })}
                     </InfiniteScroll>
                 </List>
