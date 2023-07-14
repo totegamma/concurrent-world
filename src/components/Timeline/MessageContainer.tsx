@@ -143,12 +143,12 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
     let body
     switch (message?.schema) {
         case Schemas.simpleNote:
-            body = <MessageView message={message as M_Current} lastUpdated={props.lastUpdated} userCCID={client.ccid} />
+            body = <MessageView message={message} lastUpdated={props.lastUpdated} userCCID={client.ccid} />
             break
         case Schemas.replyMessage:
             body = (
                 <ReplyMessageFrame
-                    message={message as M_Reply}
+                    message={message}
                     lastUpdated={props.lastUpdated}
                     reloadMessage={reloadMessage}
                     userCCID={client.ccid}
@@ -157,15 +157,11 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
             break
         case Schemas.rerouteMessage:
             body = (
-                <ReRouteMessageFrame
-                    message={message as M_Reroute}
-                    lastUpdated={props.lastUpdated}
-                    reloadMessage={reloadMessage}
-                />
+                <ReRouteMessageFrame message={message} lastUpdated={props.lastUpdated} reloadMessage={reloadMessage} />
             )
             break
         default:
-            body = <Typography>unknown schema: {message?.schema}</Typography>
+            body = <Typography>unknown schema: {(message as any).schema}</Typography>
             break
     }
 

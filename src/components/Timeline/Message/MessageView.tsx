@@ -2,7 +2,7 @@ import { Box, IconButton, ListItem, Typography, Chip, Paper, Tooltip } from '@mu
 import { Link as routerLink } from 'react-router-dom'
 import { useApi } from '../../../context/api'
 import { CCAvatar } from '../../CCAvatar'
-import type { M_Current } from '@concurrent-world/client'
+import type { M_Current, M_Reply } from '@concurrent-world/client'
 import { SimpleNote } from '../SimpleNote'
 import { MessageHeader } from './MessageHeader'
 import { MessageActions } from './MessageActions'
@@ -12,7 +12,7 @@ import { FollowButton } from '../../FollowButton'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 
 export interface MessageViewProps {
-    message: M_Current
+    message: M_Current | M_Reply
     userCCID: string
     beforeMessage?: JSX.Element
     lastUpdated?: number
