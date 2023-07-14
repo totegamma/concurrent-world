@@ -15,10 +15,7 @@ import {
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
-import type { Character, Message } from '../model'
-import { Schemas } from '../schemas'
-import type { Profile } from '../schemas/profile'
-import { validateSignature } from '../util'
+import { validateSignature, type CoreMessage } from '@concurrent-world/client'
 import grey from '@mui/material/colors/grey'
 import { Codeblock } from '../components/Codeblock'
 import { MessageContainer } from '../components/Timeline/MessageContainer'
@@ -45,25 +42,21 @@ const Puller = styled(Box)(({ theme }) => ({
 }))
 
 export const InspectorProvider = (props: InspectorProps): JSX.Element => {
-    const api = useApi()
+    const client = useApi()
     const theme = useTheme()
     const greaterThanMid = useMediaQuery(theme.breakpoints.up('md'))
     const [inspectingItem, inspectItem] = useState<{ messageId: string; author: string } | null>(null)
-    const [author, setAuthor] = useState<Character<Profile> | undefined>()
-    const [message, setMessage] = useState<Message<any> | undefined>()
+    const [message, setMessage] = useState<CoreMessage<any> | undefined>()
     const [signatureIsValid, setSignatureIsValid] = useState<boolean>(false)
     const [currentHost, setCurrentHost] = useState<string>('')
 
     useEffect(() => {
         if (!inspectingItem) return
 
-        api.fetchMessageWithAuthor(inspectingItem.messageId, inspectingItem.author).then((msg) => {
+        client.api.readMessageWithAuthor(inspectingItem.messageId, inspectingItem.author).then((msg) => {
             if (!msg) return
             setSignatureIsValid(validateSignature(msg.rawpayload, msg.signature, msg.author))
             setMessage(msg)
-        })
-        api.readCharacter(inspectingItem.author, Schemas.profile).then((author) => {
-            setAuthor(author)
         })
     }, [inspectingItem])
 

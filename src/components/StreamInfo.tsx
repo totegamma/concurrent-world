@@ -1,11 +1,9 @@
 import { Box, Button, Divider, Modal, Paper, TextField, Typography } from '@mui/material'
-import type { Commonstream } from '../schemas/commonstream'
 import { useCallback, useEffect, useState } from 'react'
 import { useApi } from '../context/api'
-import type { Stream } from '../model'
+import { Schemas, type Commonstream, type CoreStream } from '@concurrent-world/client'
 import Background from '../resources/defaultbg.png'
 import { CCEditor } from './cceditor'
-import { Schemas } from '../schemas'
 import { useSnackbar } from 'notistack'
 import { usePreference } from '../context/PreferenceContext'
 
@@ -14,21 +12,21 @@ export interface StreamInfoProps {
 }
 
 export function StreamInfo(props: StreamInfoProps): JSX.Element {
-    const api = useApi()
+    const client = useApi()
     const pref = usePreference()
     const { enqueueSnackbar } = useSnackbar()
-    const [stream, setStream] = useState<Stream<Commonstream>>()
+    const [stream, setStream] = useState<CoreStream<Commonstream>>()
     const bookmarking = pref.bookmarkingStreams.includes(props.id)
     const [settingsOpen, setSettingsOpen] = useState(false)
-    const isAuthor = stream?.author === api.userAddress
-    const isMaintainer = stream?.maintainer.includes(api.userAddress)
+    const isAuthor = stream?.author === client.ccid
+    const isMaintainer = stream?.maintainer.includes(client.ccid)
 
     const [writerDraft, setWriterDraft] = useState('')
     const [readerDraft, setReaderDraft] = useState('')
 
     useEffect(() => {
         if (!props.id) return
-        api.readStream(props.id).then((e) => {
+        client.api.readStream(props.id).then((e) => {
             if (!e) return
             setStream(e)
             setWriterDraft(e.writer.join('\n'))
@@ -39,13 +37,14 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
     const updateStream = useCallback(
         (body: Commonstream) => {
             if (!stream) return
-            api.updateStream(props.id, {
-                schema: Schemas.commonstream,
-                body,
-                maintainer: stream.maintainer,
-                writer: writerDraft.split('\n').filter((e) => e),
-                reader: readerDraft.split('\n').filter((e) => e)
-            })
+            client.api
+                .updateStream(props.id, {
+                    schema: Schemas.commonstream,
+                    body,
+                    maintainer: stream.maintainer,
+                    writer: writerDraft.split('\n').filter((e) => e),
+                    reader: readerDraft.split('\n').filter((e) => e)
+                })
                 .then((_) => {
                     enqueueSnackbar('更新しました', { variant: 'success' })
                 })
@@ -53,7 +52,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                     enqueueSnackbar('更新に失敗しました', { variant: 'error' })
                 })
         },
-        [api, stream, writerDraft, readerDraft]
+        [client.api, stream, writerDraft, readerDraft]
     )
 
     if (!stream) {

@@ -1,27 +1,26 @@
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import { useEffect, useState } from 'react'
-import { Schemas } from '../schemas'
+import { Schemas, type Profile } from '@concurrent-world/client'
 import Button from '@mui/material/Button'
-import type { Profile } from '../schemas/profile'
 import { useApi } from '../context/api'
-import type { Character } from '../model'
 import { CCAvatar } from './CCAvatar'
 import Background from '../resources/defaultbg.png'
 import { alpha, useTheme } from '@mui/material'
 
 interface ProfileEditorProps {
-    initial?: Character<Profile>
+    initial?: Profile
     onSubmit?: (profile: Profile) => void
+    id?: string
 }
 
 export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
-    const api = useApi()
+    const client = useApi()
     const theme = useTheme()
-    const [username, setUsername] = useState<string>(props.initial?.payload.body.username ?? '')
-    const [avatar, setAvatar] = useState<string>(props.initial?.payload.body.avatar ?? '')
-    const [description, setDescription] = useState<string>(props.initial?.payload.body.description ?? '')
-    const [banner, setBanner] = useState<string>(props.initial?.payload.body.banner ?? '')
+    const [username, setUsername] = useState<string>(props.initial?.username ?? '')
+    const [avatar, setAvatar] = useState<string>(props.initial?.avatar ?? '')
+    const [description, setDescription] = useState<string>(props.initial?.description ?? '')
+    const [banner, setBanner] = useState<string>(props.initial?.banner ?? '')
 
     const updateProfile = async (): Promise<void> => {
         const profile = {
@@ -30,17 +29,17 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
             description,
             banner
         }
-        api.upsertCharacter<Profile>(Schemas.profile, profile, props.initial?.id).then((data) => {
+        client.api.upsertCharacter<Profile>(Schemas.profile, profile, props.id).then((data) => {
             console.log(data)
             props.onSubmit?.(profile)
         })
     }
 
     useEffect(() => {
-        setUsername(props.initial?.payload.body.username ?? '')
-        setAvatar(props.initial?.payload.body.avatar ?? '')
-        setDescription(props.initial?.payload.body.description ?? '')
-        setBanner(props.initial?.payload.body.banner ?? '')
+        setUsername(props.initial?.username ?? '')
+        setAvatar(props.initial?.avatar ?? '')
+        setDescription(props.initial?.description ?? '')
+        setBanner(props.initial?.banner ?? '')
     }, [props.initial])
 
     return (
@@ -57,7 +56,7 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
         >
             <CCAvatar
                 avatarURL={avatar}
-                identiconSource={api.userAddress}
+                identiconSource={client.ccid}
                 sx={{
                     width: '64px',
                     height: '64px'

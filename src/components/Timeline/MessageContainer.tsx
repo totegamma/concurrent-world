@@ -1,17 +1,12 @@
-import { Schemas } from '../../schemas'
-import type { Character, Message, ProfileWithAddress, Stream } from '../../model'
+import { Schemas, type M_Current, type M_Reply, type M_Reroute } from '@concurrent-world/client'
 import { useApi } from '../../context/api'
 import { createContext, memo, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { ReplyMessageFrame } from './Message/ReplyMessageFrame'
-import type { SimpleNote } from '../../schemas/simpleNote'
-import type { ReplyMessage } from '../../schemas/replyMessage'
-import type { ReRouteMessage } from '../../schemas/reRouteMessage'
 import { ReRouteMessageFrame } from './Message/ReRouteMessageFrame'
 import { MessageSkeleton } from '../MessageSkeleton'
 import { Typography } from '@mui/material'
 import { useInspector } from '../../context/Inspector'
 import { useMessageDetail } from '../../context/MessageDetail'
-import { type Profile } from '../../schemas/profile'
 import { MessageView } from './Message/MessageView'
 
 export interface MessageServiceState {
@@ -39,20 +34,19 @@ interface MessageContainerProps {
 }
 
 export const MessageContainer = memo<MessageContainerProps>((props: MessageContainerProps): JSX.Element | null => {
-    const api = useApi()
+    const client = useApi()
     const inspector = useInspector()
     const messageDetail = useMessageDetail()
-    const [message, setMessage] = useState<Message<SimpleNote | ReplyMessage | ReRouteMessage> | undefined>()
+    const [message, setMessage] = useState<M_Current | M_Reroute | M_Reply | null>()
     const [isFetching, setIsFetching] = useState<boolean>(false)
 
     const loadMessage = useCallback((): void => {
-        api.fetchMessageWithAuthor(props.messageID, props.messageOwner)
+        if (isFetching) return
+        setIsFetching(true)
+        client
+            .getMessage(props.messageID, props.messageOwner)
             .then((msg) => {
-                if (!msg) return
                 setMessage(msg)
-            })
-            .catch((_e) => {
-                setMessage(undefined)
             })
             .finally(() => {
                 setIsFetching(false)
@@ -60,126 +54,67 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
     }, [props.messageID, props.messageOwner])
 
     const reloadMessage = useCallback((): void => {
-        api.invalidateMessage(props.messageID)
+        client.api.invalidateMessage(props.messageID)
         loadMessage()
-    }, [api, props.messageID])
+    }, [client, props.messageID])
 
     const addFavorite = useCallback(async () => {
         if (!message) return
-        await api.favoriteMessage(message.id, message.author)
+        await client.favorite(message)
         reloadMessage()
-    }, [api, message])
+    }, [client, message])
 
     const removeFavorite = useCallback(async () => {
-        const target = message?.associations.find((e) => e.author === api.userAddress && e.schema === Schemas.like)?.id
-        if (!message || !target) return
-        await api.unFavoriteMessage(target, message.author)
+        if (!message) return
+        await client.unFavorite(message)
         reloadMessage()
-    }, [api, message])
+    }, [client, message])
 
     const deleteMessage = useCallback((): void => {
         if (!message) return
-        api.deleteMessage(message.id).then(() => {
+        client.deleteMessage(message).then(() => {
             reloadMessage()
         })
-    }, [api, message])
+    }, [client, message])
 
     const addReaction = useCallback(
         (shortcode: string, img: string) => {
             if (!message) return
-            api.addMessageReaction(message.id, message.author, shortcode, img).then(() => {
+            client.addReaction(message, shortcode, img).then(() => {
                 reloadMessage()
             })
         },
-        [api, message]
+        [client, message]
     )
 
     const removeReaction = useCallback(
         (id: string) => {
             if (!message) return
-            api.unFavoriteMessage(id, message.author).then(() => {
+            client.removeAssociation(message, id).then(() => {
                 reloadMessage()
             })
         },
-        [api, message]
+        [client, message]
     )
 
     const openInspector = useCallback(() => {
         if (!message) return
-        inspector.inspectItem({ messageId: message.id, author: message.author })
+        inspector.inspectItem({ messageId: message.id, author: message.author.ccaddr })
     }, [inspector, message])
 
     const openReply = useCallback(() => {
         if (!message) return
-        messageDetail.openAction('reply', message.id, message.author)
+        messageDetail.openAction('reply', message.id, message.author.ccaddr)
     }, [message, messageDetail])
 
     const openReroute = useCallback(() => {
         if (!message) return
-        messageDetail.openAction('reroute', message.id, message.author)
+        messageDetail.openAction('reroute', message.id, message.author.ccaddr)
     }, [message, messageDetail])
 
     useEffect(() => {
         loadMessage()
     }, [props.messageID, props.messageOwner, props.lastUpdated])
-
-    const [author, setAuthor] = useState<Character<Profile> | undefined>()
-    const [streams, setStreams] = useState<Array<Stream<any>>>([])
-    const [favoriteUsers, setFavoriteUsers] = useState<ProfileWithAddress[]>([])
-    const [reactionUsers, setReactionUsers] = useState<ProfileWithAddress[]>([])
-
-    useEffect(() => {
-        if (!message) return
-        Promise.all(message.streams.map(async (id) => await api.readStream(id))).then((e) => {
-            setStreams(e.filter((x) => x?.payload.body.name) as Array<Stream<any>>)
-        })
-        api.readCharacter(message.author, Schemas.profile)
-            .then((author) => {
-                setAuthor(author)
-            })
-            .catch((error) => {
-                console.error(error)
-            })
-    }, [message, props.lastUpdated])
-
-    useEffect(() => {
-        if (!message) return
-        const fetchEmojiUsers = async (): Promise<any> => {
-            const authors =
-                message.associations.filter((e) => e.schema === Schemas.emojiAssociation).map((m) => m.author) ?? []
-
-            const users = await Promise.all(
-                authors.map((ccaddress) =>
-                    api.readCharacter(ccaddress, Schemas.profile).then((e) => {
-                        return {
-                            ccaddress,
-                            ...e?.payload.body
-                        }
-                    })
-                )
-            )
-            setReactionUsers(users)
-        }
-
-        const fetchUsers = async (): Promise<any> => {
-            const authors = message.associations.filter((e) => e.schema === Schemas.like).map((m) => m.author)
-
-            const users = await Promise.all(
-                authors.map((ccaddress) =>
-                    api.readCharacter(ccaddress, Schemas.profile).then((e) => {
-                        return {
-                            ccaddress,
-                            ...e?.payload.body
-                        }
-                    })
-                )
-            )
-            setFavoriteUsers(users)
-        }
-
-        fetchUsers()
-        fetchEmojiUsers()
-    }, [message?.associations])
 
     const services = useMemo(() => {
         return {
@@ -208,35 +143,22 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
     let body
     switch (message?.schema) {
         case Schemas.simpleNote:
-            body = (
-                <MessageView
-                    message={message as Message<SimpleNote>}
-                    userCCID={api.userAddress}
-                    author={author}
-                    streams={streams}
-                    favoriteUsers={favoriteUsers}
-                    reactionUsers={reactionUsers}
-                />
-            )
+            body = <MessageView message={message as M_Current} lastUpdated={props.lastUpdated} userCCID={client.ccid} />
             break
         case Schemas.replyMessage:
             body = (
                 <ReplyMessageFrame
-                    message={message as Message<ReplyMessage>}
+                    message={message as M_Reply}
                     lastUpdated={props.lastUpdated}
                     reloadMessage={reloadMessage}
-                    author={author}
-                    userCCID={api.userAddress}
-                    streams={streams}
-                    favoriteUsers={favoriteUsers}
-                    reactionUsers={reactionUsers}
+                    userCCID={client.ccid}
                 />
             )
             break
-        case Schemas.reRouteMessage:
+        case Schemas.rerouteMessage:
             body = (
                 <ReRouteMessageFrame
-                    message={message as Message<ReRouteMessage>}
+                    message={message as M_Reroute}
                     lastUpdated={props.lastUpdated}
                     reloadMessage={reloadMessage}
                 />

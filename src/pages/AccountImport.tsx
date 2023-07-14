@@ -9,8 +9,8 @@ import { LoadKey, isValid256k1PrivateKey } from '../util'
 import { useNavigate } from 'react-router-dom'
 import { HDNodeWallet } from 'ethers'
 import { LangJa } from '../utils/lang-ja'
-import ConcurrentApiClient from '../apiservice'
-import type { ConcurrentTheme, Host } from '../model'
+import { Client, type CoreHost } from '@concurrent-world/client'
+import type { ConcurrentTheme } from '../model'
 import { usePersistent } from '../hooks/usePersistent'
 import { Themes, createConcurrentTheme } from '../themes'
 import { ThemeProvider } from '@emotion/react'
@@ -33,9 +33,9 @@ export function AccountImport(): JSX.Element {
     const [mnemonic, setMnemonic] = useState<string>('')
     const [secret, setSecret] = useState<string>('')
     const [server, setServer] = useState<string>('')
-    const [host, setHost] = useState<Host>()
+    const [host, setHost] = useState<CoreHost>()
     const [entityFound, setEntityFound] = useState<boolean>(false)
-    const [api, initializeApi] = useState<ConcurrentApiClient>()
+    const [client, initializeClient] = useState<Client>()
     const [errorMessage, setErrorMessage] = useState<string>('')
 
     const [privatekey, setPrivatekey] = useState<string>('')
@@ -71,9 +71,9 @@ export function AccountImport(): JSX.Element {
         setPrivatekey(privatekey)
         setCcid(ccid)
 
-        const hubApi = new ConcurrentApiClient(ccid, privatekey, 'hub.concurrent.world')
+        const hubClient = new Client(ccid, privatekey, 'hub.concurrent.world')
 
-        hubApi.readEntity(ccid).then((entity) => {
+        hubClient.api.readEntity(ccid).then((entity) => {
             console.log(entity)
             if (entity && entity.ccaddr === ccid) {
                 setServer(entity.host || 'hub.concurrent.world')
@@ -87,22 +87,24 @@ export function AccountImport(): JSX.Element {
     useEffect(() => {
         let unmounted = false
         const fqdn = server.replace('https://', '').replace('/', '')
-        const api = new ConcurrentApiClient(ccid, privatekey, fqdn)
-        api.getHostProfile(fqdn)
+        const client = new Client(ccid, privatekey, fqdn)
+        client.api
+            .getHostProfile(fqdn)
             .then((e: any) => {
                 if (unmounted) return
                 setHost(e)
-                api.readEntity(api.userAddress)
+                client.api
+                    .readEntity(client.ccid)
                     .then((entity) => {
                         if (unmounted) return
                         console.log(entity)
-                        if (!entity || entity.ccaddr !== api.userAddress) {
+                        if (!entity || entity.ccaddr !== client.ccid) {
                             setErrorMessage('指定のサーバーにあなたのアカウントは見つかりませんでした。')
                             return
                         }
                         setErrorMessage('')
-                        setEntityFound(entity.ccaddr === api.userAddress)
-                        initializeApi(api)
+                        setEntityFound(entity.ccaddr === client.ccid)
+                        initializeClient(client)
                     })
                     .catch((_) => {
                         if (unmounted) return
@@ -120,11 +122,11 @@ export function AccountImport(): JSX.Element {
     }, [server])
 
     const accountImport = (): void => {
-        if (!api) return
+        if (!client) return
         if (!host) return
         localStorage.setItem('Domain', JSON.stringify(host.fqdn))
-        localStorage.setItem('PrivateKey', JSON.stringify(api.privatekey))
-        localStorage.setItem('Address', JSON.stringify(api.userAddress))
+        localStorage.setItem('PrivateKey', JSON.stringify(client.api.privatekey))
+        localStorage.setItem('Address', JSON.stringify(client.ccid))
         localStorage.setItem('Mnemonic', JSON.stringify(mnemonic))
         navigate('/')
     }
