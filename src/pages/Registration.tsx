@@ -37,8 +37,14 @@ import { ConcurrentWordmark } from '../components/ConcurrentWordmark'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
-import { Client, type DomainProfile, type Profile, Schemas } from '@concurrent-world/client'
-import { type Character, type Host } from '@concurrent-world/client/dist/model/core'
+import {
+    Client,
+    type DomainProfile,
+    type Profile,
+    Schemas,
+    type CoreCharacter,
+    type CoreHost
+} from '@concurrent-world/client'
 
 export function Registration(): JSX.Element {
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue2')
@@ -73,7 +79,7 @@ export function Registration(): JSX.Element {
     }, [])
 
     const [server, setServer] = useState<string>('')
-    const [host, setHost] = useState<Host>()
+    const [host, setHost] = useState<CoreHost>()
     const [entityFound, setEntityFound] = useState<boolean>(false)
 
     useEffect(() => {
@@ -102,7 +108,7 @@ export function Registration(): JSX.Element {
 
         client?.api
             .readCharacter(host.ccaddr, Schemas.domainProfile)
-            .then((profile: Character<DomainProfile> | undefined) => {
+            .then((profile: CoreCharacter<DomainProfile> | undefined) => {
                 console.log(profile)
                 if (profile) {
                     if (profile.payload.body.defaultBookmarkStreams)
