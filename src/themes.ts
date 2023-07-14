@@ -84,15 +84,12 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         },
         components: {
             MuiCssBaseline: {
-                styleOverrides: `
-                ::-webkit-scrollbar{
-                    width: 10px;
-                },
-                ::-webkit-scrollbar-thumb {
-                    background-color: rgba(255, 255, 255, 0.2);
-                    border-radius: 10px;
+                styleOverrides: {
+                    '::-webkit-scrollbar-thumb': {
+                        'background-color': 'rgba(255, 255, 255, 0.2)',
+                        'border-radius': '10px'
+                    }
                 }
-                `
             }
         }
     },
@@ -121,15 +118,12 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         },
         components: {
             MuiCssBaseline: {
-                styleOverrides: `
-                ::-webkit-scrollbar{
-                    width: 10px;
-                },
-                ::-webkit-scrollbar-thumb {
-                    background-color: rgba(255, 255, 255, 0.2);
-                    border-radius: 10px;
+                styleOverrides: {
+                    '::-webkit-scrollbar-thumb': {
+                        'background-color': 'rgba(255, 255, 255, 0.2)',
+                        'border-radius': '10px'
+                    }
                 }
-                `
             }
         }
     },
@@ -341,15 +335,12 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         },
         components: {
             MuiCssBaseline: {
-                styleOverrides: `
-                ::-webkit-scrollbar{
-                    width: 10px;
-                },
-                ::-webkit-scrollbar-thumb {
-                    background-color: rgba(255, 255, 255, 0.2);
-                    border-radius: 10px;
+                styleOverrides: {
+                    '::-webkit-scrollbar-thumb': {
+                        'background-color': 'rgba(255, 255, 255, 0.2)',
+                        'border-radius': '10px'
+                    }
                 }
-                `
             }
         }
     },
@@ -376,15 +367,12 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         },
         components: {
             MuiCssBaseline: {
-                styleOverrides: `
-                ::-webkit-scrollbar{
-                    width: 10px;
-                },
-                ::-webkit-scrollbar-thumb {
-                    background-color: rgba(255, 255, 255, 0.2);
-                    border-radius: 10px;
+                styleOverrides: {
+                    '::-webkit-scrollbar-thumb': {
+                        'background-color': 'rgba(255, 255, 255, 0.2)',
+                        'border-radius': '10px'
+                    }
                 }
-                `
             }
         },
         shape: {
@@ -414,15 +402,12 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         },
         components: {
             MuiCssBaseline: {
-                styleOverrides: `
-                ::-webkit-scrollbar{
-                    width: 10px;
-                },
-                ::-webkit-scrollbar-thumb {
-                    background-color: rgba(255, 255, 255, 0.2);
-                    border-radius: 10px;
+                styleOverrides: {
+                    '::-webkit-scrollbar-thumb': {
+                        'background-color': 'rgba(255, 255, 255, 0.2)',
+                        'border-radius': '10px'
+                    }
                 }
-                `
             }
         },
         shape: {
@@ -482,19 +467,19 @@ export const ConcurrentDefaultTheme = {
             }
         },
         MuiCssBaseline: {
-            styleOverrides: `
-            ::-webkit-scrollbar{
-                width: 10px;
-                height: 10px;
-            },
-            ::-webkit-scrollbar-thumb {
-                background-color: rgba(0, 0, 0, 0.2);
-                border-radius: 10px;
+            styleOverrides: {
+                '::-webkit-scrollbar': {
+                    width: '10px',
+                    height: '10px'
+                },
+                '::-webkit-scrollbar-thumb': {
+                    'background-color': 'rgba(0, 0, 0, 0.2)',
+                    'border-radius': '10px'
+                },
+                body: {
+                    overflow: 'hidden'
+                }
             }
-            body {
-                overflow: hidden;
-              }
-            `
         }
     },
     shape: {
