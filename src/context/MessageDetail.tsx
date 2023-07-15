@@ -4,10 +4,9 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { useApi } from './api'
 import {
     type CCID,
-    type Message,
     Schemas,
-    type ReplyMessage,
-    type ReplyAssociation,
+    type RawReplyMessage,
+    type RawReplyAssociation,
     type CoreMessage
 } from '@concurrent-world/client'
 import { ApplicationContext } from '../App'
@@ -64,7 +63,7 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
     }, [showingMessage])
 
     const sendReply = async (replyText: string, messageStream: string[]): Promise<void> => {
-        const data = await client.api.createMessage<ReplyMessage>(
+        const data = await client.api.createMessage<RawReplyMessage>(
             Schemas.replyMessage,
             {
                 replyToMessageId: message?.id || '',
@@ -80,7 +79,7 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
 
         console.log('assosiation', targetStream)
 
-        await client.api.createAssociation<ReplyAssociation>(
+        await client.api.createAssociation<RawReplyAssociation>(
             Schemas.replyAssociation,
             { messageId: data.content.id, messageAuthor: client.ccid },
             message?.id || '',

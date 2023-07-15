@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import { useEffect, useState } from 'react'
-import { Schemas, type Profile } from '@concurrent-world/client'
+import { Schemas, type Profile, RawProfile } from '@concurrent-world/client'
 import Button from '@mui/material/Button'
 import { useApi } from '../context/api'
 import { CCAvatar } from './CCAvatar'
@@ -23,15 +23,12 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
     const [banner, setBanner] = useState<string>(props.initial?.banner ?? '')
 
     const updateProfile = async (): Promise<void> => {
-        const profile = {
-            username,
-            avatar,
-            description,
-            banner
+        if (props.id === undefined) {
+            throw new Error('id is undefined')
         }
-        client.api.upsertCharacter<Profile>(Schemas.profile, profile, props.id).then((data) => {
+        client.updateProfile(props.id, username, description, avatar, banner).then((data) => {
             console.log(data)
-            props.onSubmit?.(profile)
+            props.onSubmit?.(data)
         })
     }
 

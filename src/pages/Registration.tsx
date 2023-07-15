@@ -39,7 +39,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import {
     Client,
-    type DomainProfile,
+    type RawDomainProfile,
     type Profile,
     Schemas,
     type CoreCharacter,
@@ -108,7 +108,7 @@ export function Registration(): JSX.Element {
 
         client?.api
             .readCharacter(host.ccaddr, Schemas.domainProfile)
-            .then((profile: CoreCharacter<DomainProfile> | undefined) => {
+            .then((profile: CoreCharacter<RawDomainProfile> | undefined) => {
                 console.log(profile)
                 if (profile) {
                     if (profile.payload.body.defaultBookmarkStreams)

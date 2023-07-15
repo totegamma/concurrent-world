@@ -2,7 +2,7 @@ import { Box, Paper, Modal, Typography } from '@mui/material'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
-import { Schemas, type DomainProfile, type CoreCharacter } from '@concurrent-world/client'
+import { Schemas, type RawDomainProfile, type CoreCharacter } from '@concurrent-world/client'
 import { Draft } from '../components/Draft'
 import { useLocation } from 'react-router-dom'
 import { usePreference } from './PreferenceContext'
@@ -140,7 +140,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                     client.api.getHostProfile(client.api.host).then((host) => {
                                         client.api
                                             .readCharacter(host.ccaddr, Schemas.domainProfile)
-                                            .then((profile: CoreCharacter<DomainProfile> | undefined) => {
+                                            .then((profile: CoreCharacter<RawDomainProfile> | undefined) => {
                                                 console.log(profile)
                                                 try {
                                                     if (profile) {

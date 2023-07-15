@@ -3,7 +3,6 @@ import {
     Divider,
     Typography,
     Box,
-    useTheme,
     Tabs,
     Tab,
     IconButton,
@@ -32,7 +31,6 @@ export interface SettingsProp {
 
 export function Settings(props: SettingsProp): JSX.Element {
     const client = useApi()
-    const theme = useTheme()
     const pref = usePreference()
     const appData = useContext(ApplicationContext)
     const { enqueueSnackbar } = useSnackbar()
@@ -61,7 +59,7 @@ export function Settings(props: SettingsProp): JSX.Element {
                 flexDirection: 'column',
                 gap: 1,
                 padding: '20px',
-                background: theme.palette.background.paper,
+                background: 'background.paper',
                 minHeight: '100%',
                 overflowY: 'scroll'
             }}
@@ -98,6 +96,7 @@ export function Settings(props: SettingsProp): JSX.Element {
                             }}
                         >
                             <ProfileEditor
+                                id={appData.user?.profile.id}
                                 initial={appData.user?.profile}
                                 onSubmit={(_profile) => {
                                     enqueueSnackbar('更新しました', { variant: 'success' })
@@ -225,9 +224,9 @@ export function Settings(props: SettingsProp): JSX.Element {
                             }}
                         >
                             {!showPrivateKey ? (
-                                <VisibilityIcon sx={{ color: theme.palette.text.primary }} />
+                                <VisibilityIcon sx={{ color: 'text.primary' }} />
                             ) : (
-                                <VisibilityOffIcon sx={{ color: theme.palette.text.primary }} />
+                                <VisibilityOffIcon sx={{ color: 'text.primary' }} />
                             )}
                         </IconButton>
                     </Typography>

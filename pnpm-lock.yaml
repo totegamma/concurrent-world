@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@concurrent-world/client':
-    specifier: ^1.1.1
-    version: 1.1.1
+    specifier: ^1.1.2
+    version: 1.1.2
   '@emoji-mart/react':
     specifier: ^1.1.1
     version: 1.1.1(emoji-mart@5.5.2)(react@18.2.0)
@@ -1647,11 +1647,11 @@ packages:
     dev: true
     optional: true
 
-  /@concurrent-world/client@1.1.1:
-    resolution: {integrity: sha512-MeznQpFt2VBWLa0E69ATJyrCDBY3DNCf9fvnoGobgyF3YHSDr+v3xhZosCk0TLiBLX7LFBvrfiE4uMG13lEuIQ==}
+  /@concurrent-world/client@1.1.2:
+    resolution: {integrity: sha512-G2YBRHRkFlGx2p1wcKmUKXUaciv8lCLQ3PP64ebykrVTg3cZGPjbB9UeoYF4mobGg4qcH1fzMyVasT/U5tN2SQ==}
     dependencies:
       elliptic: 6.5.4
-      ethers: 6.6.3
+      ethers: 6.6.4
       uuid: 9.0.0
     transitivePeerDependencies:
       - bufferutil
@@ -6295,8 +6295,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /ethers@6.6.3:
-    resolution: {integrity: sha512-g8wLXeRWSGDD0T+wsL3pvyc3aYnmxEEAwH8LSoDTDRhRsmJeNs9YMXlNU7ax2caO+zHkeI9MkHiz6rwxEjN4Mw==}
+  /ethers@6.6.4:
+    resolution: {integrity: sha512-r3myN2hEnydmu23iiIj5kjWnCh5JNzlqrE/z+Kw5UqH173F+JOWzU6qkFB4HVC50epgxzKSL2Hq1oNXA877vwQ==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@adraffy/ens-normalize': 1.9.2
