@@ -38,11 +38,9 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
     const inspector = useInspector()
     const messageDetail = useMessageDetail()
     const [message, setMessage] = useState<M_Current | M_Reroute | M_Reply | null>()
-    const [isFetching, setIsFetching] = useState<boolean>(false)
+    const [isFetching, setIsFetching] = useState<boolean>(true)
 
     const loadMessage = useCallback((): void => {
-        if (isFetching) return
-        setIsFetching(true)
         client
             .getMessage(props.messageID, props.messageOwner)
             .then((msg) => {
