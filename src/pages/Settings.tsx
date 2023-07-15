@@ -59,7 +59,7 @@ export function Settings(props: SettingsProp): JSX.Element {
                 flexDirection: 'column',
                 gap: 1,
                 padding: '20px',
-                background: 'background.paper',
+                backgroundColor: 'background.paper',
                 minHeight: '100%',
                 overflowY: 'scroll'
             }}
