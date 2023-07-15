@@ -11,11 +11,12 @@ import {
     type M_Current
 } from '@concurrent-world/client'
 import { useApi } from '../../context/api'
-import { Box, IconButton, ListItem, ListItemButton, Typography } from '@mui/material'
-import { Link as routerLink } from 'react-router-dom'
+import { Box, IconButton, Link, ListItem, Typography } from '@mui/material'
+import { Link as routerLink, Link as RouterLink } from 'react-router-dom'
 import { CCAvatar } from '../CCAvatar'
 import { MessageSkeleton } from '../MessageSkeleton'
 import { MessageContainer } from './MessageContainer'
+import { TimeDiff } from '../TimeDiff'
 
 export interface AssociationFrameProp {
     association: CoreStreamElement
@@ -64,48 +65,39 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                     <ListItem
                         sx={{
                             alignItems: 'flex-start',
-                            wordBreak: 'break-word'
+                            wordBreak: 'break-word',
+                            gap: 2
                         }}
                         disablePadding
                     >
-                        <ListItemButton
-                            disableGutters
-                            component={routerLink}
-                            to={`/message/${association.target.id ?? ''}@${association.target.author.ccaddr ?? ''}`}
+                        <IconButton
                             sx={{
-                                display: 'flex',
-                                alignItems: 'flex-start',
-                                flex: 1,
-                                gap: 2
+                                width: { xs: '38px', sm: '48px' },
+                                height: { xs: '38px', sm: '48px' },
+                                mt: { xs: '3px', sm: '5px' }
                             }}
+                            component={routerLink}
+                            to={'/entity/' + (association.author.ccaddr ?? '')}
                         >
-                            <IconButton
+                            <CCAvatar
+                                avatarURL={actionUser?.profile.avatar}
+                                identiconSource={actionUser?.ccaddr ?? ''}
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
-                                    height: { xs: '38px', sm: '48px' },
-                                    mt: { xs: '3px', sm: '5px' }
+                                    height: { xs: '38px', sm: '48px' }
                                 }}
-                                component={routerLink}
-                                to={'/entity/' + (association.author.ccaddr ?? '')}
-                            >
-                                <CCAvatar
-                                    avatarURL={actionUser?.profile.avatar}
-                                    identiconSource={actionUser?.ccaddr ?? ''}
-                                    sx={{
-                                        width: { xs: '38px', sm: '48px' },
-                                        height: { xs: '38px', sm: '48px' }
-                                    }}
-                                />
-                            </IconButton>
-                            <Box
-                                sx={{
-                                    flex: 1,
-                                    flexDirection: 'column',
-                                    width: '100%',
-                                    overflow: 'auto',
-                                    alignItems: 'flex-start'
-                                }}
-                            >
+                            />
+                        </IconButton>
+                        <Box
+                            sx={{
+                                flex: 1,
+                                flexDirection: 'column',
+                                width: '100%',
+                                overflow: 'auto',
+                                alignItems: 'flex-start'
+                            }}
+                        >
+                            <Box display="flex" justifyContent="space-between">
                                 <Typography>
                                     {isMeToOther ? (
                                         <>
@@ -120,11 +112,22 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                         </>
                                     )}
                                 </Typography>
-                                <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
-                                    {(association.target as M_Current)?.body}
-                                </blockquote>
+                                <Link
+                                    component={RouterLink}
+                                    underline="hover"
+                                    color="inherit"
+                                    fontSize="0.75rem"
+                                    to={`/message/${association.target.id ?? ''}@${
+                                        association.target.author.ccaddr ?? ''
+                                    }`}
+                                >
+                                    <TimeDiff date={new Date(association.cdate)} />
+                                </Link>
                             </Box>
-                        </ListItemButton>
+                            <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
+                                {(association.target as M_Current)?.body}
+                            </blockquote>
+                        </Box>
                     </ListItem>
                     {props.after}
                 </>
@@ -135,48 +138,39 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                     <ListItem
                         sx={{
                             alignItems: 'flex-start',
-                            wordBreak: 'break-word'
+                            wordBreak: 'break-word',
+                            gap: 2
                         }}
                         disablePadding
                     >
-                        <ListItemButton
-                            disableGutters
-                            component={routerLink}
-                            to={`/message/${association.target.id ?? ''}@${association.target.author.ccaddr ?? ''}`}
+                        <IconButton
                             sx={{
-                                display: 'flex',
-                                alignItems: 'flex-start',
-                                flex: 1,
-                                gap: 2
+                                width: { xs: '38px', sm: '48px' },
+                                height: { xs: '38px', sm: '48px' },
+                                mt: { xs: '3px', sm: '5px' }
                             }}
+                            component={routerLink}
+                            to={'/entity/' + (association.author.ccaddr ?? '')}
                         >
-                            <IconButton
+                            <CCAvatar
+                                avatarURL={actionUser?.profile.avatar}
+                                identiconSource={actionUser?.ccaddr ?? ''}
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
-                                    height: { xs: '38px', sm: '48px' },
-                                    mt: { xs: '3px', sm: '5px' }
+                                    height: { xs: '38px', sm: '48px' }
                                 }}
-                                component={routerLink}
-                                to={'/entity/' + (association.author.ccaddr ?? '')}
-                            >
-                                <CCAvatar
-                                    avatarURL={actionUser?.profile.avatar}
-                                    identiconSource={actionUser?.ccaddr ?? ''}
-                                    sx={{
-                                        width: { xs: '38px', sm: '48px' },
-                                        height: { xs: '38px', sm: '48px' }
-                                    }}
-                                />
-                            </IconButton>
-                            <Box
-                                sx={{
-                                    flex: 1,
-                                    flexDirection: 'column',
-                                    width: '100%',
-                                    overflow: 'auto',
-                                    alignItems: 'flex-start'
-                                }}
-                            >
+                            />
+                        </IconButton>
+                        <Box
+                            sx={{
+                                flex: 1,
+                                flexDirection: 'column',
+                                width: '100%',
+                                overflow: 'auto',
+                                alignItems: 'flex-start'
+                            }}
+                        >
+                            <Box display="flex" justifyContent="space-between">
                                 <Typography>
                                     {isMeToOther ? (
                                         <>
@@ -201,11 +195,22 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                         </>
                                     )}
                                 </Typography>
-                                <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
-                                    {(association.target as M_Current).body}
-                                </blockquote>
+                                <Link
+                                    component={RouterLink}
+                                    underline="hover"
+                                    color="inherit"
+                                    fontSize="0.75rem"
+                                    to={`/message/${association.target.id ?? ''}@${
+                                        association.target.author.ccaddr ?? ''
+                                    }`}
+                                >
+                                    <TimeDiff date={new Date(association.cdate)} />
+                                </Link>
                             </Box>
-                        </ListItemButton>
+                            <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
+                                {(association.target as M_Current).body}
+                            </blockquote>
+                        </Box>
                     </ListItem>
                     {props.after}
                 </>
