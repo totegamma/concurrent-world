@@ -41,7 +41,6 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     const actionUser: User | undefined = isMeToOther ? association?.author : association?.target.author
 
     useEffect(() => {
-        console.log(props.association)
         client
             .getAssociation(props.association.id, props.association.author)
             .then((a) => {
@@ -56,12 +55,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     }, [props.association, props.lastUpdated])
 
     if (fetching) return <MessageSkeleton />
-    if (!association)
-        return (
-            <ListItem>
-                <Typography>failed to load {props.association.id}</Typography>
-            </ListItem>
-        ) // TODO: あとで消す
+    if (!association) return null
 
     switch (association.schema) {
         case Schemas.like:
@@ -225,7 +219,6 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                 />
             )
         case Schemas.rerouteAssociation:
-            console.log('reroute', association)
             return (
                 <MessageContainer
                     messageID={(association as A_Reroute).rerouteBody.id}
