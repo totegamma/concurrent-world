@@ -1,5 +1,5 @@
 import { Box, Link, IconButton, Typography } from '@mui/material'
-import { Link as routerLink } from 'react-router-dom'
+import { Link as routerLink, Link as RouterLink } from 'react-router-dom'
 import { CCAvatar } from '../../CCAvatar'
 import { TimeDiff } from '../../TimeDiff'
 import { type M_Current } from '@concurrent-world/client'
@@ -50,14 +50,11 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                 </Typography>
             </Box>
             <Link
-                component="button"
+                component={RouterLink}
                 underline="hover"
                 color="inherit"
-                sx={{
-                    display: 'flex',
-                    flexShrink: 0,
-                    fontSize: '0.75rem'
-                }}
+                fontSize="0.75rem"
+                to={`/message/${props.message.id}@${props.message.author.ccaddr}`}
             >
                 <TimeDiff date={new Date(props.message.cdate)} />
             </Link>
