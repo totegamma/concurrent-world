@@ -16,7 +16,7 @@ export interface RerouteMessageFrameProp {
 export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element => {
     return (
         <>
-            <Box display="flex" alignItems="center" gap={1}>
+            <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 2 }}>
                 <Box
                     display="flex"
                     width={{ xs: '38px', sm: '48px' }}
@@ -53,12 +53,21 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
                         flex: 1
                     }}
                 >
-                    {props.message.author.profile?.username || 'Anonymous'} rerouted
+                    {props.message.author.profile?.username || 'Anonymous'} rerouted{' '}
+                    {props.message.body && 'with comment:'}
                 </Typography>
                 <Box color="text.disabled" fontSize="0.75rem">
                     <TimeDiff date={new Date(props.message.cdate)} />
                 </Box>
             </Box>
+            {props.message.body && (
+                <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 2 }}>
+                    <Box display="flex" flexDirection="row-reverse" width={{ xs: '38px', sm: '48px' }} flexShrink={0} />
+                    <Typography overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
+                        {props.message.body}
+                    </Typography>
+                </Box>
+            )}
             <MessageContainer
                 messageID={props.message.rerouteMessageId}
                 messageOwner={props.message.rerouteMessageAuthor}
