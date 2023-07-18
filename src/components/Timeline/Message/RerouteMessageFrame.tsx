@@ -7,13 +7,13 @@ import { Link as routerLink } from 'react-router-dom'
 import { TimeDiff } from '../../TimeDiff'
 import { MessageContainer } from '../MessageContainer'
 
-export interface ReRouteMessageFrameProp {
+export interface RerouteMessageFrameProp {
     message: M_Reroute
     reloadMessage: () => void
     lastUpdated?: number
 }
 
-export const ReRouteMessageFrame = (props: ReRouteMessageFrameProp): JSX.Element => {
+export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element => {
     return (
         <>
             <Box display="flex" alignItems="center" gap={1}>

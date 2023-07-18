@@ -2,7 +2,7 @@ import { Schemas, type M_Current, type M_Reply, type M_Reroute } from '@concurre
 import { useApi } from '../../context/api'
 import { createContext, memo, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { ReplyMessageFrame } from './Message/ReplyMessageFrame'
-import { ReRouteMessageFrame } from './Message/ReRouteMessageFrame'
+import { RerouteMessageFrame } from './Message/RerouteMessageFrame'
 import { MessageSkeleton } from '../MessageSkeleton'
 import { Typography } from '@mui/material'
 import { useInspector } from '../../context/Inspector'
@@ -155,7 +155,7 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
             break
         case Schemas.rerouteMessage:
             body = (
-                <ReRouteMessageFrame message={message} lastUpdated={props.lastUpdated} reloadMessage={reloadMessage} />
+                <RerouteMessageFrame message={message} lastUpdated={props.lastUpdated} reloadMessage={reloadMessage} />
             )
             break
         default:
