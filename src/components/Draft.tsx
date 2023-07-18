@@ -10,9 +10,9 @@ import {
     Tooltip,
     Paper,
     List,
-    ListItem,
     ListItemIcon,
-    ListItemText
+    ListItemText,
+    ListItemButton
 } from '@mui/material'
 import { ApplicationContext } from '../App'
 import { MarkdownRenderer } from './MarkdownRenderer'
@@ -61,6 +61,8 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const [emojiSuggestions, setEmojiSuggestions] = useState<Emoji[]>([])
 
     const [selectedSuggestions, setSelectedSuggestions] = useState<number>(0)
+
+    const timerRef = useRef<any | null>(null)
 
     const { enqueueSnackbar } = useSnackbar()
 
@@ -166,6 +168,27 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         }
     }
 
+    const onEmojiSuggestConfirm = (index: number): void => {
+        console.log('confirm', index)
+        const before = draft.slice(0, textInputRef.current?.selectionEnd ?? 0) ?? ''
+        const colonPos = before.lastIndexOf(':')
+        if (colonPos === -1) return
+        const after = draft.slice(textInputRef.current?.selectionEnd ?? 0) ?? ''
+
+        const emoji = emojiSuggestions[index].skins[0].native
+            ? emojiSuggestions[index].skins[0].native ?? ''
+            : ':' + emojiSuggestions[index].name + ':'
+
+        setDraft(before.slice(0, colonPos) + emoji + after)
+        setSelectedSuggestions(0)
+        setEnableSuggestions(false)
+        if (timerRef.current) {
+            clearTimeout(timerRef.current)
+            timerRef.current = null
+            textInputRef.current?.focus()
+        }
+    }
+
     return (
         <Box
             sx={{
@@ -188,7 +211,14 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             >
                 <List dense>
                     {emojiSuggestions.map((emoji, index) => (
-                        <ListItem dense key={emoji.name} selected={index === selectedSuggestions}>
+                        <ListItemButton
+                            dense
+                            key={emoji.name}
+                            selected={index === selectedSuggestions}
+                            onClick={() => {
+                                onEmojiSuggestConfirm(index)
+                            }}
+                        >
                             <ListItemIcon>
                                 {emoji.skins[0]?.native ? (
                                     <Box>{emoji.skins[0]?.native}</Box>
@@ -201,7 +231,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                 )}
                             </ListItemIcon>
                             <ListItemText>{emoji.name}</ListItemText>
-                        </ListItem>
+                        </ListItemButton>
                     ))}
                 </List>
             </Paper>
@@ -281,18 +311,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         if (enableSuggestions) {
                             if (e.key === 'Enter') {
                                 e.preventDefault()
-                                const before = draft.slice(0, e.target.selectionEnd) ?? ''
-                                const colonPos = before.lastIndexOf(':')
-                                if (colonPos === -1) return
-                                const after = draft.slice(e.target.selectionEnd) ?? ''
-
-                                const emoji = emojiSuggestions[selectedSuggestions].skins[0].native
-                                    ? emojiSuggestions[selectedSuggestions].skins[0].native ?? ''
-                                    : ':' + emojiSuggestions[selectedSuggestions].name + ':'
-
-                                setDraft(before.slice(0, colonPos) + emoji + after)
-                                setSelectedSuggestions(0)
-                                setEnableSuggestions(false)
+                                onEmojiSuggestConfirm(selectedSuggestions)
                                 return
                             }
                             if (e.key === 'ArrowUp') {
@@ -314,10 +333,12 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         }
                     }}
                     onBlur={() => {
-                        if (enableSuggestions) {
-                            setEnableSuggestions(false)
-                            setSelectedSuggestions(0)
-                        }
+                        timerRef.current = setTimeout(() => {
+                            if (enableSuggestions) {
+                                setEnableSuggestions(false)
+                                setSelectedSuggestions(0)
+                            }
+                        }, 100)
                     }}
                     inputRef={textInputRef}
                 />
