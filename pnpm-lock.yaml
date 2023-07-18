@@ -1,4 +1,4 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
 
 settings:
   autoInstallPeers: true
@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@concurrent-world/client':
-    specifier: ^1.1.2
-    version: 1.1.2
+    specifier: ^1.2.0
+    version: 1.2.0
   '@emoji-mart/react':
     specifier: ^1.1.1
     version: 1.1.1(emoji-mart@5.5.2)(react@18.2.0)
@@ -1647,8 +1647,8 @@ packages:
     dev: true
     optional: true
 
-  /@concurrent-world/client@1.1.2:
-    resolution: {integrity: sha512-G2YBRHRkFlGx2p1wcKmUKXUaciv8lCLQ3PP64ebykrVTg3cZGPjbB9UeoYF4mobGg4qcH1fzMyVasT/U5tN2SQ==}
+  /@concurrent-world/client@1.2.0:
+    resolution: {integrity: sha512-JJghKTlyvasUwpNZuI70nz7IZxSvN368KDQdFEIh9ky3huQtQN0Ic0Mz/e3BBTI8Xt2vBul8nePv3uo5/d+dJA==}
     dependencies:
       elliptic: 6.5.4
       ethers: 6.6.4

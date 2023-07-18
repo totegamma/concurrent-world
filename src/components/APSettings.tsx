@@ -60,7 +60,7 @@ export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
             }
         }
         const profile = window.location.protocol + '//' + window.location.host + '/entity/' + client.ccid
-        const home = appData.user?.userstreams.homeStream
+        const home = appData.user?.userstreams?.homeStream
         client.api
             .fetchWithCredential(`https://${client.api.host}/api/v1/ap/person/${userID}`, requestOptions)
             .then(async (res) => await res.json())
@@ -76,10 +76,10 @@ export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
             })
             .catch((_) => {
                 setForm({
-                    name: appData.user?.profile.username,
-                    summary: appData.user?.profile.description,
+                    name: appData.user?.profile?.username,
+                    summary: appData.user?.profile?.description,
                     profile_url: profile,
-                    icon_url: appData.user?.profile.avatar,
+                    icon_url: appData.user?.profile?.avatar,
                     homestream: home
                 })
             })

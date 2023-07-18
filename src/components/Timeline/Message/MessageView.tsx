@@ -63,8 +63,8 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                                     justifyContent="space-between"
                                 >
                                     <CCAvatar
-                                        alt={props.message.author.profile.username}
-                                        avatarURL={props.message.author.profile.avatar}
+                                        alt={props.message.author.profile?.username}
+                                        avatarURL={props.message.author.profile?.avatar}
                                         identiconSource={props.message.author.ccaddr}
                                         sx={{
                                             width: { xs: '38px', sm: '48px' },
@@ -82,7 +82,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                                     gap={1}
                                     justifyContent="space-between"
                                 >
-                                    <Typography variant="h2">{props.message.author.profile.username}</Typography>
+                                    <Typography variant="h2">{props.message.author.profile?.username}</Typography>
                                     <Chip
                                         size="small"
                                         label={`${props.message.author.ccaddr.slice(0, 9)}...`}
@@ -93,7 +93,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                                         }}
                                     />
                                 </Box>
-                                <Typography variant="body1">{props.message.author.profile.description}</Typography>
+                                <Typography variant="body1">{props.message.author.profile?.description}</Typography>
                             </Box>
                         }
                     >
@@ -107,8 +107,8 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                             to={'/entity/' + props.message.author.ccaddr}
                         >
                             <CCAvatar
-                                alt={props.message.author.profile.username}
-                                avatarURL={props.message.author.profile.avatar}
+                                alt={props.message.author.profile?.username}
+                                avatarURL={props.message.author.profile?.avatar}
                                 identiconSource={props.message.author.ccaddr}
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
@@ -130,7 +130,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                             authorID={props.message.author.ccaddr}
                             messageID={props.message.id}
                             cdate={props.message.cdate}
-                            username={props.message.author.profile.username}
+                            username={props.message.author.profile?.username}
                         />
                         {props.beforeMessage}
                         <SimpleNote message={props.message} />

@@ -24,7 +24,7 @@ export const ReplyMessageFrame = (props: ReplyMessageFrameProp): JSX.Element => 
                     message={props.message}
                     beforeMessage={
                         <Chip
-                            label={`@${props.message.replyTarget.author.profile.username || 'anonymous'}`}
+                            label={`@${props.message.replyTarget.author.profile?.username || 'anonymous'}`}
                             size="small"
                             sx={{ width: 'fit-content', mb: 1 }}
                         />

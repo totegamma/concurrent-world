@@ -35,9 +35,9 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     const perspective = props.perspective ?? client.ccid
     const isMeToOther = association?.author.ccaddr !== perspective
 
-    const Nominative = perspective === client.ccid ? 'You' : association?.author.profile.username ?? 'anonymous'
+    const Nominative = perspective === client.ccid ? 'You' : association?.author.profile?.username ?? 'anonymous'
     const Possessive =
-        perspective === client.ccid ? 'your' : (association?.target.author.profile.username ?? 'anonymous') + "'s"
+        perspective === client.ccid ? 'your' : (association?.target.author.profile?.username ?? 'anonymous') + "'s"
 
     const actionUser: User | undefined = isMeToOther ? association?.author : association?.target.author
 
@@ -80,7 +80,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                             to={'/entity/' + (association.author.ccaddr ?? '')}
                         >
                             <CCAvatar
-                                avatarURL={actionUser?.profile.avatar}
+                                avatarURL={actionUser?.profile?.avatar}
                                 identiconSource={actionUser?.ccaddr ?? ''}
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
@@ -101,13 +101,13 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                 <Typography>
                                     {isMeToOther ? (
                                         <>
-                                            <b>{association.author.profile.username ?? 'anonymous'}</b> favorited{' '}
+                                            <b>{association.author.profile?.username ?? 'anonymous'}</b> favorited{' '}
                                             {Possessive} message
                                         </>
                                     ) : (
                                         <>
                                             {Nominative} favorited{' '}
-                                            <b>{association.target.author.profile.username ?? 'anonymous'}</b>&apos;s
+                                            <b>{association.target.author.profile?.username ?? 'anonymous'}</b>&apos;s
                                             message
                                         </>
                                     )}
@@ -153,7 +153,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                             to={'/entity/' + (association.author.ccaddr ?? '')}
                         >
                             <CCAvatar
-                                avatarURL={actionUser?.profile.avatar}
+                                avatarURL={actionUser?.profile?.avatar}
                                 identiconSource={actionUser?.ccaddr ?? ''}
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
@@ -174,7 +174,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                 <Typography>
                                     {isMeToOther ? (
                                         <>
-                                            <b>{association.author.profile.username ?? 'anonymous'}</b> reacted{' '}
+                                            <b>{association.author.profile?.username ?? 'anonymous'}</b> reacted{' '}
                                             {Possessive} message with{' '}
                                             <img
                                                 height="13px"
@@ -185,7 +185,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                     ) : (
                                         <>
                                             {Nominative} reacted{' '}
-                                            <b>{association.target.author.profile.username ?? 'anonymous'}</b>&apos;s
+                                            <b>{association.target.author.profile?.username ?? 'anonymous'}</b>&apos;s
                                             message with{' '}
                                             <img
                                                 height="13px"

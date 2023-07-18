@@ -118,10 +118,10 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                                 height: '20px',
                                                 width: '20px'
                                             }}
-                                            avatarURL={fav.author.profile.avatar}
+                                            avatarURL={fav.author.profile?.avatar}
                                             identiconSource={fav.author.ccaddr}
                                         />
-                                        {fav.author.profile.username ?? 'anonymous'}
+                                        {fav.author.profile?.username ?? 'anonymous'}
                                     </Box>
                                 ))}
                             </Box>

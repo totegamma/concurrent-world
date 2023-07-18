@@ -73,9 +73,9 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             enqueueSnackbar('Message must not be empty!', { variant: 'error' })
             return
         }
-        const dest = [...new Set([...destStreams, ...(postHome ? [appData.user?.userstreams.homeStream] : [])])].filter(
-            (e) => e
-        ) as string[]
+        const dest = [
+            ...new Set([...destStreams, ...(postHome ? [appData.user?.userstreams?.homeStream] : [])])
+        ].filter((e) => e) as string[]
         setSending(true)
         props
             .onSubmit(draft, dest)

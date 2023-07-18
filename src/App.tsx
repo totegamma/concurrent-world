@@ -38,7 +38,6 @@ import ApiProvider from './context/api'
 import { PreferenceProvider } from './context/PreferenceContext'
 import { GlobalActionsProvider } from './context/GlobalActions'
 import { EmojiPickerProvider } from './context/EmojiPickerContext'
-import { ConcurrentLogo } from './components/ConcurrentLogo'
 
 export const ApplicationContext = createContext<appData>({
     user: null,
@@ -94,12 +93,12 @@ function App(): JSX.Element {
                 return query
             }
             case '/notifications': {
-                const notifications = user?.userstreams.notificationStream
+                const notifications = user?.userstreams?.notificationStream
                 if (!notifications) return []
                 return [notifications]
             }
             case '/associations': {
-                const associations = user?.userstreams.associationStream
+                const associations = user?.userstreams?.associationStream
                 if (!associations) return []
                 return [associations]
             }
@@ -158,7 +157,7 @@ function App(): JSX.Element {
         sendJsonMessage({
             channels: [
                 ...displayingStream,
-                ...(user?.userstreams.notificationStream ? [user?.userstreams.notificationStream] : [])
+                ...(user?.userstreams?.notificationStream ? [user?.userstreams.notificationStream] : [])
             ]
         })
     }, [displayingStream, user])
@@ -201,7 +200,7 @@ function App(): JSX.Element {
                             target.LastUpdated = new Date().getTime()
                             messages.update((e) => [...e])
                         }
-                        if (event.stream === user?.userstreams.notificationStream) {
+                        if (event.stream === user?.userstreams?.notificationStream) {
                             playNotificationRef.current()
                             client?.api.readAssociation(event.body.id, event.body.currenthost).then((a) => {
                                 if (!a) return

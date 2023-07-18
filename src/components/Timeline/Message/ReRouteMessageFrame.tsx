@@ -1,9 +1,7 @@
-import { useState, useEffect } from 'react'
 import { Box, IconButton, Typography } from '@mui/material'
 
 import { type M_Reroute } from '@concurrent-world/client'
 import RepeatIcon from '@mui/icons-material/Repeat'
-import { useApi } from '../../../context/api'
 import { CCAvatar } from '../../CCAvatar'
 import { Link as routerLink } from 'react-router-dom'
 import { TimeDiff } from '../../TimeDiff'
@@ -35,7 +33,7 @@ export const ReRouteMessageFrame = (props: ReRouteMessageFrameProp): JSX.Element
                         to={'/entity/' + props.message.author.ccaddr}
                     >
                         <CCAvatar
-                            avatarURL={props.message.author.profile.avatar}
+                            avatarURL={props.message.author.profile?.avatar}
                             identiconSource={props.message.author.ccaddr}
                             sx={{
                                 width: { xs: '12px', sm: '18px' },
@@ -55,7 +53,7 @@ export const ReRouteMessageFrame = (props: ReRouteMessageFrameProp): JSX.Element
                         flex: 1
                     }}
                 >
-                    {props.message.author.profile.username || 'Anonymous'} rerouted
+                    {props.message.author.profile?.username || 'Anonymous'} rerouted
                 </Typography>
                 <Box color="text.disabled" fontSize="0.75rem">
                     <TimeDiff date={new Date(props.message.cdate)} />

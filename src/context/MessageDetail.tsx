@@ -75,7 +75,7 @@ export const MessageDetailProvider = (props: MessageDetailProps): JSX.Element =>
 
         const authorInbox = (await client.api.readCharacter(message?.author || '', Schemas.userstreams))?.payload.body
             .notificationStream
-        const targetStream = [authorInbox, appData.user?.userstreams.associationStream].filter((e) => e) as string[]
+        const targetStream = [authorInbox, appData.user?.userstreams?.associationStream].filter((e) => e) as string[]
 
         console.log('assosiation', targetStream)
 

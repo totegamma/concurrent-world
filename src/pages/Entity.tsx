@@ -42,10 +42,10 @@ export function EntityPage(): JSX.Element {
         let target
         switch (tab) {
             case 0:
-                target = user?.userstreams.homeStream
+                target = user?.userstreams?.homeStream
                 break
             case 1:
-                target = user?.userstreams.associationStream
+                target = user?.userstreams?.associationStream
                 break
         }
         return target ? [target] : []
@@ -87,7 +87,7 @@ export function EntityPage(): JSX.Element {
                     }}
                     disableRipple
                 >
-                    <b>{user.profile.username || 'anonymous'}</b>
+                    <b>{user.profile?.username || 'anonymous'}</b>
                 </Button>
                 <Box
                     sx={{
@@ -151,7 +151,7 @@ export function EntityPage(): JSX.Element {
             >
                 <Box /* profile */
                     sx={{
-                        backgroundImage: `url(${user.profile.banner || Background})`,
+                        backgroundImage: `url(${user.profile?.banner || Background})`,
                         backgroundPosition: 'center',
                         backgroundSize: 'cover',
                         display: 'flex',
@@ -166,8 +166,8 @@ export function EntityPage(): JSX.Element {
                         }}
                     >
                         <CCAvatar
-                            alt={user.profile.username}
-                            avatarURL={user.profile.avatar}
+                            alt={user.profile?.username}
+                            avatarURL={user.profile?.avatar}
                             identiconSource={user.ccaddr}
                             sx={{
                                 width: '80px',
@@ -199,7 +199,7 @@ export function EntityPage(): JSX.Element {
                                     alignItems: 'center'
                                 }}
                             >
-                                <Typography>{user.profile.description}</Typography>
+                                <Typography>{user.profile?.description}</Typography>
                             </Box>
                             <Box
                                 sx={{

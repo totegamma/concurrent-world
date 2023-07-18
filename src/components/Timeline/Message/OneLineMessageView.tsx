@@ -29,8 +29,8 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                 to={'/entity/' + props.message.author.ccaddr}
             >
                 <CCAvatar
-                    alt={props.message.author.profile.username}
-                    avatarURL={props.message.author.profile.avatar}
+                    alt={props.message.author.profile?.username}
+                    avatarURL={props.message.author.profile?.avatar}
                     identiconSource={props.message.author.ccaddr}
                     sx={{
                         width: { xs: '38px', sm: '48px' },

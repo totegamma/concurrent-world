@@ -96,7 +96,7 @@ export function Settings(props: SettingsProp): JSX.Element {
                             }}
                         >
                             <ProfileEditor
-                                id={appData.user?.profile.id}
+                                id={appData.user?.profile?.id}
                                 initial={appData.user?.profile}
                                 onSubmit={(_profile) => {
                                     enqueueSnackbar('更新しました', { variant: 'success' })

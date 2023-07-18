@@ -45,11 +45,11 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                                     height: '20px',
                                     width: '20px'
                                 }}
-                                avatarURL={value.author.profile.avatar}
+                                avatarURL={value.author.profile?.avatar}
                                 identiconSource={value.author.ccaddr}
                                 alt={value.author.ccaddr}
                             />
-                            {value.author.profile.username ?? 'anonymous'}
+                            {value.author.profile?.username ?? 'anonymous'}
                         </Box>
                     ) : (
                         <Fragment key={0} />

@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import { useEffect, useState } from 'react'
-import { Schemas, type Profile, RawProfile } from '@concurrent-world/client'
+import { type Profile } from '@concurrent-world/client'
 import Button from '@mui/material/Button'
 import { useApi } from '../context/api'
 import { CCAvatar } from './CCAvatar'
@@ -24,12 +24,16 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
 
     const updateProfile = async (): Promise<void> => {
         if (props.id === undefined) {
-            throw new Error('id is undefined')
+            client.createProfile(username, description, avatar, banner).then((data) => {
+                console.log(data)
+                props.onSubmit?.(data)
+            })
+        } else {
+            client.updateProfile(props.id, username, description, avatar, banner).then((data) => {
+                console.log(data)
+                props.onSubmit?.(data)
+            })
         }
-        client.updateProfile(props.id, username, description, avatar, banner).then((data) => {
-            console.log(data)
-            props.onSubmit?.(data)
-        })
     }
 
     useEffect(() => {
@@ -111,7 +115,7 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
                         updateProfile()
                     }}
                 >
-                    Update
+                    {props.id === undefined ? '新規作成' : '更新'}
                 </Button>
             </Box>
         </Box>

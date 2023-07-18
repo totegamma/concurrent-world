@@ -36,7 +36,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const appData = useContext(ApplicationContext)
     const [mode, setMode] = useState<'compose' | 'none'>('none')
 
-    const accountIsOK = appData.user?.profile !== null && appData.user?.userstreams !== null
+    const setupAccountRequired =
+        appData.user !== null && (appData.user.profile === undefined || appData.user.userstreams === undefined)
 
     const openDraft = useCallback(() => {
         setMode('compose')
@@ -123,7 +124,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     </Box>
                 </Paper>
             </Modal>
-            <Modal open={!accountIsOK} onClose={() => {}}>
+            <Modal open={setupAccountRequired} onClose={() => {}}>
                 <Paper sx={style}>
                     <Box
                         sx={{
@@ -135,6 +136,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                             アカウント設定を完了させましょう！
                         </Typography>
                         <ProfileEditor
+                            id={appData.user?.profile?.id}
+                            initial={appData.user?.profile}
                             onSubmit={(_) => {
                                 client.setupUserstreams().then(() => {
                                     client.api.getHostProfile(client.api.host).then((host) => {
