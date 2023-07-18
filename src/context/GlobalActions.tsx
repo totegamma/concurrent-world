@@ -1,16 +1,19 @@
-import { Box, Paper, Modal, Typography } from '@mui/material'
+import { Box, Paper, Modal, Typography, Divider } from '@mui/material'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
-import { Schemas, type RawDomainProfile, type CoreCharacter } from '@concurrent-world/client'
+import { Schemas, type RawDomainProfile, type CoreCharacter, type Message } from '@concurrent-world/client'
 import { Draft } from '../components/Draft'
 import { useLocation } from 'react-router-dom'
 import { usePreference } from './PreferenceContext'
 import { ApplicationContext } from '../App'
 import { ProfileEditor } from '../components/ProfileEditor'
+import { MessageContainer } from '../components/Timeline/MessageContainer'
 
 export interface GlobalActionsState {
     openDraft: () => void
+    openReply: (target: Message) => void
+    openReroute: (target: Message) => void
 }
 
 const GlobalActionsContext = createContext<GlobalActionsState | undefined>(undefined)
@@ -34,13 +37,24 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const pref = usePreference()
     const reactlocation = useLocation()
     const appData = useContext(ApplicationContext)
-    const [mode, setMode] = useState<'compose' | 'none'>('none')
+    const [mode, setMode] = useState<'compose' | 'reply' | 'reroute' | 'none'>('none')
+    const [targetMessage, setTargetMessage] = useState<Message | null>(null)
 
     const setupAccountRequired =
         appData.user !== null && (appData.user.profile === undefined || appData.user.userstreams === undefined)
 
     const openDraft = useCallback(() => {
         setMode('compose')
+    }, [])
+
+    const openReply = useCallback((target: Message) => {
+        setTargetMessage(target)
+        setMode('reply')
+    }, [])
+
+    const openReroute = useCallback((target: Message) => {
+        setTargetMessage(target)
+        setMode('reroute')
     }, [])
 
     const queriedStreams = useMemo(
@@ -90,7 +104,9 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         <GlobalActionsContext.Provider
             value={useMemo(() => {
                 return {
-                    openDraft
+                    openDraft,
+                    openReply,
+                    openReroute
                 }
             }, [])}
         >
@@ -101,28 +117,64 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     setMode('none')
                 }}
             >
-                <Paper sx={style}>
-                    <Box sx={{ display: 'flex' }}>
-                        <Draft
-                            autoFocus
-                            streamPickerInitial={streamPickerInitial}
-                            onSubmit={async (text: string, destinations: string[]) => {
-                                client
-                                    .createCurrent(text, destinations)
-                                    .then(() => {
-                                        return null
-                                    })
-                                    .catch((e) => {
-                                        return e
-                                    })
-                                    .finally(() => {
+                <>
+                    {mode === 'compose' && (
+                        <Paper sx={style}>
+                            <Box sx={{ display: 'flex' }}>
+                                <Draft
+                                    autoFocus
+                                    streamPickerInitial={streamPickerInitial}
+                                    onSubmit={async (text: string, destinations: string[]) => {
+                                        client
+                                            .createCurrent(text, destinations)
+                                            .then(() => {
+                                                return null
+                                            })
+                                            .catch((e) => {
+                                                return e
+                                            })
+                                            .finally(() => {
+                                                setMode('none')
+                                            })
+                                        return await Promise.resolve(null)
+                                    }}
+                                />
+                            </Box>
+                        </Paper>
+                    )}
+                    {targetMessage && (mode === 'reply' || mode === 'reroute') && (
+                        <Paper sx={style}>
+                            <MessageContainer messageID={targetMessage.id} messageOwner={targetMessage.author.ccaddr} />
+                            <Divider />
+                            <Box sx={{ display: 'flex' }}>
+                                <Draft
+                                    autoFocus
+                                    allowEmpty={mode === 'reroute'}
+                                    submitButtonLabel={mode === 'reply' ? 'Reply' : 'Reroute'}
+                                    streamPickerInitial={targetMessage.streams.map((e) => e.id) ?? []}
+                                    onSubmit={async (text, streams): Promise<Error | null> => {
+                                        if (mode === 'reroute')
+                                            await client.reroute(
+                                                targetMessage.id,
+                                                targetMessage.author.ccaddr,
+                                                streams,
+                                                text
+                                            )
+                                        else
+                                            await client.reply(
+                                                targetMessage.id,
+                                                targetMessage.author.ccaddr,
+                                                streams,
+                                                text
+                                            )
                                         setMode('none')
-                                    })
-                                return await Promise.resolve(null)
-                            }}
-                        />
-                    </Box>
-                </Paper>
+                                        return null
+                                    }}
+                                />
+                            </Box>
+                        </Paper>
+                    )}
+                </>
             </Modal>
             <Modal open={setupAccountRequired} onClose={() => {}}>
                 <Paper sx={style}>

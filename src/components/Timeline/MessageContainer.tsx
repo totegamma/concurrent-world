@@ -6,8 +6,8 @@ import { ReRouteMessageFrame } from './Message/ReRouteMessageFrame'
 import { MessageSkeleton } from '../MessageSkeleton'
 import { Typography } from '@mui/material'
 import { useInspector } from '../../context/Inspector'
-import { useMessageDetail } from '../../context/MessageDetail'
 import { MessageView } from './Message/MessageView'
+import { useGlobalActions } from '../../context/GlobalActions'
 
 export interface MessageServiceState {
     addFavorite: () => void
@@ -36,7 +36,7 @@ interface MessageContainerProps {
 export const MessageContainer = memo<MessageContainerProps>((props: MessageContainerProps): JSX.Element | null => {
     const client = useApi()
     const inspector = useInspector()
-    const messageDetail = useMessageDetail()
+    const actions = useGlobalActions()
     const [message, setMessage] = useState<M_Current | M_Reroute | M_Reply | null>()
     const [isFetching, setIsFetching] = useState<boolean>(true)
 
@@ -102,13 +102,13 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
 
     const openReply = useCallback(() => {
         if (!message) return
-        messageDetail.openAction('reply', message.id, message.author.ccaddr)
-    }, [message, messageDetail])
+        actions.openReply(message)
+    }, [message, actions])
 
     const openReroute = useCallback(() => {
         if (!message) return
-        messageDetail.openAction('reroute', message.id, message.author.ccaddr)
-    }, [message, messageDetail])
+        actions.openReroute(message)
+    }, [message, actions])
 
     useEffect(() => {
         loadMessage()

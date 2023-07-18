@@ -9,7 +9,6 @@ import { useApi } from '../../context/api'
 import { InspectorProvider } from '../../context/Inspector'
 import { Loading } from '../Loading'
 import { MessageContainer } from './MessageContainer'
-import { MessageDetailProvider } from '../../context/MessageDetail'
 import { ErrorBoundary } from 'react-error-boundary'
 import HeartBrokenIcon from '@mui/icons-material/HeartBroken'
 
@@ -99,66 +98,64 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
 
     return (
         <InspectorProvider>
-            <MessageDetailProvider>
-                <List sx={{ flex: 1, width: '100%' }}>
-                    <InfiniteScroll
-                        loadMore={() => {
-                            loadMore()
-                        }}
-                        initialLoad={false}
-                        hasMore={hasMoreData}
-                        loader={<Loading key={0} message="Loading..." color={theme.palette.text.primary} />}
-                        useWindow={false}
-                        getScrollParent={() => props.scrollParentRef.current}
-                    >
-                        {props.timeline.current.map((e) => {
-                            let element
-                            switch (e.type) {
-                                case 'message':
-                                    element = (
-                                        <MessageContainer
-                                            messageID={e.id}
-                                            messageOwner={e.author}
-                                            lastUpdated={e.LastUpdated}
-                                            after={divider}
-                                        />
-                                    )
-                                    break
-                                case 'association':
-                                    element = (
-                                        <AssociationFrame
-                                            association={e}
-                                            lastUpdated={e.LastUpdated}
-                                            after={divider}
-                                            perspective={props.perspective}
-                                        />
-                                    )
-                                    break
-                                default:
-                                    element = <Typography>Unknown message type: {e.type}</Typography>
-                                    break
-                            }
+            <List sx={{ flex: 1, width: '100%' }}>
+                <InfiniteScroll
+                    loadMore={() => {
+                        loadMore()
+                    }}
+                    initialLoad={false}
+                    hasMore={hasMoreData}
+                    loader={<Loading key={0} message="Loading..." color={theme.palette.text.primary} />}
+                    useWindow={false}
+                    getScrollParent={() => props.scrollParentRef.current}
+                >
+                    {props.timeline.current.map((e) => {
+                        let element
+                        switch (e.type) {
+                            case 'message':
+                                element = (
+                                    <MessageContainer
+                                        messageID={e.id}
+                                        messageOwner={e.author}
+                                        lastUpdated={e.LastUpdated}
+                                        after={divider}
+                                    />
+                                )
+                                break
+                            case 'association':
+                                element = (
+                                    <AssociationFrame
+                                        association={e}
+                                        lastUpdated={e.LastUpdated}
+                                        after={divider}
+                                        perspective={props.perspective}
+                                    />
+                                )
+                                break
+                            default:
+                                element = <Typography>Unknown message type: {e.type}</Typography>
+                                break
+                        }
 
-                            return (
-                                <React.Fragment key={e.id}>
-                                    <ErrorBoundary
-                                        fallback={
-                                            <ListItem>
-                                                <ListItemIcon>
-                                                    <HeartBrokenIcon />
-                                                </ListItemIcon>
-                                                <ListItemText>この要素の描画中に問題が発生しました</ListItemText>
-                                            </ListItem>
-                                        }
-                                    >
-                                        {element}
-                                    </ErrorBoundary>
-                                </React.Fragment>
-                            )
-                        })}
-                    </InfiniteScroll>
-                </List>
-            </MessageDetailProvider>
+                        return (
+                            <React.Fragment key={e.id}>
+                                <ErrorBoundary
+                                    fallback={
+                                        <ListItem>
+                                            <ListItemIcon>
+                                                <HeartBrokenIcon />
+                                            </ListItemIcon>
+                                            <ListItemText>この要素の描画中に問題が発生しました</ListItemText>
+                                        </ListItem>
+                                    }
+                                >
+                                    {element}
+                                </ErrorBoundary>
+                            </React.Fragment>
+                        )
+                    })}
+                </InfiniteScroll>
+            </List>
         </InspectorProvider>
     )
 })
