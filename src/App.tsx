@@ -39,6 +39,11 @@ import { PreferenceProvider } from './context/PreferenceContext'
 import { GlobalActionsProvider } from './context/GlobalActions'
 import { EmojiPickerProvider } from './context/EmojiPickerContext'
 
+// @ts-expect-error vite dynamic import
+import { branch, sha } from '~build/info'
+const branchName = branch || window.location.host.split('.')[0]
+const versionString = `${location.hostname}-${branchName as string}-${sha.slice(0, 7) as string}`
+
 export const ApplicationContext = createContext<appData>({
     user: null,
     emojiDict: {},
@@ -58,12 +63,15 @@ export const ClockContext = createContext<Date>(new Date())
 function App(): JSX.Element {
     const [domain] = usePersistent<string>('Domain', '')
     const [prvkey] = usePersistent<string>('PrivateKey', '')
-    const [address] = usePersistent<string>('Address', '')
     const [client, initializeClient] = useState<Client>()
     useEffect(() => {
-        const client = new Client(address, prvkey, domain, 'cc-client')
-        initializeClient(client)
-    }, [domain, address, prvkey])
+        try {
+            const client = new Client(prvkey, domain, versionString)
+            initializeClient(client)
+        } catch (e) {
+            console.log(e)
+        }
+    }, [domain, prvkey])
 
     const [themeName, setThemeName] = usePersistent<string>('Theme', Object.keys(Themes)[0])
 
@@ -148,10 +156,10 @@ function App(): JSX.Element {
     }, [])
 
     useEffect(() => {
-        client?.getUser(address).then((user) => {
+        client?.getUser(client.ccid).then((user) => {
             setUser(user)
         })
-    }, [address, client])
+    }, [client])
 
     useEffect(() => {
         sendJsonMessage({

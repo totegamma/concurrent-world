@@ -1,5 +1,4 @@
-import { ec as Ec } from 'elliptic'
-import { computeAddress, Mnemonic, randomBytes, HDNodeWallet } from 'ethers'
+import { Mnemonic, randomBytes, HDNodeWallet } from 'ethers'
 import { LangJa } from './utils/lang-ja'
 
 interface identity {
@@ -60,45 +59,6 @@ export const isValid256k1PrivateKey = (key: string): boolean => {
     const privateKey = BigInt(`0x${key}`)
     const n = BigInt('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141')
     return privateKey > BigInt(0) && privateKey < n
-}
-
-export const Keygen = (): key => {
-    const ellipsis = new Ec('secp256k1')
-    const keyPair = ellipsis.genKeyPair()
-    const privatekey = keyPair.getPrivate().toString('hex')
-    const publickey = keyPair.getPublic().encode('hex', false)
-    const ethAddress = computeAddress('0x' + publickey)
-    const ccaddress = 'CC' + ethAddress.slice(2)
-    return {
-        privatekey,
-        publickey,
-        ccaddress
-    }
-}
-
-export const LoadKey = (privateKey: string): key | null => {
-    try {
-        const ellipsis = new Ec('secp256k1')
-        const keyPair = ellipsis.keyFromPrivate(privateKey)
-        if (!keyPair.getPrivate()) return null
-        const privatekey = keyPair.getPrivate().toString('hex')
-        const publickey = keyPair.getPublic().encode('hex', false)
-        const ethAddress = computeAddress('0x' + publickey)
-        const ccaddress = 'CC' + ethAddress.slice(2)
-        return {
-            privatekey,
-            publickey,
-            ccaddress
-        }
-    } catch (error) {
-        return null
-    }
-}
-
-interface key {
-    privatekey: string
-    publickey: string
-    ccaddress: string
 }
 
 export type DeepPartial<T> = {

@@ -75,7 +75,7 @@ export function Registration(): JSX.Element {
         setCCID(identity.CCID)
         setPrivateKey(identity.privateKey)
         setPublicKey(identity.publicKey)
-        initializeClient(new Client(identity.CCID, identity.privateKey, 'hub.concurrent.world'))
+        initializeClient(new Client(identity.privateKey, 'hub.concurrent.world'))
     }, [])
 
     const [server, setServer] = useState<string>('')
@@ -84,7 +84,7 @@ export function Registration(): JSX.Element {
 
     useEffect(() => {
         if (!CCID || !privateKey || !host) return
-        const api = new Client(CCID, privateKey, host.fqdn)
+        const api = new Client(privateKey, host.fqdn)
         initializeClient(api)
     }, [host, CCID, privateKey])
 
@@ -103,7 +103,6 @@ export function Registration(): JSX.Element {
         localStorage.setItem('Domain', JSON.stringify(host.fqdn))
         localStorage.setItem('PublicKey', JSON.stringify(publicKey))
         localStorage.setItem('PrivateKey', JSON.stringify(privateKey))
-        localStorage.setItem('Address', JSON.stringify(CCID))
         localStorage.setItem('Mnemonic', JSON.stringify(mnemonic))
 
         client?.api

@@ -27,7 +27,9 @@ export function GuestTimelinePage(): JSX.Element {
 
         const resolver = queriedStreams[0].split('@')[1]
 
-        const client = new Client('', '', resolver)
+        // well-known guest
+        // らたい すいか きけんせい うつる てんない にいがた れきだい つながる あたためる みいら よゆう えもの
+        const client = new Client('8c215bedacf0888470fd2567d03a813f4ae926be4a2cd587979809b629d70592', resolver)
 
         initializeClient(client)
     }, [])
