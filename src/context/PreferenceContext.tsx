@@ -128,6 +128,7 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
                 setDevMode(parsed.devMode ?? false)
                 setShowEditorOnTop(parsed.showEditorOnTop ?? true)
                 setShowEditorOnTopMobile(parsed.showEditorOnTopMobile ?? false)
+                setLists(parsed.lists ?? {})
             })
             .catch((e) => {
                 setInitialized(true)
@@ -152,7 +153,8 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
             defaultPostNonHome,
             devMode,
             showEditorOnTop,
-            showEditorOnTopMobile
+            showEditorOnTopMobile,
+            lists
         })
         client.api.writeKV('world.concurrent.preference', storage)
     }, [
@@ -165,7 +167,8 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
         defaultPostNonHome,
         devMode,
         showEditorOnTop,
-        showEditorOnTopMobile
+        showEditorOnTopMobile,
+        lists
     ])
 
     const value = useMemo(() => {

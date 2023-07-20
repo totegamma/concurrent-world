@@ -63,7 +63,13 @@ export interface ConcurrentTheme extends Theme {
 export interface StreamList {
     label: string
     pinned: boolean
-    streams: string[]
+    items: Followable[]
+}
+
+export interface Followable {
+    type: 'stream' | 'user'
+    id: string
+    userID?: string
 }
 
 export type CCID = string

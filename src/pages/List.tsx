@@ -1,5 +1,5 @@
 import { Box, Button, Collapse, Divider, IconButton, Tab, Tabs, TextField, Zoom, useTheme } from '@mui/material'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { usePreference } from '../context/PreferenceContext'
 import { type ConcurrentTheme, type StreamElementDated } from '../model'
@@ -42,6 +42,10 @@ export function ListPage(props: ListPageProps): JSX.Element {
         navigate(`#${tab}`)
     }, [tab])
 
+    const streams = useMemo(() => {
+        return pref.lists[id]?.items.map((e) => e.id) ?? []
+    }, [pref.lists[id]])
+
     const theme = useTheme<ConcurrentTheme>()
     const iconColor = theme.palette.background.contrastText
 
@@ -61,7 +65,7 @@ export function ListPage(props: ListPageProps): JSX.Element {
                             home: {
                                 label: 'Home',
                                 pinned: true,
-                                streams: []
+                                items: []
                             }
                         })
                         window.location.reload()
@@ -162,8 +166,8 @@ export function ListPage(props: ListPageProps): JSX.Element {
 
             <Tabs
                 value={tab}
-                onChange={(_, index) => {
-                    setTab(index)
+                onChange={(_, newValue) => {
+                    setTab(newValue)
                 }}
             >
                 {Object.keys(pref.lists)
@@ -212,7 +216,7 @@ export function ListPage(props: ListPageProps): JSX.Element {
                                     old[id] = {
                                         label: listName,
                                         pinned: old[id].pinned,
-                                        streams: old[id].streams
+                                        items: old[id].items
                                     }
                                     pref.setLists(JSON.parse(JSON.stringify(old)))
                                 }}
@@ -227,7 +231,7 @@ export function ListPage(props: ListPageProps): JSX.Element {
                                     old[id] = {
                                         label: listName,
                                         pinned: !old[id].pinned,
-                                        streams: old[id].streams
+                                        items: old[id].items
                                     }
                                     pref.setLists(JSON.parse(JSON.stringify(old)))
                                 }}
@@ -278,11 +282,7 @@ export function ListPage(props: ListPageProps): JSX.Element {
                     <Divider />
                 </Box>
                 <Box sx={{ display: 'flex', flex: 1, py: { xs: 1, sm: 1 }, px: { xs: 1, sm: 2 } }}>
-                    <Timeline
-                        streams={pref.lists[id].streams}
-                        timeline={props.messages}
-                        scrollParentRef={scrollParentRef}
-                    />
+                    <Timeline streams={streams} timeline={props.messages} scrollParentRef={scrollParentRef} />
                 </Box>
             </Box>
         </Box>

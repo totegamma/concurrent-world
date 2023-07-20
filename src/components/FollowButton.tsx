@@ -1,61 +1,57 @@
-import { IconButton, Zoom, useTheme } from '@mui/material'
-import { useSnackbar } from 'notistack'
+import { Checkbox, IconButton, Menu, MenuItem } from '@mui/material'
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1'
-import PersonRemoveIcon from '@mui/icons-material/PersonRemove'
 import { usePreference } from '../context/PreferenceContext'
+import { useState } from 'react'
 
 export interface FollowButtonProps {
     color?: string
     userCCID: string
+    userStreamID: string
 }
 
 export const FollowButton = (props: FollowButtonProps): JSX.Element => {
-    const theme = useTheme()
     const pref = usePreference()
-    const { enqueueSnackbar } = useSnackbar()
-    const following = props.userCCID && pref.followingUsers.includes(props.userCCID)
-
-    const transitionDuration = {
-        enter: theme.transitions.duration.enteringScreen,
-        exit: theme.transitions.duration.leavingScreen
-    }
+    const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
     return (
         <>
-            <Zoom
-                in={following || false}
-                timeout={transitionDuration}
-                style={{
-                    transitionDelay: `${following ? transitionDuration.exit : 0}ms`
+            <IconButton
+                onClick={(e) => {
+                    setMenuAnchor(e.currentTarget)
                 }}
-                unmountOnExit
             >
-                <IconButton
-                    onClick={() => {
-                        props.userCCID && pref.unfollowUser(props.userCCID)
-                        enqueueSnackbar('Unfollowed', { variant: 'success' })
-                    }}
-                >
-                    <PersonRemoveIcon sx={{ color: props.color ?? 'primary.contrastText' }} />
-                </IconButton>
-            </Zoom>
-            <Zoom
-                in={!following}
-                timeout={transitionDuration}
-                style={{
-                    transitionDelay: `${following ? 0 : transitionDuration.exit}ms`
+                <PersonAddAlt1Icon sx={{ color: props.color ?? 'primary.contrastText' }} />
+            </IconButton>
+            <Menu
+                anchorEl={menuAnchor}
+                open={Boolean(menuAnchor)}
+                onClose={() => {
+                    setMenuAnchor(null)
                 }}
-                unmountOnExit
             >
-                <IconButton
-                    onClick={() => {
-                        props.userCCID && pref.followUser(props.userCCID)
-                        enqueueSnackbar('Followed', { variant: 'success' })
-                    }}
-                >
-                    <PersonAddAlt1Icon sx={{ color: props.color ?? 'primary.contrastText' }} />
-                </IconButton>
-            </Zoom>
+                {Object.keys(pref.lists).map((e) => (
+                    <MenuItem key={e} onClick={() => {}}>
+                        {pref.lists[e].label}
+                        <Checkbox
+                            checked={pref.lists[e].items.map((e) => e.id).includes(props.userStreamID)}
+                            onChange={(check) => {
+                                const old = pref.lists
+                                if (check.target.checked) {
+                                    old[e].items.push({
+                                        type: 'user',
+                                        id: props.userStreamID,
+                                        userID: props.userCCID
+                                    })
+                                    pref.setLists(old)
+                                } else {
+                                    old[e].items = old[e].items.filter((e) => e.id !== props.userStreamID)
+                                    pref.setLists(old)
+                                }
+                            }}
+                        />
+                    </MenuItem>
+                ))}
+            </Menu>
         </>
     )
 }

@@ -136,7 +136,7 @@ export function EntityPage(): JSX.Element {
                             {mode === 'edit' && <Navigate to="/settings" />}
                         </>
                     ) : (
-                        <>{id && <FollowButton userCCID={id} />}</>
+                        <>{id && <FollowButton userCCID={id} userStreamID={user.userstreams?.homeStream ?? ''} />}</>
                     )}
                 </Box>
             </Box>

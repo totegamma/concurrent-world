@@ -1,5 +1,8 @@
 import { Mnemonic, randomBytes, HDNodeWallet } from 'ethers'
 import { LangJa } from './utils/lang-ja'
+import { StreamID } from '@concurrent-world/client/dist/types/model/core'
+import { Followable } from './model'
+import { Client } from '@concurrent-world/client'
 
 interface identity {
     mnemonic: string

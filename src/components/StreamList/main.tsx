@@ -24,7 +24,7 @@ export const StreamList = (): JSX.Element => {
                             old[uuidv4()] = {
                                 label: 'new list',
                                 pinned: false,
-                                streams: []
+                                items: []
                             }
                             pref.setLists(old)
                         }}

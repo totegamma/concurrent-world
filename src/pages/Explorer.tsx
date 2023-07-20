@@ -23,7 +23,6 @@ import { useEffect, useState } from 'react'
 import { usePreference } from '../context/PreferenceContext'
 
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
-import { StreamList } from '../model'
 
 export function Explorer(): JSX.Element {
     const client = useApi()
@@ -173,14 +172,17 @@ export function Explorer(): JSX.Element {
                     <MenuItem key={e} onClick={() => {}}>
                         {pref.lists[e].label}
                         <Checkbox
-                            checked={pref.lists[e].streams.includes(selectedStream)}
+                            checked={pref.lists[e].items.map((e) => e.id).includes(selectedStream)}
                             onChange={(check) => {
                                 const old = pref.lists
                                 if (check.target.checked) {
-                                    old[e].streams.push(selectedStream)
+                                    old[e].items.push({
+                                        type: 'stream',
+                                        id: selectedStream
+                                    })
                                     pref.setLists(old)
                                 } else {
-                                    old[e].streams = old[e].streams.filter((e) => e !== selectedStream)
+                                    old[e].items = old[e].items.filter((e) => e.id !== selectedStream)
                                     pref.setLists(old)
                                 }
                             }}

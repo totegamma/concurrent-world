@@ -35,10 +35,10 @@ export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
             </ListItemButton>
             <Collapse in={open} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
-                    {props.body.streams.map((stream) => (
+                    {props.body.items.map((stream) => (
                         <StreamLink
-                            key={stream}
-                            id={stream}
+                            key={stream.id}
+                            followable={stream}
                             sx={{
                                 pl: 4
                             }}
