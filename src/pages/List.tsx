@@ -50,6 +50,29 @@ export function ListPage(props: ListPageProps): JSX.Element {
         exit: theme.transitions.duration.leavingScreen
     }
 
+    if (!pref.lists[id]) {
+        return (
+            <Box>
+                <div>list not found</div>
+                <Button
+                    variant="contained"
+                    onClick={() => {
+                        pref.setLists({
+                            home: {
+                                label: 'Home',
+                                pinned: true,
+                                streams: []
+                            }
+                        })
+                        window.location.reload()
+                    }}
+                >
+                    治す
+                </Button>
+            </Box>
+        )
+    }
+
     return (
         <Box
             sx={{
