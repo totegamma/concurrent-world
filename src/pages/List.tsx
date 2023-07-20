@@ -1,16 +1,4 @@
-import {
-    Box,
-    Button,
-    Collapse,
-    Divider,
-    IconButton,
-    Tab,
-    Tabs,
-    TextField,
-    Typography,
-    Zoom,
-    useTheme
-} from '@mui/material'
+import { Box, Button, Collapse, Divider, IconButton, Tab, Tabs, TextField, Zoom, useTheme } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { usePreference } from '../context/PreferenceContext'
@@ -176,12 +164,20 @@ export function ListPage(props: ListPageProps): JSX.Element {
                     }}
                 >
                     <Collapse in={mode === 'settings'}>
-                        <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                gap: 1,
+                                p: 1
+                            }}
+                        >
                             <TextField
                                 label="list name"
                                 variant="outlined"
                                 value={listName}
-                                sx={{ flexGrow: 1 }}
+                                sx={{
+                                    flexGrow: 1
+                                }}
                                 onChange={(e) => {
                                     setListName(e.target.value)
                                 }}
