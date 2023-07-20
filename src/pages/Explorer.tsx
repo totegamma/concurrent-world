@@ -1,12 +1,14 @@
 import {
     Box,
     Button,
+    Checkbox,
     Divider,
     IconButton,
     List,
     ListItem,
     ListItemButton,
     ListItemText,
+    Menu,
     MenuItem,
     Select,
     TextField,
@@ -20,11 +22,8 @@ import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { usePreference } from '../context/PreferenceContext'
 
-import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd'
-import BookmarkRemoveIcon from '@mui/icons-material/BookmarkRemove'
-
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
-import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove'
+import { StreamList } from '../model'
 
 export function Explorer(): JSX.Element {
     const client = useApi()
@@ -35,6 +34,9 @@ export function Explorer(): JSX.Element {
     const [currentHost, setCurrentHost] = useState<string>(client.api.host ?? '')
     const [streams, setStreams] = useState<Stream[]>([])
     const [newStreamName, setNewStreamName] = useState<string>('')
+
+    const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
+    const [selectedStream, setSelectedStream] = useState<string>('')
 
     const loadHosts = (): void => {
         client.api.getKnownHosts().then((e) => {
@@ -129,68 +131,19 @@ export function Explorer(): JSX.Element {
                             disablePadding
                             secondaryAction={
                                 <>
-                                    <Tooltip
-                                        title={
-                                            pref.bookmarkingStreams.includes(value.id)
-                                                ? 'サイドバーから削除'
-                                                : 'サイドバーに追加'
-                                        }
-                                        placement="top"
-                                        arrow
-                                    >
+                                    <Tooltip title="リストに追加" placement="top" arrow>
                                         <IconButton
                                             sx={{ flexGrow: 0 }}
-                                            onClick={() => {
-                                                if (pref.bookmarkingStreams.includes(value.id)) {
-                                                    pref.unbookmarkStream(value.id)
-                                                } else {
-                                                    pref.bookmarkStream(value.id)
-                                                }
+                                            onClick={(e) => {
+                                                setMenuAnchor(e.currentTarget)
+                                                setSelectedStream(value.id)
                                             }}
                                         >
-                                            {pref.bookmarkingStreams.includes(value.id) ? (
-                                                <BookmarkRemoveIcon
-                                                    sx={{
-                                                        color: theme.palette.text.primary
-                                                    }}
-                                                />
-                                            ) : (
-                                                <BookmarkAddIcon
-                                                    sx={{
-                                                        color: theme.palette.text.primary
-                                                    }}
-                                                />
-                                            )}
-                                        </IconButton>
-                                    </Tooltip>
-                                    <Tooltip
-                                        title={pref.followingStreams.includes(value.id) ? 'フォロー解除' : 'フォロー'}
-                                        placement="top"
-                                        arrow
-                                    >
-                                        <IconButton
-                                            sx={{ flexGrow: 0 }}
-                                            onClick={() => {
-                                                if (pref.followingStreams.includes(value.id)) {
-                                                    pref.unfollowStream(value.id)
-                                                } else {
-                                                    pref.followStream(value.id)
-                                                }
-                                            }}
-                                        >
-                                            {pref.followingStreams.includes(value.id) ? (
-                                                <PlaylistRemoveIcon
-                                                    sx={{
-                                                        color: theme.palette.text.primary
-                                                    }}
-                                                />
-                                            ) : (
-                                                <PlaylistAddIcon
-                                                    sx={{
-                                                        color: theme.palette.text.primary
-                                                    }}
-                                                />
-                                            )}
+                                            <PlaylistAddIcon
+                                                sx={{
+                                                    color: theme.palette.text.primary
+                                                }}
+                                            />
                                         </IconButton>
                                     </Tooltip>
                                 </>
@@ -209,6 +162,32 @@ export function Explorer(): JSX.Element {
                     )
                 })}
             </List>
+            <Menu
+                anchorEl={menuAnchor}
+                open={Boolean(menuAnchor)}
+                onClose={() => {
+                    setMenuAnchor(null)
+                }}
+            >
+                {Object.keys(pref.lists).map((e) => (
+                    <MenuItem key={e} onClick={() => {}}>
+                        {pref.lists[e].label}
+                        <Checkbox
+                            checked={pref.lists[e].streams.includes(selectedStream)}
+                            onChange={(check) => {
+                                const old = pref.lists
+                                if (check.target.checked) {
+                                    old[e].streams.push(selectedStream)
+                                    pref.setLists(old)
+                                } else {
+                                    old[e].streams = old[e].streams.filter((e) => e !== selectedStream)
+                                    pref.setLists(old)
+                                }
+                            }}
+                        />
+                    </MenuItem>
+                ))}
+            </Menu>
         </Box>
     )
 }

@@ -60,4 +60,10 @@ export interface ConcurrentTheme extends Theme {
     palette: ConcurrentPalette
 }
 
+export interface StreamList {
+    label: string
+    pinned: boolean
+    streams: string[]
+}
+
 export type CCID = string

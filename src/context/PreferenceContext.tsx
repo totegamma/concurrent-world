@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { usePersistent } from '../hooks/usePersistent'
 import { useApi } from './api'
+import { type StreamList } from '../model'
 
 interface PreferenceState {
     themeName: string
@@ -35,6 +36,9 @@ interface PreferenceState {
 
     showEditorOnTopMobile: boolean
     setShowEditorOnTopMobile: (_: boolean) => void
+
+    lists: Record<string, StreamList>
+    setLists: (_: Record<string, StreamList>) => void
 }
 
 const PreferenceContext = createContext<PreferenceState | undefined>(undefined)
@@ -58,6 +62,7 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
     const [devMode, setDevMode] = usePersistent<boolean>('devMode', false)
     const [showEditorOnTop, setShowEditorOnTop] = usePersistent<boolean>('showEditorOnTop', true)
     const [showEditorOnTopMobile, setShowEditorOnTopMobile] = usePersistent<boolean>('showEditorOnTopMobile', false)
+    const [lists, setLists] = usePersistent<Record<string, StreamList>>('lists', {})
 
     const followUser = useCallback(
         (ccaddr: string): void => {
@@ -130,6 +135,10 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
             })
     }, [])
 
+    const setListsWrapper = useCallback((list: Record<string, StreamList>) => {
+        setLists(JSON.parse(JSON.stringify(list)))
+    }, [])
+
     useEffect(() => {
         if (!client) return
         if (!initialized) return
@@ -184,7 +193,9 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
             showEditorOnTop,
             setShowEditorOnTop,
             showEditorOnTopMobile,
-            setShowEditorOnTopMobile
+            setShowEditorOnTopMobile,
+            lists,
+            setLists: setListsWrapper
         }
     }, [
         themeName,
@@ -210,7 +221,9 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
         showEditorOnTop,
         setShowEditorOnTop,
         showEditorOnTopMobile,
-        setShowEditorOnTopMobile
+        setShowEditorOnTopMobile,
+        lists,
+        setListsWrapper
     ])
 
     return <PreferenceContext.Provider value={value}>{props.children}</PreferenceContext.Provider>

@@ -18,7 +18,7 @@ import {
 } from '@concurrent-world/client'
 import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu'
-import type { StreamElementDated, Emoji, ConcurrentTheme } from './model'
+import type { StreamElementDated, Emoji, ConcurrentTheme, StreamList } from './model'
 import {
     Associations,
     Explorer,
@@ -41,6 +41,7 @@ import { EmojiPickerProvider } from './context/EmojiPickerContext'
 
 // @ts-expect-error vite dynamic import
 import { branch, sha } from '~build/info'
+import { ListPage } from './pages/List'
 const branchName = branch || window.location.host.split('.')[0]
 const versionString = `${location.hostname}-${branchName as string}-${sha.slice(0, 7) as string}`
 
@@ -88,10 +89,17 @@ function App(): JSX.Element {
         })
     }, [client])
 
+    const [lists] = usePersistent<Record<string, StreamList>>('lists', {})
+
     const path = useLocation()
     const displayingStream: string[] = useMemo(() => {
         switch (path.pathname) {
             case '/': {
+                const rawid = path.hash.replace('#', '')
+                const list = lists[rawid] ?? Object.values(lists)[0]
+                return list?.streams ?? []
+            }
+            case '/stream': {
                 const query = path.hash.replace('#', '').split(',')
                 if (query.length === 0 || query[0] === '') {
                     // is Home
@@ -400,7 +408,7 @@ function App(): JSX.Element {
                         >
                             <Routes>
                                 <Route
-                                    index
+                                    path="/stream"
                                     element={<TimelinePage messages={messages} setMobileMenuOpen={setMobileMenuOpen} />}
                                 />
                                 <Route path="/associations" element={<Associations messages={messages} />} />
@@ -409,6 +417,7 @@ function App(): JSX.Element {
                                 <Route path="/settings" element={<Settings setThemeName={setThemeName} />} />
                                 <Route path="/message/:id" element={<MessagePage />} />
                                 <Route path="/entity/:id" element={<EntityPage />} />
+                                <Route index element={<ListPage messages={messages} />} />
                                 <Route path="/devtool" element={<Devtool />} />
                             </Routes>
                         </Paper>
