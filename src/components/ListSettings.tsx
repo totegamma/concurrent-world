@@ -29,8 +29,7 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
     }, [props.id])
 
     useEffect(() => {
-        const streamIDs = list.items.filter((e) => e.type === 'stream').map((e) => e.id)
-        Promise.all(streamIDs.map((streamID) => client.getStream(streamID))).then((streams) => {
+        Promise.all(list.streams.map((streamID) => client.getStream(streamID))).then((streams) => {
             setOptions(streams.filter((e) => e !== null) as Stream[])
         })
 
@@ -66,11 +65,8 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                     variant="contained"
                     onClick={(_) => {
                         pref.updateList(props.id, {
-                            label: listName,
-                            pinned: list.pinned,
-                            items: list.items,
-                            expanded: list.expanded,
-                            defaultPostStreams: list.defaultPostStreams
+                            ...list,
+                            label: listName
                         })
                     }}
                 >

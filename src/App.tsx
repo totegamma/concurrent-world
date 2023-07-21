@@ -97,7 +97,8 @@ function App(): JSX.Element {
             case '/': {
                 const rawid = path.hash.replace('#', '')
                 const list = lists[rawid] ?? Object.values(lists)[0]
-                return list?.items?.map((e) => e.id) ?? []
+                if (!list) return []
+                return [...list.streams, list.userStreams.map((e) => e.streamID)].flat()
             }
             case '/stream': {
                 const query = path.hash.replace('#', '').split(',')

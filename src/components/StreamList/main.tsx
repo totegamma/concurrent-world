@@ -23,10 +23,11 @@ export const StreamList = (): JSX.Element => {
                                 label: 'new list',
                                 pinned: false,
                                 expanded: false,
-                                items: [],
+                                streams: [],
+                                userStreams: [],
                                 defaultPostStreams: []
                             }
-                            pref.setLists(old)
+                            pref.setLists(JSON.parse(JSON.stringify(old)))
                         }}
                     >
                         <AddIcon />

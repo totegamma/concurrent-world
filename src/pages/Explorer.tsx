@@ -172,18 +172,15 @@ export function Explorer(): JSX.Element {
                     <MenuItem key={e} onClick={() => {}}>
                         {pref.lists[e].label}
                         <Checkbox
-                            checked={pref.lists[e].items.map((e) => e.id).includes(selectedStream)}
+                            checked={pref.lists[e].streams.includes(selectedStream)}
                             onChange={(check) => {
                                 const old = pref.lists
                                 if (check.target.checked) {
-                                    old[e].items.push({
-                                        type: 'stream',
-                                        id: selectedStream
-                                    })
-                                    pref.setLists(old)
+                                    old[e].streams.push(selectedStream)
+                                    pref.setLists(JSON.parse(JSON.stringify(old)))
                                 } else {
-                                    old[e].items = old[e].items.filter((e) => e.id !== selectedStream)
-                                    pref.setLists(old)
+                                    old[e].streams = old[e].streams.filter((e) => e !== selectedStream)
+                                    pref.setLists(JSON.parse(JSON.stringify(old)))
                                 }
                             }}
                         />

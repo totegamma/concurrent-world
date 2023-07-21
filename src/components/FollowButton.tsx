@@ -29,23 +29,30 @@ export const FollowButton = (props: FollowButtonProps): JSX.Element => {
                     setMenuAnchor(null)
                 }}
             >
-                {Object.keys(pref.lists).map((e) => (
-                    <MenuItem key={e} onClick={() => {}}>
-                        {pref.lists[e].label}
+                {Object.keys(pref.lists).map((id) => (
+                    <MenuItem key={id} onClick={() => {}}>
+                        {pref.lists[id].label}
                         <Checkbox
-                            checked={pref.lists[e].items.map((e) => e.id).includes(props.userStreamID)}
+                            checked={pref.lists[id].userStreams.map((e) => e.userID).includes(props.userCCID)}
                             onChange={(check) => {
-                                const old = pref.lists
                                 if (check.target.checked) {
-                                    old[e].items.push({
-                                        type: 'user',
-                                        id: props.userStreamID,
-                                        userID: props.userCCID
+                                    pref.updateList(id, {
+                                        ...pref.lists[id],
+                                        userStreams: [
+                                            ...pref.lists[id].userStreams,
+                                            {
+                                                streamID: props.userStreamID,
+                                                userID: props.userCCID
+                                            }
+                                        ]
                                     })
-                                    pref.setLists(old)
                                 } else {
-                                    old[e].items = old[e].items.filter((e) => e.id !== props.userStreamID)
-                                    pref.setLists(old)
+                                    pref.updateList(id, {
+                                        ...pref.lists[id],
+                                        userStreams: pref.lists[id].userStreams.filter(
+                                            (e) => e.userID !== props.userCCID
+                                        )
+                                    })
                                 }
                             }}
                         />

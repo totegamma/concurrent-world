@@ -4,7 +4,7 @@ import { Link as RouterLink } from 'react-router-dom'
 
 import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
-import { StreamLink } from './StreamLink'
+import { StreamLink, UserStreamLink } from './StreamLink'
 import { usePreference } from '../../context/PreferenceContext'
 
 export interface StreamListItemProps {
@@ -43,10 +43,19 @@ export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
             </ListItemButton>
             <Collapse in={open} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
-                    {props.body.items.map((stream) => (
+                    {props.body.streams.map((stream) => (
                         <StreamLink
-                            key={stream.id}
-                            followable={stream}
+                            key={stream}
+                            streamID={stream}
+                            sx={{
+                                pl: 4
+                            }}
+                        />
+                    ))}
+                    {props.body.userStreams.map((stream) => (
+                        <UserStreamLink
+                            key={stream.userID}
+                            userHomeStream={stream}
                             sx={{
                                 pl: 4
                             }}

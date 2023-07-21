@@ -41,6 +41,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const [targetMessage, setTargetMessage] = useState<Message | null>(null)
 
     const [queriedStreams, setQueriedStreams] = useState<Stream[]>([])
+    const [allKnownStreams, setAllKnownStreams] = useState<Stream[]>([])
 
     const setupAccountRequired =
         appData.user !== null && (appData.user.profile === undefined || appData.user.userstreams === undefined)
@@ -54,10 +55,23 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         setMode('reply')
     }, [])
 
-    const openReroute = useCallback((target: Message) => {
-        setTargetMessage(target)
-        setMode('reroute')
-    }, [])
+    const openReroute = useCallback(
+        (target: Message) => {
+            setTargetMessage(target)
+            setMode('reroute')
+
+            if (allKnownStreams.length === 0) {
+                const allStreams = Object.values(pref.lists)
+                    .map((list) => list.streams)
+                    .flat()
+                const uniq = [...new Set(allStreams)]
+                Promise.all(uniq.map((id) => client.getStream(id))).then((streams) => {
+                    setAllKnownStreams(streams.filter((e) => e !== null) as Stream[])
+                })
+            }
+        },
+        [allKnownStreams, pref.lists]
+    )
 
     useEffect(() => {
         const ids = reactlocation.hash
@@ -146,7 +160,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                     allowEmpty={mode === 'reroute'}
                                     submitButtonLabel={mode === 'reply' ? 'Reply' : 'Reroute'}
                                     streamPickerInitial={targetMessage.streams}
-                                    streamPickerOptions={targetMessage.streams}
+                                    streamPickerOptions={mode === 'reroute' ? allKnownStreams : targetMessage.streams}
                                     onSubmit={async (text, streams): Promise<Error | null> => {
                                         if (mode === 'reroute')
                                             await client.reroute(

@@ -64,14 +64,14 @@ export interface StreamList {
     label: string
     pinned: boolean
     expanded: boolean
-    items: Followable[]
+    streams: string[]
+    userStreams: userHomeStream[]
     defaultPostStreams: string[]
 }
 
-export interface Followable {
-    type: 'stream' | 'user'
-    id: string
-    userID?: string
+export interface userHomeStream {
+    streamID: string
+    userID: string
 }
 
 export type CCID = string

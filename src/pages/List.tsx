@@ -36,8 +36,7 @@ export function ListPage(props: ListPageProps): JSX.Element {
         if (!id) return
         const list = pref.lists[id]
         if (!list) return
-        const streamIDs = list.items.filter((e) => e.type === 'stream').map((e) => e.id)
-        Promise.all(streamIDs.map((streamID) => client.getStream(streamID))).then((streams) => {
+        Promise.all(list.streams.map((streamID) => client.getStream(streamID))).then((streams) => {
             setStreams(streams.filter((e) => e !== null) as Stream[])
         })
 
@@ -57,7 +56,7 @@ export function ListPage(props: ListPageProps): JSX.Element {
     }, [tab])
 
     const streamIDs = useMemo(() => {
-        return pref.lists[id]?.items.map((e) => e.id) ?? []
+        return [...(pref.lists[id]?.streams ?? []), pref.lists[id]?.userStreams.map((e) => e.streamID) ?? []].flat()
     }, [pref.lists[id]])
 
     const theme = useTheme<ConcurrentTheme>()
@@ -79,7 +78,8 @@ export function ListPage(props: ListPageProps): JSX.Element {
                             home: {
                                 label: 'Home',
                                 pinned: true,
-                                items: [],
+                                streams: [],
+                                userStreams: [],
                                 expanded: false,
                                 defaultPostStreams: []
                             }
