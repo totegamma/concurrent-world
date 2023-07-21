@@ -1,6 +1,6 @@
-import { Box, Button, Collapse, Divider, IconButton, Tab, Tabs, TextField, Zoom, useTheme } from '@mui/material'
+import { Box, Button, Collapse, Divider, IconButton, Tab, Tabs, Typography, Zoom, useTheme } from '@mui/material'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, Link as RouterLink } from 'react-router-dom'
 import { usePreference } from '../context/PreferenceContext'
 import { type ConcurrentTheme, type StreamElementDated } from '../model'
 import { type IuseObjectList } from '../hooks/useObjectList'
@@ -8,8 +8,11 @@ import { Timeline } from '../components/Timeline'
 import { Draft } from '../components/Draft'
 import { useApi } from '../context/api'
 import { ConcurrentLogo } from '../components/ConcurrentLogo'
+import { type Stream } from '@concurrent-world/client'
 import InfoIcon from '@mui/icons-material/Info'
 import CreateIcon from '@mui/icons-material/Create'
+import ExploreIcon from '@mui/icons-material/Explore'
+import { ListSettings } from '../components/ListSettings'
 
 export interface ListPageProps {
     messages: IuseObjectList<StreamElementDated>
@@ -26,14 +29,25 @@ export function ListPage(props: ListPageProps): JSX.Element {
     const [mode, setMode] = useState<'compose' | 'settings'>('compose')
     const [tab, setTab] = useState<string>(id)
 
-    const [listName, setListName] = useState<string>('')
+    const [streams, setStreams] = useState<Stream[]>([])
+    const [postStreams, setPostStreams] = useState<Stream[]>([])
+
+    useEffect(() => {
+        if (!id) return
+        const list = pref.lists[id]
+        if (!list) return
+        const streamIDs = list.items.filter((e) => e.type === 'stream').map((e) => e.id)
+        Promise.all(streamIDs.map((streamID) => client.getStream(streamID))).then((streams) => {
+            setStreams(streams.filter((e) => e !== null) as Stream[])
+        })
+
+        Promise.all(list.defaultPostStreams.map((streamID) => client.getStream(streamID))).then((streams) => {
+            setPostStreams(streams.filter((e) => e !== null) as Stream[])
+        })
+    }, [id, pref.lists])
 
     useEffect(() => {
         if (id) {
-            const list = pref.lists[id]
-            if (list) {
-                setListName(list.label)
-            }
             setTab(id)
         }
     }, [id])
@@ -42,7 +56,7 @@ export function ListPage(props: ListPageProps): JSX.Element {
         navigate(`#${tab}`)
     }, [tab])
 
-    const streams = useMemo(() => {
+    const streamIDs = useMemo(() => {
         return pref.lists[id]?.items.map((e) => e.id) ?? []
     }, [pref.lists[id]])
 
@@ -65,7 +79,9 @@ export function ListPage(props: ListPageProps): JSX.Element {
                             home: {
                                 label: 'Home',
                                 pinned: true,
-                                items: []
+                                items: [],
+                                expanded: false,
+                                defaultPostStreams: []
                             }
                         })
                         window.location.reload()
@@ -94,14 +110,13 @@ export function ListPage(props: ListPageProps): JSX.Element {
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     backgroundColor: 'primary.main',
-                    p: { xs: '', sm: '2px 2px 2px 16px' },
+                    p: { xs: '', sm: '2px 2px 2px 2px' },
                     width: '100%'
                 }}
             >
                 <IconButton
                     sx={{
-                        p: '8px',
-                        display: { xs: 'inherit', sm: 'none' }
+                        p: '8px'
                     }}
                     onClick={() => {}}
                 >
@@ -191,67 +206,8 @@ export function ListPage(props: ListPageProps): JSX.Element {
                     }}
                 >
                     <Collapse in={mode === 'settings'}>
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                gap: 1,
-                                p: 1
-                            }}
-                        >
-                            <TextField
-                                label="list name"
-                                variant="outlined"
-                                value={listName}
-                                sx={{
-                                    flexGrow: 1
-                                }}
-                                onChange={(e) => {
-                                    setListName(e.target.value)
-                                }}
-                            />
-                            <Button
-                                variant="contained"
-                                onClick={(_) => {
-                                    const old = pref.lists
-                                    old[id] = {
-                                        label: listName,
-                                        pinned: old[id].pinned,
-                                        items: old[id].items
-                                    }
-                                    pref.setLists(JSON.parse(JSON.stringify(old)))
-                                }}
-                            >
-                                Update
-                            </Button>
-                            <Button
-                                variant="contained"
-                                color="info"
-                                onClick={(_) => {
-                                    const old = pref.lists
-                                    old[id] = {
-                                        label: listName,
-                                        pinned: !old[id].pinned,
-                                        items: old[id].items
-                                    }
-                                    pref.setLists(JSON.parse(JSON.stringify(old)))
-                                }}
-                            >
-                                {pref.lists[id].pinned ? 'Unpin' : 'Pin'}
-                            </Button>
-                            <Button
-                                variant="contained"
-                                color="error"
-                                onClick={(_) => {
-                                    const old = pref.lists
-                                    delete old[id]
-                                    pref.setLists(JSON.parse(JSON.stringify(old)))
-                                }}
-                            >
-                                Delete
-                            </Button>
-                        </Box>
+                        <ListSettings id={id} />
                     </Collapse>
-
                     <Collapse in={mode === 'compose'}>
                         <Box
                             sx={{
@@ -263,7 +219,8 @@ export function ListPage(props: ListPageProps): JSX.Element {
                             }}
                         >
                             <Draft
-                                streamPickerInitial={pref.defaultPostHome}
+                                streamPickerOptions={streams}
+                                streamPickerInitial={postStreams}
                                 onSubmit={(text: string, destinations: string[]): Promise<Error | null> => {
                                     client
                                         .createCurrent(text, destinations)
@@ -281,9 +238,40 @@ export function ListPage(props: ListPageProps): JSX.Element {
 
                     <Divider />
                 </Box>
-                <Box sx={{ display: 'flex', flex: 1, py: { xs: 1, sm: 1 }, px: { xs: 1, sm: 2 } }}>
-                    <Timeline streams={streams} timeline={props.messages} scrollParentRef={scrollParentRef} />
-                </Box>
+                {streamIDs.length > 0 ? (
+                    <Box sx={{ display: 'flex', flex: 1, py: { xs: 1, sm: 1 }, px: { xs: 1, sm: 2 } }}>
+                        <Timeline streams={streamIDs} timeline={props.messages} scrollParentRef={scrollParentRef} />
+                    </Box>
+                ) : (
+                    <Box
+                        sx={{
+                            marginTop: 4,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }}
+                    >
+                        <Box
+                            style={{
+                                display: 'flex',
+                                marginTop: 8,
+                                marginLeft: 8,
+                                marginRight: 8,
+                                flexDirection: 'column',
+                                alignItems: 'center'
+                            }}
+                        >
+                            <Button variant="contained" component={RouterLink} to="/explorer">
+                                <Typography variant="h1" sx={{ fontWeight: 600, mx: 1 }}>
+                                    Go Explore
+                                </Typography>
+                                <ExploreIcon sx={{ fontSize: '10rem', verticalAlign: 'middle' }} />
+                            </Button>
+                            <p>フォローするユーザー・ストリームを探しに行く</p>
+                        </Box>
+                    </Box>
+                )}
             </Box>
         </Box>
     )

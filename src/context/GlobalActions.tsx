@@ -2,7 +2,7 @@ import { Box, Paper, Modal, Typography, Divider } from '@mui/material'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
-import { Schemas, type RawDomainProfile, type CoreCharacter, type Message } from '@concurrent-world/client'
+import { Schemas, type RawDomainProfile, type CoreCharacter, type Message, type Stream } from '@concurrent-world/client'
 import { Draft } from '../components/Draft'
 import { useLocation } from 'react-router-dom'
 import { usePreference } from './PreferenceContext'
@@ -40,6 +40,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const [mode, setMode] = useState<'compose' | 'reply' | 'reroute' | 'none'>('none')
     const [targetMessage, setTargetMessage] = useState<Message | null>(null)
 
+    const [queriedStreams, setQueriedStreams] = useState<Stream[]>([])
+
     const setupAccountRequired =
         appData.user !== null && (appData.user.profile === undefined || appData.user.userstreams === undefined)
 
@@ -57,24 +59,15 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         setMode('reroute')
     }, [])
 
-    const queriedStreams = useMemo(
-        () =>
-            reactlocation.hash
-                .replace('#', '')
-                .split(',')
-                .filter((e) => e !== ''),
-        [reactlocation.hash]
-    )
-
-    const streamPickerInitial = useMemo(
-        () => [
-            ...new Set([
-                ...(reactlocation.hash && reactlocation.hash !== '' ? pref.defaultPostNonHome : pref.defaultPostHome),
-                ...queriedStreams
-            ])
-        ],
-        [reactlocation.hash, pref.defaultPostHome, pref.defaultPostNonHome, queriedStreams]
-    )
+    useEffect(() => {
+        const ids = reactlocation.hash
+            .replace('#', '')
+            .split(',')
+            .filter((e) => e !== '')
+        Promise.all(ids.map((id) => client.getStream(id))).then((streams) => {
+            setQueriedStreams(streams.filter((e) => e !== null) as Stream[])
+        })
+    }, [reactlocation.hash])
 
     const handleKeyPress = useCallback((event: KeyboardEvent) => {
         if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
@@ -123,7 +116,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                             <Box sx={{ display: 'flex' }}>
                                 <Draft
                                     autoFocus
-                                    streamPickerInitial={streamPickerInitial}
+                                    streamPickerInitial={queriedStreams}
+                                    streamPickerOptions={queriedStreams}
                                     onSubmit={async (text: string, destinations: string[]) => {
                                         client
                                             .createCurrent(text, destinations)
@@ -151,7 +145,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                     autoFocus
                                     allowEmpty={mode === 'reroute'}
                                     submitButtonLabel={mode === 'reply' ? 'Reply' : 'Reroute'}
-                                    streamPickerInitial={targetMessage.streams.map((e) => e.id) ?? []}
+                                    streamPickerInitial={targetMessage.streams}
+                                    streamPickerOptions={targetMessage.streams}
                                     onSubmit={async (text, streams): Promise<Error | null> => {
                                         if (mode === 'reroute')
                                             await client.reroute(

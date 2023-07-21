@@ -1,52 +1,14 @@
 import { Autocomplete, Box, Chip, InputBase, type SxProps } from '@mui/material'
-import { memo, useEffect, useState } from 'react'
-import { useApi } from '../context/api'
-import { usePreference } from '../context/PreferenceContext'
+import { type Stream } from '@concurrent-world/client'
 
 export interface StreamPickerProps {
-    selected: string[]
-    setSelected: (selected: string[]) => void
+    selected: Stream[]
+    setSelected: (selected: Stream[]) => void
     sx?: SxProps
+    options: Stream[]
 }
 
-interface StreamOption {
-    label: string
-    id: string
-}
-
-export const StreamPicker = memo<StreamPickerProps>((props: StreamPickerProps): JSX.Element => {
-    const client = useApi()
-    const pref = usePreference()
-    const [options, setOptions] = useState<StreamOption[]>([])
-    const [selectedStreams, setSelectedStreams] = useState<StreamOption[]>([])
-
-    useEffect(() => {
-        Promise.all(pref.bookmarkingStreams.map((e) => client.api.readStream(e))).then((a) => {
-            setOptions(
-                a
-                    .filter((e) => e?.payload)
-                    .map((e) => {
-                        return {
-                            label: e!.payload.body.name,
-                            id: e!.id
-                        }
-                    })
-            )
-        })
-    }, [])
-
-    useEffect(() => {
-        Promise.all(props.selected.map((e) => client.api.readStream(e))).then((a) => {
-            setSelectedStreams(
-                a
-                    .filter((e) => e?.payload)
-                    .map((e) => {
-                        return { label: e!.payload.body.name, id: e!.id }
-                    })
-            )
-        })
-    }, [props.selected])
-
+export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
     return (
         <Box
             sx={{
@@ -61,11 +23,12 @@ export const StreamPicker = memo<StreamPickerProps>((props: StreamPickerProps): 
                 filterSelectedOptions
                 sx={{ width: 1 }}
                 multiple
-                value={selectedStreams}
-                options={options}
+                value={props.selected}
+                options={props.options}
+                getOptionLabel={(option) => option.name}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 onChange={(_, value) => {
-                    props.setSelected(value.map((e) => e.id))
+                    props.setSelected(value)
                 }}
                 renderInput={(params) => {
                     const { InputLabelProps, InputProps, ...rest } = params
@@ -83,11 +46,10 @@ export const StreamPicker = memo<StreamPickerProps>((props: StreamPickerProps): 
                     value.map((option, index) => (
                         // disabling ESLint here becase 'key' should exist in {..getTagProps({index})}
                         // eslint-disable-next-line
-                        <Chip label={option.label} sx={{ color: 'text.default' }} {...getTagProps({ index })} />
+                        <Chip label={option.name} sx={{ color: 'text.default' }} {...getTagProps({ index })} />
                     ))
                 }
             />
         </Box>
     )
-})
-StreamPicker.displayName = 'StreamPicker'
+}

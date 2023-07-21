@@ -63,7 +63,9 @@ export interface ConcurrentTheme extends Theme {
 export interface StreamList {
     label: string
     pinned: boolean
+    expanded: boolean
     items: Followable[]
+    defaultPostStreams: string[]
 }
 
 export interface Followable {

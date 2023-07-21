@@ -1,5 +1,4 @@
 import { IconButton, List, ListItem, Typography } from '@mui/material'
-import { useApi } from '../../context/api'
 import { usePreference } from '../../context/PreferenceContext'
 import { v4 as uuidv4 } from 'uuid'
 import { StreamListItem } from './StreamListItem'
@@ -7,7 +6,6 @@ import AddIcon from '@mui/icons-material/Add'
 import ListIcon from '@mui/icons-material/List'
 
 export const StreamList = (): JSX.Element => {
-    const client = useApi()
     const pref = usePreference()
     return (
         <List>
@@ -24,7 +22,9 @@ export const StreamList = (): JSX.Element => {
                             old[uuidv4()] = {
                                 label: 'new list',
                                 pinned: false,
-                                items: []
+                                expanded: false,
+                                items: [],
+                                defaultPostStreams: []
                             }
                             pref.setLists(old)
                         }}
