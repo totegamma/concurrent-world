@@ -1,5 +1,4 @@
 import { useEffect, useState, createContext, useRef, useMemo } from 'react'
-import { DndProvider, getBackendOptions, MultiBackend } from '@minoru/react-dnd-treeview'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider, CssBaseline, Drawer } from '@mui/material'
 import useWebSocket, { type ReadyState } from 'react-use-websocket'
@@ -332,22 +331,20 @@ function App(): JSX.Element {
 
     const providers = (childs: JSX.Element): JSX.Element => (
         <SnackbarProvider preventDuplicate>
-            <DndProvider backend={MultiBackend} options={getBackendOptions()}>
-                <ThemeProvider theme={theme}>
-                    <CssBaseline />
-                    <ClockContext.Provider value={clock}>
-                        <ApiProvider api={client}>
-                            <PreferenceProvider>
-                                <ApplicationContext.Provider value={applicationContext}>
-                                    <EmojiPickerProvider>
-                                        <GlobalActionsProvider>{childs}</GlobalActionsProvider>
-                                    </EmojiPickerProvider>
-                                </ApplicationContext.Provider>
-                            </PreferenceProvider>
-                        </ApiProvider>
-                    </ClockContext.Provider>
-                </ThemeProvider>
-            </DndProvider>
+            <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <ClockContext.Provider value={clock}>
+                    <ApiProvider api={client}>
+                        <PreferenceProvider>
+                            <ApplicationContext.Provider value={applicationContext}>
+                                <EmojiPickerProvider>
+                                    <GlobalActionsProvider>{childs}</GlobalActionsProvider>
+                                </EmojiPickerProvider>
+                            </ApplicationContext.Provider>
+                        </PreferenceProvider>
+                    </ApiProvider>
+                </ClockContext.Provider>
+            </ThemeProvider>
         </SnackbarProvider>
     )
 
