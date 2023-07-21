@@ -49,7 +49,7 @@ export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
                     <ListItemText primary={props.body.label} />
                 </ListItemButton>
             </ListItem>
-            <Collapse in={open} timeout="auto" unmountOnExit>
+            <Collapse in={open} timeout="auto">
                 <List component="div" disablePadding>
                     {props.body.streams.map((stream) => (
                         <StreamLink

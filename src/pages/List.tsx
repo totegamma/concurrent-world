@@ -57,7 +57,7 @@ export function ListPage(props: ListPageProps): JSX.Element {
 
     const streamIDs = useMemo(() => {
         return [...(pref.lists[id]?.streams ?? []), pref.lists[id]?.userStreams.map((e) => e.streamID) ?? []].flat()
-    }, [pref.lists[id]])
+    }, [id])
 
     const theme = useTheme<ConcurrentTheme>()
     const iconColor = theme.palette.background.contrastText
