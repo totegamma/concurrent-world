@@ -60,4 +60,18 @@ export interface ConcurrentTheme extends Theme {
     palette: ConcurrentPalette
 }
 
+export interface StreamList {
+    label: string
+    pinned: boolean
+    expanded: boolean
+    streams: string[]
+    userStreams: userHomeStream[]
+    defaultPostStreams: string[]
+}
+
+export interface userHomeStream {
+    streamID: string
+    userID: string
+}
+
 export type CCID = string

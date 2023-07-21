@@ -238,7 +238,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                 fontSize: '12px',
                                 color: 'text.secondary'
                             }}
-                            href={'/#' + e.id}
+                            href={'/stream#' + e.id}
                         >
                             {`%${e.shortname}`}
                         </Link>
@@ -254,7 +254,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                     fontSize: '12px',
                                     color: 'text.secondary'
                                 }}
-                                href={'/#' + props.message.streams[0].id}
+                                href={'/stream#' + props.message.streams[0].id}
                             >
                                 {`%${props.message.streams[0].shortname}`}
                             </Link>
@@ -315,7 +315,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                 fontSize: '12px',
                                 color: 'text.secondary'
                             }}
-                            href={'/#' + e.id}
+                            href={'/stream#' + e.id}
                         >
                             {`%${e.shortname}`}
                         </Link>

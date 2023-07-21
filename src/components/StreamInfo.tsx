@@ -5,7 +5,6 @@ import { Schemas, type Commonstream, type CoreStream } from '@concurrent-world/c
 import Background from '../resources/defaultbg.png'
 import { CCEditor } from './cceditor'
 import { useSnackbar } from 'notistack'
-import { usePreference } from '../context/PreferenceContext'
 
 export interface StreamInfoProps {
     id: string
@@ -13,10 +12,8 @@ export interface StreamInfoProps {
 
 export function StreamInfo(props: StreamInfoProps): JSX.Element {
     const client = useApi()
-    const pref = usePreference()
     const { enqueueSnackbar } = useSnackbar()
     const [stream, setStream] = useState<CoreStream<Commonstream>>()
-    const bookmarking = pref.bookmarkingStreams.includes(props.id)
     const [settingsOpen, setSettingsOpen] = useState(false)
     const isAuthor = stream?.author === client.ccid
     const isMaintainer = stream?.maintainer.includes(client.ccid)
@@ -78,27 +75,6 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                     <Typography>{stream.payload.body.description || 'まだ説明はありません'}</Typography>
                 </Paper>
                 <Box sx={{ display: 'flex', flex: 1, flexFlow: 'column', gap: '10px' }}>
-                    {bookmarking ? (
-                        <Button
-                            variant={'contained'}
-                            onClick={() => {
-                                pref.unbookmarkStream(props.id)
-                            }}
-                            sx={{ height: '50px' }}
-                        >
-                            Favorited
-                        </Button>
-                    ) : (
-                        <Button
-                            variant={'contained'}
-                            onClick={() => {
-                                pref.bookmarkStream(props.id)
-                            }}
-                            sx={{ height: '50px' }}
-                        >
-                            Favorite
-                        </Button>
-                    )}
                     {(isAuthor || isMaintainer) && (
                         <Button
                             variant={'contained'}

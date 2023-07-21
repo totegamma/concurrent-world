@@ -1,5 +1,4 @@
 import { useEffect, useState, createContext, useRef, useMemo } from 'react'
-import { DndProvider, getBackendOptions, MultiBackend } from '@minoru/react-dnd-treeview'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider, CssBaseline, Drawer } from '@mui/material'
 import useWebSocket, { type ReadyState } from 'react-use-websocket'
@@ -18,7 +17,7 @@ import {
 } from '@concurrent-world/client'
 import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu'
-import type { StreamElementDated, Emoji, ConcurrentTheme } from './model'
+import type { StreamElementDated, Emoji, ConcurrentTheme, StreamList } from './model'
 import {
     Associations,
     Explorer,
@@ -41,6 +40,7 @@ import { EmojiPickerProvider } from './context/EmojiPickerContext'
 
 // @ts-expect-error vite dynamic import
 import { branch, sha } from '~build/info'
+import { ListPage } from './pages/List'
 const branchName = branch || window.location.host.split('.')[0]
 const versionString = `${location.hostname}-${branchName as string}-${sha.slice(0, 7) as string}`
 
@@ -88,10 +88,18 @@ function App(): JSX.Element {
         })
     }, [client])
 
+    const [lists] = usePersistent<Record<string, StreamList>>('lists', {})
+
     const path = useLocation()
     const displayingStream: string[] = useMemo(() => {
         switch (path.pathname) {
             case '/': {
+                const rawid = path.hash.replace('#', '')
+                const list = lists[rawid] ?? Object.values(lists)[0]
+                if (!list) return []
+                return [...list.streams, list.userStreams.map((e) => e.streamID)].flat()
+            }
+            case '/stream': {
                 const query = path.hash.replace('#', '').split(',')
                 if (query.length === 0 || query[0] === '') {
                     // is Home
@@ -323,22 +331,20 @@ function App(): JSX.Element {
 
     const providers = (childs: JSX.Element): JSX.Element => (
         <SnackbarProvider preventDuplicate>
-            <DndProvider backend={MultiBackend} options={getBackendOptions()}>
-                <ThemeProvider theme={theme}>
-                    <CssBaseline />
-                    <ClockContext.Provider value={clock}>
-                        <ApiProvider api={client}>
-                            <PreferenceProvider>
-                                <ApplicationContext.Provider value={applicationContext}>
-                                    <EmojiPickerProvider>
-                                        <GlobalActionsProvider>{childs}</GlobalActionsProvider>
-                                    </EmojiPickerProvider>
-                                </ApplicationContext.Provider>
-                            </PreferenceProvider>
-                        </ApiProvider>
-                    </ClockContext.Provider>
-                </ThemeProvider>
-            </DndProvider>
+            <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <ClockContext.Provider value={clock}>
+                    <ApiProvider api={client}>
+                        <PreferenceProvider>
+                            <ApplicationContext.Provider value={applicationContext}>
+                                <EmojiPickerProvider>
+                                    <GlobalActionsProvider>{childs}</GlobalActionsProvider>
+                                </EmojiPickerProvider>
+                            </ApplicationContext.Provider>
+                        </PreferenceProvider>
+                    </ApiProvider>
+                </ClockContext.Provider>
+            </ThemeProvider>
         </SnackbarProvider>
     )
 
@@ -400,7 +406,7 @@ function App(): JSX.Element {
                         >
                             <Routes>
                                 <Route
-                                    index
+                                    path="/stream"
                                     element={<TimelinePage messages={messages} setMobileMenuOpen={setMobileMenuOpen} />}
                                 />
                                 <Route path="/associations" element={<Associations messages={messages} />} />
@@ -409,6 +415,7 @@ function App(): JSX.Element {
                                 <Route path="/settings" element={<Settings setThemeName={setThemeName} />} />
                                 <Route path="/message/:id" element={<MessagePage />} />
                                 <Route path="/entity/:id" element={<EntityPage />} />
+                                <Route index element={<ListPage messages={messages} />} />
                                 <Route path="/devtool" element={<Devtool />} />
                             </Routes>
                         </Paper>

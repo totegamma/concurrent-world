@@ -72,7 +72,11 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                                         }}
                                     />
                                     {!isSelf && (
-                                        <FollowButton userCCID={props.message.author.ccaddr} color="primary.main" />
+                                        <FollowButton
+                                            userCCID={props.message.author.ccaddr}
+                                            userStreamID={props.message.author.userstreams?.homeStream ?? ''}
+                                            color="primary.main"
+                                        />
                                     )}
                                 </Box>
                                 <Box

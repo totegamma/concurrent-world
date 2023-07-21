@@ -26,7 +26,7 @@ import type { ConcurrentTheme } from '../model'
 import buildTime from '~build/time'
 // @ts-expect-error vite dynamic import
 import { branch, sha } from '~build/info'
-import { StreamList } from './StreamList'
+import { StreamList } from './StreamList/main'
 import { CCAvatar } from './CCAvatar'
 import { useApi } from '../context/api'
 import { usePreference } from '../context/PreferenceContext'
@@ -192,7 +192,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         }
                     }}
                 >
-                    <StreamList onClick={props.onClick} />
+                    <StreamList />
                 </Box>
                 {!pref.showEditorOnTop && (
                     <Button

@@ -29,10 +29,12 @@ import Splitscreen from '@mui/icons-material/Splitscreen'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 import { type Emoji, useEmojiPicker } from '../context/EmojiPickerContext'
 import caretPosition from 'textarea-caret'
+import { type Stream } from '@concurrent-world/client'
 
 export interface DraftProps {
     submitButtonLabel?: string
-    streamPickerInitial: string[]
+    streamPickerInitial: Stream[]
+    streamPickerOptions: Stream[]
     onSubmit: (text: string, destinations: string[]) => Promise<Error | null>
     allowEmpty?: boolean
     autoFocus?: boolean
@@ -44,7 +46,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const pref = usePreference()
     const emojiPicker = useEmojiPicker()
 
-    const [destStreams, setDestStreams] = useState<string[]>(props.streamPickerInitial)
+    const [destStreams, setDestStreams] = useState<Stream[]>(props.streamPickerInitial)
 
     const [draft, setDraft] = usePersistent<string>('draft', '')
     const [openPreview, setOpenPreview] = useState<boolean>(false)
@@ -75,8 +77,9 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             enqueueSnackbar('Message must not be empty!', { variant: 'error' })
             return
         }
+        const destStreamIDs = destStreams.map((s) => s.id)
         const dest = [
-            ...new Set([...destStreams, ...(postHome ? [appData.user?.userstreams?.homeStream] : [])])
+            ...new Set([...destStreamIDs, ...(postHome ? [appData.user?.userstreams?.homeStream] : [])])
         ].filter((e) => e) as string[]
         setSending(true)
         props
@@ -244,7 +247,11 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         flex: 1
                     }}
                 >
-                    <StreamPicker selected={destStreams} setSelected={setDestStreams} />
+                    <StreamPicker
+                        options={props.streamPickerOptions}
+                        selected={destStreams}
+                        setSelected={setDestStreams}
+                    />
                 </Box>
                 <Tooltip title={postHome ? 'ホーム同時投稿モード' : 'ストリーム限定投稿モード'} arrow placement="top">
                     <IconButton

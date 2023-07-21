@@ -1,50 +1,24 @@
-import { type RefObject, useContext, useEffect, useState, memo } from 'react'
+import { type RefObject, useContext, memo } from 'react'
 import { IconButton, Box, useTheme, Button, Zoom, Tooltip } from '@mui/material'
-import { type Location as ReactLocation } from 'react-router-dom'
 import { ApplicationContext } from '../App'
 import { ConcurrentLogo } from './ConcurrentLogo'
 import type { ConcurrentTheme } from '../model'
-import { useApi } from '../context/api'
 
 import InfoIcon from '@mui/icons-material/Info'
 import CreateIcon from '@mui/icons-material/Create'
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
 
 export interface TimelineHeaderProps {
-    location: ReactLocation
     scrollParentRef: RefObject<HTMLDivElement>
+    title: string
     setMobileMenuOpen: (state: boolean) => void
-    mode: string
-    setMode: (_: string) => void
+    mode: 'compose' | 'info'
+    setMode: (_: 'compose' | 'info') => void
     writeable: boolean
 }
 
 export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderProps): JSX.Element => {
-    const client = useApi()
     const appData = useContext(ApplicationContext)
     const theme = useTheme<ConcurrentTheme>()
-
-    const [title, setTitle] = useState<string>('')
-
-    useEffect(() => {
-        if (!props.location.hash || props.location.hash === '#') {
-            setTitle('Home')
-            return
-        }
-        Promise.all(
-            props.location.hash
-                .replace('#', '')
-                .split(',')
-                .map((e) => client.api.readStream(e))
-        ).then((a) => {
-            setTitle(
-                a
-                    .map((e) => e?.payload.body.name)
-                    .filter((e) => e)
-                    .join(', ')
-            )
-        })
-    }, [props.location.hash])
 
     const iconColor = appData.websocketState === 1 ? theme.palette.background.contrastText : theme.palette.text.disabled
 
@@ -102,7 +76,7 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
                     }}
                     disableRipple
                 >
-                    <b>{title}</b>
+                    <b>{props.title}</b>
                 </Button>
                 <Box sx={{ position: 'relative', width: '40px', height: '40px', mr: '8px' }}>
                     <Zoom
@@ -145,40 +119,6 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
                             }}
                         >
                             <InfoIcon sx={{ color: 'primary.contrastText' }} />
-                        </IconButton>
-                    </Zoom>
-                    <Zoom
-                        in={props.mode === 'home'}
-                        timeout={transitionDuration}
-                        style={{
-                            transitionDelay: `${props.mode === 'home' ? transitionDuration.exit : 0}ms`
-                        }}
-                        unmountOnExit
-                    >
-                        <IconButton
-                            sx={{ p: '8px', position: 'absolute' }}
-                            onClick={() => {
-                                props.setMode('edit')
-                            }}
-                        >
-                            <PlaylistAddIcon sx={{ color: 'primary.contrastText' }} />
-                        </IconButton>
-                    </Zoom>
-                    <Zoom
-                        in={props.mode === 'edit'}
-                        timeout={transitionDuration}
-                        style={{
-                            transitionDelay: `${props.mode === 'edit' ? transitionDuration.exit : 0}ms`
-                        }}
-                        unmountOnExit
-                    >
-                        <IconButton
-                            sx={{ p: '8px', position: 'absolute' }}
-                            onClick={() => {
-                                props.setMode('home')
-                            }}
-                        >
-                            <CreateIcon sx={{ color: 'primary.contrastText' }} />
                         </IconButton>
                     </Zoom>
                 </Box>
