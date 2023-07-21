@@ -1,4 +1,4 @@
-import { Collapse, List, ListItemButton, ListItemText } from '@mui/material'
+import { Collapse, List, ListItem, ListItemButton, ListItemText } from '@mui/material'
 import { type StreamList } from '../../model'
 import { Link as RouterLink } from 'react-router-dom'
 
@@ -25,22 +25,30 @@ export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
 
     return (
         <>
-            <ListItemButton dense component={RouterLink} to={`/#${props.id}`}>
+            <ListItem dense>
                 {open ? (
                     <ExpandLess
-                        onClick={() => {
-                            setOpen(!open)
+                        onClick={(): void => {
+                            setOpen(false)
                         }}
                     />
                 ) : (
                     <ExpandMore
-                        onClick={() => {
-                            setOpen(!open)
+                        onClick={(): void => {
+                            setOpen(true)
                         }}
                     />
                 )}
-                <ListItemText primary={props.body.label} />
-            </ListItemButton>
+                <ListItemButton
+                    component={RouterLink}
+                    to={`/#${props.id}`}
+                    sx={{
+                        padding: 1
+                    }}
+                >
+                    <ListItemText primary={props.body.label} />
+                </ListItemButton>
+            </ListItem>
             <Collapse in={open} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                     {props.body.streams.map((stream) => (
@@ -48,7 +56,8 @@ export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
                             key={stream}
                             streamID={stream}
                             sx={{
-                                pl: 4
+                                pl: 2,
+                                gap: 1
                             }}
                         />
                     ))}
@@ -57,7 +66,8 @@ export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
                             key={stream.userID}
                             userHomeStream={stream}
                             sx={{
-                                pl: 4
+                                pl: 2,
+                                gap: 1
                             }}
                         />
                     ))}
