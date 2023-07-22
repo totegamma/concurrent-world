@@ -13,6 +13,7 @@ import InfoIcon from '@mui/icons-material/Info'
 import CreateIcon from '@mui/icons-material/Create'
 import ExploreIcon from '@mui/icons-material/Explore'
 import { ListSettings } from '../components/ListSettings'
+import ListIcon from '@mui/icons-material/List'
 
 export interface ListPageProps {
     messages: IuseObjectList<StreamElementDated>
@@ -125,11 +126,7 @@ export function ListPage(props: ListPageProps): JSX.Element {
                 <Button
                     sx={{
                         width: 1,
-                        justifyContent: {
-                            xs: 'flex-left'
-                        },
-                        color: 'primary.contrastText',
-                        p: { xs: '0', xl: '8px 0 8 4px' }
+                        color: 'primary.contrastText'
                     }}
                     onClick={() => {
                         scrollParentRef.current?.scroll({
@@ -139,6 +136,7 @@ export function ListPage(props: ListPageProps): JSX.Element {
                     }}
                     disableRipple
                 >
+                    <ListIcon sx={{ mr: '4px' }} />
                     <b>{pref.lists[id].label}</b>
                 </Button>
                 <Box sx={{ position: 'relative', width: '40px', height: '40px', mr: '8px' }}>

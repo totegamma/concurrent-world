@@ -3,6 +3,7 @@ import { IconButton, Box, useTheme, Button, Zoom, Tooltip } from '@mui/material'
 import { ApplicationContext } from '../App'
 import { ConcurrentLogo } from './ConcurrentLogo'
 import type { ConcurrentTheme } from '../model'
+import PercentIcon from '@mui/icons-material/Percent'
 
 import InfoIcon from '@mui/icons-material/Info'
 import CreateIcon from '@mui/icons-material/Create'
@@ -62,11 +63,7 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
                 <Button
                     sx={{
                         width: 1,
-                        justifyContent: {
-                            xs: 'flex-left'
-                        },
-                        color: 'primary.contrastText',
-                        p: { xs: '0', xl: '8px 0 8 4px' }
+                        color: 'primary.contrastText'
                     }}
                     onClick={() => {
                         props.scrollParentRef.current?.scroll({
@@ -76,6 +73,7 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
                     }}
                     disableRipple
                 >
+                    <PercentIcon />
                     <b>{props.title}</b>
                 </Button>
                 <Box sx={{ position: 'relative', width: '40px', height: '40px', mr: '8px' }}>

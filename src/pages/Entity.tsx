@@ -11,6 +11,7 @@ import InfoIcon from '@mui/icons-material/Info'
 import CreateIcon from '@mui/icons-material/Create'
 import { FollowButton } from '../components/FollowButton'
 import { type User } from '@concurrent-world/client'
+import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 
 export function EntityPage(): JSX.Element {
     const client = useApi()
@@ -87,6 +88,7 @@ export function EntityPage(): JSX.Element {
                     }}
                     disableRipple
                 >
+                    <AlternateEmailIcon />
                     <b>{user.profile?.username || 'anonymous'}</b>
                 </Button>
                 <Box
