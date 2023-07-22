@@ -68,11 +68,14 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
             })
     }, [])
 
-    const updateList = useCallback((id: string, newList: StreamList) => {
-        const old = lists
-        old[id] = newList
-        setLists(JSON.parse(JSON.stringify(old)))
-    }, [])
+    const updateList = useCallback(
+        (id: string, newList: StreamList) => {
+            const old = lists
+            old[id] = newList
+            setLists(JSON.parse(JSON.stringify(old)))
+        },
+        [lists]
+    )
 
     useEffect(() => {
         if (!client) return
