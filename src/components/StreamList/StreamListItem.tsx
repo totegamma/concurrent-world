@@ -25,7 +25,12 @@ export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
 
     return (
         <>
-            <ListItem dense>
+            <ListItem
+                dense
+                sx={{
+                    gap: 1
+                }}
+            >
                 {open ? (
                     <ExpandLess
                         onClick={(): void => {
@@ -40,17 +45,18 @@ export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
                     />
                 )}
                 <ListItemButton
+                    dense
+                    sx={{
+                        padding: 0
+                    }}
                     component={RouterLink}
                     to={`/#${props.id}`}
-                    sx={{
-                        padding: 1
-                    }}
                 >
                     <ListItemText primary={props.body.label} />
                 </ListItemButton>
             </ListItem>
             <Collapse in={open} timeout="auto">
-                <List component="div" disablePadding>
+                <List dense component="div" disablePadding>
                     {props.body.streams.map((stream) => (
                         <StreamLink
                             key={stream}

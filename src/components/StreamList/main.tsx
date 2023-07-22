@@ -1,4 +1,4 @@
-import { IconButton, List, ListItem, Typography } from '@mui/material'
+import { IconButton, List, ListItem, ListItemText } from '@mui/material'
 import { usePreference } from '../../context/PreferenceContext'
 import { v4 as uuidv4 } from 'uuid'
 import { StreamListItem } from './StreamListItem'
@@ -8,7 +8,13 @@ import ListIcon from '@mui/icons-material/List'
 export const StreamList = (): JSX.Element => {
     const pref = usePreference()
     return (
-        <List>
+        <List
+            dense
+            sx={{
+                py: 0.5,
+                width: '100%'
+            }}
+        >
             <ListItem
                 onClick={() => {}}
                 secondaryAction={
@@ -42,9 +48,7 @@ export const StreamList = (): JSX.Element => {
                         color: 'background.contrastText'
                     }}
                 />
-                <Typography flex={1} fontSize={'0.875rem'} justifyContent={'center'} marginY={'3px'}>
-                    Lists
-                </Typography>
+                <ListItemText primary="Lists" />
             </ListItem>
             {Object.keys(pref.lists).map((key) => (
                 <StreamListItem key={key} id={key} body={pref.lists[key]} />
