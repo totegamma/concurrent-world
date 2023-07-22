@@ -100,13 +100,7 @@ function App(): JSX.Element {
                 return [...list.streams, list.userStreams.map((e) => e.streamID)].flat()
             }
             case '/stream': {
-                const query = path.hash.replace('#', '').split(',')
-                if (query.length === 0 || query[0] === '') {
-                    // is Home
-                    const followingStreams = JSON.parse(localStorage.getItem('followingStreams') ?? '[]')
-                    return [...followingStreams, ...followingUserStreams].filter((e) => e)
-                }
-                return query
+                return path.hash.replace('#', '').split(',')
             }
             case '/notifications': {
                 const notifications = user?.userstreams?.notificationStream

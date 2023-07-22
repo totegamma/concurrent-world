@@ -35,7 +35,7 @@ const style = {
 export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element => {
     const client = useApi()
     const pref = usePreference()
-    const reactlocation = useLocation()
+    const path = useLocation()
     const appData = useContext(ApplicationContext)
     const [mode, setMode] = useState<'compose' | 'reply' | 'reroute' | 'none'>('none')
     const [targetMessage, setTargetMessage] = useState<Message | null>(null)
@@ -47,8 +47,27 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         appData.user !== null && (appData.user.profile === undefined || appData.user.userstreams === undefined)
 
     const openDraft = useCallback(() => {
+        let streamIDs: string[] = []
+        switch (path.pathname) {
+            case '/stream': {
+                streamIDs = path.hash.replace('#', '').split(',')
+                break
+            }
+            default: {
+                const rawid = path.hash.replace('#', '')
+                const list = pref.lists[rawid] ?? Object.values(pref.lists)[0]
+                if (!list) break
+                streamIDs = list.defaultPostStreams
+                break
+            }
+        }
+
+        Promise.all(streamIDs.map((id) => client.getStream(id))).then((streams) => {
+            setQueriedStreams(streams.filter((e) => e !== null) as Stream[])
+        })
+
         setMode('compose')
-    }, [])
+    }, [path.pathname, path.hash, pref.lists])
 
     const openReply = useCallback((target: Message) => {
         setTargetMessage(target)
@@ -73,29 +92,22 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         [allKnownStreams, pref.lists]
     )
 
-    useEffect(() => {
-        const ids = reactlocation.hash
-            .replace('#', '')
-            .split(',')
-            .filter((e) => e !== '')
-        Promise.all(ids.map((id) => client.getStream(id))).then((streams) => {
-            setQueriedStreams(streams.filter((e) => e !== null) as Stream[])
-        })
-    }, [reactlocation.hash])
-
-    const handleKeyPress = useCallback((event: KeyboardEvent) => {
-        if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
-            return
-        }
-        switch (event.key) {
-            case 'n':
-                setTimeout(() => {
-                    // XXX: this is a hack to prevent the keypress from being captured by the draft
-                    openDraft()
-                }, 0)
-                break
-        }
-    }, [])
+    const handleKeyPress = useCallback(
+        (event: KeyboardEvent) => {
+            if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
+                return
+            }
+            switch (event.key) {
+                case 'n':
+                    setTimeout(() => {
+                        // XXX: this is a hack to prevent the keypress from being captured by the draft
+                        openDraft()
+                    }, 0)
+                    break
+            }
+        },
+        [openDraft]
+    )
 
     useEffect(() => {
         // attach the event listener
@@ -115,7 +127,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     openReply,
                     openReroute
                 }
-            }, [])}
+            }, [openDraft, openReply, openReroute])}
         >
             {props.children}
             <Modal
