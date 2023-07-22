@@ -12,7 +12,7 @@ import {
 } from '@concurrent-world/client'
 import { useApi } from '../../context/api'
 import { Box, IconButton, Link, ListItem, Typography } from '@mui/material'
-import { Link as routerLink, Link as RouterLink } from 'react-router-dom'
+import { Link as RouterLink } from 'react-router-dom'
 import { CCAvatar } from '../CCAvatar'
 import { MessageSkeleton } from '../MessageSkeleton'
 import { MessageContainer } from './MessageContainer'
@@ -76,7 +76,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                 height: { xs: '38px', sm: '48px' },
                                 mt: { xs: '3px', sm: '5px' }
                             }}
-                            component={routerLink}
+                            component={RouterLink}
                             to={'/entity/' + (association.author.ccaddr ?? '')}
                         >
                             <CCAvatar
@@ -149,7 +149,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                 height: { xs: '38px', sm: '48px' },
                                 mt: { xs: '3px', sm: '5px' }
                             }}
-                            component={routerLink}
+                            component={RouterLink}
                             to={'/entity/' + (association.author.ccaddr ?? '')}
                         >
                             <CCAvatar

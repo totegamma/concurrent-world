@@ -16,6 +16,7 @@ import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { useEmojiPicker } from '../../../context/EmojiPickerContext'
+import { Link as RouterLink } from 'react-router-dom'
 
 export interface MessageActionsProps {
     message: M_Current | M_Reply | M_Reroute
@@ -231,6 +232,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                 <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 0.5, ml: 'auto' }}>
                     {props.message.streams.map((e) => (
                         <Link
+                            component={RouterLink}
                             key={e.id}
                             underline="hover"
                             sx={{
@@ -238,7 +240,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                 fontSize: '12px',
                                 color: 'text.secondary'
                             }}
-                            href={'/stream#' + e.id}
+                            to={'/stream#' + e.id}
                         >
                             {`%${e.shortname}`}
                         </Link>
@@ -248,13 +250,14 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     <Box sx={{ display: { sm: 'block', md: 'none' }, ml: 'auto', overFlow: 'hidden' }}>
                         {props.message.streams.length === 1 && (
                             <Link
+                                component={RouterLink}
                                 underline="hover"
                                 sx={{
                                     fontweight: '400',
                                     fontSize: '12px',
                                     color: 'text.secondary'
                                 }}
-                                href={'/stream#' + props.message.streams[0].id}
+                                to={'/stream#' + props.message.streams[0].id}
                             >
                                 {`%${props.message.streams[0].shortname}`}
                             </Link>
@@ -310,12 +313,13 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         <Link
                             key={e.id}
                             underline="hover"
+                            component={RouterLink}
                             sx={{
                                 fontweight: '400',
                                 fontSize: '12px',
                                 color: 'text.secondary'
                             }}
-                            href={'/stream#' + e.id}
+                            to={'/stream#' + e.id}
                         >
                             {`%${e.shortname}`}
                         </Link>
