@@ -150,7 +150,7 @@ export function Explorer(): JSX.Element {
                         >
                             <ListItemButton
                                 component={Link}
-                                to={'/#' + value.id}
+                                to={'/stream#' + value.id}
                                 sx={{
                                     height: '40px'
                                 }}
