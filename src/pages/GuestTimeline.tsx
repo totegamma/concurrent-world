@@ -4,7 +4,7 @@ import type { ConcurrentTheme, StreamElementDated } from '../model'
 import { useObjectList } from '../hooks/useObjectList'
 import { Link, useLocation } from 'react-router-dom'
 import { Timeline } from '../components/Timeline/main'
-import ConcurrentApiClient from '../apiservice'
+import { Client } from '@concurrent-world/client'
 import { FullScreenLoading } from '../components/FullScreenLoading'
 import ApiProvider from '../context/api'
 import { ClockContext } from '../App'
@@ -17,7 +17,7 @@ export function GuestTimelinePage(): JSX.Element {
     const [queriedStreams, setQueriedStreams] = useState<string[]>([])
     const [title, setTitle] = useState<string>('')
 
-    const [api, initializeApi] = useState<ConcurrentApiClient>()
+    const [client, initializeClient] = useState<Client>()
     useEffect(() => {
         const queriedStreams = reactlocation.hash
             .replace('#', '')
@@ -27,14 +27,16 @@ export function GuestTimelinePage(): JSX.Element {
 
         const resolver = queriedStreams[0].split('@')[1]
 
-        const api = new ConcurrentApiClient('', '', resolver)
+        // well-known guest
+        // らたい すいか きけんせい うつる てんない にいがた れきだい つながる あたためる みいら よゆう えもの
+        const client = new Client('8c215bedacf0888470fd2567d03a813f4ae926be4a2cd587979809b629d70592', resolver)
 
-        initializeApi(api)
+        initializeClient(client)
     }, [])
 
     useEffect(() => {
-        if (!api) return
-        Promise.all(queriedStreams.map((e) => api.readStream(e))).then((a) => {
+        if (!client) return
+        Promise.all(queriedStreams.map((e) => client.api.readStream(e))).then((a) => {
             setTitle(
                 a
                     .map((e) => e?.payload.body.name)
@@ -42,7 +44,7 @@ export function GuestTimelinePage(): JSX.Element {
                     .join(', ')
             )
         })
-    }, [api, queriedStreams])
+    }, [client, queriedStreams])
 
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'sacher')
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
@@ -68,13 +70,13 @@ export function GuestTimelinePage(): JSX.Element {
         }
     }, [setClock])
 
-    if (!api) return <FullScreenLoading message="Loading..." />
+    if (!client) return <FullScreenLoading message="Loading..." />
 
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <ClockContext.Provider value={clock}>
-                <ApiProvider api={api}>
+                <ApiProvider api={client}>
                     <Box
                         sx={{
                             display: 'flex',

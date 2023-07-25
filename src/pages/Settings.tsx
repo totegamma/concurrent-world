@@ -3,7 +3,6 @@ import {
     Divider,
     Typography,
     Box,
-    useTheme,
     Tabs,
     Tab,
     IconButton,
@@ -31,8 +30,7 @@ export interface SettingsProp {
 }
 
 export function Settings(props: SettingsProp): JSX.Element {
-    const api = useApi()
-    const theme = useTheme()
+    const client = useApi()
     const pref = usePreference()
     const appData = useContext(ApplicationContext)
     const { enqueueSnackbar } = useSnackbar()
@@ -61,7 +59,7 @@ export function Settings(props: SettingsProp): JSX.Element {
                 flexDirection: 'column',
                 gap: 1,
                 padding: '20px',
-                background: theme.palette.background.paper,
+                backgroundColor: 'background.paper',
                 minHeight: '100%',
                 overflowY: 'scroll'
             }}
@@ -98,7 +96,8 @@ export function Settings(props: SettingsProp): JSX.Element {
                             }}
                         >
                             <ProfileEditor
-                                initial={appData.profile!}
+                                id={appData.user?.profile?.id}
+                                initial={appData.user?.profile}
                                 onSubmit={(_profile) => {
                                     enqueueSnackbar('更新しました', { variant: 'success' })
                                 }}
@@ -200,12 +199,12 @@ export function Settings(props: SettingsProp): JSX.Element {
                     <Typography variant="h3" gutterBottom>
                         CCID
                     </Typography>
-                    <Typography>{api.userAddress}</Typography>
+                    <Typography>{client.ccid}</Typography>
 
                     <Typography variant="h3" gutterBottom>
                         Host
                     </Typography>
-                    <Typography>{api.host}</Typography>
+                    <Typography>{client.api.host}</Typography>
 
                     <Typography variant="h3" gutterBottom>
                         Privatekey
@@ -217,7 +216,7 @@ export function Settings(props: SettingsProp): JSX.Element {
                             alignItems: 'center'
                         }}
                     >
-                        {showPrivateKey ? api.privatekey : '•••••••••••••••••••••••••••••••••••••••••••••••••'}
+                        {showPrivateKey ? client.api.privatekey : '•••••••••••••••••••••••••••••••••••••••••••••••••'}
                         <IconButton
                             sx={{ ml: 'auto' }}
                             onClick={() => {
@@ -225,22 +224,22 @@ export function Settings(props: SettingsProp): JSX.Element {
                             }}
                         >
                             {!showPrivateKey ? (
-                                <VisibilityIcon sx={{ color: theme.palette.text.primary }} />
+                                <VisibilityIcon sx={{ color: 'text.primary' }} />
                             ) : (
-                                <VisibilityOffIcon sx={{ color: theme.palette.text.primary }} />
+                                <VisibilityOffIcon sx={{ color: 'text.primary' }} />
                             )}
                         </IconButton>
                     </Typography>
                     <Button
                         variant="contained"
                         onClick={(_) => {
-                            if (api.host === undefined) {
+                            if (client.api.host === undefined) {
                                 return
                             }
-                            const jwt = api.constructJWT({
+                            const jwt = client.api.constructJWT({
                                 exp: Math.floor((new Date().getTime() + 60 * 60 * 1000) / 1000).toString()
                             }) // 1h validity
-                            window.location.href = `https://${api.host}/login?token=${jwt}`
+                            window.location.href = `https://${client.api.host}/login?token=${jwt}`
                         }}
                     >
                         Goto Domain Home

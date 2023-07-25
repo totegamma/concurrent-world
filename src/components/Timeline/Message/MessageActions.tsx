@@ -7,9 +7,7 @@ import AddReactionIcon from '@mui/icons-material/AddReaction'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import RepeatIcon from '@mui/icons-material/Repeat'
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown'
-import type { Stream, Message as CCMessage, ProfileWithAddress } from '../../../model'
-import { Schemas } from '../../../schemas'
-import type { SimpleNote as TypeSimpleNote } from '../../../schemas/simpleNote'
+import { type M_Reply, type M_Current, type M_Reroute } from '@concurrent-world/client'
 import { useState } from 'react'
 import Collapse from '@mui/material/Collapse'
 import Fade from '@mui/material/Fade'
@@ -18,11 +16,10 @@ import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { useEmojiPicker } from '../../../context/EmojiPickerContext'
+import { Link as RouterLink } from 'react-router-dom'
 
 export interface MessageActionsProps {
-    favoriteUsers: ProfileWithAddress[]
-    message: CCMessage<TypeSimpleNote>
-    msgstreams: Array<Stream<any>>
+    message: M_Current | M_Reply | M_Reroute
     userCCID: string
 }
 
@@ -31,11 +28,11 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
     const service = useMessageService()
 
-    const hasOwnReaction = props.favoriteUsers.find((user) => user.ccaddress === props.userCCID)
+    const hasOwnReaction = props.message.favorites.find((fav) => fav.author.ccaddr === props.userCCID)
 
-    const replyCount = props.message.associations.filter((e) => e.schema === Schemas.replyAssociation).length
-    const likeCount = props.message.associations.filter((e) => e.schema === Schemas.like).length
-    const rerouteCount = props.message.associations.filter((e) => e.schema === Schemas.reRouteAssociation).length
+    const replyCount = props.message.replies.length
+    const likeCount = props.message.favorites.length
+    const rerouteCount = props.message.reroutes.length
 
     const emojiPicker = useEmojiPicker()
 
@@ -108,9 +105,9 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                     gap: 1
                                 }}
                             >
-                                {props.favoriteUsers.map((user) => (
+                                {props.message.favorites.map((fav) => (
                                     <Box
-                                        key={user.ccaddress}
+                                        key={fav.author.ccaddr}
                                         sx={{
                                             display: 'flex',
                                             alignItems: 'center',
@@ -122,17 +119,16 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                                 height: '20px',
                                                 width: '20px'
                                             }}
-                                            avatarURL={user.avatar}
-                                            identiconSource={user.ccaddress}
-                                            alt={user.ccaddress}
+                                            avatarURL={fav.author.profile?.avatar}
+                                            identiconSource={fav.author.ccaddr}
                                         />
-                                        {user.username ?? 'anonymous'}
+                                        {fav.author.profile?.username ?? 'anonymous'}
                                     </Box>
                                 ))}
                             </Box>
                         }
                         placement="top"
-                        disableHoverListener={props.favoriteUsers.length === 0}
+                        disableHoverListener={likeCount === 0}
                     >
                         <Box
                             sx={{
@@ -200,8 +196,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                 >
                     <MenuItem
                         onClick={() => {
-                            const target: CCMessage<TypeSimpleNote> = props.message
-                            navigator.clipboard.writeText(target.payload.body.body)
+                            props.message.body && navigator.clipboard.writeText(props.message.body)
                             setMenuAnchor(null)
                         }}
                     >
@@ -221,7 +216,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         </ListItemIcon>
                         <ListItemText>詳細</ListItemText>
                     </MenuItem>
-                    {props.message.author === props.userCCID && (
+                    {props.message.author.ccaddr === props.userCCID && (
                         <MenuItem
                             onClick={() => {
                                 service.deleteMessage()
@@ -235,8 +230,9 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     )}
                 </Menu>
                 <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 0.5, ml: 'auto' }}>
-                    {props.msgstreams.map((e) => (
+                    {props.message.streams.map((e) => (
                         <Link
+                            component={RouterLink}
                             key={e.id}
                             underline="hover"
                             sx={{
@@ -244,32 +240,33 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                 fontSize: '12px',
                                 color: 'text.secondary'
                             }}
-                            href={'/#' + e.id}
+                            to={'/stream#' + e.id}
                         >
-                            {`%${e.payload.body.shortname as string}`}
+                            {`%${e.shortname}`}
                         </Link>
                     ))}
                 </Box>
                 <Fade in={!streamListOpen}>
                     <Box sx={{ display: { sm: 'block', md: 'none' }, ml: 'auto', overFlow: 'hidden' }}>
-                        {props.msgstreams.length === 1 && (
+                        {props.message.streams.length === 1 && (
                             <Link
+                                component={RouterLink}
                                 underline="hover"
                                 sx={{
                                     fontweight: '400',
                                     fontSize: '12px',
                                     color: 'text.secondary'
                                 }}
-                                href={'/#' + props.msgstreams[0].id}
+                                to={'/stream#' + props.message.streams[0].id}
                             >
-                                {`%${props.msgstreams[0].payload.body.shortname as string}`}
+                                {`%${props.message.streams[0].shortname}`}
                             </Link>
                         )}
                     </Box>
                 </Fade>
                 {streamListOpen || (
                     <Box sx={{ display: { sm: 'block', md: 'none', whiteSpace: 'nowrap' } }}>
-                        {props.msgstreams.length > 1 && (
+                        {props.message.streams.length > 1 && (
                             <Link
                                 onClick={() => {
                                     setStreamListOpen(true)
@@ -281,8 +278,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                     color: 'text.secondary'
                                 }}
                             >
-                                {`%${props.msgstreams[0].payload.body.shortname as string}`} +
-                                {props.msgstreams.length - 1}
+                                {`%${props.message.streams[0].shortname}`} +{props.message.streams.length - 1}
                             </Link>
                         )}
                     </Box>
@@ -313,18 +309,19 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         gap: 0.5
                     }}
                 >
-                    {props.msgstreams.map((e) => (
+                    {props.message.streams.map((e) => (
                         <Link
                             key={e.id}
                             underline="hover"
+                            component={RouterLink}
                             sx={{
                                 fontweight: '400',
                                 fontSize: '12px',
                                 color: 'text.secondary'
                             }}
-                            href={'/#' + e.id}
+                            to={'/stream#' + e.id}
                         >
-                            {`%${e.payload.body.shortname as string}`}
+                            {`%${e.shortname}`}
                         </Link>
                     ))}
                 </Box>

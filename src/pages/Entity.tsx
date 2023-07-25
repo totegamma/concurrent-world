@@ -2,10 +2,7 @@ import { Box, Button, IconButton, Paper, Tab, Tabs, Typography, Zoom, alpha, use
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 import { useApi } from '../context/api'
-import type { Character, Entity, StreamElementDated } from '../model'
-import type { Userstreams } from '../schemas/userstreams'
-import type { Profile } from '../schemas/profile'
-import { Schemas } from '../schemas'
+import type { StreamElementDated } from '../model'
 import { CCAvatar } from '../components/CCAvatar'
 import { Timeline } from '../components/Timeline'
 import { useObjectList } from '../hooks/useObjectList'
@@ -13,18 +10,20 @@ import Background from '../resources/defaultbg.png'
 import InfoIcon from '@mui/icons-material/Info'
 import CreateIcon from '@mui/icons-material/Create'
 import { FollowButton } from '../components/FollowButton'
+import { type User } from '@concurrent-world/client'
+import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 
 export function EntityPage(): JSX.Element {
-    const api = useApi()
+    const client = useApi()
     const theme = useTheme()
     const { id } = useParams()
-    const [entity, setEntity] = useState<Entity>()
-    const [profile, setProfile] = useState<Character<Profile>>()
-    const [streams, setStreams] = useState<Character<Userstreams>>()
+
+    const [user, setUser] = useState<User | null>(null)
+
     const [mode, setMode] = useState<'info' | 'edit'>('info')
     const messages = useObjectList<StreamElementDated>()
     const scrollParentRef = useRef<HTMLDivElement>(null)
-    const isSelf = id === api.userAddress
+    const isSelf = id === client.ccid
 
     const [tab, setTab] = useState(0)
 
@@ -35,14 +34,8 @@ export function EntityPage(): JSX.Element {
 
     useEffect(() => {
         if (!id) return
-        api.readEntity(id).then((e) => {
-            setEntity(e)
-        })
-        api.readCharacter(id, Schemas.profile).then((e) => {
-            setProfile(e)
-        })
-        api.readCharacter(id, Schemas.userstreams).then((e) => {
-            setStreams(e)
+        client.getUser(id).then((user) => {
+            setUser(user)
         })
     }, [id])
 
@@ -50,16 +43,16 @@ export function EntityPage(): JSX.Element {
         let target
         switch (tab) {
             case 0:
-                target = streams?.payload.body.homeStream
+                target = user?.userstreams?.homeStream
                 break
             case 1:
-                target = streams?.payload.body.associationStream
+                target = user?.userstreams?.associationStream
                 break
         }
         return target ? [target] : []
-    }, [streams, tab])
+    }, [user, tab])
 
-    if (!entity || !profile || !streams) {
+    if (!user) {
         return <>loading...</>
     }
 
@@ -95,7 +88,8 @@ export function EntityPage(): JSX.Element {
                     }}
                     disableRipple
                 >
-                    <b>{profile.payload.body.username || 'anonymous'}</b>
+                    <AlternateEmailIcon />
+                    <b>{user.profile?.username || 'anonymous'}</b>
                 </Button>
                 <Box
                     sx={{
@@ -144,7 +138,7 @@ export function EntityPage(): JSX.Element {
                             {mode === 'edit' && <Navigate to="/settings" />}
                         </>
                     ) : (
-                        <>{id && <FollowButton userCCID={id} />}</>
+                        <>{id && <FollowButton userCCID={id} userStreamID={user.userstreams?.homeStream ?? ''} />}</>
                     )}
                 </Box>
             </Box>
@@ -159,7 +153,7 @@ export function EntityPage(): JSX.Element {
             >
                 <Box /* profile */
                     sx={{
-                        backgroundImage: `url(${profile.payload.body.banner || Background})`,
+                        backgroundImage: `url(${user.profile?.banner || Background})`,
                         backgroundPosition: 'center',
                         backgroundSize: 'cover',
                         display: 'flex',
@@ -174,9 +168,9 @@ export function EntityPage(): JSX.Element {
                         }}
                     >
                         <CCAvatar
-                            alt={profile.payload.body.username}
-                            avatarURL={profile.payload.body.avatar}
-                            identiconSource={entity.ccaddr}
+                            alt={user.profile?.username}
+                            avatarURL={user.profile?.avatar}
+                            identiconSource={user.ccaddr}
                             sx={{
                                 width: '80px',
                                 height: '80px',
@@ -207,7 +201,7 @@ export function EntityPage(): JSX.Element {
                                     alignItems: 'center'
                                 }}
                             >
-                                <Typography>{profile.payload.body.description}</Typography>
+                                <Typography>{user.profile?.description}</Typography>
                             </Box>
                             <Box
                                 sx={{
@@ -217,9 +211,9 @@ export function EntityPage(): JSX.Element {
                                 }}
                             >
                                 <Typography variant="caption">
-                                    現住所: {entity.host !== '' ? entity.host : api.host}
+                                    現住所: {user.host !== '' ? user.host : client.api.host}
                                 </Typography>
-                                <Typography variant="caption">{entity.ccaddr}</Typography>
+                                <Typography variant="caption">{user.ccaddr}</Typography>
                             </Box>
                         </Box>
                     </Paper>
@@ -242,7 +236,7 @@ export function EntityPage(): JSX.Element {
                         streams={targetStreams}
                         timeline={messages}
                         scrollParentRef={scrollParentRef}
-                        perspective={entity.ccaddr}
+                        perspective={user.ccaddr}
                     />
                 </Box>
             </Box>

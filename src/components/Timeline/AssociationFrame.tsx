@@ -1,61 +1,59 @@
 import { memo, useEffect, useState } from 'react'
-import type { Association, Character, Message, StreamElement } from '../../model'
+import {
+    type CoreStreamElement,
+    Schemas,
+    type A_Unknown,
+    type A_Reroute,
+    type A_Reply,
+    type A_Reaction,
+    type A_Favorite,
+    type User,
+    type M_Current
+} from '@concurrent-world/client'
 import { useApi } from '../../context/api'
-import { Schemas } from '../../schemas'
-import { Box, IconButton, ListItem, ListItemButton, Typography } from '@mui/material'
-import type { Profile } from '../../schemas/profile'
-import { Link as routerLink } from 'react-router-dom'
+import { Box, IconButton, Link, ListItem, Typography } from '@mui/material'
+import { Link as RouterLink } from 'react-router-dom'
 import { CCAvatar } from '../CCAvatar'
 import { MessageSkeleton } from '../MessageSkeleton'
 import { MessageContainer } from './MessageContainer'
+import { TimeDiff } from '../TimeDiff'
 
 export interface AssociationFrameProp {
-    association: StreamElement
+    association: CoreStreamElement
     lastUpdated: number
     after: JSX.Element | undefined
     perspective?: string
 }
 
 export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFrameProp): JSX.Element | null => {
-    const api = useApi()
-    const [associationAuthor, setAssociationAuthor] = useState<Character<Profile> | undefined>()
-    const [message, setMessage] = useState<Message<any> | undefined>()
-    const [messageAuthor, setMessageAuthor] = useState<Character<Profile> | undefined>()
-    const [association, setAssociation] = useState<Association<any> | undefined>()
+    const client = useApi()
+    const [association, setAssociation] = useState<A_Favorite | A_Reaction | A_Reply | A_Reroute | A_Unknown | null>(
+        null
+    )
     const [fetching, setFetching] = useState<boolean>(true)
 
-    const perspective = props.perspective ?? api.userAddress
-    const isMeToOther = association?.author !== perspective
+    const perspective = props.perspective ?? client.ccid
+    const isMeToOther = association?.author.ccaddr !== perspective
 
-    const Nominative = perspective === api.userAddress ? 'You' : associationAuthor?.payload.body.username ?? 'anonymous'
+    const Nominative = perspective === client.ccid ? 'You' : association?.author.profile?.username ?? 'anonymous'
     const Possessive =
-        perspective === api.userAddress ? 'your' : (messageAuthor?.payload.body.username ?? 'anonymous') + "'s"
+        perspective === client.ccid ? 'your' : (association?.target.author.profile?.username ?? 'anonymous') + "'s"
 
-    const actionUser = isMeToOther ? associationAuthor : messageAuthor
+    const actionUser: User | undefined = isMeToOther ? association?.author : association?.target.author
 
     useEffect(() => {
-        api.fetchAssociation(props.association.id, props.association.currenthost)
+        client
+            .getAssociation(props.association.id, props.association.author)
             .then((a) => {
-                if (!a) return
                 setAssociation(a)
-                api.fetchMessage(a.targetID, props.association.currenthost).then((m) => {
-                    setMessage(m)
-                    if (!m) return
-                    api.readCharacter(a.author, Schemas.profile).then((author) => {
-                        setAssociationAuthor(author)
-                    })
-                    api.readCharacter(m.author, Schemas.profile).then((author) => {
-                        setMessageAuthor(author)
-                    })
-                })
             })
-            .catch((_e) => {
-                setAssociation(undefined)
+            .catch((e) => {
+                console.warn(e)
             })
             .finally(() => {
                 setFetching(false)
             })
-    }, [])
+    }, [props.association, props.lastUpdated])
 
     if (fetching) return <MessageSkeleton />
     if (!association) return null
@@ -67,67 +65,69 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                     <ListItem
                         sx={{
                             alignItems: 'flex-start',
-                            wordBreak: 'break-word'
+                            wordBreak: 'break-word',
+                            gap: 2
                         }}
                         disablePadding
                     >
-                        <ListItemButton
-                            disableGutters
-                            component={routerLink}
-                            to={`/message/${message?.id ?? ''}@${message?.author ?? ''}`}
+                        <IconButton
                             sx={{
-                                display: 'flex',
-                                alignItems: 'flex-start',
-                                flex: 1,
-                                gap: 2
+                                width: { xs: '38px', sm: '48px' },
+                                height: { xs: '38px', sm: '48px' },
+                                mt: { xs: '3px', sm: '5px' }
                             }}
+                            component={RouterLink}
+                            to={'/entity/' + (association.author.ccaddr ?? '')}
                         >
-                            <IconButton
+                            <CCAvatar
+                                avatarURL={actionUser?.profile?.avatar}
+                                identiconSource={actionUser?.ccaddr ?? ''}
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
-                                    height: { xs: '38px', sm: '48px' },
-                                    mt: { xs: '3px', sm: '5px' }
+                                    height: { xs: '38px', sm: '48px' }
                                 }}
-                                component={routerLink}
-                                to={'/entity/' + association.author}
-                            >
-                                <CCAvatar
-                                    alt={actionUser?.payload.body.username}
-                                    avatarURL={actionUser?.payload.body.avatar}
-                                    identiconSource={actionUser?.id ?? ''}
-                                    sx={{
-                                        width: { xs: '38px', sm: '48px' },
-                                        height: { xs: '38px', sm: '48px' }
-                                    }}
-                                />
-                            </IconButton>
-                            <Box
-                                sx={{
-                                    flex: 1,
-                                    flexDirection: 'column',
-                                    width: '100%',
-                                    overflow: 'auto',
-                                    alignItems: 'flex-start'
-                                }}
-                            >
+                            />
+                        </IconButton>
+                        <Box
+                            sx={{
+                                flex: 1,
+                                flexDirection: 'column',
+                                width: '100%',
+                                overflow: 'auto',
+                                alignItems: 'flex-start'
+                            }}
+                        >
+                            <Box display="flex" justifyContent="space-between">
                                 <Typography>
                                     {isMeToOther ? (
                                         <>
-                                            <b>{associationAuthor?.payload.body.username ?? 'anonymous'}</b> favorited{' '}
+                                            <b>{association.author.profile?.username ?? 'anonymous'}</b> favorited{' '}
                                             {Possessive} message
                                         </>
                                     ) : (
                                         <>
                                             {Nominative} favorited{' '}
-                                            <b>{messageAuthor?.payload.body.username ?? 'anonymous'}</b>&apos;s message
+                                            <b>{association.target.author.profile?.username ?? 'anonymous'}</b>&apos;s
+                                            message
                                         </>
                                     )}
                                 </Typography>
-                                <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
-                                    {message?.payload.body.body}
-                                </blockquote>
+                                <Link
+                                    component={RouterLink}
+                                    underline="hover"
+                                    color="inherit"
+                                    fontSize="0.75rem"
+                                    to={`/message/${association.target.id ?? ''}@${
+                                        association.target.author.ccaddr ?? ''
+                                    }`}
+                                >
+                                    <TimeDiff date={new Date(association.cdate)} />
+                                </Link>
                             </Box>
-                        </ListItemButton>
+                            <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
+                                {(association.target as M_Current)?.body}
+                            </blockquote>
+                        </Box>
                     </ListItem>
                     {props.after}
                 </>
@@ -138,78 +138,79 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                     <ListItem
                         sx={{
                             alignItems: 'flex-start',
-                            wordBreak: 'break-word'
+                            wordBreak: 'break-word',
+                            gap: 2
                         }}
                         disablePadding
                     >
-                        <ListItemButton
-                            disableGutters
-                            component={routerLink}
-                            to={`/message/${message?.id ?? ''}@${message?.author ?? ''}`}
+                        <IconButton
                             sx={{
-                                display: 'flex',
-                                alignItems: 'flex-start',
-                                flex: 1,
-                                gap: 2
+                                width: { xs: '38px', sm: '48px' },
+                                height: { xs: '38px', sm: '48px' },
+                                mt: { xs: '3px', sm: '5px' }
                             }}
+                            component={RouterLink}
+                            to={'/entity/' + (association.author.ccaddr ?? '')}
                         >
-                            <IconButton
+                            <CCAvatar
+                                avatarURL={actionUser?.profile?.avatar}
+                                identiconSource={actionUser?.ccaddr ?? ''}
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
-                                    height: { xs: '38px', sm: '48px' },
-                                    mt: { xs: '3px', sm: '5px' }
+                                    height: { xs: '38px', sm: '48px' }
                                 }}
-                                component={routerLink}
-                                to={'/entity/' + association.author}
-                            >
-                                <CCAvatar
-                                    alt={actionUser?.payload.body.username}
-                                    avatarURL={actionUser?.payload.body.avatar}
-                                    identiconSource={actionUser?.id ?? ''}
-                                    sx={{
-                                        width: { xs: '38px', sm: '48px' },
-                                        height: { xs: '38px', sm: '48px' }
-                                    }}
-                                />
-                            </IconButton>
-                            <Box
-                                sx={{
-                                    flex: 1,
-                                    flexDirection: 'column',
-                                    width: '100%',
-                                    overflow: 'auto',
-                                    alignItems: 'flex-start'
-                                }}
-                            >
+                            />
+                        </IconButton>
+                        <Box
+                            sx={{
+                                flex: 1,
+                                flexDirection: 'column',
+                                width: '100%',
+                                overflow: 'auto',
+                                alignItems: 'flex-start'
+                            }}
+                        >
+                            <Box display="flex" justifyContent="space-between">
                                 <Typography>
                                     {isMeToOther ? (
                                         <>
-                                            <b>{associationAuthor?.payload.body.username ?? 'anonymous'}</b> reacted{' '}
+                                            <b>{association.author.profile?.username ?? 'anonymous'}</b> reacted{' '}
                                             {Possessive} message with{' '}
                                             <img
                                                 height="13px"
-                                                src={association?.payload.body.imageUrl}
-                                                alt={association?.payload.body.shortcode}
+                                                src={(association as A_Reaction).imageUrl}
+                                                alt={(association as A_Reaction).shortcode}
                                             />
                                         </>
                                     ) : (
                                         <>
                                             {Nominative} reacted{' '}
-                                            <b>{messageAuthor?.payload.body.username ?? 'anonymous'}</b>&apos;s message
-                                            with{' '}
+                                            <b>{association.target.author.profile?.username ?? 'anonymous'}</b>&apos;s
+                                            message with{' '}
                                             <img
                                                 height="13px"
-                                                src={association?.payload.body.imageUrl}
-                                                alt={association?.payload.body.shortcode}
+                                                src={(association as A_Reaction).imageUrl}
+                                                alt={(association as A_Reaction).shortcode}
                                             />
                                         </>
                                     )}
                                 </Typography>
-                                <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
-                                    {message?.payload.body.body}
-                                </blockquote>
+                                <Link
+                                    component={RouterLink}
+                                    underline="hover"
+                                    color="inherit"
+                                    fontSize="0.75rem"
+                                    to={`/message/${association.target.id ?? ''}@${
+                                        association.target.author.ccaddr ?? ''
+                                    }`}
+                                >
+                                    <TimeDiff date={new Date(association.cdate)} />
+                                </Link>
                             </Box>
-                        </ListItemButton>
+                            <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
+                                {(association.target as M_Current).body}
+                            </blockquote>
+                        </Box>
                     </ListItem>
                     {props.after}
                 </>
@@ -217,16 +218,16 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
         case Schemas.replyAssociation:
             return (
                 <MessageContainer
-                    messageID={association.payload.body.messageId}
-                    messageOwner={association.author}
+                    messageID={(association as A_Reply).replyBody.id}
+                    messageOwner={(association as A_Reply).replyBody.author.ccaddr}
                     after={props.after}
                 />
             )
-        case Schemas.reRouteAssociation:
+        case Schemas.rerouteAssociation:
             return (
                 <MessageContainer
-                    messageID={association.payload.body.messageId}
-                    messageOwner={association.payload.body.messageAuthor}
+                    messageID={(association as A_Reroute).rerouteBody.id}
+                    messageOwner={(association as A_Reroute).rerouteBody.author.ccaddr}
                     after={props.after}
                 />
             )

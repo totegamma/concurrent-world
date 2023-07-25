@@ -5,12 +5,12 @@ import Paper from '@mui/material/Paper'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
-import { LoadKey, isValid256k1PrivateKey } from '../util'
+import { isValid256k1PrivateKey } from '../util'
 import { useNavigate } from 'react-router-dom'
 import { HDNodeWallet } from 'ethers'
 import { LangJa } from '../utils/lang-ja'
-import ConcurrentApiClient from '../apiservice'
-import type { ConcurrentTheme, Host } from '../model'
+import { Client, LoadKey, type CoreHost, CommputeCCID } from '@concurrent-world/client'
+import type { ConcurrentTheme } from '../model'
 import { usePersistent } from '../hooks/usePersistent'
 import { Themes, createConcurrentTheme } from '../themes'
 import { ThemeProvider } from '@emotion/react'
@@ -33,13 +33,12 @@ export function AccountImport(): JSX.Element {
     const [mnemonic, setMnemonic] = useState<string>('')
     const [secret, setSecret] = useState<string>('')
     const [server, setServer] = useState<string>('')
-    const [host, setHost] = useState<Host>()
+    const [host, setHost] = useState<CoreHost>()
     const [entityFound, setEntityFound] = useState<boolean>(false)
-    const [api, initializeApi] = useState<ConcurrentApiClient>()
+    const [client, initializeClient] = useState<Client>()
     const [errorMessage, setErrorMessage] = useState<string>('')
 
     const [privatekey, setPrivatekey] = useState<string>('')
-    const [ccid, setCcid] = useState<string>('')
 
     useEffect(() => {
         let privatekey = ''
@@ -53,9 +52,10 @@ export function AccountImport(): JSX.Element {
                 return
             }
             const key = LoadKey(secret)
+            console.log(key)
             if (!key) return
             privatekey = key.privatekey
-            ccid = key.ccaddress
+            ccid = CommputeCCID(key.publickey)
         } else {
             try {
                 const wallet = HDNodeWallet.fromPhrase(mnemonic.trim(), undefined, undefined, LangJa.wordlist()) // TODO: move to utils
@@ -69,62 +69,70 @@ export function AccountImport(): JSX.Element {
         }
 
         setPrivatekey(privatekey)
-        setCcid(ccid)
 
-        const hubApi = new ConcurrentApiClient(ccid, privatekey, 'hub.concurrent.world')
-
-        hubApi.readEntity(ccid).then((entity) => {
-            console.log(entity)
-            if (entity && entity.ccaddr === ccid) {
-                setServer(entity.host || 'hub.concurrent.world')
-                setEntityFound(true)
-            } else {
-                setErrorMessage('お住まいのサーバーが見つかりませんでした。手動入力することで継続できます。')
-            }
-        })
+        try {
+            const hubClient = new Client(privatekey, 'hub.concurrent.world', 'stab-client')
+            hubClient.api.readEntity(ccid).then((entity) => {
+                console.log(entity)
+                if (entity && entity.ccaddr === ccid) {
+                    setServer(entity.host || 'hub.concurrent.world')
+                    setEntityFound(true)
+                } else {
+                    setErrorMessage('お住まいのサーバーが見つかりませんでした。手動入力することで継続できます。')
+                }
+            })
+        } catch (e) {
+            console.log(e)
+        }
     }, [mnemonic, secret])
 
     useEffect(() => {
         let unmounted = false
         const fqdn = server.replace('https://', '').replace('/', '')
-        const api = new ConcurrentApiClient(ccid, privatekey, fqdn)
-        api.getHostProfile(fqdn)
-            .then((e: any) => {
-                if (unmounted) return
-                setHost(e)
-                api.readEntity(api.userAddress)
-                    .then((entity) => {
-                        if (unmounted) return
-                        console.log(entity)
-                        if (!entity || entity.ccaddr !== api.userAddress) {
+        try {
+            const client = new Client(privatekey, fqdn)
+            client.api
+                .getHostProfile(fqdn)
+                .then((e: any) => {
+                    if (unmounted) return
+                    setHost(e)
+                    client.api
+                        .readEntity(client.ccid)
+                        .then((entity) => {
+                            if (unmounted) return
+                            console.log(entity)
+                            if (!entity || entity.ccaddr !== client.ccid) {
+                                setErrorMessage('指定のサーバーにあなたのアカウントは見つかりませんでした。')
+                                return
+                            }
+                            setErrorMessage('')
+                            setEntityFound(entity.ccaddr === client.ccid)
+                            initializeClient(client)
+                        })
+                        .catch((_) => {
+                            if (unmounted) return
                             setErrorMessage('指定のサーバーにあなたのアカウントは見つかりませんでした。')
-                            return
-                        }
-                        setErrorMessage('')
-                        setEntityFound(entity.ccaddr === api.userAddress)
-                        initializeApi(api)
-                    })
-                    .catch((_) => {
-                        if (unmounted) return
-                        setErrorMessage('指定のサーバーにあなたのアカウントは見つかりませんでした。')
-                    })
-                console.log(fqdn)
-            })
-            .catch((_) => {
-                if (unmounted) return
-                setErrorMessage('指定のサーバーに接続できませんでした。')
-            })
+                        })
+                    console.log(fqdn)
+                })
+                .catch((_) => {
+                    if (unmounted) return
+                    setErrorMessage('指定のサーバーに接続できませんでした。')
+                })
+        } catch (e) {
+            console.log(e)
+            return
+        }
         return () => {
             unmounted = true
         }
     }, [server])
 
     const accountImport = (): void => {
-        if (!api) return
+        if (!client) return
         if (!host) return
         localStorage.setItem('Domain', JSON.stringify(host.fqdn))
-        localStorage.setItem('PrivateKey', JSON.stringify(api.privatekey))
-        localStorage.setItem('Address', JSON.stringify(api.userAddress))
+        localStorage.setItem('PrivateKey', JSON.stringify(client.api.privatekey))
         localStorage.setItem('Mnemonic', JSON.stringify(mnemonic))
         navigate('/')
     }

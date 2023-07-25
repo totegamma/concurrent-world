@@ -54,7 +54,7 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                         xs: '0.9rem',
                         sm: '1rem'
                     },
-                    '&:first-child': {
+                    '&:firs-child': {
                         marginTop: 0
                     },
                     '&:last-child': {
@@ -90,7 +90,7 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                         xs: '0.9rem',
                         sm: '1rem'
                     },
-                    '&:first-child': {
+                    '&:first-of-type': {
                         marginTop: 0
                     },
                     '&:last-child': {
@@ -116,7 +116,7 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                                 },
                                 mt: 1,
                                 mb: 1,
-                                '&:first-child': {
+                                '&:first-of-type': {
                                     mt: 0
                                 },
                                 '&:last-child': {
@@ -133,7 +133,7 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                             sx={{
                                 mt: 1.8,
                                 mb: 1,
-                                '&:first-child': {
+                                '&:first-of-type': {
                                     mt: 0
                                 }
                             }}
@@ -147,7 +147,7 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                             sx={{
                                 mt: 1.5,
                                 mb: 1,
-                                '&:first-child': {
+                                '&:first-of-type': {
                                     mt: 0
                                 },
                                 '&:last-child': {
@@ -164,7 +164,7 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                             sx={{
                                 mt: 1,
                                 mb: 1,
-                                '&:first-child': {
+                                '&:first-of-type': {
                                     mt: 0
                                 },
                                 '&:last-child': {

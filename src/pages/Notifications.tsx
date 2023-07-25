@@ -15,7 +15,7 @@ export function Notifications(props: NotificationsProps): JSX.Element {
 
     useEffect(() => {
         scrollParentRef.current?.scroll({ top: 0 })
-    }, [appData.userstreams])
+    }, [appData.displayingStream])
 
     return (
         <Box

@@ -10,9 +10,9 @@ import {
     Tooltip,
     Paper,
     List,
-    ListItem,
     ListItemIcon,
-    ListItemText
+    ListItemText,
+    ListItemButton
 } from '@mui/material'
 import { ApplicationContext } from '../App'
 import { MarkdownRenderer } from './MarkdownRenderer'
@@ -29,10 +29,12 @@ import Splitscreen from '@mui/icons-material/Splitscreen'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 import { type Emoji, useEmojiPicker } from '../context/EmojiPickerContext'
 import caretPosition from 'textarea-caret'
+import { type Stream } from '@concurrent-world/client'
 
 export interface DraftProps {
     submitButtonLabel?: string
-    streamPickerInitial: string[]
+    streamPickerInitial: Stream[]
+    streamPickerOptions: Stream[]
     onSubmit: (text: string, destinations: string[]) => Promise<Error | null>
     allowEmpty?: boolean
     autoFocus?: boolean
@@ -44,7 +46,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const pref = usePreference()
     const emojiPicker = useEmojiPicker()
 
-    const [destStreams, setDestStreams] = useState<string[]>(props.streamPickerInitial)
+    const [destStreams, setDestStreams] = useState<Stream[]>(props.streamPickerInitial)
 
     const [draft, setDraft] = usePersistent<string>('draft', '')
     const [openPreview, setOpenPreview] = useState<boolean>(false)
@@ -62,6 +64,8 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
 
     const [selectedSuggestions, setSelectedSuggestions] = useState<number>(0)
 
+    const timerRef = useRef<any | null>(null)
+
     const { enqueueSnackbar } = useSnackbar()
 
     useEffect(() => {
@@ -73,19 +77,23 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             enqueueSnackbar('Message must not be empty!', { variant: 'error' })
             return
         }
+        const destStreamIDs = destStreams.map((s) => s.id)
         const dest = [
-            ...new Set([...destStreams, ...(postHome ? [appData.userstreams?.payload.body.homeStream] : [])])
+            ...new Set([...destStreamIDs, ...(postHome ? [appData.user?.userstreams?.homeStream] : [])])
         ].filter((e) => e) as string[]
         setSending(true)
-        props.onSubmit(draft, dest).then((error) => {
-            if (error) {
-                enqueueSnackbar(`Failed to post message: ${error.message}`, { variant: 'error' })
+        props
+            .onSubmit(draft, dest)
+            .then((error) => {
+                if (error) {
+                    enqueueSnackbar(`Failed to post message: ${error.message}`, { variant: 'error' })
+                } else {
+                    setDraft('')
+                }
+            })
+            .finally(() => {
                 setSending(false)
-            } else {
-                setDraft('')
-                setSending(false)
-            }
-        })
+            })
     }
 
     const uploadToImgur = async (base64Data: string): Promise<string> => {
@@ -163,6 +171,27 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         }
     }
 
+    const onEmojiSuggestConfirm = (index: number): void => {
+        console.log('confirm', index)
+        const before = draft.slice(0, textInputRef.current?.selectionEnd ?? 0) ?? ''
+        const colonPos = before.lastIndexOf(':')
+        if (colonPos === -1) return
+        const after = draft.slice(textInputRef.current?.selectionEnd ?? 0) ?? ''
+
+        const emoji = emojiSuggestions[index].skins[0].native
+            ? emojiSuggestions[index].skins[0].native ?? ''
+            : ':' + emojiSuggestions[index].name + ':'
+
+        setDraft(before.slice(0, colonPos) + emoji + after)
+        setSelectedSuggestions(0)
+        setEnableSuggestions(false)
+        if (timerRef.current) {
+            clearTimeout(timerRef.current)
+            timerRef.current = null
+            textInputRef.current?.focus()
+        }
+    }
+
     return (
         <Box
             sx={{
@@ -185,7 +214,14 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             >
                 <List dense>
                     {emojiSuggestions.map((emoji, index) => (
-                        <ListItem dense key={emoji.name} selected={index === selectedSuggestions}>
+                        <ListItemButton
+                            dense
+                            key={emoji.name}
+                            selected={index === selectedSuggestions}
+                            onClick={() => {
+                                onEmojiSuggestConfirm(index)
+                            }}
+                        >
                             <ListItemIcon>
                                 {emoji.skins[0]?.native ? (
                                     <Box>{emoji.skins[0]?.native}</Box>
@@ -198,7 +234,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                 )}
                             </ListItemIcon>
                             <ListItemText>{emoji.name}</ListItemText>
-                        </ListItem>
+                        </ListItemButton>
                     ))}
                 </List>
             </Paper>
@@ -211,7 +247,11 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         flex: 1
                     }}
                 >
-                    <StreamPicker selected={destStreams} setSelected={setDestStreams} />
+                    <StreamPicker
+                        options={props.streamPickerOptions}
+                        selected={destStreams}
+                        setSelected={setDestStreams}
+                    />
                 </Box>
                 <Tooltip title={postHome ? 'ホーム同時投稿モード' : 'ストリーム限定投稿モード'} arrow placement="top">
                     <IconButton
@@ -278,18 +318,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         if (enableSuggestions) {
                             if (e.key === 'Enter') {
                                 e.preventDefault()
-                                const before = draft.slice(0, e.target.selectionEnd) ?? ''
-                                const colonPos = before.lastIndexOf(':')
-                                if (colonPos === -1) return
-                                const after = draft.slice(e.target.selectionEnd) ?? ''
-
-                                const emoji = emojiSuggestions[selectedSuggestions].skins[0].native
-                                    ? emojiSuggestions[selectedSuggestions].skins[0].native ?? ''
-                                    : ':' + emojiSuggestions[selectedSuggestions].name + ':'
-
-                                setDraft(before.slice(0, colonPos) + emoji + after)
-                                setSelectedSuggestions(0)
-                                setEnableSuggestions(false)
+                                onEmojiSuggestConfirm(selectedSuggestions)
                                 return
                             }
                             if (e.key === 'ArrowUp') {
@@ -311,10 +340,12 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         }
                     }}
                     onBlur={() => {
-                        if (enableSuggestions) {
-                            setEnableSuggestions(false)
-                            setSelectedSuggestions(0)
-                        }
+                        timerRef.current = setTimeout(() => {
+                            if (enableSuggestions) {
+                                setEnableSuggestions(false)
+                                setSelectedSuggestions(0)
+                            }
+                        }, 100)
                     }}
                     inputRef={textInputRef}
                 />

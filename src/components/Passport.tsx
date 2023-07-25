@@ -5,18 +5,18 @@ import { useContext, useId } from 'react'
 import { useApi } from '../context/api'
 
 export function Passport(): JSX.Element {
-    const api = useApi()
+    const client = useApi()
     const appData = useContext(ApplicationContext)
     const theme = useTheme<ConcurrentTheme>()
 
     return (
         <PassportRenderer
             theme={theme}
-            ccid={api.userAddress}
-            name={appData.profile?.payload.body.username || ''}
-            avatar={appData.profile?.payload.body.avatar || ''}
-            host={api.host || ''}
-            cdate={new Date(appData.profile?.payload.signedAt ?? 0).toLocaleDateString()}
+            ccid={client.ccid}
+            name={appData.user?.profile?.username || ''}
+            avatar={appData.user?.profile?.avatar || ''}
+            host={client.api.host || ''}
+            cdate={'N/A'}
             trust={100}
         />
     )

@@ -1,17 +1,17 @@
 import { createContext, useContext } from 'react'
-import type ConcurrentApiClient from '../apiservice'
+import { type Client } from '@concurrent-world/client'
 
-const ApiContext = createContext<ConcurrentApiClient | undefined>(undefined)
+const ApiContext = createContext<Client | undefined>(undefined)
 
 export interface ApiProviderProps {
     children: JSX.Element
-    api: ConcurrentApiClient
+    api: Client
 }
 
 export default function ApiProvider(props: ApiProviderProps): JSX.Element {
     return <ApiContext.Provider value={props.api}>{props.children}</ApiContext.Provider>
 }
 
-export function useApi(): ConcurrentApiClient {
-    return useContext(ApiContext) as ConcurrentApiClient
+export function useApi(): Client {
+    return useContext(ApiContext) as Client
 }

@@ -1,19 +1,14 @@
 import { Box, Link, IconButton, Typography } from '@mui/material'
-import { Link as routerLink } from 'react-router-dom'
+import { Link as routerLink, Link as RouterLink } from 'react-router-dom'
 import { CCAvatar } from '../../CCAvatar'
 import { TimeDiff } from '../../TimeDiff'
-import { type SimpleNote } from '../../../schemas/simpleNote'
-import { type ReplyMessage } from '../../../schemas/replyMessage'
-import { type Character, type Message } from '../../../model'
-import { type Profile } from '../../../schemas/profile'
+import { type M_Current } from '@concurrent-world/client'
 
 export interface OneLineMessageViewProps {
-    message: Message<SimpleNote | ReplyMessage>
-    author: Character<Profile> | undefined
+    message: M_Current
 }
 
 export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element => {
-    if (!props.message?.payload?.body) return <>message not found</>
     return (
         <Box
             sx={{
@@ -31,12 +26,12 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                     height: { xs: '12px', sm: '18px' }
                 }}
                 component={routerLink}
-                to={'/entity/' + props.message.author}
+                to={'/entity/' + props.message.author.ccaddr}
             >
                 <CCAvatar
-                    alt={props.author?.payload.body.username}
-                    avatarURL={props.author?.payload.body.avatar}
-                    identiconSource={props.message.author}
+                    alt={props.message.author.profile?.username}
+                    avatarURL={props.message.author.profile?.avatar}
+                    identiconSource={props.message.author.ccaddr}
                     sx={{
                         width: { xs: '38px', sm: '48px' },
                         height: { xs: '12px', sm: '18px' }
@@ -51,18 +46,15 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                     minWidth={0}
                     sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
                 >
-                    {props.message.payload.body.body}
+                    {props.message.body}
                 </Typography>
             </Box>
             <Link
-                component="button"
+                component={RouterLink}
                 underline="hover"
                 color="inherit"
-                sx={{
-                    display: 'flex',
-                    flexShrink: 0,
-                    fontSize: '0.75rem'
-                }}
+                fontSize="0.75rem"
+                to={`/message/${props.message.id}@${props.message.author.ccaddr}`}
             >
                 <TimeDiff date={new Date(props.message.cdate)} />
             </Link>

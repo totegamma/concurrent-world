@@ -1,19 +1,19 @@
-import { Box, Paper, Modal, Typography } from '@mui/material'
+import { Box, Paper, Modal, Typography, Divider } from '@mui/material'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
-import { Schemas } from '../schemas'
+import { Schemas, type RawDomainProfile, type CoreCharacter, type Message, type Stream } from '@concurrent-world/client'
 import { Draft } from '../components/Draft'
-import { type SimpleNote } from '../schemas/simpleNote'
 import { useLocation } from 'react-router-dom'
 import { usePreference } from './PreferenceContext'
 import { ApplicationContext } from '../App'
 import { ProfileEditor } from '../components/ProfileEditor'
-import { type Character } from '../model'
-import { type DomainProfile } from '../schemas/domainProfile'
+import { MessageContainer } from '../components/Timeline/MessageContainer'
 
 export interface GlobalActionsState {
     openDraft: () => void
+    openReply: (target: Message) => void
+    openReroute: (target: Message) => void
 }
 
 const GlobalActionsContext = createContext<GlobalActionsState | undefined>(undefined)
@@ -33,50 +33,81 @@ const style = {
 }
 
 export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element => {
-    const api = useApi()
+    const client = useApi()
     const pref = usePreference()
-    const reactlocation = useLocation()
+    const path = useLocation()
     const appData = useContext(ApplicationContext)
-    const [mode, setMode] = useState<'compose' | 'none'>('none')
+    const [mode, setMode] = useState<'compose' | 'reply' | 'reroute' | 'none'>('none')
+    const [targetMessage, setTargetMessage] = useState<Message | null>(null)
 
-    const accountIsOK = appData.profile !== null && appData.userstreams !== null
+    const [queriedStreams, setQueriedStreams] = useState<Stream[]>([])
+    const [allKnownStreams, setAllKnownStreams] = useState<Stream[]>([])
+
+    const setupAccountRequired =
+        appData.user !== null && (appData.user.profile === undefined || appData.user.userstreams === undefined)
 
     const openDraft = useCallback(() => {
-        setMode('compose')
-    }, [])
-
-    const queriedStreams = useMemo(
-        () =>
-            reactlocation.hash
-                .replace('#', '')
-                .split(',')
-                .filter((e) => e !== ''),
-        [reactlocation.hash]
-    )
-
-    const streamPickerInitial = useMemo(
-        () => [
-            ...new Set([
-                ...(reactlocation.hash && reactlocation.hash !== '' ? pref.defaultPostNonHome : pref.defaultPostHome),
-                ...queriedStreams
-            ])
-        ],
-        [reactlocation.hash, pref.defaultPostHome, pref.defaultPostNonHome, queriedStreams]
-    )
-
-    const handleKeyPress = useCallback((event: KeyboardEvent) => {
-        if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
-            return
-        }
-        switch (event.key) {
-            case 'n':
-                setTimeout(() => {
-                    // XXX: this is a hack to prevent the keypress from being captured by the draft
-                    openDraft()
-                }, 0)
+        let streamIDs: string[] = []
+        switch (path.pathname) {
+            case '/stream': {
+                streamIDs = path.hash.replace('#', '').split(',')
                 break
+            }
+            default: {
+                const rawid = path.hash.replace('#', '')
+                const list = pref.lists[rawid] ?? Object.values(pref.lists)[0]
+                if (!list) break
+                streamIDs = list.defaultPostStreams
+                break
+            }
         }
+
+        Promise.all(streamIDs.map((id) => client.getStream(id))).then((streams) => {
+            setQueriedStreams(streams.filter((e) => e !== null) as Stream[])
+        })
+
+        setMode('compose')
+    }, [path.pathname, path.hash, pref.lists])
+
+    const openReply = useCallback((target: Message) => {
+        setTargetMessage(target)
+        setMode('reply')
     }, [])
+
+    const openReroute = useCallback(
+        (target: Message) => {
+            setTargetMessage(target)
+            setMode('reroute')
+
+            if (allKnownStreams.length === 0) {
+                const allStreams = Object.values(pref.lists)
+                    .map((list) => list.streams)
+                    .flat()
+                const uniq = [...new Set(allStreams)]
+                Promise.all(uniq.map((id) => client.getStream(id))).then((streams) => {
+                    setAllKnownStreams(streams.filter((e) => e !== null) as Stream[])
+                })
+            }
+        },
+        [allKnownStreams, pref.lists]
+    )
+
+    const handleKeyPress = useCallback(
+        (event: KeyboardEvent) => {
+            if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
+                return
+            }
+            switch (event.key) {
+                case 'n':
+                    setTimeout(() => {
+                        // XXX: this is a hack to prevent the keypress from being captured by the draft
+                        openDraft()
+                    }, 0)
+                    break
+            }
+        },
+        [openDraft]
+    )
 
     useEffect(() => {
         // attach the event listener
@@ -92,9 +123,11 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         <GlobalActionsContext.Provider
             value={useMemo(() => {
                 return {
-                    openDraft
+                    openDraft,
+                    openReply,
+                    openReroute
                 }
-            }, [])}
+            }, [openDraft, openReply, openReroute])}
         >
             {props.children}
             <Modal
@@ -103,32 +136,68 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     setMode('none')
                 }}
             >
-                <Paper sx={style}>
-                    <Box sx={{ display: 'flex' }}>
-                        <Draft
-                            autoFocus
-                            streamPickerInitial={streamPickerInitial}
-                            onSubmit={async (text: string, destinations: string[]) => {
-                                const body = {
-                                    body: text
-                                }
-                                return await api
-                                    .createMessage<SimpleNote>(Schemas.simpleNote, body, destinations)
-                                    .then((_) => {
-                                        return null
-                                    })
-                                    .catch((e) => {
-                                        return e
-                                    })
-                                    .finally(() => {
+                <>
+                    {mode === 'compose' && (
+                        <Paper sx={style}>
+                            <Box sx={{ display: 'flex' }}>
+                                <Draft
+                                    autoFocus
+                                    streamPickerInitial={queriedStreams}
+                                    streamPickerOptions={queriedStreams}
+                                    onSubmit={async (text: string, destinations: string[]) => {
+                                        client
+                                            .createCurrent(text, destinations)
+                                            .then(() => {
+                                                return null
+                                            })
+                                            .catch((e) => {
+                                                return e
+                                            })
+                                            .finally(() => {
+                                                setMode('none')
+                                            })
+                                        return await Promise.resolve(null)
+                                    }}
+                                />
+                            </Box>
+                        </Paper>
+                    )}
+                    {targetMessage && (mode === 'reply' || mode === 'reroute') && (
+                        <Paper sx={style}>
+                            <MessageContainer messageID={targetMessage.id} messageOwner={targetMessage.author.ccaddr} />
+                            <Divider />
+                            <Box sx={{ display: 'flex' }}>
+                                <Draft
+                                    autoFocus
+                                    allowEmpty={mode === 'reroute'}
+                                    submitButtonLabel={mode === 'reply' ? 'Reply' : 'Reroute'}
+                                    streamPickerInitial={targetMessage.streams}
+                                    streamPickerOptions={mode === 'reroute' ? allKnownStreams : targetMessage.streams}
+                                    onSubmit={async (text, streams): Promise<Error | null> => {
+                                        if (mode === 'reroute')
+                                            await client.reroute(
+                                                targetMessage.id,
+                                                targetMessage.author.ccaddr,
+                                                streams,
+                                                text
+                                            )
+                                        else
+                                            await client.reply(
+                                                targetMessage.id,
+                                                targetMessage.author.ccaddr,
+                                                streams,
+                                                text
+                                            )
                                         setMode('none')
-                                    })
-                            }}
-                        />
-                    </Box>
-                </Paper>
+                                        return null
+                                    }}
+                                />
+                            </Box>
+                        </Paper>
+                    )}
+                </>
             </Modal>
-            <Modal open={!accountIsOK} onClose={() => {}}>
+            <Modal open={setupAccountRequired} onClose={() => {}}>
                 <Paper sx={style}>
                     <Box
                         sx={{
@@ -140,11 +209,14 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                             アカウント設定を完了させましょう！
                         </Typography>
                         <ProfileEditor
+                            id={appData.user?.profile?.id}
+                            initial={appData.user?.profile}
                             onSubmit={(_) => {
-                                api?.setupUserstreams().then(() => {
-                                    api.getHostProfile(api.host).then((host) => {
-                                        api.readCharacter(host.ccaddr, Schemas.domainProfile).then(
-                                            (profile: Character<DomainProfile> | undefined) => {
+                                client.setupUserstreams().then(() => {
+                                    client.api.getHostProfile(client.api.host).then((host) => {
+                                        client.api
+                                            .readCharacter(host.ccaddr, Schemas.domainProfile)
+                                            .then((profile: CoreCharacter<RawDomainProfile> | undefined) => {
                                                 console.log(profile)
                                                 try {
                                                     if (profile) {
@@ -172,8 +244,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                     console.error(e)
                                                 }
                                                 window.location.reload()
-                                            }
-                                        )
+                                            })
                                     })
                                 })
                             }}
