@@ -88,7 +88,8 @@ function App(): JSX.Element {
         })
     }, [client])
 
-    const [lists] = usePersistent<Record<string, StreamList>>('lists', {})
+    const listsSource = localStorage.getItem('lists')
+    const lists: Record<string, StreamList> = listsSource ? JSON.parse(listsSource) : {}
 
     const path = useLocation()
     const displayingStream: string[] = useMemo(() => {
@@ -97,6 +98,7 @@ function App(): JSX.Element {
                 const rawid = path.hash.replace('#', '')
                 const list = lists[rawid] ?? Object.values(lists)[0]
                 if (!list) return []
+                console.log(list)
                 return [...list.streams, list.userStreams.map((e) => e.streamID)].flat()
             }
             case '/stream': {

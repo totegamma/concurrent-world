@@ -101,28 +101,31 @@ export function Registration(): JSX.Element {
         if (!client) return
         if (!host) return
         localStorage.setItem('Domain', JSON.stringify(host.fqdn))
-        localStorage.setItem('PublicKey', JSON.stringify(publicKey))
         localStorage.setItem('PrivateKey', JSON.stringify(privateKey))
         localStorage.setItem('Mnemonic', JSON.stringify(mnemonic))
+
+        console.log('hostAddr', host.ccaddr)
 
         client?.api
             .readCharacter(host.ccaddr, Schemas.domainProfile)
             .then((profile: CoreCharacter<RawDomainProfile> | undefined) => {
-                console.log(profile)
-                if (profile) {
-                    if (profile.payload.body.defaultBookmarkStreams)
-                        localStorage.setItem(
-                            'bookmarkingStreams',
-                            JSON.stringify(profile.payload.body.defaultBookmarkStreams)
-                        )
-                    if (profile.payload.body.defaultFollowingStreams)
-                        localStorage.setItem(
-                            'followingStreams',
-                            JSON.stringify(profile.payload.body.defaultFollowingStreams)
-                        )
-                    if (profile.payload.body.defaultPostStreams)
-                        localStorage.setItem('defaultPostHome', JSON.stringify(profile.payload.body.defaultPostStreams))
+                console.log('domainprofile:', profile)
+                const list = {
+                    home: {
+                        label: 'Home',
+                        pinned: true,
+                        streams: profile?.payload.body.defaultFollowingStreams
+                            ? profile.payload.body.defaultFollowingStreams
+                            : [],
+                        userStreams: [],
+                        expanded: false,
+                        defaultPostStreams: profile?.payload.body.defaultPostStreams
+                            ? profile.payload.body.defaultPostStreams
+                            : []
+                    }
                 }
+                console.log(list)
+                localStorage.setItem('lists', JSON.stringify(list))
                 navigate('/')
             })
     }

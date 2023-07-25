@@ -42,7 +42,16 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
     const [devMode, setDevMode] = usePersistent<boolean>('devMode', false)
     const [showEditorOnTop, setShowEditorOnTop] = usePersistent<boolean>('showEditorOnTop', true)
     const [showEditorOnTopMobile, setShowEditorOnTopMobile] = usePersistent<boolean>('showEditorOnTopMobile', false)
-    const [lists, setLists] = usePersistent<Record<string, StreamList>>('lists', {})
+    const [lists, setLists] = usePersistent<Record<string, StreamList>>('lists', {
+        home: {
+            label: 'Home',
+            pinned: true,
+            streams: [],
+            userStreams: [],
+            expanded: false,
+            defaultPostStreams: []
+        }
+    })
 
     useEffect(() => {
         if (!client) return
