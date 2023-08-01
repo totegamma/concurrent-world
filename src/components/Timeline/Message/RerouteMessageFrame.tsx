@@ -7,10 +7,10 @@ import { Link as routerLink, Link as RouterLink } from 'react-router-dom'
 import { TimeDiff } from '../../TimeDiff'
 import { MessageContainer, useMessageService } from '../MessageContainer'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
-import { useContext, useState } from 'react'
+import { useState } from 'react'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-import { ApplicationContext } from '../../../App'
+import { useApi } from '../../../context/api'
 
 export interface RerouteMessageFrameProp {
     message: M_Reroute
@@ -19,7 +19,7 @@ export interface RerouteMessageFrameProp {
 }
 
 export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element => {
-    const appData = useContext(ApplicationContext)
+    const client = useApi()
     const service = useMessageService()
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
@@ -107,7 +107,7 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
                     </ListItemIcon>
                     <ListItemText>詳細</ListItemText>
                 </MenuItem>
-                {props.message.author.ccaddr === appData.user?.ccaddr && (
+                {props.message.author.ccaddr === client?.user?.ccaddr && (
                     <MenuItem
                         onClick={() => {
                             service.deleteMessage()

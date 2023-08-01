@@ -1,20 +1,18 @@
 import { useTheme } from '@mui/material'
 import { type ConcurrentTheme } from '../model'
-import { ApplicationContext } from '../App'
-import { useContext, useId } from 'react'
+import { useId } from 'react'
 import { useApi } from '../context/api'
 
 export function Passport(): JSX.Element {
     const client = useApi()
-    const appData = useContext(ApplicationContext)
     const theme = useTheme<ConcurrentTheme>()
 
     return (
         <PassportRenderer
             theme={theme}
             ccid={client.ccid}
-            name={appData.user?.profile?.username || ''}
-            avatar={appData.user?.profile?.avatar || ''}
+            name={client?.user?.profile?.username || ''}
+            avatar={client?.user?.profile?.avatar || ''}
             host={client.api.host || ''}
             cdate={'N/A'}
             trust={100}

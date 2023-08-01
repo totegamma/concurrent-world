@@ -27,9 +27,9 @@ export interface AssociationFrameProp {
 
 export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFrameProp): JSX.Element | null => {
     const client = useApi()
-    const [association, setAssociation] = useState<A_Favorite | A_Reaction | A_Reply | A_Reroute | A_Unknown | null>(
-        null
-    )
+    const [association, setAssociation] = useState<
+        A_Favorite | A_Reaction | A_Reply | A_Reroute | A_Unknown | null | undefined
+    >(null)
     const [fetching, setFetching] = useState<boolean>(true)
 
     const perspective = props.perspective ?? client.ccid

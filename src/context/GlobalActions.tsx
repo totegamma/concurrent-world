@@ -6,7 +6,6 @@ import { Schemas, type RawDomainProfile, type CoreCharacter, type Message, type 
 import { Draft } from '../components/Draft'
 import { useLocation } from 'react-router-dom'
 import { usePreference } from './PreferenceContext'
-import { ApplicationContext } from '../App'
 import { ProfileEditor } from '../components/ProfileEditor'
 import { MessageContainer } from '../components/Timeline/MessageContainer'
 
@@ -36,7 +35,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const client = useApi()
     const pref = usePreference()
     const path = useLocation()
-    const appData = useContext(ApplicationContext)
     const [mode, setMode] = useState<'compose' | 'reply' | 'reroute' | 'none'>('none')
     const [targetMessage, setTargetMessage] = useState<Message | null>(null)
 
@@ -44,7 +42,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const [allKnownStreams, setAllKnownStreams] = useState<Stream[]>([])
 
     const setupAccountRequired =
-        appData.user !== null && (appData.user.profile === undefined || appData.user.userstreams === undefined)
+        client?.user !== null && (client?.user.profile === undefined || client?.user.userstreams === undefined)
 
     const openDraft = useCallback(() => {
         let streamIDs: string[] = []
@@ -209,14 +207,15 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                             アカウント設定を完了させましょう！
                         </Typography>
                         <ProfileEditor
-                            id={appData.user?.profile?.id}
-                            initial={appData.user?.profile}
+                            id={client?.user?.profile?.id}
+                            initial={client?.user?.profile}
                             onSubmit={(_) => {
                                 client.setupUserstreams().then(() => {
-                                    client.api.getHostProfile(client.api.host).then((host) => {
+                                    client.api.readHost(client.api.host).then((host) => {
+                                        if (!host) return // TODO: add notice
                                         client.api
                                             .readCharacter(host.ccaddr, Schemas.domainProfile)
-                                            .then((profile: CoreCharacter<RawDomainProfile> | undefined) => {
+                                            .then((profile: CoreCharacter<RawDomainProfile> | null | undefined) => {
                                                 console.log(profile)
                                                 try {
                                                     if (profile) {

@@ -66,7 +66,6 @@ export function Registration(): JSX.Element {
     const [mnemonic, setMnemonic] = useState<string>('')
     const [CCID, setCCID] = useState<string>('')
     const [privateKey, setPrivateKey] = useState<string>('')
-    const [publicKey, setPublicKey] = useState<string>('')
     const [client, initializeClient] = useState<Client>()
 
     useEffect(() => {
@@ -74,12 +73,11 @@ export function Registration(): JSX.Element {
         setMnemonic(identity.mnemonic)
         setCCID(identity.CCID)
         setPrivateKey(identity.privateKey)
-        setPublicKey(identity.publicKey)
         initializeClient(new Client(identity.privateKey, 'hub.concurrent.world'))
     }, [])
 
     const [server, setServer] = useState<string>('')
-    const [host, setHost] = useState<CoreHost>()
+    const [host, setHost] = useState<CoreHost | null | undefined>()
     const [entityFound, setEntityFound] = useState<boolean>(false)
 
     useEffect(() => {
@@ -91,7 +89,7 @@ export function Registration(): JSX.Element {
     useEffect(() => {
         if (!client) return
         const fqdn = server.replace('https://', '').replace('/', '')
-        client.api.getHostProfile(fqdn).then((e) => {
+        client.api.readHost(fqdn).then((e) => {
             setHost(e)
         })
         console.log(fqdn)
@@ -108,7 +106,7 @@ export function Registration(): JSX.Element {
 
         client?.api
             .readCharacter(host.ccaddr, Schemas.domainProfile)
-            .then((profile: CoreCharacter<RawDomainProfile> | undefined) => {
+            .then((profile: CoreCharacter<RawDomainProfile> | null | undefined) => {
                 console.log('domainprofile:', profile)
                 const list = {
                     home: {
@@ -132,6 +130,7 @@ export function Registration(): JSX.Element {
 
     const checkRegistration = async (): Promise<void> => {
         console.log('check!!!')
+        client?.api.invalidateEntity(CCID)
         const entity = await client?.api.readEntity(CCID)
         console.log(entity)
         setEntityFound(!!entity && entity.ccaddr != null)

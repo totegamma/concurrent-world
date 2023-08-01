@@ -15,14 +15,13 @@ import { ThemeSelect } from '../components/Settings/ThemeSelect'
 import { ImgurSettings } from '../components/Settings/Imgur'
 import { useApi } from '../context/api'
 import { useSnackbar } from 'notistack'
-import { useContext, useState } from 'react'
+import { useState } from 'react'
 import { APSettings } from '../components/APSettings'
 import { Passport } from '../components/Passport'
 import Tilt from 'react-parallax-tilt'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import { ProfileEditor } from '../components/ProfileEditor'
-import { ApplicationContext } from '../App'
 import { usePreference } from '../context/PreferenceContext'
 
 export interface SettingsProp {
@@ -32,7 +31,6 @@ export interface SettingsProp {
 export function Settings(props: SettingsProp): JSX.Element {
     const client = useApi()
     const pref = usePreference()
-    const appData = useContext(ApplicationContext)
     const { enqueueSnackbar } = useSnackbar()
 
     const deleteAllCache = (): void => {
@@ -96,8 +94,8 @@ export function Settings(props: SettingsProp): JSX.Element {
                             }}
                         >
                             <ProfileEditor
-                                id={appData.user?.profile?.id}
-                                initial={appData.user?.profile}
+                                id={client?.user?.profile?.id}
+                                initial={client?.user?.profile}
                                 onSubmit={(_profile) => {
                                     enqueueSnackbar('更新しました', { variant: 'success' })
                                 }}

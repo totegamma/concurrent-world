@@ -18,7 +18,7 @@ export function EntityPage(): JSX.Element {
     const theme = useTheme()
     const { id } = useParams()
 
-    const [user, setUser] = useState<User | null>(null)
+    const [user, setUser] = useState<User | null | undefined>(null)
 
     const [mode, setMode] = useState<'info' | 'edit'>('info')
     const messages = useObjectList<StreamElementDated>()

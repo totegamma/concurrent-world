@@ -17,7 +17,7 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
     const [associationTargetAuthor, setAssociationTargetAuthor] = useState<string>('')
     const [associationTargetType, setAssociationTargetType] = useState<string>('message')
 
-    const [character, setCharacter] = useState<CoreCharacter<any>>()
+    const [character, setCharacter] = useState<CoreCharacter<any> | null | undefined>()
 
     const createMessage = async (e: any): Promise<void> => {
         client.api.createMessage(schemaURL as Schema, e, streams.split(','))
