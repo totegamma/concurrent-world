@@ -8,6 +8,7 @@ import { Typography } from '@mui/material'
 import { useInspector } from '../../context/Inspector'
 import { MessageView } from './Message/MessageView'
 import { useGlobalActions } from '../../context/GlobalActions'
+import { usePreference } from '../../context/PreferenceContext'
 
 export interface MessageServiceState {
     addFavorite: () => void
@@ -35,6 +36,7 @@ interface MessageContainerProps {
 
 export const MessageContainer = memo<MessageContainerProps>((props: MessageContainerProps): JSX.Element | null => {
     const client = useApi()
+    const pref = usePreference()
     const inspector = useInspector()
     const actions = useGlobalActions()
     const [message, setMessage] = useState<M_Current | M_Reroute | M_Reply | null>()
@@ -136,7 +138,18 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
         )
     }
 
-    if (!message) return null
+    if (!message) {
+        if (pref.devMode) {
+            return (
+                <>
+                    <Typography>Message not found</Typography>
+                    {props.messageID}@{props.messageOwner}
+                    {props.after}
+                </>
+            )
+        }
+        return null
+    }
 
     let body
     switch (message?.schema) {

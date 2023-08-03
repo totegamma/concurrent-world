@@ -1,4 +1,4 @@
-import { Box, Paper, Modal, Typography, Divider } from '@mui/material'
+import { Box, Paper, Modal, Typography, Divider, Button } from '@mui/material'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
@@ -40,9 +40,19 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
 
     const [queriedStreams, setQueriedStreams] = useState<Stream[]>([])
     const [allKnownStreams, setAllKnownStreams] = useState<Stream[]>([])
+    const [domainIsOffline, setDomainIsOffline] = useState<boolean>(false)
 
     const setupAccountRequired =
         client?.user !== null && (client?.user.profile === undefined || client?.user.userstreams === undefined)
+
+    useEffect(() => {
+        client.api.readHost(client.api.host).then((host) => {
+            console.log(host)
+            if (host === null) {
+                setDomainIsOffline(true)
+            }
+        })
+    }, [client.user])
 
     const openDraft = useCallback(() => {
         let streamIDs: string[] = []
@@ -194,6 +204,28 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                         </Paper>
                     )}
                 </>
+            </Modal>
+            <Modal open={domainIsOffline} onClose={() => {}}>
+                <Paper sx={style}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }}
+                    >
+                        <Typography>
+                            あなたのドメイン{client.api.host}は現在オフラインです。復旧までしばらくお待ちください。
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            onClick={() => {
+                                window.location.reload()
+                            }}
+                        >
+                            Reload
+                        </Button>
+                    </Box>
+                </Paper>
             </Modal>
             <Modal open={setupAccountRequired} onClose={() => {}}>
                 <Paper sx={style}>
