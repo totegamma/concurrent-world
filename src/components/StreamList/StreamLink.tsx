@@ -22,7 +22,14 @@ export const StreamLink = (props: StreamLinkProps): JSX.Element | null => {
         })
     }, [props.streamID])
 
-    if (!stream) return null
+    if (!stream) {
+        return (
+            <ListItemButton dense disabled component={RouterLink} to={`/stream#${props.streamID}`} sx={props.sx}>
+                <PercentIcon />
+                offline
+            </ListItemButton>
+        )
+    }
 
     return (
         <ListItemButton dense component={RouterLink} to={`/stream#${props.streamID}`} sx={props.sx}>
@@ -47,7 +54,20 @@ export const UserStreamLink = (props: UserStreamLinkProps): JSX.Element | null =
         })
     }, [props.userHomeStream])
 
-    if (!user) return null
+    if (!user) {
+        return (
+            <ListItemButton
+                dense
+                disabled
+                component={RouterLink}
+                to={`/entity/${props.userHomeStream.userID ?? ''}`}
+                sx={props.sx}
+            >
+                <AlternateEmailIcon />
+                offline
+            </ListItemButton>
+        )
+    }
 
     return (
         <ListItemButton dense component={RouterLink} to={`/entity/${props.userHomeStream.userID ?? ''}`} sx={props.sx}>
