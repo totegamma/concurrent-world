@@ -1,10 +1,9 @@
 import { Box, Button, TextField, Typography } from '@mui/material'
-import { forwardRef, useContext, useEffect, useState } from 'react'
+import { forwardRef, useEffect, useState } from 'react'
 import type { RJSFSchema } from '@rjsf/utils'
 import Form from '@rjsf/mui'
 import validator from '@rjsf/validator-ajv8'
 import { useApi } from '../context/api'
-import { ApplicationContext } from '../App'
 
 const schema: RJSFSchema = {
     title: 'ActivityPubSettings',
@@ -22,7 +21,6 @@ const schema: RJSFSchema = {
 
 export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
     const client = useApi()
-    const appData = useContext(ApplicationContext)
     const [loading, setLoading] = useState(false)
     const [registered, setRegistered] = useState(false)
     const [userID, setUserID] = useState('')
@@ -60,7 +58,7 @@ export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
             }
         }
         const profile = window.location.protocol + '//' + window.location.host + '/entity/' + client.ccid
-        const home = appData.user?.userstreams?.homeStream
+        const home = client?.user?.userstreams?.homeStream
         client.api
             .fetchWithCredential(`https://${client.api.host}/api/v1/ap/person/${userID}`, requestOptions)
             .then(async (res) => await res.json())
@@ -76,10 +74,10 @@ export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
             })
             .catch((_) => {
                 setForm({
-                    name: appData.user?.profile?.username,
-                    summary: appData.user?.profile?.description,
+                    name: client?.user?.profile?.username,
+                    summary: client?.user?.profile?.description,
                     profile_url: profile,
-                    icon_url: appData.user?.profile?.avatar,
+                    icon_url: client?.user?.profile?.avatar,
                     homestream: home
                 })
             })

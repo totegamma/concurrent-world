@@ -92,7 +92,7 @@ export function AccountImport(): JSX.Element {
         try {
             const client = new Client(privatekey, fqdn)
             client.api
-                .getHostProfile(fqdn)
+                .readHost(fqdn)
                 .then((e: any) => {
                     if (unmounted) return
                     setHost(e)

@@ -7,14 +7,7 @@ import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
 
-import {
-    Client,
-    Schemas,
-    type User,
-    type CoreServerEvent,
-    type CoreCharacter,
-    type Profile
-} from '@concurrent-world/client'
+import { Client, Schemas, type CoreServerEvent } from '@concurrent-world/client'
 import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu'
 import type { StreamElementDated, Emoji, ConcurrentTheme, StreamList } from './model'
@@ -45,14 +38,12 @@ const branchName = branch || window.location.host.split('.')[0]
 const versionString = `${location.hostname}-${branchName as string}-${sha.slice(0, 7) as string}`
 
 export const ApplicationContext = createContext<appData>({
-    user: null,
     emojiDict: {},
     websocketState: -1,
     displayingStream: []
 })
 
 export interface appData {
-    user: User | null
     emojiDict: Record<string, Emoji>
     websocketState: ReadyState
     displayingStream: string[]
@@ -77,8 +68,6 @@ function App(): JSX.Element {
 
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
     const messages = useObjectList<StreamElementDated>()
-
-    const [user, setUser] = useState<User | null>(null)
 
     const [followingUserStreams, setFollowingUserStreams] = useState<string[]>([])
     useEffect(() => {
@@ -105,12 +94,12 @@ function App(): JSX.Element {
                 return path.hash.replace('#', '').split(',')
             }
             case '/notifications': {
-                const notifications = user?.userstreams?.notificationStream
+                const notifications = client?.user?.userstreams?.notificationStream
                 if (!notifications) return []
                 return [notifications]
             }
             case '/associations': {
-                const associations = user?.userstreams?.associationStream
+                const associations = client?.user?.userstreams?.associationStream
                 if (!associations) return []
                 return [associations]
             }
@@ -118,7 +107,7 @@ function App(): JSX.Element {
                 return []
             }
         }
-    }, [path, user, followingUserStreams])
+    }, [client, path, followingUserStreams])
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
 
@@ -160,19 +149,13 @@ function App(): JSX.Element {
     }, [])
 
     useEffect(() => {
-        client?.getUser(client.ccid).then((user) => {
-            setUser(user)
-        })
-    }, [client])
-
-    useEffect(() => {
         sendJsonMessage({
             channels: [
                 ...displayingStream,
-                ...(user?.userstreams?.notificationStream ? [user?.userstreams.notificationStream] : [])
+                ...(client?.user?.userstreams?.notificationStream ? [client?.user?.userstreams.notificationStream] : [])
             ]
         })
-    }, [displayingStream, user])
+    }, [displayingStream, client])
 
     useEffect(() => {
         if (!lastMessage) return
@@ -212,44 +195,38 @@ function App(): JSX.Element {
                             target.LastUpdated = new Date().getTime()
                             messages.update((e) => [...e])
                         }
-                        if (event.stream === user?.userstreams?.notificationStream) {
+                        if (event.stream === client?.user?.userstreams?.notificationStream) {
                             playNotificationRef.current()
                             client?.api.readAssociation(event.body.id, event.body.currenthost).then((a) => {
                                 if (!a) return
                                 if (a.schema === Schemas.replyAssociation) {
-                                    client?.api
-                                        .readCharacter(a.author, Schemas.profile)
-                                        .then((c: CoreCharacter<Profile> | undefined) => {
-                                            enqueueSnackbar(
-                                                `${c?.payload.body.username ?? 'anonymous'} replied to your message.`
-                                            )
-                                        })
+                                    client?.api.readCharacter(a.author, Schemas.profile).then((c) => {
+                                        enqueueSnackbar(
+                                            `${c?.payload.body.username ?? 'anonymous'} replied to your message.`
+                                        )
+                                    })
                                     return
                                 }
 
                                 if (a.schema === Schemas.rerouteAssociation) {
-                                    client?.api
-                                        .readCharacter(a.author, Schemas.profile)
-                                        .then((c: CoreCharacter<Profile> | undefined) => {
-                                            enqueueSnackbar(
-                                                `${c?.payload.body.username ?? 'anonymous'} rerouted to your message.`
-                                            )
-                                        })
+                                    client?.api.readCharacter(a.author, Schemas.profile).then((c) => {
+                                        enqueueSnackbar(
+                                            `${c?.payload.body.username ?? 'anonymous'} rerouted to your message.`
+                                        )
+                                    })
                                     return
                                 }
 
                                 if (a.schema === Schemas.like) {
                                     client?.api.readMessage(a.targetID).then((m) => {
                                         m &&
-                                            client.api
-                                                .readCharacter(a.author, Schemas.profile)
-                                                .then((c: CoreCharacter<Profile> | undefined) => {
-                                                    enqueueSnackbar(
-                                                        `${c?.payload.body.username ?? 'anonymous'} favorited "${
-                                                            (m.payload.body.body as string) ?? 'your message.'
-                                                        }"`
-                                                    )
-                                                })
+                                            client.api.readCharacter(a.author, Schemas.profile).then((c) => {
+                                                enqueueSnackbar(
+                                                    `${c?.payload.body.username ?? 'anonymous'} favorited "${
+                                                        (m.payload.body.body as string) ?? 'your message.'
+                                                    }"`
+                                                )
+                                            })
                                     })
                                     return
                                 }
@@ -258,18 +235,16 @@ function App(): JSX.Element {
                                     client.api.readMessage(a.targetID).then((m) => {
                                         console.log(m)
                                         m &&
-                                            client.api
-                                                .readCharacter(a.author, Schemas.profile)
-                                                .then((c: CoreCharacter<Profile> | undefined) => {
-                                                    enqueueSnackbar(
-                                                        `${c?.payload.body.username ?? 'anonymous'} reacted to "${
-                                                            (m.payload.body.body as string) ?? 'your message.'
-                                                        }" with ${
-                                                            (m.associations.at(-1)?.payload.body.shortcode as string) ??
-                                                            'emoji'
-                                                        }`
-                                                    )
-                                                })
+                                            client.api.readCharacter(a.author, Schemas.profile).then((c) => {
+                                                enqueueSnackbar(
+                                                    `${c?.payload.body.username ?? 'anonymous'} reacted to "${
+                                                        (m.payload.body.body as string) ?? 'your message.'
+                                                    }" with ${
+                                                        (m.associations.at(-1)?.payload.body.shortcode as string) ??
+                                                        'emoji'
+                                                    }`
+                                                )
+                                            })
                                     })
                                     return
                                 }
@@ -315,11 +290,10 @@ function App(): JSX.Element {
     const applicationContext = useMemo(() => {
         return {
             emojiDict,
-            user,
             websocketState: readyState,
             displayingStream
         }
-    }, [emojiDict, user, readyState, displayingStream])
+    }, [emojiDict, readyState, displayingStream])
 
     if (!client) {
         return <>building api service...</>

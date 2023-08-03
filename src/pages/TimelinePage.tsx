@@ -29,7 +29,7 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
     const [writeable, setWriteable] = useState<boolean>(true)
 
     const targetStreamID = reactlocation.hash.replace('#', '').split(',')[0]
-    const [targetStream, setTargetStream] = useState<Stream | null>(null)
+    const [targetStream, setTargetStream] = useState<Stream | null | undefined>(null)
 
     useEffect(() => {
         client.getStream(targetStreamID).then((stream) => {

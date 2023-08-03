@@ -1,4 +1,4 @@
-import { Box, Paper, Modal, Typography, Divider } from '@mui/material'
+import { Box, Paper, Modal, Typography, Divider, Button } from '@mui/material'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
@@ -6,7 +6,6 @@ import { Schemas, type RawDomainProfile, type CoreCharacter, type Message, type 
 import { Draft } from '../components/Draft'
 import { useLocation } from 'react-router-dom'
 import { usePreference } from './PreferenceContext'
-import { ApplicationContext } from '../App'
 import { ProfileEditor } from '../components/ProfileEditor'
 import { MessageContainer } from '../components/Timeline/MessageContainer'
 
@@ -36,15 +35,24 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const client = useApi()
     const pref = usePreference()
     const path = useLocation()
-    const appData = useContext(ApplicationContext)
     const [mode, setMode] = useState<'compose' | 'reply' | 'reroute' | 'none'>('none')
     const [targetMessage, setTargetMessage] = useState<Message | null>(null)
 
     const [queriedStreams, setQueriedStreams] = useState<Stream[]>([])
     const [allKnownStreams, setAllKnownStreams] = useState<Stream[]>([])
+    const [domainIsOffline, setDomainIsOffline] = useState<boolean>(false)
 
     const setupAccountRequired =
-        appData.user !== null && (appData.user.profile === undefined || appData.user.userstreams === undefined)
+        client?.user !== null && (client?.user.profile === undefined || client?.user.userstreams === undefined)
+
+    useEffect(() => {
+        client.api.readHost(client.api.host).then((host) => {
+            console.log(host)
+            if (host === null) {
+                setDomainIsOffline(true)
+            }
+        })
+    }, [client.user])
 
     const openDraft = useCallback(() => {
         let streamIDs: string[] = []
@@ -197,6 +205,28 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     )}
                 </>
             </Modal>
+            <Modal open={domainIsOffline} onClose={() => {}}>
+                <Paper sx={style}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }}
+                    >
+                        <Typography>
+                            あなたのドメイン{client.api.host}は現在オフラインです。復旧までしばらくお待ちください。
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            onClick={() => {
+                                window.location.reload()
+                            }}
+                        >
+                            Reload
+                        </Button>
+                    </Box>
+                </Paper>
+            </Modal>
             <Modal open={setupAccountRequired} onClose={() => {}}>
                 <Paper sx={style}>
                     <Box
@@ -209,14 +239,15 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                             アカウント設定を完了させましょう！
                         </Typography>
                         <ProfileEditor
-                            id={appData.user?.profile?.id}
-                            initial={appData.user?.profile}
+                            id={client?.user?.profile?.id}
+                            initial={client?.user?.profile}
                             onSubmit={(_) => {
                                 client.setupUserstreams().then(() => {
-                                    client.api.getHostProfile(client.api.host).then((host) => {
+                                    client.api.readHost(client.api.host).then((host) => {
+                                        if (!host) return // TODO: add notice
                                         client.api
                                             .readCharacter(host.ccaddr, Schemas.domainProfile)
-                                            .then((profile: CoreCharacter<RawDomainProfile> | undefined) => {
+                                            .then((profile: CoreCharacter<RawDomainProfile> | null | undefined) => {
                                                 console.log(profile)
                                                 try {
                                                     if (profile) {
