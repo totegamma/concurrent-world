@@ -27,7 +27,6 @@ import { CCDrawer } from '../components/CCDrawer'
 import Background from '../resources/defaultbg.png'
 
 import Fuse from 'fuse.js'
-import { I18n } from 'emoji-mart'
 
 interface StreamWithDomain {
     domain: string

@@ -12,7 +12,7 @@ const Puller = styled(Box)(({ theme }) => ({
     width: 30,
     height: 6,
     backgroundColor: theme.palette.mode === 'light' ? grey[300] : grey[900],
-    borderRadius: 3,
+    borderRadius: 1,
     position: 'absolute',
     top: 8,
     left: 'calc(50% - 15px)'
@@ -43,8 +43,8 @@ export const CCDrawer = (props: CCDrawerProps): JSX.Element => {
                         sm: '100%'
                     },
                     borderRadius: {
-                        xs: '20px 20px 0 0',
-                        sm: '20px 0 0 20px'
+                        xs: '10px 10px 0 0',
+                        sm: '10px 0 0 10px'
                     },
                     overflowY: 'hidden',
                     padding: '20px 0 10px 20px'
