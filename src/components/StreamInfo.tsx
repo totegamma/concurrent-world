@@ -1,4 +1,4 @@
-import { Box, Divider, Paper, TextField, Typography } from '@mui/material'
+import { Box, Button, Divider, Paper, TextField, Typography } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
 import { useApi } from '../context/api'
 import { Schemas, type Commonstream, type CoreStream } from '@concurrent-world/client'
@@ -100,6 +100,17 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                         <Typography variant="h3">属性</Typography>
                         <CCEditor schemaURL={Schemas.commonstream} init={stream.payload.body} onSubmit={updateStream} />
                     </Box>
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => {
+                            client.api.deleteStream(props.id).then((_) => {
+                                enqueueSnackbar('削除しました', { variant: 'success' })
+                            })
+                        }}
+                    >
+                        削除
+                    </Button>
                 </Box>
             )}
         </>

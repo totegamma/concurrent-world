@@ -15,6 +15,7 @@ import { useMessageService } from '../MessageContainer'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove'
 import { useEmojiPicker } from '../../../context/EmojiPickerContext'
 import { Link as RouterLink } from 'react-router-dom'
 
@@ -216,6 +217,18 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         </ListItemIcon>
                         <ListItemText>詳細</ListItemText>
                     </MenuItem>
+                    {props.message.author.ccaddr === props.userCCID && ( // TODO: このStreamに属するかどうかをstreamContextを作ってここに提供する
+                        <MenuItem
+                            onClick={() => {
+                                // TODO
+                            }}
+                        >
+                            <ListItemIcon>
+                                <PlaylistRemoveIcon sx={{ color: 'text.primary' }} />
+                            </ListItemIcon>
+                            <ListItemText>このStreamから削除</ListItemText>
+                        </MenuItem>
+                    )}
                     {props.message.author.ccaddr === props.userCCID && (
                         <MenuItem
                             onClick={() => {
