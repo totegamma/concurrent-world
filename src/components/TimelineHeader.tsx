@@ -11,6 +11,7 @@ export interface TimelineHeaderProps {
     secondaryAction?: JSX.Element
     onSecondaryActionClick?: () => void
     onConcurrentLogoClick?: () => void
+    useRawSecondaryAction?: boolean
 }
 
 export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderProps): JSX.Element => {
@@ -61,16 +62,20 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
                     <b>{props.title}</b>
                 </Button>
                 <Box sx={{ position: 'relative', width: '40px', height: '40px', mr: '8px' }}>
-                    <IconButton
-                        sx={{
-                            p: 1,
-                            position: 'absolute',
-                            color: 'primary.contrastText'
-                        }}
-                        onClick={props.onSecondaryActionClick}
-                    >
-                        {props.secondaryAction}
-                    </IconButton>
+                    {props.useRawSecondaryAction ? (
+                        props.secondaryAction
+                    ) : (
+                        <IconButton
+                            sx={{
+                                p: 1,
+                                position: 'absolute',
+                                color: 'primary.contrastText'
+                            }}
+                            onClick={props.onSecondaryActionClick}
+                        >
+                            {props.secondaryAction}
+                        </IconButton>
+                    )}
                 </Box>
             </Box>
         </Box>

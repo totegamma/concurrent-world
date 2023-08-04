@@ -1,4 +1,4 @@
-import { Checkbox, IconButton, Menu, MenuItem } from '@mui/material'
+import { Box, Checkbox, IconButton, Menu, MenuItem } from '@mui/material'
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1'
 import { usePreference } from '../context/PreferenceContext'
 import { useState } from 'react'
@@ -14,7 +14,7 @@ export const FollowButton = (props: FollowButtonProps): JSX.Element => {
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
     return (
-        <>
+        <Box>
             <IconButton
                 onClick={(e) => {
                     setMenuAnchor(e.currentTarget)
@@ -59,6 +59,6 @@ export const FollowButton = (props: FollowButtonProps): JSX.Element => {
                     </MenuItem>
                 ))}
             </Menu>
-        </>
+        </Box>
     )
 }
