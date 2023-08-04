@@ -16,9 +16,10 @@ import {
     Explorer,
     Notifications,
     Settings,
-    TimelinePage,
+    StreamPage,
     EntityPage,
     MessagePage,
+    ListPage,
     Devtool
 } from './pages'
 
@@ -33,7 +34,6 @@ import { EmojiPickerProvider } from './context/EmojiPickerContext'
 
 // @ts-expect-error vite dynamic import
 import { branch, sha } from '~build/info'
-import { ListPage } from './pages/List'
 const branchName = branch || window.location.host.split('.')[0]
 const versionString = `${location.hostname}-${branchName as string}-${sha.slice(0, 7) as string}`
 
@@ -377,7 +377,7 @@ function App(): JSX.Element {
                             <Routes>
                                 <Route
                                     path="/stream"
-                                    element={<TimelinePage messages={messages} setMobileMenuOpen={setMobileMenuOpen} />}
+                                    element={<StreamPage messages={messages} setMobileMenuOpen={setMobileMenuOpen} />}
                                 />
                                 <Route path="/associations" element={<Associations messages={messages} />} />
                                 <Route path="/explorer" element={<Explorer />} />

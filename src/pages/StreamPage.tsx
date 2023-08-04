@@ -15,12 +15,12 @@ import PercentIcon from '@mui/icons-material/Percent'
 import InfoIcon from '@mui/icons-material/Info'
 import { CCDrawer } from '../components/CCDrawer'
 
-export interface TimelinePageProps {
+export interface StreamPageProps {
     messages: IuseObjectList<StreamElementDated>
     setMobileMenuOpen: (state: boolean) => void
 }
 
-export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): JSX.Element => {
+export const StreamPage = memo<StreamPageProps>((props: StreamPageProps): JSX.Element => {
     const client = useApi()
     const appData = useContext(ApplicationContext)
     const pref = usePreference()
@@ -146,4 +146,4 @@ export const TimelinePage = memo<TimelinePageProps>((props: TimelinePageProps): 
         </>
     )
 })
-TimelinePage.displayName = 'TimelinePage'
+StreamPage.displayName = 'StreamPage'
