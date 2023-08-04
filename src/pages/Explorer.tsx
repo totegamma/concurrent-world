@@ -1,16 +1,16 @@
 import {
     Box,
     Button,
+    Card,
+    CardActionArea,
+    CardActions,
+    CardContent,
+    CardMedia,
     Checkbox,
     Divider,
     IconButton,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemText,
     Menu,
     MenuItem,
-    Select,
     TextField,
     Tooltip,
     Typography,
@@ -19,49 +19,86 @@ import {
 import { type Stream } from '@concurrent-world/client'
 import { useApi } from '../context/api'
 import { Link } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { usePreference } from '../context/PreferenceContext'
 
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
+import { CCDrawer } from '../components/CCDrawer'
+import Background from '../resources/defaultbg.png'
+
+import Fuse from 'fuse.js'
+import { I18n } from 'emoji-mart'
+
+interface StreamWithDomain {
+    domain: string
+    stream: Stream
+}
 
 export function Explorer(): JSX.Element {
     const client = useApi()
     const theme = useTheme()
     const pref = usePreference()
 
-    const [hosts, setHosts] = useState<string[]>([...(client.api.host ? [client.api.host] : [])])
-    const [currentHost, setCurrentHost] = useState<string>(client.api.host ?? '')
-    const [streams, setStreams] = useState<Stream[]>([])
+    const [streams, setStreams] = useState<StreamWithDomain[]>([])
+    const [searchResult, setSearchResult] = useState<StreamWithDomain[]>([])
     const [newStreamName, setNewStreamName] = useState<string>('')
+    const [search, setSearch] = useState<string>('')
 
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
     const [selectedStream, setSelectedStream] = useState<string>('')
 
-    const loadHosts = (): void => {
+    const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
+
+    const fuse = useRef<Fuse<StreamWithDomain> | null>(null)
+
+    const load = (): void => {
         client.api.getKnownHosts().then((e) => {
             if (!client.api.host) return
-            setHosts([client.api.host, ...e.filter((e) => e.fqdn !== client.api.host).map((e) => e.fqdn)])
-        })
-    }
-
-    const loadStreams = (): void => {
-        client.getCommonStreams(currentHost).then((e) => {
-            setStreams(e)
+            const domains = [client.api.host, ...e.filter((e) => e.fqdn !== client.api.host).map((e) => e.fqdn)]
+            Promise.all(
+                domains.map(async (e) => {
+                    const streams = await client.getCommonStreams(e)
+                    return streams.map((stream) => {
+                        return {
+                            domain: e,
+                            stream
+                        }
+                    })
+                })
+            ).then((e) => {
+                const streams = e.flat()
+                setStreams(streams)
+                setSearchResult(streams)
+            })
         })
     }
 
     const createNewStream = (name: string): void => {
-        client.createCommonStream(currentHost, name).then((_) => {})
+        client.createCommonStream(name, name).then((_) => {
+            load()
+        })
     }
 
     useEffect(() => {
-        loadHosts()
-        loadStreams()
+        load()
     }, [])
 
     useEffect(() => {
-        loadStreams()
-    }, [currentHost])
+        if (streams.length === 0) return
+        fuse.current = new Fuse(streams, {
+            keys: ['stream.name', 'stream.description'],
+            threshold: 0.3
+        })
+    }, [streams])
+
+    useEffect(() => {
+        if (fuse.current === null) return
+        if (search === '') {
+            setSearchResult(streams)
+            return
+        }
+        setSearchResult(fuse.current.search(search).map((e) => e.item))
+    }, [search])
 
     if (!client.api.host) return <>loading...</>
 
@@ -81,86 +118,79 @@ export function Explorer(): JSX.Element {
                 Explorer
             </Typography>
             <Divider sx={{ mb: 2 }} />
-            <Typography variant="h3" gutterBottom>
-                server
-            </Typography>
-            <Select
-                value={currentHost}
-                label="Host"
-                onChange={(e) => {
-                    setCurrentHost(e.target.value)
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
                 }}
-                defaultValue={client.api.host}
             >
-                {hosts.map((e) => (
-                    <MenuItem key={e} value={e}>
-                        {e}
-                    </MenuItem>
-                ))}
-            </Select>
-            <Divider />
-            <Typography variant="h3" gutterBottom>
-                streams
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-                <TextField
-                    label="stream name"
-                    variant="outlined"
-                    value={newStreamName}
-                    sx={{ flexGrow: 1 }}
-                    onChange={(e) => {
-                        setNewStreamName(e.target.value)
-                    }}
-                />
+                <Typography variant="h3" gutterBottom>
+                    ストリーム
+                </Typography>
                 <Button
                     variant="contained"
-                    onClick={(_) => {
-                        createNewStream(newStreamName)
+                    onClick={() => {
+                        setDrawerOpen(true)
                     }}
                 >
-                    Create
+                    新しく作る
                 </Button>
             </Box>
-            <List dense sx={{ width: '100%' }}>
-                {streams.map((value) => {
-                    const labelId = `checkbox-list-secondary-label-${value.id}`
+            <TextField
+                label="search"
+                variant="outlined"
+                value={search}
+                onChange={(e) => {
+                    setSearch(e.target.value)
+                }}
+            />
+            <Box
+                sx={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                    gap: 2
+                }}
+            >
+                {searchResult.map((value) => {
                     return (
-                        <ListItem
-                            key={value.id}
-                            disablePadding
-                            secondaryAction={
-                                <>
-                                    <Tooltip title="リストに追加" placement="top" arrow>
-                                        <IconButton
-                                            sx={{ flexGrow: 0 }}
-                                            onClick={(e) => {
-                                                setMenuAnchor(e.currentTarget)
-                                                setSelectedStream(value.id)
+                        <Card key={value.stream.id}>
+                            <CardActionArea component={Link} to={'/stream#' + value.stream.id}>
+                                <CardMedia component="img" height="140" image={value.stream.banner || Background} />
+                                <CardContent>
+                                    <Typography gutterBottom variant="h5" component="div">
+                                        {value.stream.name}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {value.stream.description}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {value.domain}
+                                    </Typography>
+                                </CardContent>
+                            </CardActionArea>
+                            <CardActions>
+                                <Tooltip title="リストに追加" placement="top" arrow>
+                                    <IconButton
+                                        sx={{ flexGrow: 0 }}
+                                        onClick={(e) => {
+                                            setMenuAnchor(e.currentTarget)
+                                            setSelectedStream(value.stream.id)
+                                        }}
+                                    >
+                                        <PlaylistAddIcon
+                                            sx={{
+                                                color: theme.palette.text.primary
                                             }}
-                                        >
-                                            <PlaylistAddIcon
-                                                sx={{
-                                                    color: theme.palette.text.primary
-                                                }}
-                                            />
-                                        </IconButton>
-                                    </Tooltip>
-                                </>
-                            }
-                        >
-                            <ListItemButton
-                                component={Link}
-                                to={'/stream#' + value.id}
-                                sx={{
-                                    height: '40px'
-                                }}
-                            >
-                                <ListItemText id={labelId} primary={`%${value.name}`} />
-                            </ListItemButton>
-                        </ListItem>
+                                        />
+                                    </IconButton>
+                                </Tooltip>
+                            </CardActions>
+                        </Card>
                     )
                 })}
-            </List>
+            </Box>
             <Menu
                 anchorEl={menuAnchor}
                 open={Boolean(menuAnchor)}
@@ -187,6 +217,33 @@ export function Explorer(): JSX.Element {
                     </MenuItem>
                 ))}
             </Menu>
+            <CCDrawer
+                open={drawerOpen}
+                onClose={() => {
+                    setDrawerOpen(false)
+                }}
+            >
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                    <TextField
+                        label="stream name"
+                        variant="outlined"
+                        value={newStreamName}
+                        sx={{ flexGrow: 1 }}
+                        onChange={(e) => {
+                            setNewStreamName(e.target.value)
+                        }}
+                    />
+                    <Button
+                        variant="contained"
+                        onClick={(_) => {
+                            createNewStream(newStreamName)
+                            setDrawerOpen(false)
+                        }}
+                    >
+                        Create
+                    </Button>
+                </Box>
+            </CCDrawer>
         </Box>
     )
 }
