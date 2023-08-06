@@ -9,11 +9,8 @@ import {
     Checkbox,
     Divider,
     IconButton,
-    Menu,
-    MenuItem,
     Paper,
     TextField,
-    Tooltip,
     Typography,
     useTheme
 } from '@mui/material'
@@ -21,9 +18,7 @@ import { type Commonstream, Schemas, type Stream } from '@concurrent-world/clien
 import { useApi } from '../context/api'
 import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
-import { usePreference } from '../context/PreferenceContext'
 
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
 import { CCDrawer } from '../components/CCDrawer'
 import Background from '../resources/defaultbg.png'
 
@@ -33,6 +28,7 @@ import { useSnackbar } from 'notistack'
 
 import DoneAllIcon from '@mui/icons-material/DoneAll'
 import RemoveDoneIcon from '@mui/icons-material/RemoveDone'
+import { AddListButton } from '../components/AddListButton'
 
 interface StreamWithDomain {
     domain: string
@@ -42,7 +38,6 @@ interface StreamWithDomain {
 export function Explorer(): JSX.Element {
     const client = useApi()
     const theme = useTheme()
-    const pref = usePreference()
     const navigate = useNavigate()
 
     const [domains, setDomains] = useState<string[]>([])
@@ -51,9 +46,6 @@ export function Explorer(): JSX.Element {
     const [streams, setStreams] = useState<StreamWithDomain[]>([])
     const [searchResult, setSearchResult] = useState<StreamWithDomain[]>([])
     const [search, setSearch] = useState<string>('')
-
-    const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
-    const [selectedStream, setSelectedStream] = useState<string>('')
 
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
 
@@ -266,52 +258,12 @@ export function Explorer(): JSX.Element {
                                 </CardContent>
                             </CardActionArea>
                             <CardActions>
-                                <Tooltip title="リストに追加" placement="top" arrow>
-                                    <IconButton
-                                        sx={{ flexGrow: 0 }}
-                                        onClick={(e) => {
-                                            setMenuAnchor(e.currentTarget)
-                                            setSelectedStream(value.stream.id)
-                                        }}
-                                    >
-                                        <PlaylistAddIcon
-                                            sx={{
-                                                color: theme.palette.text.primary
-                                            }}
-                                        />
-                                    </IconButton>
-                                </Tooltip>
+                                <AddListButton stream={value.stream.id} />
                             </CardActions>
                         </Card>
                     )
                 })}
             </Box>
-            <Menu
-                anchorEl={menuAnchor}
-                open={Boolean(menuAnchor)}
-                onClose={() => {
-                    setMenuAnchor(null)
-                }}
-            >
-                {Object.keys(pref.lists).map((e) => (
-                    <MenuItem key={e} onClick={() => {}}>
-                        {pref.lists[e].label}
-                        <Checkbox
-                            checked={pref.lists[e].streams.includes(selectedStream)}
-                            onChange={(check) => {
-                                const old = pref.lists
-                                if (check.target.checked) {
-                                    old[e].streams.push(selectedStream)
-                                    pref.setLists(JSON.parse(JSON.stringify(old)))
-                                } else {
-                                    old[e].streams = old[e].streams.filter((e) => e !== selectedStream)
-                                    pref.setLists(JSON.parse(JSON.stringify(old)))
-                                }
-                            }}
-                        />
-                    </MenuItem>
-                ))}
-            </Menu>
             <CCDrawer
                 open={drawerOpen}
                 onClose={() => {

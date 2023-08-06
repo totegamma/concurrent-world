@@ -5,6 +5,7 @@ import { type Commonstream, type CoreStream } from '@concurrent-world/client'
 import Background from '../resources/defaultbg.png'
 import { CCEditor } from './cceditor'
 import { useSnackbar } from 'notistack'
+import { AddListButton } from './AddListButton'
 
 export interface StreamInfoProps {
     id: string
@@ -70,7 +71,17 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                 }}
             >
                 <Paper sx={{ flex: 2, padding: '20px' }}>
-                    <Typography variant="h1">{stream.payload.body.name}</Typography>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: '10px'
+                        }}
+                    >
+                        <Typography variant="h1">{stream.payload.body.name}</Typography>
+                        <AddListButton stream={props.id} />
+                    </Box>
                     <Typography variant="caption">{props.id}</Typography>
                     <Divider />
                     <Typography>{stream.payload.body.description || 'まだ説明はありません'}</Typography>
