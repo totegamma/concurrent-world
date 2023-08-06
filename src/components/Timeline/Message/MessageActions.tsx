@@ -217,10 +217,10 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         </ListItemIcon>
                         <ListItemText>詳細</ListItemText>
                     </MenuItem>
-                    {props.message.author.ccaddr === props.userCCID && ( // TODO: このStreamに属するかどうかをstreamContextを作ってここに提供する
+                    {service.removeFromStream && props.message.author.ccaddr === props.userCCID && (
                         <MenuItem
                             onClick={() => {
-                                // TODO
+                                service.removeFromStream?.()
                             }}
                         >
                             <ListItemIcon>

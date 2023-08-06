@@ -14,6 +14,7 @@ import { type Stream } from '@concurrent-world/client'
 import PercentIcon from '@mui/icons-material/Percent'
 import InfoIcon from '@mui/icons-material/Info'
 import { CCDrawer } from '../components/CCDrawer'
+import WatchingStreamContextProvider from '../context/WatchingStreamContext'
 
 export interface StreamPageProps {
     messages: IuseObjectList<StreamElementDated>
@@ -60,6 +61,10 @@ export const StreamPage = memo<StreamPageProps>((props: StreamPageProps): JSX.El
 
     const streams = useMemo(() => {
         return targetStream ? [targetStream] : []
+    }, [targetStream])
+
+    const streamIDs = useMemo(() => {
+        return targetStream ? [targetStream.id] : []
     }, [targetStream])
 
     return (
@@ -126,13 +131,15 @@ export const StreamPage = memo<StreamPageProps>((props: StreamPageProps): JSX.El
                             <Divider />
                         </Box>
                     )}
-                    <Box sx={{ display: 'flex', flex: 1, py: { xs: 1, sm: 1 }, px: { xs: 1, sm: 2 } }}>
-                        <Timeline
-                            streams={appData.displayingStream}
-                            timeline={props.messages}
-                            scrollParentRef={scrollParentRef}
-                        />
-                    </Box>
+                    <WatchingStreamContextProvider watchingStreams={streamIDs}>
+                        <Box sx={{ display: 'flex', flex: 1, py: { xs: 1, sm: 1 }, px: { xs: 1, sm: 2 } }}>
+                            <Timeline
+                                streams={appData.displayingStream}
+                                timeline={props.messages}
+                                scrollParentRef={scrollParentRef}
+                            />
+                        </Box>
+                    </WatchingStreamContextProvider>
                 </Box>
             </Box>
             <CCDrawer
