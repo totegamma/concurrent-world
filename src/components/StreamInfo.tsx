@@ -1,7 +1,7 @@
 import { Box, Button, Divider, Paper, TextField, Typography } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
 import { useApi } from '../context/api'
-import { Schemas, type Commonstream, type CoreStream } from '@concurrent-world/client'
+import { type Commonstream, type CoreStream } from '@concurrent-world/client'
 import Background from '../resources/defaultbg.png'
 import { CCEditor } from './cceditor'
 import { useSnackbar } from 'notistack'

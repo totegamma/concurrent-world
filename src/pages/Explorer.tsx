@@ -16,9 +16,9 @@ import {
     Typography,
     useTheme
 } from '@mui/material'
-import { type Stream } from '@concurrent-world/client'
+import { type Commonstream, Schemas, type Stream } from '@concurrent-world/client'
 import { useApi } from '../context/api'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
 import { usePreference } from '../context/PreferenceContext'
 
@@ -27,6 +27,8 @@ import { CCDrawer } from '../components/CCDrawer'
 import Background from '../resources/defaultbg.png'
 
 import Fuse from 'fuse.js'
+import { CCEditor } from '../components/cceditor'
+import { useSnackbar } from 'notistack'
 
 interface StreamWithDomain {
     domain: string
@@ -37,10 +39,10 @@ export function Explorer(): JSX.Element {
     const client = useApi()
     const theme = useTheme()
     const pref = usePreference()
+    const navigate = useNavigate()
 
     const [streams, setStreams] = useState<StreamWithDomain[]>([])
     const [searchResult, setSearchResult] = useState<StreamWithDomain[]>([])
-    const [newStreamName, setNewStreamName] = useState<string>('')
     const [search, setSearch] = useState<string>('')
 
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
@@ -49,6 +51,8 @@ export function Explorer(): JSX.Element {
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
 
     const fuse = useRef<Fuse<StreamWithDomain> | null>(null)
+
+    const { enqueueSnackbar } = useSnackbar()
 
     const load = (): void => {
         client.api.getKnownHosts().then((e) => {
@@ -72,10 +76,18 @@ export function Explorer(): JSX.Element {
         })
     }
 
-    const createNewStream = (name: string): void => {
-        client.createCommonStream(name, name).then((_) => {
-            load()
-        })
+    const createNewStream = (stream: Commonstream): void => {
+        client.api
+            .createStream(Schemas.commonstream, stream)
+            .then((e: any) => {
+                const id: string = e.id
+                if (id) navigate('/stream#' + id)
+                else enqueueSnackbar('ストリームの作成に失敗しました', { variant: 'error' })
+            })
+            .catch((e) => {
+                console.error(e)
+                enqueueSnackbar('ストリームの作成に失敗しました', { variant: 'error' })
+            })
     }
 
     useEffect(() => {
@@ -222,25 +234,15 @@ export function Explorer(): JSX.Element {
                     setDrawerOpen(false)
                 }}
             >
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                    <TextField
-                        label="stream name"
-                        variant="outlined"
-                        value={newStreamName}
-                        sx={{ flexGrow: 1 }}
-                        onChange={(e) => {
-                            setNewStreamName(e.target.value)
-                        }}
-                    />
-                    <Button
-                        variant="contained"
-                        onClick={(_) => {
-                            createNewStream(newStreamName)
-                            setDrawerOpen(false)
-                        }}
-                    >
-                        Create
-                    </Button>
+                <Box p={1}>
+                    <Typography variant="h3" gutterBottom>
+                        ストリーム新規作成
+                    </Typography>
+                    <Typography variant="body1" gutterBottom>
+                        あなたの管轄ドメイン{client.api.host}に新しいストリームを作成します。
+                    </Typography>
+                    <Divider />
+                    <CCEditor schemaURL={Schemas.commonstream} onSubmit={createNewStream} />
                 </Box>
             </CCDrawer>
         </Box>
