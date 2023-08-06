@@ -11,6 +11,7 @@ import {
     IconButton,
     Menu,
     MenuItem,
+    Paper,
     TextField,
     Tooltip,
     Typography,
@@ -30,6 +31,9 @@ import Fuse from 'fuse.js'
 import { CCEditor } from '../components/cceditor'
 import { useSnackbar } from 'notistack'
 
+import DoneAllIcon from '@mui/icons-material/DoneAll'
+import RemoveDoneIcon from '@mui/icons-material/RemoveDone'
+
 interface StreamWithDomain {
     domain: string
     stream: Stream
@@ -40,6 +44,9 @@ export function Explorer(): JSX.Element {
     const theme = useTheme()
     const pref = usePreference()
     const navigate = useNavigate()
+
+    const [domains, setDomains] = useState<string[]>([])
+    const [selectedDomains, setSelectedDomains] = useState<string[]>([client.api.host])
 
     const [streams, setStreams] = useState<StreamWithDomain[]>([])
     const [searchResult, setSearchResult] = useState<StreamWithDomain[]>([])
@@ -58,23 +65,32 @@ export function Explorer(): JSX.Element {
         client.api.getKnownHosts().then((e) => {
             if (!client.api.host) return
             const domains = [client.api.host, ...e.filter((e) => e.fqdn !== client.api.host).map((e) => e.fqdn)]
-            Promise.all(
-                domains.map(async (e) => {
-                    const streams = await client.getCommonStreams(e)
-                    return streams.map((stream) => {
-                        return {
-                            domain: e,
-                            stream
-                        }
-                    })
-                })
-            ).then((e) => {
-                const streams = e.flat()
-                setStreams(streams)
-                setSearchResult(streams)
-            })
+            setDomains(domains)
         })
     }
+
+    useEffect(() => {
+        if (selectedDomains.length === 0) {
+            setStreams([])
+            setSearchResult([])
+            return
+        }
+        Promise.all(
+            selectedDomains.map(async (e) => {
+                const streams = await client.getCommonStreams(e)
+                return streams.map((stream) => {
+                    return {
+                        domain: e,
+                        stream
+                    }
+                })
+            })
+        ).then((e) => {
+            const streams = e.flat()
+            setStreams(streams)
+            setSearchResult(streams)
+        })
+    }, [selectedDomains])
 
     const createNewStream = (stream: Commonstream): void => {
         client.api
@@ -128,6 +144,74 @@ export function Explorer(): JSX.Element {
             <Typography variant="h2" gutterBottom>
                 Explorer
             </Typography>
+            <Divider sx={{ mb: 2 }} />
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 1
+                }}
+            >
+                <Typography variant="h3" gutterBottom>
+                    Domains
+                </Typography>
+                <Box>
+                    <IconButton
+                        onClick={() => {
+                            setSelectedDomains([])
+                        }}
+                    >
+                        <RemoveDoneIcon />
+                    </IconButton>
+                    <IconButton
+                        onClick={() => {
+                            setSelectedDomains(domains)
+                        }}
+                    >
+                        <DoneAllIcon />
+                    </IconButton>
+                </Box>
+            </Box>
+            <Box
+                sx={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                    gap: 2
+                }}
+            >
+                {domains.map((e) => {
+                    return (
+                        <Paper
+                            key={e}
+                            variant="outlined"
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '10px',
+                                gap: 1,
+                                outline: selectedDomains.includes(e)
+                                    ? '2px solid ' + theme.palette.primary.main
+                                    : 'none'
+                            }}
+                        >
+                            <Typography variant="h4" gutterBottom>
+                                {e}
+                            </Typography>
+                            <Checkbox
+                                checked={selectedDomains.includes(e)}
+                                onChange={(event) => {
+                                    if (event.target.checked) setSelectedDomains([...selectedDomains, e])
+                                    else setSelectedDomains(selectedDomains.filter((f) => f !== e))
+                                }}
+                            />
+                        </Paper>
+                    )
+                })}
+            </Box>
             <Divider sx={{ mb: 2 }} />
             <Box
                 sx={{
