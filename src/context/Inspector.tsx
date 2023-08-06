@@ -59,12 +59,9 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                 {inspectingItem && message ? (
                     <Box
                         sx={{
-                            margin: 0,
+                            p: 1,
                             wordBreak: 'break-all',
-                            whiteSpace: 'pre-wrap',
-                            height: '100%',
-                            overflowY: 'auto',
-                            paddingRight: '10px'
+                            whiteSpace: 'pre-wrap'
                         }}
                     >
                         <Typography variant="h1">Inspect</Typography>
