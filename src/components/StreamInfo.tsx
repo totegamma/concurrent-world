@@ -19,6 +19,8 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
     const [writerDraft, setWriterDraft] = useState('')
     const [readerDraft, setReaderDraft] = useState('')
 
+    const [schemaDraft, setSchemaDraft] = useState('')
+
     useEffect(() => {
         if (!props.id) return
         client.api.readStream(props.id).then((e) => {
@@ -26,6 +28,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
             setStream(e)
             setWriterDraft(e.writer.join('\n'))
             setReaderDraft(e.reader.join('\n'))
+            setSchemaDraft(e.schema)
         })
     }, [props.id])
 
@@ -34,7 +37,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
             if (!stream) return
             client.api
                 .updateStream(props.id, {
-                    schema: Schemas.commonstream,
+                    schema: schemaDraft,
                     body,
                     maintainer: stream.maintainer,
                     writer: writerDraft.split('\n').filter((e) => e),
@@ -47,7 +50,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                     enqueueSnackbar('更新に失敗しました', { variant: 'error' })
                 })
         },
-        [client.api, stream, writerDraft, readerDraft]
+        [client.api, stream, writerDraft, readerDraft, schemaDraft, props.id]
     )
 
     if (!stream) {
@@ -74,8 +77,19 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                 </Paper>
             </Box>
             {isAuthor && (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '20px',
+                        p: 1
+                    }}
+                >
                     <Typography variant="h3">権限</Typography>
+                    <Box>
+                        <Typography>空の場合パブリックになります。</Typography>
+                        <Typography>改行区切りで複数人指定できます。</Typography>
+                    </Box>
                     <TextField
                         label="writer"
                         multiline
@@ -92,13 +106,18 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                             setReaderDraft(e.target.value)
                         }}
                     />
-                    <Box>
-                        <Typography>空の場合パブリックになります。</Typography>
-                        <Typography>改行区切りで複数人指定できます。</Typography>
-                    </Box>
+                    <Typography variant="h3">スキーマ</Typography>
+                    ※基本的に変更する必要はありません。
+                    <TextField
+                        label="Schema"
+                        value={schemaDraft}
+                        onChange={(e) => {
+                            setSchemaDraft(e.target.value)
+                        }}
+                    />
                     <Box>
                         <Typography variant="h3">属性</Typography>
-                        <CCEditor schemaURL={Schemas.commonstream} init={stream.payload.body} onSubmit={updateStream} />
+                        <CCEditor schemaURL={schemaDraft} init={stream.payload.body} onSubmit={updateStream} />
                     </Box>
                     <Button
                         variant="contained"

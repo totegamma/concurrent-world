@@ -36,6 +36,7 @@ export const CCDrawer = (props: CCDrawerProps): JSX.Element => {
             PaperProps={{
                 sx: {
                     width: {
+                        xs: '100%',
                         sm: '500px'
                     },
                     height: {
@@ -46,8 +47,8 @@ export const CCDrawer = (props: CCDrawerProps): JSX.Element => {
                         xs: '10px 10px 0 0',
                         sm: '10px 0 0 10px'
                     },
-                    overflowY: 'hidden',
-                    padding: '20px 0 10px 20px'
+                    overflowX: 'hidden',
+                    overflowY: 'auto'
                 }
             }}
         >
