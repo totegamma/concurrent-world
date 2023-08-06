@@ -23,6 +23,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import { ProfileEditor } from '../components/ProfileEditor'
 import { usePreference } from '../context/PreferenceContext'
+import { IssueJWT } from '@concurrent-world/client'
 
 export interface SettingsProp {
     setThemeName: (themeName: string) => void
@@ -234,7 +235,9 @@ export function Settings(props: SettingsProp): JSX.Element {
                             if (client.api.host === undefined) {
                                 return
                             }
-                            const jwt = client.api.constructJWT({
+                            const jwt = IssueJWT(client.keyPair.privatekey, {
+                                iss: client.ccid,
+                                sub: client.domain,
                                 exp: Math.floor((new Date().getTime() + 60 * 60 * 1000) / 1000).toString()
                             }) // 1h validity
                             window.location.href = `https://${client.api.host}/login?token=${jwt}`

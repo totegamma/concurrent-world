@@ -9,6 +9,7 @@ import Divider from '@mui/material/Divider'
 import { ProfileEditor } from '../components/ProfileEditor'
 import ApiProvider from '../context/api'
 import type { ConcurrentTheme } from '../model'
+import { IssueJWT } from '@concurrent-world/client'
 import {
     Alert,
     AlertTitle,
@@ -123,6 +124,20 @@ export function Registration(): JSX.Element {
                     }
                 }
                 console.log(list)
+                localStorage.setItem('lists', JSON.stringify(list))
+                navigate('/')
+            })
+            .catch((_) => {
+                const list = {
+                    home: {
+                        label: 'Home',
+                        pinned: true,
+                        streams: [],
+                        userStreams: [],
+                        expanded: false,
+                        defaultPostStreams: []
+                    }
+                }
                 localStorage.setItem('lists', JSON.stringify(list))
                 navigate('/')
             })
@@ -379,7 +394,7 @@ export function Registration(): JSX.Element {
                             <ListItemButton
                                 component={Link}
                                 to={`https://hub.concurrent.world/register?token=${
-                                    client?.api.constructJWT({ aud: 'hub.concurrent.world' }) ?? ''
+                                    IssueJWT(privateKey, { iss: CCID, aud: 'hub.concurrent.world' }) ?? ''
                                 }`}
                                 target="_blank"
                                 onClick={() => {
@@ -425,7 +440,7 @@ export function Registration(): JSX.Element {
                                     'http://' +
                                     (host?.fqdn ?? '') +
                                     '/register?token=' +
-                                    (client?.api.constructJWT({}) ?? '')
+                                    (IssueJWT(privateKey, { iss: CCID, aud: host?.fqdn }) ?? '')
                                 }
                                 target="_blank"
                                 disabled={!host}

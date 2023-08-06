@@ -1,6 +1,7 @@
 import { forwardRef, useState } from 'react'
 import { useApi } from '../../context/api'
 import { Box, Button, TextField, Typography } from '@mui/material'
+import { IssueJWT } from '@concurrent-world/client'
 
 export const UserJWT = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
     const client = useApi()
@@ -10,12 +11,7 @@ export const UserJWT = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
     const [subject, setSubject] = useState<string>('')
 
     const issueJwt = (): void => {
-        setIssuedJwt(
-            client.api.constructJWT({
-                aud: audience,
-                sub: subject
-            })
-        )
+        setIssuedJwt(IssueJWT(client?.keyPair.privatekey, { iss: client?.ccid, aud: audience, sub: subject }))
     }
 
     return (
