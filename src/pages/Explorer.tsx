@@ -248,6 +248,7 @@ export function Explorer(): JSX.Element {
                                 <CardContent>
                                     <Typography gutterBottom variant="h5" component="div">
                                         {value.stream.name}
+                                        {value.stream.author === client.ccid ? ' (owner)' : ''}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
                                         {value.stream.description}
