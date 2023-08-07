@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@concurrent-world/client':
-    specifier: ^1.3.0
-    version: 1.3.0
+    specifier: ^1.5.0
+    version: 1.5.0
   '@emoji-mart/react':
     specifier: ^1.1.1
     version: 1.1.1(emoji-mart@5.5.2)(react@18.2.0)
@@ -53,6 +53,9 @@ dependencies:
   ethers:
     specifier: ^6.3.0
     version: 6.3.0
+  fuse.js:
+    specifier: ^6.6.2
+    version: 6.6.2
   json-schema-to-typescript:
     specifier: ^13.0.1
     version: 13.0.1
@@ -1641,11 +1644,11 @@ packages:
     dev: true
     optional: true
 
-  /@concurrent-world/client@1.3.0:
-    resolution: {integrity: sha512-+/jJkfkUNRGcb5DY5kMCBriM5xHe8ZIMmh8KgdWyZ70/Kiirhne8ETcBfhEs2XQA5MTfKpe+anEJYmFAwd1dSQ==}
+  /@concurrent-world/client@1.5.0:
+    resolution: {integrity: sha512-Ck0IDwhLQAIXMSZdSw46DtxIl3xZvL3zPXmqEM1wjA8RpFTHHJbhqJaXiex3gpqwCImFehxRdxlqkNxysBa1dg==}
     dependencies:
       elliptic: 6.5.4
-      ethers: 6.6.4
+      ethers: 6.6.7
       uuid: 9.0.0
     transitivePeerDependencies:
       - bufferutil
@@ -6184,8 +6187,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /ethers@6.6.4:
-    resolution: {integrity: sha512-r3myN2hEnydmu23iiIj5kjWnCh5JNzlqrE/z+Kw5UqH173F+JOWzU6qkFB4HVC50epgxzKSL2Hq1oNXA877vwQ==}
+  /ethers@6.6.7:
+    resolution: {integrity: sha512-1SdT3W5/IPAcx9l5/+9qKRYR/iqVIdNQIct18yeh+XvN+I4RK44mvOsAerMwJYCAwdQfsOgf3OkfozeuMInbtQ==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@adraffy/ens-normalize': 1.9.2
@@ -6544,6 +6547,11 @@ packages:
   /functions-have-names@1.2.3:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
     dev: true
+
+  /fuse.js@6.6.2:
+    resolution: {integrity: sha512-cJaJkxCCxC8qIIcPBF9yGxY0W/tVZS3uEISDxhYIdtk8OL93pe+6Zj7LjCqVV4dzbqcriOZ+kQ/NE4RXZHsIGA==}
+    engines: {node: '>=10'}
+    dev: false
 
   /gauge@3.0.2:
     resolution: {integrity: sha512-+5J6MS/5XksCuXq++uFRsnUd7Ovu1XenbeuIuNRJxYWjgQbPuFhT14lAvsWfqfAmnwluf1OwMjz39HjfLPci0Q==}

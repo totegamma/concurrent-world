@@ -54,13 +54,6 @@ export const fetchWithTimeout = async (
     }
 }
 
-export const isValid256k1PrivateKey = (key: string): boolean => {
-    if (!/^[0-9a-f]{64}$/i.test(key)) return false
-    const privateKey = BigInt(`0x${key}`)
-    const n = BigInt('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141')
-    return privateKey > BigInt(0) && privateKey < n
-}
-
 export type DeepPartial<T> = {
     [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P]
 }

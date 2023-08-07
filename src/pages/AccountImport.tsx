@@ -5,7 +5,6 @@ import Paper from '@mui/material/Paper'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
-import { isValid256k1PrivateKey } from '../util'
 import { useNavigate } from 'react-router-dom'
 import { HDNodeWallet } from 'ethers'
 import { LangJa } from '../utils/lang-ja'
@@ -16,6 +15,7 @@ import { Themes, createConcurrentTheme } from '../themes'
 import { ThemeProvider } from '@emotion/react'
 import { CssBaseline, darken } from '@mui/material'
 import { ConcurrentWordmark } from '../components/ConcurrentWordmark'
+import { IsValid256k1PrivateKey } from '@concurrent-world/client'
 
 export function AccountImport(): JSX.Element {
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue2')
@@ -47,7 +47,7 @@ export function AccountImport(): JSX.Element {
         setErrorMessage('')
         setEntityFound(false)
         if (mnemonic === '') {
-            if (!isValid256k1PrivateKey(secret)) {
+            if (!IsValid256k1PrivateKey(secret)) {
                 setErrorMessage('秘密鍵の要件を満たしていません。秘密鍵でないか入力に誤りがあります。')
                 return
             }
@@ -92,7 +92,7 @@ export function AccountImport(): JSX.Element {
         try {
             const client = new Client(privatekey, fqdn)
             client.api
-                .getHostProfile(fqdn)
+                .readHost(fqdn)
                 .then((e: any) => {
                     if (unmounted) return
                     setHost(e)

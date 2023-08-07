@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect, useRef, memo } from 'react'
+import { useState, useEffect, useRef, memo } from 'react'
 import {
     InputBase,
     Box,
@@ -14,7 +14,6 @@ import {
     ListItemText,
     ListItemButton
 } from '@mui/material'
-import { ApplicationContext } from '../App'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import { StreamPicker } from './StreamPicker'
 import { closeSnackbar, useSnackbar } from 'notistack'
@@ -30,6 +29,7 @@ import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 import { type Emoji, useEmojiPicker } from '../context/EmojiPickerContext'
 import caretPosition from 'textarea-caret'
 import { type Stream } from '@concurrent-world/client'
+import { useApi } from '../context/api'
 
 export interface DraftProps {
     submitButtonLabel?: string
@@ -41,7 +41,7 @@ export interface DraftProps {
 }
 
 export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
-    const appData = useContext(ApplicationContext)
+    const client = useApi()
     const theme = useTheme()
     const pref = usePreference()
     const emojiPicker = useEmojiPicker()
@@ -79,7 +79,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         }
         const destStreamIDs = destStreams.map((s) => s.id)
         const dest = [
-            ...new Set([...destStreamIDs, ...(postHome ? [appData.user?.userstreams?.homeStream] : [])])
+            ...new Set([...destStreamIDs, ...(postHome ? [client?.user?.userstreams?.homeStream] : [])])
         ].filter((e) => e) as string[]
         setSending(true)
         props

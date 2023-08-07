@@ -15,15 +15,15 @@ import { ThemeSelect } from '../components/Settings/ThemeSelect'
 import { ImgurSettings } from '../components/Settings/Imgur'
 import { useApi } from '../context/api'
 import { useSnackbar } from 'notistack'
-import { useContext, useState } from 'react'
+import { useState } from 'react'
 import { APSettings } from '../components/APSettings'
 import { Passport } from '../components/Passport'
 import Tilt from 'react-parallax-tilt'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import { ProfileEditor } from '../components/ProfileEditor'
-import { ApplicationContext } from '../App'
 import { usePreference } from '../context/PreferenceContext'
+import { IssueJWT } from '@concurrent-world/client'
 
 export interface SettingsProp {
     setThemeName: (themeName: string) => void
@@ -32,7 +32,6 @@ export interface SettingsProp {
 export function Settings(props: SettingsProp): JSX.Element {
     const client = useApi()
     const pref = usePreference()
-    const appData = useContext(ApplicationContext)
     const { enqueueSnackbar } = useSnackbar()
 
     const deleteAllCache = (): void => {
@@ -73,6 +72,8 @@ export function Settings(props: SettingsProp): JSX.Element {
                 onChange={(_, index) => {
                     setTab(index)
                 }}
+                textColor="secondary"
+                indicatorColor="secondary"
             >
                 <Tab label="基本設定" />
                 <Tab label="アカウント詳細" />
@@ -96,8 +97,8 @@ export function Settings(props: SettingsProp): JSX.Element {
                             }}
                         >
                             <ProfileEditor
-                                id={appData.user?.profile?.id}
-                                initial={appData.user?.profile}
+                                id={client?.user?.profile?.id}
+                                initial={client?.user?.profile}
                                 onSubmit={(_profile) => {
                                     enqueueSnackbar('更新しました', { variant: 'success' })
                                 }}
@@ -236,7 +237,9 @@ export function Settings(props: SettingsProp): JSX.Element {
                             if (client.api.host === undefined) {
                                 return
                             }
-                            const jwt = client.api.constructJWT({
+                            const jwt = IssueJWT(client.keyPair.privatekey, {
+                                iss: client.ccid,
+                                sub: client.domain,
                                 exp: Math.floor((new Date().getTime() + 60 * 60 * 1000) / 1000).toString()
                             }) // 1h validity
                             window.location.href = `https://${client.api.host}/login?token=${jwt}`

@@ -1,24 +1,11 @@
-import {
-    Alert,
-    Box,
-    Paper,
-    SwipeableDrawer,
-    Table,
-    TableBody,
-    TableCell,
-    TableRow,
-    Typography,
-    styled,
-    useMediaQuery,
-    useTheme
-} from '@mui/material'
+import { Alert, Box, Paper, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material'
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
 import { validateSignature, type CoreMessage } from '@concurrent-world/client'
-import grey from '@mui/material/colors/grey'
 import { Codeblock } from '../components/Codeblock'
 import { MessageContainer } from '../components/Timeline/MessageContainer'
+import { CCDrawer } from '../components/CCDrawer'
 
 export interface InspectorState {
     inspectingItem: { messageId: string; author: string } | null
@@ -31,20 +18,8 @@ interface InspectorProps {
     children: JSX.Element | JSX.Element[]
 }
 
-const Puller = styled(Box)(({ theme }) => ({
-    width: 30,
-    height: 6,
-    backgroundColor: theme.palette.mode === 'light' ? grey[300] : grey[900],
-    borderRadius: 3,
-    position: 'absolute',
-    top: 8,
-    left: 'calc(50% - 15px)'
-}))
-
 export const InspectorProvider = (props: InspectorProps): JSX.Element => {
     const client = useApi()
-    const theme = useTheme()
-    const greaterThanMid = useMediaQuery(theme.breakpoints.up('md'))
     const [inspectingItem, inspectItem] = useState<{ messageId: string; author: string } | null>(null)
     const [message, setMessage] = useState<CoreMessage<any> | undefined>()
     const [signatureIsValid, setSignatureIsValid] = useState<boolean>(false)
@@ -52,6 +27,11 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
 
     useEffect(() => {
         if (!inspectingItem) return
+
+        client.api.readEntity(inspectingItem.author).then((entity) => {
+            if (!entity) return
+            setCurrentHost(entity.host || client.api.host)
+        })
 
         client.api.readMessageWithAuthor(inspectingItem.messageId, inspectingItem.author).then((msg) => {
             if (!msg) return
@@ -70,43 +50,18 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
             }, [])}
         >
             {props.children}
-
-            <SwipeableDrawer
-                disableSwipeToOpen
-                anchor={greaterThanMid ? 'right' : 'bottom'}
-                open={inspectingItem != null}
-                onOpen={() => {}}
+            <CCDrawer
+                open={!!inspectingItem}
                 onClose={() => {
                     inspectItem(null)
                 }}
-                PaperProps={{
-                    sx: {
-                        width: {
-                            md: '40vw'
-                        },
-                        height: {
-                            xs: '80vh',
-                            md: '100%'
-                        },
-                        borderRadius: {
-                            xs: '20px 20px 0 0',
-                            md: '20px 0 0 20px'
-                        },
-                        overflowY: 'hidden',
-                        padding: '20px 0 10px 20px'
-                    }
-                }}
             >
-                <Puller visibility={greaterThanMid ? 'hidden' : 'visible'} />
                 {inspectingItem && message ? (
                     <Box
                         sx={{
-                            margin: 0,
+                            p: 1,
                             wordBreak: 'break-all',
-                            whiteSpace: 'pre-wrap',
-                            height: '100%',
-                            overflowY: 'auto',
-                            paddingRight: '10px'
+                            whiteSpace: 'pre-wrap'
                         }}
                     >
                         <Typography variant="h1">Inspect</Typography>
@@ -132,12 +87,12 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                                     </TableCell>
                                     <TableCell>{message.author}</TableCell>
                                 </TableRow>
-                                {/* <TableRow> */}
-                                {/*     <TableCell> */}
-                                {/*         <b>Host</b> */}
-                                {/*     </TableCell> */}
-                                {/*     <TableCell>{inspectingItem.currenthost}</TableCell> */}
-                                {/* </TableRow> */}
+                                <TableRow>
+                                    <TableCell>
+                                        <b>Host</b>
+                                    </TableCell>
+                                    <TableCell>{currentHost}</TableCell>
+                                </TableRow>
                                 <TableRow>
                                     <TableCell>
                                         <b>Schema</b>
@@ -188,7 +143,7 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                 ) : (
                     <Box>nothing to inspect...</Box>
                 )}
-            </SwipeableDrawer>
+            </CCDrawer>
         </InspectorContext.Provider>
     )
 }

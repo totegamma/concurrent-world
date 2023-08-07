@@ -14,7 +14,7 @@ export interface StreamLinkProps {
 
 export const StreamLink = (props: StreamLinkProps): JSX.Element | null => {
     const client = useApi()
-    const [stream, SetStream] = useState<Stream | null>(null)
+    const [stream, SetStream] = useState<Stream | null | undefined>(null)
 
     useEffect(() => {
         client.getStream(props.streamID).then((e) => {
@@ -22,7 +22,14 @@ export const StreamLink = (props: StreamLinkProps): JSX.Element | null => {
         })
     }, [props.streamID])
 
-    if (!stream) return null
+    if (!stream) {
+        return (
+            <ListItemButton dense disabled component={RouterLink} to={`/stream#${props.streamID}`} sx={props.sx}>
+                <PercentIcon />
+                offline
+            </ListItemButton>
+        )
+    }
 
     return (
         <ListItemButton dense component={RouterLink} to={`/stream#${props.streamID}`} sx={props.sx}>
@@ -39,7 +46,7 @@ export interface UserStreamLinkProps {
 
 export const UserStreamLink = (props: UserStreamLinkProps): JSX.Element | null => {
     const client = useApi()
-    const [user, SetUser] = useState<User | null>(null)
+    const [user, SetUser] = useState<User | null | undefined>(null)
 
     useEffect(() => {
         client.getUser(props.userHomeStream.userID).then((e) => {
@@ -47,7 +54,20 @@ export const UserStreamLink = (props: UserStreamLinkProps): JSX.Element | null =
         })
     }, [props.userHomeStream])
 
-    if (!user) return null
+    if (!user) {
+        return (
+            <ListItemButton
+                dense
+                disabled
+                component={RouterLink}
+                to={`/entity/${props.userHomeStream.userID ?? ''}`}
+                sx={props.sx}
+            >
+                <AlternateEmailIcon />
+                offline
+            </ListItemButton>
+        )
+    }
 
     return (
         <ListItemButton dense component={RouterLink} to={`/entity/${props.userHomeStream.userID ?? ''}`} sx={props.sx}>

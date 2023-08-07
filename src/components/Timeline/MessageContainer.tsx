@@ -8,6 +8,8 @@ import { Typography } from '@mui/material'
 import { useInspector } from '../../context/Inspector'
 import { MessageView } from './Message/MessageView'
 import { useGlobalActions } from '../../context/GlobalActions'
+import { usePreference } from '../../context/PreferenceContext'
+import { useWatchingStream } from '../../context/WatchingStreamContext'
 
 export interface MessageServiceState {
     addFavorite: () => void
@@ -18,6 +20,7 @@ export interface MessageServiceState {
     openReply: () => void
     openReroute: () => void
     deleteMessage: () => void
+    removeFromStream?: () => void
 }
 
 const MessageServiceContext = createContext<MessageServiceState | undefined>(undefined)
@@ -31,14 +34,17 @@ interface MessageContainerProps {
     messageOwner: string
     lastUpdated?: number
     after?: JSX.Element | undefined
+    timestamp?: string
 }
 
 export const MessageContainer = memo<MessageContainerProps>((props: MessageContainerProps): JSX.Element | null => {
     const client = useApi()
+    const pref = usePreference()
     const inspector = useInspector()
     const actions = useGlobalActions()
     const [message, setMessage] = useState<M_Current | M_Reroute | M_Reply | null>()
     const [isFetching, setIsFetching] = useState<boolean>(true)
+    const watchingStreams = useWatchingStream()
 
     const loadMessage = useCallback((): void => {
         client
@@ -110,6 +116,11 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
         actions.openReroute(message)
     }, [message, actions])
 
+    const removeFromStream = useCallback(() => {
+        if (!props.timestamp || !watchingStreams[0]) return
+        client.api.removeFromStream(props.timestamp, watchingStreams[0])
+    }, [client, props.timestamp, watchingStreams])
+
     useEffect(() => {
         loadMessage()
     }, [props.messageID, props.messageOwner, props.lastUpdated])
@@ -123,9 +134,22 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
             openInspector,
             openReply,
             openReroute,
-            deleteMessage
+            deleteMessage,
+            removeFromStream: !props.timestamp || !watchingStreams[0] ? undefined : removeFromStream
         }
-    }, [addFavorite, removeFavorite, addReaction, removeReaction, openInspector, openReply, openReroute, deleteMessage])
+    }, [
+        addFavorite,
+        removeFavorite,
+        addReaction,
+        removeReaction,
+        openInspector,
+        openReply,
+        openReroute,
+        deleteMessage,
+        removeFromStream,
+        watchingStreams,
+        removeFromStream
+    ])
 
     if (isFetching) {
         return (
@@ -136,7 +160,18 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
         )
     }
 
-    if (!message) return null
+    if (!message) {
+        if (pref.devMode) {
+            return (
+                <>
+                    <Typography>Message not found</Typography>
+                    {props.messageID}@{props.messageOwner}
+                    {props.after}
+                </>
+            )
+        }
+        return null
+    }
 
     let body
     switch (message?.schema) {

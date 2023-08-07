@@ -1,10 +1,11 @@
-import { Box, Button, Divider, Modal, Paper, TextField, Typography } from '@mui/material'
+import { Box, Button, Divider, Paper, TextField, Typography } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
 import { useApi } from '../context/api'
-import { Schemas, type Commonstream, type CoreStream } from '@concurrent-world/client'
+import { type Commonstream, type CoreStream } from '@concurrent-world/client'
 import Background from '../resources/defaultbg.png'
 import { CCEditor } from './cceditor'
 import { useSnackbar } from 'notistack'
+import { AddListButton } from './AddListButton'
 
 export interface StreamInfoProps {
     id: string
@@ -14,12 +15,12 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
     const client = useApi()
     const { enqueueSnackbar } = useSnackbar()
     const [stream, setStream] = useState<CoreStream<Commonstream>>()
-    const [settingsOpen, setSettingsOpen] = useState(false)
     const isAuthor = stream?.author === client.ccid
-    const isMaintainer = stream?.maintainer.includes(client.ccid)
 
     const [writerDraft, setWriterDraft] = useState('')
     const [readerDraft, setReaderDraft] = useState('')
+
+    const [schemaDraft, setSchemaDraft] = useState('')
 
     useEffect(() => {
         if (!props.id) return
@@ -28,6 +29,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
             setStream(e)
             setWriterDraft(e.writer.join('\n'))
             setReaderDraft(e.reader.join('\n'))
+            setSchemaDraft(e.schema)
         })
     }, [props.id])
 
@@ -36,7 +38,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
             if (!stream) return
             client.api
                 .updateStream(props.id, {
-                    schema: Schemas.commonstream,
+                    schema: schemaDraft,
                     body,
                     maintainer: stream.maintainer,
                     writer: writerDraft.split('\n').filter((e) => e),
@@ -49,7 +51,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                     enqueueSnackbar('更新に失敗しました', { variant: 'error' })
                 })
         },
-        [client.api, stream, writerDraft, readerDraft]
+        [client.api, stream, writerDraft, readerDraft, schemaDraft, props.id]
     )
 
     if (!stream) {
@@ -69,75 +71,78 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                 }}
             >
                 <Paper sx={{ flex: 2, padding: '20px' }}>
-                    <Typography variant="h1">{stream.payload.body.name}</Typography>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: '10px'
+                        }}
+                    >
+                        <Typography variant="h1">{stream.payload.body.name}</Typography>
+                        <AddListButton stream={props.id} />
+                    </Box>
                     <Typography variant="caption">{props.id}</Typography>
                     <Divider />
                     <Typography>{stream.payload.body.description || 'まだ説明はありません'}</Typography>
                 </Paper>
-                <Box sx={{ display: 'flex', flex: 1, flexFlow: 'column', gap: '10px' }}>
-                    {(isAuthor || isMaintainer) && (
-                        <Button
-                            variant={'contained'}
-                            onClick={() => {
-                                setSettingsOpen(true)
-                            }}
-                            sx={{ height: '50px' }}
-                        >
-                            Stream Setting
-                        </Button>
-                    )}
-                </Box>
             </Box>
-            <Modal
-                open={settingsOpen}
-                onClose={(): void => {
-                    setSettingsOpen(false)
-                }}
-            >
-                <Paper
+            {isAuthor && (
+                <Box
                     sx={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        padding: '20px'
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '20px',
+                        p: 1
                     }}
                 >
-                    <Typography variant="h2">{stream.payload.body.name}</Typography>
-                    <Divider sx={{ mb: '20px' }} />
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                        <Typography variant="h3">権限</Typography>
-                        <TextField
-                            label="writer"
-                            multiline
-                            value={writerDraft}
-                            onChange={(e) => {
-                                setWriterDraft(e.target.value)
-                            }}
-                        />
-                        <TextField
-                            label="reader"
-                            multiline
-                            value={readerDraft}
-                            onChange={(e) => {
-                                setReaderDraft(e.target.value)
-                            }}
-                        />
-                        <Box>
-                            <Typography>空の場合パブリックになります。</Typography>
-                            <Typography>改行区切りで複数人指定できます。</Typography>
-                        </Box>
-                        <Box>
-                            <Typography variant="h3">属性</Typography>
-                            <CCEditor
-                                schemaURL={Schemas.commonstream}
-                                init={stream.payload.body}
-                                onSubmit={updateStream}
-                            />
-                        </Box>
+                    <Typography variant="h3">権限</Typography>
+                    <Box>
+                        <Typography>空の場合パブリックになります。</Typography>
+                        <Typography>改行区切りで複数人指定できます。</Typography>
                     </Box>
-                </Paper>
-            </Modal>
+                    <TextField
+                        label="writer"
+                        multiline
+                        value={writerDraft}
+                        onChange={(e) => {
+                            setWriterDraft(e.target.value)
+                        }}
+                    />
+                    <TextField
+                        label="reader"
+                        multiline
+                        value={readerDraft}
+                        onChange={(e) => {
+                            setReaderDraft(e.target.value)
+                        }}
+                    />
+                    <Typography variant="h3">スキーマ</Typography>
+                    ※基本的に変更する必要はありません。
+                    <TextField
+                        label="Schema"
+                        value={schemaDraft}
+                        onChange={(e) => {
+                            setSchemaDraft(e.target.value)
+                        }}
+                    />
+                    <Box>
+                        <Typography variant="h3">属性</Typography>
+                        <CCEditor schemaURL={schemaDraft} init={stream.payload.body} onSubmit={updateStream} />
+                    </Box>
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => {
+                            client.api.deleteStream(props.id).then((_) => {
+                                enqueueSnackbar('削除しました', { variant: 'success' })
+                            })
+                        }}
+                    >
+                        削除
+                    </Button>
+                </Box>
+            )}
         </>
     )
 }

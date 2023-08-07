@@ -12,6 +12,15 @@ export interface CCEditorProps {
 
 export const CCEditor = memo<CCEditorProps>((props: CCEditorProps): JSX.Element => {
     const [schema, setSchema] = useState<any>()
+    const [formData, setFormData] = useState<any>()
+
+    useEffect(() => {
+        setFormData(props.init)
+    }, [props.init])
+
+    useEffect(() => {
+        setFormData({})
+    }, [props.schemaURL])
 
     useEffect(() => {
         console.log(props.schemaURL)
@@ -29,7 +38,10 @@ export const CCEditor = memo<CCEditorProps>((props: CCEditorProps): JSX.Element 
                 <Form
                     schema={schema}
                     validator={validator}
-                    formData={props.init}
+                    formData={formData}
+                    onChange={(e) => {
+                        setFormData(e.formData)
+                    }}
                     onSubmit={(e) => {
                         console.log(e.formData)
                         props.onSubmit(e.formData)

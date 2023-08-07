@@ -119,6 +119,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                                         messageOwner={e.author}
                                         lastUpdated={e.LastUpdated}
                                         after={divider}
+                                        timestamp={e.timestamp}
                                     />
                                 )
                                 break

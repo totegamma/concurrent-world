@@ -1,20 +1,17 @@
-import { type RefObject, useContext, memo } from 'react'
-import { IconButton, Box, useTheme, Button, Zoom, Tooltip } from '@mui/material'
+import { useContext, memo } from 'react'
+import { IconButton, Box, useTheme, Button } from '@mui/material'
 import { ApplicationContext } from '../App'
 import { ConcurrentLogo } from './ConcurrentLogo'
 import type { ConcurrentTheme } from '../model'
-import PercentIcon from '@mui/icons-material/Percent'
-
-import InfoIcon from '@mui/icons-material/Info'
-import CreateIcon from '@mui/icons-material/Create'
 
 export interface TimelineHeaderProps {
-    scrollParentRef: RefObject<HTMLDivElement>
-    title: string
-    setMobileMenuOpen: (state: boolean) => void
-    mode: 'compose' | 'info'
-    setMode: (_: 'compose' | 'info') => void
-    writeable: boolean
+    title?: string
+    titleIcon?: JSX.Element
+    onTitleClick?: () => void
+    secondaryAction?: JSX.Element
+    onSecondaryActionClick?: () => void
+    onConcurrentLogoClick?: () => void
+    useRawSecondaryAction?: boolean
 }
 
 export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderProps): JSX.Element => {
@@ -22,11 +19,6 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
     const theme = useTheme<ConcurrentTheme>()
 
     const iconColor = appData.websocketState === 1 ? theme.palette.background.contrastText : theme.palette.text.disabled
-
-    const transitionDuration = {
-        enter: theme.transitions.duration.enteringScreen,
-        exit: theme.transitions.duration.leavingScreen
-    }
 
     return (
         <Box
@@ -54,9 +46,7 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
                         p: '8px',
                         display: { xs: 'inherit', sm: 'none' }
                     }}
-                    onClick={() => {
-                        props.setMobileMenuOpen(true)
-                    }}
+                    onClick={props.onConcurrentLogoClick}
                 >
                     <ConcurrentLogo size="25px" upperColor={iconColor} lowerColor={iconColor} frameColor={iconColor} />
                 </IconButton>
@@ -65,60 +55,27 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
                         width: 1,
                         color: 'primary.contrastText'
                     }}
-                    onClick={() => {
-                        props.scrollParentRef.current?.scroll({
-                            top: 0,
-                            behavior: 'smooth'
-                        })
-                    }}
+                    onClick={props.onTitleClick}
                     disableRipple
                 >
-                    <PercentIcon />
+                    {props.titleIcon}
                     <b>{props.title}</b>
                 </Button>
                 <Box sx={{ position: 'relative', width: '40px', height: '40px', mr: '8px' }}>
-                    <Zoom
-                        in={props.mode === 'info'}
-                        timeout={transitionDuration}
-                        style={{
-                            transitionDelay: `${props.mode === 'info' ? transitionDuration.exit : 0}ms`
-                        }}
-                        unmountOnExit
-                    >
-                        {props.writeable ? (
-                            <IconButton
-                                sx={{ p: 1, position: 'absolute' }}
-                                onClick={() => {
-                                    props.setMode('compose')
-                                }}
-                            >
-                                <CreateIcon sx={{ color: 'primary.contrastText' }} />
-                            </IconButton>
-                        ) : (
-                            <IconButton sx={{ p: 1, position: 'absolute' }}>
-                                <Tooltip title="you have no permission to write to this stream" placement="left" arrow>
-                                    <CreateIcon sx={{ color: 'disabled' }} />
-                                </Tooltip>
-                            </IconButton>
-                        )}
-                    </Zoom>
-                    <Zoom
-                        in={props.mode === 'compose'}
-                        timeout={transitionDuration}
-                        style={{
-                            transitionDelay: `${props.mode === 'compose' ? transitionDuration.exit : 0}ms`
-                        }}
-                        unmountOnExit
-                    >
+                    {props.useRawSecondaryAction ? (
+                        props.secondaryAction
+                    ) : (
                         <IconButton
-                            sx={{ p: 1, position: 'absolute' }}
-                            onClick={() => {
-                                props.setMode('info')
+                            sx={{
+                                p: 1,
+                                position: 'absolute',
+                                color: 'primary.contrastText'
                             }}
+                            onClick={props.onSecondaryActionClick}
                         >
-                            <InfoIcon sx={{ color: 'primary.contrastText' }} />
+                            {props.secondaryAction}
                         </IconButton>
-                    </Zoom>
+                    )}
                 </Box>
             </Box>
         </Box>

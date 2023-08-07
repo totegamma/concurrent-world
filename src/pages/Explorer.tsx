@@ -1,67 +1,123 @@
 import {
     Box,
     Button,
+    Card,
+    CardActionArea,
+    CardActions,
+    CardContent,
+    CardMedia,
     Checkbox,
     Divider,
     IconButton,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemText,
-    Menu,
-    MenuItem,
-    Select,
+    Paper,
     TextField,
-    Tooltip,
     Typography,
     useTheme
 } from '@mui/material'
-import { type Stream } from '@concurrent-world/client'
+import { type Commonstream, Schemas, type Stream } from '@concurrent-world/client'
 import { useApi } from '../context/api'
-import { Link } from 'react-router-dom'
-import { useEffect, useState } from 'react'
-import { usePreference } from '../context/PreferenceContext'
+import { Link, useNavigate } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
 
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
+import { CCDrawer } from '../components/CCDrawer'
+import Background from '../resources/defaultbg.png'
+
+import Fuse from 'fuse.js'
+import { CCEditor } from '../components/cceditor'
+import { useSnackbar } from 'notistack'
+
+import DoneAllIcon from '@mui/icons-material/DoneAll'
+import RemoveDoneIcon from '@mui/icons-material/RemoveDone'
+import { AddListButton } from '../components/AddListButton'
+
+interface StreamWithDomain {
+    domain: string
+    stream: Stream
+}
 
 export function Explorer(): JSX.Element {
     const client = useApi()
     const theme = useTheme()
-    const pref = usePreference()
+    const navigate = useNavigate()
 
-    const [hosts, setHosts] = useState<string[]>([...(client.api.host ? [client.api.host] : [])])
-    const [currentHost, setCurrentHost] = useState<string>(client.api.host ?? '')
-    const [streams, setStreams] = useState<Stream[]>([])
-    const [newStreamName, setNewStreamName] = useState<string>('')
+    const [domains, setDomains] = useState<string[]>([])
+    const [selectedDomains, setSelectedDomains] = useState<string[]>([client.api.host])
 
-    const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
-    const [selectedStream, setSelectedStream] = useState<string>('')
+    const [streams, setStreams] = useState<StreamWithDomain[]>([])
+    const [searchResult, setSearchResult] = useState<StreamWithDomain[]>([])
+    const [search, setSearch] = useState<string>('')
 
-    const loadHosts = (): void => {
+    const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
+
+    const fuse = useRef<Fuse<StreamWithDomain> | null>(null)
+
+    const { enqueueSnackbar } = useSnackbar()
+
+    const load = (): void => {
         client.api.getKnownHosts().then((e) => {
             if (!client.api.host) return
-            setHosts([client.api.host, ...e.filter((e) => e.fqdn !== client.api.host).map((e) => e.fqdn)])
+            const domains = [client.api.host, ...e.filter((e) => e.fqdn !== client.api.host).map((e) => e.fqdn)]
+            setDomains(domains)
         })
-    }
-
-    const loadStreams = (): void => {
-        client.getCommonStreams(currentHost).then((e) => {
-            setStreams(e)
-        })
-    }
-
-    const createNewStream = (name: string): void => {
-        client.createCommonStream(currentHost, name).then((_) => {})
     }
 
     useEffect(() => {
-        loadHosts()
-        loadStreams()
+        if (selectedDomains.length === 0) {
+            setStreams([])
+            setSearchResult([])
+            return
+        }
+        Promise.all(
+            selectedDomains.map(async (e) => {
+                const streams = await client.getCommonStreams(e)
+                return streams.map((stream) => {
+                    return {
+                        domain: e,
+                        stream
+                    }
+                })
+            })
+        ).then((e) => {
+            const streams = e.flat()
+            setStreams(streams)
+            setSearchResult(streams)
+        })
+    }, [selectedDomains])
+
+    const createNewStream = (stream: Commonstream): void => {
+        client.api
+            .createStream(Schemas.commonstream, stream)
+            .then((e: any) => {
+                const id: string = e.id
+                if (id) navigate('/stream#' + id)
+                else enqueueSnackbar('ストリームの作成に失敗しました', { variant: 'error' })
+            })
+            .catch((e) => {
+                console.error(e)
+                enqueueSnackbar('ストリームの作成に失敗しました', { variant: 'error' })
+            })
+    }
+
+    useEffect(() => {
+        load()
     }, [])
 
     useEffect(() => {
-        loadStreams()
-    }, [currentHost])
+        if (streams.length === 0) return
+        fuse.current = new Fuse(streams, {
+            keys: ['stream.name', 'stream.description'],
+            threshold: 0.3
+        })
+    }, [streams])
+
+    useEffect(() => {
+        if (fuse.current === null) return
+        if (search === '') {
+            setSearchResult(streams)
+            return
+        }
+        setSearchResult(fuse.current.search(search).map((e) => e.item))
+    }, [search])
 
     if (!client.api.host) return <>loading...</>
 
@@ -81,112 +137,150 @@ export function Explorer(): JSX.Element {
                 Explorer
             </Typography>
             <Divider sx={{ mb: 2 }} />
-            <Typography variant="h3" gutterBottom>
-                server
-            </Typography>
-            <Select
-                value={currentHost}
-                label="Host"
-                onChange={(e) => {
-                    setCurrentHost(e.target.value)
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 1
                 }}
-                defaultValue={client.api.host}
             >
-                {hosts.map((e) => (
-                    <MenuItem key={e} value={e}>
-                        {e}
-                    </MenuItem>
-                ))}
-            </Select>
-            <Divider />
-            <Typography variant="h3" gutterBottom>
-                streams
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-                <TextField
-                    label="stream name"
-                    variant="outlined"
-                    value={newStreamName}
-                    sx={{ flexGrow: 1 }}
-                    onChange={(e) => {
-                        setNewStreamName(e.target.value)
-                    }}
-                />
-                <Button
-                    variant="contained"
-                    onClick={(_) => {
-                        createNewStream(newStreamName)
-                    }}
-                >
-                    Create
-                </Button>
+                <Typography variant="h3" gutterBottom>
+                    Domains
+                </Typography>
+                <Box>
+                    <IconButton
+                        onClick={() => {
+                            setSelectedDomains([])
+                        }}
+                    >
+                        <RemoveDoneIcon />
+                    </IconButton>
+                    <IconButton
+                        onClick={() => {
+                            setSelectedDomains(domains)
+                        }}
+                    >
+                        <DoneAllIcon />
+                    </IconButton>
+                </Box>
             </Box>
-            <List dense sx={{ width: '100%' }}>
-                {streams.map((value) => {
-                    const labelId = `checkbox-list-secondary-label-${value.id}`
+            <Box
+                sx={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                    gap: 2
+                }}
+            >
+                {domains.map((e) => {
                     return (
-                        <ListItem
-                            key={value.id}
-                            disablePadding
-                            secondaryAction={
-                                <>
-                                    <Tooltip title="リストに追加" placement="top" arrow>
-                                        <IconButton
-                                            sx={{ flexGrow: 0 }}
-                                            onClick={(e) => {
-                                                setMenuAnchor(e.currentTarget)
-                                                setSelectedStream(value.id)
-                                            }}
-                                        >
-                                            <PlaylistAddIcon
-                                                sx={{
-                                                    color: theme.palette.text.primary
-                                                }}
-                                            />
-                                        </IconButton>
-                                    </Tooltip>
-                                </>
-                            }
+                        <Paper
+                            key={e}
+                            variant="outlined"
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '10px',
+                                gap: 1,
+                                outline: selectedDomains.includes(e)
+                                    ? '2px solid ' + theme.palette.primary.main
+                                    : 'none'
+                            }}
                         >
-                            <ListItemButton
-                                component={Link}
-                                to={'/stream#' + value.id}
-                                sx={{
-                                    height: '40px'
+                            <Typography variant="h4" gutterBottom>
+                                {e}
+                            </Typography>
+                            <Checkbox
+                                checked={selectedDomains.includes(e)}
+                                onChange={(event) => {
+                                    if (event.target.checked) setSelectedDomains([...selectedDomains, e])
+                                    else setSelectedDomains(selectedDomains.filter((f) => f !== e))
                                 }}
-                            >
-                                <ListItemText id={labelId} primary={`%${value.name}`} />
-                            </ListItemButton>
-                        </ListItem>
+                            />
+                        </Paper>
                     )
                 })}
-            </List>
-            <Menu
-                anchorEl={menuAnchor}
-                open={Boolean(menuAnchor)}
-                onClose={() => {
-                    setMenuAnchor(null)
+            </Box>
+            <Divider sx={{ mb: 2 }} />
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
                 }}
             >
-                {Object.keys(pref.lists).map((e) => (
-                    <MenuItem key={e} onClick={() => {}}>
-                        {pref.lists[e].label}
-                        <Checkbox
-                            checked={pref.lists[e].streams.includes(selectedStream)}
-                            onChange={(check) => {
-                                const old = pref.lists
-                                if (check.target.checked) {
-                                    old[e].streams.push(selectedStream)
-                                    pref.setLists(JSON.parse(JSON.stringify(old)))
-                                } else {
-                                    old[e].streams = old[e].streams.filter((e) => e !== selectedStream)
-                                    pref.setLists(JSON.parse(JSON.stringify(old)))
-                                }
-                            }}
-                        />
-                    </MenuItem>
-                ))}
-            </Menu>
+                <Typography variant="h3" gutterBottom>
+                    ストリーム
+                </Typography>
+                <Button
+                    variant="contained"
+                    onClick={() => {
+                        setDrawerOpen(true)
+                    }}
+                >
+                    新しく作る
+                </Button>
+            </Box>
+            <TextField
+                label="search"
+                variant="outlined"
+                value={search}
+                onChange={(e) => {
+                    setSearch(e.target.value)
+                }}
+            />
+            <Box
+                sx={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                    gap: 2
+                }}
+            >
+                {searchResult.map((value) => {
+                    return (
+                        <Card key={value.stream.id}>
+                            <CardActionArea component={Link} to={'/stream#' + value.stream.id}>
+                                <CardMedia component="img" height="140" image={value.stream.banner || Background} />
+                                <CardContent>
+                                    <Typography gutterBottom variant="h5" component="div">
+                                        {value.stream.name}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {value.stream.description}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {value.domain}
+                                    </Typography>
+                                </CardContent>
+                            </CardActionArea>
+                            <CardActions>
+                                <AddListButton stream={value.stream.id} />
+                            </CardActions>
+                        </Card>
+                    )
+                })}
+            </Box>
+            <CCDrawer
+                open={drawerOpen}
+                onClose={() => {
+                    setDrawerOpen(false)
+                }}
+            >
+                <Box p={1}>
+                    <Typography variant="h3" gutterBottom>
+                        ストリーム新規作成
+                    </Typography>
+                    <Typography variant="body1" gutterBottom>
+                        あなたの管轄ドメイン{client.api.host}に新しいストリームを作成します。
+                    </Typography>
+                    <Divider />
+                    <CCEditor schemaURL={Schemas.commonstream} onSubmit={createNewStream} />
+                </Box>
+            </CCDrawer>
         </Box>
     )
 }

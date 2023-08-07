@@ -418,7 +418,14 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
 
 export const ConcurrentDefaultTheme = {
     palette: {
+        primary: {
+            main: '#7e7e7e'
+        },
+        secondary: {
+            main: '#737373'
+        },
         background: {
+            default: '#9e9e9e',
             contrastText: '#ffffff'
         }
     },
