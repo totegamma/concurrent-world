@@ -19,16 +19,18 @@ export const CCEditor = memo<CCEditorProps>((props: CCEditorProps): JSX.Element 
     }, [props.init])
 
     useEffect(() => {
-        setFormData({})
-    }, [props.schemaURL])
-
-    useEffect(() => {
         console.log(props.schemaURL)
         fetchWithTimeout(props.schemaURL, { method: 'GET' })
             .then((e) => e.json())
             .then((e) => {
-                console.log(e)
                 setSchema(e)
+                // if not compatible, reset form data
+                if (formData) {
+                    const errors = validator.rawValidation(schema, formData)
+                    if (errors.errors && errors.errors.length > 0) {
+                        setFormData({})
+                    }
+                }
             })
     }, [props.schemaURL])
 
