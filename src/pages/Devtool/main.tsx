@@ -25,6 +25,8 @@ export const Devtool = memo((): JSX.Element => {
                 onChange={(_, index) => {
                     setTab(index)
                 }}
+                textColor="secondary"
+                indicatorColor="secondary"
             >
                 <Tab label="Composer" />
                 <Tab label="ServerJWT" />

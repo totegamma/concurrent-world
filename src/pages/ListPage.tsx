@@ -113,6 +113,8 @@ export function ListPage(props: ListPageProps): JSX.Element {
                     onChange={(_, newValue) => {
                         setTab(newValue)
                     }}
+                    textColor="secondary"
+                    indicatorColor="secondary"
                 >
                     {Object.keys(pref.lists)
                         .filter((e) => pref.lists[e].pinned)

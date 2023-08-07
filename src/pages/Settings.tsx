@@ -72,6 +72,8 @@ export function Settings(props: SettingsProp): JSX.Element {
                 onChange={(_, index) => {
                     setTab(index)
                 }}
+                textColor="secondary"
+                indicatorColor="secondary"
             >
                 <Tab label="基本設定" />
                 <Tab label="アカウント詳細" />

@@ -162,6 +162,8 @@ export function EntityPage(): JSX.Element {
                     onChange={(_, index) => {
                         setTab(index)
                     }}
+                    textColor="secondary"
+                    indicatorColor="secondary"
                 >
                     <Tab label="カレント" />
                     <Tab label="アクティビティ" />
