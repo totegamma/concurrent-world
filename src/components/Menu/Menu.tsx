@@ -20,18 +20,18 @@ import ExploreIcon from '@mui/icons-material/Explore'
 import SettingsIcon from '@mui/icons-material/Settings'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import { memo, useContext } from 'react'
-import { ApplicationContext } from '../App'
-import type { ConcurrentTheme } from '../model'
+import { ApplicationContext } from '../../App'
+import type { ConcurrentTheme } from '../../model'
 // @ts-expect-error vite dynamic import
 import buildTime from '~build/time'
 // @ts-expect-error vite dynamic import
 import { branch, sha } from '~build/info'
-import { StreamList } from './StreamList/main'
-import { CCAvatar } from './CCAvatar'
-import { useApi } from '../context/api'
-import { usePreference } from '../context/PreferenceContext'
-import { useGlobalActions } from '../context/GlobalActions'
-import { ConcurrentLogo } from './ConcurrentLogo'
+import { StreamList } from '../StreamList/main'
+import { CCAvatar } from '../ui/CCAvatar'
+import { useApi } from '../../context/api'
+import { usePreference } from '../../context/PreferenceContext'
+import { useGlobalActions } from '../../context/GlobalActions'
+import { ConcurrentLogo } from '../theming/ConcurrentLogo'
 
 const branchName = branch || window.location.host.split('.')[0]
 

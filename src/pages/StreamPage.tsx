@@ -13,7 +13,7 @@ import { usePreference } from '../context/PreferenceContext'
 import { type Stream } from '@concurrent-world/client'
 import PercentIcon from '@mui/icons-material/Percent'
 import InfoIcon from '@mui/icons-material/Info'
-import { CCDrawer } from '../components/CCDrawer'
+import { CCDrawer } from '../components/ui/CCDrawer'
 import WatchingStreamContextProvider from '../context/WatchingStreamContext'
 
 export interface StreamPageProps {

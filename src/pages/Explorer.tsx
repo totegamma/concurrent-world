@@ -19,11 +19,11 @@ import { useApi } from '../context/api'
 import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
 
-import { CCDrawer } from '../components/CCDrawer'
+import { CCDrawer } from '../components/ui/CCDrawer'
 import Background from '../resources/defaultbg.png'
 
 import Fuse from 'fuse.js'
-import { CCEditor } from '../components/cceditor'
+import { CCEditor } from '../components/ui/cceditor'
 import { useSnackbar } from 'notistack'
 
 import DoneAllIcon from '@mui/icons-material/DoneAll'

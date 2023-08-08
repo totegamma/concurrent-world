@@ -12,7 +12,7 @@ import InfoIcon from '@mui/icons-material/Info'
 import ExploreIcon from '@mui/icons-material/Explore'
 import { ListSettings } from '../components/ListSettings'
 import ListIcon from '@mui/icons-material/List'
-import { CCDrawer } from '../components/CCDrawer'
+import { CCDrawer } from '../components/ui/CCDrawer'
 import { TimelineHeader } from '../components/TimelineHeader'
 
 export interface ListPageProps {

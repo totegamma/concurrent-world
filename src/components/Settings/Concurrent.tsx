@@ -1,6 +1,6 @@
 import { Box, Button, Divider, IconButton, Typography } from '@mui/material'
 import { forwardRef, useState } from 'react'
-import { Passport } from '../../components/Passport'
+import { Passport } from '../../components/theming/Passport'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import { useApi } from '../../context/api'

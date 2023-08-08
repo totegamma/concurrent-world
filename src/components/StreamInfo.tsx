@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useApi } from '../context/api'
 import { type Commonstream, type CoreStream } from '@concurrent-world/client'
 import Background from '../resources/defaultbg.png'
-import { CCEditor } from './cceditor'
+import { CCEditor } from './ui/cceditor'
 import { useSnackbar } from 'notistack'
 import { AddListButton } from './AddListButton'
 

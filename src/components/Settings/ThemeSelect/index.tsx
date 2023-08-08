@@ -1,5 +1,5 @@
 import { Box, Button, Paper, Typography } from '@mui/material'
-import { ConcurrentLogo } from '../../ConcurrentLogo'
+import { ConcurrentLogo } from '../../theming/ConcurrentLogo'
 import type { ConcurrentTheme } from '../../../model'
 import { useContext, useMemo } from 'react'
 import { createConcurrentTheme, Themes } from '../../../themes'

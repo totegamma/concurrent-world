@@ -9,7 +9,7 @@ import { useObjectList } from './hooks/useObjectList'
 
 import { Client, Schemas, type CoreServerEvent } from '@concurrent-world/client'
 import { Themes, createConcurrentTheme } from './themes'
-import { Menu } from './components/Menu'
+import { Menu } from './components/Menu/Menu'
 import type { StreamElementDated, Emoji, ConcurrentTheme, StreamList } from './model'
 import {
     Associations,
@@ -26,7 +26,7 @@ import {
 import BubbleSound from './resources/Bubble.wav'
 import NotificationSound from './resources/Notification.wav'
 import useSound from 'use-sound'
-import { MobileMenu } from './components/MobileMenu'
+import { MobileMenu } from './components/Menu/MobileMenu'
 import ApiProvider from './context/api'
 import { PreferenceProvider } from './context/PreferenceContext'
 import { GlobalActionsProvider } from './context/GlobalActions'

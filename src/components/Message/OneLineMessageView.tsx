@@ -1,7 +1,7 @@
 import { Box, Link, IconButton, Typography } from '@mui/material'
 import { Link as routerLink, Link as RouterLink } from 'react-router-dom'
-import { CCAvatar } from '../../CCAvatar'
-import { TimeDiff } from '../../TimeDiff'
+import { CCAvatar } from '../ui/CCAvatar'
+import { TimeDiff } from '../ui/TimeDiff'
 import { type M_Current } from '@concurrent-world/client'
 
 export interface OneLineMessageViewProps {

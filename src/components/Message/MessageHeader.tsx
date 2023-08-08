@@ -1,5 +1,5 @@
 import { Box, Typography, Link } from '@mui/material'
-import { TimeDiff } from '../../TimeDiff'
+import { TimeDiff } from '../ui/TimeDiff'
 import { Link as RouterLink } from 'react-router-dom'
 
 export interface MessageHeaderProps {

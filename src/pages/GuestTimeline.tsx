@@ -5,12 +5,12 @@ import { useObjectList } from '../hooks/useObjectList'
 import { Link, useLocation } from 'react-router-dom'
 import { Timeline } from '../components/Timeline/main'
 import { Client } from '@concurrent-world/client'
-import { FullScreenLoading } from '../components/FullScreenLoading'
+import { FullScreenLoading } from '../components/ui/FullScreenLoading'
 import ApiProvider from '../context/api'
 import { ClockContext } from '../App'
 import { Themes, createConcurrentTheme } from '../themes'
 import { usePersistent } from '../hooks/usePersistent'
-import { ConcurrentWordmark } from '../components/ConcurrentWordmark'
+import { ConcurrentWordmark } from '../components/theming/ConcurrentWordmark'
 
 export function GuestTimelinePage(): JSX.Element {
     const reactlocation = useLocation()

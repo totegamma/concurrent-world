@@ -3,9 +3,9 @@ import { Alert, Box, Paper, Table, TableBody, TableCell, TableRow, Typography } 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
 import { validateSignature, type CoreMessage } from '@concurrent-world/client'
-import { Codeblock } from '../components/Codeblock'
-import { MessageContainer } from '../components/Timeline/MessageContainer'
-import { CCDrawer } from '../components/CCDrawer'
+import { Codeblock } from '../components/ui/Codeblock'
+import { MessageContainer } from '../components/Message/MessageContainer'
+import { CCDrawer } from '../components/ui/CCDrawer'
 
 export interface InspectorState {
     inspectingItem: { messageId: string; author: string } | null
