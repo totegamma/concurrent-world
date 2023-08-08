@@ -1,5 +1,5 @@
-import { Box, Button, FormControlLabel, FormGroup, Switch, Typography } from '@mui/material'
-import { forwardRef } from 'react'
+import { Box, Button, Divider, FormControlLabel, FormGroup, Switch, Typography } from '@mui/material'
+import { forwardRef, useState } from 'react'
 import { ProfileEditor } from '../ProfileEditor'
 import { useApi } from '../../context/api'
 import { usePreference } from '../../context/PreferenceContext'
@@ -7,11 +7,13 @@ import { useSnackbar } from 'notistack'
 import { LogoutButton } from './LogoutButton'
 import { ThemeSelect } from './ThemeSelect'
 import { ImgurSettings } from './Imgur'
+import { IssueJWT } from '@concurrent-world/client'
 
 export const GeneralSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
     const client = useApi()
     const pref = usePreference()
     const { enqueueSnackbar } = useSnackbar()
+    const [invitationCode, setInvitationCode] = useState<string>('')
 
     const deleteAllCache = (): void => {
         if (window.caches) {
@@ -118,6 +120,58 @@ export const GeneralSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Elem
                     >
                         Force Reload
                     </Button>
+                    <Divider sx={{ my: 2 }} />
+                    {invitationCode === '' ? (
+                        <Button
+                            variant="contained"
+                            onClick={(_) => {
+                                if (client.api.host === undefined) {
+                                    return
+                                }
+                                const jwt = IssueJWT(client.keyPair.privatekey, {
+                                    iss: client.ccid,
+                                    aud: client.domain,
+                                    sub: 'CONCURRENT_INVITE',
+                                    exp: Math.floor((new Date().getTime() + 24 * 60 * 60 * 1000) / 1000).toString()
+                                }) // 24h validity
+                                setInvitationCode(jwt)
+                            }}
+                        >
+                            招待コードを生成
+                        </Button>
+                    ) : (
+                        <>
+                            <Typography variant="body1">招待コード(24時間有効)</Typography>
+                            <Typography variant="body2">
+                                このコードを他のユーザーに渡すことで、このドメインに登録できます。
+                                <br />
+                                但し、あなたが招待権を持っているとは限りません。
+                                <br />
+                                詳しくはドメイン管理者にお問い合わせください。
+                            </Typography>
+                            <pre
+                                style={{
+                                    whiteSpace: 'pre-wrap',
+                                    wordBreak: 'break-all',
+                                    backgroundColor: '#333',
+                                    padding: '10px',
+                                    borderRadius: '5px',
+                                    color: '#fff'
+                                }}
+                            >
+                                {invitationCode}
+                            </pre>
+                            <Button
+                                variant="contained"
+                                onClick={(_) => {
+                                    navigator.clipboard.writeText(invitationCode)
+                                    enqueueSnackbar('コピーしました', { variant: 'success' })
+                                }}
+                            >
+                                招待コードをコピー
+                            </Button>
+                        </>
+                    )}
                 </Box>
 
                 <Box

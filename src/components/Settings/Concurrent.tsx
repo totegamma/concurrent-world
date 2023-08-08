@@ -69,7 +69,7 @@ export const ConcurrentSettings = forwardRef<HTMLDivElement>((props, ref): JSX.E
                         sub: client.domain,
                         exp: Math.floor((new Date().getTime() + 60 * 60 * 1000) / 1000).toString()
                     }) // 1h validity
-                    window.location.href = `https://${client.api.host}/login?token=${jwt}`
+                    window.location.href = `https://${client.api.host}/web/login?token=${jwt}`
                 }}
             >
                 Goto Domain Home
