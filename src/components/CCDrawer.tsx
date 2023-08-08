@@ -9,12 +9,12 @@ export interface CCDrawerProps {
 }
 
 const Puller = styled(Box)(({ theme }) => ({
-    width: 30,
-    height: 6,
+    width: '30px',
+    height: '6px',
     backgroundColor: theme.palette.mode === 'light' ? grey[300] : grey[900],
-    borderRadius: 1,
+    borderRadius: '3px',
     position: 'absolute',
-    top: 8,
+    top: '7px',
     left: 'calc(50% - 15px)'
 }))
 
@@ -35,6 +35,8 @@ export const CCDrawer = (props: CCDrawerProps): JSX.Element => {
             }}
             PaperProps={{
                 sx: {
+                    display: 'flex',
+                    flexDirection: 'column',
                     width: {
                         xs: '100%',
                         sm: '500px'
@@ -46,14 +48,25 @@ export const CCDrawer = (props: CCDrawerProps): JSX.Element => {
                     borderRadius: {
                         xs: '10px 10px 0 0',
                         sm: '10px 0 0 10px'
-                    },
-                    overflowX: 'hidden',
-                    overflowY: 'auto'
+                    }
                 }
             }}
         >
-            <Puller visibility={greaterThanSm ? 'hidden' : 'visible'} />
-            {props.children}
+            <Box visibility={greaterThanSm ? 'hidden' : 'visible'} height="20px" width="100%" position="relative">
+                <Puller />
+            </Box>
+            <Box
+                sx={{
+                    overflowX: 'hidden',
+                    overflowY: 'auto',
+                    flex: 1
+                }}
+                onTouchStart={(e) => {
+                    e.stopPropagation()
+                }}
+            >
+                {props.children}
+            </Box>
         </SwipeableDrawer>
     )
 }

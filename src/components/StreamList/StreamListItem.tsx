@@ -2,7 +2,6 @@ import { Collapse, List, ListItem, ListItemButton, ListItemText } from '@mui/mat
 import { type StreamList } from '../../model'
 import { Link as RouterLink } from 'react-router-dom'
 
-import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import { StreamLink, UserStreamLink } from './StreamLink'
 import { usePreference } from '../../context/PreferenceContext'
@@ -32,15 +31,23 @@ export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
                 }}
             >
                 {open ? (
-                    <ExpandLess
+                    <ExpandMore
                         onClick={(): void => {
                             setOpen(false)
+                        }}
+                        sx={{
+                            transform: 'rotate(0deg)',
+                            transition: 'transform 0.2s'
                         }}
                     />
                 ) : (
                     <ExpandMore
                         onClick={(): void => {
                             setOpen(true)
+                        }}
+                        sx={{
+                            transform: 'rotate(-90deg)',
+                            transition: 'transform 0.2s'
                         }}
                     />
                 )}
