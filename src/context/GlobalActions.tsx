@@ -1,4 +1,4 @@
-import { Box, Paper, Modal, Typography, Divider, Button } from '@mui/material'
+import { Box, Paper, Modal, Typography, Divider, Button, Drawer, useTheme } from '@mui/material'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
@@ -8,11 +8,13 @@ import { useLocation } from 'react-router-dom'
 import { usePreference } from './PreferenceContext'
 import { ProfileEditor } from '../components/ProfileEditor'
 import { MessageContainer } from '../components/Timeline/MessageContainer'
+import { Menu } from '../components/Menu'
 
 export interface GlobalActionsState {
     openDraft: () => void
     openReply: (target: Message) => void
     openReroute: (target: Message) => void
+    openMobileMenu: (open?: boolean) => void
 }
 
 const GlobalActionsContext = createContext<GlobalActionsState | undefined>(undefined)
@@ -35,12 +37,14 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const client = useApi()
     const pref = usePreference()
     const path = useLocation()
+    const theme = useTheme()
     const [mode, setMode] = useState<'compose' | 'reply' | 'reroute' | 'none'>('none')
     const [targetMessage, setTargetMessage] = useState<Message | null>(null)
 
     const [queriedStreams, setQueriedStreams] = useState<Stream[]>([])
     const [allKnownStreams, setAllKnownStreams] = useState<Stream[]>([])
     const [domainIsOffline, setDomainIsOffline] = useState<boolean>(false)
+    const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
 
     const setupAccountRequired =
         client?.user !== null && (client?.user.profile === undefined || client?.user.userstreams === undefined)
@@ -100,6 +104,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         [allKnownStreams, pref.lists]
     )
 
+    const openMobileMenu = useCallback((open?: boolean) => {
+        setMobileMenuOpen(open ?? true)
+    }, [])
+
     const handleKeyPress = useCallback(
         (event: KeyboardEvent) => {
             if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
@@ -133,9 +141,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                 return {
                     openDraft,
                     openReply,
-                    openReroute
+                    openReroute,
+                    openMobileMenu
                 }
-            }, [openDraft, openReply, openReroute])}
+            }, [openDraft, openReply, openReroute, openMobileMenu])}
         >
             {props.children}
             <Modal
@@ -285,6 +294,28 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     </Box>
                 </Paper>
             </Modal>
+            <Drawer
+                anchor={'left'}
+                open={mobileMenuOpen}
+                onClose={() => {
+                    setMobileMenuOpen(false)
+                }}
+                PaperProps={{
+                    sx: {
+                        width: '200px',
+                        pt: 1,
+                        borderRadius: `0 ${theme.shape.borderRadius * 2}px ${theme.shape.borderRadius * 2}px 0`,
+                        overflow: 'hidden',
+                        backgroundColor: 'background.default'
+                    }
+                }}
+            >
+                <Menu
+                    onClick={() => {
+                        setMobileMenuOpen(false)
+                    }}
+                />
+            </Drawer>
         </GlobalActionsContext.Provider>
     )
 }

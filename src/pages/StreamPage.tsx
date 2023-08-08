@@ -18,7 +18,6 @@ import WatchingStreamContextProvider from '../context/WatchingStreamContext'
 
 export interface StreamPageProps {
     messages: IuseObjectList<StreamElementDated>
-    setMobileMenuOpen: (state: boolean) => void
 }
 
 export const StreamPage = memo<StreamPageProps>((props: StreamPageProps): JSX.Element => {

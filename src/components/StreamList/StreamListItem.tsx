@@ -9,6 +9,7 @@ import { usePreference } from '../../context/PreferenceContext'
 export interface StreamListItemProps {
     id: string
     body: StreamList
+    onClick?: () => void
 }
 
 export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
@@ -72,6 +73,7 @@ export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
                                 pl: 2,
                                 gap: 1
                             }}
+                            onClick={props.onClick}
                         />
                     ))}
                     {props.body.userStreams.map((stream) => (
@@ -82,6 +84,7 @@ export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
                                 pl: 2,
                                 gap: 1
                             }}
+                            onClick={props.onClick}
                         />
                     ))}
                 </List>
