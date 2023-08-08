@@ -10,11 +10,7 @@ import { NavLink } from 'react-router-dom'
 import { useGlobalActions } from '../context/GlobalActions'
 import type { ConcurrentTheme } from '../model'
 
-export interface MobileMenuProps {
-    setMobileMenuOpen: (state: boolean) => void
-}
-
-export const MobileMenu = (props: MobileMenuProps): JSX.Element => {
+export const MobileMenu = (): JSX.Element => {
     const actions = useGlobalActions()
     const theme = useTheme<ConcurrentTheme>()
 
@@ -31,7 +27,7 @@ export const MobileMenu = (props: MobileMenuProps): JSX.Element => {
             <Button
                 disableRipple
                 onClick={() => {
-                    props.setMobileMenuOpen(true)
+                    actions.openMobileMenu()
                 }}
                 sx={{
                     color: 'divider',

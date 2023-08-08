@@ -1,6 +1,6 @@
 import { useEffect, useState, createContext, useRef, useMemo } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
-import { darken, Box, Paper, ThemeProvider, CssBaseline, Drawer } from '@mui/material'
+import { darken, Box, Paper, ThemeProvider, CssBaseline } from '@mui/material'
 import useWebSocket, { type ReadyState } from 'react-use-websocket'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 
@@ -108,8 +108,6 @@ function App(): JSX.Element {
             }
         }
     }, [client, path, followingUserStreams])
-
-    const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
 
     const { lastMessage, readyState, sendJsonMessage } = useWebSocket(`wss://${domain}/api/v1/socket`, {
         shouldReconnect: (_) => true,
@@ -375,17 +373,14 @@ function App(): JSX.Element {
                             }}
                         >
                             <Routes>
-                                <Route
-                                    path="/stream"
-                                    element={<StreamPage messages={messages} setMobileMenuOpen={setMobileMenuOpen} />}
-                                />
+                                <Route index element={<ListPage messages={messages} />} />
+                                <Route path="/stream" element={<StreamPage messages={messages} />} />
                                 <Route path="/associations" element={<Associations messages={messages} />} />
                                 <Route path="/explorer" element={<Explorer />} />
                                 <Route path="/notifications" element={<Notifications messages={messages} />} />
                                 <Route path="/settings" element={<Settings setThemeName={setThemeName} />} />
                                 <Route path="/message/:id" element={<MessagePage />} />
                                 <Route path="/entity/:id" element={<EntityPage />} />
-                                <Route index element={<ListPage messages={messages} />} />
                                 <Route path="/devtool" element={<Devtool />} />
                             </Routes>
                         </Paper>
@@ -397,33 +392,11 @@ function App(): JSX.Element {
                                 }
                             }}
                         >
-                            <MobileMenu setMobileMenuOpen={setMobileMenuOpen} />
+                            <MobileMenu />
                         </Box>
                     </Box>
                 </Box>
             </Box>
-            <Drawer
-                anchor={'left'}
-                open={mobileMenuOpen}
-                onClose={() => {
-                    setMobileMenuOpen(false)
-                }}
-                PaperProps={{
-                    sx: {
-                        width: '200px',
-                        pt: 1,
-                        borderRadius: `0 ${theme.shape.borderRadius * 2}px ${theme.shape.borderRadius * 2}px 0`,
-                        overflow: 'hidden',
-                        backgroundColor: 'background.default'
-                    }
-                }}
-            >
-                <Menu
-                    onClick={() => {
-                        setMobileMenuOpen(false)
-                    }}
-                />
-            </Drawer>
         </>
     )
 }

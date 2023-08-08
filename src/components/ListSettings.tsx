@@ -1,9 +1,11 @@
-import { Box, Button, Switch, TextField, Typography } from '@mui/material'
+import { Box, Button, IconButton, List, ListItem, Switch, Tab, Tabs, TextField, Typography } from '@mui/material'
 import { StreamPicker } from './StreamPicker'
 import { useEffect, useState } from 'react'
 import { usePreference } from '../context/PreferenceContext'
 import { type Stream } from '@concurrent-world/client'
 import { useApi } from '../context/api'
+import { StreamLink, UserStreamLink } from './StreamList/StreamLink'
+import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove'
 
 export interface ListSettingsProps {
     id: string
@@ -18,6 +20,8 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
 
     const [options, setOptions] = useState<Stream[]>([])
     const [postStreams, setPostStreams] = useState<Stream[]>([])
+
+    const [tab, setTab] = useState<'stream' | 'user'>('stream')
 
     useEffect(() => {
         if (props.id) {
@@ -118,6 +122,63 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                     </Button>
                 </>
             )}
+            <Tabs
+                value={tab}
+                onChange={(_, value) => {
+                    setTab(value)
+                }}
+                textColor="secondary"
+                indicatorColor="secondary"
+            >
+                <Tab label="ストリーム" value="stream" />
+                <Tab label="ユーザー" value="user" />
+            </Tabs>
+            <List>
+                {tab === 'stream' &&
+                    list.streams.map((streamID) => (
+                        <ListItem
+                            key={streamID}
+                            disablePadding
+                            secondaryAction={
+                                <IconButton
+                                    onClick={(_) => {
+                                        pref.updateList(props.id, {
+                                            ...list,
+                                            streams: list.streams.filter((e) => e !== streamID)
+                                        })
+                                    }}
+                                >
+                                    <PlaylistRemoveIcon />
+                                </IconButton>
+                            }
+                        >
+                            <StreamLink streamID={streamID} />
+                        </ListItem>
+                    ))}
+                {tab === 'user' &&
+                    list.userStreams.map((userstream) => (
+                        <ListItem
+                            key={userstream.streamID}
+                            disablePadding
+                            secondaryAction={
+                                <IconButton
+                                    onClick={(_) => {
+                                        pref.updateList(props.id, {
+                                            ...list,
+                                            userStreams: list.userStreams.filter(
+                                                (e) => e.streamID !== userstream.streamID
+                                            )
+                                        })
+                                    }}
+                                >
+                                    <PlaylistRemoveIcon />
+                                </IconButton>
+                            }
+                        >
+                            <UserStreamLink userHomeStream={userstream} />
+                        </ListItem>
+                    ))}
+            </List>
         </Box>
     )
 }

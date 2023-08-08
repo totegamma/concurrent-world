@@ -10,6 +10,7 @@ import { type userHomeStream } from '../../model'
 export interface StreamLinkProps {
     streamID: string
     sx?: SxProps
+    onClick?: () => void
 }
 
 export const StreamLink = (props: StreamLinkProps): JSX.Element | null => {
@@ -32,7 +33,13 @@ export const StreamLink = (props: StreamLinkProps): JSX.Element | null => {
     }
 
     return (
-        <ListItemButton dense component={RouterLink} to={`/stream#${props.streamID}`} sx={props.sx}>
+        <ListItemButton
+            dense
+            component={RouterLink}
+            to={`/stream#${props.streamID}`}
+            sx={props.sx}
+            onClick={props.onClick}
+        >
             <PercentIcon />
             {stream?.name}
         </ListItemButton>
@@ -42,6 +49,7 @@ export const StreamLink = (props: StreamLinkProps): JSX.Element | null => {
 export interface UserStreamLinkProps {
     userHomeStream: userHomeStream
     sx?: SxProps
+    onClick?: () => void
 }
 
 export const UserStreamLink = (props: UserStreamLinkProps): JSX.Element | null => {
@@ -62,6 +70,7 @@ export const UserStreamLink = (props: UserStreamLinkProps): JSX.Element | null =
                 component={RouterLink}
                 to={`/entity/${props.userHomeStream.userID ?? ''}`}
                 sx={props.sx}
+                onClick={props.onClick}
             >
                 <AlternateEmailIcon />
                 offline
@@ -70,7 +79,13 @@ export const UserStreamLink = (props: UserStreamLinkProps): JSX.Element | null =
     }
 
     return (
-        <ListItemButton dense component={RouterLink} to={`/entity/${props.userHomeStream.userID ?? ''}`} sx={props.sx}>
+        <ListItemButton
+            dense
+            component={RouterLink}
+            to={`/entity/${props.userHomeStream.userID ?? ''}`}
+            sx={props.sx}
+            onClick={props.onClick}
+        >
             <AlternateEmailIcon />
             {user?.profile?.username}
         </ListItemButton>

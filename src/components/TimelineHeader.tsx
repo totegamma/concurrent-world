@@ -3,6 +3,7 @@ import { IconButton, Box, useTheme, Button } from '@mui/material'
 import { ApplicationContext } from '../App'
 import { ConcurrentLogo } from './ConcurrentLogo'
 import type { ConcurrentTheme } from '../model'
+import { useGlobalActions } from '../context/GlobalActions'
 
 export interface TimelineHeaderProps {
     title?: string
@@ -10,13 +11,13 @@ export interface TimelineHeaderProps {
     onTitleClick?: () => void
     secondaryAction?: JSX.Element
     onSecondaryActionClick?: () => void
-    onConcurrentLogoClick?: () => void
     useRawSecondaryAction?: boolean
 }
 
 export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderProps): JSX.Element => {
     const appData = useContext(ApplicationContext)
     const theme = useTheme<ConcurrentTheme>()
+    const actions = useGlobalActions()
 
     const iconColor = appData.websocketState === 1 ? theme.palette.background.contrastText : theme.palette.text.disabled
 
@@ -46,7 +47,9 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
                         p: '8px',
                         display: { xs: 'inherit', sm: 'none' }
                     }}
-                    onClick={props.onConcurrentLogoClick}
+                    onClick={() => {
+                        actions.openMobileMenu(true)
+                    }}
                 >
                     <ConcurrentLogo size="25px" upperColor={iconColor} lowerColor={iconColor} frameColor={iconColor} />
                 </IconButton>
