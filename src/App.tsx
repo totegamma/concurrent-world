@@ -375,6 +375,7 @@ function App(): JSX.Element {
                             }}
                         >
                             <Routes>
+                                <Route index element={<ListPage messages={messages} />} />
                                 <Route
                                     path="/stream"
                                     element={<StreamPage messages={messages} setMobileMenuOpen={setMobileMenuOpen} />}
@@ -385,7 +386,6 @@ function App(): JSX.Element {
                                 <Route path="/settings" element={<Settings setThemeName={setThemeName} />} />
                                 <Route path="/message/:id" element={<MessagePage />} />
                                 <Route path="/entity/:id" element={<EntityPage />} />
-                                <Route index element={<ListPage messages={messages} />} />
                                 <Route path="/devtool" element={<Devtool />} />
                             </Routes>
                         </Paper>
