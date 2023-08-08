@@ -40,13 +40,15 @@ const versionString = `${location.hostname}-${branchName as string}-${sha.slice(
 export const ApplicationContext = createContext<appData>({
     emojiDict: {},
     websocketState: -1,
-    displayingStream: []
+    displayingStream: [],
+    setThemeName: (_newtheme: string) => {}
 })
 
 export interface appData {
     emojiDict: Record<string, Emoji>
     websocketState: ReadyState
     displayingStream: string[]
+    setThemeName: (newtheme: string) => void
 }
 
 export const ClockContext = createContext<Date>(new Date())
@@ -289,7 +291,8 @@ function App(): JSX.Element {
         return {
             emojiDict,
             websocketState: readyState,
-            displayingStream
+            displayingStream,
+            setThemeName
         }
     }, [emojiDict, readyState, displayingStream])
 
@@ -378,7 +381,7 @@ function App(): JSX.Element {
                                 <Route path="/associations" element={<Associations messages={messages} />} />
                                 <Route path="/explorer" element={<Explorer />} />
                                 <Route path="/notifications" element={<Notifications messages={messages} />} />
-                                <Route path="/settings" element={<Settings setThemeName={setThemeName} />} />
+                                <Route path="/settings" element={<Settings />} />
                                 <Route path="/message/:id" element={<MessagePage />} />
                                 <Route path="/entity/:id" element={<EntityPage />} />
                                 <Route path="/devtool" element={<Devtool />} />
