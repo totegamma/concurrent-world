@@ -14,7 +14,7 @@ import { usePersistent } from '../hooks/usePersistent'
 import { Themes, createConcurrentTheme } from '../themes'
 import { ThemeProvider } from '@emotion/react'
 import { CssBaseline, darken } from '@mui/material'
-import { ConcurrentWordmark } from '../components/ConcurrentWordmark'
+import { ConcurrentWordmark } from '../components/theming/ConcurrentWordmark'
 import { IsValid256k1PrivateKey } from '@concurrent-world/client'
 
 export function AccountImport(): JSX.Element {

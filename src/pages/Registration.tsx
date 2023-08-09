@@ -30,10 +30,10 @@ import {
 import { usePersistent } from '../hooks/usePersistent'
 import { Themes, createConcurrentTheme } from '../themes'
 import Tilt from 'react-parallax-tilt'
-import { PassportRenderer } from '../components/Passport'
-import { CCAvatar } from '../components/CCAvatar'
+import { PassportRenderer } from '../components/theming/Passport'
+import { CCAvatar } from '../components/ui/CCAvatar'
 import { generateIdentity } from '../util'
-import { ConcurrentWordmark } from '../components/ConcurrentWordmark'
+import { ConcurrentWordmark } from '../components/theming/ConcurrentWordmark'
 
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'

@@ -1,6 +1,6 @@
 import { Box, Divider, Paper, Typography } from '@mui/material'
 import { useParams } from 'react-router-dom'
-import { MessageContainer } from '../components/Timeline/MessageContainer'
+import { MessageContainer } from '../components/Message/MessageContainer'
 import { InspectorProvider } from '../context/Inspector'
 
 export function MessagePage(): JSX.Element {

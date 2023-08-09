@@ -2,15 +2,15 @@ import { Box, IconButton, Link, ListItemIcon, ListItemText, Menu, MenuItem, Typo
 
 import { type M_Reroute } from '@concurrent-world/client'
 import RepeatIcon from '@mui/icons-material/Repeat'
-import { CCAvatar } from '../../CCAvatar'
+import { CCAvatar } from '../ui/CCAvatar'
 import { Link as routerLink, Link as RouterLink } from 'react-router-dom'
-import { TimeDiff } from '../../TimeDiff'
-import { MessageContainer, useMessageService } from '../MessageContainer'
+import { TimeDiff } from '../ui/TimeDiff'
+import { MessageContainer, useMessageService } from './MessageContainer'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { useState } from 'react'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-import { useApi } from '../../../context/api'
+import { useApi } from '../../context/api'
 
 export interface RerouteMessageFrameProp {
     message: M_Reroute

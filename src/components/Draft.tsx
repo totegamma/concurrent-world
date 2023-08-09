@@ -14,8 +14,8 @@ import {
     ListItemText,
     ListItemButton
 } from '@mui/material'
-import { MarkdownRenderer } from './MarkdownRenderer'
-import { StreamPicker } from './StreamPicker'
+import { MarkdownRenderer } from './ui/MarkdownRenderer'
+import { StreamPicker } from './ui/StreamPicker'
 import { closeSnackbar, useSnackbar } from 'notistack'
 import { usePreference } from '../context/PreferenceContext'
 import { usePersistent } from '../hooks/usePersistent'

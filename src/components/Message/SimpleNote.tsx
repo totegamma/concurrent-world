@@ -1,5 +1,5 @@
 import type { M_Current, M_Reply, M_Reroute } from '@concurrent-world/client'
-import { MarkdownRenderer } from '../MarkdownRenderer'
+import { MarkdownRenderer } from '../ui/MarkdownRenderer'
 
 interface SimpleNoteProps {
     message: M_Current | M_Reply | M_Reroute

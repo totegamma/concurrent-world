@@ -7,8 +7,8 @@ import { Draft } from '../components/Draft'
 import { useLocation } from 'react-router-dom'
 import { usePreference } from './PreferenceContext'
 import { ProfileEditor } from '../components/ProfileEditor'
-import { MessageContainer } from '../components/Timeline/MessageContainer'
-import { Menu } from '../components/Menu'
+import { MessageContainer } from '../components/Message/MessageContainer'
+import { Menu } from '../components/Menu/Menu'
 
 export interface GlobalActionsState {
     openDraft: () => void

@@ -1,9 +1,9 @@
 import { memo, useState } from 'react'
 import { Box, Divider, Fade, Tab, Tabs, Typography } from '@mui/material'
-import { ServerJWT } from './ServerJWT'
-import { UserJWT } from './UserJWT'
-import { CCComposer } from './CCComposer'
-import { IdentityGenerator } from './IdentityGenerator'
+import { ServerJWT } from '../components/Devtool/ServerJWT'
+import { UserJWT } from '../components/Devtool/UserJWT'
+import { CCComposer } from '../components/Devtool/CCComposer'
+import { IdentityGenerator } from '../components/Devtool/IdentityGenerator'
 
 export const Devtool = memo((): JSX.Element => {
     const [tab, setTab] = useState(0)

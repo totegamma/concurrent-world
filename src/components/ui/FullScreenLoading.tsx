@@ -1,5 +1,5 @@
 import { Box, CssBaseline, Typography } from '@mui/material'
-import { ConcurrentLogo } from './ConcurrentLogo'
+import { ConcurrentLogo } from '../theming/ConcurrentLogo'
 
 export interface FullScreenLoadingProps {
     message: string

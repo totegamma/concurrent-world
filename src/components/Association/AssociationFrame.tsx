@@ -13,10 +13,10 @@ import {
 import { useApi } from '../../context/api'
 import { Box, IconButton, Link, ListItem, Typography } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
-import { CCAvatar } from '../CCAvatar'
+import { CCAvatar } from '../ui/CCAvatar'
 import { MessageSkeleton } from '../MessageSkeleton'
-import { MessageContainer } from './MessageContainer'
-import { TimeDiff } from '../TimeDiff'
+import { MessageContainer } from '../Message/MessageContainer'
+import { TimeDiff } from '../ui/TimeDiff'
 
 export interface AssociationFrameProp {
     association: CoreStreamElement

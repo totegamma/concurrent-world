@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box'
 import { Themes, createConcurrentTheme } from '../themes'
 import { Button, CssBaseline, IconButton, Paper, ThemeProvider, Typography, darken } from '@mui/material'
-import { ConcurrentLogo } from '../components/ConcurrentLogo'
+import { ConcurrentLogo } from '../components/theming/ConcurrentLogo'
 import { useState } from 'react'
 import { usePersistent } from '../hooks/usePersistent'
 import type { ConcurrentTheme } from '../model'

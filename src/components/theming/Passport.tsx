@@ -1,7 +1,7 @@
 import { useTheme } from '@mui/material'
-import { type ConcurrentTheme } from '../model'
+import { type ConcurrentTheme } from '../../model'
 import { useId } from 'react'
-import { useApi } from '../context/api'
+import { useApi } from '../../context/api'
 
 export function Passport(): JSX.Element {
     const client = useApi()

@@ -1,12 +1,10 @@
 import type { Meta } from '@storybook/react'
 import { useState, useEffect } from 'react'
-import type { ConcurrentTheme } from '../../../model'
-import { createConcurrentTheme, Themes } from '../../../themes'
+import type { ConcurrentTheme } from '../../model'
+import { createConcurrentTheme, Themes } from '../../themes'
 import { CssBaseline, ThemeProvider } from '@mui/material'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { MessageView } from './MessageView'
-import { CharacterProfileMock, MessageMock, StreamMock } from '@concurrent-world/client'
-import { InspectorProvider } from '../../../context/Inspector'
+import { InspectorProvider } from '../../context/Inspector'
 import Paper from '@mui/material/Paper'
 
 const ThemeList = Object.keys(Themes)

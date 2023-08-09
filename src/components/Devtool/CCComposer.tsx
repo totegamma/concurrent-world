@@ -1,8 +1,8 @@
 import { Box, Button, Divider, MenuItem, Select, TextField, Typography } from '@mui/material'
 import { forwardRef, useState } from 'react'
 import { useApi } from '../../context/api'
-import { CCEditor } from '../../components/cceditor'
 import { type Schema, type CoreCharacter } from '@concurrent-world/client'
+import { CCEditor } from '../ui/cceditor'
 
 export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
     const client = useApi()

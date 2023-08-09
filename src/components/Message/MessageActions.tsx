@@ -1,6 +1,6 @@
 import { Box, IconButton, Link, ListItemIcon, ListItemText, Menu, MenuItem, Tooltip, Typography } from '@mui/material'
 import ReplyIcon from '@mui/icons-material/Reply'
-import { CCAvatar } from '../../CCAvatar'
+import { CCAvatar } from '../ui/CCAvatar'
 import StarIcon from '@mui/icons-material/Star'
 import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import AddReactionIcon from '@mui/icons-material/AddReaction'
@@ -11,12 +11,12 @@ import { type M_Reply, type M_Current, type M_Reroute } from '@concurrent-world/
 import { useState } from 'react'
 import Collapse from '@mui/material/Collapse'
 import Fade from '@mui/material/Fade'
-import { useMessageService } from '../MessageContainer'
+import { useMessageService } from './MessageContainer'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove'
-import { useEmojiPicker } from '../../../context/EmojiPickerContext'
+import { useEmojiPicker } from '../../context/EmojiPickerContext'
 import { Link as RouterLink } from 'react-router-dom'
 
 export interface MessageActionsProps {

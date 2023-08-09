@@ -1,8 +1,8 @@
 import { Box, Button, Divider, Tooltip, Typography, alpha, useTheme } from '@mui/material'
-import { useApi } from '../../../context/api'
-import { CCAvatar } from '../../CCAvatar'
+import { useApi } from '../../context/api'
+import { CCAvatar } from '../ui/CCAvatar'
 import { Fragment } from 'react'
-import { useMessageService } from '../MessageContainer'
+import { useMessageService } from './MessageContainer'
 
 import { type M_Reply, type M_Current, type M_Reroute, type User } from '@concurrent-world/client'
 

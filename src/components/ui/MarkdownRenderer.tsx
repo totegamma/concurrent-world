@@ -8,8 +8,8 @@ import { type ReactMarkdownProps } from 'react-markdown/lib/ast-to-react'
 import breaks from 'remark-breaks'
 import { Codeblock } from './Codeblock'
 
-import type { Emoji } from '../model'
-import { ApplicationContext } from '../App'
+import type { Emoji } from '../../model'
+import { ApplicationContext } from '../../App'
 
 export interface MarkdownRendererProps {
     messagebody: string

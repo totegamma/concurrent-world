@@ -10,7 +10,7 @@ export const LoginGuard = (props: Props): JSX.Element => {
     const prvkey = localStorage.getItem('PrivateKey') ?? ''
 
     if (domain === '' || prvkey === '') {
-        if (location.pathname === '/' && location.hash !== '') {
+        if (location.pathname === '/stream' && location.hash !== '') {
             return <Navigate to={'/guest/' + location.hash} state={{ from: useLocation() }} replace={true} />
         }
         return <Navigate to={props.redirect} state={{ from: useLocation() }} replace={true} />

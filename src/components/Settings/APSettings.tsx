@@ -3,7 +3,7 @@ import { forwardRef, useEffect, useState } from 'react'
 import type { RJSFSchema } from '@rjsf/utils'
 import Form from '@rjsf/mui'
 import validator from '@rjsf/validator-ajv8'
-import { useApi } from '../context/api'
+import { useApi } from '../../context/api'
 
 const schema: RJSFSchema = {
     title: 'ActivityPubSettings',

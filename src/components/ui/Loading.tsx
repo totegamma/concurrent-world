@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material'
-import { ConcurrentLogo } from './ConcurrentLogo'
+import { ConcurrentLogo } from '../theming/ConcurrentLogo'
 
 export interface LoadingProps {
     message: string

@@ -7,8 +7,8 @@ import CreateIcon from '@mui/icons-material/Create'
 import MenuIcon from '@mui/icons-material/Menu'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import { NavLink } from 'react-router-dom'
-import { useGlobalActions } from '../context/GlobalActions'
-import type { ConcurrentTheme } from '../model'
+import { useGlobalActions } from '../../context/GlobalActions'
+import type { ConcurrentTheme } from '../../model'
 
 export const MobileMenu = (): JSX.Element => {
     const actions = useGlobalActions()

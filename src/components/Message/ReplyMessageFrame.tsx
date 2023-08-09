@@ -1,7 +1,7 @@
 import { Box, Chip } from '@mui/material'
 
 import { type M_Reply, type M_Current } from '@concurrent-world/client'
-import { useApi } from '../../../context/api'
+import { useApi } from '../../context/api'
 import { MessageView } from './MessageView'
 import { OneLineMessageView } from './OneLineMessageView'
 

@@ -2,7 +2,7 @@ import type { Meta } from '@storybook/react'
 import { useState, useEffect } from 'react'
 import type { ConcurrentTheme } from '../../../model'
 import { createConcurrentTheme, Themes } from '../../../themes'
-import { Box, CssBaseline, ThemeProvider } from '@mui/material'
+import { CssBaseline, ThemeProvider } from '@mui/material'
 import { ThemeSelect } from './index'
 
 const ThemeList = Object.keys(Themes)
@@ -37,7 +37,7 @@ export const Default = (arg: Props): JSX.Element => {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline>
-                <ThemeSelect setThemeName={() => {}} />
+                <ThemeSelect />
             </CssBaseline>
         </ThemeProvider>
     )

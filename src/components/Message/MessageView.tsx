@@ -1,14 +1,14 @@
 import { Box, IconButton, ListItem, Typography, Chip, Paper, Tooltip } from '@mui/material'
 import { Link as routerLink } from 'react-router-dom'
-import { useApi } from '../../../context/api'
-import { CCAvatar } from '../../CCAvatar'
+import { useApi } from '../../context/api'
+import { CCAvatar } from '../ui/CCAvatar'
 import type { M_Current, M_Reply } from '@concurrent-world/client'
-import { SimpleNote } from '../SimpleNote'
+import { SimpleNote } from './SimpleNote'
 import { MessageHeader } from './MessageHeader'
 import { MessageActions } from './MessageActions'
 import { MessageReactions } from './MessageReactions'
 import { useSnackbar } from 'notistack'
-import { FollowButton } from '../../FollowButton'
+import { FollowButton } from '../FollowButton'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 
 export interface MessageViewProps {

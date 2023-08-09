@@ -1,5 +1,5 @@
 import { Box, Button, IconButton, List, ListItem, Switch, Tab, Tabs, TextField, Typography } from '@mui/material'
-import { StreamPicker } from './StreamPicker'
+import { StreamPicker } from './ui/StreamPicker'
 import { useEffect, useState } from 'react'
 import { usePreference } from '../context/PreferenceContext'
 import { type Stream } from '@concurrent-world/client'

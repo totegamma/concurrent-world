@@ -1,7 +1,7 @@
 import { useContext, memo } from 'react'
 import { IconButton, Box, useTheme, Button } from '@mui/material'
 import { ApplicationContext } from '../App'
-import { ConcurrentLogo } from './ConcurrentLogo'
+import { ConcurrentLogo } from './theming/ConcurrentLogo'
 import type { ConcurrentTheme } from '../model'
 import { useGlobalActions } from '../context/GlobalActions'
 

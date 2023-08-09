@@ -2,7 +2,7 @@ import { Box } from '@mui/material'
 import Form from '@rjsf/mui'
 import validator from '@rjsf/validator-ajv8'
 import { memo, useEffect, useState } from 'react'
-import { fetchWithTimeout } from '../util'
+import { fetchWithTimeout } from '../../util'
 
 export interface CCEditorProps {
     schemaURL: string
