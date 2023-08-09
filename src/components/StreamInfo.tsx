@@ -64,7 +64,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                 sx={{
                     padding: '20px',
                     display: 'flex',
-                    backgroundImage: `url(${Background})`,
+                    backgroundImage: `url(${stream.payload.body.banner || Background})`,
                     backgroundPosition: 'center',
                     objectFit: 'cover',
                     gap: '10px'

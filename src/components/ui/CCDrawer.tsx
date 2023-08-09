@@ -52,7 +52,7 @@ export const CCDrawer = (props: CCDrawerProps): JSX.Element => {
                 }
             }}
         >
-            <Box visibility={greaterThanSm ? 'hidden' : 'visible'} height="20px" width="100%" position="relative">
+            <Box display={greaterThanSm ? 'none' : 'flex'} height="20px" width="100%" position="relative">
                 <Puller />
             </Box>
             <Box
