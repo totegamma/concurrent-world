@@ -9,7 +9,7 @@ import type {
     TypeText
 } from '@mui/material/styles/createPalette'
 
-import type { CoreStreamElement, Profile } from '@concurrent-world/client'
+import type { CoreStreamElement } from '@concurrent-world/client'
 
 export interface StreamElementDated extends CoreStreamElement {
     LastUpdated: number
@@ -19,11 +19,6 @@ export interface Emoji {
     publicUrl: string
     name: string
     aliases: string[]
-}
-
-export interface ProfileWithAddress extends Profile {
-    // TODO: deprecate
-    ccaddress: string
 }
 
 export interface ImgurSettings {

@@ -74,7 +74,7 @@ export function AccountImport(): JSX.Element {
             const hubClient = new Client(privatekey, 'hub.concurrent.world', 'stab-client')
             hubClient.api.readEntity(ccid).then((entity) => {
                 console.log(entity)
-                if (entity && entity.ccaddr === ccid) {
+                if (entity && entity.ccid === ccid) {
                     setServer(entity.host || 'hub.concurrent.world')
                     setEntityFound(true)
                 } else {
@@ -101,12 +101,12 @@ export function AccountImport(): JSX.Element {
                         .then((entity) => {
                             if (unmounted) return
                             console.log(entity)
-                            if (!entity || entity.ccaddr !== client.ccid) {
+                            if (!entity || entity.ccid !== client.ccid) {
                                 setErrorMessage('指定のサーバーにあなたのアカウントは見つかりませんでした。')
                                 return
                             }
                             setErrorMessage('')
-                            setEntityFound(entity.ccaddr === client.ccid)
+                            setEntityFound(entity.ccid === client.ccid)
                             initializeClient(client)
                         })
                         .catch((_) => {

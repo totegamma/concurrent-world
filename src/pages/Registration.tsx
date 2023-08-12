@@ -103,10 +103,10 @@ export function Registration(): JSX.Element {
         localStorage.setItem('PrivateKey', JSON.stringify(privateKey))
         localStorage.setItem('Mnemonic', JSON.stringify(mnemonic))
 
-        console.log('hostAddr', host.ccaddr)
+        console.log('hostAddr', host.ccid)
 
         client?.api
-            .readCharacter(host.ccaddr, Schemas.domainProfile)
+            .readCharacter(host.ccid, Schemas.domainProfile)
             .then((profile: CoreCharacter<RawDomainProfile> | null | undefined) => {
                 console.log('domainprofile:', profile)
                 const list = {
@@ -148,7 +148,7 @@ export function Registration(): JSX.Element {
         client?.api.invalidateEntity(CCID)
         const entity = await client?.api.readEntity(CCID)
         console.log(entity)
-        setEntityFound(!!entity && entity.ccaddr != null)
+        setEntityFound(!!entity && entity.ccid != null)
     }
 
     const steps = [

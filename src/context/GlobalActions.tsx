@@ -181,7 +181,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     )}
                     {targetMessage && (mode === 'reply' || mode === 'reroute') && (
                         <Paper sx={style}>
-                            <MessageContainer messageID={targetMessage.id} messageOwner={targetMessage.author.ccaddr} />
+                            <MessageContainer messageID={targetMessage.id} messageOwner={targetMessage.author.ccid} />
                             <Divider />
                             <Box sx={{ display: 'flex' }}>
                                 <Draft
@@ -194,14 +194,14 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                         if (mode === 'reroute')
                                             await client.reroute(
                                                 targetMessage.id,
-                                                targetMessage.author.ccaddr,
+                                                targetMessage.author.ccid,
                                                 streams,
                                                 text
                                             )
                                         else
                                             await client.reply(
                                                 targetMessage.id,
-                                                targetMessage.author.ccaddr,
+                                                targetMessage.author.ccid,
                                                 streams,
                                                 text
                                             )
@@ -255,7 +255,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                     client.api.readHost(client.api.host).then((host) => {
                                         if (!host) return // TODO: add notice
                                         client.api
-                                            .readCharacter(host.ccaddr, Schemas.domainProfile)
+                                            .readCharacter(host.ccid, Schemas.domainProfile)
                                             .then((profile: CoreCharacter<RawDomainProfile> | null | undefined) => {
                                                 console.log(profile)
                                                 try {

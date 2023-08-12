@@ -39,11 +39,11 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
                             height: { xs: '12px', sm: '18px' }
                         }}
                         component={routerLink}
-                        to={'/entity/' + props.message.author.ccaddr}
+                        to={'/entity/' + props.message.author.ccid}
                     >
                         <CCAvatar
                             avatarURL={props.message.author.profile?.avatar}
-                            identiconSource={props.message.author.ccaddr}
+                            identiconSource={props.message.author.ccid}
                             sx={{
                                 width: { xs: '12px', sm: '18px' },
                                 height: { xs: '12px', sm: '18px' }
@@ -83,7 +83,7 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
                         underline="hover"
                         color="inherit"
                         fontSize="0.75rem"
-                        to={`/message/${props.message.id}@${props.message.author.ccaddr}`}
+                        to={`/message/${props.message.id}@${props.message.author.ccid}`}
                     >
                         <TimeDiff date={new Date(props.message.cdate)} />
                     </Link>
@@ -107,7 +107,7 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
                     </ListItemIcon>
                     <ListItemText>詳細</ListItemText>
                 </MenuItem>
-                {props.message.author.ccaddr === client?.user?.ccaddr && (
+                {props.message.author.ccid === client?.user?.ccid && (
                     <MenuItem
                         onClick={() => {
                             service.deleteMessage()

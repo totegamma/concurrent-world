@@ -29,7 +29,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
     const service = useMessageService()
 
-    const hasOwnReaction = props.message.favorites.find((fav) => fav.author.ccaddr === props.userCCID)
+    const hasOwnReaction = props.message.favorites.find((fav) => fav.author.ccid === props.userCCID)
 
     const replyCount = props.message.replies.length
     const likeCount = props.message.favorites.length
@@ -108,7 +108,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                             >
                                 {props.message.favorites.map((fav) => (
                                     <Box
-                                        key={fav.author.ccaddr}
+                                        key={fav.author.ccid}
                                         sx={{
                                             display: 'flex',
                                             alignItems: 'center',
@@ -121,7 +121,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                                 width: '20px'
                                             }}
                                             avatarURL={fav.author.profile?.avatar}
-                                            identiconSource={fav.author.ccaddr}
+                                            identiconSource={fav.author.ccid}
                                         />
                                         {fav.author.profile?.username ?? 'anonymous'}
                                     </Box>
@@ -217,7 +217,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         </ListItemIcon>
                         <ListItemText>詳細</ListItemText>
                     </MenuItem>
-                    {service.removeFromStream && props.message.author.ccaddr === props.userCCID && (
+                    {service.removeFromStream && props.message.author.ccid === props.userCCID && (
                         <MenuItem
                             onClick={() => {
                                 service.removeFromStream?.()
@@ -229,7 +229,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                             <ListItemText>このStreamから削除</ListItemText>
                         </MenuItem>
                     )}
-                    {props.message.author.ccaddr === props.userCCID && (
+                    {props.message.author.ccid === props.userCCID && (
                         <MenuItem
                             onClick={() => {
                                 service.deleteMessage()
