@@ -393,7 +393,7 @@ export function Registration(): JSX.Element {
                         <List>
                             <ListItemButton
                                 component={Link}
-                                to={`https://hub.concurrent.world/register?token=${
+                                to={`https://hub.concurrent.world/web/register?token=${
                                     IssueJWT(privateKey, { iss: CCID, aud: 'hub.concurrent.world' }) ?? ''
                                 }`}
                                 target="_blank"
@@ -439,7 +439,7 @@ export function Registration(): JSX.Element {
                                 to={
                                     'http://' +
                                     (host?.fqdn ?? '') +
-                                    '/register?token=' +
+                                    '/web/register?token=' +
                                     (IssueJWT(privateKey, { iss: CCID, aud: host?.fqdn }) ?? '')
                                 }
                                 target="_blank"

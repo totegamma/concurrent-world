@@ -64,12 +64,9 @@ export const ConcurrentSettings = forwardRef<HTMLDivElement>((props, ref): JSX.E
                     if (client.api.host === undefined) {
                         return
                     }
-                    const jwt = IssueJWT(client.keyPair.privatekey, {
-                        iss: client.ccid,
-                        sub: client.domain,
-                        exp: Math.floor((new Date().getTime() + 60 * 60 * 1000) / 1000).toString()
-                    }) // 1h validity
-                    window.location.href = `https://${client.api.host}/web/login?token=${jwt}`
+                    client.api.getJWT().then((jwt) => {
+                        window.open(`https://${client.api.host}/web/login?token=${jwt}`, '_blank', 'noreferrer')
+                    })
                 }}
             >
                 Goto Domain Home
