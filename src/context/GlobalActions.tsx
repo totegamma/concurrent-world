@@ -50,9 +50,9 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         client?.user !== null && (client?.user.profile === undefined || client?.user.userstreams === undefined)
 
     useEffect(() => {
-        client.api.readHost(client.api.host).then((host) => {
-            console.log(host)
-            if (host === null) {
+        client.api.readDomain(client.api.host).then((domain) => {
+            console.log(domain)
+            if (domain === null) {
                 setDomainIsOffline(true)
             }
         })
@@ -252,10 +252,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                             initial={client?.user?.profile}
                             onSubmit={(_) => {
                                 client.setupUserstreams().then(() => {
-                                    client.api.readHost(client.api.host).then((host) => {
-                                        if (!host) return // TODO: add notice
+                                    client.api.readDomain(client.api.host).then((domain) => {
+                                        if (!domain) return // TODO: add notice
                                         client.api
-                                            .readCharacter(host.ccid, Schemas.domainProfile)
+                                            .readCharacter(domain.ccid, Schemas.domainProfile)
                                             .then((profile: CoreCharacter<RawDomainProfile> | null | undefined) => {
                                                 console.log(profile)
                                                 try {

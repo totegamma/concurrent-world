@@ -197,7 +197,7 @@ function App(): JSX.Element {
                         }
                         if (event.stream === client?.user?.userstreams?.notificationStream) {
                             playNotificationRef.current()
-                            client?.api.readAssociation(event.body.id, event.body.currenthost).then((a) => {
+                            client?.api.readAssociation(event.body.id, event.body.domain).then((a) => {
                                 if (!a) return
                                 if (a.schema === Schemas.replyAssociation) {
                                     client?.api.readCharacter(a.author, Schemas.profile).then((c) => {

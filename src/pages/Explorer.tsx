@@ -54,9 +54,9 @@ export function Explorer(): JSX.Element {
     const { enqueueSnackbar } = useSnackbar()
 
     const load = (): void => {
-        client.api.getKnownHosts().then((e) => {
+        client.api.getDomains().then((e) => {
             if (!client.api.host) return
-            const domains = [client.api.host, ...e.filter((e) => e.fqdn !== client.api.host).map((e) => e.fqdn)]
+            const domains = [client.host, ...e.filter((e) => e.fqdn !== client.host).map((e) => e.fqdn)]
             setDomains(domains)
         })
     }

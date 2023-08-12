@@ -130,7 +130,7 @@ export const GeneralSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Elem
                                 }
                                 const jwt = IssueJWT(client.keyPair.privatekey, {
                                     iss: client.ccid,
-                                    aud: client.domain,
+                                    aud: client.host,
                                     sub: 'CONCURRENT_INVITE',
                                     exp: Math.floor((new Date().getTime() + 24 * 60 * 60 * 1000) / 1000).toString()
                                 }) // 24h validity

@@ -30,7 +30,7 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
 
         client.api.readEntity(inspectingItem.author).then((entity) => {
             if (!entity) return
-            setCurrentHost(entity.host || client.api.host)
+            setCurrentHost(entity.domain || client.api.host)
         })
 
         client.api.readMessageWithAuthor(inspectingItem.messageId, inspectingItem.author).then((msg) => {

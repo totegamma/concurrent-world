@@ -150,7 +150,7 @@ export function EntityPage(): JSX.Element {
                                 }}
                             >
                                 <Typography variant="caption">
-                                    現住所: {user.host !== '' ? user.host : client.api.host}
+                                    現住所: {user.domain !== '' ? user.domain : client.api.host}
                                 </Typography>
                                 <Typography variant="caption">{user.ccid}</Typography>
                             </Box>

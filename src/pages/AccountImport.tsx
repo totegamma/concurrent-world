@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { HDNodeWallet } from 'ethers'
 import { LangJa } from '../utils/lang-ja'
-import { Client, LoadKey, type CoreHost, CommputeCCID } from '@concurrent-world/client'
+import { Client, LoadKey, type CoreDomain, CommputeCCID } from '@concurrent-world/client'
 import type { ConcurrentTheme } from '../model'
 import { usePersistent } from '../hooks/usePersistent'
 import { Themes, createConcurrentTheme } from '../themes'
@@ -33,7 +33,7 @@ export function AccountImport(): JSX.Element {
     const [mnemonic, setMnemonic] = useState<string>('')
     const [secret, setSecret] = useState<string>('')
     const [server, setServer] = useState<string>('')
-    const [host, setHost] = useState<CoreHost>()
+    const [host, setHost] = useState<CoreDomain>()
     const [entityFound, setEntityFound] = useState<boolean>(false)
     const [client, initializeClient] = useState<Client>()
     const [errorMessage, setErrorMessage] = useState<string>('')
@@ -75,7 +75,7 @@ export function AccountImport(): JSX.Element {
             hubClient.api.readEntity(ccid).then((entity) => {
                 console.log(entity)
                 if (entity && entity.ccid === ccid) {
-                    setServer(entity.host || 'hub.concurrent.world')
+                    setServer(entity.domain || 'hub.concurrent.world')
                     setEntityFound(true)
                 } else {
                     setErrorMessage('お住まいのサーバーが見つかりませんでした。手動入力することで継続できます。')
@@ -92,7 +92,7 @@ export function AccountImport(): JSX.Element {
         try {
             const client = new Client(privatekey, fqdn)
             client.api
-                .readHost(fqdn)
+                .readDomain(fqdn)
                 .then((e: any) => {
                     if (unmounted) return
                     setHost(e)

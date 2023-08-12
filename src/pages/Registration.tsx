@@ -44,7 +44,7 @@ import {
     type Profile,
     Schemas,
     type CoreCharacter,
-    type CoreHost
+    type CoreDomain
 } from '@concurrent-world/client'
 
 export function Registration(): JSX.Element {
@@ -78,7 +78,7 @@ export function Registration(): JSX.Element {
     }, [])
 
     const [server, setServer] = useState<string>('')
-    const [host, setHost] = useState<CoreHost | null | undefined>()
+    const [host, setHost] = useState<CoreDomain | null | undefined>()
     const [entityFound, setEntityFound] = useState<boolean>(false)
 
     useEffect(() => {
@@ -90,7 +90,7 @@ export function Registration(): JSX.Element {
     useEffect(() => {
         if (!client) return
         const fqdn = server.replace('https://', '').replace('/', '')
-        client.api.readHost(fqdn).then((e) => {
+        client.api.readDomain(fqdn).then((e) => {
             setHost(e)
         })
         console.log(fqdn)
