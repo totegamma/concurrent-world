@@ -21,7 +21,7 @@ export interface MessageViewProps {
 export const MessageView = (props: MessageViewProps): JSX.Element => {
     const client = useApi()
     const { enqueueSnackbar } = useSnackbar()
-    const isSelf = props.message.author.ccaddr === client.ccid
+    const isSelf = props.message.author.ccid === client.ccid
 
     return (
         <ListItem
@@ -65,7 +65,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                                     <CCAvatar
                                         alt={props.message.author.profile?.username}
                                         avatarURL={props.message.author.profile?.avatar}
-                                        identiconSource={props.message.author.ccaddr}
+                                        identiconSource={props.message.author.ccid}
                                         sx={{
                                             width: { xs: '38px', sm: '48px' },
                                             height: { xs: '38px', sm: '48px' }
@@ -73,7 +73,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                                     />
                                     {!isSelf && (
                                         <FollowButton
-                                            userCCID={props.message.author.ccaddr}
+                                            userCCID={props.message.author.ccid}
                                             userStreamID={props.message.author.userstreams?.homeStream ?? ''}
                                             color="primary.main"
                                         />
@@ -89,10 +89,10 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                                     <Typography variant="h2">{props.message.author.profile?.username}</Typography>
                                     <Chip
                                         size="small"
-                                        label={`${props.message.author.ccaddr.slice(0, 9)}...`}
+                                        label={`${props.message.author.ccid.slice(0, 9)}...`}
                                         deleteIcon={<ContentPasteIcon />}
                                         onDelete={() => {
-                                            navigator.clipboard.writeText(props.message.author.ccaddr)
+                                            navigator.clipboard.writeText(props.message.author.ccid)
                                             enqueueSnackbar('Copied', { variant: 'info' })
                                         }}
                                     />
@@ -108,12 +108,12 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                                 mt: { xs: '3px', sm: '5px' }
                             }}
                             component={routerLink}
-                            to={'/entity/' + props.message.author.ccaddr}
+                            to={'/entity/' + props.message.author.ccid}
                         >
                             <CCAvatar
                                 alt={props.message.author.profile?.username}
                                 avatarURL={props.message.author.profile?.avatar}
-                                identiconSource={props.message.author.ccaddr}
+                                identiconSource={props.message.author.ccid}
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
                                     height: { xs: '38px', sm: '48px' }
@@ -131,7 +131,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                         }}
                     >
                         <MessageHeader
-                            authorID={props.message.author.ccaddr}
+                            authorID={props.message.author.ccid}
                             messageID={props.message.id}
                             cdate={props.message.cdate}
                             username={props.message.author.profile?.username}

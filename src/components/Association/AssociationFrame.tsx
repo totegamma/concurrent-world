@@ -33,7 +33,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     const [fetching, setFetching] = useState<boolean>(true)
 
     const perspective = props.perspective ?? client.ccid
-    const isMeToOther = association?.author.ccaddr !== perspective
+    const isMeToOther = association?.author.ccid !== perspective
 
     const Nominative = perspective === client.ccid ? 'You' : association?.author.profile?.username ?? 'anonymous'
     const Possessive =
@@ -77,11 +77,11 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                 mt: { xs: '3px', sm: '5px' }
                             }}
                             component={RouterLink}
-                            to={'/entity/' + (association.author.ccaddr ?? '')}
+                            to={'/entity/' + (association.author.ccid ?? '')}
                         >
                             <CCAvatar
                                 avatarURL={actionUser?.profile?.avatar}
-                                identiconSource={actionUser?.ccaddr ?? ''}
+                                identiconSource={actionUser?.ccid ?? ''}
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
                                     height: { xs: '38px', sm: '48px' }
@@ -118,7 +118,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                     color="inherit"
                                     fontSize="0.75rem"
                                     to={`/message/${association.target.id ?? ''}@${
-                                        association.target.author.ccaddr ?? ''
+                                        association.target.author.ccid ?? ''
                                     }`}
                                 >
                                     <TimeDiff date={new Date(association.cdate)} />
@@ -150,11 +150,11 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                 mt: { xs: '3px', sm: '5px' }
                             }}
                             component={RouterLink}
-                            to={'/entity/' + (association.author.ccaddr ?? '')}
+                            to={'/entity/' + (association.author.ccid ?? '')}
                         >
                             <CCAvatar
                                 avatarURL={actionUser?.profile?.avatar}
-                                identiconSource={actionUser?.ccaddr ?? ''}
+                                identiconSource={actionUser?.ccid ?? ''}
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
                                     height: { xs: '38px', sm: '48px' }
@@ -201,7 +201,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                     color="inherit"
                                     fontSize="0.75rem"
                                     to={`/message/${association.target.id ?? ''}@${
-                                        association.target.author.ccaddr ?? ''
+                                        association.target.author.ccid ?? ''
                                     }`}
                                 >
                                     <TimeDiff date={new Date(association.cdate)} />
@@ -219,7 +219,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
             return (
                 <MessageContainer
                     messageID={(association as A_Reply).replyBody.id}
-                    messageOwner={(association as A_Reply).replyBody.author.ccaddr}
+                    messageOwner={(association as A_Reply).replyBody.author.ccid}
                     after={props.after}
                 />
             )
@@ -227,7 +227,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
             return (
                 <MessageContainer
                     messageID={(association as A_Reroute).rerouteBody.id}
-                    messageOwner={(association as A_Reroute).rerouteBody.author.ccaddr}
+                    messageOwner={(association as A_Reroute).rerouteBody.author.ccid}
                     after={props.after}
                 />
             )

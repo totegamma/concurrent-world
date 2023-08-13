@@ -44,7 +44,7 @@ import {
     type Profile,
     Schemas,
     type CoreCharacter,
-    type CoreHost
+    type CoreDomain
 } from '@concurrent-world/client'
 
 export function Registration(): JSX.Element {
@@ -78,7 +78,7 @@ export function Registration(): JSX.Element {
     }, [])
 
     const [server, setServer] = useState<string>('')
-    const [host, setHost] = useState<CoreHost | null | undefined>()
+    const [host, setHost] = useState<CoreDomain | null | undefined>()
     const [entityFound, setEntityFound] = useState<boolean>(false)
 
     useEffect(() => {
@@ -90,7 +90,7 @@ export function Registration(): JSX.Element {
     useEffect(() => {
         if (!client) return
         const fqdn = server.replace('https://', '').replace('/', '')
-        client.api.readHost(fqdn).then((e) => {
+        client.api.readDomain(fqdn).then((e) => {
             setHost(e)
         })
         console.log(fqdn)
@@ -103,10 +103,10 @@ export function Registration(): JSX.Element {
         localStorage.setItem('PrivateKey', JSON.stringify(privateKey))
         localStorage.setItem('Mnemonic', JSON.stringify(mnemonic))
 
-        console.log('hostAddr', host.ccaddr)
+        console.log('hostAddr', host.ccid)
 
         client?.api
-            .readCharacter(host.ccaddr, Schemas.domainProfile)
+            .readCharacter(host.ccid, Schemas.domainProfile)
             .then((profile: CoreCharacter<RawDomainProfile> | null | undefined) => {
                 console.log('domainprofile:', profile)
                 const list = {
@@ -148,7 +148,7 @@ export function Registration(): JSX.Element {
         client?.api.invalidateEntity(CCID)
         const entity = await client?.api.readEntity(CCID)
         console.log(entity)
-        setEntityFound(!!entity && entity.ccaddr != null)
+        setEntityFound(!!entity && entity.ccid != null)
     }
 
     const steps = [
@@ -393,7 +393,7 @@ export function Registration(): JSX.Element {
                         <List>
                             <ListItemButton
                                 component={Link}
-                                to={`https://hub.concurrent.world/register?token=${
+                                to={`https://hub.concurrent.world/web/register?token=${
                                     IssueJWT(privateKey, { iss: CCID, aud: 'hub.concurrent.world' }) ?? ''
                                 }`}
                                 target="_blank"
@@ -439,7 +439,7 @@ export function Registration(): JSX.Element {
                                 to={
                                     'http://' +
                                     (host?.fqdn ?? '') +
-                                    '/register?token=' +
+                                    '/web/register?token=' +
                                     (IssueJWT(privateKey, { iss: CCID, aud: host?.fqdn }) ?? '')
                                 }
                                 target="_blank"

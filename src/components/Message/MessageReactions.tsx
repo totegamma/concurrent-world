@@ -29,11 +29,11 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
         <Box display="flex" flexWrap="wrap" gap={1}>
             {Object.entries(filteredReactions).map((r) => {
                 const [shortcode, reaction]: [string, any] = r
-                const ownReaction = reaction.find((x: any) => x.author.ccaddr === client.ccid)
+                const ownReaction = reaction.find((x: any) => x.author.ccid === client.ccid)
                 const reactedUsersList = reaction.map((value: { author: User }) => {
                     return value !== undefined ? (
                         <Box
-                            key={value.author.ccaddr}
+                            key={value.author.ccid}
                             sx={{
                                 display: 'flex',
                                 alignItems: 'center',
@@ -46,8 +46,8 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                                     width: '20px'
                                 }}
                                 avatarURL={value.author.profile?.avatar}
-                                identiconSource={value.author.ccaddr}
-                                alt={value.author.ccaddr}
+                                identiconSource={value.author.ccid}
+                                alt={value.author.ccid}
                             />
                             {value.author.profile?.username ?? 'anonymous'}
                         </Box>

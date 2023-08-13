@@ -103,7 +103,7 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
 
     const openInspector = useCallback(() => {
         if (!message) return
-        inspector.inspectItem({ messageId: message.id, author: message.author.ccaddr })
+        inspector.inspectItem({ messageId: message.id, author: message.author.ccid })
     }, [inspector, message])
 
     const openReply = useCallback(() => {

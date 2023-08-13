@@ -109,7 +109,7 @@ export function EntityPage(): JSX.Element {
                         <CCAvatar
                             alt={user.profile?.username}
                             avatarURL={user.profile?.avatar}
-                            identiconSource={user.ccaddr}
+                            identiconSource={user.ccid}
                             sx={{
                                 width: '80px',
                                 height: '80px',
@@ -150,9 +150,9 @@ export function EntityPage(): JSX.Element {
                                 }}
                             >
                                 <Typography variant="caption">
-                                    現住所: {user.host !== '' ? user.host : client.api.host}
+                                    現住所: {user.domain !== '' ? user.domain : client.api.host}
                                 </Typography>
-                                <Typography variant="caption">{user.ccaddr}</Typography>
+                                <Typography variant="caption">{user.ccid}</Typography>
                             </Box>
                         </Box>
                     </Paper>
@@ -177,7 +177,7 @@ export function EntityPage(): JSX.Element {
                         streams={targetStreams}
                         timeline={messages}
                         scrollParentRef={scrollParentRef}
-                        perspective={user.ccaddr}
+                        perspective={user.ccid}
                     />
                 </Box>
             </Box>
