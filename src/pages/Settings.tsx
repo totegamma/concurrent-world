@@ -1,11 +1,14 @@
 import { Divider, Typography, Box, Tabs, Tab } from '@mui/material'
-import { useState } from 'react'
 import { APSettings } from '../components/Settings/APSettings'
 import { GeneralSettings } from '../components/Settings/General'
 import { ConcurrentSettings } from '../components/Settings/Concurrent'
+import { useLocation } from 'react-router-dom'
+
+type widgets = 'general' | 'concurrent' | 'activitypub'
 
 export function Settings(): JSX.Element {
-    const [tab, setTab] = useState(0)
+    const path = useLocation()
+    const tab: widgets = (path.hash.replace('#', '') as widgets) || 'general'
 
     return (
         <Box
@@ -25,19 +28,19 @@ export function Settings(): JSX.Element {
             <Divider />
             <Tabs
                 value={tab}
-                onChange={(_, index) => {
-                    setTab(index)
+                onChange={(_, next) => {
+                    window.location.hash = next
                 }}
                 textColor="secondary"
                 indicatorColor="secondary"
             >
-                <Tab label="基本設定" />
-                <Tab label="アカウント詳細" />
-                <Tab label="Activitypub" />
+                <Tab value="general" label="基本設定" />
+                <Tab value="concurrent" label="アカウント詳細" />
+                <Tab value="activitypub" label="Activitypub" />
             </Tabs>
-            {tab === 0 && <GeneralSettings />}
-            {tab === 1 && <ConcurrentSettings />}
-            {tab === 2 && <APSettings />}
+            {tab === 'general' && <GeneralSettings />}
+            {tab === 'concurrent' && <ConcurrentSettings />}
+            {tab === 'activitypub' && <APSettings />}
         </Box>
     )
 }

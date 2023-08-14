@@ -69,7 +69,7 @@ dependencies:
     specifier: ^18.2.0
     version: 18.2.0(react@18.2.0)
   react-error-boundary:
-    specifier: ^4.0.4
+    specifier: ^4.0.10
     version: 4.0.10(react@18.2.0)
   react-infinite-scroller:
     specifier: ^1.2.6
