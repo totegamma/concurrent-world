@@ -1,4 +1,6 @@
-export function EmergencyKit(): JSX.Element {
+import { type FallbackProps } from 'react-error-boundary'
+
+export function EmergencyKit({ error }: FallbackProps): JSX.Element {
     const gracefulResetLocalStorage = (): void => {
         for (const key in localStorage) {
             if (['PrivateKey', 'PublicKey', 'ServerAddress'].includes(key)) continue
@@ -11,10 +13,13 @@ export function EmergencyKit(): JSX.Element {
             localStorage.removeItem(key)
         }
     }
+
     return (
         <>
             <h1>Emergency!</h1>
-            何かしらのエラーが発生しました。
+            どうしようもないエラーが発生しました。
+            <br />
+            {error?.message}
             <button
                 style={{ height: '100px', width: '100%' }}
                 onClick={(): void => {
@@ -33,6 +38,8 @@ export function EmergencyKit(): JSX.Element {
             <div>
                 <button onClick={resetAllLocalstorage}>localStorageをすべてリセットする</button>
             </div>
+            <h2>Debug Info</h2>
+            <pre>{error ? error.stack : 'そんなものはない'}</pre>
         </>
     )
 }
