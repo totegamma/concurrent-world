@@ -50,6 +50,16 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         client?.user !== null && (client?.user.profile === undefined || client?.user.userstreams === undefined)
 
     useEffect(() => {
+        const allStreams = Object.values(pref.lists)
+            .map((list) => list.streams)
+            .flat()
+        const uniq = [...new Set(allStreams)]
+        Promise.all(uniq.map((id) => client.getStream(id))).then((streams) => {
+            setAllKnownStreams(streams.filter((e) => e !== null) as Stream[])
+        })
+    }, [pref.lists])
+
+    useEffect(() => {
         client.api.readDomain(client.api.host).then((domain) => {
             console.log(domain)
             if (domain === null) {
@@ -90,18 +100,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         (target: Message) => {
             setTargetMessage(target)
             setMode('reroute')
-
-            if (allKnownStreams.length === 0) {
-                const allStreams = Object.values(pref.lists)
-                    .map((list) => list.streams)
-                    .flat()
-                const uniq = [...new Set(allStreams)]
-                Promise.all(uniq.map((id) => client.getStream(id))).then((streams) => {
-                    setAllKnownStreams(streams.filter((e) => e !== null) as Stream[])
-                })
-            }
         },
-        [allKnownStreams, pref.lists]
+        [setTargetMessage, setMode]
     )
 
     const openMobileMenu = useCallback((open?: boolean) => {
@@ -160,7 +160,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                 <Draft
                                     autoFocus
                                     streamPickerInitial={queriedStreams}
-                                    streamPickerOptions={queriedStreams}
+                                    streamPickerOptions={allKnownStreams}
                                     onSubmit={async (text: string, destinations: string[]) => {
                                         client
                                             .createCurrent(text, destinations)
