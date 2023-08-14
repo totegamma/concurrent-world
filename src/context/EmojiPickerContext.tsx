@@ -24,6 +24,7 @@ export interface EmojiProps {
     native: string
     shortcodes: string
     src: string
+    unified?: string
 }
 
 export interface Skin {
