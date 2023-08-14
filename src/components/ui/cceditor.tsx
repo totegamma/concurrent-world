@@ -19,7 +19,7 @@ export const CCEditor = memo<CCEditorProps>((props: CCEditorProps): JSX.Element 
     }, [props.init])
 
     useEffect(() => {
-        console.log(props.schemaURL)
+        if (!props.schemaURL) return
         fetchWithTimeout(props.schemaURL, { method: 'GET' })
             .then((e) => e.json())
             .then((e) => {
