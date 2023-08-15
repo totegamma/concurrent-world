@@ -1,5 +1,5 @@
-import { Box, Button, Divider, FormControlLabel, FormGroup, Switch, Typography } from '@mui/material'
-import { forwardRef, useState } from 'react'
+import { Box, Button, Divider, FormControlLabel, FormGroup, Slider, Switch, TextField, Typography } from '@mui/material'
+import { forwardRef, useContext, useState } from 'react'
 import { ProfileEditor } from '../ProfileEditor'
 import { useApi } from '../../context/api'
 import { usePreference } from '../../context/PreferenceContext'
@@ -8,8 +8,10 @@ import { LogoutButton } from './LogoutButton'
 import { ThemeSelect } from './ThemeSelect'
 import { ImgurSettings } from './Imgur'
 import { IssueJWT } from '@concurrent-world/client'
+import { ApplicationContext } from '../../App'
 
 export const GeneralSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
+    const appData = useContext(ApplicationContext)
     const client = useApi()
     const pref = usePreference()
     const { enqueueSnackbar } = useSnackbar()
@@ -96,6 +98,35 @@ export const GeneralSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Elem
                         />
                     </FormGroup>
                 </Box>
+                <Box display="flex" flexDirection="column" gap={1}>
+                    <Typography variant="h3">サウンド</Typography>
+                    <Typography variant="h4">音量</Typography>
+                    <Slider
+                        aria-label="Volume"
+                        value={appData.volume}
+                        onChange={(_, value) => {
+                            appData.setVolume(value as number)
+                        }}
+                    />
+                    <Typography variant="h4">Override</Typography>
+                    <TextField
+                        label="投稿音"
+                        placeholder="https://example.com/sound.mp3"
+                        value={appData.postSound}
+                        onChange={(e) => {
+                            appData.setPostSound(e.target.value)
+                        }}
+                    />
+                    <TextField
+                        label="通知音"
+                        placeholder="https://example.com/sound.mp3"
+                        value={appData.notificationSound}
+                        onChange={(e) => {
+                            appData.setNotificationSound(e.target.value)
+                        }}
+                    />
+                </Box>
+
                 <ThemeSelect />
                 <ImgurSettings />
                 <Box

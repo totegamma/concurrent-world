@@ -41,7 +41,13 @@ export const ApplicationContext = createContext<appData>({
     emojiDict: {},
     websocketState: -1,
     displayingStream: [],
-    setThemeName: (_newtheme: string) => {}
+    setThemeName: (_newtheme: string) => {},
+    postSound: BubbleSound,
+    setPostSound: (_sound: any) => {},
+    notificationSound: NotificationSound,
+    setNotificationSound: (_sound: any) => {},
+    volume: 0.5,
+    setVolume: (_volume: number) => {}
 })
 
 export interface appData {
@@ -49,6 +55,12 @@ export interface appData {
     websocketState: ReadyState
     displayingStream: string[]
     setThemeName: (newtheme: string) => void
+    postSound: any
+    setPostSound: (sound: any) => void
+    notificationSound: any
+    setNotificationSound: (sound: any) => void
+    volume: number
+    setVolume: (volume: number) => void
 }
 
 export const ClockContext = createContext<Date>(new Date())
@@ -67,6 +79,9 @@ function App(): JSX.Element {
     }, [domain, prvkey])
 
     const [themeName, setThemeName] = usePersistent<string>('Theme', Object.keys(Themes)[0])
+    const [postSound, setPostSound] = usePersistent<any>('PostSound', BubbleSound)
+    const [notificationSound, setNotificationSound] = usePersistent<any>('NotificationSound', NotificationSound)
+    const [volume, setVolume] = usePersistent<number>('Volume', 0.5)
 
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
     const messages = useObjectList<StreamElementDated>()
@@ -119,8 +134,8 @@ function App(): JSX.Element {
         }
     })
 
-    const [playBubble] = useSound(BubbleSound)
-    const [playNotification] = useSound(NotificationSound, { volume: 0.3 })
+    const [playBubble] = useSound(postSound, { volume: volume / 100 })
+    const [playNotification] = useSound(notificationSound, { volume: volume / 100 })
     const playBubbleRef = useRef(playBubble)
     const playNotificationRef = useRef(playNotification)
     useEffect(() => {
@@ -292,9 +307,26 @@ function App(): JSX.Element {
             emojiDict,
             websocketState: readyState,
             displayingStream,
-            setThemeName
+            setThemeName,
+            postSound,
+            setPostSound,
+            notificationSound,
+            setNotificationSound,
+            volume,
+            setVolume
         }
-    }, [emojiDict, readyState, displayingStream])
+    }, [
+        emojiDict,
+        readyState,
+        displayingStream,
+        setThemeName,
+        postSound,
+        setPostSound,
+        notificationSound,
+        setNotificationSound,
+        volume,
+        setVolume
+    ])
 
     if (!client) {
         return <>building api service...</>
