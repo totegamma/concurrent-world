@@ -26,11 +26,11 @@ import ImageIcon from '@mui/icons-material/Image'
 import DeleteIcon from '@mui/icons-material/Delete'
 import Splitscreen from '@mui/icons-material/Splitscreen'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
-import { type Emoji, useEmojiPicker, type EmojiProps } from '../context/EmojiPickerContext'
+import { useEmojiPicker } from '../context/EmojiPickerContext'
 import caretPosition from 'textarea-caret'
 import { type Stream } from '@concurrent-world/client'
 import { useApi } from '../context/api'
-import { type EmojiLite } from '../model'
+import { type Emoji, type EmojiLite } from '../model'
 
 export interface DraftProps {
     submitButtonLabel?: string
@@ -75,12 +75,12 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
 
     const [emojiDict, setEmojiDict] = useState<Record<string, EmojiLite>>({})
 
-    const insertEmoji = (emoji: EmojiProps): void => {
-        const newDraft = draft.slice(0, caretPos.left) + `:${emoji.name}:` + draft.slice(caretPos.left)
+    const insertEmoji = (emoji: Emoji): void => {
+        const newDraft = draft.slice(0, caretPos.left) + `:${emoji.shortcode}:` + draft.slice(caretPos.left)
         setDraft(newDraft)
         setEnableSuggestions(false)
         setSelectedSuggestions(0)
-        setEmojiDict((prev) => ({ ...prev, [emoji.name]: { imageURL: emoji.src } }))
+        setEmojiDict((prev) => ({ ...prev, [emoji.shortcode]: { imageURL: emoji.imageURL } }))
     }
 
     const post = (): void => {
@@ -191,21 +191,23 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         const after = draft.slice(textInputRef.current?.selectionEnd ?? 0) ?? ''
 
         // 選択されたのがネイティブ絵文字だったらそのまま挿入
+        /*
         const emoji = emojiSuggestions[index].skins[0].native
             ? emojiSuggestions[index].skins[0].native ?? ''
             : ':' + emojiSuggestions[index].name + ':'
+        */
 
-        setDraft(before.slice(0, colonPos) + emoji + after)
+        const selected = emojiSuggestions[index]
+
+        setDraft(before.slice(0, colonPos) + `:${selected.shortcode}:` + after)
         setSelectedSuggestions(0)
         setEnableSuggestions(false)
 
         // カスタム絵文字なので辞書に登録
-        if (!emojiSuggestions[index].skins[0].native) {
-            setEmojiDict((prev) => ({
-                ...prev,
-                [emojiSuggestions[index].name]: { imageURL: emojiSuggestions[index].skins[0].src }
-            }))
-        }
+        setEmojiDict((prev) => ({
+            ...prev,
+            [selected.shortcode]: { imageURL: selected.imageURL }
+        }))
         if (timerRef.current) {
             clearTimeout(timerRef.current)
             timerRef.current = null
@@ -237,24 +239,16 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     {emojiSuggestions.map((emoji, index) => (
                         <ListItemButton
                             dense
-                            key={emoji.name}
+                            key={emoji.shortcode}
                             selected={index === selectedSuggestions}
                             onClick={() => {
                                 onEmojiSuggestConfirm(index)
                             }}
                         >
                             <ListItemIcon>
-                                {emoji.skins[0]?.native ? (
-                                    <Box>{emoji.skins[0]?.native}</Box>
-                                ) : (
-                                    <Box
-                                        component="img"
-                                        src={emoji.skins[0]?.src}
-                                        sx={{ width: '1em', height: '1em' }}
-                                    />
-                                )}
+                                <Box component="img" src={emoji.imageURL} sx={{ width: '1em', height: '1em' }} />
                             </ListItemIcon>
-                            <ListItemText>{emoji.name}</ListItemText>
+                            <ListItemText>{emoji.shortcode}</ListItemText>
                         </ListItemButton>
                     ))}
                 </List>
@@ -319,10 +313,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         }
                         query = query.split(':').at(-1)
                         if (query) {
-                            emojiPicker.search(query).then((result) => {
-                                console.log(result)
-                                setEmojiSuggestions(result ?? [])
-                            })
+                            setEmojiSuggestions(emojiPicker.search(query))
                         }
                     }}
                     onPaste={handlePasteImage}
