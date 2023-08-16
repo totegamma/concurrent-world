@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { Popover, TextField, type PopoverActions, Box, Tabs, Tab, Typography, Divider, IconButton } from '@mui/material'
+import { Popover, TextField, Box, Tabs, Tab, Typography, Divider, IconButton } from '@mui/material'
 import { usePreference } from './PreferenceContext'
 import { type EmojiPackage, type Emoji } from '../model'
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled'
@@ -24,7 +24,6 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
 
     const [anchor, setAnchor] = useState<HTMLElement | null>(null)
     const onSelectedRef = useRef<((selected: Emoji) => void) | null>(null)
-    const repositionEmojiPicker = useRef<PopoverActions | null>(null)
     const [frequentEmojis, setFrequentEmojis] = usePersistent<Emoji[]>('FrequentEmojis', [])
     const [query, setQuery] = useState<string>('')
     const [emojiPackages, setEmojiPackages] = useState<EmojiPackage[]>([])
@@ -32,24 +31,43 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
     const [searchResults, setSearchResults] = useState<Emoji[]>([])
     const fuse = useRef<Fuse<Emoji> | null>(null)
 
-    const open = useMemo(
-        () => (anchor: HTMLElement, onSelected: (selected: Emoji) => void) => {
-            setAnchor(anchor)
-            onSelectedRef.current = onSelected
-        },
-        []
-    )
+    const title: string = useMemo(() => {
+        if (query.length > 0) {
+            return 'Search Result'
+        } else {
+            if (emojiPickerTab === 0) {
+                return 'Frequently Used'
+            } else {
+                return emojiPackages[emojiPickerTab - 1].name
+            }
+        }
+    }, [emojiPickerTab, emojiPackages, query])
 
-    const close = useMemo(
-        () => () => {
-            setAnchor(null)
-            onSelectedRef.current = null
-        },
-        []
-    )
+    const displayEmojis: Emoji[] = useMemo(() => {
+        if (query.length > 0) {
+            return searchResults
+        } else {
+            if (emojiPickerTab === 0) {
+                return frequentEmojis
+            } else {
+                return emojiPackages[emojiPickerTab - 1].emojis
+            }
+        }
+    }, [emojiPickerTab, emojiPackages, frequentEmojis, query, searchResults])
 
-    const search = useCallback((input: string) => {
-        return fuse.current?.search(input).map((e) => e.item) ?? []
+    const open = useCallback((anchor: HTMLElement, onSelected: (selected: Emoji) => void) => {
+        setAnchor(anchor)
+        onSelectedRef.current = onSelected
+    }, [])
+
+    const close = useCallback(() => {
+        setAnchor(null)
+        setQuery('')
+        onSelectedRef.current = null
+    }, [])
+
+    const search = useCallback((input: string, limit: number = 10) => {
+        return fuse.current?.search(input, { limit }).map((e) => e.item) ?? []
     }, [])
 
     const onSelectEmoji = useCallback(
@@ -85,6 +103,10 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
         }
     }, [query])
 
+    const tabsx = {
+        minWidth: '10%'
+    }
+
     return (
         <EmojiPickerContext.Provider
             value={useMemo(() => {
@@ -111,7 +133,6 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                         vertical: 'top',
                         horizontal: 'center'
                     }}
-                    action={repositionEmojiPicker}
                     PaperProps={{
                         style: {
                             width: 400,
@@ -133,17 +154,24 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                             variant="scrollable"
                             scrollButtons="auto"
                         >
-                            <Tab key="frequent" aria-label="Frequently Used" icon={<AccessTimeFilledIcon />} />
+                            <Tab
+                                key="frequent"
+                                aria-label="Frequently Used"
+                                icon={<AccessTimeFilledIcon />}
+                                sx={tabsx}
+                            />
                             {emojiPackages.map((emojiPackage) => (
                                 <Tab
                                     key={emojiPackage.packageURL}
                                     aria-label={emojiPackage.name}
                                     icon={<img src={emojiPackage.iconURL} alt={emojiPackage.name} height="20px" />}
+                                    sx={tabsx}
                                 />
                             ))}
                         </Tabs>
                         <Divider />
                         <TextField
+                            autoFocus
                             placeholder="Search emoji"
                             onChange={(e) => {
                                 setQuery(e.target.value)
@@ -152,7 +180,15 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                 flexGrow: 1,
                                 m: 1
                             }}
-                            autoFocus
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    if (displayEmojis.length > 0) {
+                                        e.preventDefault()
+                                        setAnchor(null)
+                                        onSelectEmoji(displayEmojis[0])
+                                    }
+                                }
+                            }}
                         />
                     </Box>
                     <Box // body
@@ -162,98 +198,27 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                         flexDirection="column"
                         padding={1}
                     >
-                        {query.length > 0 ? (
-                            <>
-                                <Box // Header
-                                    display="flex"
-                                >
-                                    <Typography>Search Result</Typography>
-                                </Box>
+                        <Box // Header
+                            display="flex"
+                        >
+                            <Typography>{title}</Typography>
+                        </Box>
 
-                                <Box // Body
-                                    display="flex"
-                                    flexWrap="wrap"
+                        <Box // Body
+                            display="flex"
+                            flexWrap="wrap"
+                        >
+                            {displayEmojis.map((emoji) => (
+                                <IconButton
+                                    key={emoji.imageURL}
+                                    onClick={() => {
+                                        onSelectEmoji(emoji)
+                                    }}
                                 >
-                                    {searchResults.map((emoji) => (
-                                        <IconButton
-                                            key={emoji.imageURL}
-                                            onClick={() => {
-                                                onSelectEmoji(emoji)
-                                            }}
-                                        >
-                                            <img
-                                                src={emoji.imageURL}
-                                                alt={emoji.shortcode}
-                                                height="30px"
-                                                width="30px"
-                                            />
-                                        </IconButton>
-                                    ))}
-                                </Box>
-                            </>
-                        ) : (
-                            <>
-                                {emojiPickerTab === 0 && (
-                                    <>
-                                        <Box // Header
-                                            display="flex"
-                                        >
-                                            <Typography>Frequently Used</Typography>
-                                        </Box>
-                                        <Box // Body
-                                            display="flex"
-                                            flexWrap="wrap"
-                                        >
-                                            {frequentEmojis.map((emoji) => (
-                                                <IconButton
-                                                    key={emoji.imageURL}
-                                                    onClick={() => {
-                                                        onSelectEmoji(emoji)
-                                                    }}
-                                                >
-                                                    <img
-                                                        src={emoji.imageURL}
-                                                        alt={emoji.shortcode}
-                                                        height="30px"
-                                                        width="30px"
-                                                    />
-                                                </IconButton>
-                                            ))}
-                                        </Box>
-                                    </>
-                                )}
-                                {emojiPickerTab !== 0 && (
-                                    <>
-                                        <Box // Header
-                                            display="flex"
-                                        >
-                                            <Typography>{emojiPackages[emojiPickerTab - 1].name}</Typography>
-                                        </Box>
-
-                                        <Box // Body
-                                            display="flex"
-                                            flexWrap="wrap"
-                                        >
-                                            {emojiPackages[emojiPickerTab - 1].emojis.map((emoji) => (
-                                                <IconButton
-                                                    key={emoji.imageURL}
-                                                    onClick={() => {
-                                                        onSelectEmoji(emoji)
-                                                    }}
-                                                >
-                                                    <img
-                                                        src={emoji.imageURL}
-                                                        alt={emoji.shortcode}
-                                                        height="30px"
-                                                        width="30px"
-                                                    />
-                                                </IconButton>
-                                            ))}
-                                        </Box>
-                                    </>
-                                )}
-                            </>
-                        )}
+                                    <img src={emoji.imageURL} alt={emoji.shortcode} height="30px" width="30px" />
+                                </IconButton>
+                            ))}
+                        </Box>
                     </Box>
                 </Popover>
             </>
