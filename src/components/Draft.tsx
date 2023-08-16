@@ -239,7 +239,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     {emojiSuggestions.map((emoji, index) => (
                         <ListItemButton
                             dense
-                            key={emoji.shortcode}
+                            key={emoji.imageURL}
                             selected={index === selectedSuggestions}
                             onClick={() => {
                                 onEmojiSuggestConfirm(index)
