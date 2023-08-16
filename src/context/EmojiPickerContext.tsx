@@ -25,6 +25,12 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
     const [anchor, setAnchor] = useState<HTMLElement | null>(null)
     const onSelectedRef = useRef<((selected: Emoji) => void) | null>(null)
     const repositionEmojiPicker = useRef<PopoverActions | null>(null)
+    const [frequentEmojis, setFrequentEmojis] = usePersistent<Emoji[]>('FrequentEmojis', [])
+    const [query, setQuery] = useState<string>('')
+    const [emojiPackages, setEmojiPackages] = useState<EmojiPackage[]>([])
+    const [emojiPickerTab, setEmojiPickerTab] = useState<number>(0)
+    const [searchResults, setSearchResults] = useState<Emoji[]>([])
+    const fuse = useRef<Fuse<Emoji> | null>(null)
 
     const open = useMemo(
         () => (anchor: HTMLElement, onSelected: (selected: Emoji) => void) => {
@@ -42,12 +48,21 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
         []
     )
 
-    const [frequentEmojis, setFrequentEmojis] = usePersistent<Emoji[]>('FrequentEmojis', [])
-    const [query, setQuery] = useState<string>('')
-    const [emojiPackages, setEmojiPackages] = useState<EmojiPackage[]>([])
-    const [emojiPickerTab, setEmojiPickerTab] = useState<number>(0)
-    const fuse = useRef<Fuse<Emoji> | null>(null)
-    const [searchResults, setSearchResults] = useState<Emoji[]>([])
+    const search = useCallback((input: string) => {
+        return fuse.current?.search(input).map((e) => e.item) ?? []
+    }, [])
+
+    const onSelectEmoji = useCallback(
+        (emoji: Emoji) => {
+            const newFrequentEmojis = frequentEmojis.filter(
+                (frequentEmoji) => frequentEmoji.shortcode !== emoji.shortcode
+            )
+            newFrequentEmojis.unshift(emoji)
+            setFrequentEmojis(newFrequentEmojis.slice(0, 32))
+            onSelectedRef.current?.(emoji)
+        },
+        [frequentEmojis]
+    )
 
     useEffect(() => {
         Promise.all(pref.emojiPackages.map((url) => fetch(url).then((j) => j.json()))).then((packages) => {
@@ -69,22 +84,6 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
             setSearchResults([])
         }
     }, [query])
-
-    const search = useCallback((input: string) => {
-        return fuse.current?.search(input).map((e) => e.item) ?? []
-    }, [])
-
-    const onSelectEmoji = useCallback(
-        (emoji: Emoji) => {
-            const newFrequentEmojis = frequentEmojis.filter(
-                (frequentEmoji) => frequentEmoji.shortcode !== emoji.shortcode
-            )
-            newFrequentEmojis.unshift(emoji)
-            setFrequentEmojis(newFrequentEmojis.slice(0, 6))
-            onSelectedRef.current?.(emoji)
-        },
-        [frequentEmojis]
-    )
 
     return (
         <EmojiPickerContext.Provider
@@ -153,6 +152,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                 flexGrow: 1,
                                 m: 1
                             }}
+                            autoFocus
                         />
                     </Box>
                     <Box // body
@@ -175,14 +175,11 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                     flexWrap="wrap"
                                 >
                                     {searchResults.map((emoji) => (
-                                        <Box
+                                        <IconButton
                                             key={emoji.imageURL}
-                                            display="flex"
-                                            flexDirection="column"
-                                            alignItems="center"
-                                            justifyContent="center"
-                                            width="50px"
-                                            height="50px"
+                                            onClick={() => {
+                                                onSelectEmoji(emoji)
+                                            }}
                                         >
                                             <img
                                                 src={emoji.imageURL}
@@ -190,7 +187,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                                 height="30px"
                                                 width="30px"
                                             />
-                                        </Box>
+                                        </IconButton>
                                     ))}
                                 </Box>
                             </>
@@ -198,68 +195,31 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                             <>
                                 {emojiPickerTab === 0 && (
                                     <>
-                                        {emojiPackages.map((emojiPackage) => (
-                                            <Box key={emojiPackage.name} display="flex" flexDirection="column">
-                                                {frequentEmojis.length > 0 && (
-                                                    <>
-                                                        <Box // Header
-                                                            display="flex"
-                                                        >
-                                                            <Typography>Frequently Used</Typography>
-                                                        </Box>
-                                                        <Box // Body
-                                                            display="flex"
-                                                            flexWrap="wrap"
-                                                        >
-                                                            {frequentEmojis.map((emoji) => (
-                                                                <Box
-                                                                    key={emoji.imageURL}
-                                                                    display="flex"
-                                                                    flexDirection="column"
-                                                                    alignItems="center"
-                                                                    justifyContent="center"
-                                                                    width="50px"
-                                                                    height="50px"
-                                                                >
-                                                                    <img
-                                                                        src={emoji.imageURL}
-                                                                        alt={emoji.shortcode}
-                                                                        height="30px"
-                                                                        width="30px"
-                                                                    />
-                                                                </Box>
-                                                            ))}
-                                                        </Box>
-                                                    </>
-                                                )}
-
-                                                <Box // Header
-                                                    display="flex"
+                                        <Box // Header
+                                            display="flex"
+                                        >
+                                            <Typography>Frequently Used</Typography>
+                                        </Box>
+                                        <Box // Body
+                                            display="flex"
+                                            flexWrap="wrap"
+                                        >
+                                            {frequentEmojis.map((emoji) => (
+                                                <IconButton
+                                                    key={emoji.imageURL}
+                                                    onClick={() => {
+                                                        onSelectEmoji(emoji)
+                                                    }}
                                                 >
-                                                    <Typography>{emojiPackage.name}</Typography>
-                                                </Box>
-                                                <Box // Body
-                                                    display="flex"
-                                                    flexWrap="wrap"
-                                                >
-                                                    {emojiPackage.emojis.map((emoji) => (
-                                                        <IconButton
-                                                            key={emoji.imageURL}
-                                                            onClick={() => {
-                                                                onSelectEmoji(emoji)
-                                                            }}
-                                                        >
-                                                            <img
-                                                                src={emoji.imageURL}
-                                                                alt={emoji.shortcode}
-                                                                height="30px"
-                                                                width="30px"
-                                                            />
-                                                        </IconButton>
-                                                    ))}
-                                                </Box>
-                                            </Box>
-                                        ))}
+                                                    <img
+                                                        src={emoji.imageURL}
+                                                        alt={emoji.shortcode}
+                                                        height="30px"
+                                                        width="30px"
+                                                    />
+                                                </IconButton>
+                                            ))}
+                                        </Box>
                                     </>
                                 )}
                                 {emojiPickerTab !== 0 && (
