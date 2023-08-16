@@ -235,14 +235,11 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                             flexWrap="wrap"
                                         >
                                             {emojiPackages[emojiPickerTab - 1].emojis.map((emoji) => (
-                                                <Box
+                                                <IconButton
                                                     key={emoji.imageURL}
-                                                    display="flex"
-                                                    flexDirection="column"
-                                                    alignItems="center"
-                                                    justifyContent="center"
-                                                    width="50px"
-                                                    height="50px"
+                                                    onClick={() => {
+                                                        onSelectEmoji(emoji)
+                                                    }}
                                                 >
                                                     <img
                                                         src={emoji.imageURL}
@@ -250,7 +247,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                                         height="30px"
                                                         width="30px"
                                                     />
-                                                </Box>
+                                                </IconButton>
                                             ))}
                                         </Box>
                                     </>
