@@ -28,13 +28,17 @@ export interface Emoji {
     soundURL?: string
 }
 
-export interface EmojiPackage {
+export interface RawEmojiPackage {
     name: string
     version: string
     description: string
     credits: string
     iconURL: string
     emojis: Emoji[]
+}
+
+export interface EmojiPackage extends RawEmojiPackage {
+    packageURL: string
 }
 
 export interface ImgurSettings {

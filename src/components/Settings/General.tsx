@@ -9,6 +9,7 @@ import { ThemeSelect } from './ThemeSelect'
 import { ImgurSettings } from './Imgur'
 import { IssueJWT } from '@concurrent-world/client'
 import { ApplicationContext } from '../../App'
+import { ManageEmojiPackages } from './ManageEmojiPackages'
 
 export const GeneralSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
     const appData = useContext(ApplicationContext)
@@ -18,8 +19,6 @@ export const GeneralSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Elem
     const [invitationCode, setInvitationCode] = useState<string>('')
 
     const tags = client?.api?.getTokenClaims()?.tag?.split(',') ?? []
-
-    const [emojiPackages, setEmojiPackages] = useState<string>(pref.emojiPackages.join(','))
 
     const deleteAllCache = (): void => {
         if (window.caches) {
@@ -130,18 +129,7 @@ export const GeneralSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Elem
                 </Box>
 
                 <Box display="flex" flexDirection="column" gap={1}>
-                    <Typography variant="h3">絵文字パッケージ</Typography>
-                    <TextField
-                        label="絵文字パッケージ"
-                        placeholder="https://example.com/emoji.zip"
-                        value={emojiPackages}
-                        onChange={(e) => {
-                            setEmojiPackages(e.target.value)
-                        }}
-                        onBlur={() => {
-                            pref.setEmojiPackages(emojiPackages.split(','))
-                        }}
-                    />
+                    <ManageEmojiPackages />
                 </Box>
 
                 <ThemeSelect />

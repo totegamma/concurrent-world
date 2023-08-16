@@ -75,6 +75,7 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
                 setShowEditorOnTop(parsed.showEditorOnTop ?? true)
                 setShowEditorOnTopMobile(parsed.showEditorOnTopMobile ?? false)
                 setLists(parsed.lists ?? {})
+                setEmojiPackages(parsed.emojiPackages ?? [])
             })
             .catch((e) => {
                 setInitialized(true)
@@ -102,7 +103,8 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
             devMode,
             showEditorOnTop,
             showEditorOnTopMobile,
-            lists
+            lists,
+            emojiPackages
         })
         client.api.writeKV('world.concurrent.preference', storage)
     }, [
@@ -113,7 +115,8 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
         devMode,
         showEditorOnTop,
         showEditorOnTopMobile,
-        lists
+        lists,
+        emojiPackages
     ])
 
     const value = useMemo(() => {
