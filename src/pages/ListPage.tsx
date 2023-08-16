@@ -147,9 +147,9 @@ export function ListPage(props: ListPageProps): JSX.Element {
                             <Draft
                                 streamPickerOptions={streams}
                                 streamPickerInitial={postStreams}
-                                onSubmit={(text: string, destinations: string[]): Promise<Error | null> => {
+                                onSubmit={(text: string, destinations: string[], emojis): Promise<Error | null> => {
                                     client
-                                        .createCurrent(text, destinations)
+                                        .createCurrent(text, destinations, emojis)
                                         .then(() => {
                                             return null
                                         })

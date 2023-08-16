@@ -10,7 +10,7 @@ import { useObjectList } from './hooks/useObjectList'
 import { Client, Schemas, type CoreServerEvent } from '@concurrent-world/client'
 import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu/Menu'
-import type { StreamElementDated, Emoji, ConcurrentTheme, StreamList } from './model'
+import type { StreamElementDated, ConcurrentTheme, StreamList } from './model'
 import {
     Associations,
     Explorer,
@@ -38,7 +38,6 @@ const branchName = branch || window.location.host.split('.')[0]
 const versionString = `${location.hostname}-${branchName as string}-${sha.slice(0, 7) as string}`
 
 export const ApplicationContext = createContext<appData>({
-    emojiDict: {},
     websocketState: -1,
     displayingStream: [],
     setThemeName: (_newtheme: string) => {},
@@ -51,7 +50,6 @@ export const ApplicationContext = createContext<appData>({
 })
 
 export interface appData {
-    emojiDict: Record<string, Emoji>
     websocketState: ReadyState
     displayingStream: string[]
     setThemeName: (newtheme: string) => void
@@ -152,16 +150,6 @@ function App(): JSX.Element {
             clearInterval(timer)
         }
     }, [setClock])
-
-    const [emojiDict, setEmojiDict] = useState<Record<string, Emoji>>({})
-    useEffect(() => {
-        fetch('https://gist.githubusercontent.com/totegamma/0beb41acad70aa4945ad38a6b00a3a1d/raw/emojis.json') // FIXME temporaly hardcoded
-            .then((j) => j.json())
-            .then((data) => {
-                const dict = Object.fromEntries(data.emojis.map((e: any) => [e.emoji.name, e.emoji]))
-                setEmojiDict(dict)
-            })
-    }, [])
 
     useEffect(() => {
         sendJsonMessage({
@@ -304,7 +292,6 @@ function App(): JSX.Element {
 
     const applicationContext = useMemo(() => {
         return {
-            emojiDict,
             websocketState: readyState,
             displayingStream,
             setThemeName,
@@ -316,7 +303,6 @@ function App(): JSX.Element {
             setVolume
         }
     }, [
-        emojiDict,
         readyState,
         displayingStream,
         setThemeName,

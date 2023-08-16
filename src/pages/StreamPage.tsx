@@ -114,9 +114,9 @@ export const StreamPage = memo<StreamPageProps>((props: StreamPageProps): JSX.El
                                 <Draft
                                     streamPickerInitial={streams}
                                     streamPickerOptions={streams}
-                                    onSubmit={(text: string, destinations: string[]): Promise<Error | null> => {
+                                    onSubmit={(text: string, destinations: string[], emojis): Promise<Error | null> => {
                                         client
-                                            .createCurrent(text, destinations)
+                                            .createCurrent(text, destinations, emojis)
                                             .then(() => {
                                                 return null
                                             })

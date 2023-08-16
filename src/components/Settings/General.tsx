@@ -19,6 +19,8 @@ export const GeneralSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Elem
 
     const tags = client?.api?.getTokenClaims()?.tag?.split(',') ?? []
 
+    const [emojiPackages, setEmojiPackages] = useState<string>(pref.emojiPackages.join(','))
+
     const deleteAllCache = (): void => {
         if (window.caches) {
             caches.keys().then((names) => {
@@ -123,6 +125,21 @@ export const GeneralSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Elem
                         value={appData.notificationSound}
                         onChange={(e) => {
                             appData.setNotificationSound(e.target.value)
+                        }}
+                    />
+                </Box>
+
+                <Box display="flex" flexDirection="column" gap={1}>
+                    <Typography variant="h3">絵文字パッケージ</Typography>
+                    <TextField
+                        label="絵文字パッケージ"
+                        placeholder="https://example.com/emoji.zip"
+                        value={emojiPackages}
+                        onChange={(e) => {
+                            setEmojiPackages(e.target.value)
+                        }}
+                        onBlur={() => {
+                            pref.setEmojiPackages(emojiPackages.split(','))
                         }}
                     />
                 </Box>

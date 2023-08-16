@@ -22,6 +22,9 @@ interface PreferenceState {
     lists: Record<string, StreamList>
     setLists: (_: Record<string, StreamList>) => void
     updateList: (id: string, newList: StreamList) => void
+
+    emojiPackages: string[]
+    setEmojiPackages: (_: string[]) => void
 }
 
 const PreferenceContext = createContext<PreferenceState | undefined>(undefined)
@@ -52,6 +55,8 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
             defaultPostStreams: []
         }
     })
+
+    const [emojiPackages, setEmojiPackages] = usePersistent<string[]>('emojiPackages', [])
 
     useEffect(() => {
         if (!client) return
@@ -129,7 +134,9 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
             setShowEditorOnTopMobile,
             lists,
             setLists,
-            updateList
+            updateList,
+            emojiPackages,
+            setEmojiPackages
         }
     }, [
         themeName,
@@ -148,7 +155,9 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
         setShowEditorOnTopMobile,
         lists,
         setLists,
-        updateList
+        updateList,
+        emojiPackages,
+        setEmojiPackages
     ])
 
     return <PreferenceContext.Provider value={value}>{props.children}</PreferenceContext.Provider>

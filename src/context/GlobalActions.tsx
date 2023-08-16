@@ -61,7 +61,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
 
     useEffect(() => {
         client.api.readDomain(client.api.host).then((domain) => {
-            console.log(domain)
             if (domain === null) {
                 setDomainIsOffline(true)
             }
@@ -161,9 +160,9 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                     autoFocus
                                     streamPickerInitial={queriedStreams}
                                     streamPickerOptions={allKnownStreams}
-                                    onSubmit={async (text: string, destinations: string[]) => {
+                                    onSubmit={async (text: string, destinations: string[], emojis) => {
                                         client
-                                            .createCurrent(text, destinations)
+                                            .createCurrent(text, destinations, emojis)
                                             .then(() => {
                                                 return null
                                             })
@@ -190,20 +189,22 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                     submitButtonLabel={mode === 'reply' ? 'Reply' : 'Reroute'}
                                     streamPickerInitial={targetMessage.streams}
                                     streamPickerOptions={mode === 'reroute' ? allKnownStreams : targetMessage.streams}
-                                    onSubmit={async (text, streams): Promise<Error | null> => {
+                                    onSubmit={async (text, streams, emojis): Promise<Error | null> => {
                                         if (mode === 'reroute')
                                             await client.reroute(
                                                 targetMessage.id,
                                                 targetMessage.author.ccid,
                                                 streams,
-                                                text
+                                                text,
+                                                emojis
                                             )
                                         else
                                             await client.reply(
                                                 targetMessage.id,
                                                 targetMessage.author.ccid,
                                                 streams,
-                                                text
+                                                text,
+                                                emojis
                                             )
                                         setMode('none')
                                         return null

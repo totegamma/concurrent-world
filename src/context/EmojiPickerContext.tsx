@@ -1,8 +1,9 @@
 import Picker from '@emoji-mart/react'
 import { init, SearchIndex } from 'emoji-mart'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { ApplicationContext } from '../App'
 import { Popover, type PopoverActions } from '@mui/material'
+import { usePreference } from './PreferenceContext'
+import { type EmojiPackage } from '../model'
 
 export interface EmojiPickerState {
     open: (anchor: HTMLElement, onSelected: (selected: EmojiProps) => void) => void
@@ -47,7 +48,7 @@ export interface CustomEmoji {
 }
 
 export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
-    const appData = useContext(ApplicationContext)
+    const pref = usePreference()
 
     const [anchor, setAnchor] = useState<HTMLElement | null>(null)
     const onSelectedRef = useRef<((selected: EmojiProps) => void) | null>(null)
@@ -69,25 +70,40 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
         []
     )
 
-    const emojis: CustomEmoji[] = useMemo(() => {
-        if (!appData.emojiDict) return []
-        const data = [
-            {
-                id: 'fluffy',
-                name: 'Fluffy Social',
-                emojis: Object.entries(appData.emojiDict).map(([key, value]) => ({
-                    id: key,
-                    name: value.name,
-                    keywords: value.aliases,
-                    skins: [{ src: value.publicUrl }]
-                }))
-            }
-        ]
-        init({
-            custom: data
+    const [emojiData, setEmojiData] = useState<CustomEmoji[]>([])
+    const [emojiCategories, setEmojiCategories] = useState<string[]>([])
+    const [categoryIcons, setCategoryIcons] = useState<any>([])
+
+    useEffect(() => {
+        Promise.all(
+            pref.emojiPackages.map(async (url) => {
+                const j = await fetch(url)
+                const data: EmojiPackage = await j.json()
+                return {
+                    id: url,
+                    icon: data.iconURL,
+                    name: data.name,
+                    emojis: data.emojis.map((emoji) => ({
+                        id: emoji.imageURL,
+                        name: emoji.shortcode,
+                        keywords: emoji.aliases,
+                        skins: [{ src: emoji.animURL || emoji.imageURL || '' }]
+                    }))
+                }
+            })
+        ).then((custom) => {
+            const categories = ['frequent', ...custom.map((c) => c.id)]
+            const categoryIcons = Object.fromEntries(custom.map((c) => [c.id, { src: c.icon }]))
+            init({
+                custom,
+                categories,
+                categoryIcons
+            })
+            setEmojiData(custom)
+            setEmojiCategories(categories)
+            setCategoryIcons(categoryIcons)
         })
-        return data
-    }, [appData.emojiDict])
+    }, [pref.emojiPackages])
 
     const search = useCallback((input: string) => {
         console.log('search!', input)
@@ -133,8 +149,9 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                     action={repositionEmojiPicker}
                 >
                     <Picker
-                        categories={['frequent', 'fluffy']}
-                        custom={emojis}
+                        custom={emojiData}
+                        categories={emojiCategories}
+                        categoryIcons={categoryIcons}
                         autoFocus={true}
                         onEmojiSelect={(emoji: EmojiProps) => {
                             onSelectedRef.current?.(emoji)

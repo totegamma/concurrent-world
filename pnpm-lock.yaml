@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@concurrent-world/client':
-    specifier: ^2.0.5
-    version: 2.0.5
+    specifier: ^2.0.7
+    version: 2.0.7
   '@emoji-mart/react':
     specifier: ^1.1.1
     version: 1.1.1(emoji-mart@5.5.2)(react@18.2.0)
@@ -1644,8 +1644,8 @@ packages:
     dev: true
     optional: true
 
-  /@concurrent-world/client@2.0.5:
-    resolution: {integrity: sha512-q8sTZMRVhLfiNCF5RuFC9gIQZ0YRK/WZwrq0hCzorSeNRoEQLpBM7MkUsyzow7LB20vuwfU79qn7SxeX4isW/A==}
+  /@concurrent-world/client@2.0.7:
+    resolution: {integrity: sha512-woEYgGM0LPtZEm7XHKmgTEf3BO5c9bfxlujLf5yl0G9Ek4ZU5BP80K7ISYrTgGaVUStIaXDV/4cGPkq+p4VvJw==}
     dependencies:
       elliptic: 6.5.4
       ethers: 6.7.0
