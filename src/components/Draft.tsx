@@ -26,16 +26,17 @@ import ImageIcon from '@mui/icons-material/Image'
 import DeleteIcon from '@mui/icons-material/Delete'
 import Splitscreen from '@mui/icons-material/Splitscreen'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
-import { type Emoji, useEmojiPicker } from '../context/EmojiPickerContext'
+import { useEmojiPicker } from '../context/EmojiPickerContext'
 import caretPosition from 'textarea-caret'
 import { type Stream } from '@concurrent-world/client'
 import { useApi } from '../context/api'
+import { type Emoji, type EmojiLite } from '../model'
 
 export interface DraftProps {
     submitButtonLabel?: string
     streamPickerInitial: Stream[]
     streamPickerOptions: Stream[]
-    onSubmit: (text: string, destinations: string[]) => Promise<Error | null>
+    onSubmit: (text: string, destinations: string[], emojis?: Record<string, EmojiLite>) => Promise<Error | null>
     allowEmpty?: boolean
     autoFocus?: boolean
 }
@@ -72,6 +73,16 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         setDestStreams(props.streamPickerInitial)
     }, [props.streamPickerInitial])
 
+    const [emojiDict, setEmojiDict] = useState<Record<string, EmojiLite>>({})
+
+    const insertEmoji = (emoji: Emoji): void => {
+        const newDraft = draft.slice(0, caretPos.left) + `:${emoji.shortcode}:` + draft.slice(caretPos.left)
+        setDraft(newDraft)
+        setEnableSuggestions(false)
+        setSelectedSuggestions(0)
+        setEmojiDict((prev) => ({ ...prev, [emoji.shortcode]: { imageURL: emoji.imageURL } }))
+    }
+
     const post = (): void => {
         if (!props.allowEmpty && (draft.length === 0 || draft.trim().length === 0)) {
             enqueueSnackbar('Message must not be empty!', { variant: 'error' })
@@ -83,12 +94,13 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         ].filter((e) => e) as string[]
         setSending(true)
         props
-            .onSubmit(draft, dest)
+            .onSubmit(draft, dest, emojiDict)
             .then((error) => {
                 if (error) {
                     enqueueSnackbar(`Failed to post message: ${error.message}`, { variant: 'error' })
                 } else {
                     setDraft('')
+                    setEmojiDict({})
                 }
             })
             .finally(() => {
@@ -178,13 +190,17 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         if (colonPos === -1) return
         const after = draft.slice(textInputRef.current?.selectionEnd ?? 0) ?? ''
 
-        const emoji = emojiSuggestions[index].skins[0].native
-            ? emojiSuggestions[index].skins[0].native ?? ''
-            : ':' + emojiSuggestions[index].name + ':'
+        const selected = emojiSuggestions[index]
 
-        setDraft(before.slice(0, colonPos) + emoji + after)
+        setDraft(before.slice(0, colonPos) + `:${selected.shortcode}:` + after)
         setSelectedSuggestions(0)
         setEnableSuggestions(false)
+
+        setEmojiDict((prev) => ({
+            ...prev,
+            [selected.shortcode]: { imageURL: selected.imageURL }
+        }))
+
         if (timerRef.current) {
             clearTimeout(timerRef.current)
             timerRef.current = null
@@ -216,24 +232,16 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     {emojiSuggestions.map((emoji, index) => (
                         <ListItemButton
                             dense
-                            key={emoji.name}
+                            key={emoji.imageURL}
                             selected={index === selectedSuggestions}
                             onClick={() => {
                                 onEmojiSuggestConfirm(index)
                             }}
                         >
                             <ListItemIcon>
-                                {emoji.skins[0]?.native ? (
-                                    <Box>{emoji.skins[0]?.native}</Box>
-                                ) : (
-                                    <Box
-                                        component="img"
-                                        src={emoji.skins[0]?.src}
-                                        sx={{ width: '1em', height: '1em' }}
-                                    />
-                                )}
+                                <Box component="img" src={emoji.imageURL} sx={{ width: '1em', height: '1em' }} />
                             </ListItemIcon>
-                            <ListItemText>{emoji.name}</ListItemText>
+                            <ListItemText>{emoji.shortcode}</ListItemText>
                         </ListItemButton>
                     ))}
                 </List>
@@ -280,8 +288,18 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     onChange={(e) => {
                         setDraft(e.target.value)
 
-                        if (!enableSuggestions) return
+                        const before = e.target.value.slice(0, e.target.selectionEnd ?? 0) ?? ''
+                        const query = /:(\w+)$/.exec(before)?.[1]
 
+                        if (!query) {
+                            setEnableSuggestions(false)
+                            return
+                        }
+
+                        setEmojiSuggestions(emojiPicker.search(query))
+                        setEnableSuggestions(true)
+
+                        // move suggestion box
                         const pos = caretPosition(e.target, e.target.selectionEnd ?? 0, {})
                         const parent = textInputRef.current?.getBoundingClientRect()
                         const offset = 10
@@ -289,18 +307,6 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             setCaretPos({
                                 top: parent.top + pos.top + offset,
                                 left: parent.left + pos.left + offset
-                            })
-                            console.log(pos)
-                        }
-                        let query: string | undefined = draft
-                        if (e.target.selectionEnd) {
-                            query = draft.slice(0, e.target.selectionEnd)
-                        }
-                        query = query.split(':').at(-1)
-                        if (query) {
-                            emojiPicker.search(query).then((result) => {
-                                console.log(result)
-                                setEmojiSuggestions(result ?? [])
                             })
                         }
                     }}
@@ -312,10 +318,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         fontSize: '0.95rem'
                     }}
                     onKeyDown={(e: any) => {
-                        if (e.key === ':') {
-                            setEnableSuggestions(!enableSuggestions)
-                        }
-                        if (enableSuggestions) {
+                        if (enableSuggestions && emojiSuggestions.length > 0) {
                             if (e.key === 'Enter') {
                                 e.preventDefault()
                                 onEmojiSuggestConfirm(selectedSuggestions)
@@ -332,6 +335,10 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                 e.preventDefault()
                                 setSelectedSuggestions((selectedSuggestions + 1) % emojiSuggestions.length)
                                 return
+                            }
+                            if (e.key === ':') {
+                                e.preventDefault()
+                                onEmojiSuggestConfirm(0)
                             }
                         }
                         if (draft.length === 0 || draft.trim().length === 0) return
@@ -360,7 +367,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                 overflowY: 'scroll'
                             }}
                         >
-                            <MarkdownRenderer messagebody={draft} />
+                            <MarkdownRenderer messagebody={draft} emojiDict={emojiDict} />
                         </Box>
                     </>
                 )}
@@ -419,7 +426,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             }}
                             onClick={(e) => {
                                 emojiPicker.open(e.currentTarget, (emoji) => {
-                                    setDraft(draft + emoji.shortcodes)
+                                    insertEmoji(emoji)
                                     emojiPicker.close()
                                 })
                             }}
@@ -449,6 +456,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                         )
                                     })
                                     setDraft('')
+                                    setEmojiDict({})
                                 }}
                                 disabled={draft.length === 0}
                             >

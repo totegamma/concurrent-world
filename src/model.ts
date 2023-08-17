@@ -15,10 +15,30 @@ export interface StreamElementDated extends CoreStreamElement {
     LastUpdated: number
 }
 
+export interface EmojiLite {
+    imageURL?: string
+    animURL?: string
+}
+
 export interface Emoji {
-    publicUrl: string
-    name: string
+    shortcode: string
     aliases: string[]
+    imageURL: string
+    animURL?: string
+    soundURL?: string
+}
+
+export interface RawEmojiPackage {
+    name: string
+    version: string
+    description: string
+    credits: string
+    iconURL: string
+    emojis: Emoji[]
+}
+
+export interface EmojiPackage extends RawEmojiPackage {
+    packageURL: string
 }
 
 export interface ImgurSettings {

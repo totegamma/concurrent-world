@@ -9,8 +9,9 @@ import { useApi } from '../../context/api'
 import { InspectorProvider } from '../../context/Inspector'
 import { Loading } from '../ui/Loading'
 import { MessageContainer } from '../Message/MessageContainer'
-import { ErrorBoundary } from 'react-error-boundary'
+import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import HeartBrokenIcon from '@mui/icons-material/HeartBroken'
+import { FallbackFragment } from 'ethers'
 
 export interface TimelineProps {
     streams: string[]
@@ -140,18 +141,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
 
                         return (
                             <React.Fragment key={e.id}>
-                                <ErrorBoundary
-                                    fallback={
-                                        <ListItem>
-                                            <ListItemIcon>
-                                                <HeartBrokenIcon />
-                                            </ListItemIcon>
-                                            <ListItemText>この要素の描画中に問題が発生しました</ListItemText>
-                                        </ListItem>
-                                    }
-                                >
-                                    {element}
-                                </ErrorBoundary>
+                                <ErrorBoundary FallbackComponent={renderError}>{element}</ErrorBoundary>
                             </React.Fragment>
                         )
                     })}
@@ -160,5 +150,16 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
         </InspectorProvider>
     )
 })
+
+const renderError = ({ error }: FallbackProps): JSX.Element => {
+    return (
+        <ListItem>
+            <ListItemIcon>
+                <HeartBrokenIcon />
+            </ListItemIcon>
+            <ListItemText primary="この要素の描画中に問題が発生しました" secondary={error?.message} />
+        </ListItem>
+    )
+}
 
 Timeline.displayName = 'Timeline'

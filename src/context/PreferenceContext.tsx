@@ -22,6 +22,9 @@ interface PreferenceState {
     lists: Record<string, StreamList>
     setLists: (_: Record<string, StreamList>) => void
     updateList: (id: string, newList: StreamList) => void
+
+    emojiPackages: string[]
+    setEmojiPackages: (_: string[]) => void
 }
 
 const PreferenceContext = createContext<PreferenceState | undefined>(undefined)
@@ -52,6 +55,9 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
             defaultPostStreams: []
         }
     })
+    const [emojiPackages, setEmojiPackages] = usePersistent<string[]>('emojiPackages', [
+        'https://gist.githubusercontent.com/totegamma/6e1a047f54960f6bb7b946064664d793/raw/twemoji.json'
+    ]) // default twemoji
 
     useEffect(() => {
         if (!client) return
@@ -62,14 +68,15 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
                 setInitialized(true)
                 if (!storage) return
                 const parsed = JSON.parse(storage)
-                setThemeName(parsed.themeName ?? 'basic')
-                setImgurClientID(parsed.imgurClientID ?? '')
-                setDefaultPostHome(parsed.defaultPostHome ?? [])
-                setDefaultPostNonHome(parsed.defaultPostNonHome ?? [])
-                setDevMode(parsed.devMode ?? false)
-                setShowEditorOnTop(parsed.showEditorOnTop ?? true)
-                setShowEditorOnTopMobile(parsed.showEditorOnTopMobile ?? false)
-                setLists(parsed.lists ?? {})
+                parsed.themeName && setThemeName(parsed.themeName)
+                parsed.imgurClientID && setImgurClientID(parsed.imgurClientID)
+                parsed.defaultPostHome && setDefaultPostHome(parsed.defaultPostHome)
+                parsed.defaultPostNonHome && setDefaultPostNonHome(parsed.defaultPostNonHome)
+                parsed.devMode && setDevMode(parsed.devMode)
+                parsed.showEditorOnTop && setShowEditorOnTop(parsed.showEditorOnTop)
+                parsed.showEditorOnTopMobile && setShowEditorOnTopMobile(parsed.showEditorOnTopMobile)
+                parsed.lists && setLists(parsed.lists)
+                parsed.emojiPackages && setEmojiPackages(parsed.emojiPackages)
             })
             .catch((e) => {
                 setInitialized(true)
@@ -97,7 +104,8 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
             devMode,
             showEditorOnTop,
             showEditorOnTopMobile,
-            lists
+            lists,
+            emojiPackages
         })
         client.api.writeKV('world.concurrent.preference', storage)
     }, [
@@ -108,7 +116,8 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
         devMode,
         showEditorOnTop,
         showEditorOnTopMobile,
-        lists
+        lists,
+        emojiPackages
     ])
 
     const value = useMemo(() => {
@@ -129,7 +138,9 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
             setShowEditorOnTopMobile,
             lists,
             setLists,
-            updateList
+            updateList,
+            emojiPackages,
+            setEmojiPackages
         }
     }, [
         themeName,
@@ -148,7 +159,9 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
         setShowEditorOnTopMobile,
         lists,
         setLists,
-        updateList
+        updateList,
+        emojiPackages,
+        setEmojiPackages
     ])
 
     return <PreferenceContext.Provider value={value}>{props.children}</PreferenceContext.Provider>

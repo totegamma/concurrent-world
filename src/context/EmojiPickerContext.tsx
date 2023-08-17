@@ -1,13 +1,18 @@
-import Picker from '@emoji-mart/react'
-import { init, SearchIndex } from 'emoji-mart'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { ApplicationContext } from '../App'
-import { Popover, type PopoverActions } from '@mui/material'
+import { Popover, TextField, Box, Tabs, Tab, Typography, Divider, IconButton, alpha, useTheme } from '@mui/material'
+import { usePreference } from './PreferenceContext'
+import { type EmojiPackage, type Emoji } from '../model'
+import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled'
+import SearchIcon from '@mui/icons-material/Search'
+import { usePersistent } from '../hooks/usePersistent'
+import { Grid } from 'react-virtualized'
+
+import Fuzzysort from 'fuzzysort'
 
 export interface EmojiPickerState {
-    open: (anchor: HTMLElement, onSelected: (selected: EmojiProps) => void) => void
+    open: (anchor: HTMLElement, onSelected: (selected: Emoji) => void) => void
     close: () => void
-    search: (input: string) => Promise<Emoji[]>
+    search: (input: string) => Emoji[]
 }
 
 const EmojiPickerContext = createContext<EmojiPickerState | undefined>(undefined)
@@ -16,93 +21,113 @@ interface EmojiPickerProps {
     children: JSX.Element | JSX.Element[]
 }
 
-// emoji returned from onEmojiSelect
-export interface EmojiProps {
-    id: string
-    keywords: string[]
-    name: string
-    native: string
-    shortcodes: string
-    src: string
-    unified?: string
-}
-
-export interface Skin {
-    src: string
-    native?: string
-}
-
-export interface Emoji {
-    id: string
-    name: string
-    keywords: string[]
-    skins: Skin[]
-}
-
-export interface CustomEmoji {
-    id?: string
-    name?: string
-    emojis?: Emoji[]
-    keywords?: string[] | undefined
-}
-
 export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
-    const appData = useContext(ApplicationContext)
+    const pref = usePreference()
+    const theme = useTheme()
+
+    const RowEmojiCount = 6
 
     const [anchor, setAnchor] = useState<HTMLElement | null>(null)
-    const onSelectedRef = useRef<((selected: EmojiProps) => void) | null>(null)
-    const repositionEmojiPicker = useRef<PopoverActions | null>(null)
+    const onSelectedRef = useRef<((selected: Emoji) => void) | null>(null)
+    const [frequentEmojis, setFrequentEmojis] = usePersistent<Emoji[]>('FrequentEmojis', [])
+    const [query, setQuery] = useState<string>('')
+    const [emojiPackages, setEmojiPackages] = useState<EmojiPackage[]>([])
+    const [allemojis, setAllEmojis] = useState<Emoji[]>([])
+    const [emojiPickerTab, setEmojiPickerTab] = useState<number>(0)
+    const [searchResults, setSearchResults] = useState<Emoji[]>([])
+    const [selected, setSelected] = useState<number>(0)
+    const [searchBoxFocused, setSearchBoxFocused] = useState<boolean>(false)
 
-    const open = useMemo(
-        () => (anchor: HTMLElement, onSelected: (selected: EmojiProps) => void) => {
-            setAnchor(anchor)
-            onSelectedRef.current = onSelected
-        },
-        []
-    )
-
-    const close = useMemo(
-        () => () => {
-            setAnchor(null)
-            onSelectedRef.current = null
-        },
-        []
-    )
-
-    const emojis: CustomEmoji[] = useMemo(() => {
-        if (!appData.emojiDict) return []
-        const data = [
-            {
-                id: 'fluffy',
-                name: 'Fluffy Social',
-                emojis: Object.entries(appData.emojiDict).map(([key, value]) => ({
-                    id: key,
-                    name: value.name,
-                    keywords: value.aliases,
-                    skins: [{ src: value.publicUrl }]
-                }))
+    const title: string = useMemo(() => {
+        if (query.length > 0) {
+            return 'Search Result'
+        } else {
+            if (emojiPickerTab === 0) {
+                return 'Frequently Used'
+            } else {
+                return emojiPackages[emojiPickerTab - 1]?.name ?? '設定から絵文字パッケージを追加しましょう'
             }
-        ]
-        init({
-            custom: data
-        })
-        return data
-    }, [appData.emojiDict])
+        }
+    }, [emojiPickerTab, emojiPackages, query])
 
-    const search = useCallback((input: string) => {
-        console.log('search!', input)
-        return SearchIndex.search(input, { maxResults: 6, caller: self })
+    const displayEmojis: Emoji[] = useMemo(() => {
+        if (query.length > 0) {
+            return searchResults
+        } else {
+            if (emojiPickerTab === 0) {
+                return frequentEmojis
+            } else {
+                return emojiPackages[emojiPickerTab - 1]?.emojis ?? []
+            }
+        }
+    }, [emojiPickerTab, emojiPackages, frequentEmojis, query, searchResults])
+
+    const open = useCallback((anchor: HTMLElement, onSelected: (selected: Emoji) => void) => {
+        setAnchor(anchor)
+        setEmojiPickerTab(frequentEmojis.length > 0 ? 0 : 1)
+        onSelectedRef.current = onSelected
     }, [])
 
+    const close = useCallback(() => {
+        setAnchor(null)
+        setQuery('')
+        onSelectedRef.current = null
+    }, [])
+
+    const search = useCallback(
+        (input: string, limit: number = 10) => {
+            const results = Fuzzysort.go(input, allemojis, {
+                limit,
+                threshold: -10000,
+                keys: ['shortcode', 'keywords']
+            }).map((result) => result.obj)
+
+            return results.filter(
+                (elem, index) => results.findIndex((e: Emoji) => e.imageURL === elem.imageURL) === index
+            )
+        },
+        [allemojis]
+    )
+
+    const onSelectEmoji = useCallback(
+        (emoji: Emoji) => {
+            const newFrequentEmojis = frequentEmojis.filter(
+                (frequentEmoji) => frequentEmoji.shortcode !== emoji.shortcode
+            )
+            newFrequentEmojis.unshift(emoji)
+            setFrequentEmojis(newFrequentEmojis.slice(0, 32))
+            onSelectedRef.current?.(emoji)
+        },
+        [frequentEmojis]
+    )
+
     useEffect(() => {
-        // XXX: this is a hack to make sure the emoji picker is repositioned after it is opened
-        const timer = setTimeout(() => {
-            repositionEmojiPicker.current?.updatePosition()
-        }, 0)
-        return () => {
-            clearTimeout(timer)
+        Promise.all(
+            pref.emojiPackages.map(async (url) => {
+                const rawpackage = await fetch(url).then((j) => j.json())
+                const packages: EmojiPackage = {
+                    ...rawpackage,
+                    packageURL: url
+                }
+                return packages
+            })
+        ).then((packages: EmojiPackage[]) => {
+            setEmojiPackages(packages)
+            setAllEmojis(packages.flatMap((p) => p.emojis))
+        })
+    }, [pref.emojiPackages])
+
+    useEffect(() => {
+        if (query.length > 0) {
+            setSearchResults(search(query, 100))
+        } else {
+            setSearchResults([])
         }
-    }, [repositionEmojiPicker.current, anchor])
+    }, [query])
+
+    const tabsx = {
+        minWidth: '10%'
+    }
 
     return (
         <EmojiPickerContext.Provider
@@ -130,16 +155,145 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                         vertical: 'top',
                         horizontal: 'center'
                     }}
-                    action={repositionEmojiPicker}
+                    PaperProps={{
+                        style: {
+                            width: '320px',
+                            height: '400px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            overflow: 'hidden'
+                        }
+                    }}
                 >
-                    <Picker
-                        categories={['frequent', 'fluffy']}
-                        custom={emojis}
-                        autoFocus={true}
-                        onEmojiSelect={(emoji: EmojiProps) => {
-                            onSelectedRef.current?.(emoji)
-                        }}
-                    />
+                    <Box // header
+                        display="flex"
+                        flexDirection="column"
+                    >
+                        <Tabs
+                            value={query.length === 0 ? emojiPickerTab : 0}
+                            onChange={(_, newValue) => {
+                                setQuery('')
+                                setEmojiPickerTab(newValue)
+                            }}
+                            variant="scrollable"
+                            scrollButtons="auto"
+                            textColor="secondary"
+                            indicatorColor="secondary"
+                        >
+                            {query.length === 0 ? (
+                                <Tab
+                                    key="frequent"
+                                    aria-label="Frequently Used"
+                                    icon={<AccessTimeFilledIcon />}
+                                    sx={tabsx}
+                                />
+                            ) : (
+                                <Tab key="search" aria-label="Search Result" icon={<SearchIcon />} sx={tabsx} />
+                            )}
+                            {emojiPackages.map((emojiPackage, index) => (
+                                <Tab
+                                    key={emojiPackage.packageURL}
+                                    aria-label={emojiPackage.name}
+                                    icon={<img src={emojiPackage.iconURL} alt={emojiPackage.name} height="20px" />}
+                                    sx={tabsx}
+                                />
+                            ))}
+                        </Tabs>
+                        <Divider />
+                        <TextField
+                            autoFocus
+                            placeholder="Search emoji"
+                            value={query}
+                            onChange={(e) => {
+                                setQuery(e.target.value)
+                            }}
+                            sx={{
+                                flexGrow: 1,
+                                m: 1
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    if (displayEmojis.length > 0) {
+                                        e.preventDefault()
+                                        setAnchor(null)
+                                        onSelectEmoji(displayEmojis[selected])
+                                    }
+                                }
+                                if (e.key === 'ArrowDown') {
+                                    e.preventDefault()
+                                    setSelected(Math.min(selected + RowEmojiCount, displayEmojis.length - 1))
+                                }
+                                if (e.key === 'ArrowUp') {
+                                    e.preventDefault()
+                                    setSelected(Math.max(selected - RowEmojiCount, 0))
+                                }
+                                if (e.key === 'ArrowLeft') {
+                                    e.preventDefault()
+                                    setSelected(Math.max(selected - 1, 0))
+                                }
+                                if (e.key === 'ArrowRight') {
+                                    e.preventDefault()
+                                    setSelected(Math.min(selected + 1, displayEmojis.length - 1))
+                                }
+                            }}
+                            onFocus={() => {
+                                setSelected(0)
+                                setSearchBoxFocused(true)
+                            }}
+                            onBlur={() => {
+                                setSearchBoxFocused(false)
+                            }}
+                        />
+                    </Box>
+                    <Box // body
+                        flexGrow={1}
+                        overflow="hidden"
+                        display="flex"
+                        flexDirection="column"
+                        padding={1}
+                    >
+                        <Box // Header
+                            display="flex"
+                        >
+                            <Typography>{title}</Typography>
+                        </Box>
+
+                        <Grid
+                            cellRenderer={({ columnIndex, rowIndex, style }) => {
+                                const index = rowIndex * RowEmojiCount + columnIndex
+                                const emoji = displayEmojis[rowIndex * RowEmojiCount + columnIndex]
+                                if (!emoji) {
+                                    return null
+                                }
+                                return (
+                                    <IconButton
+                                        key={emoji.imageURL}
+                                        onClick={() => {
+                                            onSelectEmoji(emoji)
+                                        }}
+                                        sx={{
+                                            bgcolor:
+                                                selected === index && searchBoxFocused
+                                                    ? alpha(theme.palette.primary.main, 0.3)
+                                                    : 'transparent',
+                                            '&:hover': {
+                                                bgcolor: alpha(theme.palette.primary.main, 0.5)
+                                            },
+                                            ...style
+                                        }}
+                                    >
+                                        <img src={emoji.imageURL} alt={emoji.shortcode} height="30px" width="30px" />
+                                    </IconButton>
+                                )
+                            }}
+                            columnCount={RowEmojiCount}
+                            rowCount={Math.ceil(displayEmojis.length / RowEmojiCount)}
+                            columnWidth={50}
+                            rowHeight={50}
+                            width={310}
+                            height={300}
+                        />
+                    </Box>
                 </Popover>
             </>
         </EmojiPickerContext.Provider>

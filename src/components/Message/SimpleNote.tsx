@@ -6,5 +6,5 @@ interface SimpleNoteProps {
 }
 
 export const SimpleNote = (props: SimpleNoteProps): JSX.Element => {
-    return <MarkdownRenderer messagebody={props.message.body ?? 'no content'} />
+    return <MarkdownRenderer messagebody={props.message.body ?? 'no content'} emojiDict={props.message.emojis ?? {}} />
 }

@@ -6,11 +6,8 @@ settings:
 
 dependencies:
   '@concurrent-world/client':
-    specifier: ^2.0.5
-    version: 2.0.5
-  '@emoji-mart/react':
-    specifier: ^1.1.1
-    version: 1.1.1(emoji-mart@5.5.2)(react@18.2.0)
+    specifier: ^2.0.7
+    version: 2.0.7
   '@emotion/react':
     specifier: ^11.10.5
     version: 11.10.5(@babel/core@7.21.8)(@types/react@18.0.26)(react@18.2.0)
@@ -47,15 +44,12 @@ dependencies:
   elliptic:
     specifier: ^6.5.4
     version: 6.5.4
-  emoji-mart:
-    specifier: ^5.5.2
-    version: 5.5.2
   ethers:
     specifier: ^6.3.0
     version: 6.3.0
-  fuse.js:
-    specifier: ^6.6.2
-    version: 6.6.2
+  fuzzysort:
+    specifier: ^2.0.4
+    version: 2.0.4
   json-schema-to-typescript:
     specifier: ^13.0.1
     version: 13.0.1
@@ -89,6 +83,9 @@ dependencies:
   react-use-websocket:
     specifier: ^4.3.1
     version: 4.3.1(react-dom@18.2.0)(react@18.2.0)
+  react-virtualized:
+    specifier: ^9.22.4
+    version: 9.22.4(react-dom@18.2.0)(react@18.2.0)
   rehype-raw:
     specifier: ^6.1.1
     version: 6.1.1
@@ -136,9 +133,6 @@ devDependencies:
   '@types/elliptic':
     specifier: ^6.4.14
     version: 6.4.14
-  '@types/emoji-mart':
-    specifier: ^3.0.9
-    version: 3.0.9
   '@types/node-forge':
     specifier: ^1.3.1
     version: 1.3.1
@@ -154,6 +148,9 @@ devDependencies:
   '@types/react-syntax-highlighter':
     specifier: ^15.5.6
     version: 15.5.6
+  '@types/react-virtualized':
+    specifier: ^9.21.22
+    version: 9.21.22
   '@types/textarea-caret':
     specifier: ^3.0.1
     version: 3.0.1
@@ -1644,8 +1641,8 @@ packages:
     dev: true
     optional: true
 
-  /@concurrent-world/client@2.0.5:
-    resolution: {integrity: sha512-q8sTZMRVhLfiNCF5RuFC9gIQZ0YRK/WZwrq0hCzorSeNRoEQLpBM7MkUsyzow7LB20vuwfU79qn7SxeX4isW/A==}
+  /@concurrent-world/client@2.0.7:
+    resolution: {integrity: sha512-woEYgGM0LPtZEm7XHKmgTEf3BO5c9bfxlujLf5yl0G9Ek4ZU5BP80K7ISYrTgGaVUStIaXDV/4cGPkq+p4VvJw==}
     dependencies:
       elliptic: 6.5.4
       ethers: 6.7.0
@@ -1659,16 +1656,6 @@ packages:
     resolution: {integrity: sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==}
     engines: {node: '>=10.0.0'}
     dev: true
-
-  /@emoji-mart/react@1.1.1(emoji-mart@5.5.2)(react@18.2.0):
-    resolution: {integrity: sha512-NMlFNeWgv1//uPsvLxvGQoIerPuVdXwK/EUek8OOkJ6wVOWPUizRBJU0hDqWZCOROVpfBgCemaC3m6jDOXi03g==}
-    peerDependencies:
-      emoji-mart: ^5.2
-      react: ^16.8 || ^17 || ^18
-    dependencies:
-      emoji-mart: 5.5.2
-      react: 18.2.0
-    dev: false
 
   /@emotion/babel-plugin@11.11.0:
     resolution: {integrity: sha512-m4HEDZleaaCH+XgDDsPF15Ht6wTLsgDTeR3WYj9Q/k76JtWhrJjcP4+/XlG8LGT/Rol9qUfOIztXeA84ATpqPQ==}
@@ -3857,12 +3844,6 @@ packages:
       '@types/bn.js': 5.1.1
     dev: true
 
-  /@types/emoji-mart@3.0.9:
-    resolution: {integrity: sha512-qdBo/2Y8MXaJ/2spKjDZocuq79GpnOhkwMHnK2GnVFa8WYFgfA+ei6sil3aeWQPCreOKIx9ogPpR5+7MaOqYAA==}
-    dependencies:
-      '@types/react': 18.0.26
-    dev: true
-
   /@types/escodegen@0.0.6:
     resolution: {integrity: sha512-AjwI4MvWx3HAOaZqYsjKWyEObT9lcVV0Y0V8nXo6cXzN8ZiMxVhf6F3d/UNvXVGKrEzL/Dluc5p+y9GkzlTWig==}
     dev: true
@@ -4069,6 +4050,13 @@ packages:
     dependencies:
       '@types/react': 18.0.26
     dev: false
+
+  /@types/react-virtualized@9.21.22:
+    resolution: {integrity: sha512-YRifyCKnBG84+J/Hny0f3bo8BRrcNT74CvsAVpQpZcS83fdC7lP7RfzwL2ND8/ihhpnDFL1IbxJ9MpQNaKUDuQ==}
+    dependencies:
+      '@types/prop-types': 15.7.5
+      '@types/react': 18.0.26
+    dev: true
 
   /@types/react@18.0.26:
     resolution: {integrity: sha512-hCR3PJQsAIXyxhTNSiDFY//LhnMZWpNNr5etoCqx/iUfGc5gXWtQR2Phl908jVR6uPXacojQWTg4qRpkxTuGug==}
@@ -5551,10 +5539,6 @@ packages:
       minimalistic-crypto-utils: 1.0.1
     dev: false
 
-  /emoji-mart@5.5.2:
-    resolution: {integrity: sha512-Sqc/nso4cjxhOwWJsp9xkVm8OF5c+mJLZJFoFfzRuKO+yWiN7K8c96xmtughYb0d/fZ8UC6cLIQ/p4BR6Pv3/A==}
-    dev: false
-
   /emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
     dev: true
@@ -6548,9 +6532,8 @@ packages:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
     dev: true
 
-  /fuse.js@6.6.2:
-    resolution: {integrity: sha512-cJaJkxCCxC8qIIcPBF9yGxY0W/tVZS3uEISDxhYIdtk8OL93pe+6Zj7LjCqVV4dzbqcriOZ+kQ/NE4RXZHsIGA==}
-    engines: {node: '>=10'}
+  /fuzzysort@2.0.4:
+    resolution: {integrity: sha512-Api1mJL+Ad7W7vnDZnWq5pGaXJjyencT+iKGia2PlHUcSsSzWwIQ3S1isiMpwpavjYtGd2FzhUIhnnhOULZgDw==}
     dev: false
 
   /gauge@3.0.2:
@@ -9220,6 +9203,10 @@ packages:
     resolution: {integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==}
     dev: false
 
+  /react-lifecycles-compat@3.0.4:
+    resolution: {integrity: sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==}
+    dev: false
+
   /react-markdown@8.0.7(@types/react@18.0.26)(react@18.2.0):
     resolution: {integrity: sha512-bvWbzG4MtOU62XqBx3Xx+zB2raaFFsq4mYiAzfjXJMEz2sixgeAfraA3tvzULF02ZdOMUOKTBFFaZJDDrq+BJQ==}
     peerDependencies:
@@ -9320,6 +9307,22 @@ packages:
     dependencies:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /react-virtualized@9.22.4(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-HYOQEK1OWWYKt8C3KnjbEOST224kv5D8USPSdo/huAamDttWzQLTtoi/IvWfqwFOr9cCnwUYzqOTStwPrdkqqQ==}
+    peerDependencies:
+      react: ^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0
+      react-dom: ^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@babel/runtime': 7.21.5
+      clsx: 1.2.1
+      dom-helpers: 5.2.1
+      loose-envify: 1.4.0
+      prop-types: 15.8.1
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      react-lifecycles-compat: 3.0.4
     dev: false
 
   /react@18.2.0:

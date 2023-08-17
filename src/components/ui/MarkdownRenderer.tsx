@@ -1,4 +1,4 @@
-import { type ImgHTMLAttributes, type DetailedHTMLProps, useContext } from 'react'
+import { type ImgHTMLAttributes, type DetailedHTMLProps } from 'react'
 import { Box, Link, Typography } from '@mui/material'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -8,11 +8,11 @@ import { type ReactMarkdownProps } from 'react-markdown/lib/ast-to-react'
 import breaks from 'remark-breaks'
 import { Codeblock } from './Codeblock'
 
-import type { Emoji } from '../../model'
-import { ApplicationContext } from '../../App'
+import type { EmojiLite } from '../../model'
 
 export interface MarkdownRendererProps {
     messagebody: string
+    emojiDict: Record<string, EmojiLite>
 }
 
 const sanitizeOption = {
@@ -27,15 +27,13 @@ const sanitizeOption = {
 }
 
 export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
-    const appData = useContext(ApplicationContext)
-
-    const genEmojiTag = (emoji: Emoji): string => {
-        return `<img src="${emoji.publicUrl}" alt="emoji:${emoji.name}:" title=":${emoji?.name}:"/>`
+    const genEmojiTag = (name: string, url: string): string => {
+        return `<img src="${url}" alt="emoji:${name}:" title=":${name}:"/>`
     }
     const messagebody = props.messagebody.replace(/:\w+:/gi, (name: string) => {
-        const emoji: Emoji | undefined = appData.emojiDict[name.slice(1, -1)]
+        const emoji: EmojiLite | undefined = props.emojiDict[name.slice(1, -1)]
         if (emoji) {
-            return genEmojiTag(emoji)
+            return genEmojiTag(name, emoji.animURL ?? emoji.imageURL ?? '')
         }
         return `${name}`
     })

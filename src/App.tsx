@@ -10,7 +10,7 @@ import { useObjectList } from './hooks/useObjectList'
 import { Client, Schemas, type CoreServerEvent } from '@concurrent-world/client'
 import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu/Menu'
-import type { StreamElementDated, Emoji, ConcurrentTheme, StreamList } from './model'
+import type { StreamElementDated, ConcurrentTheme, StreamList } from './model'
 import {
     Associations,
     Explorer,
@@ -38,17 +38,27 @@ const branchName = branch || window.location.host.split('.')[0]
 const versionString = `${location.hostname}-${branchName as string}-${sha.slice(0, 7) as string}`
 
 export const ApplicationContext = createContext<appData>({
-    emojiDict: {},
     websocketState: -1,
     displayingStream: [],
-    setThemeName: (_newtheme: string) => {}
+    setThemeName: (_newtheme: string) => {},
+    postSound: BubbleSound,
+    setPostSound: (_sound: any) => {},
+    notificationSound: NotificationSound,
+    setNotificationSound: (_sound: any) => {},
+    volume: 0.5,
+    setVolume: (_volume: number) => {}
 })
 
 export interface appData {
-    emojiDict: Record<string, Emoji>
     websocketState: ReadyState
     displayingStream: string[]
     setThemeName: (newtheme: string) => void
+    postSound: any
+    setPostSound: (sound: any) => void
+    notificationSound: any
+    setNotificationSound: (sound: any) => void
+    volume: number
+    setVolume: (volume: number) => void
 }
 
 export const ClockContext = createContext<Date>(new Date())
@@ -67,6 +77,9 @@ function App(): JSX.Element {
     }, [domain, prvkey])
 
     const [themeName, setThemeName] = usePersistent<string>('Theme', Object.keys(Themes)[0])
+    const [postSound, setPostSound] = usePersistent<any>('PostSound', BubbleSound)
+    const [notificationSound, setNotificationSound] = usePersistent<any>('NotificationSound', NotificationSound)
+    const [volume, setVolume] = usePersistent<number>('Volume', 50)
 
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
     const messages = useObjectList<StreamElementDated>()
@@ -119,8 +132,8 @@ function App(): JSX.Element {
         }
     })
 
-    const [playBubble] = useSound(BubbleSound)
-    const [playNotification] = useSound(NotificationSound, { volume: 0.3 })
+    const [playBubble] = useSound(postSound, { volume: volume / 100 })
+    const [playNotification] = useSound(notificationSound, { volume: volume / 100 })
     const playBubbleRef = useRef(playBubble)
     const playNotificationRef = useRef(playNotification)
     useEffect(() => {
@@ -137,16 +150,6 @@ function App(): JSX.Element {
             clearInterval(timer)
         }
     }, [setClock])
-
-    const [emojiDict, setEmojiDict] = useState<Record<string, Emoji>>({})
-    useEffect(() => {
-        fetch('https://gist.githubusercontent.com/totegamma/0beb41acad70aa4945ad38a6b00a3a1d/raw/emojis.json') // FIXME temporaly hardcoded
-            .then((j) => j.json())
-            .then((data) => {
-                const dict = Object.fromEntries(data.emojis.map((e: any) => [e.emoji.name, e.emoji]))
-                setEmojiDict(dict)
-            })
-    }, [])
 
     useEffect(() => {
         sendJsonMessage({
@@ -289,12 +292,27 @@ function App(): JSX.Element {
 
     const applicationContext = useMemo(() => {
         return {
-            emojiDict,
             websocketState: readyState,
             displayingStream,
-            setThemeName
+            setThemeName,
+            postSound,
+            setPostSound,
+            notificationSound,
+            setNotificationSound,
+            volume,
+            setVolume
         }
-    }, [emojiDict, readyState, displayingStream])
+    }, [
+        readyState,
+        displayingStream,
+        setThemeName,
+        postSound,
+        setPostSound,
+        notificationSound,
+        setNotificationSound,
+        volume,
+        setVolume
+    ])
 
     if (!client) {
         return <>building api service...</>

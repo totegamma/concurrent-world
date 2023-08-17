@@ -170,10 +170,12 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         onClick={(e) => {
                             emojiPicker.open(e.currentTarget, (emoji) => {
                                 console.log(emoji)
+                                /*
                                 if (emoji.src === undefined && emoji.unified) {
                                     emoji.src = `https://twemoji.maxcdn.com/v/latest/svg/${emoji.unified}.svg`
                                 }
-                                service.addReaction(emoji.shortcodes, emoji.src)
+                                */
+                                service.addReaction(emoji.shortcode, emoji.imageURL)
                                 emojiPicker.close()
                             })
                         }}
