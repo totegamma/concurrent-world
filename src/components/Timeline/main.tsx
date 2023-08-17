@@ -11,7 +11,6 @@ import { Loading } from '../ui/Loading'
 import { MessageContainer } from '../Message/MessageContainer'
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import HeartBrokenIcon from '@mui/icons-material/HeartBroken'
-import { FallbackFragment } from 'ethers'
 
 export interface TimelineProps {
     streams: string[]
@@ -33,7 +32,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
         props.timeline.clear()
         let unmounted = false
         setIsFetching(true)
-        setHasMoreData(true)
+        setHasMoreData(false)
         client.api?.readStreamRecent(props.streams).then((data: CoreStreamElement[]) => {
             if (unmounted) return
             const current = new Date().getTime()
