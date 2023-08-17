@@ -6,7 +6,7 @@ import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled'
 import SearchIcon from '@mui/icons-material/Search'
 import { usePersistent } from '../hooks/usePersistent'
 
-import Fuse from 'fuse.js'
+import Fuzzysort from 'fuzzysort'
 
 export interface EmojiPickerState {
     open: (anchor: HTMLElement, onSelected: (selected: Emoji) => void) => void
@@ -31,9 +31,9 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
     const [frequentEmojis, setFrequentEmojis] = usePersistent<Emoji[]>('FrequentEmojis', [])
     const [query, setQuery] = useState<string>('')
     const [emojiPackages, setEmojiPackages] = useState<EmojiPackage[]>([])
+    const [allemojis, setAllEmojis] = useState<Emoji[]>([])
     const [emojiPickerTab, setEmojiPickerTab] = useState<number>(0)
     const [searchResults, setSearchResults] = useState<Emoji[]>([])
-    const fuse = useRef<Fuse<Emoji> | null>(null)
     const [selected, setSelected] = useState<number>(0)
     const [searchBoxFocused, setSearchBoxFocused] = useState<boolean>(false)
 
@@ -73,9 +73,20 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
         onSelectedRef.current = null
     }, [])
 
-    const search = useCallback((input: string, limit: number = 10) => {
-        return fuse.current?.search(input, { limit }).map((e) => e.item) ?? []
-    }, [])
+    const search = useCallback(
+        (input: string, limit: number = 10) => {
+            const results = Fuzzysort.go(input, allemojis, {
+                limit,
+                threshold: -10000,
+                keys: ['shortcode', 'keywords']
+            }).map((result) => result.obj)
+
+            return results.filter(
+                (elem, index) => results.findIndex((e: Emoji) => e.imageURL === elem.imageURL) === index
+            )
+        },
+        [allemojis]
+    )
 
     const onSelectEmoji = useCallback(
         (emoji: Emoji) => {
@@ -90,21 +101,24 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
     )
 
     useEffect(() => {
-        Promise.all(pref.emojiPackages.map((url) => fetch(url).then((j) => j.json()))).then((packages) => {
-            setEmojiPackages(packages)
-            fuse.current = new Fuse(
-                packages.flatMap((p) => p.emojis),
-                {
-                    keys: ['shortcode', 'aliases'],
-                    threshold: 0.3
+        Promise.all(
+            pref.emojiPackages.map(async (url) => {
+                const rawpackage = await fetch(url).then((j) => j.json())
+                const packages: EmojiPackage = {
+                    ...rawpackage,
+                    packageURL: url
                 }
-            )
+                return packages
+            })
+        ).then((packages: EmojiPackage[]) => {
+            setEmojiPackages(packages)
+            setAllEmojis(packages.flatMap((p) => p.emojis))
         })
     }, [pref.emojiPackages])
 
     useEffect(() => {
         if (query.length > 0) {
-            setSearchResults(fuse.current?.search(query).map((e) => e.item) ?? [])
+            setSearchResults(search(query, 100))
         } else {
             setSearchResults([])
         }

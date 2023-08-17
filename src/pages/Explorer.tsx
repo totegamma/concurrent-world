@@ -17,12 +17,13 @@ import {
 import { type Commonstream, Schemas, type Stream } from '@concurrent-world/client'
 import { useApi } from '../context/api'
 import { Link, useNavigate } from 'react-router-dom'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
+
+import Fuzzysort from 'fuzzysort'
 
 import { CCDrawer } from '../components/ui/CCDrawer'
 import Background from '../resources/defaultbg.png'
 
-import Fuse from 'fuse.js'
 import { CCEditor } from '../components/ui/cceditor'
 import { useSnackbar } from 'notistack'
 
@@ -48,8 +49,6 @@ export function Explorer(): JSX.Element {
     const [search, setSearch] = useState<string>('')
 
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
-
-    const fuse = useRef<Fuse<StreamWithDomain> | null>(null)
 
     const { enqueueSnackbar } = useSnackbar()
 
@@ -103,20 +102,15 @@ export function Explorer(): JSX.Element {
     }, [])
 
     useEffect(() => {
-        if (streams.length === 0) return
-        fuse.current = new Fuse(streams, {
-            keys: ['stream.name', 'stream.description'],
-            threshold: 0.3
-        })
-    }, [streams])
-
-    useEffect(() => {
-        if (fuse.current === null) return
         if (search === '') {
             setSearchResult(streams)
             return
         }
-        setSearchResult(fuse.current.search(search).map((e) => e.item))
+        setSearchResult(
+            Fuzzysort.go(search, streams, {
+                keys: ['stream.name', 'stream.description']
+            }).map((e) => e.obj)
+        )
     }, [search])
 
     if (!client.api.host) return <>loading...</>

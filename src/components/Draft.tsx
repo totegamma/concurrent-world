@@ -190,24 +190,17 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         if (colonPos === -1) return
         const after = draft.slice(textInputRef.current?.selectionEnd ?? 0) ?? ''
 
-        // 選択されたのがネイティブ絵文字だったらそのまま挿入
-        /*
-        const emoji = emojiSuggestions[index].skins[0].native
-            ? emojiSuggestions[index].skins[0].native ?? ''
-            : ':' + emojiSuggestions[index].name + ':'
-        */
-
         const selected = emojiSuggestions[index]
 
         setDraft(before.slice(0, colonPos) + `:${selected.shortcode}:` + after)
         setSelectedSuggestions(0)
         setEnableSuggestions(false)
 
-        // カスタム絵文字なので辞書に登録
         setEmojiDict((prev) => ({
             ...prev,
             [selected.shortcode]: { imageURL: selected.imageURL }
         }))
+
         if (timerRef.current) {
             clearTimeout(timerRef.current)
             timerRef.current = null
@@ -295,8 +288,18 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     onChange={(e) => {
                         setDraft(e.target.value)
 
-                        if (!enableSuggestions) return
+                        const before = e.target.value.slice(0, e.target.selectionEnd ?? 0) ?? ''
+                        const query = /:(\w+)$/.exec(before)?.[1]
 
+                        if (!query) {
+                            setEnableSuggestions(false)
+                            return
+                        }
+
+                        setEmojiSuggestions(emojiPicker.search(query))
+                        setEnableSuggestions(true)
+
+                        // move suggestion box
                         const pos = caretPosition(e.target, e.target.selectionEnd ?? 0, {})
                         const parent = textInputRef.current?.getBoundingClientRect()
                         const offset = 10
@@ -305,15 +308,6 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                 top: parent.top + pos.top + offset,
                                 left: parent.left + pos.left + offset
                             })
-                            console.log(pos)
-                        }
-                        let query: string | undefined = draft
-                        if (e.target.selectionEnd) {
-                            query = draft.slice(0, e.target.selectionEnd)
-                        }
-                        query = query.split(':').at(-1)
-                        if (query) {
-                            setEmojiSuggestions(emojiPicker.search(query))
                         }
                     }}
                     onPaste={handlePasteImage}
@@ -324,10 +318,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         fontSize: '0.95rem'
                     }}
                     onKeyDown={(e: any) => {
-                        if (e.key === ':') {
-                            setEnableSuggestions(!enableSuggestions)
-                        }
-                        if (enableSuggestions) {
+                        if (enableSuggestions && emojiSuggestions.length > 0) {
                             if (e.key === 'Enter') {
                                 e.preventDefault()
                                 onEmojiSuggestConfirm(selectedSuggestions)
@@ -344,6 +335,10 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                 e.preventDefault()
                                 setSelectedSuggestions((selectedSuggestions + 1) % emojiSuggestions.length)
                                 return
+                            }
+                            if (e.key === ':') {
+                                e.preventDefault()
+                                onEmojiSuggestConfirm(0)
                             }
                         }
                         if (draft.length === 0 || draft.trim().length === 0) return

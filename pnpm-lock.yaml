@@ -47,9 +47,9 @@ dependencies:
   ethers:
     specifier: ^6.3.0
     version: 6.3.0
-  fuse.js:
-    specifier: ^6.6.2
-    version: 6.6.2
+  fuzzysort:
+    specifier: ^2.0.4
+    version: 2.0.4
   json-schema-to-typescript:
     specifier: ^13.0.1
     version: 13.0.1
@@ -6519,9 +6519,8 @@ packages:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
     dev: true
 
-  /fuse.js@6.6.2:
-    resolution: {integrity: sha512-cJaJkxCCxC8qIIcPBF9yGxY0W/tVZS3uEISDxhYIdtk8OL93pe+6Zj7LjCqVV4dzbqcriOZ+kQ/NE4RXZHsIGA==}
-    engines: {node: '>=10'}
+  /fuzzysort@2.0.4:
+    resolution: {integrity: sha512-Api1mJL+Ad7W7vnDZnWq5pGaXJjyencT+iKGia2PlHUcSsSzWwIQ3S1isiMpwpavjYtGd2FzhUIhnnhOULZgDw==}
     dev: false
 
   /gauge@3.0.2:

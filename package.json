@@ -25,7 +25,7 @@
         "boring-avatars": "github:totegamma/boring-avatars#49ed345027665e1d6135ae6b0b6f2a442ff52915",
         "elliptic": "^6.5.4",
         "ethers": "^6.3.0",
-        "fuse.js": "^6.6.2",
+        "fuzzysort": "^2.0.4",
         "json-schema-to-typescript": "^13.0.1",
         "notistack": "^3.0.1",
         "react": "^18.2.0",
