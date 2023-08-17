@@ -1,8 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { Popover, TextField, Box, Tabs, Tab, Typography, Divider, IconButton } from '@mui/material'
+import { Popover, TextField, Box, Tabs, Tab, Typography, Divider, IconButton, alpha, useTheme } from '@mui/material'
 import { usePreference } from './PreferenceContext'
 import { type EmojiPackage, type Emoji } from '../model'
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled'
+import SearchIcon from '@mui/icons-material/Search'
 import { usePersistent } from '../hooks/usePersistent'
 
 import Fuse from 'fuse.js'
@@ -21,6 +22,9 @@ interface EmojiPickerProps {
 
 export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
     const pref = usePreference()
+    const theme = useTheme()
+
+    const RowEmojiCount = 8
 
     const [anchor, setAnchor] = useState<HTMLElement | null>(null)
     const onSelectedRef = useRef<((selected: Emoji) => void) | null>(null)
@@ -30,6 +34,8 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
     const [emojiPickerTab, setEmojiPickerTab] = useState<number>(0)
     const [searchResults, setSearchResults] = useState<Emoji[]>([])
     const fuse = useRef<Fuse<Emoji> | null>(null)
+    const [selected, setSelected] = useState<number>(0)
+    const [searchBoxFocused, setSearchBoxFocused] = useState<boolean>(false)
 
     const title: string = useMemo(() => {
         if (query.length > 0) {
@@ -57,6 +63,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
 
     const open = useCallback((anchor: HTMLElement, onSelected: (selected: Emoji) => void) => {
         setAnchor(anchor)
+        setEmojiPickerTab(frequentEmojis.length > 0 ? 0 : 1)
         onSelectedRef.current = onSelected
     }, [])
 
@@ -147,20 +154,27 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                         flexDirection="column"
                     >
                         <Tabs
-                            value={emojiPickerTab}
+                            value={query.length === 0 ? emojiPickerTab : 0}
                             onChange={(_, newValue) => {
+                                setQuery('')
                                 setEmojiPickerTab(newValue)
                             }}
                             variant="scrollable"
                             scrollButtons="auto"
+                            textColor="secondary"
+                            indicatorColor="secondary"
                         >
-                            <Tab
-                                key="frequent"
-                                aria-label="Frequently Used"
-                                icon={<AccessTimeFilledIcon />}
-                                sx={tabsx}
-                            />
-                            {emojiPackages.map((emojiPackage) => (
+                            {query.length === 0 ? (
+                                <Tab
+                                    key="frequent"
+                                    aria-label="Frequently Used"
+                                    icon={<AccessTimeFilledIcon />}
+                                    sx={tabsx}
+                                />
+                            ) : (
+                                <Tab key="search" aria-label="Search Result" icon={<SearchIcon />} sx={tabsx} />
+                            )}
+                            {emojiPackages.map((emojiPackage, index) => (
                                 <Tab
                                     key={emojiPackage.packageURL}
                                     aria-label={emojiPackage.name}
@@ -173,6 +187,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                         <TextField
                             autoFocus
                             placeholder="Search emoji"
+                            value={query}
                             onChange={(e) => {
                                 setQuery(e.target.value)
                             }}
@@ -185,9 +200,32 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                     if (displayEmojis.length > 0) {
                                         e.preventDefault()
                                         setAnchor(null)
-                                        onSelectEmoji(displayEmojis[0])
+                                        onSelectEmoji(displayEmojis[selected])
                                     }
                                 }
+                                if (e.key === 'ArrowDown') {
+                                    e.preventDefault()
+                                    setSelected(Math.min(selected + RowEmojiCount, displayEmojis.length - 1))
+                                }
+                                if (e.key === 'ArrowUp') {
+                                    e.preventDefault()
+                                    setSelected(Math.max(selected - RowEmojiCount, 0))
+                                }
+                                if (e.key === 'ArrowLeft') {
+                                    e.preventDefault()
+                                    setSelected(Math.max(selected - 1, 0))
+                                }
+                                if (e.key === 'ArrowRight') {
+                                    e.preventDefault()
+                                    setSelected(Math.min(selected + 1, displayEmojis.length - 1))
+                                }
+                            }}
+                            onFocus={() => {
+                                setSelected(0)
+                                setSearchBoxFocused(true)
+                            }}
+                            onBlur={() => {
+                                setSearchBoxFocused(false)
                             }}
                         />
                     </Box>
@@ -208,11 +246,20 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                             display="flex"
                             flexWrap="wrap"
                         >
-                            {displayEmojis.map((emoji) => (
+                            {displayEmojis.map((emoji, index) => (
                                 <IconButton
                                     key={emoji.imageURL}
                                     onClick={() => {
                                         onSelectEmoji(emoji)
+                                    }}
+                                    sx={{
+                                        bgcolor:
+                                            selected === index && searchBoxFocused
+                                                ? alpha(theme.palette.primary.main, 0.3)
+                                                : 'transparent',
+                                        '&:hover': {
+                                            bgcolor: alpha(theme.palette.primary.main, 0.5)
+                                        }
                                     }}
                                 >
                                     <img src={emoji.imageURL} alt={emoji.shortcode} height="30px" width="30px" />
