@@ -44,7 +44,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
             if (emojiPickerTab === 0) {
                 return 'Frequently Used'
             } else {
-                return emojiPackages[emojiPickerTab - 1].name
+                return emojiPackages[emojiPickerTab - 1]?.name ?? '設定から絵文字パッケージを追加しましょう'
             }
         }
     }, [emojiPickerTab, emojiPackages, query])
@@ -56,7 +56,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
             if (emojiPickerTab === 0) {
                 return frequentEmojis
             } else {
-                return emojiPackages[emojiPickerTab - 1].emojis
+                return emojiPackages[emojiPickerTab - 1]?.emojis ?? []
             }
         }
     }, [emojiPickerTab, emojiPackages, frequentEmojis, query, searchResults])
