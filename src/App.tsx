@@ -79,7 +79,7 @@ function App(): JSX.Element {
     const [themeName, setThemeName] = usePersistent<string>('Theme', Object.keys(Themes)[0])
     const [postSound, setPostSound] = usePersistent<any>('PostSound', BubbleSound)
     const [notificationSound, setNotificationSound] = usePersistent<any>('NotificationSound', NotificationSound)
-    const [volume, setVolume] = usePersistent<number>('Volume', 0.5)
+    const [volume, setVolume] = usePersistent<number>('Volume', 50)
 
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
     const messages = useObjectList<StreamElementDated>()

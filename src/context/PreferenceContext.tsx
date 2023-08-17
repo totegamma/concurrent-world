@@ -55,8 +55,9 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
             defaultPostStreams: []
         }
     })
-
-    const [emojiPackages, setEmojiPackages] = usePersistent<string[]>('emojiPackages', [])
+    const [emojiPackages, setEmojiPackages] = usePersistent<string[]>('emojiPackages', [
+        'https://gist.githubusercontent.com/totegamma/6e1a047f54960f6bb7b946064664d793/raw/twemoji.json'
+    ]) // default twemoji
 
     useEffect(() => {
         if (!client) return
@@ -67,15 +68,15 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
                 setInitialized(true)
                 if (!storage) return
                 const parsed = JSON.parse(storage)
-                setThemeName(parsed.themeName ?? 'basic')
-                setImgurClientID(parsed.imgurClientID ?? '')
-                setDefaultPostHome(parsed.defaultPostHome ?? [])
-                setDefaultPostNonHome(parsed.defaultPostNonHome ?? [])
-                setDevMode(parsed.devMode ?? false)
-                setShowEditorOnTop(parsed.showEditorOnTop ?? true)
-                setShowEditorOnTopMobile(parsed.showEditorOnTopMobile ?? false)
-                setLists(parsed.lists ?? {})
-                setEmojiPackages(parsed.emojiPackages ?? [])
+                parsed.themeName && setThemeName(parsed.themeName)
+                parsed.imgurClientID && setImgurClientID(parsed.imgurClientID)
+                parsed.defaultPostHome && setDefaultPostHome(parsed.defaultPostHome)
+                parsed.defaultPostNonHome && setDefaultPostNonHome(parsed.defaultPostNonHome)
+                parsed.devMode && setDevMode(parsed.devMode)
+                parsed.showEditorOnTop && setShowEditorOnTop(parsed.showEditorOnTop)
+                parsed.showEditorOnTopMobile && setShowEditorOnTopMobile(parsed.showEditorOnTopMobile)
+                parsed.lists && setLists(parsed.lists)
+                parsed.emojiPackages && setEmojiPackages(parsed.emojiPackages)
             })
             .catch((e) => {
                 setInitialized(true)
