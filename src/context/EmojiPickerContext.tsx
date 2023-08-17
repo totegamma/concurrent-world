@@ -5,6 +5,7 @@ import { type EmojiPackage, type Emoji } from '../model'
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled'
 import SearchIcon from '@mui/icons-material/Search'
 import { usePersistent } from '../hooks/usePersistent'
+import { Grid } from 'react-virtualized'
 
 import Fuzzysort from 'fuzzysort'
 
@@ -24,7 +25,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
     const pref = usePreference()
     const theme = useTheme()
 
-    const RowEmojiCount = 8
+    const RowEmojiCount = 6
 
     const [anchor, setAnchor] = useState<HTMLElement | null>(null)
     const onSelectedRef = useRef<((selected: Emoji) => void) | null>(null)
@@ -156,10 +157,11 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                     }}
                     PaperProps={{
                         style: {
-                            width: 400,
-                            height: 400,
+                            width: '320px',
+                            height: '400px',
                             display: 'flex',
-                            flexDirection: 'column'
+                            flexDirection: 'column',
+                            overflow: 'hidden'
                         }
                     }}
                 >
@@ -245,7 +247,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                     </Box>
                     <Box // body
                         flexGrow={1}
-                        overflow="auto"
+                        overflow="hidden"
                         display="flex"
                         flexDirection="column"
                         padding={1}
@@ -256,30 +258,41 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                             <Typography>{title}</Typography>
                         </Box>
 
-                        <Box // Body
-                            display="flex"
-                            flexWrap="wrap"
-                        >
-                            {displayEmojis.map((emoji, index) => (
-                                <IconButton
-                                    key={emoji.imageURL}
-                                    onClick={() => {
-                                        onSelectEmoji(emoji)
-                                    }}
-                                    sx={{
-                                        bgcolor:
-                                            selected === index && searchBoxFocused
-                                                ? alpha(theme.palette.primary.main, 0.3)
-                                                : 'transparent',
-                                        '&:hover': {
-                                            bgcolor: alpha(theme.palette.primary.main, 0.5)
-                                        }
-                                    }}
-                                >
-                                    <img src={emoji.imageURL} alt={emoji.shortcode} height="30px" width="30px" />
-                                </IconButton>
-                            ))}
-                        </Box>
+                        <Grid
+                            cellRenderer={({ columnIndex, rowIndex, style }) => {
+                                const index = rowIndex * RowEmojiCount + columnIndex
+                                const emoji = displayEmojis[rowIndex * RowEmojiCount + columnIndex]
+                                if (!emoji) {
+                                    return null
+                                }
+                                return (
+                                    <IconButton
+                                        key={emoji.imageURL}
+                                        onClick={() => {
+                                            onSelectEmoji(emoji)
+                                        }}
+                                        sx={{
+                                            bgcolor:
+                                                selected === index && searchBoxFocused
+                                                    ? alpha(theme.palette.primary.main, 0.3)
+                                                    : 'transparent',
+                                            '&:hover': {
+                                                bgcolor: alpha(theme.palette.primary.main, 0.5)
+                                            },
+                                            ...style
+                                        }}
+                                    >
+                                        <img src={emoji.imageURL} alt={emoji.shortcode} height="30px" width="30px" />
+                                    </IconButton>
+                                )
+                            }}
+                            columnCount={RowEmojiCount}
+                            rowCount={Math.ceil(displayEmojis.length / RowEmojiCount)}
+                            columnWidth={50}
+                            rowHeight={50}
+                            width={310}
+                            height={300}
+                        />
                     </Box>
                 </Popover>
             </>
