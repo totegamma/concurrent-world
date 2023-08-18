@@ -34,6 +34,7 @@ import { EmojiPickerProvider } from './context/EmojiPickerContext'
 
 // @ts-expect-error vite dynamic import
 import { branch, sha } from '~build/info'
+import { ThinMenu } from './components/Menu/ThinMenu'
 const branchName = branch || window.location.host.split('.')[0]
 const versionString = `${location.hostname}-${branchName as string}-${sha.slice(0, 7) as string}`
 
@@ -365,13 +366,27 @@ function App(): JSX.Element {
                         sx={{
                             display: {
                                 xs: 'none',
-                                sm: 'block'
+                                sm: 'none',
+                                md: 'block'
                             },
                             width: '200px',
                             m: 1
                         }}
                     >
                         <Menu />
+                    </Box>
+                    <Box
+                        sx={{
+                            display: {
+                                xs: 'none',
+                                sm: 'block',
+                                md: 'none'
+                            },
+                            width: '50px',
+                            m: 1
+                        }}
+                    >
+                        <ThinMenu />
                     </Box>
                     <Box
                         sx={{
