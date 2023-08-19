@@ -359,7 +359,9 @@ function App(): JSX.Element {
                         display: 'flex',
                         flex: 1,
                         maxWidth: '1280px',
-                        width: '100%'
+                        width: '100%',
+                        marginLeft: 'env(safe-area-inset-left)',
+                        marginRight: 'env(safe-area-inset-right)'
                     }}
                 >
                     <Box
