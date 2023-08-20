@@ -33,15 +33,20 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
         let unmounted = false
         setIsFetching(true)
         setHasMoreData(false)
-        client.api?.readStreamRecent(props.streams).then((data: CoreStreamElement[]) => {
-            if (unmounted) return
-            const current = new Date().getTime()
-            const dated = data.map((e) => {
-                return { ...e, LastUpdated: current }
+        client.api
+            ?.readStreamRecent(props.streams)
+            .then((data: CoreStreamElement[]) => {
+                if (unmounted) return
+                const current = new Date().getTime()
+                const dated = data.map((e) => {
+                    return { ...e, LastUpdated: current }
+                })
+                props.timeline.set(dated)
+                setHasMoreData(data.length > 0)
             })
-            props.timeline.set(dated)
-            setHasMoreData(data.length > 0)
-        })
+            .finally(() => {
+                setIsFetching(false)
+            })
         return () => {
             unmounted = true
         }
@@ -71,6 +76,9 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                     props.timeline.concat(dated)
                 } else setHasMoreData(false)
             })
+            .finally(() => {
+                setIsFetching(false)
+            })
         return () => {
             unmounted = true
         }
@@ -92,9 +100,38 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
         }
     }, [loadMore, props.timeline.current, hasMoreData])
 
+    const onScroll = useCallback(() => {
+        // console.log(props.scrollParentRef.current?.scrollTop)
+        if (!props.scrollParentRef.current) return
+        if (props.scrollParentRef.current.scrollTop < -48) {
+            if (!client.api.host) return
+            if (isFetching) return
+            props.timeline.clear()
+            const unmounted = false
+            setIsFetching(true)
+            setHasMoreData(false)
+            client.api
+                ?.readStreamRecent(props.streams)
+                .then((data: CoreStreamElement[]) => {
+                    if (unmounted) return
+                    const current = new Date().getTime()
+                    const dated = data.map((e) => {
+                        return { ...e, LastUpdated: current }
+                    })
+                    props.timeline.set(dated)
+                    setHasMoreData(data.length > 0)
+                })
+                .finally(() => {
+                    setIsFetching(false)
+                })
+        }
+    }, [props.scrollParentRef.current])
+
     useEffect(() => {
-        setIsFetching(false)
-    }, [props.timeline.current])
+        if (!props.scrollParentRef.current) return
+        props.scrollParentRef.current.addEventListener('scroll', onScroll)
+        return (): void => props.scrollParentRef.current?.removeEventListener('scroll', onScroll)
+    }, [])
 
     return (
         <InspectorProvider>
