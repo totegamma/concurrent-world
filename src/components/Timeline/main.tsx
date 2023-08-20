@@ -103,7 +103,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     const onScroll = useCallback(() => {
         // console.log(props.scrollParentRef.current?.scrollTop)
         if (!props.scrollParentRef.current) return
-        if (props.scrollParentRef.current.scrollTop < -48) {
+        if (props.scrollParentRef.current.scrollTop < -80) {
             if (!client.api.host) return
             if (isFetching) return
             props.timeline.clear()
@@ -136,14 +136,14 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     return (
         <InspectorProvider>
             <Box
-                height="48px"
+                height="80px"
+                width="100%"
+                position="absolute"
+                top="-80px"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
-                sx={{ color: theme.palette.text.secondary }}
-                position="absolute"
-                width="100%"
-                top="-48px"
+                sx={{ color: 'text.secondary' }}
             >
                 Pull to refresh
             </Box>
