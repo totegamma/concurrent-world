@@ -40,7 +40,8 @@ export function Notifications(props: NotificationsProps): JSX.Element {
             <Box
                 sx={{
                     overflowX: 'hidden',
-                    overflowY: 'auto'
+                    overflowY: 'auto',
+                    overscrollBehaviorY: 'contain'
                 }}
                 ref={scrollParentRef}
             >

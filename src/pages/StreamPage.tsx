@@ -91,7 +91,8 @@ export const StreamPage = memo<StreamPageProps>((props: StreamPageProps): JSX.El
                 <Box
                     sx={{
                         overflowX: 'hidden',
-                        overflowY: 'auto'
+                        overflowY: 'auto',
+                        overscrollBehaviorY: 'contain'
                     }}
                     ref={scrollParentRef}
                 >
