@@ -11,6 +11,7 @@ import { Loading } from '../ui/Loading'
 import { MessageContainer } from '../Message/MessageContainer'
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import HeartBrokenIcon from '@mui/icons-material/HeartBroken'
+import { usePreference } from '../../context/PreferenceContext'
 
 export interface TimelineProps {
     streams: string[]
@@ -26,6 +27,8 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     const [hasMoreData, setHasMoreData] = useState<boolean>(false)
     const [isFetching, setIsFetching] = useState<boolean>(false)
     const theme = useTheme()
+
+    const pref = usePreference()
 
     useEffect(() => {
         if (!client.api.host) return
@@ -139,11 +142,16 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                 height="80px"
                 width="100%"
                 position="absolute"
-                top="-80px"
-                display="flex"
+                top="-79px" // TEST
                 alignItems="center"
                 justifyContent="center"
-                sx={{ color: 'text.secondary' }}
+                sx={{
+                    color: 'text.secondary',
+                    display: {
+                        xs: pref.showEditorOnTopMobile ? 'none' : 'flex',
+                        sm: pref.showEditorOnTop ? 'none' : 'flex'
+                    }
+                }}
             >
                 Pull to refresh
             </Box>
