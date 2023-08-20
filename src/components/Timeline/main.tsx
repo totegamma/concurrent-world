@@ -134,7 +134,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
         if (!props.scrollParentRef.current) return
         props.scrollParentRef.current.addEventListener('scroll', onScroll)
         return (): void => props.scrollParentRef.current?.removeEventListener('scroll', onScroll)
-    }, [])
+    }, [onScroll])
 
     return (
         <InspectorProvider>
