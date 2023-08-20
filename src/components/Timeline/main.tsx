@@ -1,4 +1,4 @@
-import { Divider, List, ListItem, ListItemIcon, ListItemText, Typography, useTheme } from '@mui/material'
+import { Box, Divider, List, ListItem, ListItemIcon, ListItemText, Typography, useTheme } from '@mui/material'
 import React, { type RefObject, memo, useCallback, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroller'
 import { AssociationFrame } from '../Association/AssociationFrame'
@@ -98,6 +98,18 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
 
     return (
         <InspectorProvider>
+            <Box
+                height="48px"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                sx={{ color: theme.palette.text.secondary }}
+                position="absolute"
+                width="100%"
+                top="-48px"
+            >
+                Pull to refresh
+            </Box>
             <List sx={{ flex: 1, width: '100%' }}>
                 <InfiniteScroll
                     loadMore={() => {
