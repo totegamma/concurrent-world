@@ -128,7 +128,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                     setIsFetching(false)
                 })
         }
-    }, [props.scrollParentRef.current])
+    }, [props.scrollParentRef.current, props.timeline, props.streams, client.api, isFetching])
 
     useEffect(() => {
         if (!props.scrollParentRef.current) return
