@@ -222,16 +222,15 @@ export function GuestTimelinePage(): JSX.Element {
                                                     flexDirection: 'column'
                                                 }}
                                             >
-                                                {/*
-                    <StreamInfo id={queriedStreams[0]} />
-                    */}
                                                 <Divider />
                                             </Box>
                                             <Box
                                                 sx={{
                                                     display: 'flex',
                                                     flex: 1,
-                                                    padding: { xs: '8px', sm: '8px 16px' }
+                                                    flexDirection: 'column',
+                                                    py: { xs: 1, sm: 1 },
+                                                    px: { xs: 1, sm: 2 }
                                                 }}
                                             >
                                                 <Timeline

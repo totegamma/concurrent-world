@@ -1,14 +1,4 @@
-import {
-    Box,
-    CircularProgress,
-    Divider,
-    List,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
-    Typography,
-    useTheme
-} from '@mui/material'
+import { Box, Divider, List, ListItem, ListItemIcon, ListItemText, Typography, useTheme } from '@mui/material'
 import React, { type RefObject, memo, useCallback, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroller'
 import { AssociationFrame } from '../Association/AssociationFrame'
@@ -32,7 +22,7 @@ export interface TimelineProps {
     perspective?: string
 }
 
-const PTR_HEIGHT = 50
+const PTR_HEIGHT = 60
 
 const divider = <Divider variant="inset" component="li" sx={{ margin: '8px 4px' }} />
 
@@ -132,10 +122,8 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
         (raw: Event) => {
             if (!loadable) return
             const e = raw as TouchEvent
-            console.log(props.scrollParentRef.current?.scrollTop)
             if (!props.scrollParentRef.current) return
             const delta = e.touches[0].clientY - touchPosition
-            console.log(delta)
             setLoaderSize(Math.min(Math.max(delta, 0), PTR_HEIGHT))
             if (delta >= PTR_HEIGHT) setPtrEnabled(true)
         },

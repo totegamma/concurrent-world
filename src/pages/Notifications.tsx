@@ -45,7 +45,15 @@ export function Notifications(props: NotificationsProps): JSX.Element {
                 }}
                 ref={scrollParentRef}
             >
-                <Box sx={{ display: 'flex', flex: 1, padding: { xs: '8px', sm: '8px 16px' } }}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flex: 1,
+                        flexDirection: 'column',
+                        py: { xs: 1, sm: 1 },
+                        px: { xs: 1, sm: 2 }
+                    }}
+                >
                     <Timeline
                         streams={appData.displayingStream}
                         timeline={props.messages}
