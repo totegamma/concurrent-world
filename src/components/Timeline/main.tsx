@@ -26,6 +26,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     const client = useApi()
     const [hasMoreData, setHasMoreData] = useState<boolean>(false)
     const [isFetching, setIsFetching] = useState<boolean>(false)
+    const [scrollPosition, setScrollPosition] = useState<number>(0)
     const theme = useTheme()
 
     const pref = usePreference()
@@ -106,6 +107,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     const onScroll = useCallback(() => {
         // console.log(props.scrollParentRef.current?.scrollTop)
         if (!props.scrollParentRef.current) return
+        setScrollPosition(props.scrollParentRef.current.scrollTop)
         if (props.scrollParentRef.current.scrollTop < -80) {
             if (!client.api.host) return
             if (isFetching) return
@@ -142,15 +144,17 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                 height="80px"
                 width="100%"
                 position="absolute"
-                top="-79px" // TEST
+                top="-80px"
                 alignItems="center"
                 justifyContent="center"
                 sx={{
                     color: 'text.secondary',
+                    backgroundColor: 'background.default',
                     display: {
                         xs: pref.showEditorOnTopMobile ? 'none' : 'flex',
                         sm: pref.showEditorOnTop ? 'none' : 'flex'
-                    }
+                    },
+                    transform: `translateY(${-scrollPosition}px)`
                 }}
             >
                 Pull to refresh
