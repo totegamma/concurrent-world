@@ -85,14 +85,6 @@ function App(): JSX.Element {
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
     const messages = useObjectList<StreamElementDated>()
 
-    const [followingUserStreams, setFollowingUserStreams] = useState<string[]>([])
-    useEffect(() => {
-        const followingUsers = JSON.parse(localStorage.getItem('followingUsers') ?? '[]')
-        client?.getUserHomeStreams(followingUsers).then((streams) => {
-            setFollowingUserStreams(streams)
-        })
-    }, [client])
-
     const listsSource = localStorage.getItem('lists')
     const lists: Record<string, StreamList> = listsSource ? JSON.parse(listsSource) : {}
 
@@ -123,7 +115,7 @@ function App(): JSX.Element {
                 return []
             }
         }
-    }, [client, path, followingUserStreams])
+    }, [client, path])
 
     const { lastMessage, readyState, sendJsonMessage } = useWebSocket(`wss://${domain}/api/v1/socket`, {
         shouldReconnect: (_) => true,
