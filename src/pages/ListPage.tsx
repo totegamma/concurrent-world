@@ -126,7 +126,7 @@ export function ListPage(props: ListPageProps): JSX.Element {
                     sx={{
                         overflowX: 'hidden',
                         overflowY: 'auto',
-                        overscrollBehaviorY: 'contain'
+                        overscrollBehaviorY: 'none'
                     }}
                     ref={scrollParentRef}
                 >
