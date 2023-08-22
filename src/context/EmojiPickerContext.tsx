@@ -275,7 +275,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                 return (
                                     <IconButton
                                         key={emoji.imageURL}
-                                        onClick={() => {
+                                        onMouseDown={() => {
                                             onSelectEmoji(emoji)
                                         }}
                                         sx={{
