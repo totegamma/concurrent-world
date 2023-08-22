@@ -108,11 +108,15 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                                 mt: { xs: '3px', sm: '5px' }
                             }}
                             component={routerLink}
-                            to={'/entity/' + props.message.author.ccid}
+                            to={props.message.profileOverride?.link ?? '/entity/' + props.message.author.ccid}
+                            target={props.message.profileOverride?.link ? '_blank' : undefined}
+                            rel={props.message.profileOverride?.link ? 'noopener noreferrer' : undefined}
                         >
                             <CCAvatar
                                 alt={props.message.author.profile?.username}
-                                avatarURL={props.message.author.profile?.avatar}
+                                avatarURL={
+                                    props.message.profileOverride?.avatar ?? props.message.author.profile?.avatar
+                                }
                                 identiconSource={props.message.author.ccid}
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
@@ -134,7 +138,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                             authorID={props.message.author.ccid}
                             messageID={props.message.id}
                             cdate={props.message.cdate}
-                            username={props.message.author.profile?.username}
+                            username={props.message.profileOverride?.username ?? props.message.author.profile?.username}
                         />
                         {props.beforeMessage}
                         <SimpleNote message={props.message} />

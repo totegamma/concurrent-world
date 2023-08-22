@@ -29,7 +29,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
     const service = useMessageService()
 
-    const hasOwnReaction = props.message.favorites.find((fav) => fav.author.ccid === props.userCCID)
+    const favorited = props.message.favorites.find((fav) => fav.author.ccid === props.userCCID)
 
     const replyCount = props.message.replies.length
     const likeCount = props.message.favorites.length
@@ -120,7 +120,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                                 height: '20px',
                                                 width: '20px'
                                             }}
-                                            avatarURL={fav.author.profile?.avatar}
+                                            avatarURL={fav.profileOverride?.avatar ?? fav.author.profile?.avatar}
                                             identiconSource={fav.author.ccid}
                                         />
                                         {fav.author.profile?.username ?? 'anonymous'}
@@ -144,14 +144,14 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                 }}
                                 color="primary"
                                 onClick={() => {
-                                    if (hasOwnReaction) {
+                                    if (favorited) {
                                         service.removeFavorite()
                                     } else {
                                         service.addFavorite()
                                     }
                                 }}
                             >
-                                {hasOwnReaction ? (
+                                {favorited ? (
                                     <StarIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
                                 ) : (
                                     <StarOutlineIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
