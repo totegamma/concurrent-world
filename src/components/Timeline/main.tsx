@@ -1,4 +1,4 @@
-import { Divider, List, ListItem, ListItemIcon, ListItemText, Typography, useTheme } from '@mui/material'
+import { Box, Divider, List, ListItem, ListItemIcon, ListItemText, Typography, useTheme } from '@mui/material'
 import React, { type RefObject, memo, useCallback, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroller'
 import { AssociationFrame } from '../Association/AssociationFrame'
@@ -11,7 +11,8 @@ import { Loading } from '../ui/Loading'
 import { MessageContainer } from '../Message/MessageContainer'
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import HeartBrokenIcon from '@mui/icons-material/HeartBroken'
-import { FallbackFragment } from 'ethers'
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
+import SyncIcon from '@mui/icons-material/Sync'
 
 export interface TimelineProps {
     streams: string[]
@@ -20,29 +21,37 @@ export interface TimelineProps {
     perspective?: string
 }
 
+const PTR_HEIGHT = 60
+
 const divider = <Divider variant="inset" component="li" sx={{ margin: '8px 4px' }} />
 
 export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element => {
     const client = useApi()
+    const theme = useTheme()
+
     const [hasMoreData, setHasMoreData] = useState<boolean>(false)
     const [isFetching, setIsFetching] = useState<boolean>(false)
-    const theme = useTheme()
 
     useEffect(() => {
         if (!client.api.host) return
         props.timeline.clear()
         let unmounted = false
         setIsFetching(true)
-        setHasMoreData(true)
-        client.api?.readStreamRecent(props.streams).then((data: CoreStreamElement[]) => {
-            if (unmounted) return
-            const current = new Date().getTime()
-            const dated = data.map((e) => {
-                return { ...e, LastUpdated: current }
+        setHasMoreData(false)
+        client.api
+            ?.readStreamRecent(props.streams)
+            .then((data: CoreStreamElement[]) => {
+                if (unmounted) return
+                const current = new Date().getTime()
+                const dated = data.map((e) => {
+                    return { ...e, LastUpdated: current }
+                })
+                props.timeline.set(dated)
+                setHasMoreData(data.length > 0)
             })
-            props.timeline.set(dated)
-            setHasMoreData(data.length > 0)
-        })
+            .finally(() => {
+                setIsFetching(false)
+            })
         return () => {
             unmounted = true
         }
@@ -72,6 +81,9 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                     props.timeline.concat(dated)
                 } else setHasMoreData(false)
             })
+            .finally(() => {
+                setIsFetching(false)
+            })
         return () => {
             unmounted = true
         }
@@ -93,12 +105,115 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
         }
     }, [loadMore, props.timeline.current, hasMoreData])
 
+    const [touchPosition, setTouchPosition] = useState<number>(0)
+    const [loaderSize, setLoaderSize] = useState<number>(0)
+    const [loadable, setLoadable] = useState<boolean>(false)
+    const [ptrEnabled, setPtrEnabled] = useState<boolean>(false)
+
+    const onTouchStart = useCallback((raw: Event) => {
+        const e = raw as TouchEvent
+        setTouchPosition(e.touches[0].clientY)
+        setLoadable(props.scrollParentRef.current?.scrollTop === 0)
+    }, [])
+
+    const onTouchMove = useCallback(
+        (raw: Event) => {
+            if (!loadable) return
+            const e = raw as TouchEvent
+            if (!props.scrollParentRef.current) return
+            const delta = e.touches[0].clientY - touchPosition
+            setLoaderSize(Math.min(Math.max(delta, 0), PTR_HEIGHT))
+            if (delta >= PTR_HEIGHT) setPtrEnabled(true)
+        },
+        [props.scrollParentRef.current, touchPosition]
+    )
+
+    const onTouchEnd = useCallback(() => {
+        setLoaderSize(0)
+        if (ptrEnabled) {
+            if (isFetching) {
+                setPtrEnabled(false)
+                return
+            }
+            const unmounted = false
+            setIsFetching(true)
+            setHasMoreData(false)
+            setTimeout(() => {
+                client.api
+                    ?.readStreamRecent(props.streams)
+                    .then((data: CoreStreamElement[]) => {
+                        if (unmounted) return
+                        props.timeline.clear()
+                        const current = new Date().getTime()
+                        const dated = data.map((e) => {
+                            return { ...e, LastUpdated: current }
+                        })
+                        props.timeline.set(dated)
+                        setHasMoreData(data.length > 0)
+                    })
+                    .finally(() => {
+                        setIsFetching(false)
+                        setPtrEnabled(false)
+                    })
+            }, 1000)
+        }
+    }, [ptrEnabled, setPtrEnabled, props.timeline, props.streams, client.api, isFetching])
+
     useEffect(() => {
-        setIsFetching(false)
-    }, [props.timeline.current])
+        if (!props.scrollParentRef.current) return
+        props.scrollParentRef.current.addEventListener('touchstart', onTouchStart)
+        props.scrollParentRef.current.addEventListener('touchmove', onTouchMove)
+        props.scrollParentRef.current.addEventListener('touchend', onTouchEnd)
+        return () => {
+            props.scrollParentRef.current?.removeEventListener('touchstart', onTouchStart)
+            props.scrollParentRef.current?.removeEventListener('touchmove', onTouchMove)
+            props.scrollParentRef.current?.removeEventListener('touchend', onTouchEnd)
+        }
+    }, [props.scrollParentRef.current, onTouchStart, onTouchMove, onTouchEnd])
 
     return (
         <InspectorProvider>
+            <Box
+                sx={{
+                    height: `${ptrEnabled ? PTR_HEIGHT : loaderSize}px`,
+                    width: '100%',
+                    position: 'relative',
+                    color: 'text.secondary',
+                    display: 'flex',
+                    transition: 'height 0.2s ease-in-out',
+                    overflow: 'hidden'
+                }}
+            >
+                <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    height={`${PTR_HEIGHT}px`}
+                    position="absolute"
+                    width="100%"
+                    bottom="0"
+                    left="0"
+                >
+                    {isFetching ? (
+                        <SyncIcon
+                            sx={{
+                                animation: 'spin 1s linear infinite',
+                                '@keyframes spin': {
+                                    '0%': { transform: 'rotate(0deg)' },
+                                    '100%': { transform: 'rotate(-360deg)' }
+                                }
+                            }}
+                        />
+                    ) : (
+                        <ArrowUpwardIcon
+                            sx={{
+                                transform: `rotate(${ptrEnabled ? 0 : 180}deg)`,
+                                transition: 'transform 0.2s ease-in-out'
+                            }}
+                        />
+                    )}
+                </Box>
+            </Box>
             <List sx={{ flex: 1, width: '100%' }}>
                 <InfiniteScroll
                     loadMore={() => {

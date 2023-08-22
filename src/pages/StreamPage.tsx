@@ -91,7 +91,8 @@ export const StreamPage = memo<StreamPageProps>((props: StreamPageProps): JSX.El
                 <Box
                     sx={{
                         overflowX: 'hidden',
-                        overflowY: 'auto'
+                        overflowY: 'auto',
+                        overscrollBehaviorY: 'none'
                     }}
                     ref={scrollParentRef}
                 >
@@ -131,7 +132,15 @@ export const StreamPage = memo<StreamPageProps>((props: StreamPageProps): JSX.El
                         </Box>
                     )}
                     <WatchingStreamContextProvider watchingStreams={streamIDs}>
-                        <Box sx={{ display: 'flex', flex: 1, py: { xs: 1, sm: 1 }, px: { xs: 1, sm: 2 } }}>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flex: 1,
+                                flexDirection: 'column',
+                                py: { xs: 1, sm: 1 },
+                                px: { xs: 1, sm: 2 }
+                            }}
+                        >
                             <Timeline
                                 streams={appData.displayingStream}
                                 timeline={props.messages}

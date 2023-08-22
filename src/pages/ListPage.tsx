@@ -125,7 +125,8 @@ export function ListPage(props: ListPageProps): JSX.Element {
                 <Box
                     sx={{
                         overflowX: 'hidden',
-                        overflowY: 'auto'
+                        overflowY: 'auto',
+                        overscrollBehaviorY: 'none'
                     }}
                     ref={scrollParentRef}
                 >
@@ -163,7 +164,15 @@ export function ListPage(props: ListPageProps): JSX.Element {
                         <Divider />
                     </Box>
                     {streamIDs.length > 0 ? (
-                        <Box sx={{ display: 'flex', flex: 1, py: { xs: 1, sm: 1 }, px: { xs: 1, sm: 2 } }}>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flex: 1,
+                                flexDirection: 'column',
+                                py: { xs: 1, sm: 1 },
+                                px: { xs: 1, sm: 2 }
+                            }}
+                        >
                             <Timeline streams={streamIDs} timeline={props.messages} scrollParentRef={scrollParentRef} />
                         </Box>
                     ) : (

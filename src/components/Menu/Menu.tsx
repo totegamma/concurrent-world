@@ -14,7 +14,7 @@ import CreateIcon from '@mui/icons-material/Create'
 import { Link } from 'react-router-dom'
 
 import HomeIcon from '@mui/icons-material/Home'
-import BuildIcon from '@mui/icons-material/Build'
+import TerminalIcon from '@mui/icons-material/Terminal'
 import MessageIcon from '@mui/icons-material/Message'
 import ExploreIcon from '@mui/icons-material/Explore'
 import SettingsIcon from '@mui/icons-material/Settings'
@@ -156,7 +156,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         {pref.devMode && (
                             <ListItem disablePadding>
                                 <ListItemButton sx={{ gap: 1 }} component={Link} to="/devtool" onClick={props.onClick}>
-                                    <BuildIcon
+                                    <TerminalIcon
                                         sx={{
                                             color: 'background.contrastText'
                                         }}

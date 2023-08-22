@@ -34,6 +34,7 @@ import { EmojiPickerProvider } from './context/EmojiPickerContext'
 
 // @ts-expect-error vite dynamic import
 import { branch, sha } from '~build/info'
+import { ThinMenu } from './components/Menu/ThinMenu'
 const branchName = branch || window.location.host.split('.')[0]
 const versionString = `${location.hostname}-${branchName as string}-${sha.slice(0, 7) as string}`
 
@@ -84,14 +85,6 @@ function App(): JSX.Element {
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
     const messages = useObjectList<StreamElementDated>()
 
-    const [followingUserStreams, setFollowingUserStreams] = useState<string[]>([])
-    useEffect(() => {
-        const followingUsers = JSON.parse(localStorage.getItem('followingUsers') ?? '[]')
-        client?.getUserHomeStreams(followingUsers).then((streams) => {
-            setFollowingUserStreams(streams)
-        })
-    }, [client])
-
     const listsSource = localStorage.getItem('lists')
     const lists: Record<string, StreamList> = listsSource ? JSON.parse(listsSource) : {}
 
@@ -122,7 +115,7 @@ function App(): JSX.Element {
                 return []
             }
         }
-    }, [client, path, followingUserStreams])
+    }, [client, path])
 
     const { lastMessage, readyState, sendJsonMessage } = useWebSocket(`wss://${domain}/api/v1/socket`, {
         shouldReconnect: (_) => true,
@@ -358,20 +351,36 @@ function App(): JSX.Element {
                         display: 'flex',
                         flex: 1,
                         maxWidth: '1280px',
-                        width: '100%'
+                        width: '100%',
+                        marginLeft: 'env(safe-area-inset-left)',
+                        marginRight: 'env(safe-area-inset-right)'
                     }}
                 >
                     <Box
                         sx={{
                             display: {
                                 xs: 'none',
-                                sm: 'block'
+                                sm: 'none',
+                                md: 'block'
                             },
                             width: '200px',
                             m: 1
                         }}
                     >
                         <Menu />
+                    </Box>
+                    <Box
+                        sx={{
+                            display: {
+                                xs: 'none',
+                                sm: 'block',
+                                md: 'none'
+                            },
+                            width: '50px',
+                            m: 1
+                        }}
+                    >
+                        <ThinMenu />
                     </Box>
                     <Box
                         sx={{

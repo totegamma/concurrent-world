@@ -5,7 +5,7 @@ import { type EmojiPackage, type Emoji } from '../model'
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled'
 import SearchIcon from '@mui/icons-material/Search'
 import { usePersistent } from '../hooks/usePersistent'
-import { Grid } from 'react-virtualized'
+import { FixedSizeGrid } from 'react-window'
 
 import Fuzzysort from 'fuzzysort'
 
@@ -258,8 +258,15 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                             <Typography>{title}</Typography>
                         </Box>
 
-                        <Grid
-                            cellRenderer={({ columnIndex, rowIndex, style }) => {
+                        <FixedSizeGrid
+                            columnCount={RowEmojiCount}
+                            rowCount={Math.ceil(displayEmojis.length / RowEmojiCount)}
+                            columnWidth={50}
+                            rowHeight={50}
+                            width={310}
+                            height={300}
+                        >
+                            {({ columnIndex, rowIndex, style }) => {
                                 const index = rowIndex * RowEmojiCount + columnIndex
                                 const emoji = displayEmojis[rowIndex * RowEmojiCount + columnIndex]
                                 if (!emoji) {
@@ -286,13 +293,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                     </IconButton>
                                 )
                             }}
-                            columnCount={RowEmojiCount}
-                            rowCount={Math.ceil(displayEmojis.length / RowEmojiCount)}
-                            columnWidth={50}
-                            rowHeight={50}
-                            width={310}
-                            height={300}
-                        />
+                        </FixedSizeGrid>
                     </Box>
                 </Popover>
             </>
