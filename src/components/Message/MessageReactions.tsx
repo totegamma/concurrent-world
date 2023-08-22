@@ -3,6 +3,7 @@ import { useApi } from '../../context/api'
 import { CCAvatar } from '../ui/CCAvatar'
 import { Fragment } from 'react'
 import { useMessageService } from './MessageContainer'
+import { Link as routerLink } from 'react-router-dom'
 
 import { type M_Reply, type M_Current, type M_Reroute, type A_Reaction } from '@concurrent-world/client'
 
@@ -36,19 +37,31 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                             sx={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: 1
+                                gap: 1,
+                                textDecoration: 'none'
                             }}
+                            component={routerLink}
+                            to={reaction.profileOverride?.link ?? '/entity/' + reaction.author.ccid}
+                            target={reaction.profileOverride?.link ? '_blank' : undefined}
+                            rel={reaction.profileOverride?.link ? 'noopener noreferrer' : undefined}
                         >
                             <CCAvatar
                                 sx={{
                                     height: '20px',
                                     width: '20px'
                                 }}
-                                avatarURL={reaction.author.profile?.avatar}
+                                avatarURL={reaction.profileOverride?.avatar ?? reaction.author.profile?.avatar}
                                 identiconSource={reaction.author.ccid}
                                 alt={reaction.author.ccid}
                             />
-                            {reaction.author.profile?.username ?? 'anonymous'}
+                            <Typography
+                                sx={{
+                                    fontSize: '0.8rem',
+                                    color: '#fff'
+                                }}
+                            >
+                                {reaction.profileOverride?.username ?? reaction.author.profile?.username ?? 'anonymous'}
+                            </Typography>
                         </Box>
                     ) : (
                         <Fragment key={0} />
