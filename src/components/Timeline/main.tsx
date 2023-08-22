@@ -11,7 +11,6 @@ import { Loading } from '../ui/Loading'
 import { MessageContainer } from '../Message/MessageContainer'
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import HeartBrokenIcon from '@mui/icons-material/HeartBroken'
-import { usePreference } from '../../context/PreferenceContext'
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
 import SyncIcon from '@mui/icons-material/Sync'
 
@@ -29,7 +28,6 @@ const divider = <Divider variant="inset" component="li" sx={{ margin: '8px 4px' 
 export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element => {
     const client = useApi()
     const theme = useTheme()
-    const pref = usePreference()
 
     const [hasMoreData, setHasMoreData] = useState<boolean>(false)
     const [isFetching, setIsFetching] = useState<boolean>(false)
@@ -166,7 +164,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
         props.scrollParentRef.current.addEventListener('touchstart', onTouchStart)
         props.scrollParentRef.current.addEventListener('touchmove', onTouchMove)
         props.scrollParentRef.current.addEventListener('touchend', onTouchEnd)
-        return (): void => {
+        return () => {
             props.scrollParentRef.current?.removeEventListener('touchstart', onTouchStart)
             props.scrollParentRef.current?.removeEventListener('touchmove', onTouchMove)
             props.scrollParentRef.current?.removeEventListener('touchend', onTouchEnd)
@@ -176,15 +174,12 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     return (
         <InspectorProvider>
             <Box
-                height={`${ptrEnabled ? PTR_HEIGHT : loaderSize}px`}
-                width="100%"
-                position="relative"
                 sx={{
+                    height: `${ptrEnabled ? PTR_HEIGHT : loaderSize}px`,
+                    width: '100%',
+                    position: 'relative',
                     color: 'text.secondary',
-                    display: {
-                        xs: pref.showEditorOnTopMobile ? 'none' : 'flex',
-                        sm: pref.showEditorOnTop ? 'none' : 'flex'
-                    },
+                    display: 'flex',
                     transition: 'height 0.2s ease-in-out',
                     overflow: 'hidden'
                 }}
