@@ -7,7 +7,7 @@ import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
 
-import { Client, Schemas, type CoreServerEvent } from '@concurrent-world/client'
+import { Client, Schemas, type CoreServerEvent, type User } from '@concurrent-world/client'
 import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu/Menu'
 import type { StreamElementDated, ConcurrentTheme, StreamList } from './model'
@@ -68,10 +68,14 @@ function App(): JSX.Element {
     const [domain] = usePersistent<string>('Domain', '')
     const [prvkey] = usePersistent<string>('PrivateKey', '')
     const [client, initializeClient] = useState<Client>()
+    const [user, setUser] = useState<User>()
     useEffect(() => {
         try {
             const client = new Client(prvkey, domain, versionString)
             initializeClient(client)
+            client.getUser(client.ccid).then(() => {
+                setUser(client?.user ?? undefined)
+            })
         } catch (e) {
             console.log(e)
         }
@@ -367,7 +371,7 @@ function App(): JSX.Element {
                             m: 1
                         }}
                     >
-                        <Menu />
+                        <Menu user={user} />
                     </Box>
                     <Box
                         sx={{
