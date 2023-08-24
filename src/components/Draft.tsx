@@ -477,7 +477,11 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             variant="contained"
                             disabled={sending}
                             onClick={(_) => {
-                                post()
+                                if (destStreams.length === 0 && !postHome) {
+                                    enqueueSnackbar('set destination required', { variant: 'error' })
+                                } else {
+                                    post()
+                                }
                             }}
                             sx={{
                                 '&.Mui-disabled': {
