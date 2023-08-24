@@ -2,7 +2,7 @@ import { Box, Paper, Modal, Typography, Divider, Button, Drawer, useTheme } from
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
-import { Schemas, type RawDomainProfile, type CoreCharacter, type Message, type Stream } from '@concurrent-world/client'
+import { Schemas, type Message, type Stream } from '@concurrent-world/client'
 import { Draft } from '../components/Draft'
 import { useLocation } from 'react-router-dom'
 import { usePreference } from './PreferenceContext'
@@ -47,7 +47,13 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
 
     const setupAccountRequired =
-        client?.user !== null && (client?.user.profile === undefined || client?.user.userstreams === undefined)
+        client?.user !== null &&
+        (client?.user.profile === undefined ||
+            client?.user.userstreams === undefined ||
+            !client?.user.userstreams.homeStream ||
+            !client?.user.userstreams.notificationStream ||
+            !client?.user.userstreams.associationStream ||
+            !client?.user.userstreams.ackCollection)
 
     useEffect(() => {
         const allStreams = Object.values(pref.lists)
@@ -123,6 +129,33 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         },
         [openDraft]
     )
+
+    const fixAccount = useCallback(async () => {
+        console.log('starting account fix')
+        await client.setupUserstreams()
+        console.log('userstream setup complete')
+        const domain = await client.api.readDomain(client.api.host)
+        if (!domain) throw new Error('Domain not found')
+        try {
+            const domainProfile = await client.api.readCharacter(domain.ccid, Schemas.domainProfile)
+            if (!domainProfile) throw new Error('Domain profile not found')
+            if (domainProfile.payload.body.defaultBookmarkStreams)
+                localStorage.setItem(
+                    'bookmarkingStreams',
+                    JSON.stringify(domainProfile.payload.body.defaultBookmarkStreams)
+                )
+            if (domainProfile.payload.body.defaultFollowingStreams)
+                localStorage.setItem(
+                    'followingStreams',
+                    JSON.stringify(domainProfile.payload.body.defaultFollowingStreams)
+                )
+            if (domainProfile.payload.body.defaultPostStreams)
+                localStorage.setItem('postingStreams', JSON.stringify(domainProfile.payload.body.defaultPostStreams))
+        } catch (e) {
+            console.info(e)
+        }
+        window.location.reload()
+    }, [client])
 
     useEffect(() => {
         // attach the event listener
@@ -248,50 +281,25 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                         <Typography variant="h2" component="div">
                             アカウント設定を完了させましょう！
                         </Typography>
+                        見つかった問題:
+                        <ul>
+                            {!client?.user?.profile && <li>プロフィールが存在していません</li>}
+                            {!client?.user?.userstreams?.homeStream && <li>ホームストリームが存在していません</li>}
+                            {!client?.user?.userstreams?.notificationStream && (
+                                <li>通知ストリームが存在していません</li>
+                            )}
+                            {!client?.user?.userstreams?.associationStream && (
+                                <li>アクティビティストリームが存在していません</li>
+                            )}
+                            {!client?.user?.userstreams?.ackCollection && <li>Ackコレクションが存在していません</li>}
+                        </ul>
                         <ProfileEditor
                             id={client?.user?.profile?.id}
                             initial={client?.user?.profile}
                             onSubmit={(_) => {
-                                client.setupUserstreams().then(() => {
-                                    client.api.readDomain(client.api.host).then((domain) => {
-                                        if (!domain) return // TODO: add notice
-                                        client.api
-                                            .readCharacter(domain.ccid, Schemas.domainProfile)
-                                            .then((profile: CoreCharacter<RawDomainProfile> | null | undefined) => {
-                                                console.log(profile)
-                                                try {
-                                                    if (profile) {
-                                                        if (profile.payload.body.defaultBookmarkStreams)
-                                                            localStorage.setItem(
-                                                                'bookmarkingStreams',
-                                                                JSON.stringify(
-                                                                    profile.payload.body.defaultBookmarkStreams
-                                                                )
-                                                            )
-                                                        if (profile.payload.body.defaultFollowingStreams)
-                                                            localStorage.setItem(
-                                                                'followingStreams',
-                                                                JSON.stringify(
-                                                                    profile.payload.body.defaultFollowingStreams
-                                                                )
-                                                            )
-                                                        if (profile.payload.body.defaultPostStreams)
-                                                            localStorage.setItem(
-                                                                'defaultPostHome',
-                                                                JSON.stringify(profile.payload.body.defaultPostStreams)
-                                                            )
-                                                    }
-                                                } catch (e) {
-                                                    console.error(e)
-                                                }
-                                                window.location.reload()
-                                            })
-                                    })
-                                })
+                                fixAccount()
                             }}
                         />
-                        以前は使えていたのにこの画面が出る場合は上のUPDATEを押さずに、
-                        再度通信環境の良い場所でリロードしてみてください。
                     </Box>
                 </Paper>
             </Modal>

@@ -1,5 +1,5 @@
-import { Box, Paper, Tab, Tabs, Typography, alpha, useTheme } from '@mui/material'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { Box, Button, Paper, Tab, Tabs, Typography, alpha, useTheme } from '@mui/material'
+import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useApi } from '../context/api'
 import type { StreamElementDated } from '../model'
@@ -12,10 +12,12 @@ import { FollowButton } from '../components/FollowButton'
 import { type User } from '@concurrent-world/client'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import { TimelineHeader } from '../components/TimelineHeader'
+import { ApplicationContext } from '../App'
 
 export function EntityPage(): JSX.Element {
     const client = useApi()
     const theme = useTheme()
+    const appData = useContext(ApplicationContext)
     const { id } = useParams()
     const navigate = useNavigate()
 
@@ -24,6 +26,10 @@ export function EntityPage(): JSX.Element {
     const messages = useObjectList<StreamElementDated>()
     const scrollParentRef = useRef<HTMLDivElement>(null)
     const isSelf = id === client.ccid
+
+    const myAck = useMemo(() => {
+        return appData.acklist.find((ack) => ack.payload.ccid === id)
+    }, [appData.acklist, id])
 
     const [tab, setTab] = useState(0)
 
@@ -132,7 +138,31 @@ export function EntityPage(): JSX.Element {
                                     display: 'flex',
                                     flexFlow: 'row-reverse'
                                 }}
-                            ></Box>
+                            >
+                                {myAck ? (
+                                    <Button
+                                        variant="outlined"
+                                        onClick={() => {
+                                            client.unAckUser(myAck.id).then(() => {
+                                                appData.updateAcklist()
+                                            })
+                                        }}
+                                    >
+                                        UnAck
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => {
+                                            client.ackUser(user).then(() => {
+                                                appData.updateAcklist()
+                                            })
+                                        }}
+                                    >
+                                        Ack
+                                    </Button>
+                                )}
+                            </Box>
                             <Box
                                 sx={{
                                     display: 'flex',
