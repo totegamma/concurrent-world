@@ -32,11 +32,13 @@ import { useApi } from '../../context/api'
 import { usePreference } from '../../context/PreferenceContext'
 import { useGlobalActions } from '../../context/GlobalActions'
 import { ConcurrentLogo } from '../theming/ConcurrentLogo'
+import { type User } from '@concurrent-world/client'
 
 const branchName = branch || window.location.host.split('.')[0]
 
 export interface MenuProps {
     onClick?: () => void
+    user?: User
 }
 
 export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
@@ -81,7 +83,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         onClick={props.onClick}
                     >
                         <CCAvatar
-                            avatarURL={client?.user?.profile?.avatar}
+                            avatarURL={props.user?.profile?.avatar}
                             identiconSource={client.ccid}
                             sx={{
                                 width: '40px',
@@ -89,7 +91,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                             }}
                         />
                         <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', flexFlow: 'column' }}>
-                            <Typography color="contrastText">{client?.user?.profile?.username}</Typography>
+                            <Typography color="contrastText">{props.user?.profile?.username}</Typography>
                             <Typography variant="caption" color="background.contrastText">
                                 {client.api.host}
                             </Typography>
