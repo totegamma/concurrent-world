@@ -122,9 +122,13 @@ export const ManageEmojiPackages = (): JSX.Element => {
                     </Typography>
                     <IconButton
                         onClick={() => {
-                            pref.setEmojiPackages([...pref.emojiPackages, addingPackageURL])
-                            setAddingPackageURL('')
-                            setPreview(null)
+                            if (!packages.find((p) => p.packageURL === preview.packageURL)) {
+                                pref.setEmojiPackages([...pref.emojiPackages, addingPackageURL])
+                                setAddingPackageURL('')
+                                setPreview(null)
+                            } else {
+                                enqueueSnackbar('すでに追加されています', { variant: 'error' })
+                            }
                         }}
                     >
                         <AddCircleIcon />
