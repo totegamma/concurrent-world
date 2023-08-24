@@ -18,9 +18,11 @@ import { ConcurrentLogo } from '../theming/ConcurrentLogo'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import { MinimalStreamList } from '../StreamList/MinimalStreamList'
 import TerminalIcon from '@mui/icons-material/Terminal'
+import { type User } from '@concurrent-world/client'
 
 export interface MenuProps {
     onClick?: () => void
+    user?: User
 }
 
 export const ThinMenu = memo<MenuProps>((props: MenuProps): JSX.Element => {
@@ -71,7 +73,7 @@ export const ThinMenu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         onClick={props.onClick}
                     >
                         <CCAvatar
-                            avatarURL={client?.user?.profile?.avatar}
+                            avatarURL={props?.user?.profile?.avatar}
                             identiconSource={client.ccid}
                             sx={{
                                 width: '40px',

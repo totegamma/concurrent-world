@@ -384,7 +384,7 @@ function App(): JSX.Element {
                             m: 1
                         }}
                     >
-                        <ThinMenu />
+                        <ThinMenu user={user} />
                     </Box>
                     <Box
                         sx={{
