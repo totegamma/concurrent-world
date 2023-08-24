@@ -88,6 +88,10 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             enqueueSnackbar('Message must not be empty!', { variant: 'error' })
             return
         }
+        if (destStreams.length === 0 && !postHome) {
+            enqueueSnackbar('set destination required', { variant: 'error' })
+            return
+        }
         const destStreamIDs = destStreams.map((s) => s.id)
         const dest = [
             ...new Set([...destStreamIDs, ...(postHome ? [client?.user?.userstreams?.homeStream] : [])])
@@ -477,11 +481,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             variant="contained"
                             disabled={sending}
                             onClick={(_) => {
-                                if (destStreams.length === 0 && !postHome) {
-                                    enqueueSnackbar('set destination required', { variant: 'error' })
-                                } else {
-                                    post()
-                                }
+                                post()
                             }}
                             sx={{
                                 '&.Mui-disabled': {
