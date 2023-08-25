@@ -1,5 +1,5 @@
-import { Box, Paper, Tab, Tabs, Typography, alpha, useTheme } from '@mui/material'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { Box, Button, Link, Paper, Tab, Tabs, Typography, alpha, useTheme } from '@mui/material'
+import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useApi } from '../context/api'
 import type { StreamElementDated } from '../model'
@@ -12,10 +12,16 @@ import { FollowButton } from '../components/FollowButton'
 import { type User } from '@concurrent-world/client'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import { TimelineHeader } from '../components/TimelineHeader'
+import { ApplicationContext } from '../App'
+import { type UserAckCollection } from '@concurrent-world/client/dist/types/schemas/userAckCollection'
+import { CCDrawer } from '../components/ui/CCDrawer'
+
+type detail = 'none' | 'ack' | 'acker'
 
 export function EntityPage(): JSX.Element {
     const client = useApi()
     const theme = useTheme()
+    const appData = useContext(ApplicationContext)
     const { id } = useParams()
     const navigate = useNavigate()
 
@@ -25,6 +31,15 @@ export function EntityPage(): JSX.Element {
     const scrollParentRef = useRef<HTMLDivElement>(null)
     const isSelf = id === client.ccid
 
+    const [ackUsers, setAckUsers] = useState<User[]>([])
+    const ackedUsers = user?.profile?.ackedby ?? []
+
+    const [detailMode, setDetailMode] = useState<detail>('none')
+
+    const myAck = useMemo(() => {
+        return appData.acklist.find((ack) => ack.payload.ccid === id)
+    }, [appData.acklist, id])
+
     const [tab, setTab] = useState(0)
 
     useEffect(() => {
@@ -33,6 +48,17 @@ export function EntityPage(): JSX.Element {
             setUser(user)
         })
     }, [id])
+
+    useEffect(() => {
+        const collectionID = user?.userstreams?.ackCollection
+        if (!collectionID) return
+        client.api.readCollection<UserAckCollection>(collectionID).then((ackCollection) => {
+            if (!ackCollection) return
+            Promise.all(ackCollection.items.map((item) => client.getUser(item.payload.ccid!))).then((users) => {
+                setAckUsers(users.filter((user) => user !== null) as User[])
+            })
+        })
+    }, [user])
 
     const targetStreams = useMemo(() => {
         let target
@@ -132,7 +158,31 @@ export function EntityPage(): JSX.Element {
                                     display: 'flex',
                                     flexFlow: 'row-reverse'
                                 }}
-                            ></Box>
+                            >
+                                {myAck ? (
+                                    <Button
+                                        variant="outlined"
+                                        onClick={() => {
+                                            client.unAckUser(myAck.id).then(() => {
+                                                appData.updateAcklist()
+                                            })
+                                        }}
+                                    >
+                                        UnAck
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => {
+                                            client.ackUser(user).then(() => {
+                                                appData.updateAcklist()
+                                            })
+                                        }}
+                                    >
+                                        Ack
+                                    </Button>
+                                )}
+                            </Box>
                             <Box
                                 sx={{
                                     display: 'flex',
@@ -141,6 +191,24 @@ export function EntityPage(): JSX.Element {
                                 }}
                             >
                                 <Typography>{user.profile?.description}</Typography>
+                                <Typography
+                                    component={Link}
+                                    underline="hover"
+                                    onClick={() => {
+                                        setDetailMode('ack')
+                                    }}
+                                >
+                                    {ackUsers.length}人を認知
+                                </Typography>
+                                <Typography
+                                    component={Link}
+                                    underline="hover"
+                                    onClick={() => {
+                                        setDetailMode('acker')
+                                    }}
+                                >
+                                    {ackedUsers.length}人に認知されています
+                                </Typography>
                             </Box>
                             <Box
                                 sx={{
@@ -181,6 +249,37 @@ export function EntityPage(): JSX.Element {
                     />
                 </Box>
             </Box>
+            <CCDrawer
+                open={detailMode !== 'none'}
+                onClose={() => {
+                    setDetailMode('none')
+                }}
+            >
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexFlow: 'column',
+                        gap: 1,
+                        p: 1
+                    }}
+                >
+                    <Typography variant="h1">{detailMode === 'ack' ? 'Ack List' : 'Acker List'}</Typography>
+                    {(detailMode === 'ack' ? ackUsers : ackedUsers).map((user) => (
+                        <Box
+                            key={user.ccid}
+                            sx={{
+                                display: 'flex',
+                                width: '100%',
+                                alignItems: 'center',
+                                gap: 1
+                            }}
+                        >
+                            <CCAvatar avatarURL={user.profile?.avatar} identiconSource={user.ccid} />
+                            <Typography>{user.profile?.username}</Typography>
+                        </Box>
+                    ))}
+                </Box>
+            </CCDrawer>
         </Box>
     )
 }

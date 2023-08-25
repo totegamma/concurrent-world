@@ -1,4 +1,4 @@
-import { useEffect, useState, createContext, useRef, useMemo } from 'react'
+import { useEffect, useState, createContext, useRef, useMemo, useCallback } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider, CssBaseline } from '@mui/material'
 import useWebSocket, { type ReadyState } from 'react-use-websocket'
@@ -35,6 +35,8 @@ import { EmojiPickerProvider } from './context/EmojiPickerContext'
 // @ts-expect-error vite dynamic import
 import { branch, sha } from '~build/info'
 import { ThinMenu } from './components/Menu/ThinMenu'
+import { type UserAckCollection } from '@concurrent-world/client/dist/types/schemas/userAckCollection'
+import { type CollectionItem } from '@concurrent-world/client/dist/types/model/core'
 const branchName = branch || window.location.host.split('.')[0]
 const versionString = `${location.hostname}-${branchName as string}-${sha.slice(0, 7) as string}`
 
@@ -47,7 +49,9 @@ export const ApplicationContext = createContext<appData>({
     notificationSound: NotificationSound,
     setNotificationSound: (_sound: any) => {},
     volume: 0.5,
-    setVolume: (_volume: number) => {}
+    setVolume: (_volume: number) => {},
+    acklist: [],
+    updateAcklist: () => {}
 })
 
 export interface appData {
@@ -60,6 +64,8 @@ export interface appData {
     setNotificationSound: (sound: any) => void
     volume: number
     setVolume: (volume: number) => void
+    acklist: Array<CollectionItem<UserAckCollection>>
+    updateAcklist: () => void
 }
 
 export const ClockContext = createContext<Date>(new Date())
@@ -88,6 +94,21 @@ function App(): JSX.Element {
 
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
     const messages = useObjectList<StreamElementDated>()
+
+    const [acklist, setAcklist] = useState<Array<CollectionItem<UserAckCollection>>>([])
+    const updateAcklist = useCallback(() => {
+        if (!client) return
+        const collectionID = client.user?.userstreams?.ackCollection
+        if (!collectionID) return
+        client.api.readCollection<UserAckCollection>(collectionID).then((ackCollection) => {
+            if (!ackCollection) return
+            setAcklist(ackCollection.items)
+        })
+    }, [client, client?.user])
+
+    useEffect(() => {
+        updateAcklist()
+    }, [client, client?.user])
 
     const listsSource = localStorage.getItem('lists')
     const lists: Record<string, StreamList> = listsSource ? JSON.parse(listsSource) : {}
@@ -297,7 +318,9 @@ function App(): JSX.Element {
             notificationSound,
             setNotificationSound,
             volume,
-            setVolume
+            setVolume,
+            acklist,
+            updateAcklist
         }
     }, [
         readyState,
@@ -308,7 +331,9 @@ function App(): JSX.Element {
         notificationSound,
         setNotificationSound,
         volume,
-        setVolume
+        setVolume,
+        acklist,
+        updateAcklist
     ])
 
     if (!client) {
