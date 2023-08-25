@@ -1,4 +1,4 @@
-import { Box, Button, Paper, Tab, Tabs, Typography, alpha, useTheme } from '@mui/material'
+import { Box, Button, Link, Paper, Tab, Tabs, Typography, alpha, useTheme } from '@mui/material'
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useApi } from '../context/api'
@@ -14,6 +14,9 @@ import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import { TimelineHeader } from '../components/TimelineHeader'
 import { ApplicationContext } from '../App'
 import { type UserAckCollection } from '@concurrent-world/client/dist/types/schemas/userAckCollection'
+import { CCDrawer } from '../components/ui/CCDrawer'
+
+type detail = 'none' | 'ack' | 'acker'
 
 export function EntityPage(): JSX.Element {
     const client = useApi()
@@ -29,6 +32,9 @@ export function EntityPage(): JSX.Element {
     const isSelf = id === client.ccid
 
     const [ackUsers, setAckUsers] = useState<User[]>([])
+    const ackedUsers = user?.profile?.ackedby ?? []
+
+    const [detailMode, setDetailMode] = useState<detail>('none')
 
     const myAck = useMemo(() => {
         return appData.acklist.find((ack) => ack.payload.ccid === id)
@@ -185,8 +191,23 @@ export function EntityPage(): JSX.Element {
                                 }}
                             >
                                 <Typography>{user.profile?.description}</Typography>
-                                <Typography>
-                                    {ackUsers.length}acks/{(user.profile?.ackedby ?? []).length}acker
+                                <Typography
+                                    component={Link}
+                                    underline="hover"
+                                    onClick={() => {
+                                        setDetailMode('ack')
+                                    }}
+                                >
+                                    {ackUsers.length}人を認知
+                                </Typography>
+                                <Typography
+                                    component={Link}
+                                    underline="hover"
+                                    onClick={() => {
+                                        setDetailMode('acker')
+                                    }}
+                                >
+                                    {ackedUsers.length}人に認知されています
                                 </Typography>
                             </Box>
                             <Box
@@ -228,6 +249,37 @@ export function EntityPage(): JSX.Element {
                     />
                 </Box>
             </Box>
+            <CCDrawer
+                open={detailMode !== 'none'}
+                onClose={() => {
+                    setDetailMode('none')
+                }}
+            >
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexFlow: 'column',
+                        gap: 1,
+                        p: 1
+                    }}
+                >
+                    <Typography variant="h1">{detailMode === 'ack' ? 'Ack List' : 'Acker List'}</Typography>
+                    {(detailMode === 'ack' ? ackUsers : ackedUsers).map((user) => (
+                        <Box
+                            key={user.ccid}
+                            sx={{
+                                display: 'flex',
+                                width: '100%',
+                                alignItems: 'center',
+                                gap: 1
+                            }}
+                        >
+                            <CCAvatar avatarURL={user.profile?.avatar} identiconSource={user.ccid} />
+                            <Typography>{user.profile?.username}</Typography>
+                        </Box>
+                    ))}
+                </Box>
+            </CCDrawer>
         </Box>
     )
 }
