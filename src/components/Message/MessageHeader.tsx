@@ -17,7 +17,7 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
 
     const myAck = useMemo(() => {
         return appData.acklist.find((ack) => ack.payload.ccid === props.authorID)
-    }, [props.authorID])
+    }, [props.authorID, appData.acklist])
 
     return (
         <Box
