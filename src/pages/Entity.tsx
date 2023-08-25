@@ -13,6 +13,7 @@ import { type User } from '@concurrent-world/client'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import { TimelineHeader } from '../components/TimelineHeader'
 import { ApplicationContext } from '../App'
+import { type UserAckCollection } from '@concurrent-world/client/dist/types/schemas/userAckCollection'
 
 export function EntityPage(): JSX.Element {
     const client = useApi()
@@ -27,6 +28,8 @@ export function EntityPage(): JSX.Element {
     const scrollParentRef = useRef<HTMLDivElement>(null)
     const isSelf = id === client.ccid
 
+    const [ackUsers, setAckUsers] = useState<User[]>([])
+
     const myAck = useMemo(() => {
         return appData.acklist.find((ack) => ack.payload.ccid === id)
     }, [appData.acklist, id])
@@ -39,6 +42,17 @@ export function EntityPage(): JSX.Element {
             setUser(user)
         })
     }, [id])
+
+    useEffect(() => {
+        const collectionID = user?.userstreams?.ackCollection
+        if (!collectionID) return
+        client.api.readCollection<UserAckCollection>(collectionID).then((ackCollection) => {
+            if (!ackCollection) return
+            Promise.all(ackCollection.items.map((item) => client.getUser(item.payload.ccid!))).then((users) => {
+                setAckUsers(users.filter((user) => user !== null) as User[])
+            })
+        })
+    }, [user])
 
     const targetStreams = useMemo(() => {
         let target
@@ -171,6 +185,9 @@ export function EntityPage(): JSX.Element {
                                 }}
                             >
                                 <Typography>{user.profile?.description}</Typography>
+                                <Typography>
+                                    {ackUsers.length}acks/{(user.profile?.ackedby ?? []).length}acker
+                                </Typography>
                             </Box>
                             <Box
                                 sx={{
