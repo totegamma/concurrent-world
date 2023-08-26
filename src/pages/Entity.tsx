@@ -15,6 +15,8 @@ import { TimelineHeader } from '../components/TimelineHeader'
 import { ApplicationContext } from '../App'
 import { type UserAckCollection } from '@concurrent-world/client/dist/types/schemas/userAckCollection'
 import { CCDrawer } from '../components/ui/CCDrawer'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 
 type detail = 'none' | 'ack' | 'acker'
 
@@ -167,8 +169,12 @@ export function EntityPage(): JSX.Element {
                                                 appData.updateAcklist()
                                             })
                                         }}
+                                        sx={{
+                                            textTransform: 'none'
+                                        }}
+                                        endIcon={<CheckCircleIcon />}
                                     >
-                                        UnAck
+                                        Acked
                                     </Button>
                                 ) : (
                                     <Button
@@ -178,6 +184,10 @@ export function EntityPage(): JSX.Element {
                                                 appData.updateAcklist()
                                             })
                                         }}
+                                        sx={{
+                                            textTransform: 'none'
+                                        }}
+                                        endIcon={<CheckCircleOutlineIcon />}
                                     >
                                         Ack
                                     </Button>
