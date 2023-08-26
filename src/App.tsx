@@ -7,7 +7,7 @@ import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
 
-import { Client, Schemas, type CoreServerEvent, type User } from '@concurrent-world/client'
+import { Client, Schemas, type CoreServerEvent } from '@concurrent-world/client'
 import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu/Menu'
 import type { StreamElementDated, ConcurrentTheme, StreamList } from './model'
@@ -74,17 +74,15 @@ function App(): JSX.Element {
     const [domain] = usePersistent<string>('Domain', '')
     const [prvkey] = usePersistent<string>('PrivateKey', '')
     const [client, initializeClient] = useState<Client>()
-    const [user, setUser] = useState<User>()
     useEffect(() => {
-        try {
-            const client = new Client(prvkey, domain, versionString)
-            initializeClient(client)
-            client.getUser(client.ccid).then(() => {
-                setUser(client?.user ?? undefined)
+        Client.create(prvkey, domain, versionString)
+            .then((client) => {
+                initializeClient(client)
             })
-        } catch (e) {
-            console.log(e)
-        }
+            .catch((e) => {
+                console.error(e)
+                enqueueSnackbar('Failed to connect to server', { variant: 'error' })
+            })
     }, [domain, prvkey])
 
     const [themeName, setThemeName] = usePersistent<string>('Theme', Object.keys(Themes)[0])
@@ -396,7 +394,7 @@ function App(): JSX.Element {
                             m: 1
                         }}
                     >
-                        <Menu user={user} />
+                        <Menu />
                     </Box>
                     <Box
                         sx={{
@@ -409,7 +407,7 @@ function App(): JSX.Element {
                             m: 1
                         }}
                     >
-                        <ThinMenu user={user} />
+                        <ThinMenu />
                     </Box>
                     <Box
                         sx={{

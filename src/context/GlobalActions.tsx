@@ -323,7 +323,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     onClick={() => {
                         setMobileMenuOpen(false)
                     }}
-                    user={client.user}
                 />
             </Drawer>
         </GlobalActionsContext.Provider>
