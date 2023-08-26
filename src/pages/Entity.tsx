@@ -158,9 +158,33 @@ export function EntityPage(): JSX.Element {
                                 sx={{
                                     height: '32px',
                                     display: 'flex',
-                                    flexFlow: 'row-reverse'
+                                    flexFlow: 'row',
+                                    alignItems: 'center',
+                                    justifyContent: 'flex-end',
+                                    gap: 1
                                 }}
                             >
+                                <Box display="flex" gap={1}>
+                                    <Typography
+                                        component={Link}
+                                        underline="hover"
+                                        onClick={() => {
+                                            setDetailMode('ack')
+                                        }}
+                                    >
+                                        {ackUsers.length} Ack
+                                    </Typography>
+                                    <Typography
+                                        component={Link}
+                                        underline="hover"
+                                        onClick={() => {
+                                            setDetailMode('acker')
+                                        }}
+                                    >
+                                        {ackedUsers.length} Acker
+                                    </Typography>
+                                </Box>
+
                                 {myAck ? (
                                     <Button
                                         variant="outlined"
@@ -201,24 +225,6 @@ export function EntityPage(): JSX.Element {
                                 }}
                             >
                                 <Typography>{user.profile?.description}</Typography>
-                                <Typography
-                                    component={Link}
-                                    underline="hover"
-                                    onClick={() => {
-                                        setDetailMode('ack')
-                                    }}
-                                >
-                                    {ackUsers.length}人を認知
-                                </Typography>
-                                <Typography
-                                    component={Link}
-                                    underline="hover"
-                                    onClick={() => {
-                                        setDetailMode('acker')
-                                    }}
-                                >
-                                    {ackedUsers.length}人に認知されています
-                                </Typography>
                             </Box>
                             <Box
                                 sx={{
