@@ -13,6 +13,10 @@ export const FollowButton = (props: FollowButtonProps): JSX.Element => {
     const pref = usePreference()
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
+    if (pref?.lists === undefined) {
+        return <></>
+    }
+
     return (
         <Box>
             <IconButton

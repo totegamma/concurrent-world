@@ -21,7 +21,7 @@ export interface MessageViewProps {
 export const MessageView = (props: MessageViewProps): JSX.Element => {
     const client = useApi()
     const { enqueueSnackbar } = useSnackbar()
-    const isSelf = props.message.author.ccid === client.ccid
+    const isSelf = props.message.author.ccid === client?.ccid
 
     return (
         <ListItem

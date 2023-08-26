@@ -5,7 +5,7 @@ import Paper from '@mui/material/Paper'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { HDNodeWallet } from 'ethers'
 import { LangJa } from '../utils/lang-ja'
 import { Client, LoadKey, type CoreDomain, CommputeCCID } from '@concurrent-world/client'
@@ -215,6 +215,21 @@ export function AccountImport(): JSX.Element {
                     <Button disabled={!entityFound} variant="contained" onClick={accountImport}>
                         インポート
                     </Button>
+                    <Box sx={{ flexGrow: 1 }} />
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'flex-end',
+                            gap: '10px',
+                            alignItems: 'center'
+                        }}
+                    >
+                        <Typography>まだアカウントを作ってない？</Typography>
+                        <Button variant="contained" component={Link} to="/register">
+                            アカウントを作成
+                        </Button>
+                    </Box>
                 </Paper>
             </Box>
         </ThemeProvider>

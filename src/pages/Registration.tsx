@@ -198,6 +198,23 @@ export function Registration(): JSX.Element {
                             IDカードを作成する
                         </Button>
                     </Box>
+
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            gap: '10px',
+                            alignItems: 'center',
+                            position: 'absolute',
+                            right: '10px',
+                            bottom: '10px'
+                        }}
+                    >
+                        <Typography>もうアカウントを持っている？</Typography>
+                        <Button variant="contained" component={Link} to="/import">
+                            アカウントのインポート
+                        </Button>
+                    </Box>
                 </>
             )
         },
