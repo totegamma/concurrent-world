@@ -88,12 +88,17 @@ export function Registration(): JSX.Element {
     }, [host, CCID, privateKey])
 
     useEffect(() => {
+        let unmounted = false
         if (!client) return
         const fqdn = server.replace('https://', '').replace('/', '')
         client.api.readDomain(fqdn).then((e) => {
+            if (unmounted) return
             setHost(e)
         })
         console.log(fqdn)
+        return () => {
+            unmounted = true
+        }
     }, [server])
 
     const setupAccount = (): void => {

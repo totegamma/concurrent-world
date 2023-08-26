@@ -1,6 +1,9 @@
-import { Box, Typography, Link } from '@mui/material'
+import { Box, Typography, Link, Tooltip } from '@mui/material'
 import { TimeDiff } from '../ui/TimeDiff'
 import { Link as RouterLink } from 'react-router-dom'
+import { useContext, useMemo } from 'react'
+import { ApplicationContext } from '../../App'
+import DoneIcon from '@mui/icons-material/Done'
 
 export interface MessageHeaderProps {
     username?: string
@@ -10,6 +13,12 @@ export interface MessageHeaderProps {
 }
 
 export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
+    const appData = useContext(ApplicationContext)
+
+    const myAck = useMemo(() => {
+        return appData.acklist.find((ack) => ack.payload.ccid === props.authorID)
+    }, [props.authorID, appData.acklist])
+
     return (
         <Box
             sx={{
@@ -20,7 +29,8 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
         >
             <Box
                 sx={{
-                    display: 'flex'
+                    display: 'flex',
+                    alignItems: 'center'
                 }}
             >
                 <Typography
@@ -32,6 +42,17 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                 >
                     {props.username || 'anonymous'}
                 </Typography>
+                {myAck && (
+                    <Tooltip arrow title="Ackしています" placement="top">
+                        <DoneIcon
+                            sx={{
+                                fontSize: '1rem',
+                                color: 'primary.main',
+                                marginLeft: '0.25rem'
+                            }}
+                        />
+                    </Tooltip>
+                )}
             </Box>
             <Link
                 component={RouterLink}
