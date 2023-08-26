@@ -161,6 +161,11 @@ export function Registration(): JSX.Element {
             title: 'Concurrentアカウントを作成しましょう！',
             component: (
                 <>
+                    <Alert severity="info">
+                        <AlertTitle>Concurrentは現在開発中のソフトウェアです。</AlertTitle>
+                        絶賛機能追加途中で説明も少ないです。観光程度に遊んでもらえると嬉しいです！
+                    </Alert>
+
                     <Box
                         sx={{
                             padding: '30px',
