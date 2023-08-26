@@ -38,7 +38,7 @@ const branchName = branch || window.location.host.split('.')[0]
 
 export interface MenuProps {
     onClick?: () => void
-    user?: User
+    user?: User | null | undefined
 }
 
 export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
