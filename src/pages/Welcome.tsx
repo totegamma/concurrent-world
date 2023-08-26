@@ -1,10 +1,10 @@
 import Box from '@mui/material/Box'
 import { Themes, createConcurrentTheme } from '../themes'
-import { Button, CssBaseline, IconButton, ThemeProvider, Typography } from '@mui/material'
+import { Button, CssBaseline, IconButton, Link, ThemeProvider, Typography } from '@mui/material'
 import { useState } from 'react'
 import { usePersistent } from '../hooks/usePersistent'
 import type { ConcurrentTheme } from '../model'
-import { Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import GitHubIcon from '@mui/icons-material/GitHub'
 import AppMock from '../components/welcome/AppMock'
 import { PassportRenderer } from '../components/theming/Passport'
@@ -61,7 +61,7 @@ export default function Welcome(): JSX.Element {
                             ✨
                         </Button>
 
-                        <Button variant="contained" component={Link} to="/import">
+                        <Button variant="contained" component={NavLink} to="/import">
                             インポート
                         </Button>
                     </Box>
@@ -79,7 +79,7 @@ export default function Welcome(): JSX.Element {
                         </Typography>
                         <Button
                             variant="contained"
-                            component={Link}
+                            component={NavLink}
                             to="/register"
                             sx={{
                                 marginTop: '20px',
@@ -88,7 +88,35 @@ export default function Welcome(): JSX.Element {
                         >
                             アカウントを作成
                         </Button>
+                        <Box pt={2}>
+                            <Typography gutterBottom variant="h3">
+                                Concurrentは現在開発中のソフトウェアです。
+                            </Typography>
+                            <Typography>
+                                絶賛機能追加途中で現在はまだたくさんの機能は使えません。観光程度に遊んでもらえると嬉しいです！
+                            </Typography>
+                            <Typography>
+                                バグを見つけたり、いいアイディアを思いついたら
+                                <Link href="https://github.com/totegamma/concurrent-web/issues/new/choose">
+                                    GithubからIssue
+                                </Link>
+                                を建てて今すぐ開発に参加しよう！
+                            </Typography>
+
+                            <Typography gutterBottom variant="h3" mt={1}>
+                                開発予定の機能
+                            </Typography>
+                            <Typography>- メンション</Typography>
+                            <Typography>- Activitypubアカウントのフォロー</Typography>
+                            <Typography>- メディア専用投稿・ユーザーのメディア一覧</Typography>
+                            <Typography>- ミュートなどの各種フィルタリング</Typography>
+                            <Typography>- ネイティブのメディアサーバーオプション</Typography>
+                            <Typography>- URLのプレビューカードの表示</Typography>
+                            <Typography>- 他のユーザーのアクティビティのタイムライン</Typography>
+                            <Typography>- etc...</Typography>
+                        </Box>
                     </Box>
+
                     <Box flex={1}>
                         <AppMock />
                     </Box>
@@ -187,7 +215,7 @@ export default function Welcome(): JSX.Element {
                     </Typography>
                     <Button
                         variant="contained"
-                        component={Link}
+                        component={NavLink}
                         to="/register"
                         sx={{
                             marginTop: '20px',
