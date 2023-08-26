@@ -12,6 +12,8 @@ export const AddListButton = (props: AddListButtonProps): JSX.Element => {
 
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
+    if (!pref?.lists) return <></>
+
     return (
         <>
             <Tooltip title="リストに追加" placement="top" arrow>

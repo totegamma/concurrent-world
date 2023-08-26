@@ -1,40 +1,20 @@
-import {
-    Box,
-    Button,
-    Card,
-    CardActionArea,
-    CardActions,
-    CardContent,
-    CardMedia,
-    Checkbox,
-    Divider,
-    IconButton,
-    Paper,
-    TextField,
-    Typography,
-    useTheme
-} from '@mui/material'
-import { type Commonstream, Schemas, type Stream } from '@concurrent-world/client'
+import { Box, Button, Checkbox, Divider, IconButton, Paper, TextField, Typography, useTheme } from '@mui/material'
+import { type Commonstream, Schemas } from '@concurrent-world/client'
 import { useApi } from '../context/api'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 
 import Fuzzysort from 'fuzzysort'
 
 import { CCDrawer } from '../components/ui/CCDrawer'
-import Background from '../resources/defaultbg.png'
 
 import { CCEditor } from '../components/ui/cceditor'
 import { useSnackbar } from 'notistack'
 
 import DoneAllIcon from '@mui/icons-material/DoneAll'
 import RemoveDoneIcon from '@mui/icons-material/RemoveDone'
-import { AddListButton } from '../components/AddListButton'
-
-interface StreamWithDomain {
-    domain: string
-    stream: Stream
-}
+import { type StreamWithDomain } from '../model'
+import { StreamCard } from '../components/Stream/Card'
 
 export function Explorer(): JSX.Element {
     const client = useApi()
@@ -236,26 +216,11 @@ export function Explorer(): JSX.Element {
             >
                 {searchResult.map((value) => {
                     return (
-                        <Card key={value.stream.id}>
-                            <CardActionArea component={Link} to={'/stream#' + value.stream.id}>
-                                <CardMedia component="img" height="140" image={value.stream.banner || Background} />
-                                <CardContent>
-                                    <Typography gutterBottom variant="h5" component="div">
-                                        {value.stream.name}
-                                        {value.stream.author === client.ccid ? ' (owner)' : ''}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {value.stream.description}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {value.domain}
-                                    </Typography>
-                                </CardContent>
-                            </CardActionArea>
-                            <CardActions>
-                                <AddListButton stream={value.stream.id} />
-                            </CardActions>
-                        </Card>
+                        <StreamCard
+                            key={value.stream.id}
+                            stream={value}
+                            isOwner={value.stream.author === client.ccid}
+                        />
                     )
                 })}
             </Box>

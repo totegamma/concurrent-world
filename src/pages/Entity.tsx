@@ -15,6 +15,8 @@ import { TimelineHeader } from '../components/TimelineHeader'
 import { ApplicationContext } from '../App'
 import { type UserAckCollection } from '@concurrent-world/client/dist/types/schemas/userAckCollection'
 import { CCDrawer } from '../components/ui/CCDrawer'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 
 type detail = 'none' | 'ack' | 'acker'
 
@@ -156,9 +158,33 @@ export function EntityPage(): JSX.Element {
                                 sx={{
                                     height: '32px',
                                     display: 'flex',
-                                    flexFlow: 'row-reverse'
+                                    flexFlow: 'row',
+                                    alignItems: 'center',
+                                    justifyContent: 'flex-end',
+                                    gap: 1
                                 }}
                             >
+                                <Box display="flex" gap={1}>
+                                    <Typography
+                                        component={Link}
+                                        underline="hover"
+                                        onClick={() => {
+                                            setDetailMode('ack')
+                                        }}
+                                    >
+                                        {ackUsers.length} Ack
+                                    </Typography>
+                                    <Typography
+                                        component={Link}
+                                        underline="hover"
+                                        onClick={() => {
+                                            setDetailMode('acker')
+                                        }}
+                                    >
+                                        {ackedUsers.length} Acker
+                                    </Typography>
+                                </Box>
+
                                 {myAck ? (
                                     <Button
                                         variant="outlined"
@@ -167,8 +193,12 @@ export function EntityPage(): JSX.Element {
                                                 appData.updateAcklist()
                                             })
                                         }}
+                                        sx={{
+                                            textTransform: 'none'
+                                        }}
+                                        endIcon={<CheckCircleIcon />}
                                     >
-                                        UnAck
+                                        Acked
                                     </Button>
                                 ) : (
                                     <Button
@@ -178,6 +208,10 @@ export function EntityPage(): JSX.Element {
                                                 appData.updateAcklist()
                                             })
                                         }}
+                                        sx={{
+                                            textTransform: 'none'
+                                        }}
+                                        endIcon={<CheckCircleOutlineIcon />}
                                     >
                                         Ack
                                     </Button>
@@ -191,24 +225,6 @@ export function EntityPage(): JSX.Element {
                                 }}
                             >
                                 <Typography>{user.profile?.description}</Typography>
-                                <Typography
-                                    component={Link}
-                                    underline="hover"
-                                    onClick={() => {
-                                        setDetailMode('ack')
-                                    }}
-                                >
-                                    {ackUsers.length}人を認知
-                                </Typography>
-                                <Typography
-                                    component={Link}
-                                    underline="hover"
-                                    onClick={() => {
-                                        setDetailMode('acker')
-                                    }}
-                                >
-                                    {ackedUsers.length}人に認知されています
-                                </Typography>
                             </Box>
                             <Box
                                 sx={{

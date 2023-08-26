@@ -66,7 +66,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                 color: 'text.secondary'
                             }}
                             onClick={() => {
-                                service.openReply()
+                                service?.openReply()
                             }}
                         >
                             <ReplyIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
@@ -87,7 +87,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                 color: 'text.secondary'
                             }}
                             onClick={() => {
-                                service.openReroute()
+                                service?.openReroute()
                             }}
                         >
                             <RepeatIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
@@ -145,9 +145,9 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                 color="primary"
                                 onClick={() => {
                                     if (favorited) {
-                                        service.removeFavorite()
+                                        service?.removeFavorite()
                                     } else {
-                                        service.addFavorite()
+                                        service?.addFavorite()
                                     }
                                 }}
                             >
@@ -175,7 +175,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                     emoji.src = `https://twemoji.maxcdn.com/v/latest/svg/${emoji.unified}.svg`
                                 }
                                 */
-                                service.addReaction(emoji.shortcode, emoji.imageURL)
+                                service?.addReaction(emoji.shortcode, emoji.imageURL)
                                 emojiPicker.close()
                             })
                         }}
@@ -214,7 +214,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     </MenuItem>
                     <MenuItem
                         onClick={() => {
-                            service.openInspector()
+                            service?.openInspector()
                             setMenuAnchor(null)
                         }}
                     >
@@ -223,10 +223,10 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         </ListItemIcon>
                         <ListItemText>詳細</ListItemText>
                     </MenuItem>
-                    {service.removeFromStream && props.message.author.ccid === props.userCCID && (
+                    {service?.removeFromStream && props.message.author.ccid === props.userCCID && (
                         <MenuItem
                             onClick={() => {
-                                service.removeFromStream?.()
+                                service?.removeFromStream?.()
                             }}
                         >
                             <ListItemIcon>
@@ -238,7 +238,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     {props.message.author.ccid === props.userCCID && (
                         <MenuItem
                             onClick={() => {
-                                service.deleteMessage()
+                                service?.deleteMessage()
                             }}
                         >
                             <ListItemIcon>

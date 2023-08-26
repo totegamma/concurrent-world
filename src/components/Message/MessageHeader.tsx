@@ -3,7 +3,7 @@ import { TimeDiff } from '../ui/TimeDiff'
 import { Link as RouterLink } from 'react-router-dom'
 import { useContext, useMemo } from 'react'
 import { ApplicationContext } from '../../App'
-import DoneIcon from '@mui/icons-material/Done'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 
 export interface MessageHeaderProps {
     username?: string
@@ -44,7 +44,7 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                 </Typography>
                 {myAck && (
                     <Tooltip arrow title="Ackしています" placement="top">
-                        <DoneIcon
+                        <CheckCircleIcon
                             sx={{
                                 fontSize: '1rem',
                                 color: 'primary.main',

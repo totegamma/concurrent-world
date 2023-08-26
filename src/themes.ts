@@ -493,7 +493,7 @@ export const ConcurrentDefaultTheme = {
                     borderRadius: '10px'
                 },
                 body: {
-                    overflow: 'hidden'
+                    overflowX: 'hidden'
                 }
             }
         }

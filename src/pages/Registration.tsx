@@ -48,7 +48,7 @@ import {
 } from '@concurrent-world/client'
 
 export function Registration(): JSX.Element {
-    const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue2')
+    const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue')
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
 
     const themes: string[] = Object.keys(Themes)
@@ -196,6 +196,23 @@ export function Registration(): JSX.Element {
                             }}
                         >
                             IDカードを作成する
+                        </Button>
+                    </Box>
+
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            gap: '10px',
+                            alignItems: 'center',
+                            position: 'absolute',
+                            right: '10px',
+                            bottom: '10px'
+                        }}
+                    >
+                        <Typography>もうアカウントを持っている？</Typography>
+                        <Button variant="contained" component={Link} to="/import">
+                            アカウントのインポート
                         </Button>
                     </Box>
                 </>
