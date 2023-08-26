@@ -37,6 +37,7 @@ import { branch, sha } from '~build/info'
 import { ThinMenu } from './components/Menu/ThinMenu'
 import { type UserAckCollection } from '@concurrent-world/client/dist/types/schemas/userAckCollection'
 import { type CollectionItem } from '@concurrent-world/client/dist/types/model/core'
+import { ConcurrentLogo } from './components/theming/ConcurrentLogo'
 const branchName = branch || window.location.host.split('.')[0]
 const versionString = `${location.hostname}-${branchName as string}-${sha.slice(0, 7) as string}`
 
@@ -452,6 +453,24 @@ function App(): JSX.Element {
                             <MobileMenu />
                         </Box>
                     </Box>
+                </Box>
+                <Box
+                    sx={{
+                        position: 'fixed',
+                        zIndex: '-1',
+                        opacity: { xs: '0.2', sm: '0.1' },
+                        left: '-30px',
+                        bottom: '-30px',
+                        width: '300px',
+                        height: '300px'
+                    }}
+                >
+                    <ConcurrentLogo
+                        size="300px"
+                        upperColor={theme.palette.background.contrastText}
+                        lowerColor={theme.palette.background.contrastText}
+                        frameColor={theme.palette.background.contrastText}
+                    />
                 </Box>
             </Box>
         </>

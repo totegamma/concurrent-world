@@ -491,9 +491,6 @@ export const ConcurrentDefaultTheme = {
                 '::-webkit-scrollbar-thumb': {
                     backgroundColor: 'rgba(0, 0, 0, 0.2)',
                     borderRadius: '10px'
-                },
-                body: {
-                    overflow: 'hidden'
                 }
             }
         }
