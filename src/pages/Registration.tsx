@@ -48,7 +48,7 @@ import {
 } from '@concurrent-world/client'
 
 export function Registration(): JSX.Element {
-    const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue2')
+    const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue')
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
 
     const themes: string[] = Object.keys(Themes)

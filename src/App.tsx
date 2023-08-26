@@ -462,7 +462,12 @@ function App(): JSX.Element {
                         left: '-30px',
                         bottom: '-30px',
                         width: '300px',
-                        height: '300px'
+                        height: '300px',
+                        display: {
+                            xs: 'none',
+                            sm: 'block',
+                            md: 'block'
+                        }
                     }}
                 >
                     <ConcurrentLogo

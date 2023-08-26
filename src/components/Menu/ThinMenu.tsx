@@ -1,4 +1,4 @@
-import { Box, ButtonBase, Divider, IconButton, useTheme } from '@mui/material'
+import { Box, ButtonBase, Divider, IconButton } from '@mui/material'
 import CreateIcon from '@mui/icons-material/Create'
 import { Link } from 'react-router-dom'
 
@@ -9,12 +9,10 @@ import SettingsIcon from '@mui/icons-material/Settings'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import { memo, useContext } from 'react'
 import { ApplicationContext } from '../../App'
-import type { ConcurrentTheme } from '../../model'
 import { CCAvatar } from '../ui/CCAvatar'
 import { useApi } from '../../context/api'
 import { usePreference } from '../../context/PreferenceContext'
 import { useGlobalActions } from '../../context/GlobalActions'
-import { ConcurrentLogo } from '../theming/ConcurrentLogo'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import { MinimalStreamList } from '../StreamList/MinimalStreamList'
 import TerminalIcon from '@mui/icons-material/Terminal'
@@ -28,10 +26,6 @@ export const ThinMenu = memo<MenuProps>((props: MenuProps): JSX.Element => {
     const pref = usePreference()
     const appData = useContext(ApplicationContext)
     const actions = useGlobalActions()
-
-    const theme = useTheme<ConcurrentTheme>()
-
-    const iconColor = appData.websocketState === 1 ? theme.palette.background.contrastText : theme.palette.text.disabled
 
     if (!appData) {
         return <>loading...</>
@@ -165,17 +159,6 @@ export const ThinMenu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                     >
                         <KeyboardArrowRightIcon />
                     </IconButton>
-                </Box>
-                <Box
-                    sx={{
-                        position: 'absolute',
-                        zIndex: '-1',
-                        opacity: { xs: '0.2', sm: '0.1' },
-                        marginLeft: '-50px',
-                        bottom: '-30px'
-                    }}
-                >
-                    <ConcurrentLogo size="300px" upperColor={iconColor} lowerColor={iconColor} frameColor={iconColor} />
                 </Box>
             </Box>
         </Box>
