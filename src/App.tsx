@@ -81,7 +81,8 @@ function App(): JSX.Element {
                 console.log(list)
                 return [...list.streams, list.userStreams.map((e) => e.streamID)].flat()
             }
-            case '/stream': {
+            case '/stream':
+            case '/stream/': {
                 return path.hash.replace('#', '').split(',')
             }
             case '/notifications': {

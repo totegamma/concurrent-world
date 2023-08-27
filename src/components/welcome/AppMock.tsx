@@ -14,6 +14,7 @@ const basicMessage = {
         tag: '',
         domain: '',
         cdate: '',
+        certs: [],
         score: 0
     },
     cdate: new Date(),
@@ -92,6 +93,7 @@ const mockData = [
                     tag: '',
                     domain: '',
                     cdate: '',
+                    certs: [],
                     score: 0
                 },
                 profileOverride: {
@@ -106,6 +108,7 @@ const mockData = [
                     tag: '',
                     domain: '',
                     cdate: '',
+                    certs: [],
                     score: 0
                 },
                 profileOverride: {
@@ -120,6 +123,7 @@ const mockData = [
                     tag: '',
                     domain: '',
                     cdate: '',
+                    certs: [],
                     score: 0
                 },
                 profileOverride: {
@@ -134,6 +138,7 @@ const mockData = [
                     tag: '',
                     domain: '',
                     cdate: '',
+                    certs: [],
                     score: 0
                 },
                 profileOverride: {
@@ -148,6 +153,7 @@ const mockData = [
                     tag: '',
                     domain: '',
                     cdate: '',
+                    certs: [],
                     score: 0
                 },
                 profileOverride: {
@@ -167,6 +173,7 @@ const mockData = [
                     tag: '',
                     domain: '',
                     cdate: '',
+                    certs: [],
                     score: 0
                 },
                 profileOverride: {
@@ -181,6 +188,7 @@ const mockData = [
                     tag: '',
                     domain: '',
                     cdate: '',
+                    certs: [],
                     score: 0
                 },
                 profileOverride: {
@@ -195,6 +203,7 @@ const mockData = [
                     tag: '',
                     domain: '',
                     cdate: '',
+                    certs: [],
                     score: 0
                 },
                 profileOverride: {
@@ -209,6 +218,7 @@ const mockData = [
                     tag: '',
                     domain: '',
                     cdate: '',
+                    certs: [],
                     score: 0
                 },
                 profileOverride: {
@@ -223,6 +233,7 @@ const mockData = [
                     tag: '',
                     domain: '',
                     cdate: '',
+                    certs: [],
                     score: 0
                 },
                 profileOverride: {
@@ -242,6 +253,7 @@ const mockData = [
                     tag: '',
                     domain: '',
                     cdate: '',
+                    certs: [],
                     score: 0
                 },
                 profileOverride: {
@@ -256,6 +268,7 @@ const mockData = [
                     tag: '',
                     domain: '',
                     cdate: '',
+                    certs: [],
                     score: 0
                 },
                 profileOverride: {
@@ -270,6 +283,7 @@ const mockData = [
                     tag: '',
                     domain: '',
                     cdate: '',
+                    certs: [],
                     score: 0
                 },
                 profileOverride: {
@@ -284,6 +298,7 @@ const mockData = [
                     tag: '',
                     domain: '',
                     cdate: '',
+                    certs: [],
                     score: 0
                 },
                 profileOverride: {
@@ -298,6 +313,7 @@ const mockData = [
                     tag: '',
                     domain: '',
                     cdate: '',
+                    certs: [],
                     score: 0
                 },
                 profileOverride: {
