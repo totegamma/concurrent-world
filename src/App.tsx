@@ -33,6 +33,7 @@ import { type UserAckCollection } from '@concurrent-world/client/dist/types/sche
 import { type CollectionItem } from '@concurrent-world/client/dist/types/model/core'
 import { ConcurrentLogo } from './components/theming/ConcurrentLogo'
 import { usePreference } from './context/PreferenceContext'
+import TickerProvider from './context/Ticker'
 
 export const ApplicationContext = createContext<appData>({
     websocketState: -1,
@@ -47,8 +48,6 @@ export interface appData {
     acklist: Array<CollectionItem<UserAckCollection>>
     updateAcklist: () => void
 }
-
-export const ClockContext = createContext<Date>(new Date())
 
 function App(): JSX.Element {
     const client = useApi()
@@ -117,16 +116,6 @@ function App(): JSX.Element {
         playBubbleRef.current = playBubble
         playNotificationRef.current = playNotification
     }, [playBubble, playNotification])
-
-    const [clock, setClock] = useState<Date>(new Date())
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setClock(new Date())
-        }, 5000)
-        return () => {
-            clearInterval(timer)
-        }
-    }, [setClock])
 
     useEffect(() => {
         sendJsonMessage({
@@ -284,13 +273,13 @@ function App(): JSX.Element {
         <SnackbarProvider preventDuplicate>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
-                <ClockContext.Provider value={clock}>
+                <TickerProvider>
                     <ApplicationContext.Provider value={applicationContext}>
                         <EmojiPickerProvider>
                             <GlobalActionsProvider>{childs}</GlobalActionsProvider>
                         </EmojiPickerProvider>
                     </ApplicationContext.Provider>
-                </ClockContext.Provider>
+                </TickerProvider>
             </ThemeProvider>
         </SnackbarProvider>
     )
