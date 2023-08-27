@@ -7,7 +7,7 @@ import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
 
-import { Client, Schemas, type CoreServerEvent } from '@concurrent-world/client'
+import { Schemas, type CoreServerEvent } from '@concurrent-world/client'
 import { Themes, createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu/Menu'
 import type { StreamElementDated, ConcurrentTheme, StreamList } from './model'
@@ -27,19 +27,14 @@ import BubbleSound from './resources/Bubble.wav'
 import NotificationSound from './resources/Notification.wav'
 import useSound from 'use-sound'
 import { MobileMenu } from './components/Menu/MobileMenu'
-import ApiProvider from './context/api'
-import { PreferenceProvider } from './context/PreferenceContext'
+import { useApi } from './context/api'
 import { GlobalActionsProvider } from './context/GlobalActions'
 import { EmojiPickerProvider } from './context/EmojiPickerContext'
 
-// @ts-expect-error vite dynamic import
-import { branch, sha } from '~build/info'
 import { ThinMenu } from './components/Menu/ThinMenu'
 import { type UserAckCollection } from '@concurrent-world/client/dist/types/schemas/userAckCollection'
 import { type CollectionItem } from '@concurrent-world/client/dist/types/model/core'
 import { ConcurrentLogo } from './components/theming/ConcurrentLogo'
-const branchName = branch || window.location.host.split('.')[0]
-const versionString = `${location.hostname}-${branchName as string}-${sha.slice(0, 7) as string}`
 
 export const ApplicationContext = createContext<appData>({
     websocketState: -1,
@@ -72,19 +67,7 @@ export interface appData {
 export const ClockContext = createContext<Date>(new Date())
 
 function App(): JSX.Element {
-    const [domain] = usePersistent<string>('Domain', '')
-    const [prvkey] = usePersistent<string>('PrivateKey', '')
-    const [client, initializeClient] = useState<Client>()
-    useEffect(() => {
-        Client.create(prvkey, domain, versionString)
-            .then((client) => {
-                initializeClient(client)
-            })
-            .catch((e) => {
-                console.error(e)
-                enqueueSnackbar('Failed to connect to server', { variant: 'error' })
-            })
-    }, [domain, prvkey])
+    const client = useApi()
 
     const [themeName, setThemeName] = usePersistent<string>('Theme', Object.keys(Themes)[0])
     const [postSound, setPostSound] = usePersistent<any>('PostSound', BubbleSound)
@@ -141,7 +124,7 @@ function App(): JSX.Element {
         }
     }, [client, path])
 
-    const { lastMessage, readyState, sendJsonMessage } = useWebSocket(`wss://${domain}/api/v1/socket`, {
+    const { lastMessage, readyState, sendJsonMessage } = useWebSocket(`wss://${client.host}/api/v1/socket`, {
         shouldReconnect: (_) => true,
         reconnectInterval: (attempt) => Math.min(Math.pow(2, attempt) * 1000, 10000),
         onOpen: (_) => {
@@ -344,15 +327,11 @@ function App(): JSX.Element {
             <ThemeProvider theme={theme}>
                 <CssBaseline />
                 <ClockContext.Provider value={clock}>
-                    <ApiProvider api={client}>
-                        <PreferenceProvider>
-                            <ApplicationContext.Provider value={applicationContext}>
-                                <EmojiPickerProvider>
-                                    <GlobalActionsProvider>{childs}</GlobalActionsProvider>
-                                </EmojiPickerProvider>
-                            </ApplicationContext.Provider>
-                        </PreferenceProvider>
-                    </ApiProvider>
+                    <ApplicationContext.Provider value={applicationContext}>
+                        <EmojiPickerProvider>
+                            <GlobalActionsProvider>{childs}</GlobalActionsProvider>
+                        </EmojiPickerProvider>
+                    </ApplicationContext.Provider>
                 </ClockContext.Provider>
             </ThemeProvider>
         </SnackbarProvider>
