@@ -134,12 +134,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                             overflow: 'auto'
                         }}
                     >
-                        <MessageHeader
-                            authorID={props.message.author.ccid}
-                            messageID={props.message.id}
-                            cdate={props.message.cdate}
-                            username={props.message.profileOverride?.username ?? props.message.author.profile?.username}
-                        />
+                        <MessageHeader message={props.message} />
                         {props.beforeMessage}
                         <SimpleNote message={props.message} />
                         <MessageReactions message={props.message} />
