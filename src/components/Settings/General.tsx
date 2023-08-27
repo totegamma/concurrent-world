@@ -1,5 +1,5 @@
 import { Box, Button, Divider, FormControlLabel, FormGroup, Slider, Switch, TextField, Typography } from '@mui/material'
-import { forwardRef, useContext, useState } from 'react'
+import { forwardRef, useState } from 'react'
 import { ProfileEditor } from '../ProfileEditor'
 import { useApi } from '../../context/api'
 import { usePreference } from '../../context/PreferenceContext'
@@ -8,11 +8,9 @@ import { LogoutButton } from './LogoutButton'
 import { ThemeSelect } from './ThemeSelect'
 import { ImgurSettings } from './Imgur'
 import { IssueJWT } from '@concurrent-world/client'
-import { ApplicationContext } from '../../App'
 import { ManageEmojiPackages } from './ManageEmojiPackages'
 
 export const GeneralSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
-    const appData = useContext(ApplicationContext)
     const client = useApi()
     const pref = usePreference()
     const { enqueueSnackbar } = useSnackbar()
@@ -104,26 +102,26 @@ export const GeneralSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Elem
                     <Typography variant="h4">音量</Typography>
                     <Slider
                         aria-label="Volume"
-                        value={appData.volume}
+                        value={pref.volume}
                         onChange={(_, value) => {
-                            appData.setVolume(value as number)
+                            pref.setVolume(value as number)
                         }}
                     />
                     <Typography variant="h4">Override</Typography>
                     <TextField
                         label="投稿音"
                         placeholder="https://example.com/sound.mp3"
-                        value={appData.postSound}
+                        value={pref.postSound}
                         onChange={(e) => {
-                            appData.setPostSound(e.target.value)
+                            pref.setPostSound(e.target.value)
                         }}
                     />
                     <TextField
                         label="通知音"
                         placeholder="https://example.com/sound.mp3"
-                        value={appData.notificationSound}
+                        value={pref.notificationSound}
                         onChange={(e) => {
-                            appData.setNotificationSound(e.target.value)
+                            pref.setNotificationSound(e.target.value)
                         }}
                     />
                 </Box>

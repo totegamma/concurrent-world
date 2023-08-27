@@ -1,12 +1,12 @@
 import { Box, Button, Paper, Typography } from '@mui/material'
 import { ConcurrentLogo } from '../../theming/ConcurrentLogo'
 import type { ConcurrentTheme } from '../../../model'
-import { useContext, useMemo } from 'react'
+import { useMemo } from 'react'
 import { createConcurrentTheme, Themes } from '../../../themes'
-import { ApplicationContext } from '../../../App'
+import { usePreference } from '../../../context/PreferenceContext'
 
 export const ThemeSelect = (): JSX.Element => {
-    const appData = useContext(ApplicationContext)
+    const pref = usePreference()
 
     const previewTheme: Record<string, ConcurrentTheme> = useMemo(
         () => Object.fromEntries(Object.keys(Themes).map((e) => [e, createConcurrentTheme(e)])),
@@ -29,7 +29,7 @@ export const ThemeSelect = (): JSX.Element => {
                     <Paper key={e}>
                         <Button
                             onClick={(_) => {
-                                appData.setThemeName(e)
+                                pref.setThemeName(e)
                             }}
                             style={{
                                 border: 'none',

@@ -574,7 +574,7 @@ export function Registration(): JSX.Element {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <ApiProvider api={client}>
+            <ApiProvider client={client}>
                 <Box
                     sx={{
                         padding: '20px',
