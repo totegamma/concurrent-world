@@ -55,7 +55,7 @@ export function EntityPage(): JSX.Element {
         if (!user) return
         let collectionID = user.userstreams?.ackCollection
         if (!collectionID) return
-        if (!collectionID.includes('@')) {
+        if (!collectionID.includes('@') && user.domain) {
             // WORKAROUND
             collectionID += '@' + user.domain
         }
