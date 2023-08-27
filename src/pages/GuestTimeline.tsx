@@ -76,7 +76,7 @@ export function GuestTimelinePage(): JSX.Element {
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <ClockContext.Provider value={clock}>
-                <ApiProvider api={client}>
+                <ApiProvider client={client}>
                     <Box
                         sx={{
                             display: 'flex',

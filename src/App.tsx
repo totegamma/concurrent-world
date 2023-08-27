@@ -4,7 +4,6 @@ import { darken, Box, Paper, ThemeProvider, CssBaseline } from '@mui/material'
 import useWebSocket, { type ReadyState } from 'react-use-websocket'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 
-import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
 
 import { Schemas, type CoreServerEvent } from '@concurrent-world/client'
@@ -23,8 +22,6 @@ import {
     Devtool
 } from './pages'
 
-import BubbleSound from './resources/Bubble.wav'
-import NotificationSound from './resources/Notification.wav'
 import useSound from 'use-sound'
 import { MobileMenu } from './components/Menu/MobileMenu'
 import { useApi } from './context/api'
@@ -40,12 +37,6 @@ import { usePreference } from './context/PreferenceContext'
 export const ApplicationContext = createContext<appData>({
     websocketState: -1,
     displayingStream: [],
-    postSound: BubbleSound,
-    setPostSound: (_sound: any) => {},
-    notificationSound: NotificationSound,
-    setNotificationSound: (_sound: any) => {},
-    volume: 0.5,
-    setVolume: (_volume: number) => {},
     acklist: [],
     updateAcklist: () => {}
 })
@@ -53,12 +44,6 @@ export const ApplicationContext = createContext<appData>({
 export interface appData {
     websocketState: ReadyState
     displayingStream: string[]
-    postSound: any
-    setPostSound: (sound: any) => void
-    notificationSound: any
-    setNotificationSound: (sound: any) => void
-    volume: number
-    setVolume: (volume: number) => void
     acklist: Array<CollectionItem<UserAckCollection>>
     updateAcklist: () => void
 }
@@ -68,10 +53,6 @@ export const ClockContext = createContext<Date>(new Date())
 function App(): JSX.Element {
     const client = useApi()
     const pref = usePreference()
-
-    const [postSound, setPostSound] = usePersistent<any>('PostSound', BubbleSound)
-    const [notificationSound, setNotificationSound] = usePersistent<any>('NotificationSound', NotificationSound)
-    const [volume, setVolume] = usePersistent<number>('Volume', 50)
 
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(pref.themeName))
     const messages = useObjectList<StreamElementDated>()
@@ -131,8 +112,8 @@ function App(): JSX.Element {
         }
     })
 
-    const [playBubble] = useSound(postSound, { volume: volume / 100 })
-    const [playNotification] = useSound(notificationSound, { volume: volume / 100 })
+    const [playBubble] = useSound(pref.postSound, { volume: pref.volume / 100 })
+    const [playNotification] = useSound(pref.notificationSound, { volume: pref.volume / 100 })
     const playBubbleRef = useRef(playBubble)
     const playNotificationRef = useRef(playNotification)
     useEffect(() => {
@@ -293,27 +274,10 @@ function App(): JSX.Element {
         return {
             websocketState: readyState,
             displayingStream,
-            postSound,
-            setPostSound,
-            notificationSound,
-            setNotificationSound,
-            volume,
-            setVolume,
             acklist,
             updateAcklist
         }
-    }, [
-        readyState,
-        displayingStream,
-        postSound,
-        setPostSound,
-        notificationSound,
-        setNotificationSound,
-        volume,
-        setVolume,
-        acklist,
-        updateAcklist
-    ])
+    }, [readyState, displayingStream, acklist, updateAcklist])
 
     if (!client) {
         return <>building api service...</>

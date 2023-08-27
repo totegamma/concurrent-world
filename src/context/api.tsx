@@ -13,6 +13,7 @@ const ApiContext = createContext<Client | undefined>(undefined)
 
 export interface ApiProviderProps {
     children: JSX.Element
+    client?: Client
 }
 
 export default function ApiProvider(props: ApiProviderProps): JSX.Element {
@@ -20,6 +21,7 @@ export default function ApiProvider(props: ApiProviderProps): JSX.Element {
     const [prvkey] = usePersistent<string>('PrivateKey', '')
     const [client, initializeClient] = useState<Client>()
     useEffect(() => {
+        if (props.client) return
         Client.create(prvkey, domain, versionString)
             .then((client) => {
                 initializeClient(client)
@@ -29,11 +31,11 @@ export default function ApiProvider(props: ApiProviderProps): JSX.Element {
             })
     }, [domain, prvkey])
 
-    if (!client) {
+    if (!(client ?? props.client)) {
         return <FullScreenLoading message="Initializing client..." />
     }
 
-    return <ApiContext.Provider value={client}>{props.children}</ApiContext.Provider>
+    return <ApiContext.Provider value={props.client ?? client}>{props.children}</ApiContext.Provider>
 }
 
 export function useApi(): Client {
