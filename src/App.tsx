@@ -8,7 +8,7 @@ import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
 
 import { Schemas, type CoreServerEvent } from '@concurrent-world/client'
-import { Themes, createConcurrentTheme } from './themes'
+import { createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu/Menu'
 import type { StreamElementDated, ConcurrentTheme, StreamList } from './model'
 import {
@@ -35,11 +35,11 @@ import { ThinMenu } from './components/Menu/ThinMenu'
 import { type UserAckCollection } from '@concurrent-world/client/dist/types/schemas/userAckCollection'
 import { type CollectionItem } from '@concurrent-world/client/dist/types/model/core'
 import { ConcurrentLogo } from './components/theming/ConcurrentLogo'
+import { usePreference } from './context/PreferenceContext'
 
 export const ApplicationContext = createContext<appData>({
     websocketState: -1,
     displayingStream: [],
-    setThemeName: (_newtheme: string) => {},
     postSound: BubbleSound,
     setPostSound: (_sound: any) => {},
     notificationSound: NotificationSound,
@@ -53,7 +53,6 @@ export const ApplicationContext = createContext<appData>({
 export interface appData {
     websocketState: ReadyState
     displayingStream: string[]
-    setThemeName: (newtheme: string) => void
     postSound: any
     setPostSound: (sound: any) => void
     notificationSound: any
@@ -68,13 +67,13 @@ export const ClockContext = createContext<Date>(new Date())
 
 function App(): JSX.Element {
     const client = useApi()
+    const pref = usePreference()
 
-    const [themeName, setThemeName] = usePersistent<string>('Theme', Object.keys(Themes)[0])
     const [postSound, setPostSound] = usePersistent<any>('PostSound', BubbleSound)
     const [notificationSound, setNotificationSound] = usePersistent<any>('NotificationSound', NotificationSound)
     const [volume, setVolume] = usePersistent<number>('Volume', 50)
 
-    const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
+    const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(pref.themeName))
     const messages = useObjectList<StreamElementDated>()
 
     const [acklist, setAcklist] = useState<Array<CollectionItem<UserAckCollection>>>([])
@@ -279,7 +278,7 @@ function App(): JSX.Element {
     }, [lastMessage])
 
     useEffect(() => {
-        const newtheme = createConcurrentTheme(themeName)
+        const newtheme = createConcurrentTheme(pref.themeName)
         setTheme(newtheme)
         let themeColorMetaTag: HTMLMetaElement = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement
         if (!themeColorMetaTag) {
@@ -288,13 +287,12 @@ function App(): JSX.Element {
             document.head.appendChild(themeColorMetaTag)
         }
         themeColorMetaTag.content = newtheme.palette.background.default
-    }, [themeName])
+    }, [pref.themeName])
 
     const applicationContext = useMemo(() => {
         return {
             websocketState: readyState,
             displayingStream,
-            setThemeName,
             postSound,
             setPostSound,
             notificationSound,
@@ -307,7 +305,6 @@ function App(): JSX.Element {
     }, [
         readyState,
         displayingStream,
-        setThemeName,
         postSound,
         setPostSound,
         notificationSound,
