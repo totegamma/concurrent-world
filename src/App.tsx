@@ -9,7 +9,7 @@ import { useObjectList } from './hooks/useObjectList'
 import { Schemas, type CoreServerEvent } from '@concurrent-world/client'
 import { createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu/Menu'
-import type { StreamElementDated, ConcurrentTheme, StreamList } from './model'
+import type { StreamElementDated, ConcurrentTheme } from './model'
 import {
     Associations,
     Explorer,
@@ -72,15 +72,12 @@ function App(): JSX.Element {
         updateAcklist()
     }, [client, client?.user])
 
-    const listsSource = localStorage.getItem('lists')
-    const lists: Record<string, StreamList> = listsSource ? JSON.parse(listsSource) : {}
-
     const path = useLocation()
     const displayingStream: string[] = useMemo(() => {
         switch (path.pathname) {
             case '/': {
                 const rawid = path.hash.replace('#', '')
-                const list = lists[rawid] ?? Object.values(lists)[0]
+                const list = pref.lists[rawid] ?? Object.values(pref.lists)[0]
                 if (!list) return []
                 console.log(list)
                 return [...list.streams, list.userStreams.map((e) => e.streamID)].flat()
