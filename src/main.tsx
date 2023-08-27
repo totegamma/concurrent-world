@@ -8,6 +8,8 @@ import { FullScreenLoading } from './components/ui/FullScreenLoading'
 import { Registration } from './pages/Registration'
 import { AccountImport } from './pages/AccountImport'
 import { GuestTimelinePage } from './pages/GuestTimeline'
+import ApiProvider from './context/api'
+import { PreferenceProvider } from './context/PreferenceContext'
 
 const AppPage = lazy(() => import('./App'))
 const Welcome = lazy(() => import('./pages/Welcome'))
@@ -21,7 +23,21 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                     <Route path="/register" element={<Registration />} />
                     <Route path="/import" element={<AccountImport />} />
                     <Route path="/guest/" element={<GuestTimelinePage />} />
-                    <Route path="*" element={<LoginGuard component={<AppPage />} redirect="/welcome" />} />
+                    <Route
+                        path="*"
+                        element={
+                            <LoginGuard
+                                component={
+                                    <ApiProvider>
+                                        <PreferenceProvider>
+                                            <AppPage />
+                                        </PreferenceProvider>
+                                    </ApiProvider>
+                                }
+                                redirect="/welcome"
+                            />
+                        }
+                    />
                 </Routes>
             </BrowserRouter>
         </Suspense>

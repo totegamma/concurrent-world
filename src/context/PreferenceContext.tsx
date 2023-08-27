@@ -3,6 +3,9 @@ import { usePersistent } from '../hooks/usePersistent'
 import { useApi } from './api'
 import { type StreamList } from '../model'
 
+import BubbleSound from '../resources/Bubble.wav'
+import NotificationSound from '../resources/Notification.wav'
+
 interface PreferenceState {
     themeName: string
     setThemeName: (_: string) => void
@@ -25,6 +28,13 @@ interface PreferenceState {
 
     emojiPackages: string[]
     setEmojiPackages: (_: string[]) => void
+
+    postSound: any
+    setPostSound: (sound: any) => void
+    notificationSound: any
+    setNotificationSound: (sound: any) => void
+    volume: number
+    setVolume: (volume: number) => void
 }
 
 const PreferenceContext = createContext<PreferenceState | undefined>(undefined)
@@ -58,6 +68,10 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
     const [emojiPackages, setEmojiPackages] = usePersistent<string[]>('emojiPackages', [
         'https://gist.githubusercontent.com/totegamma/6e1a047f54960f6bb7b946064664d793/raw/twemoji.json'
     ]) // default twemoji
+
+    const [postSound, setPostSound] = usePersistent<any>('PostSound', BubbleSound)
+    const [notificationSound, setNotificationSound] = usePersistent<any>('NotificationSound', NotificationSound)
+    const [volume, setVolume] = usePersistent<number>('Volume', 50)
 
     useEffect(() => {
         if (!client) return
@@ -140,28 +154,27 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
             setLists,
             updateList,
             emojiPackages,
-            setEmojiPackages
+            setEmojiPackages,
+            postSound,
+            setPostSound,
+            notificationSound,
+            setNotificationSound,
+            volume,
+            setVolume
         }
     }, [
         themeName,
-        setThemeName,
         imgurClientID,
-        setImgurClientID,
         defaultPostHome,
-        setDefaultPostHome,
         defaultPostNonHome,
-        setDefaultPostNonHome,
         devMode,
-        setDevMode,
         showEditorOnTop,
-        setShowEditorOnTop,
         showEditorOnTopMobile,
-        setShowEditorOnTopMobile,
         lists,
-        setLists,
-        updateList,
         emojiPackages,
-        setEmojiPackages
+        postSound,
+        notificationSound,
+        volume
     ])
 
     return <PreferenceContext.Provider value={value}>{props.children}</PreferenceContext.Provider>

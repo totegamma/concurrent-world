@@ -7,10 +7,10 @@ import { Timeline } from '../components/Timeline/main'
 import { Client } from '@concurrent-world/client'
 import { FullScreenLoading } from '../components/ui/FullScreenLoading'
 import ApiProvider from '../context/api'
-import { ClockContext } from '../App'
 import { Themes, createConcurrentTheme } from '../themes'
 import { usePersistent } from '../hooks/usePersistent'
 import { ConcurrentWordmark } from '../components/theming/ConcurrentWordmark'
+import TickerProvider from '../context/Ticker'
 
 export function GuestTimelinePage(): JSX.Element {
     const reactlocation = useLocation()
@@ -60,23 +60,13 @@ export function GuestTimelinePage(): JSX.Element {
 
     const scrollParentRef = useRef<HTMLDivElement>(null)
 
-    const [clock, setClock] = useState<Date>(new Date())
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setClock(new Date())
-        }, 5000)
-        return () => {
-            clearInterval(timer)
-        }
-    }, [setClock])
-
     if (!client) return <FullScreenLoading message="Loading..." />
 
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <ClockContext.Provider value={clock}>
-                <ApiProvider api={client}>
+            <TickerProvider>
+                <ApiProvider client={client}>
                     <Box
                         sx={{
                             display: 'flex',
@@ -246,7 +236,7 @@ export function GuestTimelinePage(): JSX.Element {
                         </Box>
                     </Box>
                 </ApiProvider>
-            </ClockContext.Provider>
+            </TickerProvider>
         </ThemeProvider>
     )
 }

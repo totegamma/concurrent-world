@@ -52,8 +52,13 @@ export function EntityPage(): JSX.Element {
     }, [id])
 
     useEffect(() => {
-        const collectionID = user?.userstreams?.ackCollection
+        if (!user) return
+        let collectionID = user.userstreams?.ackCollection
         if (!collectionID) return
+        if (!collectionID.includes('@') && user.domain) {
+            // WORKAROUND
+            collectionID += '@' + user.domain
+        }
         client.api.readCollection<UserAckCollection>(collectionID).then((ackCollection) => {
             if (!ackCollection) return
             Promise.all(ackCollection.items.map((item) => client.getUser(item.payload.ccid!))).then((users) => {

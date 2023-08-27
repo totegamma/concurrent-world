@@ -4,13 +4,12 @@ import { darken, Box, Paper, ThemeProvider, CssBaseline } from '@mui/material'
 import useWebSocket, { type ReadyState } from 'react-use-websocket'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 
-import { usePersistent } from './hooks/usePersistent'
 import { useObjectList } from './hooks/useObjectList'
 
-import { Client, Schemas, type CoreServerEvent } from '@concurrent-world/client'
-import { Themes, createConcurrentTheme } from './themes'
+import { Schemas, type CoreServerEvent } from '@concurrent-world/client'
+import { createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu/Menu'
-import type { StreamElementDated, ConcurrentTheme, StreamList } from './model'
+import type { StreamElementDated, ConcurrentTheme } from './model'
 import {
     Associations,
     Explorer,
@@ -23,34 +22,22 @@ import {
     Devtool
 } from './pages'
 
-import BubbleSound from './resources/Bubble.wav'
-import NotificationSound from './resources/Notification.wav'
 import useSound from 'use-sound'
 import { MobileMenu } from './components/Menu/MobileMenu'
-import ApiProvider from './context/api'
-import { PreferenceProvider } from './context/PreferenceContext'
+import { useApi } from './context/api'
 import { GlobalActionsProvider } from './context/GlobalActions'
 import { EmojiPickerProvider } from './context/EmojiPickerContext'
 
-// @ts-expect-error vite dynamic import
-import { branch, sha } from '~build/info'
 import { ThinMenu } from './components/Menu/ThinMenu'
 import { type UserAckCollection } from '@concurrent-world/client/dist/types/schemas/userAckCollection'
 import { type CollectionItem } from '@concurrent-world/client/dist/types/model/core'
 import { ConcurrentLogo } from './components/theming/ConcurrentLogo'
-const branchName = branch || window.location.host.split('.')[0]
-const versionString = `${location.hostname}-${branchName as string}-${sha.slice(0, 7) as string}`
+import { usePreference } from './context/PreferenceContext'
+import TickerProvider from './context/Ticker'
 
 export const ApplicationContext = createContext<appData>({
     websocketState: -1,
     displayingStream: [],
-    setThemeName: (_newtheme: string) => {},
-    postSound: BubbleSound,
-    setPostSound: (_sound: any) => {},
-    notificationSound: NotificationSound,
-    setNotificationSound: (_sound: any) => {},
-    volume: 0.5,
-    setVolume: (_volume: number) => {},
     acklist: [],
     updateAcklist: () => {}
 })
@@ -58,40 +45,15 @@ export const ApplicationContext = createContext<appData>({
 export interface appData {
     websocketState: ReadyState
     displayingStream: string[]
-    setThemeName: (newtheme: string) => void
-    postSound: any
-    setPostSound: (sound: any) => void
-    notificationSound: any
-    setNotificationSound: (sound: any) => void
-    volume: number
-    setVolume: (volume: number) => void
     acklist: Array<CollectionItem<UserAckCollection>>
     updateAcklist: () => void
 }
 
-export const ClockContext = createContext<Date>(new Date())
-
 function App(): JSX.Element {
-    const [domain] = usePersistent<string>('Domain', '')
-    const [prvkey] = usePersistent<string>('PrivateKey', '')
-    const [client, initializeClient] = useState<Client>()
-    useEffect(() => {
-        Client.create(prvkey, domain, versionString)
-            .then((client) => {
-                initializeClient(client)
-            })
-            .catch((e) => {
-                console.error(e)
-                enqueueSnackbar('Failed to connect to server', { variant: 'error' })
-            })
-    }, [domain, prvkey])
+    const client = useApi()
+    const pref = usePreference()
 
-    const [themeName, setThemeName] = usePersistent<string>('Theme', Object.keys(Themes)[0])
-    const [postSound, setPostSound] = usePersistent<any>('PostSound', BubbleSound)
-    const [notificationSound, setNotificationSound] = usePersistent<any>('NotificationSound', NotificationSound)
-    const [volume, setVolume] = usePersistent<number>('Volume', 50)
-
-    const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
+    const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(pref.themeName))
     const messages = useObjectList<StreamElementDated>()
 
     const [acklist, setAcklist] = useState<Array<CollectionItem<UserAckCollection>>>([])
@@ -109,15 +71,12 @@ function App(): JSX.Element {
         updateAcklist()
     }, [client, client?.user])
 
-    const listsSource = localStorage.getItem('lists')
-    const lists: Record<string, StreamList> = listsSource ? JSON.parse(listsSource) : {}
-
     const path = useLocation()
     const displayingStream: string[] = useMemo(() => {
         switch (path.pathname) {
             case '/': {
                 const rawid = path.hash.replace('#', '')
-                const list = lists[rawid] ?? Object.values(lists)[0]
+                const list = pref.lists[rawid] ?? Object.values(pref.lists)[0]
                 if (!list) return []
                 console.log(list)
                 return [...list.streams, list.userStreams.map((e) => e.streamID)].flat()
@@ -141,7 +100,7 @@ function App(): JSX.Element {
         }
     }, [client, path])
 
-    const { lastMessage, readyState, sendJsonMessage } = useWebSocket(`wss://${domain}/api/v1/socket`, {
+    const { lastMessage, readyState, sendJsonMessage } = useWebSocket(`wss://${client.host}/api/v1/socket`, {
         shouldReconnect: (_) => true,
         reconnectInterval: (attempt) => Math.min(Math.pow(2, attempt) * 1000, 10000),
         onOpen: (_) => {
@@ -149,24 +108,14 @@ function App(): JSX.Element {
         }
     })
 
-    const [playBubble] = useSound(postSound, { volume: volume / 100 })
-    const [playNotification] = useSound(notificationSound, { volume: volume / 100 })
+    const [playBubble] = useSound(pref.postSound, { volume: pref.volume / 100 })
+    const [playNotification] = useSound(pref.notificationSound, { volume: pref.volume / 100 })
     const playBubbleRef = useRef(playBubble)
     const playNotificationRef = useRef(playNotification)
     useEffect(() => {
         playBubbleRef.current = playBubble
         playNotificationRef.current = playNotification
     }, [playBubble, playNotification])
-
-    const [clock, setClock] = useState<Date>(new Date())
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setClock(new Date())
-        }, 5000)
-        return () => {
-            clearInterval(timer)
-        }
-    }, [setClock])
 
     useEffect(() => {
         sendJsonMessage({
@@ -296,7 +245,7 @@ function App(): JSX.Element {
     }, [lastMessage])
 
     useEffect(() => {
-        const newtheme = createConcurrentTheme(themeName)
+        const newtheme = createConcurrentTheme(pref.themeName)
         setTheme(newtheme)
         let themeColorMetaTag: HTMLMetaElement = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement
         if (!themeColorMetaTag) {
@@ -305,35 +254,16 @@ function App(): JSX.Element {
             document.head.appendChild(themeColorMetaTag)
         }
         themeColorMetaTag.content = newtheme.palette.background.default
-    }, [themeName])
+    }, [pref.themeName])
 
     const applicationContext = useMemo(() => {
         return {
             websocketState: readyState,
             displayingStream,
-            setThemeName,
-            postSound,
-            setPostSound,
-            notificationSound,
-            setNotificationSound,
-            volume,
-            setVolume,
             acklist,
             updateAcklist
         }
-    }, [
-        readyState,
-        displayingStream,
-        setThemeName,
-        postSound,
-        setPostSound,
-        notificationSound,
-        setNotificationSound,
-        volume,
-        setVolume,
-        acklist,
-        updateAcklist
-    ])
+    }, [readyState, displayingStream, acklist, updateAcklist])
 
     if (!client) {
         return <>building api service...</>
@@ -343,17 +273,13 @@ function App(): JSX.Element {
         <SnackbarProvider preventDuplicate>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
-                <ClockContext.Provider value={clock}>
-                    <ApiProvider api={client}>
-                        <PreferenceProvider>
-                            <ApplicationContext.Provider value={applicationContext}>
-                                <EmojiPickerProvider>
-                                    <GlobalActionsProvider>{childs}</GlobalActionsProvider>
-                                </EmojiPickerProvider>
-                            </ApplicationContext.Provider>
-                        </PreferenceProvider>
-                    </ApiProvider>
-                </ClockContext.Provider>
+                <TickerProvider>
+                    <ApplicationContext.Provider value={applicationContext}>
+                        <EmojiPickerProvider>
+                            <GlobalActionsProvider>{childs}</GlobalActionsProvider>
+                        </EmojiPickerProvider>
+                    </ApplicationContext.Provider>
+                </TickerProvider>
             </ThemeProvider>
         </SnackbarProvider>
     )
