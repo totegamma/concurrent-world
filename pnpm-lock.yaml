@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@concurrent-world/client':
-    specifier: ^2.2.3
-    version: 2.2.3
+    specifier: ^2.2.4
+    version: 2.2.4
   '@emotion/react':
     specifier: ^11.10.5
     version: 11.10.5(@babel/core@7.21.8)(@types/react@18.0.26)(react@18.2.0)
@@ -1641,8 +1641,8 @@ packages:
     dev: true
     optional: true
 
-  /@concurrent-world/client@2.2.3:
-    resolution: {integrity: sha512-svz6vp14Mbh31sOU8a3g6RZl2LA9pp3UjMsJ93asLlXOBDgHbcDr4VSFAYypw/iFxPoGe2GqYRw4x/XxlAemYw==}
+  /@concurrent-world/client@2.2.4:
+    resolution: {integrity: sha512-HpIaqBm/PVvigVq5ktEekqoJUVzG/03SoUnbwnjCVDv+IvfQlBefTbr+CotWXHMn5Z/HB9z8LKX0rxPG9J0fTg==}
     dependencies:
       elliptic: 6.5.4
       ethers: 6.7.0
