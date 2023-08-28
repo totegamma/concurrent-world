@@ -1,11 +1,24 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { Popover, TextField, Box, Tabs, Tab, Typography, Divider, IconButton, alpha, useTheme } from '@mui/material'
+import {
+    Popover,
+    TextField,
+    Box,
+    Tabs,
+    Tab,
+    Typography,
+    Divider,
+    IconButton,
+    alpha,
+    useTheme,
+    Button
+} from '@mui/material'
 import { usePreference } from './PreferenceContext'
 import { type EmojiPackage, type Emoji } from '../model'
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled'
 import SearchIcon from '@mui/icons-material/Search'
 import { usePersistent } from '../hooks/usePersistent'
 import { FixedSizeGrid } from 'react-window'
+import { Link as RouterLink } from 'react-router-dom'
 
 import Fuzzysort from 'fuzzysort'
 
@@ -190,7 +203,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                             ) : (
                                 <Tab key="search" aria-label="Search Result" icon={<SearchIcon />} sx={tabsx} />
                             )}
-                            {emojiPackages.map((emojiPackage, index) => (
+                            {emojiPackages.map((emojiPackage, _index) => (
                                 <Tab
                                     key={emojiPackage.packageURL}
                                     aria-label={emojiPackage.name}
@@ -294,6 +307,40 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                 )
                             }}
                         </FixedSizeGrid>
+                    </Box>
+                    <Divider />
+                    <Box display="flex" padding={1} justifyContent="space-between" alignItems="center">
+                        <Box display="flex" alignItems="center" gap={1}>
+                            <Box /* preview */
+                                component="img"
+                                src={displayEmojis[selected]?.imageURL}
+                                alt={displayEmojis[selected]?.shortcode}
+                                height="30px"
+                                width="30px"
+                            />
+                            <Typography
+                                variant="caption"
+                                sx={{
+                                    display: 'inline-block',
+                                    width: '100px',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                {displayEmojis[selected]?.shortcode}
+                            </Typography>
+                        </Box>
+                        <Button
+                            component={RouterLink}
+                            variant="outlined"
+                            to="/settings/emoji"
+                            onClick={() => {
+                                setAnchor(null)
+                            }}
+                        >
+                            絵文字を追加
+                        </Button>
                     </Box>
                 </Popover>
             </>

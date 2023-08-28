@@ -31,6 +31,7 @@ import caretPosition from 'textarea-caret'
 import { type Stream } from '@concurrent-world/client'
 import { useApi } from '../context/api'
 import { type Emoji, type EmojiLite } from '../model'
+import { useNavigate } from 'react-router-dom'
 
 export interface DraftProps {
     submitButtonLabel?: string
@@ -46,6 +47,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const theme = useTheme()
     const pref = usePreference()
     const emojiPicker = useEmojiPicker()
+    const navigate = useNavigate()
 
     const [destStreams, setDestStreams] = useState<Stream[]>(props.streamPickerInitial)
 
@@ -395,8 +397,13 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                 sx={{
                                     color: theme.palette.text.secondary
                                 }}
-                                onClick={onFileUploadClick}
-                                disabled={pref.imgurClientID === ''}
+                                onClick={() => {
+                                    if (pref.imgurClientID === '') {
+                                        navigate('/settings/media')
+                                    } else {
+                                        onFileUploadClick()
+                                    }
+                                }}
                             >
                                 <ImageIcon sx={{ fontSize: '80%' }} />
                                 <input
