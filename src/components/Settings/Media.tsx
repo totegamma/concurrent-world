@@ -1,4 +1,4 @@
-import { Box, Button, TextField, Typography } from '@mui/material'
+import { Box, Button, Divider, TextField, Typography } from '@mui/material'
 import { useRef, useState } from 'react'
 import { usePreference } from '../../context/PreferenceContext'
 
@@ -6,12 +6,23 @@ export const MediaSettings = (): JSX.Element => {
     const pref = usePreference()
 
     const clientIdRef = useRef<HTMLInputElement>(null)
+    const mediaProxyRef = useRef<HTMLInputElement>(null)
 
     const [buttonText, setButtonText] = useState<string>('Save')
 
     const handleSave = (): void => {
         if (clientIdRef.current) {
             pref.setImgurClientID(clientIdRef.current.value)
+            setButtonText('OK!')
+            setTimeout(() => {
+                setButtonText('Save')
+            }, 2000)
+        }
+    }
+
+    const handleMediaProxySave = (): void => {
+        if (mediaProxyRef.current) {
+            pref.setMediaProxy(mediaProxyRef.current.value)
             setButtonText('OK!')
             setTimeout(() => {
                 setButtonText('Save')
@@ -42,6 +53,25 @@ export const MediaSettings = (): JSX.Element => {
                 />
             </Box>
             <Button variant="contained" onClick={handleSave}>
+                {buttonText}
+            </Button>
+            <Divider />
+
+            <Typography variant="h3">URLプレビュー設定</Typography>
+            <Typography>
+                URLプレビューに私用するAPIのURLを設定します。デフォルトでは、いずれアカウントのhostに移行する予定です。
+            </Typography>
+            <Box>
+                <TextField
+                    label="MediaProxyUrl"
+                    variant="outlined"
+                    fullWidth={true}
+                    defaultValue={pref.mediaProxy}
+                    inputRef={mediaProxyRef}
+                    type="text"
+                />
+            </Box>
+            <Button variant="contained" onClick={handleMediaProxySave}>
                 {buttonText}
             </Button>
         </Box>

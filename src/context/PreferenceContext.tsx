@@ -13,6 +13,9 @@ interface PreferenceState {
     imgurClientID: string
     setImgurClientID: (_: string) => void
 
+    mediaProxy: string
+    setMediaProxy: (_: string) => void
+
     devMode: boolean
     setDevMode: (_: boolean) => void
 
@@ -50,6 +53,7 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
 
     const [themeName, setThemeName] = usePersistent<string>('themeName', 'basic')
     const [imgurClientID, setImgurClientID] = usePersistent<string>('imgurClientID', '')
+    const [mediaProxy, setMediaProxy] = usePersistent<string>('mediaProxy', 'https://urlpreview.kokoa.dev/')
     const [defaultPostHome, setDefaultPostHome] = usePersistent<string[]>('defaultPostHome', [])
     const [defaultPostNonHome, setDefaultPostNonHome] = usePersistent<string[]>('defaultPostNonHome', [])
     const [devMode, setDevMode] = usePersistent<boolean>('devMode', false)
@@ -84,6 +88,7 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
                 const parsed = JSON.parse(storage)
                 parsed.themeName && setThemeName(parsed.themeName)
                 parsed.imgurClientID && setImgurClientID(parsed.imgurClientID)
+                parsed.mediaProxy && setMediaProxy(parsed.mediaProxy)
                 parsed.defaultPostHome && setDefaultPostHome(parsed.defaultPostHome)
                 parsed.defaultPostNonHome && setDefaultPostNonHome(parsed.defaultPostNonHome)
                 parsed.devMode && setDevMode(parsed.devMode)
@@ -140,6 +145,8 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
             setThemeName,
             imgurClientID,
             setImgurClientID,
+            mediaProxy,
+            setMediaProxy,
             defaultPostHome,
             setDefaultPostHome,
             defaultPostNonHome,
