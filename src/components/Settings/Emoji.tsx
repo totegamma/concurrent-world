@@ -8,7 +8,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle'
 import CancelIcon from '@mui/icons-material/Cancel'
 import { useSnackbar } from 'notistack'
 
-export const ManageEmojiPackages = (): JSX.Element => {
+export const EmojiSettings = (): JSX.Element => {
     const pref = usePreference()
     const { enqueueSnackbar } = useSnackbar()
 

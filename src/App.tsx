@@ -363,7 +363,7 @@ function App(): JSX.Element {
                                 <Route path="/associations" element={<Associations messages={messages} />} />
                                 <Route path="/explorer" element={<Explorer />} />
                                 <Route path="/notifications" element={<Notifications messages={messages} />} />
-                                <Route path="/settings" element={<Settings />} />
+                                <Route path="/settings/*" element={<Settings />} />
                                 <Route path="/message/:id" element={<MessagePage />} />
                                 <Route path="/entity/:id" element={<EntityPage />} />
                                 <Route path="/devtool" element={<Devtool />} />

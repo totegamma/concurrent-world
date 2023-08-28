@@ -1,14 +1,16 @@
-import { Divider, Typography, Box, Tabs, Tab } from '@mui/material'
-import { APSettings } from '../components/Settings/APSettings'
+import { Divider, Box, Breadcrumbs, Link } from '@mui/material'
+import { Route, Routes, useLocation, Link as RouterLink } from 'react-router-dom'
+import { SettingsIndex } from '../components/Settings/Index'
 import { GeneralSettings } from '../components/Settings/General'
-import { ConcurrentSettings } from '../components/Settings/Concurrent'
-import { useLocation } from 'react-router-dom'
-
-type widgets = 'general' | 'concurrent' | 'activitypub'
+import { ProfileSettings } from '../components/Settings/Profile'
+import { ThemeSettings } from '../components/Settings/Theme'
+import { SoundSettings } from '../components/Settings/Sound'
+import { EmojiSettings } from '../components/Settings/Emoji'
+import { MediaSettings } from '../components/Settings/Media'
+import { APSettings } from '../components/Settings/APSettings'
 
 export function Settings(): JSX.Element {
     const path = useLocation()
-    const tab: widgets = (path.hash.replace('#', '') as widgets) || 'general'
 
     return (
         <Box
@@ -22,25 +24,36 @@ export function Settings(): JSX.Element {
                 overflowY: 'scroll'
             }}
         >
-            <Typography variant="h2" gutterBottom>
-                Settings
-            </Typography>
+            <Breadcrumbs>
+                <Link variant="h2" component={RouterLink} underline="hover" color="text.primary" to="/settings">
+                    Settings
+                </Link>
+                {path.pathname !== '/settings' && (
+                    <Link
+                        variant="h2"
+                        underline="hover"
+                        color="inherit"
+                        href={path.pathname}
+                        sx={{
+                            textTransform: 'capitalize',
+                            color: 'text.primary'
+                        }}
+                    >
+                        {path.pathname.split('/')[2]}
+                    </Link>
+                )}
+            </Breadcrumbs>
             <Divider />
-            <Tabs
-                value={tab}
-                onChange={(_, next) => {
-                    window.location.hash = next
-                }}
-                textColor="secondary"
-                indicatorColor="secondary"
-            >
-                <Tab value="general" label="基本設定" />
-                <Tab value="concurrent" label="アカウント詳細" />
-                <Tab value="activitypub" label="Activitypub" />
-            </Tabs>
-            {tab === 'general' && <GeneralSettings />}
-            {tab === 'concurrent' && <ConcurrentSettings />}
-            {tab === 'activitypub' && <APSettings />}
+            <Routes>
+                <Route path="/" element={<SettingsIndex />} />
+                <Route path="/general" element={<GeneralSettings />} />
+                <Route path="/profile" element={<ProfileSettings />} />
+                <Route path="/theme" element={<ThemeSettings />} />
+                <Route path="/sound" element={<SoundSettings />} />
+                <Route path="/emoji" element={<EmojiSettings />} />
+                <Route path="/media" element={<MediaSettings />} />
+                <Route path="/activitypub" element={<APSettings />} />
+            </Routes>
         </Box>
     )
 }
