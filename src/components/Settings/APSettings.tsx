@@ -1,5 +1,5 @@
 import { Box, Button, TextField, Typography } from '@mui/material'
-import { forwardRef, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { RJSFSchema } from '@rjsf/utils'
 import Form from '@rjsf/mui'
 import validator from '@rjsf/validator-ajv8'
@@ -19,7 +19,7 @@ const schema: RJSFSchema = {
     }
 }
 
-export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
+export const APSettings = (): JSX.Element => {
     const client = useApi()
     const [loading, setLoading] = useState(false)
     const [registered, setRegistered] = useState(false)
@@ -143,7 +143,7 @@ export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
     }
 
     return (
-        <div ref={ref} {...props}>
+        <div>
             {!registered ? (
                 <Box
                     sx={{
@@ -195,6 +195,4 @@ export const APSettings = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
             )}
         </div>
     )
-})
-
-APSettings.displayName = 'APSettings'
+}

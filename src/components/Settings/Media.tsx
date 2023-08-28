@@ -1,8 +1,8 @@
-import { Box, Button, type SxProps, TextField, Typography } from '@mui/material'
+import { Box, Button, TextField, Typography } from '@mui/material'
 import { useRef, useState } from 'react'
-import { usePreference } from '../../../context/PreferenceContext'
+import { usePreference } from '../../context/PreferenceContext'
 
-export const ImgurSettings = (): JSX.Element => {
+export const MediaSettings = (): JSX.Element => {
     const pref = usePreference()
 
     const clientIdRef = useRef<HTMLInputElement>(null)
