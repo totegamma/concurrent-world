@@ -92,7 +92,7 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
                 parsed.lists && setLists(parsed.lists)
                 parsed.emojiPackages && setEmojiPackages(parsed.emojiPackages)
             })
-            .catch((e) => {
+            .catch((e: any) => {
                 setInitialized(true)
                 console.log(e)
             })
