@@ -1,8 +1,8 @@
-import { type APIResponse } from '@dhaiwat10/react-link-preview'
-import { Box, Paper, Typography } from '@mui/material'
-import { usePreference } from '../../context/PreferenceContext'
+import { Box, Paper, Skeleton, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
+import { useApi } from '../../context/api'
+// import { usePreference } from '../../context/PreferenceContext'
 
 export interface MessageUrlPreviewProps {
     messageBody: string
@@ -33,20 +33,56 @@ export const MessageUrlPreview = (props: MessageUrlPreviewProps): JSX.Element | 
     )
 }
 
+interface Summary {
+    title: string
+    icon: string
+    description: string
+    thumbnail: string
+    sitename: string
+    url: string
+}
+
 export const UrlPreview = (props: { url: string }): JSX.Element | null => {
-    const pref = usePreference()
-    const [preview, setPreview] = useState<APIResponse | null>(null)
+    // const pref = usePreference()
+    const client = useApi()
+    const [preview, setPreview] = useState<Summary | null>(null)
+    const [errored, setErrored] = useState(false)
 
     useEffect(() => {
         const fetchPreview = async (): Promise<void> => {
-            const response = await fetch(`${pref.mediaProxy}v2?url=${props.url}`)
+            const response = await fetch(`https://${client.host}/summary?url=${props.url}`).catch(() => {
+                setErrored(true)
+            })
+            if (!response || errored) return
             const json = await response.json()
-            setPreview(json.metadata)
+            setPreview(json)
         }
         fetchPreview()
     }, [props.url])
 
-    if (!preview?.title) return null
+    if (errored) return null
+
+    if (!preview?.title) {
+        return (
+            <Paper
+                variant="outlined"
+                sx={{
+                    display: 'flex',
+                    height: '100px',
+                    width: '100%',
+                    overflow: 'hidden',
+                    textDecoration: 'none'
+                }}
+            >
+                <Skeleton variant="rectangular" width="100px" height={100} />
+                <Box padding={1} height="100px" flex={1}>
+                    <Skeleton variant="text" />
+                    <Skeleton variant="text" />
+                    <Skeleton variant="text" width="40%" />
+                </Box>
+            </Paper>
+        )
+    }
 
     return (
         <Paper
@@ -54,6 +90,7 @@ export const UrlPreview = (props: { url: string }): JSX.Element | null => {
             sx={{
                 display: 'flex',
                 height: '100px',
+                width: '100%',
                 overflow: 'hidden',
                 textDecoration: 'none'
             }}
@@ -65,20 +102,20 @@ export const UrlPreview = (props: { url: string }): JSX.Element | null => {
             <Box
                 component="img"
                 sx={{
-                    width: 100,
-                    height: 100,
+                    width: '100px',
+                    height: '100px',
                     objectFit: 'cover'
                 }}
-                src={preview?.image ?? ''}
+                src={preview?.thumbnail || preview?.icon || ''}
                 alt={preview?.title ?? ''}
             />
             <Box padding={1} height="100px" overflow="hidden">
                 <Typography variant="h3" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" width="100%">
-                    {preview?.title ?? ''}
+                    {preview?.title ?? 'No Title'}
                 </Typography>
 
                 <Typography variant="body2" width="100%" height="40px" textOverflow="ellipsis" overflow="hidden">
-                    {preview?.description ?? ''}
+                    {preview?.description ?? '説明はありません'}
                 </Typography>
 
                 <Typography

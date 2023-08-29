@@ -12,7 +12,6 @@
     },
     "dependencies": {
         "@concurrent-world/client": "^2.2.7",
-        "@dhaiwat10/react-link-preview": "^1.15.0",
         "@emotion/react": "^11.10.5",
         "@emotion/styled": "^11.10.5",
         "@mui/icons-material": "^5.11.16",
