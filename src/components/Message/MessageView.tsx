@@ -10,6 +10,7 @@ import { MessageReactions } from './MessageReactions'
 import { useSnackbar } from 'notistack'
 import { FollowButton } from '../FollowButton'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
+import { MessageUrlPreview } from './MessageUrlPreview'
 
 export interface MessageViewProps {
     message: M_Current | M_Reply
@@ -137,6 +138,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                         <MessageHeader message={props.message} />
                         {props.beforeMessage}
                         <SimpleNote message={props.message} />
+                        <MessageUrlPreview message={props.message} />
                         <MessageReactions message={props.message} />
                         <MessageActions message={props.message} userCCID={props.userCCID} />
                     </Box>
