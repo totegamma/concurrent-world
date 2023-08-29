@@ -1,4 +1,3 @@
-import type { M_Current, M_Reply } from '@concurrent-world/client'
 import { type APIResponse } from '@dhaiwat10/react-link-preview'
 import { Box, Paper, Typography } from '@mui/material'
 import { usePreference } from '../../context/PreferenceContext'
@@ -6,14 +5,12 @@ import { useEffect, useState } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 
 export interface MessageUrlPreviewProps {
-    message: M_Current | M_Reply
+    messageBody: string
 }
 
 export const MessageUrlPreview = (props: MessageUrlPreviewProps): JSX.Element | null => {
-    const messageBody = props.message.body
-
     // strip markdown image syntax
-    const replaced = messageBody.replace(/!\[.*\]\(.*\)/g, '')
+    const replaced = props.messageBody.replace(/!\[.*\]\(.*\)/g, '')
 
     // extract urls
     const urls = replaced.match(/(https?:\/\/[^\s]+)/g)
@@ -24,9 +21,9 @@ export const MessageUrlPreview = (props: MessageUrlPreviewProps): JSX.Element | 
         <Box
             sx={{
                 display: 'flex',
-                flexWrap: 'wrap',
+                flexDirection: 'column',
                 gap: 1,
-                p: 1
+                py: 1
             }}
         >
             {urls.map((url, i) => {

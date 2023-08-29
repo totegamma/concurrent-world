@@ -138,7 +138,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                         <MessageHeader message={props.message} />
                         {props.beforeMessage}
                         <SimpleNote message={props.message} />
-                        <MessageUrlPreview message={props.message} />
+                        <MessageUrlPreview messageBody={props.message.body} />
                         <MessageReactions message={props.message} />
                         <MessageActions message={props.message} userCCID={props.userCCID} />
                     </Box>
