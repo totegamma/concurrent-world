@@ -2,6 +2,7 @@ import { Box, Paper, Skeleton, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 import { useApi } from '../../context/api'
+import { fetchWithTimeout } from '@concurrent-world/client'
 // import { usePreference } from '../../context/PreferenceContext'
 
 export interface MessageUrlPreviewProps {
@@ -10,7 +11,10 @@ export interface MessageUrlPreviewProps {
 
 export const MessageUrlPreview = (props: MessageUrlPreviewProps): JSX.Element | null => {
     // strip markdown image syntax
-    const replaced = props.messageBody.replace(/!\[.*\]\(.*\)/g, '')
+    let replaced = props.messageBody.replace(/!\[.*\]\(.*\)/g, '')
+
+    // strip codeblock
+    replaced = replaced.replace(/```[\s\S]*?```/g, '')
 
     // extract urls
     const urls = replaced.match(/(https?:\/\/[^\s]+)/g)
@@ -50,7 +54,7 @@ export const UrlPreview = (props: { url: string }): JSX.Element | null => {
 
     useEffect(() => {
         const fetchPreview = async (): Promise<void> => {
-            const response = await fetch(`https://${client.host}/summary?url=${props.url}`).catch(() => {
+            const response = await fetchWithTimeout(client.host, `/summary?url=${props.url}`, {}).catch(() => {
                 setErrored(true)
             })
             if (!response || errored) return
