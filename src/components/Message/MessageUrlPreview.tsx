@@ -16,6 +16,10 @@ export const MessageUrlPreview = (props: MessageUrlPreviewProps): JSX.Element | 
     // strip codeblock
     replaced = replaced.replace(/```[\s\S]*?```/g, '')
 
+    // replace markdown link syntax
+    replaced = replaced.replace(/\[(.*)\]\((.*)\)/g, '$2')
+    console.log(replaced)
+
     // extract urls
     const urls = replaced.match(/(https?:\/\/[^\s]+)/g)
 

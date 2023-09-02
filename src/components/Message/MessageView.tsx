@@ -34,7 +34,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
             }}
             disablePadding
         >
-            {props.message.body && (
+            {props.message && (
                 <>
                     <Tooltip
                         enterDelay={500}
