@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Paper, TextField, Typography } from '@mui/material'
+import { Box, Button, Divider, FormControlLabel, FormGroup, Paper, Switch, TextField, Typography } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
 import { useApi } from '../context/api'
 import { type Commonstream, type CoreStream } from '@concurrent-world/client'
@@ -17,6 +17,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
     const [stream, setStream] = useState<CoreStream<Commonstream>>()
     const isAuthor = stream?.author === client.ccid
 
+    const [visible, setVisible] = useState(false)
     const [writerDraft, setWriterDraft] = useState('')
     const [readerDraft, setReaderDraft] = useState('')
 
@@ -27,6 +28,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
         client.api.readStream(props.id).then((e) => {
             if (!e) return
             setStream(e)
+            setVisible(e.visible)
             setWriterDraft(e.writer.join('\n'))
             setReaderDraft(e.reader.join('\n'))
             setSchemaDraft(e.schema)
@@ -42,7 +44,8 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                     body,
                     maintainer: stream.maintainer,
                     writer: writerDraft.split('\n').filter((e) => e),
-                    reader: readerDraft.split('\n').filter((e) => e)
+                    reader: readerDraft.split('\n').filter((e) => e),
+                    visible
                 })
                 .then((_) => {
                     enqueueSnackbar('更新しました', { variant: 'success' })
@@ -51,7 +54,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                     enqueueSnackbar('更新に失敗しました', { variant: 'error' })
                 })
         },
-        [client.api, stream, writerDraft, readerDraft, schemaDraft, props.id]
+        [client.api, stream, writerDraft, readerDraft, schemaDraft, props.id, visible, enqueueSnackbar]
     )
 
     if (!stream) {
@@ -96,6 +99,19 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                         p: 1
                     }}
                 >
+                    <FormGroup>
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={visible}
+                                    onChange={(e) => {
+                                        setVisible(e.target.checked)
+                                    }}
+                                />
+                            }
+                            label="検索可能"
+                        />
+                    </FormGroup>
                     <Typography variant="h3">権限</Typography>
                     <Box>
                         <Typography>空の場合パブリックになります。</Typography>
