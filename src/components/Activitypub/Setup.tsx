@@ -16,11 +16,18 @@ export const ApSetup = (): JSX.Element => {
             return
         }
 
-        const followstream = await client.api.createStream(Schemas.commonstream, {
-            name: 'ActivityPub',
-            shortname: 'activitypub',
-            description: 'ActivityPub home stream'
-        })
+        const followstream = await client.api.createStream(
+            Schemas.commonstream,
+            {
+                name: 'ActivityPub',
+                shortname: 'activitypub',
+                description: 'ActivityPub home stream'
+            },
+            {
+                reader: client?.user?.ccid ? [client?.user?.ccid] : [],
+                visible: false
+            }
+        )
 
         const oldhome = pref.lists.home
         if (oldhome) {
