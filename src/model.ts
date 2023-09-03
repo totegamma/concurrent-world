@@ -95,3 +95,13 @@ export interface StreamWithDomain {
 }
 
 export type CCID = string
+
+export interface ApEntity {
+    id: string
+    ccid: string
+    publickey: string
+    privatekey: string
+    homestream: string
+    notificationstream: string
+    followstream: string
+}
