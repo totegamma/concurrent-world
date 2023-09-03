@@ -165,10 +165,6 @@ export const APUserCard = (props: { url: string; remove?: (_: string) => void })
                 gap: 1,
                 textDecoration: 'none'
             }}
-            component={Link}
-            href={props.url}
-            target="_blank"
-            rel="noopener noreferrer"
         >
             <Avatar src={person.icon?.url} />
             <Box
@@ -182,9 +178,9 @@ export const APUserCard = (props: { url: string; remove?: (_: string) => void })
                 }}
             >
                 <Typography variant="h3">{person.name}</Typography>
-                <Typography>
+                <Link underline="hover" href={props.url} target="_blank" rel="noopener noreferrer">
                     @{person.preferredUsername}@{host}
-                </Typography>
+                </Link>
             </Box>
             {props.remove && (
                 <Box
