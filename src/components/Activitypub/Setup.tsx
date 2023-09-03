@@ -62,6 +62,7 @@ export const ApSetup = (): JSX.Element => {
                     'content-type': 'application/json'
                 },
                 body: JSON.stringify({
+                    id: userID,
                     name: client?.user?.profile?.username,
                     summary: client?.user?.profile?.description,
                     icon_url: client?.user?.profile?.avatar
