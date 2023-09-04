@@ -2,7 +2,7 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import muiLink from '@mui/material/Link'
 import TextField from '@mui/material/TextField'
 import Divider from '@mui/material/Divider'
@@ -59,7 +59,6 @@ export function Registration(): JSX.Element {
         setTheme(createConcurrentTheme(newThemeName))
     }
 
-    const navigate = useNavigate()
     const [activeStep, setActiveStep] = useState(0)
     const [mnemonicTest, setMnemonicTest] = useState<string>('')
     const [profile, setProfile] = useState<Profile>()
@@ -130,7 +129,7 @@ export function Registration(): JSX.Element {
                 }
                 console.log(list)
                 localStorage.setItem('lists', JSON.stringify(list))
-                navigate('/')
+                window.location.href = '/'
             })
             .catch((_) => {
                 const list = {
@@ -144,7 +143,7 @@ export function Registration(): JSX.Element {
                     }
                 }
                 localStorage.setItem('lists', JSON.stringify(list))
-                navigate('/')
+                window.location.href = '/'
             })
     }
 

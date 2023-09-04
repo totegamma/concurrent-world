@@ -1,30 +1,15 @@
-import { Box, Button, TextField, Typography } from '@mui/material'
+import { Box } from '@mui/material'
 import { useEffect, useState } from 'react'
-import type { RJSFSchema } from '@rjsf/utils'
-import Form from '@rjsf/mui'
-import validator from '@rjsf/validator-ajv8'
 import { useApi } from '../../context/api'
-
-const schema: RJSFSchema = {
-    title: 'ActivityPubSettings',
-    description: 'Activitypubに乗せるユーザー情報の設定',
-    type: 'object',
-    required: ['name', 'summary', 'profile_url', 'icon_url'],
-    properties: {
-        name: { type: 'string', title: 'Name' },
-        summary: { type: 'string', title: 'Bio' },
-        profile_url: { type: 'string', title: 'ProfileURL' },
-        icon_url: { type: 'string', title: 'IconURL' },
-        homestream: { type: 'string', title: 'Homestream' }
-    }
-}
+import { type ApEntity } from '../../model'
+import { ApSetup } from '../Activitypub/Setup'
+import { ApProfileEditor } from '../Activitypub/ProfileEditor'
+import { ApFollowManager } from '../Activitypub/FollowManager'
+import { AddListButton } from '../AddListButton'
 
 export const APSettings = (): JSX.Element => {
     const client = useApi()
-    const [loading, setLoading] = useState(false)
-    const [registered, setRegistered] = useState(false)
-    const [userID, setUserID] = useState('')
-    const [form, setForm] = useState<any>({})
+    const [entity, setEntity] = useState<ApEntity | null | undefined>(undefined)
 
     useEffect(() => {
         const requestOptions = {
@@ -39,160 +24,37 @@ export const APSettings = (): JSX.Element => {
             .then(async (res) => await res.json())
             .then((data) => {
                 console.log(data)
-                setUserID(data.content)
-                setRegistered(true)
+                setEntity(data.content)
             })
             .catch((e) => {
                 console.log(e)
-                setRegistered(false)
+                setEntity(null)
             })
     }, [])
 
-    useEffect(() => {
-        if (!client) return
-        if (!userID) return
-        const requestOptions = {
-            method: 'GET',
-            headers: {
-                'content-type': 'application/json'
-            }
-        }
-        const profile = window.location.protocol + '//' + window.location.host + '/entity/' + client.ccid
-        const home = client?.user?.userstreams?.homeStream
-        client.api
-            .fetchWithCredential(client.api.host, `/ap/api/person/${userID}`, requestOptions)
-            .then(async (res) => await res.json())
-            .then((data) => {
-                console.log(data)
-                setForm({
-                    name: data.content.name,
-                    summary: data.content.summary,
-                    profile_url: data.content.profile_url || profile,
-                    icon_url: data.content.icon_url,
-                    homestream: data.content.homestream || home
-                })
-            })
-            .catch((_) => {
-                setForm({
-                    name: client?.user?.profile?.username,
-                    summary: client?.user?.profile?.description,
-                    profile_url: profile,
-                    icon_url: client?.user?.profile?.avatar,
-                    homestream: home
-                })
-            })
-    }, [userID])
-
-    const register = (): void => {
-        if (!client) {
-            return
-        }
-        setLoading(true)
-        const requestOptions = {
-            method: 'POST',
-            headers: {
-                'content-type': 'application/json'
-            },
-            body: JSON.stringify({
-                id: userID
-            })
-        }
-
-        client.api
-            .fetchWithCredential(client.api.host, `/ap/api/entity`, requestOptions)
-            .then(async (res) => await res.json())
-            .then((data) => {
-                console.log(data)
-                setLoading(false)
-                alert('success')
-            })
-            .catch((e) => {
-                alert(e)
-                setLoading(false)
-            })
-    }
-
-    const updateProfile = (form: any): void => {
-        if (!client.api) {
-            return
-        }
-        setLoading(true)
-        const requestOptions = {
-            method: 'PUT',
-            headers: {
-                'content-type': 'application/json'
-            },
-            body: JSON.stringify({
-                id: userID,
-                ...form
-            })
-        }
-
-        client.api
-            .fetchWithCredential(client.api.host, `/ap/api/person`, requestOptions)
-            .then(async (res) => await res.json())
-            .then((data) => {
-                console.log(data)
-                setLoading(false)
-                alert('success')
-            })
-            .catch((e) => {
-                alert(e)
-                setLoading(false)
-            })
+    if (entity === undefined) {
+        return <>loading...</>
     }
 
     return (
-        <div>
-            {!registered ? (
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '10px'
-                    }}
-                >
-                    <h3>Register</h3>
-                    <Typography>一度登録すると変更できません</Typography>
-                    <TextField
-                        label="UserID"
-                        value={userID}
-                        onChange={(x) => {
-                            setUserID(x.target.value)
-                        }}
-                    />
-                    <Button
-                        variant="contained"
-                        onClick={() => {
-                            register()
-                        }}
-                    >
-                        register
-                    </Button>
-                </Box>
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px'
+            }}
+        >
+            {entity === null ? (
+                <ApSetup />
             ) : (
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '10px'
-                    }}
-                >
-                    <Typography>UserID: {userID}</Typography>
-                    <Form
-                        disabled={loading}
-                        schema={schema}
-                        validator={validator}
-                        formData={form}
-                        onChange={(e) => {
-                            setForm(e.formData)
-                        }}
-                        onSubmit={(e) => {
-                            updateProfile(e.formData)
-                        }}
-                    />
-                </Box>
+                <>
+                    <Box display="flex" flexDirection="row" justifyContent="flex-end" gap={1} width="100%">
+                        <AddListButton stream={entity.followstream} />
+                    </Box>
+                    <ApProfileEditor entity={entity} />
+                    <ApFollowManager />
+                </>
             )}
-        </div>
+        </Box>
     )
 }

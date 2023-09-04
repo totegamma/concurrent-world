@@ -34,7 +34,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
             }}
             disablePadding
         >
-            {props.message.body && (
+            {props.message && (
                 <>
                     <Tooltip
                         enterDelay={500}
@@ -115,9 +115,8 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                         >
                             <CCAvatar
                                 alt={props.message.author.profile?.username}
-                                avatarURL={
-                                    props.message.profileOverride?.avatar ?? props.message.author.profile?.avatar
-                                }
+                                avatarURL={props.message.author.profile?.avatar}
+                                avatarOverride={props.message.profileOverride?.avatar}
                                 identiconSource={props.message.author.ccid}
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
