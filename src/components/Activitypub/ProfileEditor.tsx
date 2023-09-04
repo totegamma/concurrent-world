@@ -89,14 +89,16 @@ export const ApProfileEditor = (props: { entity: ApEntity }): JSX.Element => {
                     display: 'flex',
                     flexDirection: 'column',
                     padding: '15px',
-                    gap: '5px',
+                    gap: 1,
                     flex: 1,
                     backgroundColor: alpha(theme.palette.background.paper, 0.8),
                     borderRadius: '5px',
                     border: '1px solid rgba(255, 255, 255, 0.3)'
                 }}
             >
-                <Typography variant="h2">@{props.entity.id}</Typography>
+                <Typography variant="h2" gutterBottom>
+                    @{props.entity.id}@{client.host}
+                </Typography>
                 <TextField
                     label="username"
                     variant="outlined"

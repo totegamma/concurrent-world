@@ -36,40 +36,6 @@ export const GeneralSettings = (): JSX.Element => {
                 </Tilt>
             </Box>
             <Divider />
-            <Typography variant="h3" gutterBottom>
-                CCID
-            </Typography>
-            <Typography>{client.ccid}</Typography>
-
-            <Typography variant="h3" gutterBottom>
-                Host
-            </Typography>
-            <Typography>{client.api.host}</Typography>
-
-            <Typography variant="h3" gutterBottom>
-                Privatekey
-            </Typography>
-            <Typography
-                sx={{
-                    wordBreak: 'break-all',
-                    display: 'flex',
-                    alignItems: 'center'
-                }}
-            >
-                {showPrivateKey ? client.api.privatekey : '•••••••••••••••••••••••••••••••••••••••••••••••••'}
-                <IconButton
-                    sx={{ ml: 'auto' }}
-                    onClick={() => {
-                        setShowPrivateKey(!showPrivateKey)
-                    }}
-                >
-                    {!showPrivateKey ? (
-                        <VisibilityIcon sx={{ color: 'text.primary' }} />
-                    ) : (
-                        <VisibilityOffIcon sx={{ color: 'text.primary' }} />
-                    )}
-                </IconButton>
-            </Typography>
 
             <Box>
                 <Typography variant="h3">基本</Typography>
@@ -109,6 +75,61 @@ export const GeneralSettings = (): JSX.Element => {
                     />
                 </FormGroup>
             </Box>
+
+            <Divider />
+
+            <Typography variant="h3" gutterBottom>
+                CCID
+            </Typography>
+            <Typography>{client.ccid}</Typography>
+
+            <Typography variant="h3" gutterBottom>
+                Host
+            </Typography>
+            <Typography>{client.api.host}</Typography>
+
+            <Typography variant="h3" gutterBottom>
+                Privatekey
+            </Typography>
+            <Typography
+                sx={{
+                    wordBreak: 'break-all',
+                    display: 'flex',
+                    alignItems: 'center'
+                }}
+            >
+                {showPrivateKey ? client.api.privatekey : '•••••••••••••••••••••••••••••••••••••••••••••••••'}
+                <IconButton
+                    sx={{ ml: 'auto' }}
+                    onClick={() => {
+                        setShowPrivateKey(!showPrivateKey)
+                    }}
+                >
+                    {!showPrivateKey ? (
+                        <VisibilityIcon sx={{ color: 'text.primary' }} />
+                    ) : (
+                        <VisibilityOffIcon sx={{ color: 'text.primary' }} />
+                    )}
+                </IconButton>
+            </Typography>
+
+            <Typography variant="h3" gutterBottom>
+                HomeStream
+            </Typography>
+            <Typography gutterBottom>{client.user?.userstreams?.homeStream}</Typography>
+
+            <Typography variant="h3" gutterBottom>
+                NotificationStream
+            </Typography>
+            <Typography gutterBottom>{client.user?.userstreams?.notificationStream}</Typography>
+
+            <Typography variant="h3" gutterBottom>
+                AssociationStream
+            </Typography>
+            <Typography gutterBottom>{client.user?.userstreams?.associationStream}</Typography>
+
+            <Divider />
+
             {tags.includes('_invite') && (
                 <>
                     {invitationCode === '' ? (
