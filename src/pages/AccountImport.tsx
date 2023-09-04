@@ -5,7 +5,7 @@ import Paper from '@mui/material/Paper'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { HDNodeWallet } from 'ethers'
 import { LangJa } from '../utils/lang-ja'
 import { Client, LoadKey, type CoreDomain, CommputeCCID } from '@concurrent-world/client'
@@ -29,7 +29,6 @@ export function AccountImport(): JSX.Element {
         setTheme(createConcurrentTheme(newThemeName))
     }
 
-    const navigate = useNavigate()
     const [mnemonic, setMnemonic] = useState<string>('')
     const [secret, setSecret] = useState<string>('')
     const [server, setServer] = useState<string>('')
@@ -134,7 +133,7 @@ export function AccountImport(): JSX.Element {
         localStorage.setItem('Domain', JSON.stringify(host.fqdn))
         localStorage.setItem('PrivateKey', JSON.stringify(client.api.privatekey))
         localStorage.setItem('Mnemonic', JSON.stringify(mnemonic))
-        navigate('/')
+        window.location.href = '/'
     }
 
     return (

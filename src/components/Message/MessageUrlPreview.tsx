@@ -18,7 +18,6 @@ export const MessageUrlPreview = (props: MessageUrlPreviewProps): JSX.Element | 
 
     // replace markdown link syntax
     replaced = replaced.replace(/\[(.*)\]\((.*)\)/g, '$2')
-    console.log(replaced)
 
     // extract urls
     const urls = replaced.match(/(https?:\/\/[^\s]+)/g)

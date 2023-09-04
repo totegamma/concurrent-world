@@ -14,6 +14,11 @@ import { PreferenceProvider } from './context/PreferenceContext'
 const AppPage = lazy(() => import('./App'))
 const Welcome = lazy(() => import('./pages/Welcome'))
 
+const domain = localStorage.getItem('Domain') ?? ''
+const prvkey = localStorage.getItem('PrivateKey') ?? ''
+
+const logined = domain !== '' && prvkey !== ''
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <ErrorBoundary FallbackComponent={EmergencyKit}>
         <Suspense fallback={<FullScreenLoading message="Loading..." />}>
@@ -22,7 +27,8 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                     <Route path="/welcome" element={<Welcome />} />
                     <Route path="/register" element={<Registration />} />
                     <Route path="/import" element={<AccountImport />} />
-                    <Route path="/guest/" element={<GuestTimelinePage />} />
+                    {!logined && <Route path="/stream" element={<GuestTimelinePage />} />}
+                    {!logined && <Route path="/entity/:id" element={<GuestTimelinePage />} />}
                     <Route
                         path="*"
                         element={
