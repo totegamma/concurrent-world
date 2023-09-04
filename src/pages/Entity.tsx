@@ -139,18 +139,23 @@ export function EntityPage(): JSX.Element {
                             backgroundColor: alpha(theme.palette.background.paper, 0.8)
                         }}
                     >
-                        <CCAvatar
-                            alt={user.profile?.username}
-                            avatarURL={user.profile?.avatar}
-                            identiconSource={user.ccid}
+                        <Box
                             sx={{
-                                width: '80px',
-                                height: '80px',
                                 position: 'absolute',
                                 left: '50%',
                                 transform: 'translate(-50%, -50%)'
                             }}
-                        />
+                        >
+                            <CCAvatar
+                                alt={user.profile?.username}
+                                avatarURL={user.profile?.avatar}
+                                identiconSource={user.ccid}
+                                sx={{
+                                    width: '80px',
+                                    height: '80px'
+                                }}
+                            />
+                        </Box>
                         <Box
                             sx={{
                                 p: '10px',
