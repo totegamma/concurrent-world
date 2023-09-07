@@ -57,7 +57,7 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                             component="img"
                             src={cert.icon}
                             sx={{
-                                height: '1rem',
+                                height: '0.9rem',
                                 marginLeft: '0.25rem'
                             }}
                         />
