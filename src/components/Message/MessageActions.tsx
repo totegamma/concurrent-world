@@ -182,6 +182,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     >
                         <AddReactionIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
                     </IconButton>
+                    <Box sx={{ m: 'auto', size: '16px' }} /> {/* 間隔を揃える */}
                     <IconButton
                         sx={{
                             p: '0',
