@@ -50,7 +50,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                 <Box
                     sx={{
                         display: 'flex',
-                        gap: { xs: 3, sm: 4 }
+                        gap: { xs: 1, sm: 4 }
                     }}
                 >
                     {/* left */}
@@ -162,27 +162,33 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                             </Typography>
                         </Box>
                     </Tooltip>
-                    <IconButton
+                    <Box
                         sx={{
-                            p: '0',
-                            color: 'text.secondary'
-                        }}
-                        onClick={(e) => {
-                            emojiPicker.open(e.currentTarget, (emoji) => {
-                                console.log(emoji)
-                                /*
-                                if (emoji.src === undefined && emoji.unified) {
-                                    emoji.src = `https://twemoji.maxcdn.com/v/latest/svg/${emoji.unified}.svg`
-                                }
-                                */
-                                service?.addReaction(emoji.shortcode, emoji.imageURL)
-                                emojiPicker.close()
-                            })
+                            display: 'flex',
+                            width: '3rem'
                         }}
                     >
-                        <AddReactionIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
-                    </IconButton>
-                    <Box sx={{ m: 'auto', size: '16px' }} /> {/* 間隔を揃える */}
+                        <IconButton
+                            sx={{
+                                p: '0',
+                                color: 'text.secondary'
+                            }}
+                            onClick={(e) => {
+                                emojiPicker.open(e.currentTarget, (emoji) => {
+                                    console.log(emoji)
+                                    /*
+                                    if (emoji.src === undefined && emoji.unified) {
+                                        emoji.src = `https://twemoji.maxcdn.com/v/latest/svg/${emoji.unified}.svg`
+                                    }
+                                    */
+                                    service?.addReaction(emoji.shortcode, emoji.imageURL)
+                                    emojiPicker.close()
+                                })
+                            }}
+                        >
+                            <AddReactionIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
+                        </IconButton>
+                    </Box>
                     <IconButton
                         sx={{
                             p: '0',
