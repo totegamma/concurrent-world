@@ -29,8 +29,8 @@ interface ChooseDomainProps {
 }
 
 export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
-    const [entityFound, setEntityFound] = useState<boolean>(false)
     const [server, setServer] = useState<string>('')
+    const [jumped, setJumped] = useState<boolean>(false)
 
     useEffect(() => {
         let unmounted = false
@@ -45,14 +45,6 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
             unmounted = true
         }
     }, [server])
-
-    const checkRegistration = async (): Promise<void> => {
-        console.log('check!!!')
-        props.client?.api.invalidateEntity(props.identity.CCID)
-        const entity = await props.client?.api.readEntity(props.identity.CCID)
-        console.log(entity)
-        setEntityFound(!!entity && entity.ccid != null)
-    }
 
     return (
         <Box
@@ -87,6 +79,7 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
                         }`}
                         target="_blank"
                         onClick={() => {
+                            setJumped(true)
                             setServer('hub.concurrent.world')
                         }}
                     >
@@ -134,6 +127,9 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
                         }
                         target="_blank"
                         disabled={!props.host}
+                        onClick={() => {
+                            setJumped(true)
+                        }}
                     >
                         登録ページへ
                     </Button>
@@ -141,21 +137,24 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
             </Box>
             <Button
                 variant="contained"
-                disabled={!props.host}
-                onClick={() => {
-                    checkRegistration()
-                }}
-            >
-                ドメインの登録状況を確認
-            </Button>
-            <Button
-                variant="contained"
-                disabled={!entityFound}
+                disabled={!jumped}
                 onClick={(): void => {
-                    props.next()
+                    props.client?.api.invalidateEntity(props.identity.CCID)
+                    props.client?.api
+                        .readEntity(props.identity.CCID)
+                        .then((e) => {
+                            if (e?.ccid != null) {
+                                props.next()
+                            } else {
+                                alert('ドメインでの登録が確認できません。ジャンプ先のドメインで登録を行ってください。')
+                            }
+                        })
+                        .catch(() => {
+                            alert('ドメインでの登録が確認できません。ジャンプ先のドメインで登録を行ってください。')
+                        })
                 }}
             >
-                Next: プロフィールの作成
+                {jumped ? 'Next: プロフィールの作成' : 'ドメインでの登録が完了したら次に進めます'}
             </Button>
         </Box>
     )
