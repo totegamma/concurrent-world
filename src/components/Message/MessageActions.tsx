@@ -1,4 +1,4 @@
-import { Box, IconButton, Link, ListItemIcon, ListItemText, Menu, MenuItem, Tooltip, Typography } from '@mui/material'
+import { Box, IconButton, Link, ListItemIcon, ListItemText, Menu, MenuItem, Tooltip } from '@mui/material'
 import ReplyIcon from '@mui/icons-material/Reply'
 import { CCAvatar } from '../ui/CCAvatar'
 import StarIcon from '@mui/icons-material/Star'
@@ -18,6 +18,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove'
 import { useEmojiPicker } from '../../context/EmojiPickerContext'
 import { Link as RouterLink } from 'react-router-dom'
+import { IconButtonWithNumber } from '../ui/IconButtonWithNumber'
 
 export interface MessageActionsProps {
     message: M_Current | M_Reply | M_Reroute
@@ -50,52 +51,24 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                 <Box
                     sx={{
                         display: 'flex',
-                        gap: { xs: 3, sm: 4 }
+                        gap: { xs: 1, sm: 4 }
                     }}
                 >
                     {/* left */}
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            width: '3rem'
+                    <IconButtonWithNumber
+                        icon={<ReplyIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />}
+                        onClick={() => {
+                            service?.openReply()
                         }}
-                    >
-                        <IconButton
-                            sx={{
-                                p: '0',
-                                color: 'text.secondary'
-                            }}
-                            onClick={() => {
-                                service?.openReply()
-                            }}
-                        >
-                            <ReplyIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
-                        </IconButton>
-                        <Typography sx={{ m: 'auto', size: '16px', fontSize: '13px' }}>
-                            {replyCount > 0 ? replyCount : <></>}
-                        </Typography>
-                    </Box>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            width: '3rem'
+                        message={replyCount}
+                    />
+                    <IconButtonWithNumber
+                        icon={<RepeatIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />}
+                        onClick={() => {
+                            service?.openReroute()
                         }}
-                    >
-                        <IconButton
-                            sx={{
-                                p: '0',
-                                color: 'text.secondary'
-                            }}
-                            onClick={() => {
-                                service?.openReroute()
-                            }}
-                        >
-                            <RepeatIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
-                        </IconButton>
-                        <Typography sx={{ m: 'auto', size: '16px', fontSize: '13px' }}>
-                            {rerouteCount > 0 ? rerouteCount : <></>}
-                        </Typography>
-                    </Box>
+                        message={rerouteCount}
+                    />
                     <Tooltip
                         arrow
                         title={
@@ -131,42 +104,26 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         placement="top"
                         disableHoverListener={likeCount === 0}
                     >
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                width: '3rem'
-                            }}
-                        >
-                            <IconButton
-                                sx={{
-                                    p: '0',
-                                    color: 'text.secondary'
-                                }}
-                                color="primary"
-                                onClick={() => {
-                                    if (favorited) {
-                                        service?.removeFavorite()
-                                    } else {
-                                        service?.addFavorite()
-                                    }
-                                }}
-                            >
-                                {favorited ? (
+                        <IconButtonWithNumber
+                            icon={
+                                favorited ? (
                                     <StarIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
                                 ) : (
                                     <StarOutlineIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
-                                )}
-                            </IconButton>
-                            <Typography sx={{ m: 'auto', size: '16px', fontSize: '13px' }}>
-                                {likeCount > 0 ? likeCount : <></>}
-                            </Typography>
-                        </Box>
+                                )
+                            }
+                            onClick={() => {
+                                if (favorited) {
+                                    service?.removeFavorite()
+                                } else {
+                                    service?.addFavorite()
+                                }
+                            }}
+                            message={likeCount}
+                        />
                     </Tooltip>
-                    <IconButton
-                        sx={{
-                            p: '0',
-                            color: 'text.secondary'
-                        }}
+                    <IconButtonWithNumber
+                        icon={<AddReactionIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />}
                         onClick={(e) => {
                             emojiPicker.open(e.currentTarget, (emoji) => {
                                 console.log(emoji)
@@ -179,21 +136,15 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                 emojiPicker.close()
                             })
                         }}
-                    >
-                        <AddReactionIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
-                    </IconButton>
-                    <Box sx={{ m: 'auto', size: '16px' }} /> {/* 間隔を揃える */}
-                    <IconButton
-                        sx={{
-                            p: '0',
-                            color: 'text.secondary'
-                        }}
+                        message={0}
+                    />
+                    <IconButtonWithNumber
+                        icon={<MoreHorizIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />}
                         onClick={(e) => {
                             setMenuAnchor(e.currentTarget)
                         }}
-                    >
-                        <MoreHorizIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
-                    </IconButton>
+                        message={0}
+                    />
                 </Box>
                 <Menu
                     anchorEl={menuAnchor}
