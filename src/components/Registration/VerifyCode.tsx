@@ -1,9 +1,8 @@
-import { Box, Button, TextField } from "@mui/material"
-import { useState } from "react"
+import { Box, Button, TextField } from '@mui/material'
+import { useState } from 'react'
+import { type Identity } from '../../util'
 
-
-export function VerifyCode(props: {next: ()=>void}): JSX.Element {
-
+export function VerifyCode(props: { next: () => void; identity: Identity }): JSX.Element {
     const [mnemonicTest, setMnemonicTest] = useState<string>('')
 
     return (
@@ -25,10 +24,10 @@ export function VerifyCode(props: {next: ()=>void}): JSX.Element {
                     width: '100%'
                 }}
             />
-            {mnemonic === mnemonicTest ? '一致しています' : '一致していません'}
+            {props.identity.mnemonic === mnemonicTest ? '一致しています' : '一致していません'}
             <Button
                 variant="contained"
-                disabled={mnemonic !== mnemonicTest}
+                disabled={props.identity.mnemonic !== mnemonicTest}
                 onClick={(): void => {
                     props.next()
                 }}
@@ -38,4 +37,3 @@ export function VerifyCode(props: {next: ()=>void}): JSX.Element {
         </Box>
     )
 }
-

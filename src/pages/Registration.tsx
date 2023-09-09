@@ -4,17 +4,10 @@ import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
 import ApiProvider from '../context/api'
 import type { ConcurrentTheme } from '../model'
-import {
-    CssBaseline,
-    Fade,
-    IconButton,
-    Paper,
-    ThemeProvider,
-    darken
-} from '@mui/material'
+import { CssBaseline, Fade, IconButton, Paper, ThemeProvider, darken } from '@mui/material'
 import { usePersistent } from '../hooks/usePersistent'
 import { Themes, createConcurrentTheme } from '../themes'
-import { generateIdentity } from '../util'
+import { type Identity, generateIdentity } from '../util'
 import { ConcurrentWordmark } from '../components/theming/ConcurrentWordmark'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import {
@@ -37,14 +30,10 @@ export function Registration(): JSX.Element {
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue')
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
     const [activeStep, setActiveStep] = useState(0)
-    const [profile, setProfile] = useState<Profile>()
-    const [mnemonic, setMnemonic] = useState<string>('')
-    const [CCID, setCCID] = useState<string>('')
-    const [privateKey, setPrivateKey] = useState<string>('')
     const [client, initializeClient] = useState<Client>()
-    const [server, setServer] = useState<string>('')
     const [host, setHost] = useState<CoreDomain | null | undefined>()
-
+    const [identity] = useState<Identity>(generateIdentity())
+    const [profile, setProfile] = useState<Profile | null>(null)
 
     const themes: string[] = Object.keys(Themes)
     const randomTheme = (): void => {
@@ -55,39 +44,21 @@ export function Registration(): JSX.Element {
     }
 
     useEffect(() => {
-        const identity = generateIdentity()
-        setMnemonic(identity.mnemonic)
-        setCCID(identity.CCID)
-        setPrivateKey(identity.privateKey)
         initializeClient(new Client(identity.privateKey, 'hub.concurrent.world'))
     }, [])
 
     useEffect(() => {
-        if (!CCID || !privateKey || !host) return
-        const api = new Client(privateKey, host.fqdn)
+        if (!host) return
+        const api = new Client(identity.privateKey, host.fqdn)
         initializeClient(api)
-    }, [host, CCID, privateKey])
-
-    useEffect(() => {
-        let unmounted = false
-        if (!client) return
-        const fqdn = server.replace('https://', '').replace('/', '')
-        client.api.readDomain(fqdn).then((e) => {
-            if (unmounted) return
-            setHost(e)
-        })
-        console.log(fqdn)
-        return () => {
-            unmounted = true
-        }
-    }, [server])
+    }, [host])
 
     const setupAccount = (): void => {
         if (!client) return
         if (!host) return
         localStorage.setItem('Domain', JSON.stringify(host.fqdn))
-        localStorage.setItem('PrivateKey', JSON.stringify(privateKey))
-        localStorage.setItem('Mnemonic', JSON.stringify(mnemonic))
+        localStorage.setItem('PrivateKey', JSON.stringify(identity.privateKey))
+        localStorage.setItem('Mnemonic', JSON.stringify(identity.mnemonic))
 
         console.log('hostAddr', host.ccid)
 
@@ -129,49 +100,89 @@ export function Registration(): JSX.Element {
             })
     }
 
-
     const steps = [
         {
             title: 'Concurrentアカウントを作成しましょう！',
-            component: <RegistrationWelcome
-                next={() => setActiveStep(1)}
-            />
+            component: (
+                <RegistrationWelcome
+                    identity={identity}
+                    next={() => {
+                        setActiveStep(1)
+                    }}
+                />
+            )
         },
         {
             title: 'あなたのID',
-            component: <YourID
-                next={() => setActiveStep(2)}
-            />
+            component: (
+                <YourID
+                    identity={identity}
+                    next={() => {
+                        setActiveStep(2)
+                    }}
+                />
+            )
         },
         {
             title: 'シークレットコード',
-            component: <SecretCode
-                next={() => setActiveStep(3)}
-            />
+            component: (
+                <SecretCode
+                    identity={identity}
+                    next={() => {
+                        setActiveStep(3)
+                    }}
+                />
+            )
         },
         {
             title: 'シークレットコードの確認',
-            component: <VerifyCode
-                next={() => setActiveStep(4)}
-            />
+            component: (
+                <VerifyCode
+                    identity={identity}
+                    next={() => {
+                        setActiveStep(4)
+                    }}
+                />
+            )
         },
         {
             title: 'ドメインの選択',
-            component: <ChooseDomain
-                next={() => setActiveStep(5)}
-            />
+            component: (
+                <ChooseDomain
+                    identity={identity}
+                    next={() => {
+                        setActiveStep(5)
+                    }}
+                    client={client}
+                    host={host}
+                    setHost={setHost}
+                />
+            )
         },
         {
             title: 'プロフィールの作成',
-            component: <CreateProfile
-                next={() => setActiveStep(6)}
-            />
+            component: (
+                <CreateProfile
+                    next={() => {
+                        setActiveStep(6)
+                    }}
+                    client={client}
+                    setProfile={setProfile}
+                />
+            )
         },
         {
             title: '準備完了!',
-            component: <RegistrationReady
-                next={() => setupAccount()}
-            />
+            component: (
+                <RegistrationReady
+                    identity={identity}
+                    next={() => {
+                        setupAccount()
+                    }}
+                    host={host}
+                    profile={profile}
+                />
+            )
         }
     ]
 

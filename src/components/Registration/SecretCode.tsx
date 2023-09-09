@@ -1,7 +1,8 @@
-import { Box, Button, Paper, Typography } from "@mui/material"
+import { Box, Button, Grid, Paper, Typography } from '@mui/material'
+import ContentPasteIcon from '@mui/icons-material/ContentPaste'
+import { type Identity } from '../../util'
 
-
-export function SecretCode(props: {next: ()=>void}): JSX.Element {
+export function SecretCode(props: { next: () => void; identity: Identity }): JSX.Element {
     return (
         <Box
             sx={{
@@ -22,7 +23,7 @@ export function SecretCode(props: {next: ()=>void}): JSX.Element {
                 columns={4}
                 container
             >
-                {mnemonic.split('　').map((e, i) => (
+                {props.identity.mnemonic.split('　').map((e, i) => (
                     <Grid
                         key={i}
                         item
@@ -49,7 +50,7 @@ export function SecretCode(props: {next: ()=>void}): JSX.Element {
             <Button
                 variant="contained"
                 onClick={() => {
-                    navigator.clipboard.writeText(mnemonic)
+                    navigator.clipboard.writeText(props.identity.mnemonic)
                 }}
                 startIcon={<ContentPasteIcon />}
             >
@@ -78,4 +79,3 @@ export function SecretCode(props: {next: ()=>void}): JSX.Element {
         </Box>
     )
 }
-

@@ -1,8 +1,12 @@
-import { Box } from "@mui/material"
-import { ProfileEditor } from "../ProfileEditor"
+import { Box } from '@mui/material'
+import { ProfileEditor } from '../ProfileEditor'
+import { type Client, type Profile } from '@concurrent-world/client'
 
-
-export function CreateProfile(props: {next: ()=>void}): JSX.Element {
+export function CreateProfile(props: {
+    next: () => void
+    client: Client | undefined
+    setProfile: (_: Profile) => void
+}): JSX.Element {
     return (
         <Box
             sx={{
@@ -22,8 +26,8 @@ export function CreateProfile(props: {next: ()=>void}): JSX.Element {
             >
                 <ProfileEditor
                     onSubmit={(newprofile) => {
-                        setProfile(newprofile)
-                        client?.setupUserstreams().then(() => {
+                        props.setProfile(newprofile)
+                        props.client?.setupUserstreams().then(() => {
                             props.next()
                         })
                     }}
@@ -32,4 +36,3 @@ export function CreateProfile(props: {next: ()=>void}): JSX.Element {
         </Box>
     )
 }
-

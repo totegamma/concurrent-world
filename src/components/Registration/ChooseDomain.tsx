@@ -1,21 +1,58 @@
-import { IssueJWT } from "@concurrent-world/client"
-import { Alert, AlertTitle, Avatar, Box, Button, Divider, Link, List, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText, TextField, Typography } from "@mui/material"
-import { useState } from "react"
+import { type Client, type CoreDomain, IssueJWT } from '@concurrent-world/client'
+import {
+    Alert,
+    AlertTitle,
+    Avatar,
+    Box,
+    Button,
+    Divider,
+    Link,
+    List,
+    ListItemAvatar,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    TextField,
+    Typography
+} from '@mui/material'
+import { useEffect, useState } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import { type Identity } from '../../util'
 
-export function ChooseDomain(props: {next: ()=>void}): JSX.Element {
+interface ChooseDomainProps {
+    next: () => void
+    identity: Identity
+    client: Client | undefined
+    host: CoreDomain | null | undefined
+    setHost: (_: CoreDomain | null | undefined) => void
+}
 
+export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
     const [entityFound, setEntityFound] = useState<boolean>(false)
+    const [server, setServer] = useState<string>('')
+
+    useEffect(() => {
+        let unmounted = false
+        if (!props.client) return
+        const fqdn = server.replace('https://', '').replace('/', '')
+        props.client.api.readDomain(fqdn).then((e) => {
+            if (unmounted) return
+            props.setHost(e)
+        })
+        console.log(fqdn)
+        return () => {
+            unmounted = true
+        }
+    }, [server])
 
     const checkRegistration = async (): Promise<void> => {
         console.log('check!!!')
-        client?.api.invalidateEntity(CCID)
-        const entity = await client?.api.readEntity(CCID)
+        props.client?.api.invalidateEntity(props.identity.CCID)
+        const entity = await props.client?.api.readEntity(props.identity.CCID)
         console.log(entity)
         setEntityFound(!!entity && entity.ccid != null)
     }
-
 
     return (
         <Box
@@ -43,7 +80,10 @@ export function ChooseDomain(props: {next: ()=>void}): JSX.Element {
                     <ListItemButton
                         component={RouterLink}
                         to={`https://hub.concurrent.world/web/register?token=${
-                            IssueJWT(privateKey, { iss: CCID, aud: 'hub.concurrent.world' }) ?? ''
+                            IssueJWT(props.identity.privateKey, {
+                                iss: props.identity.CCID,
+                                aud: 'hub.concurrent.world'
+                            }) ?? ''
                         }`}
                         target="_blank"
                         onClick={() => {
@@ -87,12 +127,13 @@ export function ChooseDomain(props: {next: ()=>void}): JSX.Element {
                         component={RouterLink}
                         to={
                             'http://' +
-                            (host?.fqdn ?? '') +
+                            (props.host?.fqdn ?? '') +
                             '/web/register?token=' +
-                            (IssueJWT(privateKey, { iss: CCID, aud: host?.fqdn }) ?? '')
+                            (IssueJWT(props.identity.privateKey, { iss: props.identity.CCID, aud: props.host?.fqdn }) ??
+                                '')
                         }
                         target="_blank"
-                        disabled={!host}
+                        disabled={!props.host}
                     >
                         登録ページへ
                     </Button>
@@ -100,7 +141,7 @@ export function ChooseDomain(props: {next: ()=>void}): JSX.Element {
             </Box>
             <Button
                 variant="contained"
-                disabled={!host}
+                disabled={!props.host}
                 onClick={() => {
                     checkRegistration()
                 }}
@@ -119,4 +160,3 @@ export function ChooseDomain(props: {next: ()=>void}): JSX.Element {
         </Box>
     )
 }
-

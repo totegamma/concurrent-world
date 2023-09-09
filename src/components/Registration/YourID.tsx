@@ -1,8 +1,8 @@
-import { Box, Button, Divider, Paper, Typography } from "@mui/material"
-import { CCAvatar } from "../ui/CCAvatar"
+import { Box, Button, Divider, Paper, Typography } from '@mui/material'
+import { CCAvatar } from '../ui/CCAvatar'
+import { type Identity } from '../../util'
 
-
-export function YourID(props: {next: ()=>void}): JSX.Element {
+export function YourID(props: { next: () => void; identity: Identity }): JSX.Element {
     return (
         <Box
             sx={{
@@ -30,7 +30,7 @@ export function YourID(props: {next: ()=>void}): JSX.Element {
                         gap: '10px'
                     }}
                 >
-                    <CCAvatar identiconSource={CCID} />
+                    <CCAvatar identiconSource={props.identity.CCID} />
                     <Typography
                         sx={{
                             fontSize: {
@@ -39,11 +39,13 @@ export function YourID(props: {next: ()=>void}): JSX.Element {
                             }
                         }}
                     >
-                        {CCID}
+                        {props.identity.CCID}
                     </Typography>
                 </Paper>
                 <Typography>これは、Concurrentの世界であなたを特定する文字列です。</Typography>
-                <Typography>どのサーバーからもあなたを等しく識別できるよう、ランダムな文字列になっています。</Typography>
+                <Typography>
+                    どのサーバーからもあなたを等しく識別できるよう、ランダムな文字列になっています。
+                </Typography>
                 <Divider />
                 <Typography>
                     次に、あなたがこのIDの持ち主であることを証明するためのシークレットコードを作成します。
@@ -60,4 +62,3 @@ export function YourID(props: {next: ()=>void}): JSX.Element {
         </Box>
     )
 }
-
