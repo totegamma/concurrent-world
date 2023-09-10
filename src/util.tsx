@@ -1,14 +1,14 @@
 import { Mnemonic, randomBytes, HDNodeWallet } from 'ethers'
 import { LangJa } from './utils/lang-ja'
 
-interface identity {
+export interface Identity {
     mnemonic: string
     privateKey: string
     publicKey: string
     CCID: string
 }
 
-export const generateIdentity = (): identity => {
+export const generateIdentity = (): Identity => {
     const entrophy = randomBytes(16)
     const mnemonic = Mnemonic.fromEntropy(entrophy, null, LangJa.wordlist())
     const wallet = HDNodeWallet.fromPhrase(mnemonic.phrase, undefined, undefined, LangJa.wordlist())
