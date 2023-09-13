@@ -104,23 +104,25 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         placement="top"
                         disableHoverListener={likeCount === 0}
                     >
-                        <IconButtonWithNumber
-                            icon={
-                                favorited ? (
-                                    <StarIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
-                                ) : (
-                                    <StarOutlineIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
-                                )
-                            }
-                            onClick={() => {
-                                if (favorited) {
-                                    service?.removeFavorite()
-                                } else {
-                                    service?.addFavorite()
+                        <Box>
+                            <IconButtonWithNumber
+                                icon={
+                                    favorited ? (
+                                        <StarIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
+                                    ) : (
+                                        <StarOutlineIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
+                                    )
                                 }
-                            }}
-                            message={likeCount}
-                        />
+                                onClick={() => {
+                                    if (favorited) {
+                                        service?.removeFavorite()
+                                    } else {
+                                        service?.addFavorite()
+                                    }
+                                }}
+                                message={likeCount}
+                            />
+                        </Box>
                     </Tooltip>
                     <IconButtonWithNumber
                         icon={<AddReactionIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />}
