@@ -1,4 +1,16 @@
-import { Box, Button, IconButton, List, ListItem, Switch, Tab, Tabs, TextField, Typography } from '@mui/material'
+import {
+    Box,
+    Button,
+    Divider,
+    IconButton,
+    List,
+    ListItem,
+    Switch,
+    Tab,
+    Tabs,
+    TextField,
+    Typography
+} from '@mui/material'
 import { StreamPicker } from './ui/StreamPicker'
 import { useEffect, useState } from 'react'
 import { usePreference } from '../context/PreferenceContext'
@@ -47,81 +59,112 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
             sx={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 1,
-                p: 1
+                gap: 3.5,
+                p: 2.5,
+                paddingTop: 5
             }}
         >
             <Typography variant="h2">リスト設定</Typography>
-            <Typography variant="h3">リスト名</Typography>
-            <Box display="flex" flexDirection="row">
-                <TextField
-                    label="list name"
-                    variant="outlined"
-                    value={listName}
-                    sx={{
-                        flexGrow: 1
-                    }}
-                    onChange={(e) => {
-                        setListName(e.target.value)
-                    }}
-                />
-                <Button
-                    variant="contained"
-                    onClick={(_) => {
-                        pref.updateList(props.id, {
-                            ...list,
-                            label: listName
-                        })
-                    }}
-                >
-                    Update
-                </Button>
-            </Box>
-            <Typography variant="h3">デフォルト投稿先</Typography>
             <Box
                 sx={{
                     display: 'flex',
-                    alignItems: 'center',
-                    flex: 1
+                    flexDirection: 'column',
+                    gap: 2,
+                    paddingLeft: 0.3
                 }}
             >
-                <StreamPicker
-                    options={options}
-                    selected={postStreams}
-                    setSelected={(value) => {
-                        pref.updateList(props.id, {
-                            ...list,
-                            defaultPostStreams: value.map((e) => e.id)
-                        })
-                        setPostStreams(value)
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 2
                     }}
-                />
-            </Box>
-            {props.id !== 'home' && (
-                <>
-                    <Typography variant="h3">リストのピン</Typography>
-                    <Switch
-                        checked={list.pinned}
-                        onChange={(_) => {
-                            pref.updateList(props.id, {
-                                ...list,
-                                pinned: !list.pinned
-                            })
-                        }}
-                    />
-                    <Button
-                        variant="contained"
-                        color="error"
-                        onClick={(_) => {
-                            const old = pref.lists
-                            delete old[props.id]
-                            pref.setLists(JSON.parse(JSON.stringify(old)))
+                >
+                    <Typography variant="h3">リスト名</Typography>
+                    <Box display="flex" flexDirection="row">
+                        <TextField
+                            label="New name"
+                            variant="outlined"
+                            value={listName}
+                            sx={{
+                                flexGrow: 1
+                            }}
+                            onChange={(e) => {
+                                setListName(e.target.value)
+                            }}
+                        />
+                        <Button
+                            disabled={listName === list.label}
+                            variant="contained"
+                            onClick={(_) => {
+                                pref.updateList(props.id, {
+                                    ...list,
+                                    label: listName
+                                })
+                            }}
+                            color="success"
+                        >
+                            Update
+                        </Button>
+                    </Box>
+                </Box>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 2
+                    }}
+                >
+                    <Divider />
+                    <Typography variant="h3">デフォルト投稿先</Typography>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            flex: 1
                         }}
                     >
-                        リストを削除
-                    </Button>
-                </>
-            )}
+                        <StreamPicker
+                            options={options}
+                            selected={postStreams}
+                            setSelected={(value) => {
+                                pref.updateList(props.id, {
+                                    ...list,
+                                    defaultPostStreams: value.map((e) => e.id)
+                                })
+                                setPostStreams(value)
+                            }}
+                        />
+                    </Box>
+                </Box>
+                {props.id !== 'home' && (
+                    <>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 2
+                            }}
+                        >
+                            <Divider />
+                            <Box display="flex" flexDirection="row" justifyContent="space-between">
+                                <Typography variant="h3">リストのピン留め</Typography>
+                                <Switch
+                                    checked={list.pinned}
+                                    onChange={(_) => {
+                                        pref.updateList(props.id, {
+                                            ...list,
+                                            pinned: !list.pinned
+                                        })
+                                    }}
+                                />
+                            </Box>
+                            ピン留めしたリストは投稿する画面の上にいい感じに出てくるようになります。
+                        </Box>
+                    </>
+                )}
+            </Box>
+            <Divider />
             <Tabs
                 value={tab}
                 onChange={(_, value) => {
@@ -179,6 +222,19 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                         </ListItem>
                     ))}
             </List>
+            {props.id !== 'home' && (
+                <Button
+                    variant="contained"
+                    color="error"
+                    onClick={(_) => {
+                        const old = pref.lists
+                        delete old[props.id]
+                        pref.setLists(JSON.parse(JSON.stringify(old)))
+                    }}
+                >
+                    リストを削除
+                </Button>
+            )}
         </Box>
     )
 }
