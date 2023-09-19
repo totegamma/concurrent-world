@@ -51,7 +51,7 @@ export const EmojiSettings = (): JSX.Element => {
                     })
                     .catch(() => {
                         setPreview(null)
-                        enqueueSnackbar('パッケージが見つかりませんでした', { variant: 'error' })
+                        enqueueSnackbar(t('packageNotFound'), { variant: 'error' })
                     })
             } else {
                 setPreview(null)
@@ -89,7 +89,7 @@ export const EmojiSettings = (): JSX.Element => {
                             }}
                             onClick={() => {
                                 navigator.clipboard.writeText(e.packageURL)
-                                enqueueSnackbar('コピーしました', { variant: 'success' })
+                                enqueueSnackbar(t('copied'), { variant: 'success' })
                             }}
                         >
                             <Box display="flex">
@@ -140,7 +140,7 @@ export const EmojiSettings = (): JSX.Element => {
                                 setAddingPackageURL('')
                                 setPreview(null)
                             } else {
-                                enqueueSnackbar('すでに追加されています', { variant: 'error' })
+                                enqueueSnackbar(t('alreadyAdded'), { variant: 'error' })
                             }
                         }}
                     >

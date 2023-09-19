@@ -27,7 +27,10 @@
     },
     "emoji": {
       "emojiPackage": "絵文字パッケージ",
-      "emojiPackageURL": "絵文字パッケージURL"
+      "emojiPackageURL": "絵文字パッケージURL",
+      "packageNotFound": "パッケージが見つかりませんでした",
+      "copied": "コピーしました",
+      "alreadyAdded": "すでに追加されています"
     }
   }
 }

@@ -27,7 +27,10 @@
     },
     "emoji": {
       "emojiPackage": "Emoji packages",
-      "emojiPackageURL": "Emoji package URL"
+      "emojiPackageURL": "Emoji package URL",
+      "packageNotFound": "Package not found",
+      "copied": "Copied",
+      "alreadyAdded": "Emoji pack already added"
     }
   }
 }
