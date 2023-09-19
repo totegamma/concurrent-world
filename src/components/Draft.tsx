@@ -33,6 +33,8 @@ import { useApi } from '../context/api'
 import { type Emoji, type EmojiLite } from '../model'
 import { useNavigate } from 'react-router-dom'
 
+import { useTranslation } from 'react-i18next'
+
 export interface DraftProps {
     submitButtonLabel?: string
     streamPickerInitial: Stream[]
@@ -214,6 +216,8 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         }
     }
 
+    const { t } = useTranslation('', { keyPrefix: 'draft' })
+
     return (
         <Box
             sx={{
@@ -267,7 +271,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         setSelected={setDestStreams}
                     />
                 </Box>
-                <Tooltip title={postHome ? 'ホーム同時投稿モード' : 'ストリーム限定投稿モード'} arrow placement="top">
+                <Tooltip title={postHome ? t('postToHome') : t('noPostToHome')} arrow placement="top">
                     <IconButton
                         onClick={() => {
                             setPostHome(!postHome)
@@ -317,7 +321,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         }
                     }}
                     onPaste={handlePasteImage}
-                    placeholder="今、なにしてる？"
+                    placeholder={t('placeholder')}
                     autoFocus={props.autoFocus}
                     sx={{
                         width: 1,
@@ -387,7 +391,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             >
                 <Box>
                     <Tooltip
-                        title={pref.imgurClientID === '' ? '設定から画像投稿設定をしてください' : '画像の添付'}
+                        title={pref.imgurClientID === '' ? t('cantAttachImage') : t('attachImage')}
                         arrow
                         placement="top"
                         enterDelay={pref.imgurClientID === '' ? 0 : 500}
@@ -418,7 +422,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             </IconButton>
                         </span>
                     </Tooltip>
-                    <Tooltip title="本文をプレビュー" arrow placement="top" enterDelay={500}>
+                    <Tooltip title={t('preview')} arrow placement="top" enterDelay={500}>
                         <IconButton
                             sx={{
                                 color: theme.palette.text.secondary
@@ -430,7 +434,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             <Splitscreen sx={{ transform: 'rotate(90deg)', fontSize: '80%' }} />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="絵文字" arrow placement="top" enterDelay={500}>
+                    <Tooltip title={t('emoji')} arrow placement="top" enterDelay={500}>
                         <IconButton
                             sx={{
                                 color: theme.palette.text.secondary
@@ -445,7 +449,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             <EmojiEmotions sx={{ fontSize: '80%' }} />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="下書きを削除" arrow placement="top" enterDelay={500}>
+                    <Tooltip title={t('clearDraft')} arrow placement="top" enterDelay={500}>
                         <span>
                             <IconButton
                                 sx={{

@@ -9,7 +9,8 @@
       "generateInviteCode": "Generate invite code",
       "inviteCode": "Invite code (valid for 24 hours)",
       "copyInviteCode": "Copy invite code",
-      "copied": "Copied"
+      "copied": "Copied",
+      "language": "Language"
     },
     "profileEditor": {
       "update": "Update",
@@ -53,5 +54,20 @@
       "alreadyRegistered": "This user is already registered.",
       "tryAnotherID": "Try another ID."
     }
+  },
+  "draft": {
+    "placeholder": "What are you up to?",
+    "attachImage": "Attach image",
+    "cantAttachImage": "Please set up Imgur client ID in settings.",
+    "preview": "Preview",
+    "emoji": "Emojis",
+    "clearDraft": "Clear draft",
+    "postToHome": "Also posting to home stream",
+    "noPostToHome": "Not posting to home stream"
+  },
+  "time": {
+    "secondsBefore": "s",
+    "minutesBefore": "m",
+    "hoursBefore": "h"
   }
 }

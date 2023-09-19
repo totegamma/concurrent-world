@@ -9,7 +9,8 @@
       "generateInviteCode": "招待コードを生成",
       "inviteCode": "招待コード(24時間有効)",
       "copyInviteCode": "招待コードをコピー",
-      "copied": "コピーしました"
+      "copied": "コピーしました",
+      "language": "言語"
     },
     "profileEditor": {
       "update": "更新",
@@ -53,5 +54,20 @@
       "alreadyRegistered": "このユーザーは既に登録されています。",
       "tryAnotherID": "他のIDを試してください"
     }
+  },
+  "draft": {
+    "placeholder": "今、なにしてる？",
+    "attachImage": "画像の添付",
+    "cantAttachImage": "設定から画像投稿設定をしてください",
+    "preview": "本文をプレビュー",
+    "emoji": "絵文字",
+    "clearDraft": "下書きを削除",
+    "postToHome": "ホーム同時投稿モード",
+    "noPostToHome": "ストリーム限定投稿モード"
+  },
+  "time": {
+    "secondsBefore": "秒前",
+    "minutesBefore": "分前",
+    "hoursBefore": "時間前"
   }
 }

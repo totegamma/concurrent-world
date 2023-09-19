@@ -1,11 +1,22 @@
-import { Box, Button, Divider, FormControlLabel, FormGroup, IconButton, Switch, Typography } from '@mui/material'
+import {
+    Box,
+    Button,
+    Divider,
+    FormControlLabel,
+    FormGroup,
+    IconButton,
+    MenuItem,
+    Select,
+    Switch,
+    Typography
+} from '@mui/material'
 import { usePreference } from '../../context/PreferenceContext'
 import { Passport } from '../../components/theming/Passport'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import Tilt from 'react-parallax-tilt'
 import { useApi } from '../../context/api'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSnackbar } from 'notistack'
 import { IssueJWT } from '@concurrent-world/client'
 import { useTranslation } from 'react-i18next'
@@ -19,7 +30,13 @@ export const GeneralSettings = (): JSX.Element => {
     const tags = client?.api?.getTokenClaims()?.tag?.split(',') ?? []
     const { enqueueSnackbar } = useSnackbar()
 
-    const { t } = useTranslation('', { keyPrefix: 'settings.general' })
+    const [currentLanguage, setCurrentLanguage] = useState<string>('')
+
+    const { t, i18n } = useTranslation('', { keyPrefix: 'settings.general' })
+
+    useEffect(() => {
+        setCurrentLanguage(i18n.language)
+    }, [])
 
     return (
         <Box
@@ -40,6 +57,19 @@ export const GeneralSettings = (): JSX.Element => {
             </Box>
             <Divider />
 
+            <Box>
+                <Typography variant="h3">{t('language')}</Typography>
+                <Select
+                    value={currentLanguage}
+                    onChange={(e) => {
+                        i18n.changeLanguage(e.target.value)
+                        setCurrentLanguage(e.target.value)
+                    }}
+                >
+                    <MenuItem value={'en'}>English</MenuItem>
+                    <MenuItem value={'ja'}>日本語</MenuItem>
+                </Select>
+            </Box>
             <Box>
                 <Typography variant="h3">{t('basic')}</Typography>
                 <FormGroup>
@@ -78,7 +108,6 @@ export const GeneralSettings = (): JSX.Element => {
                     />
                 </FormGroup>
             </Box>
-
             <Divider />
 
             <Typography variant="h3" gutterBottom>
