@@ -19,7 +19,7 @@ export const GeneralSettings = (): JSX.Element => {
     const tags = client?.api?.getTokenClaims()?.tag?.split(',') ?? []
     const { enqueueSnackbar } = useSnackbar()
 
-    const { t } = useTranslation()
+    const { t } = useTranslation('', { keyPrefix: 'settings.general' })
 
     return (
         <Box
@@ -41,7 +41,7 @@ export const GeneralSettings = (): JSX.Element => {
             <Divider />
 
             <Box>
-                <Typography variant="h3">{t('settings.general.basic')}</Typography>
+                <Typography variant="h3">{t('basic')}</Typography>
                 <FormGroup>
                     <FormControlLabel
                         control={
@@ -52,7 +52,7 @@ export const GeneralSettings = (): JSX.Element => {
                                 }}
                             />
                         }
-                        label={t('settings.general.showEditorOnTop')}
+                        label={t('showEditorOnTop')}
                     />
                     <FormControlLabel
                         control={
@@ -63,7 +63,7 @@ export const GeneralSettings = (): JSX.Element => {
                                 }}
                             />
                         }
-                        label={t('settings.general.showEditorOnTopMobile')}
+                        label={t('showEditorOnTopMobile')}
                     />
                     <FormControlLabel
                         control={
@@ -74,7 +74,7 @@ export const GeneralSettings = (): JSX.Element => {
                                 }}
                             />
                         }
-                        label={t('settings.general.developerMode')}
+                        label={t('developerMode')}
                     />
                 </FormGroup>
             </Box>
@@ -151,11 +151,11 @@ export const GeneralSettings = (): JSX.Element => {
                                 setInvitationCode(jwt)
                             }}
                         >
-                            {t('settings.general.generateInviteCode')}
+                            {t('generateInviteCode')}
                         </Button>
                     ) : (
                         <>
-                            <Typography variant="body1">{t('settings.general.inviteCode')}</Typography>
+                            <Typography variant="body1">{t('inviteCode')}</Typography>
                             <pre
                                 style={{
                                     whiteSpace: 'pre-wrap',
@@ -172,10 +172,10 @@ export const GeneralSettings = (): JSX.Element => {
                                 variant="contained"
                                 onClick={(_) => {
                                     navigator.clipboard.writeText(invitationCode)
-                                    enqueueSnackbar(t('settings.general.copied'), { variant: 'success' })
+                                    enqueueSnackbar(t('copied'), { variant: 'success' })
                                 }}
                             >
-                                {t('settings.general.copyInviteCode')}
+                                {t('copyInviteCode')}
                             </Button>
                         </>
                     )}

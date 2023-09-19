@@ -10,6 +10,24 @@
       "inviteCode": "Invite code (valid for 24 hours)",
       "copyInviteCode": "Copy invite code",
       "copied": "Copied"
+    },
+    "profile": {
+      "title": "Profile",
+      "update": "Update",
+      "updated": "Updated"
+    },
+    "sound": {
+      "sound": "Sound",
+      "volume": "Volume",
+      "override": {
+        "title": "Override",
+        "postSound": "Post sound",
+        "notificationSound": "Notification sound"
+      }
+    },
+    "emoji": {
+      "emojiPackage": "Emoji packages",
+      "emojiPackageURL": "Emoji package URL"
     }
   }
 }

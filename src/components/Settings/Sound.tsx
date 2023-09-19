@@ -1,8 +1,11 @@
 import { Box, Slider, TextField, Typography } from '@mui/material'
 import { usePreference } from '../../context/PreferenceContext'
+import { useTranslation } from 'react-i18next'
 
 export const SoundSettings = (): JSX.Element => {
     const pref = usePreference()
+
+    const { t } = useTranslation('', { keyPrefix: 'settings.sound' })
 
     return (
         <Box
@@ -13,8 +16,8 @@ export const SoundSettings = (): JSX.Element => {
             }}
         >
             <Box display="flex" flexDirection="column" gap={1}>
-                <Typography variant="h3">サウンド</Typography>
-                <Typography variant="h4">音量</Typography>
+                <Typography variant="h3">{t('sound')}</Typography>
+                <Typography variant="h4">{t('volume')}</Typography>
                 <Slider
                     aria-label="Volume"
                     value={pref.volume}
@@ -22,9 +25,9 @@ export const SoundSettings = (): JSX.Element => {
                         pref.setVolume(value as number)
                     }}
                 />
-                <Typography variant="h4">Override</Typography>
+                <Typography variant="h4">{t('override.title')}</Typography>
                 <TextField
-                    label="投稿音"
+                    label={t('override.postSound')}
                     placeholder="https://example.com/sound.mp3"
                     value={pref.postSound}
                     onChange={(e) => {
@@ -32,7 +35,7 @@ export const SoundSettings = (): JSX.Element => {
                     }}
                 />
                 <TextField
-                    label="通知音"
+                    label={t('override.notificationSound')}
                     placeholder="https://example.com/sound.mp3"
                     value={pref.notificationSound}
                     onChange={(e) => {

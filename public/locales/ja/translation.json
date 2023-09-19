@@ -10,6 +10,24 @@
       "inviteCode": "招待コード(24時間有効)",
       "copyInviteCode": "招待コードをコピー",
       "copied": "コピーしました"
+    },
+    "profile": {
+      "title": "プロフィール",
+      "update": "更新",
+      "updated": "更新しました"
+    },
+    "sound": {
+      "sound": "サウンド",
+      "volume": "音量",
+      "override": {
+        "title": "Override",
+        "postSound": "投稿音",
+        "notificationSound": "通知音"
+      }
+    },
+    "emoji": {
+      "emojiPackage": "絵文字パッケージ",
+      "emojiPackageURL": "絵文字パッケージURL"
     }
   }
 }
