@@ -148,7 +148,7 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                         >
                             <Divider />
                             <Box display="flex" flexDirection="row" justifyContent="space-between">
-                                <Typography variant="h3">リストのピン留め</Typography>
+                                <Typography variant="h3">リストタブにこのリストを表示する</Typography>
                                 <Switch
                                     checked={list.pinned}
                                     onChange={(_) => {
@@ -159,7 +159,7 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                                     }}
                                 />
                             </Box>
-                            ピン留めしたリストは投稿する画面の上にいい感じに出てくるようになります。
+                            他のリストから簡単に切り替えることができます。
                         </Box>
                     </>
                 )}
