@@ -8,6 +8,7 @@ import { useApi } from '../../context/api'
 import { useState } from 'react'
 import { useSnackbar } from 'notistack'
 import { IssueJWT } from '@concurrent-world/client'
+import { useTranslation } from 'react-i18next'
 
 export const GeneralSettings = (): JSX.Element => {
     const pref = usePreference()
@@ -17,6 +18,8 @@ export const GeneralSettings = (): JSX.Element => {
 
     const tags = client?.api?.getTokenClaims()?.tag?.split(',') ?? []
     const { enqueueSnackbar } = useSnackbar()
+
+    const { t } = useTranslation()
 
     return (
         <Box
@@ -38,7 +41,7 @@ export const GeneralSettings = (): JSX.Element => {
             <Divider />
 
             <Box>
-                <Typography variant="h3">基本</Typography>
+                <Typography variant="h3">{t('settings.general.basic')}</Typography>
                 <FormGroup>
                     <FormControlLabel
                         control={
@@ -49,7 +52,7 @@ export const GeneralSettings = (): JSX.Element => {
                                 }}
                             />
                         }
-                        label="投稿エディタを上部に表示"
+                        label={t('settings.general.showEditorOnTop')}
                     />
                     <FormControlLabel
                         control={
@@ -60,7 +63,7 @@ export const GeneralSettings = (): JSX.Element => {
                                 }}
                             />
                         }
-                        label="投稿エディタを上部に表示 (モバイル)"
+                        label={t('settings.general.showEditorOnTopMobile')}
                     />
                     <FormControlLabel
                         control={
@@ -71,7 +74,7 @@ export const GeneralSettings = (): JSX.Element => {
                                 }}
                             />
                         }
-                        label="開発者モード"
+                        label={t('settings.general.developerMode')}
                     />
                 </FormGroup>
             </Box>
@@ -148,11 +151,11 @@ export const GeneralSettings = (): JSX.Element => {
                                 setInvitationCode(jwt)
                             }}
                         >
-                            招待コードを生成
+                            {t('settings.general.generateInviteCode')}
                         </Button>
                     ) : (
                         <>
-                            <Typography variant="body1">招待コード(24時間有効)</Typography>
+                            <Typography variant="body1">{t('settings.general.inviteCode')}</Typography>
                             <pre
                                 style={{
                                     whiteSpace: 'pre-wrap',
@@ -169,10 +172,10 @@ export const GeneralSettings = (): JSX.Element => {
                                 variant="contained"
                                 onClick={(_) => {
                                     navigator.clipboard.writeText(invitationCode)
-                                    enqueueSnackbar('コピーしました', { variant: 'success' })
+                                    enqueueSnackbar(t('settings.general.copied'), { variant: 'success' })
                                 }}
                             >
-                                招待コードをコピー
+                                {t('settings.general.copyInviteCode')}
                             </Button>
                         </>
                     )}

@@ -10,6 +10,7 @@ import { AccountImport } from './pages/AccountImport'
 import { GuestTimelinePage } from './pages/GuestTimeline'
 import ApiProvider from './context/api'
 import { PreferenceProvider } from './context/PreferenceContext'
+import './i18n'
 
 const AppPage = lazy(() => import('./App'))
 const Welcome = lazy(() => import('./pages/Welcome'))

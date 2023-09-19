@@ -1,0 +1,15 @@
+{
+  "test": "テスト",
+  "settings": {
+    "general": {
+      "basic": "基本",
+      "showEditorOnTop": "投稿エディタを上部に表示",
+      "showEditorOnTopMobile": "投稿エディタを上部に表示（モバイル）",
+      "developerMode": "開発者モード",
+      "generateInviteCode": "招待コードを生成",
+      "inviteCode": "招待コード(24時間有効)",
+      "copyInviteCode": "招待コードをコピー",
+      "copied": "コピーしました"
+    }
+  }
+}

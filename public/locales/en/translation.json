@@ -1,0 +1,15 @@
+{
+  "test": "Test",
+  "settings": {
+    "general": {
+      "basic": "Basic",
+      "showEditorOnTop": "Show editor on top",
+      "showEditorOnTopMobile": "Show editor on top (mobile)",
+      "developerMode": "Developer mode",
+      "generateInviteCode": "Generate invite code",
+      "inviteCode": "Invite code (valid for 24 hours)",
+      "copyInviteCode": "Copy invite code",
+      "copied": "Copied"
+    }
+  }
+}
