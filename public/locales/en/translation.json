@@ -11,6 +11,12 @@
       "copyInviteCode": "Copy invite code",
       "copied": "Copied"
     },
+    "profileEditor": {
+      "update": "Update",
+      "updateSuccess": "Updated Successfully",
+      "updateFailed": "Update Failed",
+      "createNew": "Create"
+    },
     "profile": {
       "title": "Profile",
       "update": "Update",
@@ -31,6 +37,21 @@
       "packageNotFound": "Package not found",
       "copied": "Copied",
       "alreadyAdded": "Emoji pack already added"
+    },
+    "media": {
+      "imagePostSettings": "Image post settings",
+      "afterRegisteringImgur": "After registering with Imgur, go to ",
+      "thisPage": "this page",
+      "oauth2": "and create application with option \"OAuth 2 authorization without a callback URL\""
+    },
+    "ap": {
+      "setup": "ActivityPub ID setup.",
+      "cantBeChangedOnceRegistered": "**Can't be changed once registered.",
+      "confirming": "Confirming...",
+      "register": "Register",
+      "helperText": "The following charaters can be used: a-z, A-Z, 0-9",
+      "alreadyRegistered": "This user is already registered.",
+      "tryAnotherID": "Try another ID."
     }
   }
 }

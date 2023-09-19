@@ -8,6 +8,8 @@ import { CCAvatar } from './ui/CCAvatar'
 import Background from '../resources/defaultbg.png'
 import { alpha, useTheme } from '@mui/material'
 
+import { useTranslation } from 'react-i18next'
+
 interface ProfileEditorProps {
     initial?: Profile
     onSubmit?: (profile: Profile) => void
@@ -21,6 +23,8 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
     const [avatar, setAvatar] = useState<string>(props.initial?.avatar ?? '')
     const [description, setDescription] = useState<string>(props.initial?.description ?? '')
     const [banner, setBanner] = useState<string>(props.initial?.banner ?? '')
+
+    const { t, i18n } = useTranslation('', { keyPrefix: 'settings.profileEditor' })
 
     const updateProfile = async (): Promise<void> => {
         if (props.id === undefined) {
@@ -115,7 +119,7 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
                         updateProfile()
                     }}
                 >
-                    {props.id === undefined ? '新規作成' : '更新'}
+                    {props.id === undefined ? t('createNew') : t('update')}
                 </Button>
             </Box>
         </Box>

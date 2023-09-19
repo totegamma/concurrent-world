@@ -11,6 +11,12 @@
       "copyInviteCode": "招待コードをコピー",
       "copied": "コピーしました"
     },
+    "profileEditor": {
+      "update": "更新",
+      "updateSuccess": "更新成功",
+      "updateFailed": "更新失敗",
+      "createNew": "新規作成"
+    },
     "profile": {
       "title": "プロフィール",
       "update": "更新",
@@ -31,6 +37,21 @@
       "packageNotFound": "パッケージが見つかりませんでした",
       "copied": "コピーしました",
       "alreadyAdded": "すでに追加されています"
+    },
+    "media": {
+      "imagePostSettings": "画像投稿設定",
+      "afterRegisteringImgur": "Imgurに登録した後、",
+      "thisPage": "このページ",
+      "oauth2": "でアプリケーションを\"OAuth 2 authorization without a callback URL\"で作成してください。"
+    },
+    "ap": {
+      "setup": "ActivityPubにおけるIDを設定します。",
+      "cantBeChangedOnceRegistered": "一度登録すると変更できません",
+      "confirming": "確認中…",
+      "register": "登録",
+      "helperText": "a-z, A-Z, 0-9, _が使用できます",
+      "alreadyRegistered": "このユーザーは既に登録されています。",
+      "tryAnotherID": "他のIDを試してください"
     }
   }
 }
