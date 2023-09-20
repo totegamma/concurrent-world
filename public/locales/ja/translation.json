@@ -1,0 +1,73 @@
+{
+  "test": "テスト",
+  "settings": {
+    "general": {
+      "basic": "基本",
+      "showEditorOnTop": "投稿エディタを上部に表示",
+      "showEditorOnTopMobile": "投稿エディタを上部に表示（モバイル）",
+      "developerMode": "開発者モード",
+      "generateInviteCode": "招待コードを生成",
+      "inviteCode": "招待コード(24時間有効)",
+      "copyInviteCode": "招待コードをコピー",
+      "copied": "コピーしました",
+      "language": "言語"
+    },
+    "profileEditor": {
+      "update": "更新",
+      "updateSuccess": "更新成功",
+      "updateFailed": "更新失敗",
+      "createNew": "新規作成"
+    },
+    "profile": {
+      "title": "プロフィール",
+      "update": "更新",
+      "updated": "更新しました"
+    },
+    "sound": {
+      "sound": "サウンド",
+      "volume": "音量",
+      "override": {
+        "title": "Override",
+        "postSound": "投稿音",
+        "notificationSound": "通知音"
+      }
+    },
+    "emoji": {
+      "emojiPackage": "絵文字パッケージ",
+      "emojiPackageURL": "絵文字パッケージURL",
+      "packageNotFound": "パッケージが見つかりませんでした",
+      "copied": "コピーしました",
+      "alreadyAdded": "すでに追加されています"
+    },
+    "media": {
+      "imagePostSettings": "画像投稿設定",
+      "afterRegisteringImgur": "Imgurに登録した後、",
+      "thisPage": "このページ",
+      "oauth2": "でアプリケーションを\"OAuth 2 authorization without a callback URL\"で作成してください。"
+    },
+    "ap": {
+      "setup": "ActivityPubにおけるIDを設定します。",
+      "cantBeChangedOnceRegistered": "一度登録すると変更できません",
+      "confirming": "確認中…",
+      "register": "登録",
+      "helperText": "a-z, A-Z, 0-9, _が使用できます",
+      "alreadyRegistered": "このユーザーは既に登録されています。",
+      "tryAnotherID": "他のIDを試してください"
+    }
+  },
+  "draft": {
+    "placeholder": "今、なにしてる？",
+    "attachImage": "画像の添付",
+    "cantAttachImage": "設定から画像投稿設定をしてください",
+    "preview": "本文をプレビュー",
+    "emoji": "絵文字",
+    "clearDraft": "下書きを削除",
+    "postToHome": "ホーム同時投稿モード",
+    "noPostToHome": "ストリーム限定投稿モード"
+  },
+  "time": {
+    "secondsBefore": "秒前",
+    "minutesBefore": "分前",
+    "hoursBefore": "時間前"
+  }
+}
