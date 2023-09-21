@@ -39,6 +39,12 @@ export const CCDrawer = (props: CCDrawerProps): JSX.Element => {
                     flexDirection: 'column',
                     width: {
                         xs: '100%',
+                        sm: '50%'
+                    },
+                    minWidth: {
+                        sm: '420px'
+                    },
+                    maxWidth: {
                         sm: '500px'
                     },
                     height: {
