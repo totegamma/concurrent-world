@@ -102,13 +102,7 @@ export function EntityPage(): JSX.Element {
                         behavior: 'smooth'
                     })
                 }}
-                secondaryAction={
-                    isSelf ? (
-                        <CreateIcon />
-                    ) : (
-                        <FollowButton userCCID={id!} userStreamID={user.userstreams?.homeStream ?? ''} />
-                    )
-                }
+                secondaryAction={isSelf ? <CreateIcon /> : <></>}
                 useRawSecondaryAction={!isSelf}
                 onSecondaryActionClick={() => {
                     if (isSelf) navigate('/settings')
@@ -170,31 +164,9 @@ export function EntityPage(): JSX.Element {
                                     display: 'flex',
                                     flexFlow: 'row',
                                     alignItems: 'center',
-                                    justifyContent: 'flex-end',
                                     gap: 1
                                 }}
                             >
-                                <Box display="flex" gap={1}>
-                                    <Typography
-                                        component={Link}
-                                        underline="hover"
-                                        onClick={() => {
-                                            setDetailMode('ack')
-                                        }}
-                                    >
-                                        {ackUsers.length} Ack
-                                    </Typography>
-                                    <Typography
-                                        component={Link}
-                                        underline="hover"
-                                        onClick={() => {
-                                            setDetailMode('acker')
-                                        }}
-                                    >
-                                        {ackedUsers.length} Acker
-                                    </Typography>
-                                </Box>
-
                                 {myAck ? (
                                     <Button
                                         variant="outlined"
@@ -226,7 +198,56 @@ export function EntityPage(): JSX.Element {
                                         Ack
                                     </Button>
                                 )}
+
+                                <Box display="flex" gap={1}>
+                                    <Typography
+                                        component={Link}
+                                        underline="hover"
+                                        onClick={() => {
+                                            setDetailMode('ack')
+                                        }}
+                                    >
+                                        {ackUsers.length} Ack
+                                    </Typography>
+                                    <Typography
+                                        component={Link}
+                                        underline="hover"
+                                        onClick={() => {
+                                            setDetailMode('acker')
+                                        }}
+                                    >
+                                        {ackedUsers.length} Acker
+                                    </Typography>
+                                </Box>
+
+                                <Box
+                                    sx={{
+                                        marginLeft: 'auto'
+                                    }}
+                                >
+                                    <Box
+                                        sx={{
+                                            height: '40px',
+                                            display: 'flex',
+                                            flexFlow: 'row',
+                                            alignItems: 'center',
+                                            gap: 0
+                                        }}
+                                    >
+                                        {!isSelf ? <Typography>リストに追加</Typography> : ''}
+                                        {!isSelf ? (
+                                            <FollowButton
+                                                color={theme.palette.secondary.main}
+                                                userCCID={id!}
+                                                userStreamID={user.userstreams?.homeStream ?? ''}
+                                            />
+                                        ) : (
+                                            ''
+                                        )}
+                                    </Box>
+                                </Box>
                             </Box>
+
                             <Box
                                 sx={{
                                     display: 'flex',

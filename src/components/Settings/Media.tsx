@@ -2,6 +2,8 @@ import { Box, Button, Divider, TextField, Typography } from '@mui/material'
 import { useRef, useState } from 'react'
 import { usePreference } from '../../context/PreferenceContext'
 
+import { useTranslation } from 'react-i18next'
+
 export const MediaSettings = (): JSX.Element => {
     const pref = usePreference()
 
@@ -30,6 +32,9 @@ export const MediaSettings = (): JSX.Element => {
         }
     }
     */
+
+    const { t } = useTranslation('', { keyPrefix: 'settings.media' })
+
     return (
         <Box
             sx={{
@@ -38,10 +43,11 @@ export const MediaSettings = (): JSX.Element => {
                 gap: '1rem'
             }}
         >
-            <Typography variant="h3">画像投稿設定</Typography>
+            <Typography variant="h3">{t('imagePostSettings')}</Typography>
             <Typography>
-                Imgurに登録した後、<a href={'https://api.imgur.com/oauth2/addclient'}>このページ</a>
-                でアプリケーションを&quot;OAuth 2 authorization without a callback URL&quot;で作成してください。
+                {t('afterRegisteringImgur')}
+                <a href={'https://api.imgur.com/oauth2/addclient'}>{t('thisPage')}</a>
+                {t('oauth2')}
             </Typography>
             <Box>
                 <TextField

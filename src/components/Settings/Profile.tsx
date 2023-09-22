@@ -2,10 +2,13 @@ import { Box, Typography } from '@mui/material'
 import { ProfileEditor } from '../ProfileEditor'
 import { useApi } from '../../context/api'
 import { useSnackbar } from 'notistack'
+import { useTranslation } from 'react-i18next'
 
 export const ProfileSettings = (): JSX.Element => {
     const client = useApi()
     const { enqueueSnackbar } = useSnackbar()
+
+    const { t } = useTranslation('', { keyPrefix: 'settings.profile' })
 
     return (
         <Box
@@ -16,7 +19,7 @@ export const ProfileSettings = (): JSX.Element => {
             }}
         >
             <Box>
-                <Typography variant="h3">プロフィール</Typography>
+                <Typography variant="h3">{t('title')}</Typography>
                 <Box
                     sx={{
                         width: '100%',
@@ -28,7 +31,7 @@ export const ProfileSettings = (): JSX.Element => {
                         id={client?.user?.profile?.id}
                         initial={client?.user?.profile}
                         onSubmit={(_profile) => {
-                            enqueueSnackbar('更新しました', { variant: 'success' })
+                            enqueueSnackbar(t('updated'), { variant: 'success' })
                         }}
                     />
                 </Box>

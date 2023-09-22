@@ -1,0 +1,73 @@
+{
+  "test": "Test",
+  "settings": {
+    "general": {
+      "basic": "Basic",
+      "showEditorOnTop": "Show editor on top",
+      "showEditorOnTopMobile": "Show editor on top (mobile)",
+      "developerMode": "Developer mode",
+      "generateInviteCode": "Generate invite code",
+      "inviteCode": "Invite code (valid for 24 hours)",
+      "copyInviteCode": "Copy invite code",
+      "copied": "Copied",
+      "language": "Language"
+    },
+    "profileEditor": {
+      "update": "Update",
+      "updateSuccess": "Updated Successfully",
+      "updateFailed": "Update Failed",
+      "createNew": "Create"
+    },
+    "profile": {
+      "title": "Profile",
+      "update": "Update",
+      "updated": "Updated"
+    },
+    "sound": {
+      "sound": "Sound",
+      "volume": "Volume",
+      "override": {
+        "title": "Override",
+        "postSound": "Post sound",
+        "notificationSound": "Notification sound"
+      }
+    },
+    "emoji": {
+      "emojiPackage": "Emoji packages",
+      "emojiPackageURL": "Emoji package URL",
+      "packageNotFound": "Package not found",
+      "copied": "Copied",
+      "alreadyAdded": "Emoji pack already added"
+    },
+    "media": {
+      "imagePostSettings": "Image post settings",
+      "afterRegisteringImgur": "After registering with Imgur, go to ",
+      "thisPage": "this page",
+      "oauth2": "and create application with option \"OAuth 2 authorization without a callback URL\""
+    },
+    "ap": {
+      "setup": "ActivityPub ID setup.",
+      "cantBeChangedOnceRegistered": "**Can't be changed once registered.",
+      "confirming": "Confirming...",
+      "register": "Register",
+      "helperText": "The following charaters can be used: a-z, A-Z, 0-9",
+      "alreadyRegistered": "This user is already registered.",
+      "tryAnotherID": "Try another ID."
+    }
+  },
+  "draft": {
+    "placeholder": "What are you up to?",
+    "attachImage": "Attach image",
+    "cantAttachImage": "Please set up Imgur client ID in settings.",
+    "preview": "Preview",
+    "emoji": "Emojis",
+    "clearDraft": "Clear draft",
+    "postToHome": "Also posting to home stream",
+    "noPostToHome": "Not posting to home stream"
+  },
+  "time": {
+    "secondsBefore": "s",
+    "minutesBefore": "m",
+    "hoursBefore": "h"
+  }
+}

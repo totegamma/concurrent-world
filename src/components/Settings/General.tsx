@@ -1,13 +1,25 @@
-import { Box, Button, Divider, FormControlLabel, FormGroup, IconButton, Switch, Typography } from '@mui/material'
+import {
+    Box,
+    Button,
+    Divider,
+    FormControlLabel,
+    FormGroup,
+    IconButton,
+    MenuItem,
+    Select,
+    Switch,
+    Typography
+} from '@mui/material'
 import { usePreference } from '../../context/PreferenceContext'
 import { Passport } from '../../components/theming/Passport'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import Tilt from 'react-parallax-tilt'
 import { useApi } from '../../context/api'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSnackbar } from 'notistack'
 import { IssueJWT } from '@concurrent-world/client'
+import { useTranslation } from 'react-i18next'
 
 export const GeneralSettings = (): JSX.Element => {
     const pref = usePreference()
@@ -17,6 +29,14 @@ export const GeneralSettings = (): JSX.Element => {
 
     const tags = client?.api?.getTokenClaims()?.tag?.split(',') ?? []
     const { enqueueSnackbar } = useSnackbar()
+
+    const [currentLanguage, setCurrentLanguage] = useState<string>('')
+
+    const { t, i18n } = useTranslation('', { keyPrefix: 'settings.general' })
+
+    useEffect(() => {
+        setCurrentLanguage(i18n.language)
+    }, [])
 
     return (
         <Box
@@ -38,7 +58,20 @@ export const GeneralSettings = (): JSX.Element => {
             <Divider />
 
             <Box>
-                <Typography variant="h3">基本</Typography>
+                <Typography variant="h3">{t('language')}</Typography>
+                <Select
+                    value={currentLanguage}
+                    onChange={(e) => {
+                        i18n.changeLanguage(e.target.value)
+                        setCurrentLanguage(e.target.value)
+                    }}
+                >
+                    <MenuItem value={'en'}>English</MenuItem>
+                    <MenuItem value={'ja'}>日本語</MenuItem>
+                </Select>
+            </Box>
+            <Box>
+                <Typography variant="h3">{t('basic')}</Typography>
                 <FormGroup>
                     <FormControlLabel
                         control={
@@ -49,7 +82,7 @@ export const GeneralSettings = (): JSX.Element => {
                                 }}
                             />
                         }
-                        label="投稿エディタを上部に表示"
+                        label={t('showEditorOnTop')}
                     />
                     <FormControlLabel
                         control={
@@ -60,7 +93,7 @@ export const GeneralSettings = (): JSX.Element => {
                                 }}
                             />
                         }
-                        label="投稿エディタを上部に表示 (モバイル)"
+                        label={t('showEditorOnTopMobile')}
                     />
                     <FormControlLabel
                         control={
@@ -71,11 +104,10 @@ export const GeneralSettings = (): JSX.Element => {
                                 }}
                             />
                         }
-                        label="開発者モード"
+                        label={t('developerMode')}
                     />
                 </FormGroup>
             </Box>
-
             <Divider />
 
             <Typography variant="h3" gutterBottom>
@@ -148,11 +180,11 @@ export const GeneralSettings = (): JSX.Element => {
                                 setInvitationCode(jwt)
                             }}
                         >
-                            招待コードを生成
+                            {t('generateInviteCode')}
                         </Button>
                     ) : (
                         <>
-                            <Typography variant="body1">招待コード(24時間有効)</Typography>
+                            <Typography variant="body1">{t('inviteCode')}</Typography>
                             <pre
                                 style={{
                                     whiteSpace: 'pre-wrap',
@@ -169,10 +201,10 @@ export const GeneralSettings = (): JSX.Element => {
                                 variant="contained"
                                 onClick={(_) => {
                                     navigator.clipboard.writeText(invitationCode)
-                                    enqueueSnackbar('コピーしました', { variant: 'success' })
+                                    enqueueSnackbar(t('copied'), { variant: 'success' })
                                 }}
                             >
-                                招待コードをコピー
+                                {t('copyInviteCode')}
                             </Button>
                         </>
                     )}

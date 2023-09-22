@@ -1,14 +1,16 @@
 import { Mnemonic, randomBytes, HDNodeWallet } from 'ethers'
 import { LangJa } from './utils/lang-ja'
 
-interface identity {
+import { useTranslation } from 'react-i18next'
+
+export interface Identity {
     mnemonic: string
     privateKey: string
     publicKey: string
     CCID: string
 }
 
-export const generateIdentity = (): identity => {
+export const generateIdentity = (): Identity => {
     const entrophy = randomBytes(16)
     const mnemonic = Mnemonic.fromEntropy(entrophy, null, LangJa.wordlist())
     const wallet = HDNodeWallet.fromPhrase(mnemonic.phrase, undefined, undefined, LangJa.wordlist())
@@ -66,12 +68,14 @@ export const humanReadableTimeDiff = (time: Date): string => {
 
     const elapsed = current.getTime() - time.getTime()
 
+    const { t } = useTranslation('', { keyPrefix: 'time' })
+
     if (elapsed < msPerMinute) {
-        return `${Math.round(elapsed / 1000)}秒前`
+        return `${Math.round(elapsed / 1000)}${t('secondsBefore')}`
     } else if (elapsed < msPerHour) {
-        return `${Math.round(elapsed / msPerMinute)}分前`
+        return `${Math.round(elapsed / msPerMinute)}${t('minutesBefore')}`
     } else if (elapsed < msPerDay) {
-        return `${Math.round(elapsed / msPerHour)}時間前`
+        return `${Math.round(elapsed / msPerHour)}${t('hoursBefore')}`
     } else {
         return (
             (current.getFullYear() === time.getFullYear() ? '' : `${time.getFullYear()}年 `) +

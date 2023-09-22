@@ -60,8 +60,12 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
             .map((list) => list.streams)
             .flat()
         const uniq = [...new Set(allStreams)]
-        Promise.all(uniq.map((id) => client.getStream(id))).then((streams) => {
-            setAllKnownStreams(streams.filter((e) => e !== null) as Stream[])
+        uniq.forEach((id) => {
+            client.getStream(id).then((stream) => {
+                if (stream) {
+                    setAllKnownStreams((prev) => [...prev, stream])
+                }
+            })
         })
     }, [pref.lists])
 

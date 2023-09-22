@@ -5,6 +5,8 @@ import { useSnackbar } from 'notistack'
 import { Schemas } from '@concurrent-world/client'
 import { usePreference } from '../../context/PreferenceContext'
 
+import { useTranslation } from 'react-i18next'
+
 export const ApSetup = (): JSX.Element => {
     const client = useApi()
     const pref = usePreference()
@@ -13,6 +15,8 @@ export const ApSetup = (): JSX.Element => {
 
     const [loading, setLoading] = useState<boolean>(false)
     const [entityFound, setEntityFound] = useState<boolean>(false)
+
+    const { t } = useTranslation('', { keyPrefix: 'settings.ap' })
 
     useEffect(() => {
         setLoading(true)
@@ -113,9 +117,9 @@ export const ApSetup = (): JSX.Element => {
     return (
         <Box display="flex" flexDirection="column" gap={1}>
             <Typography>
-                ActivityPubにおけるIDを設定します。
+                {t('setup')}
                 <br />
-                一度登録すると変更できません
+                {t('cantBeChangedOnceRegistered')}
                 <br />
             </Typography>
             <TextField
@@ -125,15 +129,13 @@ export const ApSetup = (): JSX.Element => {
                     setUserID(x.target.value)
                 }}
                 error={userID.length > 0 && !userID.match(/^[a-zA-Z0-9_]+$/)}
-                helperText={
-                    userID.length > 0 && !userID.match(/^[a-zA-Z0-9_]+$/) ? 'a-z, A-Z, 0-9, _が使用できます' : ''
-                }
+                helperText={userID.length > 0 && !userID.match(/^[a-zA-Z0-9_]+$/) ? t('helperText') : ''}
             />
             {entityFound && (
                 <Typography>
-                    このユーザーは既に登録されています。
+                    {t('alreadyRegistered')}
                     <br />
-                    他のIDを試してください
+                    {t('tryAnotherID')}
                 </Typography>
             )}
             <Button
@@ -143,7 +145,7 @@ export const ApSetup = (): JSX.Element => {
                 }}
                 disabled={userID.length === 0 || !userID.match(/^[a-zA-Z0-9_]+$/) || entityFound || loading}
             >
-                {loading ? '確認中...' : '登録'}
+                {loading ? t('confirming') : t('register')}
             </Button>
         </Box>
     )
