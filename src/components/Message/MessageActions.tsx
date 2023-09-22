@@ -1,4 +1,4 @@
-import { Box, IconButton, Link, ListItemIcon, ListItemText, Menu, MenuItem, Tooltip } from '@mui/material'
+import { Box, IconButton, Link, ListItemIcon, ListItemText, Menu, MenuItem, Tooltip, Typography } from '@mui/material'
 import ReplyIcon from '@mui/icons-material/Reply'
 import { CCAvatar } from '../ui/CCAvatar'
 import StarIcon from '@mui/icons-material/Star'
@@ -85,8 +85,13 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                         sx={{
                                             display: 'flex',
                                             alignItems: 'center',
-                                            gap: 1
+                                            gap: 1,
+                                            textDecoration: 'none'
                                         }}
+                                        component={RouterLink}
+                                        to={fav.profileOverride?.link ?? '/entity/' + fav.author.ccid}
+                                        target={fav.profileOverride?.link ? '_blank' : undefined}
+                                        rel={fav.profileOverride?.link ? 'noopener noreferrer' : undefined}
                                     >
                                         <CCAvatar
                                             sx={{
@@ -96,7 +101,16 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                             avatarURL={fav.profileOverride?.avatar ?? fav.author.profile?.avatar}
                                             identiconSource={fav.author.ccid}
                                         />
-                                        {fav.author.profile?.username ?? 'anonymous'}
+                                        <Typography
+                                            sx={{
+                                                fontSize: '0.8rem',
+                                                color: '#fff'
+                                            }}
+                                        >
+                                            {fav.profileOverride?.username ||
+                                                fav.author.profile?.username ||
+                                                'anonymous'}
+                                        </Typography>
                                     </Box>
                                 ))}
                             </Box>
