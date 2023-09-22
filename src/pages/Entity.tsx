@@ -102,13 +102,7 @@ export function EntityPage(): JSX.Element {
                         behavior: 'smooth'
                     })
                 }}
-                secondaryAction={
-                    isSelf ? (
-                        <CreateIcon />
-                    ) : (
-                        <FollowButton userCCID={id!} userStreamID={user.userstreams?.homeStream ?? ''} />
-                    )
-                }
+                secondaryAction={isSelf ? <CreateIcon /> : <></>}
                 useRawSecondaryAction={!isSelf}
                 onSecondaryActionClick={() => {
                     if (isSelf) navigate('/settings')
