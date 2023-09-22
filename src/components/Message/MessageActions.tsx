@@ -118,36 +118,28 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         placement="top"
                         disableHoverListener={likeCount === 0}
                     >
-                        <Box>
-                            <IconButtonWithNumber
-                                icon={
-                                    favorited ? (
-                                        <StarIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
-                                    ) : (
-                                        <StarOutlineIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
-                                    )
+                        <IconButtonWithNumber
+                            icon={
+                                favorited ? (
+                                    <StarIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
+                                ) : (
+                                    <StarOutlineIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
+                                )
+                            }
+                            onClick={() => {
+                                if (favorited) {
+                                    service?.removeFavorite()
+                                } else {
+                                    service?.addFavorite()
                                 }
-                                onClick={() => {
-                                    if (favorited) {
-                                        service?.removeFavorite()
-                                    } else {
-                                        service?.addFavorite()
-                                    }
-                                }}
-                                message={likeCount}
-                            />
-                        </Box>
+                            }}
+                            message={likeCount}
+                        />
                     </Tooltip>
                     <IconButtonWithNumber
                         icon={<AddReactionIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />}
                         onClick={(e) => {
                             emojiPicker.open(e.currentTarget, (emoji) => {
-                                console.log(emoji)
-                                /*
-                                if (emoji.src === undefined && emoji.unified) {
-                                    emoji.src = `https://twemoji.maxcdn.com/v/latest/svg/${emoji.unified}.svg`
-                                }
-                                */
                                 service?.addReaction(emoji.shortcode, emoji.imageURL)
                                 emojiPicker.close()
                             })

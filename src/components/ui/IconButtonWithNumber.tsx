@@ -1,19 +1,22 @@
 import { Box, IconButton, Typography, useTheme } from '@mui/material'
+import { type ForwardRefRenderFunction, forwardRef } from 'react'
 
 export interface IconButtonWithNumberProps {
     icon: JSX.Element
     onClick: (e: any) => void
     message: number
 }
-export const IconButtonWithNumber = (props: IconButtonWithNumberProps): JSX.Element => {
+const _IconButtonWithNumber: ForwardRefRenderFunction<HTMLDivElement, IconButtonWithNumberProps> = (props, ref) => {
     const theme = useTheme()
 
     return (
         <Box
+            {...props}
             sx={{
                 display: 'flex',
                 width: '3rem'
             }}
+            ref={ref}
         >
             <IconButton
                 sx={{
@@ -29,3 +32,5 @@ export const IconButtonWithNumber = (props: IconButtonWithNumberProps): JSX.Elem
         </Box>
     )
 }
+
+export const IconButtonWithNumber = forwardRef(_IconButtonWithNumber)
