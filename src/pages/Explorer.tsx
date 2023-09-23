@@ -1,5 +1,5 @@
 import { Box, Button, Checkbox, Divider, IconButton, Paper, TextField, Typography, useTheme } from '@mui/material'
-import { type Commonstream, Schemas } from '@concurrent-world/client'
+import { Schemas } from '@concurrent-world/client'
 import { useApi } from '../context/api'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
@@ -63,7 +63,7 @@ export function Explorer(): JSX.Element {
         })
     }, [selectedDomains])
 
-    const createNewStream = (stream: Commonstream): void => {
+    const createNewStream = (stream: any): void => {
         client.api
             .createStream(Schemas.commonstream, stream)
             .then((e: any) => {

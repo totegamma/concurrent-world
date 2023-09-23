@@ -1,7 +1,7 @@
 import { Box, Button, Divider, FormControlLabel, FormGroup, Paper, Switch, TextField, Typography } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
 import { useApi } from '../context/api'
-import { type Commonstream, type CoreStream } from '@concurrent-world/client'
+import { type RawCommonstream, type CoreStream } from '@concurrent-world/client'
 import Background from '../resources/defaultbg.png'
 import { CCEditor } from './ui/cceditor'
 import { useSnackbar } from 'notistack'
@@ -14,7 +14,7 @@ export interface StreamInfoProps {
 export function StreamInfo(props: StreamInfoProps): JSX.Element {
     const client = useApi()
     const { enqueueSnackbar } = useSnackbar()
-    const [stream, setStream] = useState<CoreStream<Commonstream>>()
+    const [stream, setStream] = useState<CoreStream<RawCommonstream>>()
     const isAuthor = stream?.author === client.ccid
 
     const [visible, setVisible] = useState(false)
@@ -36,13 +36,13 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
     }, [props.id])
 
     const updateStream = useCallback(
-        (body: Commonstream) => {
+        (payload: RawCommonstream) => {
             if (!stream) return
             client.api
-                .updateStream(props.id, {
+                .updateStream({
+                    ...stream,
                     schema: schemaDraft,
-                    body,
-                    maintainer: stream.maintainer,
+                    payload,
                     writer: writerDraft.split('\n').filter((e) => e),
                     reader: readerDraft.split('\n').filter((e) => e),
                     visible
@@ -67,7 +67,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                 sx={{
                     padding: '20px',
                     display: 'flex',
-                    backgroundImage: `url(${stream.payload.body.banner || Background})`,
+                    backgroundImage: `url(${stream.payload.banner || Background})`,
                     backgroundPosition: 'center',
                     objectFit: 'cover',
                     gap: '10px'
@@ -82,12 +82,12 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                             gap: '10px'
                         }}
                     >
-                        <Typography variant="h1">{stream.payload.body.name}</Typography>
+                        <Typography variant="h1">{stream.payload.name}</Typography>
                         <AddListButton stream={props.id} />
                     </Box>
                     <Typography variant="caption">{props.id}</Typography>
                     <Divider />
-                    <Typography>{stream.payload.body.description || 'まだ説明はありません'}</Typography>
+                    <Typography>{stream.payload.description || 'まだ説明はありません'}</Typography>
                 </Paper>
             </Box>
             {isAuthor && (
@@ -144,7 +144,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                     />
                     <Box>
                         <Typography variant="h3">属性</Typography>
-                        <CCEditor schemaURL={schemaDraft} init={stream.payload.body} onSubmit={updateStream} />
+                        <CCEditor schemaURL={schemaDraft} init={stream.payload} onSubmit={updateStream} />
                     </Box>
                     <Button
                         variant="contained"
