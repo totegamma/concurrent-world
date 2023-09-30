@@ -234,7 +234,6 @@ export function EntityPage(): JSX.Element {
                                             gap: 0
                                         }}
                                     >
-                                        {!isSelf ? <Typography>リストに追加</Typography> : ''}
                                         {!isSelf ? (
                                             <FollowButton
                                                 color={theme.palette.secondary.main}

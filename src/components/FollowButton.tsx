@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup, Checkbox, Menu, MenuItem } from '@mui/material'
+import { Box, Button, ButtonGroup, Checkbox, Menu, MenuItem, useTheme } from '@mui/material'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import { usePreference } from '../context/PreferenceContext'
 import { useState } from 'react'
@@ -11,6 +11,7 @@ export interface FollowButtonProps {
 
 export const FollowButton = (props: FollowButtonProps): JSX.Element => {
     const pref = usePreference()
+    const theme = useTheme()
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
     const followed =
@@ -51,6 +52,9 @@ export const FollowButton = (props: FollowButtonProps): JSX.Element => {
                     onClick={(e) => {
                         setMenuAnchor(e.currentTarget)
                     }}
+                    sx={{
+                        padding: 0
+                    }}
                 >
                     <ArrowDropDownIcon />
                 </Button>
@@ -60,6 +64,9 @@ export const FollowButton = (props: FollowButtonProps): JSX.Element => {
                 open={Boolean(menuAnchor)}
                 onClose={() => {
                     setMenuAnchor(null)
+                }}
+                sx={{
+                    zIndex: theme.zIndex.tooltip + 1
                 }}
             >
                 {Object.keys(pref.lists).map((id) => (
