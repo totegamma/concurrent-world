@@ -29,6 +29,7 @@ import { CCAvatar } from '../ui/CCAvatar'
 import { useApi } from '../../context/api'
 import { usePreference } from '../../context/PreferenceContext'
 import { useGlobalActions } from '../../context/GlobalActions'
+import { useTranslation } from 'react-i18next'
 
 const branchName = branch || window.location.host.split('.')[0]
 
@@ -41,6 +42,8 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
     const pref = usePreference()
     const appData = useContext(ApplicationContext)
     const actions = useGlobalActions()
+
+    const { t } = useTranslation('', { keyPrefix: 'common' })
 
     if (!appData) {
         return <>loading...</>
@@ -105,7 +108,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                         color: 'background.contrastText'
                                     }}
                                 />
-                                <ListItemText primary="Home" />
+                                <ListItemText primary={t('home')} />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
@@ -121,7 +124,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                     }}
                                 />
 
-                                <ListItemText primary="Notifications" />
+                                <ListItemText primary={t('notifications')} />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
@@ -132,7 +135,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                     }}
                                 />
 
-                                <ListItemText primary="Associations" />
+                                <ListItemText primary={t('associations')} />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
@@ -143,7 +146,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                     }}
                                 />
 
-                                <ListItemText primary="Explorer" />
+                                <ListItemText primary={t('explore')} />
                             </ListItemButton>
                         </ListItem>
                         {pref.devMode && (
@@ -155,7 +158,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                         }}
                                     />
 
-                                    <ListItemText primary="DevTool" />
+                                    <ListItemText primary={t('devtool')} />
                                 </ListItemButton>
                             </ListItem>
                         )}
@@ -166,7 +169,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                         color: 'background.contrastText'
                                     }}
                                 />
-                                <ListItemText primary="Settings" />
+                                <ListItemText primary={t('settings')} />
                             </ListItemButton>
                         </ListItem>
                     </List>

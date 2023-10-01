@@ -1,5 +1,14 @@
 {
   "test": "Test",
+  "common": {
+    "home": "Home",
+    "notifications": "Notifications",
+    "associations": "Associations",
+    "contacts": "Contacts",
+    "explore": "Explore",
+    "devtool": "Devtool",
+    "settings": "Settings"
+  },
   "settings": {
     "general": {
       "basic": "Basic",
