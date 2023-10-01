@@ -1,5 +1,5 @@
-import { Box, Button, Link, Paper, Tab, Tabs, Typography, alpha, useTheme } from '@mui/material'
-import { useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { Box, Link, Paper, Tab, Tabs, Typography, alpha, useTheme } from '@mui/material'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useApi } from '../context/api'
 import type { StreamElementDated } from '../model'
@@ -12,19 +12,16 @@ import { FollowButton } from '../components/FollowButton'
 import { type User } from '@concurrent-world/client'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import { TimelineHeader } from '../components/TimelineHeader'
-import { ApplicationContext } from '../App'
 import { type UserAckCollection } from '@concurrent-world/client/dist/types/schemas/userAckCollection'
 import { CCDrawer } from '../components/ui/CCDrawer'
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import { AckList } from '../components/AckList'
+import { AckButton } from '../components/AckButton'
 
 type detail = 'none' | 'ack' | 'acker'
 
 export function EntityPage(): JSX.Element {
     const client = useApi()
     const theme = useTheme()
-    const appData = useContext(ApplicationContext)
     const { id } = useParams()
     const navigate = useNavigate()
 
@@ -38,10 +35,6 @@ export function EntityPage(): JSX.Element {
     const ackedUsers = user?.profile?.ackedby ?? []
 
     const [detailMode, setDetailMode] = useState<detail>('none')
-
-    const myAck = useMemo(() => {
-        return appData.acklist.find((ack) => ack.payload.ccid === id)
-    }, [appData.acklist, id])
 
     const [tab, setTab] = useState(0)
 
@@ -129,28 +122,10 @@ export function EntityPage(): JSX.Element {
                 >
                     <Paper
                         sx={{
-                            position: 'relative',
-                            margin: '50px',
+                            margin: 3,
                             backgroundColor: alpha(theme.palette.background.paper, 0.8)
                         }}
                     >
-                        <Box
-                            sx={{
-                                position: 'absolute',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)'
-                            }}
-                        >
-                            <CCAvatar
-                                alt={user.profile?.username}
-                                avatarURL={user.profile?.avatar}
-                                identiconSource={user.ccid}
-                                sx={{
-                                    width: '80px',
-                                    height: '80px'
-                                }}
-                            />
-                        </Box>
                         <Box
                             sx={{
                                 p: '10px',
@@ -161,90 +136,63 @@ export function EntityPage(): JSX.Element {
                         >
                             <Box
                                 sx={{
-                                    height: '32px',
                                     display: 'flex',
-                                    flexFlow: 'row',
+                                    flexFlow: { xs: 'column', sm: 'row', md: 'row' },
                                     alignItems: 'center',
                                     gap: 1
                                 }}
                             >
-                                {myAck ? (
-                                    <Button
-                                        variant="outlined"
-                                        onClick={() => {
-                                            client.unAckUser(myAck.id).then(() => {
-                                                appData.updateAcklist()
-                                            })
-                                        }}
-                                        sx={{
-                                            textTransform: 'none'
-                                        }}
-                                        endIcon={<CheckCircleIcon />}
-                                    >
-                                        Acked
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        variant="contained"
-                                        onClick={() => {
-                                            client.ackUser(user).then(() => {
-                                                appData.updateAcklist()
-                                            })
-                                        }}
-                                        sx={{
-                                            textTransform: 'none'
-                                        }}
-                                        endIcon={<CheckCircleOutlineIcon />}
-                                    >
-                                        Ack
-                                    </Button>
-                                )}
-
-                                <Box display="flex" gap={1}>
-                                    <Typography
-                                        component={Link}
-                                        underline="hover"
-                                        onClick={() => {
-                                            setDetailMode('ack')
-                                        }}
-                                    >
-                                        {ackUsers.length} Ack
-                                    </Typography>
-                                    <Typography
-                                        component={Link}
-                                        underline="hover"
-                                        onClick={() => {
-                                            setDetailMode('acker')
-                                        }}
-                                    >
-                                        {ackedUsers.length} Acker
-                                    </Typography>
-                                </Box>
-
+                                <CCAvatar
+                                    alt={user.profile?.username}
+                                    avatarURL={user.profile?.avatar}
+                                    identiconSource={user.ccid}
+                                    sx={{
+                                        width: { xs: '80px', sm: '60px', md: '80px' },
+                                        height: { xs: '80px', sm: '60px', md: '80px' }
+                                    }}
+                                />
                                 <Box
                                     sx={{
-                                        marginLeft: 'auto'
+                                        display: 'flex',
+                                        flexFlow: 'row',
+                                        alignItems: 'center',
+                                        justifyContent: 'flex-end',
+                                        width: '100%',
+                                        gap: 0
                                     }}
                                 >
-                                    <Box
-                                        sx={{
-                                            height: '40px',
-                                            display: 'flex',
-                                            flexFlow: 'row',
-                                            alignItems: 'center',
-                                            gap: 0
-                                        }}
-                                    >
-                                        {!isSelf ? (
+                                    <Box display="flex" gap={1}>
+                                        <Typography
+                                            component={Link}
+                                            underline="hover"
+                                            onClick={() => {
+                                                setDetailMode('ack')
+                                            }}
+                                        >
+                                            {ackUsers.length} Ack
+                                        </Typography>
+                                        <Typography
+                                            component={Link}
+                                            underline="hover"
+                                            onClick={() => {
+                                                setDetailMode('acker')
+                                            }}
+                                        >
+                                            {ackedUsers.length} Acker
+                                        </Typography>
+                                    </Box>
+                                    {!isSelf ? (
+                                        <>
+                                            <AckButton user={user} />
                                             <FollowButton
                                                 color={theme.palette.secondary.main}
                                                 userCCID={id!}
                                                 userStreamID={user.userstreams?.homeStream ?? ''}
                                             />
-                                        ) : (
-                                            ''
-                                        )}
-                                    </Box>
+                                        </>
+                                    ) : (
+                                        ''
+                                    )}
                                 </Box>
                             </Box>
 
