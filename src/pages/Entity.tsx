@@ -17,6 +17,7 @@ import { type UserAckCollection } from '@concurrent-world/client/dist/types/sche
 import { CCDrawer } from '../components/ui/CCDrawer'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
+import { AckList } from '../components/AckList'
 
 type detail = 'none' | 'ack' | 'acker'
 
@@ -309,21 +310,9 @@ export function EntityPage(): JSX.Element {
                         p: 1
                     }}
                 >
-                    <Typography variant="h1">{detailMode === 'ack' ? 'Ack List' : 'Acker List'}</Typography>
-                    {(detailMode === 'ack' ? ackUsers : ackedUsers).map((user) => (
-                        <Box
-                            key={user.ccid}
-                            sx={{
-                                display: 'flex',
-                                width: '100%',
-                                alignItems: 'center',
-                                gap: 1
-                            }}
-                        >
-                            <CCAvatar avatarURL={user.profile?.avatar} identiconSource={user.ccid} />
-                            <Typography>{user.profile?.username}</Typography>
-                        </Box>
-                    ))}
+                    {detailMode !== 'none' && (
+                        <AckList initmode={detailMode === 'ack' ? 'acking' : 'acker'} user={user} />
+                    )}
                 </Box>
             </CCDrawer>
         </Box>

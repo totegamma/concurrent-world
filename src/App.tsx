@@ -34,6 +34,7 @@ import { type CollectionItem } from '@concurrent-world/client/dist/types/model/c
 import { ConcurrentLogo } from './components/theming/ConcurrentLogo'
 import { usePreference } from './context/PreferenceContext'
 import TickerProvider from './context/Ticker'
+import { ContactsPage } from './pages/Contacts'
 
 export const ApplicationContext = createContext<appData>({
     websocketState: -1,
@@ -361,6 +362,7 @@ function App(): JSX.Element {
                                 <Route index element={<ListPage messages={messages} />} />
                                 <Route path="/stream" element={<StreamPage messages={messages} />} />
                                 <Route path="/associations" element={<Associations messages={messages} />} />
+                                <Route path="/contacts" element={<ContactsPage />} />
                                 <Route path="/explorer" element={<Explorer />} />
                                 <Route path="/notifications" element={<Notifications messages={messages} />} />
                                 <Route path="/settings/*" element={<Settings />} />
