@@ -236,12 +236,7 @@ export function EntityPage(): JSX.Element {
                         padding: { xs: '8px', sm: '8px 16px' }
                     }}
                 >
-                    <Timeline
-                        streams={targetStreams}
-                        timeline={messages}
-                        scrollParentRef={scrollParentRef}
-                        perspective={user.ccid}
-                    />
+                    <Timeline streams={targetStreams} scrollParentRef={scrollParentRef} perspective={user.ccid} />
                 </Box>
             </Box>
             <CCDrawer

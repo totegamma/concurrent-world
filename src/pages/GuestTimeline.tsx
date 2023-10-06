@@ -303,11 +303,7 @@ export function GuestTimelinePage(): JSX.Element {
                                                     px: { xs: 1, sm: 2 }
                                                 }}
                                             >
-                                                <Timeline
-                                                    streams={targetStream}
-                                                    timeline={messages}
-                                                    scrollParentRef={scrollParentRef}
-                                                />
+                                                <Timeline streams={targetStream} scrollParentRef={scrollParentRef} />
                                             </Box>
                                         </Box>
                                     </Box>
