@@ -2,9 +2,6 @@ import { Box, Divider, List, ListItem, ListItemIcon, ListItemText, Typography, u
 import React, { type RefObject, memo, useCallback, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroller'
 import { AssociationFrame } from '../Association/AssociationFrame'
-import type { IuseObjectList } from '../../hooks/useObjectList'
-import type { CoreStreamElement } from '@concurrent-world/client'
-import type { StreamElementDated } from '../../model'
 import { useApi } from '../../context/api'
 import { InspectorProvider } from '../../context/Inspector'
 import { Loading } from '../ui/Loading'
@@ -13,10 +10,11 @@ import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import HeartBrokenIcon from '@mui/icons-material/HeartBroken'
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
 import SyncIcon from '@mui/icons-material/Sync'
+import { type Timeline as CoreTimeline } from '@concurrent-world/client'
+import { useRefWithForceUpdate } from '../../hooks/useRefWithForceUpdate'
 
 export interface TimelineProps {
     streams: string[]
-    timeline: IuseObjectList<StreamElementDated>
     scrollParentRef: RefObject<HTMLDivElement>
     perspective?: string
 }
@@ -29,86 +27,27 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     const client = useApi()
     const theme = useTheme()
 
+    const [timeline, timelineChanged] = useRefWithForceUpdate<CoreTimeline | null>(null)
+
     const [hasMoreData, setHasMoreData] = useState<boolean>(false)
     const [isFetching, setIsFetching] = useState<boolean>(false)
-
-    useEffect(() => {
-        if (!client.api.host) return
-        props.timeline.clear()
-        let unmounted = false
-        setIsFetching(true)
-        setHasMoreData(false)
-        client.api
-            ?.readStreamRecent(props.streams)
-            .then((data: CoreStreamElement[]) => {
-                if (unmounted) return
-                const current = new Date().getTime()
-                const dated = data.map((e) => {
-                    return { ...e, LastUpdated: current }
-                })
-                props.timeline.set(dated)
-                setHasMoreData(data.length > 0)
-            })
-            .finally(() => {
-                setIsFetching(false)
-            })
-        return () => {
-            unmounted = true
-        }
-    }, [props.streams])
-
-    const loadMore = useCallback(() => {
-        if (!client.api.host) return
-        if (isFetching) return
-        if (!props.timeline.current[props.timeline.current.length - 1]?.timestamp) {
-            setHasMoreData(false)
-            return
-        }
-        if (!hasMoreData) return
-        let unmounted = false
-        setIsFetching(true)
-        client.api
-            ?.readStreamRanged(props.streams, props.timeline.current[props.timeline.current.length - 1].timestamp)
-            .then((data: CoreStreamElement[]) => {
-                if (unmounted) return
-                const idtable = props.timeline.current.map((e) => e.id)
-                const newdata = data.filter((e) => !idtable.includes(e.id))
-                if (newdata.length > 0) {
-                    const current = new Date().getTime()
-                    const dated = newdata.map((e) => {
-                        return { ...e, LastUpdated: current }
-                    })
-                    props.timeline.concat(dated)
-                } else setHasMoreData(false)
-            })
-            .finally(() => {
-                setIsFetching(false)
-            })
-        return () => {
-            unmounted = true
-        }
-    }, [client.api, props.streams, props.timeline, hasMoreData, isFetching])
-
-    // WORKAROUND: fill the screen with messages if there are not enough messages to fill the screen
-    // to work react-infinite-scroller properly
-    useEffect(() => {
-        if (!hasMoreData) return
-        const timer = setTimeout(() => {
-            if (!props.scrollParentRef.current) return
-            if (props.scrollParentRef.current.scrollHeight > props.scrollParentRef.current.clientHeight) return
-            console.log('filling screen')
-            loadMore()
-        }, 1000)
-
-        return () => {
-            clearTimeout(timer)
-        }
-    }, [loadMore, props.timeline.current, hasMoreData])
 
     const [touchPosition, setTouchPosition] = useState<number>(0)
     const [loaderSize, setLoaderSize] = useState<number>(0)
     const [loadable, setLoadable] = useState<boolean>(false)
     const [ptrEnabled, setPtrEnabled] = useState<boolean>(false)
+
+    useEffect(() => {
+        client.newTimeline().then((t) => {
+            timeline.current = t
+            timeline.current.listen(props.streams).then((hasMore) => {
+                setHasMoreData(hasMore)
+            })
+            t.onUpdate = () => {
+                timelineChanged()
+            }
+        })
+    }, [props.streams])
 
     const onTouchStart = useCallback((raw: Event) => {
         const e = raw as TouchEvent
@@ -135,29 +74,13 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                 setPtrEnabled(false)
                 return
             }
-            const unmounted = false
             setIsFetching(true)
             setHasMoreData(false)
             setTimeout(() => {
-                client.api
-                    ?.readStreamRecent(props.streams)
-                    .then((data: CoreStreamElement[]) => {
-                        if (unmounted) return
-                        props.timeline.clear()
-                        const current = new Date().getTime()
-                        const dated = data.map((e) => {
-                            return { ...e, LastUpdated: current }
-                        })
-                        props.timeline.set(dated)
-                        setHasMoreData(data.length > 0)
-                    })
-                    .finally(() => {
-                        setIsFetching(false)
-                        setPtrEnabled(false)
-                    })
+                // TODO: reload
             }, 1000)
         }
-    }, [ptrEnabled, setPtrEnabled, props.timeline, props.streams, client.api, isFetching])
+    }, [ptrEnabled, setPtrEnabled, props.streams, client.api, isFetching])
 
     useEffect(() => {
         if (!props.scrollParentRef.current) return
@@ -217,7 +140,10 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
             <List sx={{ flex: 1, width: '100%' }}>
                 <InfiniteScroll
                     loadMore={() => {
-                        loadMore()
+                        console.log('readMore!!!')
+                        timeline.current?.readMore().then((hasMore) => {
+                            setHasMoreData(hasMore)
+                        })
                     }}
                     initialLoad={false}
                     hasMore={hasMoreData}
@@ -225,17 +151,17 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                     useWindow={false}
                     getScrollParent={() => props.scrollParentRef.current}
                 >
-                    {props.timeline.current.map((e) => {
+                    {timeline.current?.body.map((e) => {
                         let element
                         switch (e.type) {
                             case 'message':
                                 element = (
                                     <MessageContainer
-                                        messageID={e.id}
-                                        messageOwner={e.author}
-                                        lastUpdated={e.LastUpdated}
+                                        messageID={e.objectID}
+                                        messageOwner={e.owner}
+                                        lastUpdated={e.lastUpdate?.getTime() ?? 0}
                                         after={divider}
-                                        timestamp={e.timestamp}
+                                        timestamp={e.cdate}
                                     />
                                 )
                                 break
@@ -243,7 +169,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                                 element = (
                                     <AssociationFrame
                                         association={e}
-                                        lastUpdated={e.LastUpdated}
+                                        lastUpdated={e.lastUpdate?.getTime() ?? 0}
                                         after={divider}
                                         perspective={props.perspective}
                                     />
@@ -255,7 +181,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                         }
 
                         return (
-                            <React.Fragment key={e.id}>
+                            <React.Fragment key={e.objectID}>
                                 <ErrorBoundary FallbackComponent={renderError}>{element}</ErrorBoundary>
                             </React.Fragment>
                         )

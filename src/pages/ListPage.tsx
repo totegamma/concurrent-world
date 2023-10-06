@@ -2,8 +2,6 @@ import { Box, Button, Divider, Tab, Tabs, Typography } from '@mui/material'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate, Link as RouterLink } from 'react-router-dom'
 import { usePreference } from '../context/PreferenceContext'
-import { type StreamElementDated } from '../model'
-import { type IuseObjectList } from '../hooks/useObjectList'
 import { Timeline } from '../components/Timeline'
 import { Draft } from '../components/Draft'
 import { useApi } from '../context/api'
@@ -15,11 +13,7 @@ import ListIcon from '@mui/icons-material/List'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import { TimelineHeader } from '../components/TimelineHeader'
 
-export interface ListPageProps {
-    messages: IuseObjectList<StreamElementDated>
-}
-
-export function ListPage(props: ListPageProps): JSX.Element {
+export function ListPage(): JSX.Element {
     const client = useApi()
     const path = useLocation()
     const navigate = useNavigate()
@@ -173,7 +167,7 @@ export function ListPage(props: ListPageProps): JSX.Element {
                                 px: { xs: 1, sm: 2 }
                             }}
                         >
-                            <Timeline streams={streamIDs} timeline={props.messages} scrollParentRef={scrollParentRef} />
+                            <Timeline streams={streamIDs} scrollParentRef={scrollParentRef} />
                         </Box>
                     ) : (
                         <Box

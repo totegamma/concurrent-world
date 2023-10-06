@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Box, Button, CssBaseline, Paper, ThemeProvider, Typography, alpha, darken } from '@mui/material'
-import type { ConcurrentTheme, StreamElementDated } from '../model'
+import type { ConcurrentTheme, StreamItemDated } from '../model'
 import { useObjectList } from '../hooks/useObjectList'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { Timeline } from '../components/Timeline/main'
@@ -65,7 +65,7 @@ export function GuestTimelinePage(): JSX.Element {
         setTheme(createConcurrentTheme(newThemeName))
     }
 
-    const messages = useObjectList<StreamElementDated>()
+    const messages = useObjectList<StreamItemDated>()
 
     const scrollParentRef = useRef<HTMLDivElement>(null)
 

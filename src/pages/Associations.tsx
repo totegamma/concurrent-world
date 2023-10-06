@@ -1,15 +1,9 @@
 import { Box, Divider, Typography } from '@mui/material'
-import type { StreamElementDated } from '../model'
-import type { IuseObjectList } from '../hooks/useObjectList'
 import { useContext, useEffect, useRef } from 'react'
 import { ApplicationContext } from '../App'
 import { Timeline } from '../components/Timeline'
 
-export interface AssociationsProps {
-    messages: IuseObjectList<StreamElementDated>
-}
-
-export function Associations(props: AssociationsProps): JSX.Element {
+export function Associations(): JSX.Element {
     const appData = useContext(ApplicationContext)
     const scrollParentRef = useRef<HTMLDivElement>(null)
 
@@ -54,11 +48,7 @@ export function Associations(props: AssociationsProps): JSX.Element {
                         px: { xs: 1, sm: 2 }
                     }}
                 >
-                    <Timeline
-                        streams={appData.displayingStream}
-                        timeline={props.messages}
-                        scrollParentRef={scrollParentRef}
-                    />
+                    <Timeline streams={appData.displayingStream} scrollParentRef={scrollParentRef} />
                 </Box>
             </Box>
         </Box>

@@ -34,7 +34,7 @@ interface MessageContainerProps {
     messageOwner: string
     lastUpdated?: number
     after?: JSX.Element | undefined
-    timestamp?: string
+    timestamp?: Date
 }
 
 export const MessageContainer = memo<MessageContainerProps>((props: MessageContainerProps): JSX.Element | null => {
@@ -118,7 +118,7 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
 
     const removeFromStream = useCallback(() => {
         if (!props.timestamp || !watchingStreams[0]) return
-        client.api.removeFromStream(props.timestamp, watchingStreams[0])
+        client.api.removeFromStream(props.timestamp.toISOString(), watchingStreams[0])
     }, [client, props.timestamp, watchingStreams])
 
     useEffect(() => {

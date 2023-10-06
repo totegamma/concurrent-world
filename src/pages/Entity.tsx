@@ -2,7 +2,7 @@ import { Box, Link, Paper, Tab, Tabs, Typography, alpha, useTheme } from '@mui/m
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useApi } from '../context/api'
-import type { StreamElementDated } from '../model'
+import type { StreamItemDated } from '../model'
 import { CCAvatar } from '../components/ui/CCAvatar'
 import { Timeline } from '../components/Timeline'
 import { useObjectList } from '../hooks/useObjectList'
@@ -27,7 +27,7 @@ export function EntityPage(): JSX.Element {
 
     const [user, setUser] = useState<User | null | undefined>(null)
 
-    const messages = useObjectList<StreamElementDated>()
+    const messages = useObjectList<StreamItemDated>()
     const scrollParentRef = useRef<HTMLDivElement>(null)
     const isSelf = id === client.ccid
 
