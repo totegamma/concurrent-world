@@ -1,7 +1,7 @@
 import { useEffect, useState, createContext, useRef, useMemo, useCallback } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider, CssBaseline } from '@mui/material'
-import { SnackbarProvider } from 'notistack'
+import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 
 import { createConcurrentTheme } from './themes'
 import { Menu } from './components/Menu/Menu'
@@ -26,11 +26,12 @@ import { EmojiPickerProvider } from './context/EmojiPickerContext'
 
 import { ThinMenu } from './components/Menu/ThinMenu'
 import { type UserAckCollection } from '@concurrent-world/client/dist/types/schemas/userAckCollection'
-import { type CollectionItem } from '@concurrent-world/client/dist/types/model/core'
+import { type StreamEvent, type CollectionItem } from '@concurrent-world/client/dist/types/model/core'
 import { ConcurrentLogo } from './components/theming/ConcurrentLogo'
 import { usePreference } from './context/PreferenceContext'
 import TickerProvider from './context/Ticker'
 import { ContactsPage } from './pages/Contacts'
+import { type CoreAssociation, Schemas, type Subscription } from '@concurrent-world/client'
 
 export const ApplicationContext = createContext<appData>({
     displayingStream: [],
@@ -64,6 +65,67 @@ function App(): JSX.Element {
     useEffect(() => {
         updateAcklist()
     }, [client, client?.user])
+
+    const subscription = useRef<Subscription>()
+
+    useEffect(() => {
+        if (!client) return
+        client.newSubscription().then((sub) => {
+            subscription.current = sub
+            subscription.current.listen([
+                ...(client?.user?.userstreams?.notificationStream ? [client?.user?.userstreams.notificationStream] : [])
+            ])
+            sub.on('AssociationCreated', (event: StreamEvent) => {
+                const a = event.body as CoreAssociation<any>
+                if (!a) return
+                if (a.schema === Schemas.replyAssociation) {
+                    client?.api.readCharacter(a.author, Schemas.profile).then((c) => {
+                        playNotificationRef.current()
+                        enqueueSnackbar(`${c?.payload.body.username ?? 'anonymous'} replied to your message.`)
+                    })
+                    return
+                }
+
+                if (a.schema === Schemas.rerouteAssociation) {
+                    client?.api.readCharacter(a.author, Schemas.profile).then((c) => {
+                        playNotificationRef.current()
+                        enqueueSnackbar(`${c?.payload.body.username ?? 'anonymous'} rerouted to your message.`)
+                    })
+                    return
+                }
+
+                if (a.schema === Schemas.like) {
+                    client?.api.readMessage(a.targetID).then((m) => {
+                        m &&
+                            client.api.readCharacter(a.author, Schemas.profile).then((c) => {
+                                playNotificationRef.current()
+                                enqueueSnackbar(
+                                    `${c?.payload.body.username ?? 'anonymous'} favorited "${
+                                        (m.payload.body.body as string) ?? 'your message.'
+                                    }"`
+                                )
+                            })
+                    })
+                    return
+                }
+
+                if (a.schema === Schemas.emojiAssociation) {
+                    client.api.readMessage(a.targetID).then((m) => {
+                        console.log(m)
+                        m &&
+                            client.api.readCharacter(a.author, Schemas.profile).then((c) => {
+                                playNotificationRef.current()
+                                enqueueSnackbar(
+                                    `${c?.payload.body.username ?? 'anonymous'} reacted to "${
+                                        (m.payload.body.body as string) ?? 'your message.'
+                                    }" with ${(m.associations.at(-1)?.payload.body.shortcode as string) ?? 'emoji'}`
+                                )
+                            })
+                    })
+                }
+            })
+        })
+    }, [client])
 
     const path = useLocation()
     const displayingStream: string[] = useMemo(() => {
