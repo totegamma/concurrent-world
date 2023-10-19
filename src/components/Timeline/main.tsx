@@ -38,6 +38,8 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     const [ptrEnabled, setPtrEnabled] = useState<boolean>(false)
 
     useEffect(() => {
+        if (props.streams.length === 0) return
+        console.log('Timeline: streams changed', props.streams)
         client.newTimeline().then((t) => {
             timeline.current = t
             timeline.current.listen(props.streams).then((hasMore) => {
