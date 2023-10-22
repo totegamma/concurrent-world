@@ -1,7 +1,5 @@
 import { memo, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { Box, Divider } from '@mui/material'
-import type { StreamElementDated } from '../model'
-import type { IuseObjectList } from '../hooks/useObjectList'
 import { Draft } from '../components/Draft'
 import { useLocation } from 'react-router-dom'
 import { TimelineHeader } from '../components/TimelineHeader'
@@ -16,11 +14,7 @@ import InfoIcon from '@mui/icons-material/Info'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import WatchingStreamContextProvider from '../context/WatchingStreamContext'
 
-export interface StreamPageProps {
-    messages: IuseObjectList<StreamElementDated>
-}
-
-export const StreamPage = memo<StreamPageProps>((props: StreamPageProps): JSX.Element => {
+export const StreamPage = memo((): JSX.Element => {
     const client = useApi()
     const appData = useContext(ApplicationContext)
     const pref = usePreference()
@@ -141,11 +135,7 @@ export const StreamPage = memo<StreamPageProps>((props: StreamPageProps): JSX.El
                                 px: { xs: 1, sm: 2 }
                             }}
                         >
-                            <Timeline
-                                streams={appData.displayingStream}
-                                timeline={props.messages}
-                                scrollParentRef={scrollParentRef}
-                            />
+                            <Timeline streams={appData.displayingStream} scrollParentRef={scrollParentRef} />
                         </Box>
                     </WatchingStreamContextProvider>
                 </Box>

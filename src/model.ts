@@ -9,9 +9,9 @@ import type {
     TypeText
 } from '@mui/material/styles/createPalette'
 
-import type { CoreStreamElement, Stream } from '@concurrent-world/client'
+import type { CoreStreamItem, Stream } from '@concurrent-world/client'
 
-export interface StreamElementDated extends CoreStreamElement {
+export interface StreamItemDated extends CoreStreamItem {
     LastUpdated: number
 }
 
