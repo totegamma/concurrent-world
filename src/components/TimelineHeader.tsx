@@ -1,6 +1,5 @@
-import { useContext, memo } from 'react'
+import { memo } from 'react'
 import { IconButton, Box, useTheme, Button } from '@mui/material'
-import { ApplicationContext } from '../App'
 import { ConcurrentLogo } from './theming/ConcurrentLogo'
 import type { ConcurrentTheme } from '../model'
 import { useGlobalActions } from '../context/GlobalActions'
@@ -15,11 +14,10 @@ export interface TimelineHeaderProps {
 }
 
 export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderProps): JSX.Element => {
-    const appData = useContext(ApplicationContext)
     const theme = useTheme<ConcurrentTheme>()
     const actions = useGlobalActions()
 
-    const iconColor = appData.websocketState === 1 ? theme.palette.background.contrastText : theme.palette.text.disabled
+    const iconColor = theme.palette.background.contrastText
 
     return (
         <Box

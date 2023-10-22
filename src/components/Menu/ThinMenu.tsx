@@ -3,9 +3,9 @@ import CreateIcon from '@mui/icons-material/Create'
 import { Link } from 'react-router-dom'
 
 import HomeIcon from '@mui/icons-material/Home'
-import MessageIcon from '@mui/icons-material/Message'
 import ExploreIcon from '@mui/icons-material/Explore'
 import SettingsIcon from '@mui/icons-material/Settings'
+import ContactsIcon from '@mui/icons-material/Contacts'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import { memo, useContext } from 'react'
 import { ApplicationContext } from '../../App'
@@ -90,8 +90,8 @@ export const ThinMenu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                             }}
                         />
                     </IconButton>
-                    <IconButton sx={{ p: 0.5 }} component={Link} to="/associations" onClick={props.onClick}>
-                        <MessageIcon
+                    <IconButton sx={{ p: 0.5 }} component={Link} to="/contacts" onClick={props.onClick}>
+                        <ContactsIcon
                             sx={{
                                 color: 'background.contrastText'
                             }}

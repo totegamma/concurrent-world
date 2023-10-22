@@ -1,7 +1,7 @@
 import { Box, Button, alpha, useTheme } from '@mui/material'
 
 import HomeIcon from '@mui/icons-material/Home'
-import MessageIcon from '@mui/icons-material/Message'
+import ContactsIcon from '@mui/icons-material/Contacts'
 import ExploreIcon from '@mui/icons-material/Explore'
 import CreateIcon from '@mui/icons-material/Create'
 import MenuIcon from '@mui/icons-material/Menu'
@@ -50,8 +50,8 @@ export const MobileMenu = (): JSX.Element => {
             <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/notifications">
                 <NotificationsIcon />
             </Button>
-            <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/associations">
-                <MessageIcon />
+            <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/contacts">
+                <ContactsIcon />
             </Button>
             <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/explorer">
                 <ExploreIcon />

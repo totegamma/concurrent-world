@@ -1,6 +1,6 @@
 import { memo, useEffect, useState } from 'react'
 import {
-    type CoreStreamElement,
+    type CoreStreamItem,
     Schemas,
     type A_Unknown,
     type A_Reroute,
@@ -19,7 +19,7 @@ import { MessageContainer } from '../Message/MessageContainer'
 import { TimeDiff } from '../ui/TimeDiff'
 
 export interface AssociationFrameProp {
-    association: CoreStreamElement
+    association: CoreStreamItem
     lastUpdated: number
     after: JSX.Element | undefined
     perspective?: string
@@ -43,7 +43,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
 
     useEffect(() => {
         client
-            .getAssociation(props.association.id, props.association.author)
+            .getAssociation(props.association.objectID, props.association.author)
             .then((a) => {
                 setAssociation(a)
             })
