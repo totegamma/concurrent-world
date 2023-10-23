@@ -157,14 +157,11 @@ function App(): JSX.Element {
         }
     }, [client, path])
 
-    const [playBubble] = useSound(pref.postSound, { volume: pref.volume / 100 })
     const [playNotification] = useSound(pref.notificationSound, { volume: pref.volume / 100 })
-    const playBubbleRef = useRef(playBubble)
     const playNotificationRef = useRef(playNotification)
     useEffect(() => {
-        playBubbleRef.current = playBubble
         playNotificationRef.current = playNotification
-    }, [playBubble, playNotification])
+    }, [playNotification])
 
     useEffect(() => {
         const newtheme = createConcurrentTheme(pref.themeName)
