@@ -40,7 +40,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     const [loadable, setLoadable] = useState<boolean>(false)
     const [ptrEnabled, setPtrEnabled] = useState<boolean>(false)
 
-    const [playBubble] = useSound(pref.postSound, { volume: pref.volume / 100 })
+    const [playBubble] = useSound(pref.postSound, { volume: pref.volume / 100, interrupt: false })
     const playBubbleRef = useRef(playBubble)
 
     useEffect(() => {
@@ -50,7 +50,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     useEffect(() => {
         if (props.streams.length === 0) return
         console.log('Timeline: streams changed', props.streams)
-        client.newTimeline().then((t) => {
+        const mt = client.newTimeline().then((t) => {
             timeline.current = t
             timeline.current.listen(props.streams).then((hasMore) => {
                 setHasMoreData(hasMore)
@@ -63,7 +63,15 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                     playBubbleRef.current()
                 }
             }
+            return t
         })
+        return () => {
+            mt.then((t) => {
+                t.onUpdate = undefined
+                t.onRealtimeEvent = undefined
+                // TODO: unsubscribe
+            })
+        }
     }, [props.streams])
 
     const onTouchStart = useCallback((raw: Event) => {
