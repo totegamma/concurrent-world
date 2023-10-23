@@ -1,5 +1,5 @@
 import { Box, Divider, List, ListItem, ListItemIcon, ListItemText, Typography, useTheme } from '@mui/material'
-import React, { type RefObject, memo, useCallback, useEffect, useState } from 'react'
+import React, { type RefObject, memo, useCallback, useEffect, useState, useRef } from 'react'
 import InfiniteScroll from 'react-infinite-scroller'
 import { AssociationFrame } from '../Association/AssociationFrame'
 import { useApi } from '../../context/api'
@@ -12,6 +12,8 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
 import SyncIcon from '@mui/icons-material/Sync'
 import { type Timeline as CoreTimeline } from '@concurrent-world/client'
 import { useRefWithForceUpdate } from '../../hooks/useRefWithForceUpdate'
+import useSound from 'use-sound'
+import { usePreference } from '../../context/PreferenceContext'
 
 export interface TimelineProps {
     streams: string[]
@@ -26,6 +28,7 @@ const divider = <Divider variant="inset" component="li" sx={{ margin: '8px 4px' 
 export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element => {
     const client = useApi()
     const theme = useTheme()
+    const pref = usePreference()
 
     const [timeline, timelineChanged] = useRefWithForceUpdate<CoreTimeline | null>(null)
 
@@ -37,6 +40,13 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     const [loadable, setLoadable] = useState<boolean>(false)
     const [ptrEnabled, setPtrEnabled] = useState<boolean>(false)
 
+    const [playBubble] = useSound(pref.postSound, { volume: pref.volume / 100 })
+    const playBubbleRef = useRef(playBubble)
+
+    useEffect(() => {
+        playBubbleRef.current = playBubble
+    }, [playBubble])
+
     useEffect(() => {
         if (props.streams.length === 0) return
         console.log('Timeline: streams changed', props.streams)
@@ -47,6 +57,11 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
             })
             t.onUpdate = () => {
                 timelineChanged()
+            }
+            t.onRealtimeEvent = (event) => {
+                if (event.type === 'message' && event.action === 'create') {
+                    playBubbleRef.current()
+                }
             }
         })
     }, [props.streams])
