@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@concurrent-world/client':
-    specifier: ^3.0.6
-    version: 3.0.6
+    specifier: ^3.0.7
+    version: 3.0.7
   '@emotion/react':
     specifier: ^11.10.5
     version: 11.10.5(@babel/core@7.21.8)(@types/react@18.0.26)(react@18.2.0)
@@ -77,9 +77,6 @@ dependencies:
   react-i18next:
     specifier: ^13.2.2
     version: 13.2.2(i18next@23.5.1)(react-dom@18.2.0)(react@18.2.0)
-  react-infinite-scroller:
-    specifier: ^1.2.6
-    version: 1.2.6(react@18.2.0)
   react-markdown:
     specifier: ^8.0.7
     version: 8.0.7(@types/react@18.0.26)(react@18.2.0)
@@ -95,9 +92,6 @@ dependencies:
   react-use-websocket:
     specifier: ^4.3.1
     version: 4.3.1(react-dom@18.2.0)(react@18.2.0)
-  react-window:
-    specifier: ^1.8.9
-    version: 1.8.9(react-dom@18.2.0)(react@18.2.0)
   rehype-raw:
     specifier: ^6.1.1
     version: 6.1.1
@@ -119,6 +113,9 @@ dependencies:
   uuid:
     specifier: ^9.0.0
     version: 9.0.0
+  virtua:
+    specifier: ^0.14.0
+    version: 0.14.0(react-dom@18.2.0)(react@18.2.0)
 
 devDependencies:
   '@storybook/addon-essentials':
@@ -154,15 +151,9 @@ devDependencies:
   '@types/react-dom':
     specifier: ^18.0.9
     version: 18.0.9
-  '@types/react-infinite-scroller':
-    specifier: ^1.2.3
-    version: 1.2.3
   '@types/react-syntax-highlighter':
     specifier: ^15.5.6
     version: 15.5.6
-  '@types/react-window':
-    specifier: ^1.8.5
-    version: 1.8.5
   '@types/textarea-caret':
     specifier: ^3.0.1
     version: 3.0.1
@@ -1660,8 +1651,8 @@ packages:
     dev: true
     optional: true
 
-  /@concurrent-world/client@3.0.6:
-    resolution: {integrity: sha512-SE50m5YjuYneA6FLLYU8LQzVHf7vYDC0a+gJHAMe+/lIaCkZ416FFT57gLAAPtNDRAiKTErKEfPAAmLrdxu7IA==}
+  /@concurrent-world/client@3.0.7:
+    resolution: {integrity: sha512-EEfEN/4h9gr7A1qbC9eXJ3bVsHZ4Jp1YRDrKJTbPcCr+HlgFszxH7n1TZ6N11acGdL4oocTknU5EoGPZuu4Rzg==}
     dependencies:
       elliptic: 6.5.4
       ethers: 6.8.0
@@ -4057,12 +4048,6 @@ packages:
       '@types/react': 18.0.26
     dev: true
 
-  /@types/react-infinite-scroller@1.2.3:
-    resolution: {integrity: sha512-l60JckVoO+dxmKW2eEG7jbliEpITsTJvRPTe97GazjF5+ylagAuyYdXl8YY9DQsTP9QjhqGKZROknzgscGJy0A==}
-    dependencies:
-      '@types/react': 18.0.26
-    dev: true
-
   /@types/react-is@18.2.0:
     resolution: {integrity: sha512-1vz2yObaQkLL7YFe/pme2cpvDsCwI1WXIfL+5eLz0MI9gFG24Re16RzUsI8t9XZn9ZWvgLNDrJBmrqXJO7GNQQ==}
     dependencies:
@@ -4080,12 +4065,6 @@ packages:
     dependencies:
       '@types/react': 18.0.26
     dev: false
-
-  /@types/react-window@1.8.5:
-    resolution: {integrity: sha512-V9q3CvhC9Jk9bWBOysPGaWy/Z0lxYcTXLtLipkt2cnRj1JOSFNF7wqGpkScSXMgBwC+fnVRg/7shwgddBG5ICw==}
-    dependencies:
-      '@types/react': 18.0.26
-    dev: true
 
   /@types/react@18.0.26:
     resolution: {integrity: sha512-hCR3PJQsAIXyxhTNSiDFY//LhnMZWpNNr5etoCqx/iUfGc5gXWtQR2Phl908jVR6uPXacojQWTg4qRpkxTuGug==}
@@ -8088,10 +8067,6 @@ packages:
     engines: {node: '>= 0.6'}
     dev: true
 
-  /memoize-one@5.2.1:
-    resolution: {integrity: sha512-zYiwtZUcYyXKo/np96AGZAckk+FWWsUdJ3cHGGmld7+AhvcWmQyGCYUh1hc4Q/pkOhb65dQR/pqCyK0cOaHz4Q==}
-    dev: false
-
   /memoizee@0.4.15:
     resolution: {integrity: sha512-UBWmJpLZd5STPm7PMUlOw/TSy972M+z8gcyQ5veOnSDRREz/0bmpyTfKt3/51DhEBqCZQn1udM/5flcSPYhkdQ==}
     dependencies:
@@ -9257,15 +9232,6 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
-  /react-infinite-scroller@1.2.6(react@18.2.0):
-    resolution: {integrity: sha512-mGdMyOD00YArJ1S1F3TVU9y4fGSfVVl6p5gh/Vt4u99CJOptfVu/q5V/Wlle72TMgYlBwIhbxK5wF0C/R33PXQ==}
-    peerDependencies:
-      react: ^0.14.9 || ^15.3.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
-    dependencies:
-      prop-types: 15.8.1
-      react: 18.2.0
-    dev: false
-
   /react-inspector@6.0.1(react@18.2.0):
     resolution: {integrity: sha512-cxKSeFTf7jpSSVddm66sKdolG90qURAX3g1roTeaN6x0YEbtWc8JpmFN9+yIqLNH2uEkYerWLtJZIXRIFuBKrg==}
     peerDependencies:
@@ -9387,19 +9353,6 @@ packages:
       react: '>= 18.0.0'
       react-dom: '>= 18.0.0'
     dependencies:
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-    dev: false
-
-  /react-window@1.8.9(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-+Eqx/fj1Aa5WnhRfj9dJg4VYATGwIUP2ItwItiJ6zboKWA6EX3lYDAXfGF2hyNqplEprhbtjbipiADEcwQ823Q==}
-    engines: {node: '>8.0.0'}
-    peerDependencies:
-      react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
-    dependencies:
-      '@babel/runtime': 7.21.5
-      memoize-one: 5.2.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     dev: false
@@ -10797,6 +10750,16 @@ packages:
       is-buffer: 2.0.5
       unist-util-stringify-position: 3.0.3
       vfile-message: 3.1.4
+    dev: false
+
+  /virtua@0.14.0(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-+g3fxgFuQCqw6PpU5qzTRKhbSUGOeMEap0VbPaIRB1RiK5MfLiGXIMwID1iX1DmvUC/SqsBsJfVvlUaPNGWSVQ==}
+    peerDependencies:
+      react: '>=16.14.0'
+      react-dom: '>=16.14.0'
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /vite-plugin-pwa@0.14.7(vite@4.0.0)(workbox-build@6.5.4)(workbox-window@6.5.4):

@@ -1,6 +1,5 @@
-import { Box, Divider, List, ListItem, ListItemIcon, ListItemText, Typography, useTheme } from '@mui/material'
-import React, { type RefObject, memo, useCallback, useEffect, useState, useRef } from 'react'
-import InfiniteScroll from 'react-infinite-scroller'
+import { Box, Divider, ListItem, ListItemIcon, ListItemText, Typography, useTheme } from '@mui/material'
+import React, { memo, useCallback, useEffect, useState, useRef, forwardRef, type ForwardedRef } from 'react'
 import { AssociationFrame } from '../Association/AssociationFrame'
 import { useApi } from '../../context/api'
 import { InspectorProvider } from '../../context/Inspector'
@@ -14,18 +13,19 @@ import { type Timeline as CoreTimeline } from '@concurrent-world/client'
 import { useRefWithForceUpdate } from '../../hooks/useRefWithForceUpdate'
 import useSound from 'use-sound'
 import { usePreference } from '../../context/PreferenceContext'
+import { VList, type VListHandle } from 'virtua'
 
 export interface TimelineProps {
     streams: string[]
-    scrollParentRef: RefObject<HTMLDivElement>
     perspective?: string
+    header?: JSX.Element
 }
 
 const PTR_HEIGHT = 60
 
-const divider = <Divider variant="inset" component="li" sx={{ margin: '8px 4px' }} />
+const divider = <Divider variant="inset" component="li" sx={{ mx: 1, mt: 1 }} />
 
-export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element => {
+const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle>): JSX.Element => {
     const client = useApi()
     const theme = useTheme()
     const pref = usePreference()
@@ -40,7 +40,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     const [loadable, setLoadable] = useState<boolean>(false)
     const [ptrEnabled, setPtrEnabled] = useState<boolean>(false)
 
-    const [playBubble] = useSound(pref.postSound, { volume: pref.volume / 100, interrupt: false })
+    const [playBubble] = useSound(pref?.postSound, { volume: pref?.volume / 100, interrupt: false })
     const playBubbleRef = useRef(playBubble)
 
     useEffect(() => {
@@ -72,22 +72,25 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
         }
     }, [props.streams])
 
+    const positionRef = useRef<number>(0)
+    const scrollParentRef = useRef<HTMLDivElement>(null)
+
     const onTouchStart = useCallback((raw: Event) => {
         const e = raw as TouchEvent
         setTouchPosition(e.touches[0].clientY)
-        setLoadable(props.scrollParentRef.current?.scrollTop === 0)
+        setLoadable(positionRef.current === 0)
     }, [])
 
     const onTouchMove = useCallback(
         (raw: Event) => {
             if (!loadable) return
             const e = raw as TouchEvent
-            if (!props.scrollParentRef.current) return
+            if (!scrollParentRef.current) return
             const delta = e.touches[0].clientY - touchPosition
             setLoaderSize(Math.min(Math.max(delta, 0), PTR_HEIGHT))
             if (delta >= PTR_HEIGHT) setPtrEnabled(true)
         },
-        [props.scrollParentRef.current, touchPosition]
+        [scrollParentRef.current, touchPosition]
     )
 
     const onTouchEnd = useCallback(() => {
@@ -110,16 +113,18 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
     }, [ptrEnabled, setPtrEnabled, props.streams, client.api, isFetching])
 
     useEffect(() => {
-        if (!props.scrollParentRef.current) return
-        props.scrollParentRef.current.addEventListener('touchstart', onTouchStart)
-        props.scrollParentRef.current.addEventListener('touchmove', onTouchMove)
-        props.scrollParentRef.current.addEventListener('touchend', onTouchEnd)
+        if (!scrollParentRef.current) return
+        scrollParentRef.current.addEventListener('touchstart', onTouchStart)
+        scrollParentRef.current.addEventListener('touchmove', onTouchMove)
+        scrollParentRef.current.addEventListener('touchend', onTouchEnd)
         return () => {
-            props.scrollParentRef.current?.removeEventListener('touchstart', onTouchStart)
-            props.scrollParentRef.current?.removeEventListener('touchmove', onTouchMove)
-            props.scrollParentRef.current?.removeEventListener('touchend', onTouchEnd)
+            scrollParentRef.current?.removeEventListener('touchstart', onTouchStart)
+            scrollParentRef.current?.removeEventListener('touchmove', onTouchMove)
+            scrollParentRef.current?.removeEventListener('touchend', onTouchEnd)
         }
-    }, [props.scrollParentRef.current, onTouchStart, onTouchMove, onTouchEnd])
+    }, [scrollParentRef.current, onTouchStart, onTouchMove, onTouchEnd])
+
+    const count = timeline.current?.body.length ?? 0
 
     return (
         <InspectorProvider>
@@ -164,20 +169,27 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
                     )}
                 </Box>
             </Box>
-            <List sx={{ flex: 1, width: '100%' }}>
-                <InfiniteScroll
-                    loadMore={() => {
-                        console.log('readMore!!!')
-                        timeline.current?.readMore().then((hasMore) => {
-                            setHasMoreData(hasMore)
-                        })
+            <Box ref={scrollParentRef} display="flex" flex={1}>
+                <VList
+                    style={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        listStyle: 'none',
+                        overscrollBehaviorY: 'none'
                     }}
-                    initialLoad={false}
-                    hasMore={hasMoreData}
-                    loader={<Loading key={0} message="Loading..." color={theme.palette.text.primary} />}
-                    useWindow={false}
-                    getScrollParent={() => props.scrollParentRef.current}
+                    onScroll={(top) => {
+                        positionRef.current = top
+                    }}
+                    onRangeChange={(_, end) => {
+                        if (end + 3 > count && hasMoreData) {
+                            console.log('readMore!!')
+                            timeline.current?.readMore()
+                        }
+                    }}
+                    ref={ref}
                 >
+                    {props.header}
                     {timeline.current?.body.map((e) => {
                         let element
                         switch (e.type) {
@@ -209,15 +221,19 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
 
                         return (
                             <React.Fragment key={e.objectID}>
-                                <ErrorBoundary FallbackComponent={renderError}>{element}</ErrorBoundary>
+                                <ErrorBoundary FallbackComponent={renderError}>
+                                    <Box padding={1}>{element}</Box>
+                                </ErrorBoundary>
                             </React.Fragment>
                         )
                     })}
-                </InfiniteScroll>
-            </List>
+                    {isFetching && <Loading key={0} message="Loading..." color={theme.palette.text.primary} />}
+                </VList>
+            </Box>
         </InspectorProvider>
     )
 })
+timeline.displayName = 'timeline'
 
 const renderError = ({ error }: FallbackProps): JSX.Element => {
     return (
@@ -230,4 +246,5 @@ const renderError = ({ error }: FallbackProps): JSX.Element => {
     )
 }
 
+export const Timeline = memo(timeline)
 Timeline.displayName = 'Timeline'

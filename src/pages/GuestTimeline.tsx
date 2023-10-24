@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Box, Button, CssBaseline, Paper, ThemeProvider, Typography, alpha, darken } from '@mui/material'
-import type { ConcurrentTheme, StreamItemDated } from '../model'
-import { useObjectList } from '../hooks/useObjectList'
+import type { ConcurrentTheme } from '../model'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { Timeline } from '../components/Timeline/main'
 import { Client, type User } from '@concurrent-world/client'
@@ -14,6 +13,7 @@ import TickerProvider from '../context/Ticker'
 import { CCAvatar } from '../components/ui/CCAvatar'
 
 import Background from '../resources/defaultbg.png'
+import { type VListHandle } from 'virtua'
 
 export function GuestTimelinePage(): JSX.Element {
     const reactlocation = useLocation()
@@ -22,6 +22,8 @@ export function GuestTimelinePage(): JSX.Element {
     const [targetStream, setTargetStream] = useState<string[]>([])
 
     const { id } = useParams()
+
+    const timelineRef = useRef<VListHandle>(null)
 
     const [client, initializeClient] = useState<Client>()
     useEffect(() => {
@@ -48,7 +50,8 @@ export function GuestTimelinePage(): JSX.Element {
             const client = new Client('8c215bedacf0888470fd2567d03a813f4ae926be4a2cd587979809b629d70592', resolver)
 
             client.api.readStream(query).then((e) => {
-                setTitle(e?.payload.body.name ?? '')
+                console.log(e)
+                setTitle(e?.payload.name ?? '')
             })
 
             initializeClient(client)
@@ -64,8 +67,6 @@ export function GuestTimelinePage(): JSX.Element {
         setThemeName(newThemeName)
         setTheme(createConcurrentTheme(newThemeName))
     }
-
-    const messages = useObjectList<StreamItemDated>()
 
     const scrollParentRef = useRef<HTMLDivElement>(null)
 
@@ -196,10 +197,7 @@ export function GuestTimelinePage(): JSX.Element {
                                                         p: { xs: '0', xl: '8px 0 8 4px' }
                                                     }}
                                                     onClick={() => {
-                                                        scrollParentRef.current?.scroll({
-                                                            top: 0,
-                                                            behavior: 'smooth'
-                                                        })
+                                                        timelineRef.current?.scrollTo(0)
                                                     }}
                                                     disableRipple
                                                 >
@@ -207,105 +205,110 @@ export function GuestTimelinePage(): JSX.Element {
                                                 </Button>
                                             </Box>
                                         </Box>
-                                        <Box
-                                            sx={{
-                                                overflowX: 'hidden',
-                                                overflowY: 'auto',
-                                                overscrollBehaviorY: 'contain'
-                                            }}
-                                            ref={scrollParentRef}
-                                        >
-                                            {user && (
-                                                <Box /* profile */
+                                        <Timeline
+                                            ref={timelineRef}
+                                            streams={targetStream}
+                                            header={
+                                                <Box
                                                     sx={{
-                                                        backgroundImage: `url(${user.profile?.banner || Background})`,
-                                                        backgroundPosition: 'center',
-                                                        backgroundSize: 'cover',
-                                                        display: 'flex',
-                                                        flexDirection: 'column'
+                                                        overflowX: 'hidden',
+                                                        overflowY: 'auto',
+                                                        overscrollBehaviorY: 'contain'
                                                     }}
+                                                    ref={scrollParentRef}
                                                 >
-                                                    <Paper
-                                                        sx={{
-                                                            position: 'relative',
-                                                            margin: '50px',
-                                                            backgroundColor: alpha(theme.palette.background.paper, 0.8)
-                                                        }}
-                                                    >
-                                                        <Box
+                                                    {user && (
+                                                        <Box /* profile */
                                                             sx={{
-                                                                position: 'absolute',
-                                                                left: '50%',
-                                                                transform: 'translate(-50%, -50%)'
-                                                            }}
-                                                        >
-                                                            <CCAvatar
-                                                                alt={user.profile?.username}
-                                                                avatarURL={user.profile?.avatar}
-                                                                identiconSource={user.ccid}
-                                                                sx={{
-                                                                    width: '80px',
-                                                                    height: '80px'
-                                                                }}
-                                                            />
-                                                        </Box>
-                                                        <Box
-                                                            sx={{
-                                                                p: '10px',
+                                                                backgroundImage: `url(${
+                                                                    user.profile?.banner || Background
+                                                                })`,
+                                                                backgroundPosition: 'center',
+                                                                backgroundSize: 'cover',
                                                                 display: 'flex',
-                                                                flexFlow: 'column',
-                                                                gap: '15px'
+                                                                flexDirection: 'column'
                                                             }}
                                                         >
-                                                            <Box
+                                                            <Paper
                                                                 sx={{
-                                                                    height: '32px',
-                                                                    display: 'flex',
-                                                                    flexFlow: 'row',
-                                                                    alignItems: 'center',
-                                                                    justifyContent: 'flex-end',
-                                                                    gap: 1
-                                                                }}
-                                                            ></Box>
-                                                            <Box
-                                                                sx={{
-                                                                    display: 'flex',
-                                                                    flexFlow: 'column',
-                                                                    alignItems: 'center'
+                                                                    position: 'relative',
+                                                                    margin: '50px',
+                                                                    backgroundColor: alpha(
+                                                                        theme.palette.background.paper,
+                                                                        0.8
+                                                                    )
                                                                 }}
                                                             >
-                                                                <Typography>{user.profile?.description}</Typography>
-                                                            </Box>
-                                                            <Box
-                                                                sx={{
-                                                                    display: 'flex',
-                                                                    flexFlow: 'column',
-                                                                    alignItems: 'flex-end'
-                                                                }}
-                                                            >
-                                                                <Typography variant="caption">
-                                                                    現住所:{' '}
-                                                                    {user.domain !== '' ? user.domain : client.api.host}
-                                                                </Typography>
-                                                                <Typography variant="caption">{user.ccid}</Typography>
-                                                            </Box>
+                                                                <Box
+                                                                    sx={{
+                                                                        position: 'absolute',
+                                                                        left: '50%',
+                                                                        transform: 'translate(-50%, -50%)'
+                                                                    }}
+                                                                >
+                                                                    <CCAvatar
+                                                                        alt={user.profile?.username}
+                                                                        avatarURL={user.profile?.avatar}
+                                                                        identiconSource={user.ccid}
+                                                                        sx={{
+                                                                            width: '80px',
+                                                                            height: '80px'
+                                                                        }}
+                                                                    />
+                                                                </Box>
+                                                                <Box
+                                                                    sx={{
+                                                                        p: '10px',
+                                                                        display: 'flex',
+                                                                        flexFlow: 'column',
+                                                                        gap: '15px'
+                                                                    }}
+                                                                >
+                                                                    <Box
+                                                                        sx={{
+                                                                            height: '32px',
+                                                                            display: 'flex',
+                                                                            flexFlow: 'row',
+                                                                            alignItems: 'center',
+                                                                            justifyContent: 'flex-end',
+                                                                            gap: 1
+                                                                        }}
+                                                                    ></Box>
+                                                                    <Box
+                                                                        sx={{
+                                                                            display: 'flex',
+                                                                            flexFlow: 'column',
+                                                                            alignItems: 'center'
+                                                                        }}
+                                                                    >
+                                                                        <Typography>
+                                                                            {user.profile?.description}
+                                                                        </Typography>
+                                                                    </Box>
+                                                                    <Box
+                                                                        sx={{
+                                                                            display: 'flex',
+                                                                            flexFlow: 'column',
+                                                                            alignItems: 'flex-end'
+                                                                        }}
+                                                                    >
+                                                                        <Typography variant="caption">
+                                                                            現住所:{' '}
+                                                                            {user.domain !== ''
+                                                                                ? user.domain
+                                                                                : client.api.host}
+                                                                        </Typography>
+                                                                        <Typography variant="caption">
+                                                                            {user.ccid}
+                                                                        </Typography>
+                                                                    </Box>
+                                                                </Box>
+                                                            </Paper>
                                                         </Box>
-                                                    </Paper>
+                                                    )}
                                                 </Box>
-                                            )}
-
-                                            <Box
-                                                sx={{
-                                                    display: 'flex',
-                                                    flex: 1,
-                                                    flexDirection: 'column',
-                                                    py: { xs: 1, sm: 1 },
-                                                    px: { xs: 1, sm: 2 }
-                                                }}
-                                            >
-                                                <Timeline streams={targetStream} scrollParentRef={scrollParentRef} />
-                                            </Box>
-                                        </Box>
+                                            }
+                                        />
                                     </Box>
                                 </Paper>
                             </Box>
