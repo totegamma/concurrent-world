@@ -242,19 +242,23 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                 }
                                 if (e.key === 'ArrowDown') {
                                     e.preventDefault()
-                                    setSelected(Math.min(selected + RowEmojiCount, displayEmojis.length - 1))
+                                    const next = Math.min(selected + RowEmojiCount, displayEmojis.length - 1)
+                                    setSelected(next)
                                 }
                                 if (e.key === 'ArrowUp') {
                                     e.preventDefault()
-                                    setSelected(Math.max(selected - RowEmojiCount, 0))
+                                    const next = Math.max(selected - RowEmojiCount, 0)
+                                    setSelected(next)
                                 }
                                 if (e.key === 'ArrowLeft') {
                                     e.preventDefault()
-                                    setSelected(Math.max(selected - 1, 0))
+                                    const next = Math.max(selected - 1, 0)
+                                    setSelected(next)
                                 }
                                 if (e.key === 'ArrowRight') {
                                     e.preventDefault()
-                                    setSelected(Math.min(selected + 1, displayEmojis.length - 1))
+                                    const next = Math.min(selected + 1, displayEmojis.length - 1)
+                                    setSelected(next)
                                 }
                             }}
                             onFocus={() => {
@@ -279,7 +283,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                             <Typography>{title}</Typography>
                         </Box>
                         <VGrid
-                            row={Math.ceil(displayEmojis.length / RowEmojiCount)}
+                            row={Math.max(Math.ceil(displayEmojis.length / RowEmojiCount), 4)} // HACK: 画面の高さを割るとvirtuaが壊れる
                             col={RowEmojiCount}
                             style={{
                                 overflowX: 'hidden',
@@ -299,7 +303,6 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                 }
                                 return (
                                     <IconButton
-                                        key={emoji.imageURL}
                                         onMouseDown={() => {
                                             onSelectEmoji(emoji)
                                         }}
