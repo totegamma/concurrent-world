@@ -72,12 +72,13 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
         }
     }, [props.streams])
 
+    const positionRef = useRef<number>(0)
     const scrollParentRef = useRef<HTMLDivElement>(null)
 
     const onTouchStart = useCallback((raw: Event) => {
         const e = raw as TouchEvent
         setTouchPosition(e.touches[0].clientY)
-        setLoadable(scrollParentRef.current?.scrollTop === 0)
+        setLoadable(positionRef.current === 0)
     }, [])
 
     const onTouchMove = useCallback(
@@ -174,7 +175,11 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                         flex: 1,
                         display: 'flex',
                         flexDirection: 'column',
-                        listStyle: 'none'
+                        listStyle: 'none',
+                        overscrollBehaviorY: 'none'
+                    }}
+                    onScroll={(top) => {
+                        positionRef.current = top
                     }}
                     onRangeChange={(_, end) => {
                         if (end + 3 > count && hasMoreData) {
