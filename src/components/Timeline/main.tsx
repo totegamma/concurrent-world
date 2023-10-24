@@ -67,9 +67,7 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
         })
         return () => {
             mt.then((t) => {
-                t.onUpdate = undefined
-                t.onRealtimeEvent = undefined
-                // TODO: unsubscribe
+                t.dispose()
             })
         }
     }, [props.streams])
@@ -102,7 +100,11 @@ export const Timeline = memo<TimelineProps>((props: TimelineProps): JSX.Element 
             setIsFetching(true)
             setHasMoreData(false)
             setTimeout(() => {
-                // TODO: reload
+                timeline.current?.reload().then((hasMore) => {
+                    setHasMoreData(hasMore)
+                    setIsFetching(false)
+                    setPtrEnabled(false)
+                })
             }, 1000)
         }
     }, [ptrEnabled, setPtrEnabled, props.streams, client.api, isFetching])
