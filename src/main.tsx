@@ -23,30 +23,30 @@ const logined = domain !== '' && prvkey !== ''
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <ErrorBoundary FallbackComponent={EmergencyKit}>
         <Suspense fallback={<FullScreenLoading message="Loading..." />}>
-            <PreferenceProvider>
-                <BrowserRouter>
-                    <Routes>
-                        <Route path="/welcome" element={<Welcome />} />
-                        <Route path="/register" element={<Registration />} />
-                        <Route path="/import" element={<AccountImport />} />
-                        {!logined && <Route path="/stream" element={<GuestTimelinePage />} />}
-                        {!logined && <Route path="/entity/:id" element={<GuestTimelinePage />} />}
-                        <Route
-                            path="*"
-                            element={
-                                <LoginGuard
-                                    component={
-                                        <ApiProvider>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/welcome" element={<Welcome />} />
+                    <Route path="/register" element={<Registration />} />
+                    <Route path="/import" element={<AccountImport />} />
+                    {!logined && <Route path="/stream" element={<GuestTimelinePage />} />}
+                    {!logined && <Route path="/entity/:id" element={<GuestTimelinePage />} />}
+                    <Route
+                        path="*"
+                        element={
+                            <LoginGuard
+                                component={
+                                    <ApiProvider>
+                                        <PreferenceProvider>
                                             <AppPage />
-                                        </ApiProvider>
-                                    }
-                                    redirect="/welcome"
-                                />
-                            }
-                        />
-                    </Routes>
-                </BrowserRouter>
-            </PreferenceProvider>
+                                        </PreferenceProvider>
+                                    </ApiProvider>
+                                }
+                                redirect="/welcome"
+                            />
+                        }
+                    />
+                </Routes>
+            </BrowserRouter>
         </Suspense>
     </ErrorBoundary>
 )
