@@ -13,6 +13,7 @@ import PercentIcon from '@mui/icons-material/Percent'
 import InfoIcon from '@mui/icons-material/Info'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import WatchingStreamContextProvider from '../context/WatchingStreamContext'
+import { type VListHandle } from 'virtua'
 
 export const StreamPage = memo((): JSX.Element => {
     const client = useApi()
@@ -20,8 +21,7 @@ export const StreamPage = memo((): JSX.Element => {
     const pref = usePreference()
 
     const reactlocation = useLocation()
-    const scrollParentRef = useRef<HTMLDivElement>(null)
-
+    const timelineRef = useRef<VListHandle>(null)
     const [writeable, setWriteable] = useState<boolean>(true)
 
     const targetStreamID = reactlocation.hash.replace('#', '').split(',')[0]
@@ -47,9 +47,7 @@ export const StreamPage = memo((): JSX.Element => {
                     setWriteable(true)
                 }
             })
-            .finally(() => {
-                scrollParentRef.current?.scroll({ top: 0 })
-            })
+            .finally(() => {})
     }, [reactlocation.hash])
 
     const streams = useMemo(() => {
@@ -76,69 +74,64 @@ export const StreamPage = memo((): JSX.Element => {
                     titleIcon={<PercentIcon />}
                     secondaryAction={<InfoIcon />}
                     onTitleClick={() => {
-                        scrollParentRef.current?.scroll({ top: 0, behavior: 'smooth' })
+                        timelineRef.current?.scrollTo(0)
                     }}
                     onSecondaryActionClick={() => {
                         setStreamInfoOpen(true)
                     }}
                 />
-                <Box
-                    sx={{
-                        overflowX: 'hidden',
-                        overflowY: 'auto',
-                        overscrollBehaviorY: 'none'
-                    }}
-                    ref={scrollParentRef}
-                >
-                    {writeable && (
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column'
-                            }}
-                        >
-                            <Box
-                                sx={{
-                                    padding: { xs: '8px', sm: '8px 16px' },
-                                    display: {
-                                        xs: pref.showEditorOnTopMobile ? 'block' : 'none',
-                                        sm: pref.showEditorOnTop ? 'block' : 'none'
-                                    }
-                                }}
-                            >
-                                <Draft
-                                    streamPickerInitial={streams}
-                                    streamPickerOptions={streams}
-                                    onSubmit={(text: string, destinations: string[], emojis): Promise<Error | null> => {
-                                        client
-                                            .createCurrent(text, destinations, emojis)
-                                            .then(() => {
-                                                return null
-                                            })
-                                            .catch((e) => {
-                                                return e
-                                            })
-                                        return Promise.resolve(null)
+                <WatchingStreamContextProvider watchingStreams={streamIDs}>
+                    <Timeline
+                        streams={appData.displayingStream}
+                        ref={timelineRef}
+                        header={
+                            (writeable && (
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'column'
                                     }}
-                                />
-                            </Box>
-                            <Divider />
-                        </Box>
-                    )}
-                    <WatchingStreamContextProvider watchingStreams={streamIDs}>
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flex: 1,
-                                flexDirection: 'column',
-                                py: { xs: 1, sm: 1 },
-                                px: { xs: 1, sm: 2 }
-                            }}
-                        >
-                            <Timeline streams={appData.displayingStream} scrollParentRef={scrollParentRef} />
-                        </Box>
-                    </WatchingStreamContextProvider>
-                </Box>
+                                >
+                                    <Box
+                                        sx={{
+                                            px: 1,
+                                            display: {
+                                                xs: pref.showEditorOnTopMobile ? 'block' : 'none',
+                                                sm: pref.showEditorOnTop ? 'block' : 'none'
+                                            }
+                                        }}
+                                    >
+                                        <Draft
+                                            streamPickerInitial={streams}
+                                            streamPickerOptions={streams}
+                                            onSubmit={(
+                                                text: string,
+                                                destinations: string[],
+                                                emojis
+                                            ): Promise<Error | null> => {
+                                                client
+                                                    .createCurrent(text, destinations, emojis)
+                                                    .then(() => {
+                                                        return null
+                                                    })
+                                                    .catch((e) => {
+                                                        return e
+                                                    })
+                                                return Promise.resolve(null)
+                                            }}
+                                        />
+                                        <Divider
+                                            sx={{
+                                                my: 1
+                                            }}
+                                        />
+                                    </Box>
+                                </Box>
+                            )) ||
+                            undefined
+                        }
+                    />
+                </WatchingStreamContextProvider>
             </Box>
             <CCDrawer
                 open={streamInfoOpen}

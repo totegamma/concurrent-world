@@ -2,10 +2,8 @@ import { Box, Link, Paper, Tab, Tabs, Typography, alpha, useTheme } from '@mui/m
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useApi } from '../context/api'
-import type { StreamItemDated } from '../model'
 import { CCAvatar } from '../components/ui/CCAvatar'
 import { Timeline } from '../components/Timeline'
-import { useObjectList } from '../hooks/useObjectList'
 import Background from '../resources/defaultbg.png'
 import CreateIcon from '@mui/icons-material/Create'
 import { FollowButton } from '../components/FollowButton'
@@ -16,6 +14,7 @@ import { type UserAckCollection } from '@concurrent-world/client/dist/types/sche
 import { CCDrawer } from '../components/ui/CCDrawer'
 import { AckList } from '../components/AckList'
 import { AckButton } from '../components/AckButton'
+import { type VListHandle } from 'virtua'
 
 type detail = 'none' | 'ack' | 'acker'
 
@@ -27,8 +26,7 @@ export function EntityPage(): JSX.Element {
 
     const [user, setUser] = useState<User | null | undefined>(null)
 
-    const messages = useObjectList<StreamItemDated>()
-    const scrollParentRef = useRef<HTMLDivElement>(null)
+    const timelineRef = useRef<VListHandle>(null)
     const isSelf = id === client.ccid
 
     const [ackUsers, setAckUsers] = useState<User[]>([])
@@ -91,10 +89,7 @@ export function EntityPage(): JSX.Element {
                 title={user.profile?.username || 'anonymous'}
                 titleIcon={<AlternateEmailIcon />}
                 onTitleClick={() => {
-                    scrollParentRef.current?.scroll({
-                        top: 0,
-                        behavior: 'smooth'
-                    })
+                    timelineRef.current?.scrollTo(0)
                 }}
                 secondaryAction={isSelf ? <CreateIcon /> : <></>}
                 useRawSecondaryAction={!isSelf}
@@ -102,143 +97,135 @@ export function EntityPage(): JSX.Element {
                     if (isSelf) navigate('/settings')
                 }}
             />
-            <Box /* body */
-                sx={{
-                    overflowX: 'hidden',
-                    overflowY: 'auto',
-                    width: '100%',
-                    minHeight: '100%'
-                }}
-                ref={scrollParentRef}
-            >
-                <Box /* profile */
-                    sx={{
-                        backgroundImage: `url(${user.profile?.banner || Background})`,
-                        backgroundPosition: 'center',
-                        backgroundSize: 'cover',
-                        display: 'flex',
-                        flexDirection: 'column'
-                    }}
-                >
-                    <Paper
-                        sx={{
-                            margin: 3,
-                            backgroundColor: alpha(theme.palette.background.paper, 0.8)
-                        }}
-                    >
-                        <Box
+            <Timeline
+                ref={timelineRef}
+                streams={targetStreams}
+                perspective={user.ccid}
+                header={
+                    <>
+                        <Box /* profile */
                             sx={{
-                                p: '10px',
+                                backgroundImage: `url(${user.profile?.banner || Background})`,
+                                backgroundPosition: 'center',
+                                backgroundSize: 'cover',
                                 display: 'flex',
-                                flexFlow: 'column',
-                                gap: '15px'
+                                flexDirection: 'column'
                             }}
                         >
-                            <Box
+                            <Paper
                                 sx={{
-                                    display: 'flex',
-                                    flexFlow: { xs: 'column', sm: 'row', md: 'row' },
-                                    alignItems: 'center',
-                                    gap: 1
+                                    margin: 3,
+                                    backgroundColor: alpha(theme.palette.background.paper, 0.8)
                                 }}
                             >
-                                <CCAvatar
-                                    alt={user.profile?.username}
-                                    avatarURL={user.profile?.avatar}
-                                    identiconSource={user.ccid}
-                                    sx={{
-                                        width: { xs: '80px', sm: '60px', md: '80px' },
-                                        height: { xs: '80px', sm: '60px', md: '80px' }
-                                    }}
-                                />
                                 <Box
                                     sx={{
+                                        p: '10px',
                                         display: 'flex',
-                                        flexFlow: 'row',
-                                        alignItems: 'center',
-                                        justifyContent: 'flex-end',
-                                        width: '100%',
-                                        gap: 0
+                                        flexFlow: 'column',
+                                        gap: '15px'
                                     }}
                                 >
-                                    <Box display="flex" gap={1}>
-                                        <Typography
-                                            component={Link}
-                                            underline="hover"
-                                            onClick={() => {
-                                                setDetailMode('ack')
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            flexFlow: { xs: 'column', sm: 'row', md: 'row' },
+                                            alignItems: 'center',
+                                            gap: 1
+                                        }}
+                                    >
+                                        <CCAvatar
+                                            alt={user.profile?.username}
+                                            avatarURL={user.profile?.avatar}
+                                            identiconSource={user.ccid}
+                                            sx={{
+                                                width: { xs: '80px', sm: '60px', md: '80px' },
+                                                height: { xs: '80px', sm: '60px', md: '80px' }
+                                            }}
+                                        />
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                flexFlow: 'row',
+                                                alignItems: 'center',
+                                                justifyContent: 'flex-end',
+                                                width: '100%',
+                                                gap: 0
                                             }}
                                         >
-                                            {ackUsers.length} Ack
-                                        </Typography>
-                                        <Typography
-                                            component={Link}
-                                            underline="hover"
-                                            onClick={() => {
-                                                setDetailMode('acker')
-                                            }}
-                                        >
-                                            {ackedUsers.length} Acker
-                                        </Typography>
+                                            <Box display="flex" gap={1}>
+                                                <Typography
+                                                    component={Link}
+                                                    underline="hover"
+                                                    onClick={() => {
+                                                        setDetailMode('ack')
+                                                    }}
+                                                >
+                                                    {ackUsers.length} Ack
+                                                </Typography>
+                                                <Typography
+                                                    component={Link}
+                                                    underline="hover"
+                                                    onClick={() => {
+                                                        setDetailMode('acker')
+                                                    }}
+                                                >
+                                                    {ackedUsers.length} Acker
+                                                </Typography>
+                                            </Box>
+                                            {!isSelf ? (
+                                                <>
+                                                    <AckButton user={user} />
+                                                    <FollowButton
+                                                        color={theme.palette.secondary.main}
+                                                        userCCID={id!}
+                                                        userStreamID={user.userstreams?.homeStream ?? ''}
+                                                    />
+                                                </>
+                                            ) : (
+                                                ''
+                                            )}
+                                        </Box>
                                     </Box>
-                                    {!isSelf ? (
-                                        <>
-                                            <AckButton user={user} />
-                                            <FollowButton
-                                                color={theme.palette.secondary.main}
-                                                userCCID={id!}
-                                                userStreamID={user.userstreams?.homeStream ?? ''}
-                                            />
-                                        </>
-                                    ) : (
-                                        ''
-                                    )}
-                                </Box>
-                            </Box>
 
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    flexFlow: 'column',
-                                    alignItems: 'center'
-                                }}
-                            >
-                                <Typography>{user.profile?.description}</Typography>
-                            </Box>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    flexFlow: 'column',
-                                    alignItems: 'flex-end'
-                                }}
-                            >
-                                <Typography variant="caption">
-                                    現住所: {user.domain !== '' ? user.domain : client.api.host}
-                                </Typography>
-                                <Typography variant="caption">{user.ccid}</Typography>
-                            </Box>
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            flexFlow: 'column',
+                                            alignItems: 'center'
+                                        }}
+                                    >
+                                        <Typography>{user.profile?.description}</Typography>
+                                    </Box>
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            flexFlow: 'column',
+                                            alignItems: 'flex-end'
+                                        }}
+                                    >
+                                        <Typography variant="caption">
+                                            現住所: {user.domain !== '' ? user.domain : client.api.host}
+                                        </Typography>
+                                        <Typography variant="caption">{user.ccid}</Typography>
+                                    </Box>
+                                </Box>
+                            </Paper>
                         </Box>
-                    </Paper>
-                </Box>
-                <Tabs
-                    value={tab}
-                    onChange={(_, index) => {
-                        setTab(index)
-                    }}
-                    textColor="secondary"
-                    indicatorColor="secondary"
-                >
-                    <Tab label="カレント" />
-                    <Tab label="アクティビティ" />
-                </Tabs>
-                <Box /* timeline */
-                    sx={{
-                        padding: { xs: '8px', sm: '8px 16px' }
-                    }}
-                >
-                    <Timeline streams={targetStreams} scrollParentRef={scrollParentRef} perspective={user.ccid} />
-                </Box>
-            </Box>
+                        <Tabs
+                            value={tab}
+                            onChange={(_, index) => {
+                                setTab(index)
+                            }}
+                            textColor="secondary"
+                            indicatorColor="secondary"
+                        >
+                            <Tab label="カレント" />
+                            <Tab label="アクティビティ" />
+                        </Tabs>
+                    </>
+                }
+            />
             <CCDrawer
                 open={detailMode !== 'none'}
                 onClose={() => {

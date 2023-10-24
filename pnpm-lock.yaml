@@ -119,6 +119,9 @@ dependencies:
   uuid:
     specifier: ^9.0.0
     version: 9.0.0
+  virtua:
+    specifier: ^0.14.0
+    version: 0.14.0(react-dom@18.2.0)(react@18.2.0)
 
 devDependencies:
   '@storybook/addon-essentials':
@@ -10797,6 +10800,16 @@ packages:
       is-buffer: 2.0.5
       unist-util-stringify-position: 3.0.3
       vfile-message: 3.1.4
+    dev: false
+
+  /virtua@0.14.0(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-+g3fxgFuQCqw6PpU5qzTRKhbSUGOeMEap0VbPaIRB1RiK5MfLiGXIMwID1iX1DmvUC/SqsBsJfVvlUaPNGWSVQ==}
+    peerDependencies:
+      react: '>=16.14.0'
+      react-dom: '>=16.14.0'
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /vite-plugin-pwa@0.14.7(vite@4.0.0)(workbox-build@6.5.4)(workbox-window@6.5.4):

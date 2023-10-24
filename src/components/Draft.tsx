@@ -286,8 +286,8 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     display: 'flex',
                     flexDirection: { xs: 'column', md: 'row' },
                     alignItems: 'start',
-                    px: '10px',
-                    gap: 2
+                    gap: 2,
+                    px: 1
                 }}
             >
                 <InputBase
