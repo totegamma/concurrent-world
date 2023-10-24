@@ -1,15 +1,10 @@
 import { Box, Divider, Typography } from '@mui/material'
-import { useContext, useEffect, useRef } from 'react'
+import { useContext } from 'react'
 import { ApplicationContext } from '../App'
 import { Timeline } from '../components/Timeline'
 
 export function Associations(): JSX.Element {
     const appData = useContext(ApplicationContext)
-    const scrollParentRef = useRef<HTMLDivElement>(null)
-
-    useEffect(() => {
-        scrollParentRef.current?.scroll({ top: 0 })
-    }, [appData.displayingStream])
 
     return (
         <Box
@@ -31,26 +26,7 @@ export function Associations(): JSX.Element {
                 </Typography>
                 <Divider />
             </Box>
-            <Box
-                sx={{
-                    overflowX: 'hidden',
-                    overflowY: 'auto',
-                    overscrollBehaviorY: 'none'
-                }}
-                ref={scrollParentRef}
-            >
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flex: 1,
-                        flexDirection: 'column',
-                        py: { xs: 1, sm: 1 },
-                        px: { xs: 1, sm: 2 }
-                    }}
-                >
-                    <Timeline streams={appData.displayingStream} scrollParentRef={scrollParentRef} />
-                </Box>
-            </Box>
+            <Timeline streams={appData.displayingStream} />
         </Box>
     )
 }

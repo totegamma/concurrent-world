@@ -12,6 +12,7 @@ import { ListSettings } from '../components/ListSettings'
 import ListIcon from '@mui/icons-material/List'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import { TimelineHeader } from '../components/TimelineHeader'
+import { type VListHandle } from 'virtua'
 
 export function ListPage(): JSX.Element {
     const client = useApi()
@@ -20,12 +21,13 @@ export function ListPage(): JSX.Element {
     const pref = usePreference()
     const rawid = path.hash.replace('#', '')
     const id = pref.lists[rawid] ? rawid : Object.keys(pref.lists)[0]
-    const scrollParentRef = useRef<HTMLDivElement>(null)
     const [tab, setTab] = useState<string>(id)
 
     const [streams, setStreams] = useState<Stream[]>([])
     const [postStreams, setPostStreams] = useState<Stream[]>([])
     const [listSettingsOpen, setListSettingsOpen] = useState<boolean>(false)
+
+    const timelineRef = useRef<VListHandle>(null)
 
     useEffect(() => {
         if (!id) return
@@ -99,7 +101,7 @@ export function ListPage(): JSX.Element {
                         setListSettingsOpen(true)
                     }}
                     onTitleClick={() => {
-                        scrollParentRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
+                        timelineRef.current?.scrollTo(0)
                     }}
                 />
                 <Tabs
@@ -113,93 +115,93 @@ export function ListPage(): JSX.Element {
                     {Object.keys(pref.lists)
                         .filter((e) => pref.lists[e].pinned)
                         .map((e) => (
-                            <Tab key={e} value={e} label={pref.lists[e].label} />
+                            <Tab
+                                key={e}
+                                value={e}
+                                label={pref.lists[e].label}
+                                onClick={() => {
+                                    console.log('click', e, tab)
+                                    if (e === tab) {
+                                        timelineRef.current?.scrollTo(0)
+                                    }
+                                }}
+                            />
                         ))}
                 </Tabs>
-                <Box
-                    sx={{
-                        overflowX: 'hidden',
-                        overflowY: 'auto',
-                        overscrollBehaviorY: 'none'
-                    }}
-                    ref={scrollParentRef}
-                >
+
+                {streamIDs.length > 0 ? (
+                    <Timeline
+                        header={
+                            <>
+                                <Box
+                                    sx={{
+                                        px: 1,
+                                        display: {
+                                            xs: pref.showEditorOnTopMobile ? 'block' : 'none',
+                                            sm: pref.showEditorOnTop ? 'block' : 'none'
+                                        }
+                                    }}
+                                >
+                                    <Draft
+                                        streamPickerOptions={streams}
+                                        streamPickerInitial={postStreams}
+                                        onSubmit={(
+                                            text: string,
+                                            destinations: string[],
+                                            emojis
+                                        ): Promise<Error | null> => {
+                                            client
+                                                .createCurrent(text, destinations, emojis)
+                                                .then(() => {
+                                                    return null
+                                                })
+                                                .catch((e) => {
+                                                    return e
+                                                })
+                                            return Promise.resolve(null)
+                                        }}
+                                    />
+                                    <Divider
+                                        sx={{
+                                            my: 1
+                                        }}
+                                    />
+                                </Box>
+                            </>
+                        }
+                        streams={streamIDs}
+                        ref={timelineRef}
+                    />
+                ) : (
                     <Box
                         sx={{
+                            marginTop: 4,
+                            alignItems: 'center',
+                            justifyContent: 'center',
                             display: 'flex',
                             flexDirection: 'column'
                         }}
                     >
                         <Box
-                            sx={{
-                                padding: { xs: '8px', sm: '8px 16px' },
-                                display: {
-                                    xs: pref.showEditorOnTopMobile ? 'block' : 'none',
-                                    sm: pref.showEditorOnTop ? 'block' : 'none'
-                                }
-                            }}
-                        >
-                            <Draft
-                                streamPickerOptions={streams}
-                                streamPickerInitial={postStreams}
-                                onSubmit={(text: string, destinations: string[], emojis): Promise<Error | null> => {
-                                    client
-                                        .createCurrent(text, destinations, emojis)
-                                        .then(() => {
-                                            return null
-                                        })
-                                        .catch((e) => {
-                                            return e
-                                        })
-                                    return Promise.resolve(null)
-                                }}
-                            />
-                        </Box>
-                        <Divider />
-                    </Box>
-                    {streamIDs.length > 0 ? (
-                        <Box
-                            sx={{
+                            style={{
                                 display: 'flex',
-                                flex: 1,
+                                marginTop: 8,
+                                marginLeft: 8,
+                                marginRight: 8,
                                 flexDirection: 'column',
-                                py: { xs: 1, sm: 1 },
-                                px: { xs: 1, sm: 2 }
+                                alignItems: 'center'
                             }}
                         >
-                            <Timeline streams={streamIDs} scrollParentRef={scrollParentRef} />
+                            <Button variant="contained" component={RouterLink} to="/explorer">
+                                <Typography variant="h1" sx={{ fontWeight: 600, mx: 1 }}>
+                                    Go Explore
+                                </Typography>
+                                <ExploreIcon sx={{ fontSize: '10rem', verticalAlign: 'middle' }} />
+                            </Button>
+                            <p>フォローするユーザー・ストリームを探しに行く</p>
                         </Box>
-                    ) : (
-                        <Box
-                            sx={{
-                                marginTop: 4,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                display: 'flex',
-                                flexDirection: 'column'
-                            }}
-                        >
-                            <Box
-                                style={{
-                                    display: 'flex',
-                                    marginTop: 8,
-                                    marginLeft: 8,
-                                    marginRight: 8,
-                                    flexDirection: 'column',
-                                    alignItems: 'center'
-                                }}
-                            >
-                                <Button variant="contained" component={RouterLink} to="/explorer">
-                                    <Typography variant="h1" sx={{ fontWeight: 600, mx: 1 }}>
-                                        Go Explore
-                                    </Typography>
-                                    <ExploreIcon sx={{ fontSize: '10rem', verticalAlign: 'middle' }} />
-                                </Button>
-                                <p>フォローするユーザー・ストリームを探しに行く</p>
-                            </Box>
-                        </Box>
-                    )}
-                </Box>
+                    </Box>
+                )}
             </Box>
             <CCDrawer
                 open={listSettingsOpen}

@@ -17,10 +17,10 @@ import { type EmojiPackage, type Emoji } from '../model'
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled'
 import SearchIcon from '@mui/icons-material/Search'
 import { usePersistent } from '../hooks/usePersistent'
-import { FixedSizeGrid } from 'react-window'
 import { Link as RouterLink } from 'react-router-dom'
 
 import Fuzzysort from 'fuzzysort'
+import { VGrid, type VGridHandle } from 'virtua'
 
 export interface EmojiPickerState {
     open: (anchor: HTMLElement, onSelected: (selected: Emoji) => void) => void
@@ -50,6 +50,8 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
     const [searchResults, setSearchResults] = useState<Emoji[]>([])
     const [selected, setSelected] = useState<number>(0)
     const [searchBoxFocused, setSearchBoxFocused] = useState<boolean>(false)
+
+    const gridRef = useRef<VGridHandle>(null)
 
     const title: string = useMemo(() => {
         if (query.length > 0) {
@@ -199,6 +201,9 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                     aria-label="Frequently Used"
                                     icon={<AccessTimeFilledIcon />}
                                     sx={tabsx}
+                                    onClick={() => {
+                                        gridRef.current?.scrollTo(0, 0)
+                                    }}
                                 />
                             ) : (
                                 <Tab key="search" aria-label="Search Result" icon={<SearchIcon />} sx={tabsx} />
@@ -209,6 +214,9 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                     aria-label={emojiPackage.name}
                                     icon={<img src={emojiPackage.iconURL} alt={emojiPackage.name} height="20px" />}
                                     sx={tabsx}
+                                    onClick={() => {
+                                        gridRef.current?.scrollTo(0, 0)
+                                    }}
                                 />
                             ))}
                         </Tabs>
@@ -270,18 +278,22 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                         >
                             <Typography>{title}</Typography>
                         </Box>
-
-                        <FixedSizeGrid
-                            columnCount={RowEmojiCount}
-                            rowCount={Math.ceil(displayEmojis.length / RowEmojiCount)}
-                            columnWidth={50}
-                            rowHeight={50}
-                            width={310}
-                            height={300}
+                        <VGrid
+                            row={Math.ceil(displayEmojis.length / RowEmojiCount)}
+                            col={RowEmojiCount}
+                            style={{
+                                overflowX: 'hidden',
+                                overflowY: 'auto',
+                                width: '310px',
+                                height: '300px'
+                            }}
+                            cellHeight={50}
+                            cellWidth={50}
+                            ref={gridRef}
                         >
-                            {({ columnIndex, rowIndex, style }) => {
-                                const index = rowIndex * RowEmojiCount + columnIndex
-                                const emoji = displayEmojis[rowIndex * RowEmojiCount + columnIndex]
+                            {({ colIndex, rowIndex }) => {
+                                const index = rowIndex * RowEmojiCount + colIndex
+                                const emoji = displayEmojis[rowIndex * RowEmojiCount + colIndex]
                                 if (!emoji) {
                                     return null
                                 }
@@ -298,15 +310,14 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                                     : 'transparent',
                                             '&:hover': {
                                                 bgcolor: alpha(theme.palette.primary.main, 0.5)
-                                            },
-                                            ...style
+                                            }
                                         }}
                                     >
                                         <img src={emoji.imageURL} alt={emoji.shortcode} height="30px" width="30px" />
                                     </IconButton>
                                 )
                             }}
-                        </FixedSizeGrid>
+                        </VGrid>
                     </Box>
                     <Divider />
                     <Box display="flex" padding={1} justifyContent="space-between" alignItems="center">
