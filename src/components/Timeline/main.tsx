@@ -52,6 +52,7 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
         console.log('Timeline: streams changed', props.streams)
         const mt = client.newTimeline().then((t) => {
             timeline.current = t
+            console.log(timeline.current?.body)
             t.onUpdate = () => {
                 console.log('Timeline: onUpdate', timeline.current?.body)
                 timelineChanged()
