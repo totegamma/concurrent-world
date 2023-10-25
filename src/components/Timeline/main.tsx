@@ -43,6 +43,12 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
     const [playBubble] = useSound(pref?.postSound, { volume: pref?.volume / 100, interrupt: false })
     const playBubbleRef = useRef(playBubble)
 
+    const updateTimeline = useCallback(() => {
+        console.log('Timeline: onUpdate', timeline.current?.body)
+        timelineChanged()
+        console.log('onUpdateCalled', timeline.current?.body)
+    }, [])
+
     useEffect(() => {
         playBubbleRef.current = playBubble
     }, [playBubble])
@@ -54,9 +60,8 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
             timeline.current = t
             console.log(timeline.current?.body)
             t.onUpdate = () => {
-                console.log('Timeline: onUpdate', timeline.current?.body)
-                timelineChanged()
-                console.log('onUpdateCalled', timeline.current?.body)
+                // timelineChanged()
+                updateTimeline()
             }
             t.onRealtimeEvent = (event) => {
                 if (event.type === 'message' && event.action === 'create') {
