@@ -53,7 +53,9 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
         const mt = client.newTimeline().then((t) => {
             timeline.current = t
             t.onUpdate = () => {
+                console.log('Timeline: onUpdate', timeline.current?.body)
                 timelineChanged()
+                console.log('onUpdateCalled', timeline.current?.body)
             }
             t.onRealtimeEvent = (event) => {
                 if (event.type === 'message' && event.action === 'create') {
