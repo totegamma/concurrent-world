@@ -48,13 +48,11 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
     }, [playBubble])
 
     useEffect(() => {
+        let isCancelled = false
         if (props.streams.length === 0) return
-        console.log('Timeline: streams changed', props.streams)
         const mt = client.newTimeline().then((t) => {
+            if (isCancelled) return
             timeline.current = t
-            timeline.current.listen(props.streams).then((hasMore) => {
-                setHasMoreData(hasMore)
-            })
             t.onUpdate = () => {
                 timelineChanged()
             }
@@ -63,11 +61,15 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                     playBubbleRef.current()
                 }
             }
+            timeline.current.listen(props.streams).then((hasMore) => {
+                setHasMoreData(hasMore)
+            })
             return t
         })
         return () => {
+            isCancelled = true
             mt.then((t) => {
-                t.dispose()
+                t?.dispose()
             })
         }
     }, [props.streams])
