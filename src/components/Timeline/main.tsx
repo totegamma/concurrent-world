@@ -52,9 +52,6 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
         console.log('Timeline: streams changed', props.streams)
         const mt = client.newTimeline().then((t) => {
             timeline.current = t
-            timeline.current.listen(props.streams).then((hasMore) => {
-                setHasMoreData(hasMore)
-            })
             t.onUpdate = () => {
                 timelineChanged()
             }
@@ -63,6 +60,9 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                     playBubbleRef.current()
                 }
             }
+            timeline.current.listen(props.streams).then((hasMore) => {
+                setHasMoreData(hasMore)
+            })
             return t
         })
         return () => {
