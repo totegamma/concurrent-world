@@ -12,7 +12,9 @@ import {
     List,
     ListItemIcon,
     ListItemText,
-    ListItemButton
+    ListItemButton,
+    Collapse,
+    Fade
 } from '@mui/material'
 import { StreamPicker } from './ui/StreamPicker'
 import { closeSnackbar, useSnackbar } from 'notistack'
@@ -460,23 +462,30 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         gap: 1
                     }}
                 >
-                    <Tooltip title={t('preview')} arrow placement="top" enterDelay={500}>
-                        <IconButton
-                            sx={{
-                                color: theme.palette.text.secondary
-                            }}
-                            onClick={() => {
-                                setOpenPreview(!openPreview)
-                            }}
-                            disabled={draft.length === 0}
-                        >
-                            <ExpandCircleDownIcon
+                    <Tooltip
+                        arrow
+                        placement="top"
+                        title={openPreview ? t('closePreview') : t('openPreview')}
+                        enterDelay={500}
+                    >
+                        <Fade in={draft.length > 0}>
+                            <IconButton
                                 sx={{
-                                    fontSize: '80%',
-                                    transform: openPreview ? 'rotate(180deg)' : 'rotate(0deg)'
+                                    color: theme.palette.text.secondary
                                 }}
-                            />
-                        </IconButton>
+                                onClick={() => {
+                                    setOpenPreview(!openPreview)
+                                }}
+                            >
+                                <ExpandCircleDownIcon
+                                    sx={{
+                                        fontSize: '80%',
+                                        transform: openPreview ? 'rotate(0deg)' : 'rotate(180deg)',
+                                        transition: 'transform 0.2s ease-in-out'
+                                    }}
+                                />
+                            </IconButton>
+                        </Fade>
                     </Tooltip>
 
                     <Box>
@@ -513,33 +522,31 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     </Box>
                 </Box>
             </Box>
-            {openPreview && draft.length > 0 && (
-                <>
-                    <Divider
-                        sx={{
-                            my: 1
-                        }}
-                    >
-                        Preview
-                    </Divider>
-                    <MessageView
-                        message={{
-                            id: '0',
-                            schema: Schemas.simpleNote,
-                            author: client.user!,
-                            cdate: new Date(),
-                            streams: destStreams,
-                            body: draft,
-                            emojis: emojiDict,
-                            favorites: [],
-                            reactions: [],
-                            replies: [],
-                            reroutes: []
-                        }}
-                        userCCID={client.ccid}
-                    />
-                </>
-            )}
+            <Collapse unmountOnExit in={openPreview && draft.length > 0}>
+                <Divider
+                    sx={{
+                        my: 1
+                    }}
+                >
+                    Preview
+                </Divider>
+                <MessageView
+                    message={{
+                        id: '0',
+                        schema: Schemas.simpleNote,
+                        author: client.user!,
+                        cdate: new Date(),
+                        streams: destStreams,
+                        body: draft,
+                        emojis: emojiDict,
+                        favorites: [],
+                        reactions: [],
+                        replies: [],
+                        reroutes: []
+                    }}
+                    userCCID={client.ccid}
+                />
+            </Collapse>
         </Box>
     )
 })
