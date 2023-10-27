@@ -177,7 +177,7 @@ export const APUserCard = (props: { url: string; remove?: (_: string) => void })
                     flex: 1
                 }}
             >
-                <Typography variant="h3">{person.name}</Typography>
+                <Typography variant="h3">{person.name || person.preferredUsername}</Typography>
                 <Link underline="hover" href={props.url} target="_blank" rel="noopener noreferrer">
                     @{person.preferredUsername}@{host}
                 </Link>
