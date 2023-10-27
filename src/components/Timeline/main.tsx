@@ -171,14 +171,23 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                     )}
                 </Box>
             </Box>
-            <Box ref={scrollParentRef} display="flex" flex={1}>
+            <Box
+                ref={scrollParentRef}
+                sx={{
+                    display: 'flex',
+                    flex: 1,
+                    overscrollBehaviorY: 'none',
+                    overflow: 'hidden'
+                }}
+            >
                 <VList
                     style={{
                         flex: 1,
                         display: 'flex',
                         flexDirection: 'column',
                         listStyle: 'none',
-                        overscrollBehaviorY: 'none'
+                        overflowX: 'hidden',
+                        overflowY: 'auto'
                     }}
                     onScroll={(top) => {
                         positionRef.current = top
@@ -209,7 +218,8 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                             case 'association':
                                 element = (
                                     <AssociationFrame
-                                        association={e}
+                                        associationID={e.objectID}
+                                        associationOwner={e.owner}
                                         lastUpdated={e.lastUpdate?.getTime() ?? 0}
                                         after={divider}
                                         perspective={props.perspective}
