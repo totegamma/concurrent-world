@@ -1,6 +1,5 @@
 import { memo, useEffect, useState } from 'react'
 import {
-    type CoreStreamItem,
     Schemas,
     type A_Unknown,
     type A_Reroute,
@@ -17,9 +16,11 @@ import { CCAvatar } from '../ui/CCAvatar'
 import { MessageSkeleton } from '../MessageSkeleton'
 import { MessageContainer } from '../Message/MessageContainer'
 import { TimeDiff } from '../ui/TimeDiff'
+import { usePreference } from '../../context/PreferenceContext'
 
 export interface AssociationFrameProp {
-    association: CoreStreamItem
+    associationID: string
+    associationOwner: string
     lastUpdated: number
     after: JSX.Element | undefined
     perspective?: string
@@ -27,6 +28,7 @@ export interface AssociationFrameProp {
 
 export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFrameProp): JSX.Element | null => {
     const client = useApi()
+    const pref = usePreference()
     const [association, setAssociation] = useState<
         A_Favorite | A_Reaction | A_Reply | A_Reroute | A_Unknown | null | undefined
     >(null)
@@ -43,7 +45,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
 
     useEffect(() => {
         client
-            .getAssociation(props.association.objectID, props.association.author)
+            .getAssociation(props.associationID, props.associationOwner)
             .then((a) => {
                 setAssociation(a)
             })
@@ -53,10 +55,21 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
             .finally(() => {
                 setFetching(false)
             })
-    }, [props.association, props.lastUpdated])
+    }, [props.associationID, props.associationOwner, props.lastUpdated])
 
     if (fetching) return <MessageSkeleton />
-    if (!association) return null
+    if (!association) {
+        if (pref.devMode) {
+            return (
+                <>
+                    <Typography>Association not found</Typography>
+                    {props.associationID}@{props.associationOwner}
+                    {props.after}
+                </>
+            )
+        }
+        return null
+    }
 
     switch (association.schema) {
         case Schemas.like:
@@ -150,7 +163,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                 mt: { xs: '3px', sm: '5px' }
                             }}
                             component={RouterLink}
-                            to={'/entity/' + (association.author.ccid ?? '')}
+                            to={'/entity/' + (actionUser?.ccid ?? '')}
                         >
                             <CCAvatar
                                 avatarURL={actionUser?.profile?.avatar}
