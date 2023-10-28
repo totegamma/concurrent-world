@@ -128,6 +128,40 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
 
     const count = timeline.current?.body.length ?? 0
 
+    if (timeline.current === null) {
+        return (
+            <Box
+                sx={{
+                    height: '100%',
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}
+            >
+                <Loading key={0} message="Loading..." color={theme.palette.text.primary} />
+            </Box>
+        )
+    }
+
+    if (count === 0) {
+        return (
+            <Box
+                sx={{
+                    height: '100%',
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}
+            >
+                <Typography variant="h6" color="text.secondary">
+                    No posts
+                </Typography>
+            </Box>
+        )
+    }
+
     return (
         <InspectorProvider>
             <Box
@@ -176,7 +210,6 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                 sx={{
                     display: 'flex',
                     flex: 1,
-                    overscrollBehaviorY: 'none',
                     overflow: 'hidden'
                 }}
             >
@@ -187,7 +220,8 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                         flexDirection: 'column',
                         listStyle: 'none',
                         overflowX: 'hidden',
-                        overflowY: 'auto'
+                        overflowY: 'auto',
+                        overscrollBehaviorY: 'none'
                     }}
                     onScroll={(top) => {
                         positionRef.current = top
