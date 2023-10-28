@@ -29,61 +29,82 @@ export function AccountImport(): JSX.Element {
         setTheme(createConcurrentTheme(newThemeName))
     }
 
-    const [mnemonic, setMnemonic] = useState<string>('')
     const [secret, setSecret] = useState<string>('')
+    const [mnemonic, setMnemonic] = useState<string>('')
     const [server, setServer] = useState<string>('')
     const [host, setHost] = useState<CoreDomain>()
     const [entityFound, setEntityFound] = useState<boolean>(false)
     const [client, initializeClient] = useState<Client>()
     const [errorMessage, setErrorMessage] = useState<string>('')
+    const [suggestFailed, setSuggestFailed] = useState<boolean>(false)
 
     const [privatekey, setPrivatekey] = useState<string>('')
 
     useEffect(() => {
-        let privatekey = ''
-        let ccid = ''
-        setServer('')
-        setErrorMessage('')
-        setEntityFound(false)
-        if (mnemonic === '') {
-            if (!IsValid256k1PrivateKey(secret)) {
-                setErrorMessage('秘密鍵の要件を満たしていません。秘密鍵でないか入力に誤りがあります。')
-                return
-            }
-            const key = LoadKey(secret)
-            console.log(key)
-            if (!key) return
-            privatekey = key.privatekey
-            ccid = CommputeCCID(key.publickey)
-        } else {
-            try {
-                const wallet = HDNodeWallet.fromPhrase(mnemonic.trim(), undefined, undefined, LangJa.wordlist()) // TODO: move to utils
-                privatekey = wallet.privateKey.slice(2)
-                ccid = 'CC' + wallet.address.slice(2)
-            } catch (e) {
-                console.log(e)
-                setErrorMessage('シークレットコードが正しくありません。')
-                return
-            }
-        }
+        if (!privatekey) return
+        const key = LoadKey(privatekey)
+        if (!key) return
+        const ccid = CommputeCCID(key.publickey)
 
-        setPrivatekey(privatekey)
-
-        try {
-            const hubClient = new Client(privatekey, 'hub.concurrent.world', 'stab-client')
-            hubClient.api.readEntity(ccid).then((entity) => {
+        setErrorMessage('検索中...')
+        const hubClient = new Client(privatekey, 'hub.concurrent.world', 'stab-client')
+        hubClient.api
+            .readEntity(ccid)
+            .then((entity) => {
                 console.log(entity)
                 if (entity && entity.ccid === ccid) {
                     setServer(entity.domain || 'hub.concurrent.world')
                     setEntityFound(true)
                 } else {
                     setErrorMessage('お住まいのサーバーが見つかりませんでした。手動入力することで継続できます。')
+                    setSuggestFailed(true)
                 }
             })
+            .catch((e) => {
+                console.log(e)
+                setErrorMessage('お住まいのサーバーが見つかりませんでした。手動入力することで継続できます。')
+                setSuggestFailed(true)
+            })
+    }, [privatekey])
+
+    useEffect(() => {
+        setServer('')
+        setErrorMessage('')
+        setEntityFound(false)
+        if (secret.length === 0) return
+
+        // try to parse as private key
+        if (IsValid256k1PrivateKey(secret)) {
+            const key = LoadKey(secret)
+            if (!key) return
+            setPrivatekey(key.privatekey)
+            return
+        }
+
+        const normalized = secret.trim().normalize().replaceAll('　', ' ')
+        const split = normalized.split(' ')
+        console.log(split)
+        if (split.length !== 12) return
+
+        // try to parse as mnemonic
+        try {
+            if (normalized[0].match(/[a-z]/)) {
+                console.log('english')
+                const wallet = HDNodeWallet.fromPhrase(normalized)
+                setMnemonic(normalized)
+                setPrivatekey(wallet.privateKey.slice(2))
+            } else {
+                console.log('japanese')
+                const wallet = HDNodeWallet.fromPhrase(normalized, undefined, undefined, LangJa.wordlist())
+                setMnemonic(normalized)
+                setPrivatekey(wallet.privateKey.slice(2))
+            }
         } catch (e) {
             console.log(e)
         }
-    }, [mnemonic, secret])
+
+        setErrorMessage('シークレットコードが正しくありません。')
+    }, [secret])
 
     useEffect(() => {
         let unmounted = false
@@ -182,34 +203,28 @@ export function AccountImport(): JSX.Element {
                         gap: '20px'
                     }}
                 >
-                    <Typography variant="h3">シークレットコードから</Typography>
+                    <Typography variant="h3">シークレットコードまたは秘密鍵を入力</Typography>
                     <TextField
                         placeholder="12個の単語からなる呪文"
-                        value={mnemonic}
-                        onChange={(e) => {
-                            setMnemonic(e.target.value)
-                        }}
-                    />
-                    <Box>
-                        <Divider>または</Divider>
-                    </Box>
-                    <Typography variant="h3">秘密鍵を直接入力</Typography>
-                    <TextField
-                        placeholder="0x..."
                         value={secret}
                         onChange={(e) => {
                             setSecret(e.target.value)
                         }}
+                        disabled={!!privatekey}
                     />
-                    <Divider sx={{ my: '30px' }} />
-                    <Typography variant="h3">ドメイン</Typography>
-                    <TextField
-                        placeholder="https://example.tld/"
-                        value={server}
-                        onChange={(e) => {
-                            setServer(e.target.value)
-                        }}
-                    />
+                    {suggestFailed && (
+                        <>
+                            <Divider sx={{ my: '30px' }} />
+                            <Typography variant="h3">ドメイン</Typography>
+                            <TextField
+                                placeholder="https://example.tld/"
+                                value={server}
+                                onChange={(e) => {
+                                    setServer(e.target.value)
+                                }}
+                            />
+                        </>
+                    )}
                     {errorMessage}
                     <Button disabled={!entityFound} variant="contained" onClick={accountImport}>
                         インポート
