@@ -25,8 +25,10 @@ import { VerifyCode } from '../components/Registration/VerifyCode'
 import { ChooseDomain } from '../components/Registration/ChooseDomain'
 import { CreateProfile } from '../components/Registration/CreateProfile'
 import { RegistrationReady } from '../components/Registration/LetsGo'
+import { useTranslation } from 'react-i18next'
 
 export function Registration(): JSX.Element {
+    const { i18n } = useTranslation('', { keyPrefix: 'registration' })
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue')
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
     const [activeStep, setActiveStep] = useState(0)
@@ -34,6 +36,7 @@ export function Registration(): JSX.Element {
     const [host, setHost] = useState<CoreDomain | null | undefined>()
     const [identity] = useState<Identity>(generateIdentity())
     const [profile, setProfile] = useState<Profile | null>(null)
+    const [mnemonicLanguage, setMnemonicLanguage] = useState<'ja' | 'en'>(i18n.language === 'ja' ? 'ja' : 'en')
 
     const themes: string[] = Object.keys(Themes)
     const randomTheme = (): void => {
@@ -58,7 +61,10 @@ export function Registration(): JSX.Element {
         if (!host) return
         localStorage.setItem('Domain', JSON.stringify(host.fqdn))
         localStorage.setItem('PrivateKey', JSON.stringify(identity.privateKey))
-        localStorage.setItem('Mnemonic', JSON.stringify(identity.mnemonic))
+        localStorage.setItem(
+            'Mnemonic',
+            JSON.stringify(mnemonicLanguage === 'ja' ? identity.mnemonic_ja : identity.mnemonic_en)
+        )
 
         console.log('hostAddr', host.ccid)
 
@@ -131,6 +137,8 @@ export function Registration(): JSX.Element {
                     next={() => {
                         setActiveStep(3)
                     }}
+                    mnemonicLanguage={mnemonicLanguage}
+                    setMnemonicLanguage={setMnemonicLanguage}
                 />
             )
         },

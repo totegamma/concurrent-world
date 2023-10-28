@@ -59,7 +59,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
 
     if (fetching) return <MessageSkeleton />
     if (!association) {
-        if (pref.devMode) {
+        if (pref?.devMode) {
             return (
                 <>
                     <Typography>Association not found</Typography>

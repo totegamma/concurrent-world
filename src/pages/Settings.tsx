@@ -33,7 +33,8 @@ export function Settings(): JSX.Element {
                         variant="h2"
                         underline="hover"
                         color="inherit"
-                        href={path.pathname}
+                        to={path.pathname}
+                        component={RouterLink}
                         sx={{
                             textTransform: 'capitalize',
                             color: 'text.primary'

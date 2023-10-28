@@ -4,7 +4,8 @@ import { LangJa } from './utils/lang-ja'
 import { useTranslation } from 'react-i18next'
 
 export interface Identity {
-    mnemonic: string
+    mnemonic_ja: string
+    mnemonic_en: string
     privateKey: string
     publicKey: string
     CCID: string
@@ -12,14 +13,16 @@ export interface Identity {
 
 export const generateIdentity = (): Identity => {
     const entrophy = randomBytes(16)
-    const mnemonic = Mnemonic.fromEntropy(entrophy, null, LangJa.wordlist())
-    const wallet = HDNodeWallet.fromPhrase(mnemonic.phrase, undefined, undefined, LangJa.wordlist())
+    const mnemonicJa = Mnemonic.fromEntropy(entrophy, null, LangJa.wordlist())
+    const mnemonicEn = Mnemonic.fromEntropy(entrophy, null)
+    const wallet = HDNodeWallet.fromPhrase(mnemonicEn.phrase)
     const CCID = 'CC' + wallet.address.slice(2)
     const privateKey = wallet.privateKey.slice(2)
     const publicKey = wallet.publicKey.slice(2)
 
     return {
-        mnemonic: mnemonic.phrase,
+        mnemonic_ja: mnemonicJa.phrase,
+        mnemonic_en: mnemonicEn.phrase,
         privateKey,
         publicKey,
         CCID

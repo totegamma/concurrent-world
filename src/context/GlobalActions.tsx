@@ -227,7 +227,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                     streamPickerInitial={targetMessage.streams}
                                     streamPickerOptions={mode === 'reroute' ? allKnownStreams : targetMessage.streams}
                                     onSubmit={async (text, streams, emojis): Promise<Error | null> => {
-                                        if (mode === 'reroute')
+                                        if (mode === 'reroute') {
                                             await client.reroute(
                                                 targetMessage.id,
                                                 targetMessage.author.ccid,
@@ -235,7 +235,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                 text,
                                                 emojis
                                             )
-                                        else
+                                        } else if (mode === 'reply') {
                                             await client.reply(
                                                 targetMessage.id,
                                                 targetMessage.author.ccid,
@@ -243,6 +243,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                 text,
                                                 emojis
                                             )
+                                        }
                                         setMode('none')
                                         return null
                                     }}

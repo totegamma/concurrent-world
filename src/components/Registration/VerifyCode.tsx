@@ -5,6 +5,8 @@ import { type Identity } from '../../util'
 export function VerifyCode(props: { next: () => void; identity: Identity }): JSX.Element {
     const [mnemonicTest, setMnemonicTest] = useState<string>('')
 
+    const match = props.identity.mnemonic_ja === mnemonicTest || props.identity.mnemonic_en === mnemonicTest
+
     return (
         <Box
             sx={{
@@ -24,10 +26,10 @@ export function VerifyCode(props: { next: () => void; identity: Identity }): JSX
                     width: '100%'
                 }}
             />
-            {props.identity.mnemonic === mnemonicTest ? '一致しています' : '一致していません'}
+            {match ? '一致しています' : '一致していません'}
             <Button
                 variant="contained"
-                disabled={props.identity.mnemonic !== mnemonicTest}
+                disabled={!match}
                 onClick={(): void => {
                     props.next()
                 }}

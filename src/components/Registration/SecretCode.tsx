@@ -1,8 +1,15 @@
-import { Box, Button, Grid, Paper, Typography } from '@mui/material'
+import { Box, Button, ButtonGroup, Grid, Paper, Typography } from '@mui/material'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import { type Identity } from '../../util'
 
-export function SecretCode(props: { next: () => void; identity: Identity }): JSX.Element {
+export function SecretCode(props: {
+    next: () => void
+    identity: Identity
+    mnemonicLanguage: string
+    setMnemonicLanguage: (value: 'ja' | 'en') => void
+}): JSX.Element {
+    const mnemonic = props.mnemonicLanguage === 'ja' ? props.identity.mnemonic_ja : props.identity.mnemonic_en
+
     return (
         <Box
             sx={{
@@ -12,6 +19,26 @@ export function SecretCode(props: { next: () => void; identity: Identity }): JSX
                 alignItems: 'center'
             }}
         >
+            <Box display="flex" flexDirection="row" justifyContent="flex-end" width="100%">
+                <ButtonGroup variant="outlined" aria-label="outlined button group">
+                    <Button
+                        variant={props.mnemonicLanguage === 'ja' ? 'contained' : 'outlined'}
+                        onClick={() => {
+                            props.setMnemonicLanguage('ja')
+                        }}
+                    >
+                        ja
+                    </Button>
+                    <Button
+                        variant={props.mnemonicLanguage === 'en' ? 'contained' : 'outlined'}
+                        onClick={() => {
+                            props.setMnemonicLanguage('en')
+                        }}
+                    >
+                        en
+                    </Button>
+                </ButtonGroup>
+            </Box>
             <Paper
                 variant="outlined"
                 component={Grid}
@@ -23,7 +50,7 @@ export function SecretCode(props: { next: () => void; identity: Identity }): JSX
                 columns={4}
                 container
             >
-                {props.identity.mnemonic.split('　').map((e, i) => (
+                {mnemonic.split(' ').map((e, i) => (
                     <Grid
                         key={i}
                         item
@@ -50,7 +77,7 @@ export function SecretCode(props: { next: () => void; identity: Identity }): JSX
             <Button
                 variant="contained"
                 onClick={() => {
-                    navigator.clipboard.writeText(props.identity.mnemonic)
+                    navigator.clipboard.writeText(mnemonic)
                 }}
                 startIcon={<ContentPasteIcon />}
             >
