@@ -161,7 +161,7 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
     }
 
     if (!message) {
-        if (pref.devMode) {
+        if (pref?.devMode) {
             return (
                 <>
                     <Typography>Message not found</Typography>
