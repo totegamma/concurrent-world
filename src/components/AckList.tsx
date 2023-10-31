@@ -2,8 +2,9 @@ import { type User } from '@concurrent-world/client'
 import { useEffect, useState } from 'react'
 import { useApi } from '../context/api'
 import { type UserAckCollection } from '@concurrent-world/client/dist/types/schemas/userAckCollection'
-import { Box, Tab, Tabs, Typography } from '@mui/material'
+import { Box, Link, Tab, Tabs } from '@mui/material'
 import { CCAvatar } from './ui/CCAvatar'
+import { Link as RouterLink } from 'react-router-dom'
 
 export interface AckListProps {
     initmode?: 'acking' | 'acker'
@@ -45,20 +46,40 @@ export const AckList = (props: AckListProps): JSX.Element => {
                 <Tab value="acking" label="追加済み" />
                 <Tab value="acker" label="ファンリスト" />
             </Tabs>
-            {(mode === 'acking' ? ackUsers : ackedUsers).map((user) => (
+            <Box
+                sx={{
+                    display: 'flex',
+                    overflowX: 'hidden',
+                    overflowY: 'auto',
+                    flex: 1
+                }}
+            >
                 <Box
-                    key={user.ccid}
                     sx={{
                         display: 'flex',
-                        width: '100%',
-                        alignItems: 'center',
+                        flexDirection: 'column',
                         gap: 1
                     }}
                 >
-                    <CCAvatar avatarURL={user.profile?.avatar} identiconSource={user.ccid} />
-                    <Typography>{user.profile?.username}</Typography>
+                    {(mode === 'acking' ? ackUsers : ackedUsers).map((user) => (
+                        <Box
+                            key={user.ccid}
+                            sx={{
+                                display: 'flex',
+                                width: '100%',
+                                alignItems: 'center',
+                                gap: 1,
+                                textDecoration: 'none'
+                            }}
+                            component={RouterLink}
+                            to={`/entity/${user.ccid}`}
+                        >
+                            <CCAvatar avatarURL={user.profile?.avatar} identiconSource={user.ccid} />
+                            <Link underline="hover">{user.profile?.username}</Link>
+                        </Box>
+                    ))}
                 </Box>
-            ))}
+            </Box>
         </>
     )
 }
