@@ -51,23 +51,6 @@ export function RegistrationWelcome(props: { next: () => void; identity: Identit
                     IDカードを作成する
                 </Button>
             </Box>
-
-            <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    gap: '10px',
-                    alignItems: 'center',
-                    position: 'absolute',
-                    right: '10px',
-                    bottom: '10px'
-                }}
-            >
-                <Typography>もうアカウントを持っている？</Typography>
-                <Button variant="contained" component={RouterLink} to="/import">
-                    アカウントのインポート
-                </Button>
-            </Box>
         </>
     )
 }

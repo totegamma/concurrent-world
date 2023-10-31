@@ -17,7 +17,10 @@ export function ContactsPage(): JSX.Element {
         >
             <Box
                 sx={{
-                    padding: '20px 20px 0 20px'
+                    padding: '20px 20px 0 20px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    overflow: 'hidden'
                 }}
             >
                 <Typography variant="h2" gutterBottom>

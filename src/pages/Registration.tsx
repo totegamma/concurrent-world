@@ -26,6 +26,7 @@ import { ChooseDomain } from '../components/Registration/ChooseDomain'
 import { CreateProfile } from '../components/Registration/CreateProfile'
 import { RegistrationReady } from '../components/Registration/LetsGo'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 
 export function Registration(): JSX.Element {
     const { i18n } = useTranslation('', { keyPrefix: 'registration' })
@@ -311,6 +312,22 @@ export function Registration(): JSX.Element {
                             }}
                         ></Box>
                     </Paper>
+                    {activeStep === 0 && (
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                justifyContent: 'flex-end',
+                                gap: '10px',
+                                alignItems: 'center'
+                            }}
+                        >
+                            <Typography color="background.contrastText">もうアカウントを持っている？</Typography>
+                            <Button variant="contained" component={Link} to="/import">
+                                アカウントのインポート
+                            </Button>
+                        </Box>
+                    )}
                 </Box>
             </ApiProvider>
         </ThemeProvider>

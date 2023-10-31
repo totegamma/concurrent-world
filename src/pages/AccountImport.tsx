@@ -229,22 +229,21 @@ export function AccountImport(): JSX.Element {
                     <Button disabled={!entityFound} variant="contained" onClick={accountImport}>
                         インポート
                     </Button>
-                    <Box sx={{ flexGrow: 1 }} />
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            justifyContent: 'flex-end',
-                            gap: '10px',
-                            alignItems: 'center'
-                        }}
-                    >
-                        <Typography>まだアカウントを作ってない？</Typography>
-                        <Button variant="contained" component={Link} to="/register">
-                            アカウントを作成
-                        </Button>
-                    </Box>
                 </Paper>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'flex-end',
+                        gap: '10px',
+                        alignItems: 'center'
+                    }}
+                >
+                    <Typography color="background.contrastText">まだアカウントを作ってない？</Typography>
+                    <Button variant="contained" component={Link} to="/register">
+                        アカウントを作成
+                    </Button>
+                </Box>
             </Box>
         </ThemeProvider>
     )
