@@ -322,9 +322,7 @@ export function Registration(): JSX.Element {
                                 alignItems: 'center'
                             }}
                         >
-                            <Typography color={theme.palette.background.contrastText}>
-                                もうアカウントを持っている？
-                            </Typography>
+                            <Typography color="background.contrastText">もうアカウントを持っている？</Typography>
                             <Button variant="contained" component={Link} to="/import">
                                 アカウントのインポート
                             </Button>

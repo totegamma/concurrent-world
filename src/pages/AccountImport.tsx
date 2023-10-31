@@ -239,7 +239,7 @@ export function AccountImport(): JSX.Element {
                         alignItems: 'center'
                     }}
                 >
-                    <Typography color={theme.palette.background.contrastText}>まだアカウントを作ってない？</Typography>
+                    <Typography color="background.contrastText">まだアカウントを作ってない？</Typography>
                     <Button variant="contained" component={Link} to="/register">
                         アカウントを作成
                     </Button>
