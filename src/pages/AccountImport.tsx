@@ -13,9 +13,12 @@ import type { ConcurrentTheme } from '../model'
 import { usePersistent } from '../hooks/usePersistent'
 import { Themes, createConcurrentTheme } from '../themes'
 import { ThemeProvider } from '@emotion/react'
-import { CssBaseline, darken } from '@mui/material'
+import { CssBaseline, IconButton, InputAdornment, darken } from '@mui/material'
 import { ConcurrentWordmark } from '../components/theming/ConcurrentWordmark'
 import { IsValid256k1PrivateKey } from '@concurrent-world/client'
+import Visibility from '@mui/icons-material/Visibility'
+import VisibilityOff from '@mui/icons-material/VisibilityOff'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 
 export function AccountImport(): JSX.Element {
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue2')
@@ -37,14 +40,17 @@ export function AccountImport(): JSX.Element {
     const [client, initializeClient] = useState<Client>()
     const [errorMessage, setErrorMessage] = useState<string>('')
     const [suggestFailed, setSuggestFailed] = useState<boolean>(false)
+    const [showSecret, setShowSecret] = useState<boolean>(false)
 
     const [privatekey, setPrivatekey] = useState<string>('')
+    const [ccid, setCcid] = useState<string>('')
 
     useEffect(() => {
         if (!privatekey) return
         const key = LoadKey(privatekey)
         if (!key) return
         const ccid = CommputeCCID(key.publickey)
+        setCcid(ccid)
 
         setErrorMessage('検索中...')
         const hubClient = new Client(privatekey, 'hub.concurrent.world', 'stab-client')
@@ -205,13 +211,35 @@ export function AccountImport(): JSX.Element {
                 >
                     <Typography variant="h3">シークレットコードまたは秘密鍵を入力</Typography>
                     <TextField
+                        type={showSecret ? 'text' : 'password'}
                         placeholder="12個の単語からなる呪文"
                         value={secret}
                         onChange={(e) => {
                             setSecret(e.target.value)
                         }}
                         disabled={!!privatekey}
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        onClick={() => {
+                                            setShowSecret(!showSecret)
+                                        }}
+                                        color="primary"
+                                    >
+                                        {privatekey ? (
+                                            <CheckCircleIcon />
+                                        ) : showSecret ? (
+                                            <VisibilityOff />
+                                        ) : (
+                                            <Visibility />
+                                        )}
+                                    </IconButton>
+                                </InputAdornment>
+                            )
+                        }}
                     />
+                    {ccid && <Typography sx={{ wordBreak: 'break-all' }}>ようこそ: {ccid}</Typography>}
                     {suggestFailed && (
                         <>
                             <Divider sx={{ my: '30px' }} />
