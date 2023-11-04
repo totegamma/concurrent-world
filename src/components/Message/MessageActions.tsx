@@ -7,7 +7,7 @@ import AddReactionIcon from '@mui/icons-material/AddReaction'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import RepeatIcon from '@mui/icons-material/Repeat'
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown'
-import { type M_Reply, type M_Current, type M_Reroute } from '@concurrent-world/client'
+import { Message, ReplyMessageSchema, RerouteMessageSchema, Schemas, SimpleNoteSchema} from '@concurrent-world/client'
 import { useState } from 'react'
 import Collapse from '@mui/material/Collapse'
 import Fade from '@mui/material/Fade'
@@ -21,7 +21,7 @@ import { Link as RouterLink } from 'react-router-dom'
 import { IconButtonWithNumber } from '../ui/IconButtonWithNumber'
 
 export interface MessageActionsProps {
-    message: M_Current | M_Reply | M_Reroute
+    message: Message<SimpleNoteSchema | ReplyMessageSchema | RerouteMessageSchema>
     userCCID: string
 }
 
@@ -30,11 +30,11 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
     const service = useMessageService()
 
-    const favorited = props.message.favorites.find((fav) => fav.author.ccid === props.userCCID)
+    const favorited = false//props.message.favorites.find((fav) => fav.author.ccid === props.userCCID)
 
-    const replyCount = props.message.replies.length
-    const likeCount = props.message.favorites.length
-    const rerouteCount = props.message.reroutes.length
+    const replyCount = props.message.reactionCounts?.[Schemas.replyAssociation] ?? 0
+    const likeCount = props.message.reactionCounts?.[Schemas.like] ?? 0
+    const rerouteCount = props.message.reactionCounts?.[Schemas.rerouteAssociation] ?? 0
 
     const emojiPicker = useEmojiPicker()
 

@@ -1,13 +1,12 @@
 import { memo, useEffect, useState } from 'react'
 import {
+    Association,
+    EmojiAssociationSchema,
+    LikeSchema,
+    ReplyAssociationSchema,
+    RerouteAssociationSchema,
     Schemas,
-    type A_Unknown,
-    type A_Reroute,
-    type A_Reply,
-    type A_Reaction,
-    type A_Favorite,
-    type User,
-    type M_Current
+    User,
 } from '@concurrent-world/client'
 import { useApi } from '../../context/api'
 import { Box, IconButton, Link, ListItem, Typography } from '@mui/material'
@@ -29,15 +28,13 @@ export interface AssociationFrameProp {
 export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFrameProp): JSX.Element | null => {
     const client = useApi()
     const pref = usePreference()
-    const [association, setAssociation] = useState<
-        A_Favorite | A_Reaction | A_Reply | A_Reroute | A_Unknown | null | undefined
-    >(null)
+    const [association, setAssociation] = useState<Association<LikeSchema | EmojiAssociationSchema | ReplyAssociationSchema | RerouteAssociationSchema> | null>(null)
     const [fetching, setFetching] = useState<boolean>(true)
 
     const perspective = props.perspective ?? client.ccid
-    const isMeToOther = association?.author.ccid !== perspective
+    const isMeToOther = association?.authorUser?.ccid !== perspective
 
-    const Nominative = perspective === client.ccid ? 'You' : association?.author.profile?.username ?? 'anonymous'
+    const Nominative = perspective === client.ccid ? 'You' : association?.authorUser?.profile?.username ?? 'anonymous'
     const Possessive =
         perspective === client.ccid ? 'your' : (association?.target.author.profile?.username ?? 'anonymous') + "'s"
 

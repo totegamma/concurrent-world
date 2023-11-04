@@ -31,7 +31,7 @@ import { ConcurrentLogo } from './components/theming/ConcurrentLogo'
 import { usePreference } from './context/PreferenceContext'
 import TickerProvider from './context/Ticker'
 import { ContactsPage } from './pages/Contacts'
-import { type CoreAssociation, Schemas, type Subscription } from '@concurrent-world/client'
+import { type CoreAssociation, Schemas, type Subscription, ProfileSchema } from '@concurrent-world/client'
 
 export const ApplicationContext = createContext<appData>({
     displayingStream: [],
@@ -54,7 +54,7 @@ function App(): JSX.Element {
     const [acklist, setAcklist] = useState<Array<CollectionItem<UserAckCollection>>>([])
     const updateAcklist = useCallback(() => {
         if (!client) return
-        const collectionID = client.user?.userstreams?.ackCollection
+        const collectionID = client.user?.userstreams?.payload.body.ackCollection
         if (!collectionID) return
         client.api.readCollection<UserAckCollection>(collectionID).then((ackCollection) => {
             if (!ackCollection) return
@@ -73,13 +73,13 @@ function App(): JSX.Element {
         client.newSubscription().then((sub) => {
             subscription.current = sub
             subscription.current.listen([
-                ...(client?.user?.userstreams?.notificationStream ? [client?.user?.userstreams.notificationStream] : [])
+                ...(client?.user?.userstreams?.payload.body.notificationStream ? [client?.user?.userstreams.payload.body.notificationStream] : [])
             ])
             sub.on('AssociationCreated', (event: StreamEvent) => {
                 const a = event.body as CoreAssociation<any>
                 if (!a) return
                 if (a.schema === Schemas.replyAssociation) {
-                    client?.api.readCharacter(a.author, Schemas.profile).then((c) => {
+                    client?.api.readCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                         playNotificationRef.current()
                         enqueueSnackbar(`${c?.payload.body.username ?? 'anonymous'} replied to your message.`)
                     })
@@ -87,7 +87,7 @@ function App(): JSX.Element {
                 }
 
                 if (a.schema === Schemas.rerouteAssociation) {
-                    client?.api.readCharacter(a.author, Schemas.profile).then((c) => {
+                    client?.api.readCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                         playNotificationRef.current()
                         enqueueSnackbar(`${c?.payload.body.username ?? 'anonymous'} rerouted to your message.`)
                     })
@@ -97,7 +97,7 @@ function App(): JSX.Element {
                 if (a.schema === Schemas.like) {
                     client?.api.readMessage(a.targetID).then((m) => {
                         m &&
-                            client.api.readCharacter(a.author, Schemas.profile).then((c) => {
+                            client.api.readCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                 playNotificationRef.current()
                                 enqueueSnackbar(
                                     `${c?.payload.body.username ?? 'anonymous'} favorited "${
@@ -113,7 +113,7 @@ function App(): JSX.Element {
                     client.api.readMessage(a.targetID).then((m) => {
                         console.log(m)
                         m &&
-                            client.api.readCharacter(a.author, Schemas.profile).then((c) => {
+                            client.api.readCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                 playNotificationRef.current()
                                 enqueueSnackbar(
                                     `${c?.payload.body.username ?? 'anonymous'} reacted to "${
@@ -142,12 +142,12 @@ function App(): JSX.Element {
                 return path.hash.replace('#', '').split(',')
             }
             case '/notifications': {
-                const notifications = client?.user?.userstreams?.notificationStream
+                const notifications = client?.user?.userstreams?.payload.body.notificationStream
                 if (!notifications) return []
                 return [notifications]
             }
             case '/associations': {
-                const associations = client?.user?.userstreams?.associationStream
+                const associations = client?.user?.userstreams?.payload.body.associationStream
                 if (!associations) return []
                 return [associations]
             }

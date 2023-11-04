@@ -2,7 +2,7 @@ import { Box, Paper, Modal, Typography, Divider, Button, Drawer, useTheme } from
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
-import { Schemas, type Message, type Stream } from '@concurrent-world/client'
+import { Schemas, type Message, type Stream, CommonstreamSchema, DomainProfileSchema } from '@concurrent-world/client'
 import { Draft } from '../components/Draft'
 import { useLocation } from 'react-router-dom'
 import { usePreference } from './PreferenceContext'
@@ -12,8 +12,8 @@ import { Menu } from '../components/Menu/Menu'
 
 export interface GlobalActionsState {
     openDraft: () => void
-    openReply: (target: Message) => void
-    openReroute: (target: Message) => void
+    openReply: (target: Message<any>) => void
+    openReroute: (target: Message<any>) => void
     openMobileMenu: (open?: boolean) => void
 }
 
@@ -39,10 +39,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const path = useLocation()
     const theme = useTheme()
     const [mode, setMode] = useState<'compose' | 'reply' | 'reroute' | 'none'>('none')
-    const [targetMessage, setTargetMessage] = useState<Message | null>(null)
+    const [targetMessage, setTargetMessage] = useState<Message<any> | null>(null)
 
-    const [queriedStreams, setQueriedStreams] = useState<Stream[]>([])
-    const [allKnownStreams, setAllKnownStreams] = useState<Stream[]>([])
+    const [queriedStreams, setQueriedStreams] = useState<Stream<CommonstreamSchema>[]>([])
+    const [allKnownStreams, setAllKnownStreams] = useState<Stream<CommonstreamSchema>[]>([])
     const [domainIsOffline, setDomainIsOffline] = useState<boolean>(false)
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
 
@@ -50,10 +50,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         client?.user !== null &&
         (client?.user.profile === undefined ||
             client?.user.userstreams === undefined ||
-            !client?.user.userstreams.homeStream ||
-            !client?.user.userstreams.notificationStream ||
-            !client?.user.userstreams.associationStream ||
-            !client?.user.userstreams.ackCollection)
+            !client?.user.userstreams.payload.body.homeStream ||
+            !client?.user.userstreams.payload.body.notificationStream ||
+            !client?.user.userstreams.payload.body.associationStream ||
+            !client?.user.userstreams.payload.body.ackCollection)
 
     useEffect(() => {
         const allStreams = Object.values(pref.lists)
@@ -61,7 +61,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
             .flat()
         const uniq = [...new Set(allStreams)]
         uniq.forEach((id) => {
-            client.getStream(id).then((stream) => {
+            client.getStream<CommonstreamSchema>(id).then((stream) => {
                 if (stream) {
                     setAllKnownStreams((prev) => [...prev, stream])
                 }
@@ -94,19 +94,19 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         }
 
         Promise.all(streamIDs.map((id) => client.getStream(id))).then((streams) => {
-            setQueriedStreams(streams.filter((e) => e !== null) as Stream[])
+            setQueriedStreams(streams.filter((e) => e !== null) as Stream<CommonstreamSchema>[])
         })
 
         setMode('compose')
     }, [path.pathname, path.hash, pref.lists])
 
-    const openReply = useCallback((target: Message) => {
+    const openReply = useCallback((target: Message<any>) => {
         setTargetMessage(target)
         setMode('reply')
     }, [])
 
     const openReroute = useCallback(
-        (target: Message) => {
+        (target: Message<any>) => {
             setTargetMessage(target)
             setMode('reroute')
         },
@@ -141,7 +141,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         const domain = await client.api.readDomain(client.api.host)
         if (!domain) throw new Error('Domain not found')
         try {
-            const domainProfile = await client.api.readCharacter(domain.ccid, Schemas.domainProfile)
+            const domainProfile = await client.api.readCharacter<DomainProfileSchema>(domain.ccid, Schemas.domainProfile)
             if (!domainProfile) throw new Error('Domain profile not found')
             if (domainProfile.payload.body.defaultBookmarkStreams)
                 localStorage.setItem(
@@ -217,7 +217,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     )}
                     {targetMessage && (mode === 'reply' || mode === 'reroute') && (
                         <Paper sx={style}>
-                            <MessageContainer messageID={targetMessage.id} messageOwner={targetMessage.author.ccid} />
+                            <MessageContainer messageID={targetMessage.id} messageOwner={targetMessage.author} />
                             <Divider />
                             <Box sx={{ display: 'flex' }}>
                                 <Draft
@@ -228,21 +228,9 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                     streamPickerOptions={mode === 'reroute' ? allKnownStreams : targetMessage.streams}
                                     onSubmit={async (text, streams, emojis): Promise<Error | null> => {
                                         if (mode === 'reroute') {
-                                            await client.reroute(
-                                                targetMessage.id,
-                                                targetMessage.author.ccid,
-                                                streams,
-                                                text,
-                                                emojis
-                                            )
+                                            targetMessage.reroute(streams, text, emojis)
                                         } else if (mode === 'reply') {
-                                            await client.reply(
-                                                targetMessage.id,
-                                                targetMessage.author.ccid,
-                                                streams,
-                                                text,
-                                                emojis
-                                            )
+                                            targetMessage.reply(streams, text, emojis)
                                         }
                                         setMode('none')
                                         return null
@@ -289,14 +277,14 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                         見つかった問題:
                         <ul>
                             {!client?.user?.profile && <li>プロフィールが存在していません</li>}
-                            {!client?.user?.userstreams?.homeStream && <li>ホームストリームが存在していません</li>}
-                            {!client?.user?.userstreams?.notificationStream && (
+                            {!client?.user?.userstreams?.payload.body.homeStream && <li>ホームストリームが存在していません</li>}
+                            {!client?.user?.userstreams?.payload.body.notificationStream && (
                                 <li>通知ストリームが存在していません</li>
                             )}
-                            {!client?.user?.userstreams?.associationStream && (
+                            {!client?.user?.userstreams?.payload.body.associationStream && (
                                 <li>アクティビティストリームが存在していません</li>
                             )}
-                            {!client?.user?.userstreams?.ackCollection && <li>Ackコレクションが存在していません</li>}
+                            {!client?.user?.userstreams?.payload.body.ackCollection && <li>Ackコレクションが存在していません</li>}
                         </ul>
                         <ProfileEditor
                             id={client?.user?.profile?.id}

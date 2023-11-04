@@ -1,16 +1,16 @@
 import { Box, IconButton, ListItem, Paper, Tooltip } from '@mui/material'
 import { Link as routerLink } from 'react-router-dom'
 import { CCAvatar } from '../ui/CCAvatar'
-import type { M_Current, M_Reply } from '@concurrent-world/client'
 import { SimpleNote } from './SimpleNote'
 import { MessageHeader } from './MessageHeader'
 import { MessageActions } from './MessageActions'
 import { MessageReactions } from './MessageReactions'
 import { MessageUrlPreview } from './MessageUrlPreview'
 import { UserProfileCard } from '../UserProfileCard'
+import { Message, ReplyMessageSchema, SimpleNoteSchema } from '@concurrent-world/client'
 
 export interface MessageViewProps {
-    message: M_Current | M_Reply
+    message: Message<SimpleNoteSchema | ReplyMessageSchema>
     userCCID: string
     beforeMessage?: JSX.Element
     lastUpdated?: number
@@ -48,7 +48,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                                 }
                             }
                         }}
-                        title={<UserProfileCard user={props.message.author} />}
+                        title={<UserProfileCard user={props.message.authorUser} />}
                     >
                         <IconButton
                             sx={{
@@ -57,15 +57,15 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                                 mt: { xs: '3px', sm: '5px' }
                             }}
                             component={routerLink}
-                            to={props.message.profileOverride?.link ?? '/entity/' + props.message.author.ccid}
-                            target={props.message.profileOverride?.link ? '_blank' : undefined}
-                            rel={props.message.profileOverride?.link ? 'noopener noreferrer' : undefined}
+                            to={props.message.payload.body.profileOverride?.link ?? '/entity/' + props.message.author}
+                            target={props.message.payload.body.profileOverride?.link ? '_blank' : undefined}
+                            rel={props.message.payload.body.profileOverride?.link ? 'noopener noreferrer' : undefined}
                         >
                             <CCAvatar
-                                alt={props.message.author.profile?.username}
-                                avatarURL={props.message.author.profile?.avatar}
-                                avatarOverride={props.message.profileOverride?.avatar}
-                                identiconSource={props.message.author.ccid}
+                                alt={props.message.authorUser?.profile?.payload.body.username}
+                                avatarURL={props.message.authorUser?.profile?.payload.body.avatar}
+                                avatarOverride={props.message.payload.body.profileOverride?.avatar}
+                                identiconSource={props.message.author}
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
                                     height: { xs: '38px', sm: '48px' }
@@ -85,9 +85,11 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                         <MessageHeader message={props.message} />
                         {props.beforeMessage}
                         <SimpleNote message={props.message} />
-                        <MessageUrlPreview messageBody={props.message.body} />
+                        <MessageUrlPreview messageBody={props.message.payload.body.body} />
                         <MessageReactions message={props.message} />
+                        {/*
                         <MessageActions message={props.message} userCCID={props.userCCID} />
+                        */}
                     </Box>
                 </>
             )}
