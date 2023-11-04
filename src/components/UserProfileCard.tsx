@@ -48,7 +48,7 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
                     label={`${props.user.ccid.slice(0, 9)}...`}
                     deleteIcon={<ContentPasteIcon />}
                     onDelete={() => {
-                        navigator.clipboard.writeText(props.user.ccid)
+                        navigator.clipboard.writeText(props.user?.ccid ?? '')
                         enqueueSnackbar('Copied', { variant: 'info' })
                     }}
                 />

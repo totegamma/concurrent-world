@@ -12,11 +12,11 @@ import { ConcurrentWordmark } from '../components/theming/ConcurrentWordmark'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import {
     Client,
-    type RawDomainProfile,
-    type Profile,
     Schemas,
     type CoreCharacter,
-    type CoreDomain
+    type CoreDomain,
+    ProfileSchema,
+    DomainProfileSchema
 } from '@concurrent-world/client'
 import { RegistrationWelcome } from '../components/Registration/Welcome'
 import { YourID } from '../components/Registration/YourID'
@@ -36,7 +36,7 @@ export function Registration(): JSX.Element {
     const [client, initializeClient] = useState<Client>()
     const [host, setHost] = useState<CoreDomain | null | undefined>()
     const [identity] = useState<Identity>(generateIdentity())
-    const [profile, setProfile] = useState<Profile | null>(null)
+    const [profile, setProfile] = useState<ProfileSchema | null>(null)
     const [mnemonicLanguage, setMnemonicLanguage] = useState<'ja' | 'en'>(i18n.language === 'ja' ? 'ja' : 'en')
 
     const themes: string[] = Object.keys(Themes)
@@ -70,8 +70,8 @@ export function Registration(): JSX.Element {
         console.log('hostAddr', host.ccid)
 
         client?.api
-            .readCharacter(host.ccid, Schemas.domainProfile)
-            .then((profile: CoreCharacter<RawDomainProfile> | null | undefined) => {
+            .readCharacter<DomainProfileSchema>(host.ccid, Schemas.domainProfile)
+            .then((profile: CoreCharacter<DomainProfileSchema> | null | undefined) => {
                 console.log('domainprofile:', profile)
                 const list = {
                     home: {

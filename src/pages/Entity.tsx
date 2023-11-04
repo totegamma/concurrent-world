@@ -45,7 +45,7 @@ export function EntityPage(): JSX.Element {
 
     useEffect(() => {
         if (!user) return
-        let collectionID = user.userstreams?.ackCollection
+        let collectionID = user.userstreams?.payload.body.ackCollection
         if (!collectionID) return
         if (!collectionID.includes('@') && user.domain) {
             // WORKAROUND
@@ -63,10 +63,10 @@ export function EntityPage(): JSX.Element {
         let target
         switch (tab) {
             case 0:
-                target = user?.userstreams?.homeStream
+                target = user?.userstreams?.payload.body.homeStream
                 break
             case 1:
-                target = user?.userstreams?.associationStream
+                target = user?.userstreams?.payload.body.associationStream
                 break
         }
         return target ? [target] : []
@@ -86,7 +86,7 @@ export function EntityPage(): JSX.Element {
             }}
         >
             <TimelineHeader
-                title={user.profile?.username || 'anonymous'}
+                title={user.profile?.payload.body.username || 'anonymous'}
                 titleIcon={<AlternateEmailIcon />}
                 onTitleClick={() => {
                     timelineRef.current?.scrollTo(0)
@@ -105,7 +105,7 @@ export function EntityPage(): JSX.Element {
                     <>
                         <Box /* profile */
                             sx={{
-                                backgroundImage: `url(${user.profile?.banner || Background})`,
+                                backgroundImage: `url(${user.profile?.payload.body.banner || Background})`,
                                 backgroundPosition: 'center',
                                 backgroundSize: 'cover',
                                 display: 'flex',
@@ -135,8 +135,8 @@ export function EntityPage(): JSX.Element {
                                         }}
                                     >
                                         <CCAvatar
-                                            alt={user.profile?.username}
-                                            avatarURL={user.profile?.avatar}
+                                            alt={user.profile?.payload.body.username}
+                                            avatarURL={user.profile?.payload.body.avatar}
                                             identiconSource={user.ccid}
                                             sx={{
                                                 width: { xs: '80px', sm: '60px', md: '80px' },
@@ -179,7 +179,7 @@ export function EntityPage(): JSX.Element {
                                                     <FollowButton
                                                         color={theme.palette.secondary.main}
                                                         userCCID={id!}
-                                                        userStreamID={user.userstreams?.homeStream ?? ''}
+                                                        userStreamID={user.userstreams?.payload.body.homeStream ?? ''}
                                                     />
                                                 </>
                                             ) : (
@@ -195,7 +195,7 @@ export function EntityPage(): JSX.Element {
                                             alignItems: 'center'
                                         }}
                                     >
-                                        <Typography>{user.profile?.description}</Typography>
+                                        <Typography>{user.profile?.payload.body.description}</Typography>
                                     </Box>
                                     <Box
                                         sx={{

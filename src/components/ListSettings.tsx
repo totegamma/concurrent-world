@@ -2,7 +2,7 @@ import { Box, Button, IconButton, List, ListItem, Switch, Tab, Tabs, TextField, 
 import { StreamPicker } from './ui/StreamPicker'
 import { useEffect, useState } from 'react'
 import { usePreference } from '../context/PreferenceContext'
-import { type Stream } from '@concurrent-world/client'
+import { CommonstreamSchema, type Stream } from '@concurrent-world/client'
 import { useApi } from '../context/api'
 import { StreamLink, UserStreamLink } from './StreamList/StreamLink'
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove'
@@ -18,8 +18,8 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
 
     const list = pref.lists[props.id]
 
-    const [options, setOptions] = useState<Stream[]>([])
-    const [postStreams, setPostStreams] = useState<Stream[]>([])
+    const [options, setOptions] = useState<Stream<CommonstreamSchema>[]>([])
+    const [postStreams, setPostStreams] = useState<Stream<CommonstreamSchema>[]>([])
 
     const [tab, setTab] = useState<'stream' | 'user'>('stream')
 
@@ -34,11 +34,11 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
 
     useEffect(() => {
         Promise.all(list.streams.map((streamID) => client.getStream(streamID))).then((streams) => {
-            setOptions(streams.filter((e) => e !== null) as Stream[])
+            setOptions(streams.filter((e) => e !== null) as Stream<CommonstreamSchema>[])
         })
 
         Promise.all(list.defaultPostStreams.map((streamID) => client.getStream(streamID))).then((streams) => {
-            setPostStreams(streams.filter((stream) => stream !== null) as Stream[])
+            setPostStreams(streams.filter((stream) => stream !== null) as Stream<CommonstreamSchema>[])
         })
     }, [props.id])
 

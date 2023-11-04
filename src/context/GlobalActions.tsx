@@ -224,8 +224,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                     autoFocus
                                     allowEmpty={mode === 'reroute'}
                                     submitButtonLabel={mode === 'reply' ? 'Reply' : 'Reroute'}
-                                    streamPickerInitial={targetMessage.streams}
-                                    streamPickerOptions={mode === 'reroute' ? allKnownStreams : targetMessage.streams}
+                                    streamPickerInitial={targetMessage.postedStreams ?? []}
+                                    streamPickerOptions={mode === 'reroute' ? allKnownStreams : targetMessage.postedStreams ?? []}
                                     onSubmit={async (text, streams, emojis): Promise<Error | null> => {
                                         if (mode === 'reroute') {
                                             targetMessage.reroute(streams, text, emojis)

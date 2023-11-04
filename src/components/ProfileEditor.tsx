@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import { useEffect, useState } from 'react'
-import { type Profile } from '@concurrent-world/client'
+import { type ProfileSchema } from '@concurrent-world/client'
 import Button from '@mui/material/Button'
 import { useApi } from '../context/api'
 import { CCAvatar } from './ui/CCAvatar'
@@ -11,8 +11,8 @@ import { alpha, useTheme } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 interface ProfileEditorProps {
-    initial?: Profile
-    onSubmit?: (profile: Profile) => void
+    initial?: ProfileSchema
+    onSubmit?: (profile: ProfileSchema) => void
     id?: string
 }
 

@@ -1,9 +1,9 @@
 import { Box, Button, Divider, Tooltip, Typography, alpha, useTheme } from '@mui/material'
 import { CCAvatar } from '../ui/CCAvatar'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link as routerLink } from 'react-router-dom'
 
-import { Association, Message, ReplyMessageSchema, RerouteMessageSchema, SimpleNoteSchema } from '@concurrent-world/client'
+import { Association, Message, ReplyMessageSchema, RerouteMessageSchema, Schemas, SimpleNoteSchema } from '@concurrent-world/client'
 import { EmojiAssociation } from '@concurrent-world/client/dist/types/schemas/emojiAssociation'
 
 export interface MessageReactionsProps {
@@ -12,9 +12,10 @@ export interface MessageReactionsProps {
 
 export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
     const theme = useTheme()
-    const ownReaction = false
 
     const [reactionMembers, setReactionMembers] = useState<Record<string, Association<EmojiAssociation>[]>>({})
+
+    const ownReactions = useMemo(() => Object.fromEntries(props.message.ownAssociations.filter((association) => association.schema === Schemas.emojiAssociation).map((association) => [association.payload.body.imageUrl, association])), [props.message])
 
     if (!props.message.reactionCounts) {
         return <></>
@@ -33,19 +34,19 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
 
     return (
         <Box display="flex" flexWrap="wrap" gap={1}>
-            {Object.entries(props.message.reactionCounts).map(([key, value]) => 
+            {Object.entries(props.message.reactionCounts).map(([imageUrl, value]) => 
                 <Tooltip
                     arrow
-                    key={key}
+                    key={imageUrl}
                     title={
                         <Box display="flex" flexDirection="column" alignItems="right" gap={1}>
                             <Box display="flex" alignItems="center" gap={1}>
-                                <Box component="img" height="20px" src={key}></Box>
-                                {reactionMembers[key] ? reactionMembers[key][0].payload.body.shortcode : "Loading..."}
+                                <Box component="img" height="20px" src={imageUrl}></Box>
+                                {reactionMembers[imageUrl]?.[0].payload.body.shortcode ?? "Loading..."}
                             </Box>
                             <Divider flexItem></Divider>
                             {
-                                reactionMembers[key]?.map((reaction) => (
+                                reactionMembers[imageUrl]?.map((reaction) => (
                                     <Box
                                         key={reaction.id}
                                         sx={{
@@ -80,22 +81,35 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                         </Box>
                     }
                     placement="top"
-                    onOpen={() => loadReactionMembers(key)}
+                    onOpen={() => loadReactionMembers(imageUrl)}
                 >
                     <Button
                         sx={{
                             p: 0,
                             gap: 1,
                             display: 'flex',
-                            backgroundColor: ownReaction ? alpha(theme.palette.primary.main, 0.5) : 'transparent',
+                            backgroundColor: ownReactions[imageUrl] ? alpha(theme.palette.primary.main, 0.5) : 'transparent',
                             borderColor: theme.palette.primary.main
                         }}
                         variant="outlined"
                         onClick={() => {
+                            if (ownReactions[imageUrl]) {
+                                props.message.deleteAssociation(ownReactions[imageUrl].id)
+                            } else {
+                                if (reactionMembers[imageUrl]) {
+                                    const shortcode = reactionMembers[imageUrl]?.[0].payload.body.shortcode
+                                    props.message.reaction(shortcode, imageUrl)
+                                } else {
+                                    props.message.getReactions(imageUrl).then((reactions) => {
+                                        const shortcode = reactions[0].payload.body.shortcode
+                                        props.message.reaction(shortcode, imageUrl)
+                                    })
+                                }
+                            }
                         }}
                     >
-                        <Box component="img" height="20px" src={key} />
-                        <Typography color={ownReaction ? 'primary.contrastText' : 'text.primary'}>
+                        <Box component="img" height="20px" src={imageUrl} />
+                        <Typography color={ownReactions[imageUrl] ? 'primary.contrastText' : 'text.primary'}>
                             {value}
                         </Typography>
                     </Button>

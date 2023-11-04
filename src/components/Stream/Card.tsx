@@ -14,14 +14,14 @@ export function StreamCard({ stream: value, isOwner }: StreamCardProps): JSX.Ele
     return (
         <Card>
             <CardActionArea component={Link} to={'/stream#' + value.stream.id}>
-                <CardMedia component="img" height="140" image={value.stream.banner || Background} />
+                <CardMedia component="img" height="140" image={value.stream.payload.banner || Background} />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
-                        {value.stream.name}
+                        {value.stream.payload.name}
                         {isOwner ? ' (owner)' : ''}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        {value.stream.description}
+                        {value.stream.payload.description}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                         {value.domain}

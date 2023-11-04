@@ -3,9 +3,12 @@ import {
     Association,
     EmojiAssociationSchema,
     LikeSchema,
+    Message,
     ReplyAssociationSchema,
+    ReplyMessageSchema,
     RerouteAssociationSchema,
     Schemas,
+    SimpleNoteSchema,
     User,
 } from '@concurrent-world/client'
 import { useApi } from '../../context/api'
@@ -29,22 +32,26 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     const client = useApi()
     const pref = usePreference()
     const [association, setAssociation] = useState<Association<LikeSchema | EmojiAssociationSchema | ReplyAssociationSchema | RerouteAssociationSchema> | null>(null)
+    const [target, setTarget] = useState<Message<SimpleNoteSchema | ReplyMessageSchema> | null>(null)
     const [fetching, setFetching] = useState<boolean>(true)
 
     const perspective = props.perspective ?? client.ccid
     const isMeToOther = association?.authorUser?.ccid !== perspective
 
-    const Nominative = perspective === client.ccid ? 'You' : association?.authorUser?.profile?.username ?? 'anonymous'
+    const Nominative = perspective === client.ccid ? 'You' : association?.authorUser?.profile?.payload.body.username ?? 'anonymous'
     const Possessive =
-        perspective === client.ccid ? 'your' : (association?.target.author.profile?.username ?? 'anonymous') + "'s"
+        perspective === client.ccid ? 'your' : (target?.authorUser?.profile?.payload.body.username ?? 'anonymous') + "'s"
 
-    const actionUser: User | undefined = isMeToOther ? association?.author : association?.target.author
+    const actionUser: User | undefined = isMeToOther ? association?.authorUser : target?.authorUser
 
     useEffect(() => {
         client
-            .getAssociation(props.associationID, props.associationOwner)
+            .getAssociation<LikeSchema | EmojiAssociationSchema | ReplyAssociationSchema | RerouteAssociationSchema>(props.associationID, props.associationOwner)
             .then((a) => {
-                setAssociation(a)
+                setAssociation(a ?? null)
+                a?.getTargetMessage().then((m) => {
+                    setTarget(m ?? null)
+                })
             })
             .catch((e) => {
                 console.warn(e)
@@ -87,10 +94,10 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                 mt: { xs: '3px', sm: '5px' }
                             }}
                             component={RouterLink}
-                            to={'/entity/' + (association.author.ccid ?? '')}
+                            to={'/entity/' + (association.author ?? '')}
                         >
                             <CCAvatar
-                                avatarURL={actionUser?.profile?.avatar}
+                                avatarURL={actionUser?.profile?.payload.body.avatar}
                                 identiconSource={actionUser?.ccid ?? ''}
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
@@ -111,13 +118,13 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                 <Typography>
                                     {isMeToOther ? (
                                         <>
-                                            <b>{association.author.profile?.username ?? 'anonymous'}</b> favorited{' '}
+                                            <b>{association.authorUser?.profile?.payload.body.username ?? 'anonymous'}</b> favorited{' '}
                                             {Possessive} message
                                         </>
                                     ) : (
                                         <>
                                             {Nominative} favorited{' '}
-                                            <b>{association.target.author.profile?.username ?? 'anonymous'}</b>&apos;s
+                                            <b>{target?.authorUser?.profile?.payload.body.username ?? 'anonymous'}</b>&apos;s
                                             message
                                         </>
                                     )}
@@ -127,15 +134,15 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                     underline="hover"
                                     color="inherit"
                                     fontSize="0.75rem"
-                                    to={`/message/${association.target.id ?? ''}@${
-                                        association.target.author.ccid ?? ''
+                                    to={`/message/${target?.id ?? ''}@${
+                                        target?.author ?? ''
                                     }`}
                                 >
                                     <TimeDiff date={new Date(association.cdate)} />
                                 </Link>
                             </Box>
                             <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
-                                {(association.target as M_Current)?.body}
+                                {target?.payload.body.body}
                             </blockquote>
                         </Box>
                     </ListItem>
@@ -163,7 +170,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                             to={'/entity/' + (actionUser?.ccid ?? '')}
                         >
                             <CCAvatar
-                                avatarURL={actionUser?.profile?.avatar}
+                                avatarURL={actionUser?.profile?.payload.body.avatar}
                                 identiconSource={actionUser?.ccid ?? ''}
                                 sx={{
                                     width: { xs: '38px', sm: '48px' },
@@ -184,23 +191,23 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                 <Typography>
                                     {isMeToOther ? (
                                         <>
-                                            <b>{association.author.profile?.username ?? 'anonymous'}</b> reacted{' '}
+                                            <b>{association.authorUser?.profile?.payload.body.username ?? 'anonymous'}</b> reacted{' '}
                                             {Possessive} message with{' '}
                                             <img
                                                 height="13px"
-                                                src={(association as A_Reaction).imageUrl}
-                                                alt={(association as A_Reaction).shortcode}
+                                                src={(association as Association<EmojiAssociationSchema>).payload.body.imageUrl}
+                                                alt={(association as Association<EmojiAssociationSchema>).payload.body.shortcode}
                                             />
                                         </>
                                     ) : (
                                         <>
                                             {Nominative} reacted{' '}
-                                            <b>{association.target.author.profile?.username ?? 'anonymous'}</b>&apos;s
+                                            <b>{target?.authorUser?.profile?.payload.body.username ?? 'anonymous'}</b>&apos;s
                                             message with{' '}
                                             <img
                                                 height="13px"
-                                                src={(association as A_Reaction).imageUrl}
-                                                alt={(association as A_Reaction).shortcode}
+                                                src={(association as Association<EmojiAssociationSchema>).payload.body.imageUrl}
+                                                alt={(association as Association<EmojiAssociationSchema>).payload.body.shortcode}
                                             />
                                         </>
                                     )}
@@ -210,15 +217,15 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                                     underline="hover"
                                     color="inherit"
                                     fontSize="0.75rem"
-                                    to={`/message/${association.target.id ?? ''}@${
-                                        association.target.author.ccid ?? ''
+                                    to={`/message/${target?.id ?? ''}@${
+                                        target?.author ?? ''
                                     }`}
                                 >
                                     <TimeDiff date={new Date(association.cdate)} />
                                 </Link>
                             </Box>
                             <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
-                                {(association.target as M_Current).body}
+                                {target?.payload.body.body}
                             </blockquote>
                         </Box>
                     </ListItem>
@@ -228,16 +235,16 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
         case Schemas.replyAssociation:
             return (
                 <MessageContainer
-                    messageID={(association as A_Reply).replyBody.id}
-                    messageOwner={(association as A_Reply).replyBody.author.ccid}
+                    messageID={(association as Association<ReplyAssociationSchema>).payload.body.messageId}
+                    messageOwner={(association as Association<ReplyAssociationSchema>).payload.body.messageAuthor}
                     after={props.after}
                 />
             )
         case Schemas.rerouteAssociation:
             return (
                 <MessageContainer
-                    messageID={(association as A_Reroute).rerouteBody.id}
-                    messageOwner={(association as A_Reroute).rerouteBody.author.ccid}
+                    messageID={(association as Association<RerouteAssociationSchema>).payload.body.messageId}
+                    messageOwner={(association as Association<ReplyAssociationSchema>).payload.body.messageAuthor}
                     after={props.after}
                 />
             )

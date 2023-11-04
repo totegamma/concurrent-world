@@ -11,8 +11,8 @@ export function Passport(): JSX.Element {
         <PassportRenderer
             theme={theme}
             ccid={client.ccid}
-            name={client?.user?.profile?.username || ''}
-            avatar={client?.user?.profile?.avatar || ''}
+            name={client?.user?.profile?.payload.body.username || ''}
+            avatar={client?.user?.profile?.payload.body.avatar || ''}
             host={client.api.host || ''}
             cdate={'N/A'}
             trust={100}
