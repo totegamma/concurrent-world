@@ -218,7 +218,11 @@ export function Explorer(): JSX.Element {
                     return (
                         <StreamCard
                             key={value.stream.id}
-                            stream={value}
+                            streamID={value.stream.id}
+                            name={value.stream.payload.name}
+                            description={value.stream.payload.description}
+                            banner={value.stream.payload.banner ?? ''}
+                            domain={value.domain}
                             isOwner={value.stream.author === client.ccid}
                         />
                     )

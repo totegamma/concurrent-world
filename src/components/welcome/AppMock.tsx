@@ -2,29 +2,8 @@ import { Box, Divider, List, Paper, Tab, Tabs } from '@mui/material'
 import { TimelineHeader } from '../TimelineHeader'
 
 import ListIcon from '@mui/icons-material/List'
-import { MessageView } from '../Message/MessageView'
-import { Schemas } from '@concurrent-world/client'
+import { DummyMessageView } from '../Message/DummyMessageView'
 import { useEffect, useState } from 'react'
-
-const basicMessage = {
-    id: '0',
-    schema: Schemas.simpleNote,
-    author: {
-        ccid: '',
-        tag: '',
-        domain: '',
-        cdate: '',
-        certs: [],
-        score: 0
-    },
-    cdate: new Date(),
-    streams: [],
-    favorites: [],
-    reactions: [],
-    replies: [],
-    reroutes: [],
-    body: 'Hello, World!'
-}
 
 export default function AppMock(): JSX.Element {
     const [tab, setTab] = useState(0)
@@ -72,7 +51,12 @@ export default function AppMock(): JSX.Element {
                 <List sx={{ flex: 1, width: '100%' }}>
                     {data.timeline.map((message, i) => (
                         <>
-                            <MessageView key={i} message={message} userCCID="" />
+                            <DummyMessageView
+                                key={i}
+                                message={message.message}
+                                user={message.user}
+                                userCCID={message.ccid}
+                            />
                             <Divider />
                         </>
                     ))}
@@ -87,79 +71,49 @@ const mockData = [
         listTitle: 'ホーム',
         timeline: [
             {
-                ...basicMessage,
-                author: {
-                    ccid: 'solitudeSam',
-                    tag: '',
-                    domain: '',
-                    cdate: '',
-                    certs: [],
-                    score: 0
-                },
-                profileOverride: {
+                ccid: 'solitudeSam',
+                user: {
                     username: 'solitudeSam'
                 },
-                body: 'この時間の静かさ、ほんとに好き。休日はひとりの時間が一番。'
+                message: {
+                    body: 'この時間の静かさ、ほんとに好き。休日はひとりの時間が一番。'
+                }
             },
             {
-                ...basicMessage,
-                author: {
-                    ccid: 'geekyTom',
-                    tag: '',
-                    domain: '',
-                    cdate: '',
-                    certs: [],
-                    score: 0
-                },
-                profileOverride: {
+                ccid: 'geekyTom',
+                user: {
                     username: 'geekyTom'
                 },
-                body: '音楽といえば、最近アニソンが頭から離れない。聴くとなんかテンション上がる。'
+                message: {
+                    body: '音楽といえば、最近アニソンが頭から離れない。聴くとなんかテンション上がる。'
+                }
             },
             {
-                ...basicMessage,
-                author: {
-                    ccid: 'cozyCara',
-                    tag: '',
-                    domain: '',
-                    cdate: '',
-                    certs: [],
-                    score: 0
-                },
-                profileOverride: {
+                ccid: 'cozyCara',
+                user: {
                     username: 'cozyCara'
                 },
-                body: '昼下がりの音楽セレクト、今日は何を聴こう。ちょっと悩むな。'
+                message: {
+                    body: '昼下がりの音楽セレクト、今日は何を聴こう。ちょっと悩むな。'
+                }
             },
             {
-                ...basicMessage,
-                author: {
-                    ccid: 'bookwormLiz',
-                    tag: '',
-                    domain: '',
-                    cdate: '',
-                    certs: [],
-                    score: 0
-                },
-                profileOverride: {
+                ccid: 'bookwormLiz',
+                user: {
                     username: 'bookwormLiz'
                 },
-                body: '新しい本が届いた！紅茶を淹れて読書の時間。最高の休日。'
+                message: {
+                    body: '新しい本が届いた！紅茶を淹れて読書の時間。最高の休日。'
+                }
             },
             {
-                ...basicMessage,
-                author: {
-                    ccid: 'geekyTom',
-                    tag: '',
-                    domain: '',
-                    cdate: '',
-                    certs: [],
-                    score: 0
-                },
-                profileOverride: {
+                ccid: 'geekyTom',
+                user: {
                     username: 'geekyTom'
                 },
-                body: '今日は久々に好きなアニメの再放送。これからまったり視聴タイム。'
+                message: {
+                    body: '今日は久々に好きなアニメの再放送。これからまったり視聴タイム。'
+                }
             }
         ]
     },
@@ -167,79 +121,49 @@ const mockData = [
         listTitle: 'ゲーム界隈',
         timeline: [
             {
-                ...basicMessage,
-                author: {
-                    ccid: 'MechaMaster88',
-                    tag: '',
-                    domain: '',
-                    cdate: '',
-                    certs: [],
-                    score: 0
-                },
-                profileOverride: {
+                ccid: 'MechaMaster88',
+                user: {
                     username: 'MechaMaster88'
                 },
-                body: '『魔界の冒険者』のセーブデータ、消失…。泣きたい。'
+                message: {
+                    body: '『魔界の冒険者』のセーブデータ、消失…。泣きたい。'
+                }
             },
             {
-                ...basicMessage,
-                author: {
-                    ccid: 'CtrlAltDefeat_',
-                    tag: '',
-                    domain: '',
-                    cdate: '',
-                    certs: [],
-                    score: 0
-                },
-                profileOverride: {
+                ccid: 'CtrlAltDefeat_',
+                user: {
                     username: 'CtrlAltDefeat_'
                 },
-                body: 'VRゲームの新作、現実感がすごい！酔わないよう気をつけないと。'
+                message: {
+                    body: 'VRゲームの新作、現実感がすごい！酔わないよう気をつけないと。'
+                }
             },
             {
-                ...basicMessage,
-                author: {
-                    ccid: 'GamerGalaxy_',
-                    tag: '',
-                    domain: '',
-                    cdate: '',
-                    certs: [],
-                    score: 0
-                },
-                profileOverride: {
+                ccid: 'GamerGalaxy_',
+                user: {
                     username: 'GamerGalaxy_'
                 },
-                body: '昨晩のオンラインバトル、完璧な連携だった。次も頼むぞ、チーム！'
+                message: {
+                    body: '昨晩のオンラインバトル、完璧な連携だった。次も頼むぞ、チーム！'
+                }
             },
             {
-                ...basicMessage,
-                author: {
-                    ccid: 'retroReveler',
-                    tag: '',
-                    domain: '',
-                    cdate: '',
-                    certs: [],
-                    score: 0
-                },
-                profileOverride: {
+                ccid: 'retroReveler',
+                user: {
                     username: 'retroReveler'
                 },
-                body: '古いアーケードゲームを発見。コイン入れてプレイする感覚、懐かしい。'
+                message: {
+                    body: '古いアーケードゲームを発見。コイン入れてプレイする感覚、懐かしい。'
+                }
             },
             {
-                ...basicMessage,
-                author: {
-                    ccid: 'bitBard',
-                    tag: '',
-                    domain: '',
-                    cdate: '',
-                    certs: [],
-                    score: 0
-                },
-                profileOverride: {
+                ccid: 'bitBard',
+                user: {
                     username: 'bitBard'
                 },
-                body: 'ゲームのOST集めるのが趣味。今日は新しい1枚ゲット！'
+                message: {
+                    body: 'ゲームのOST集めるのが趣味。今日は新しい1枚ゲット！'
+                }
             }
         ]
     },
@@ -247,79 +171,49 @@ const mockData = [
         listTitle: 'ごはん',
         timeline: [
             {
-                ...basicMessage,
-                author: {
-                    ccid: 'TofuTribe',
-                    tag: '',
-                    domain: '',
-                    cdate: '',
-                    certs: [],
-                    score: 0
-                },
-                profileOverride: {
+                ccid: 'TofuTribe',
+                user: {
                     username: 'TofuTribe'
                 },
-                body: '手作りのビーガン料理に挑戦中。今日はトマトとキヌアのサラダ。'
+                message: {
+                    body: '手作りのビーガン料理に挑戦中。今日はトマトとキヌアのサラダ。'
+                }
             },
             {
-                ...basicMessage,
-                author: {
-                    ccid: 'SpiceSeeker_',
-                    tag: '',
-                    domain: '',
-                    cdate: '',
-                    certs: [],
-                    score: 0
-                },
-                profileOverride: {
+                ccid: 'SpiceSeeker_',
+                user: {
                     username: 'SpiceSeeker_'
                 },
-                body: '新しいスパイスショップを発見！エキゾチックな味で実験開始。'
+                message: {
+                    body: '新しいスパイスショップを発見！エキゾチックな味で実験開始。'
+                }
             },
             {
-                ...basicMessage,
-                author: {
-                    ccid: 'NoodleNomad',
-                    tag: '',
-                    domain: '',
-                    cdate: '',
-                    certs: [],
-                    score: 0
-                },
-                profileOverride: {
+                ccid: 'NoodleNomad',
+                user: {
                     username: 'NoodleNomad'
                 },
-                body: '今日のラーメン、絶品だった。辛さがちょうど良い。'
+                message: {
+                    body: '今日のラーメン、絶品だった。辛さがちょうど良い。'
+                }
             },
             {
-                ...basicMessage,
-                author: {
-                    ccid: 'BrewedLife',
-                    tag: '',
-                    domain: '',
-                    cdate: '',
-                    certs: [],
-                    score: 0
-                },
-                profileOverride: {
+                ccid: 'BrewedLife',
+                user: {
                     username: 'BrewedLife'
                 },
-                body: '自家製のコールドブリュー、夏の定番。コーヒー豆の選び方が鍵。'
+                message: {
+                    body: '自家製のコールドブリュー、夏の定番。コーヒー豆の選び方が鍵。'
+                }
             },
             {
-                ...basicMessage,
-                author: {
-                    ccid: 'CrispyCritic_',
-                    tag: '',
-                    domain: '',
-                    cdate: '',
-                    certs: [],
-                    score: 0
-                },
-                profileOverride: {
+                ccid: 'CrispyCritic_',
+                user: {
                     username: 'CrispyCritic_'
                 },
-                body: 'お店で食べた焼き鳥、外はサクサク、中はジューシー。次は友達を連れて行く！'
+                message: {
+                    body: 'お店で食べた焼き鳥、外はサクサク、中はジューシー。次は友達を連れて行く！'
+                }
             }
         ]
     }

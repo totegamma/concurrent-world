@@ -2,7 +2,13 @@ import { Box, Paper, Modal, Typography, Divider, Button, Drawer, useTheme } from
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
-import { Schemas, type Message, type Stream, CommonstreamSchema, DomainProfileSchema } from '@concurrent-world/client'
+import {
+    Schemas,
+    type Message,
+    type Stream,
+    type CommonstreamSchema,
+    type DomainProfileSchema
+} from '@concurrent-world/client'
 import { Draft } from '../components/Draft'
 import { useLocation } from 'react-router-dom'
 import { usePreference } from './PreferenceContext'
@@ -41,8 +47,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const [mode, setMode] = useState<'compose' | 'reply' | 'reroute' | 'none'>('none')
     const [targetMessage, setTargetMessage] = useState<Message<any> | null>(null)
 
-    const [queriedStreams, setQueriedStreams] = useState<Stream<CommonstreamSchema>[]>([])
-    const [allKnownStreams, setAllKnownStreams] = useState<Stream<CommonstreamSchema>[]>([])
+    const [queriedStreams, setQueriedStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
+    const [allKnownStreams, setAllKnownStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
     const [domainIsOffline, setDomainIsOffline] = useState<boolean>(false)
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
 
@@ -94,7 +100,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         }
 
         Promise.all(streamIDs.map((id) => client.getStream(id))).then((streams) => {
-            setQueriedStreams(streams.filter((e) => e !== null) as Stream<CommonstreamSchema>[])
+            setQueriedStreams(streams.filter((e) => e !== null) as Array<Stream<CommonstreamSchema>>)
         })
 
         setMode('compose')
@@ -141,7 +147,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         const domain = await client.api.readDomain(client.api.host)
         if (!domain) throw new Error('Domain not found')
         try {
-            const domainProfile = await client.api.readCharacter<DomainProfileSchema>(domain.ccid, Schemas.domainProfile)
+            const domainProfile = await client.api.readCharacter<DomainProfileSchema>(
+                domain.ccid,
+                Schemas.domainProfile
+            )
             if (!domainProfile) throw new Error('Domain profile not found')
             if (domainProfile.payload.body.defaultBookmarkStreams)
                 localStorage.setItem(
@@ -225,7 +234,9 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                     allowEmpty={mode === 'reroute'}
                                     submitButtonLabel={mode === 'reply' ? 'Reply' : 'Reroute'}
                                     streamPickerInitial={targetMessage.postedStreams ?? []}
-                                    streamPickerOptions={mode === 'reroute' ? allKnownStreams : targetMessage.postedStreams ?? []}
+                                    streamPickerOptions={
+                                        mode === 'reroute' ? allKnownStreams : targetMessage.postedStreams ?? []
+                                    }
                                     onSubmit={async (text, streams, emojis): Promise<Error | null> => {
                                         if (mode === 'reroute') {
                                             targetMessage.reroute(streams, text, emojis)
@@ -277,18 +288,22 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                         見つかった問題:
                         <ul>
                             {!client?.user?.profile && <li>プロフィールが存在していません</li>}
-                            {!client?.user?.userstreams?.payload.body.homeStream && <li>ホームストリームが存在していません</li>}
+                            {!client?.user?.userstreams?.payload.body.homeStream && (
+                                <li>ホームストリームが存在していません</li>
+                            )}
                             {!client?.user?.userstreams?.payload.body.notificationStream && (
                                 <li>通知ストリームが存在していません</li>
                             )}
                             {!client?.user?.userstreams?.payload.body.associationStream && (
                                 <li>アクティビティストリームが存在していません</li>
                             )}
-                            {!client?.user?.userstreams?.payload.body.ackCollection && <li>Ackコレクションが存在していません</li>}
+                            {!client?.user?.userstreams?.payload.body.ackCollection && (
+                                <li>Ackコレクションが存在していません</li>
+                            )}
                         </ul>
                         <ProfileEditor
                             id={client?.user?.profile?.id}
-                            initial={client?.user?.profile}
+                            initial={client?.user?.profile?.payload.body}
                             onSubmit={(_) => {
                                 fixAccount()
                             }}

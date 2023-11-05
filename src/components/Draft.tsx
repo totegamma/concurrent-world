@@ -15,7 +15,6 @@ import {
     ListItemButton,
     Collapse,
     Fade,
-    ListItem,
     Typography
 } from '@mui/material'
 import { StreamPicker } from './ui/StreamPicker'
@@ -31,19 +30,18 @@ import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 import { useEmojiPicker } from '../context/EmojiPickerContext'
 import caretPosition from 'textarea-caret'
-import { CommonstreamSchema, type Stream } from '@concurrent-world/client'
+import { type CommonstreamSchema, type Stream } from '@concurrent-world/client'
 import { useApi } from '../context/api'
 import { type Emoji, type EmojiLite } from '../model'
 import { useNavigate } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
-import { CCAvatar } from './ui/CCAvatar'
-import { MarkdownRenderer } from './ui/MarkdownRenderer'
+import { DummyMessageView } from './Message/DummyMessageView'
 
 export interface DraftProps {
     submitButtonLabel?: string
-    streamPickerInitial: Stream<CommonstreamSchema>[]
-    streamPickerOptions: Stream<CommonstreamSchema>[]
+    streamPickerInitial: Array<Stream<CommonstreamSchema>>
+    streamPickerOptions: Array<Stream<CommonstreamSchema>>
     onSubmit: (text: string, destinations: string[], emojis?: Record<string, EmojiLite>) => Promise<Error | null>
     allowEmpty?: boolean
     autoFocus?: boolean
@@ -56,7 +54,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const emojiPicker = useEmojiPicker()
     const navigate = useNavigate()
 
-    const [destStreams, setDestStreams] = useState<Stream<CommonstreamSchema>[]>(props.streamPickerInitial)
+    const [destStreams, setDestStreams] = useState<Array<Stream<CommonstreamSchema>>>(props.streamPickerInitial)
 
     const [draft, setDraft] = usePersistent<string>('draft', '')
     const [openPreview, setOpenPreview] = useState<boolean>(true)
@@ -533,75 +531,26 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 >
                     Preview
                 </Divider>
-                <ListItem
-                    sx={{
-                        wordBreak: 'break-word',
-                        alignItems: 'flex-start',
-                        flex: 1,
-                        gap: { xs: 1, sm: 2 }
+
+                <DummyMessageView
+                    message={{
+                        body: draft,
+                        emojis: emojiDict
                     }}
-                    disablePadding
-                >
-                    <IconButton
-                        sx={{
-                            width: { xs: '38px', sm: '48px' },
-                            height: { xs: '38px', sm: '48px' },
-                            mt: { xs: '3px', sm: '5px' }
-                        }}
-                    >
-                        <CCAvatar
-                            alt={client.user?.profile?.payload.body.username}
-                            avatarURL={client.user?.profile?.payload.body.avatar}
-                            identiconSource={client.user?.ccid ?? ''}
+                    user={client.user?.profile?.payload.body}
+                    userCCID={client.user?.ccid}
+                    timestamp={
+                        <Typography
                             sx={{
-                                width: { xs: '38px', sm: '48px' },
-                                height: { xs: '38px', sm: '48px' }
-                            }}
-                        />
-                    </IconButton>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flex: 1,
-                            flexDirection: 'column',
-                            width: '100%',
-                            overflow: 'auto'
-                        }}
-                    >
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'baseline',
-                                justifyContent: 'space-between'
+                                backgroundColor: theme.palette.primary.main,
+                                color: theme.palette.primary.contrastText,
+                                px: 1
                             }}
                         >
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center'
-                                }}
-                            >
-                                <Typography
-                                    component="span"
-                                    sx={{
-                                        fontWeight: '700',
-                                        fontSize: { xs: '0.9rem', sm: '0.95rem' }
-                                    }}
-                                >
-                                    {client.user?.profile?.payload.body.username}
-                                </Typography>
-                            </Box>
-                            <Typography
-                                sx={{
-                                    backgroundColor: theme.palette.primary.main,
-                                    color: theme.palette.primary.contrastText,
-                                    px: 1,
-                                }}
-                            >Preview</Typography>
-                        </Box>
-                        <MarkdownRenderer messagebody={draft} emojiDict={emojiDict} />
-                    </Box>
-                </ListItem>
+                            Preview
+                        </Typography>
+                    }
+                />
             </Collapse>
         </Box>
     )

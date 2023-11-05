@@ -10,7 +10,6 @@ import { FollowButton } from '../components/FollowButton'
 import { type User } from '@concurrent-world/client'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import { TimelineHeader } from '../components/TimelineHeader'
-import { type UserAckCollection } from '@concurrent-world/client/dist/types/schemas/userAckCollection'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import { AckList } from '../components/AckList'
 import { AckButton } from '../components/AckButton'
@@ -29,8 +28,8 @@ export function EntityPage(): JSX.Element {
     const timelineRef = useRef<VListHandle>(null)
     const isSelf = id === client.ccid
 
-    const [ackUsers, setAckUsers] = useState<User[]>([])
-    const ackedUsers = user?.profile?.ackedby ?? []
+    const [ackingUsers, setAckingUsers] = useState<User[]>([])
+    const [ackerUsers, setAckerUsers] = useState<User[]>([])
 
     const [detailMode, setDetailMode] = useState<detail>('none')
 
@@ -44,19 +43,19 @@ export function EntityPage(): JSX.Element {
     }, [id])
 
     useEffect(() => {
+        let unmounted = false
         if (!user) return
-        let collectionID = user.userstreams?.payload.body.ackCollection
-        if (!collectionID) return
-        if (!collectionID.includes('@') && user.domain) {
-            // WORKAROUND
-            collectionID += '@' + user.domain
-        }
-        client.api.readCollection<UserAckCollection>(collectionID).then((ackCollection) => {
-            if (!ackCollection) return
-            Promise.all(ackCollection.items.map((item) => client.getUser(item.payload.ccid!))).then((users) => {
-                setAckUsers(users.filter((user) => user !== null) as User[])
-            })
+        user.getAcker().then((ackers) => {
+            if (unmounted) return
+            setAckerUsers(ackers)
         })
+        user.getAcking().then((acking) => {
+            if (unmounted) return
+            setAckingUsers(acking)
+        })
+        return () => {
+            unmounted = true
+        }
     }, [user])
 
     const targetStreams = useMemo(() => {
@@ -161,7 +160,7 @@ export function EntityPage(): JSX.Element {
                                                         setDetailMode('ack')
                                                     }}
                                                 >
-                                                    {ackUsers.length} Ack
+                                                    {ackingUsers.length} Ack
                                                 </Typography>
                                                 <Typography
                                                     component={Link}
@@ -170,7 +169,7 @@ export function EntityPage(): JSX.Element {
                                                         setDetailMode('acker')
                                                     }}
                                                 >
-                                                    {ackedUsers.length} Acker
+                                                    {ackerUsers.length} Acker
                                                 </Typography>
                                             </Box>
                                             {!isSelf ? (
