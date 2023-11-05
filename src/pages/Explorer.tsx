@@ -1,5 +1,5 @@
 import { Box, Button, Checkbox, Divider, IconButton, Paper, TextField, Typography, useTheme } from '@mui/material'
-import { Schemas } from '@concurrent-world/client'
+import { type CommonstreamSchema, Schemas } from '@concurrent-world/client'
 import { useApi } from '../context/api'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
@@ -48,7 +48,7 @@ export function Explorer(): JSX.Element {
         }
         Promise.all(
             selectedDomains.map(async (e) => {
-                const streams = await client.getCommonStreams(e)
+                const streams = await client.getStreamsBySchema<CommonstreamSchema>(e, Schemas.commonstream)
                 return streams.map((stream) => {
                     return {
                         domain: e,
