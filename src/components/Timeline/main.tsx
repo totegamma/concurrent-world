@@ -287,7 +287,15 @@ const renderError = ({ error }: FallbackProps): JSX.Element => {
             <ListItemIcon>
                 <HeartBrokenIcon />
             </ListItemIcon>
-            <ListItemText primary="この要素の描画中に問題が発生しました" secondary={error?.message} />
+            <ListItemText
+                primary="この要素の描画中に問題が発生しました"
+                secondary={
+                    <Box>
+                        {error?.message}
+                        <pre>{error?.stack}</pre>
+                    </Box>
+                }
+            />
         </ListItem>
     )
 }
