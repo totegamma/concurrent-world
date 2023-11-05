@@ -4,7 +4,7 @@ import { Link as RouterLink } from 'react-router-dom'
 import { useContext, useMemo } from 'react'
 import { ApplicationContext } from '../../App'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import { Message, ReplyMessageSchema, SimpleNoteSchema } from '@concurrent-world/client'
+import { type Message, type ReplyMessageSchema, type SimpleNoteSchema } from '@concurrent-world/client'
 
 export interface MessageHeaderProps {
     message: Message<SimpleNoteSchema | ReplyMessageSchema>
@@ -14,7 +14,7 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
     const appData = useContext(ApplicationContext)
 
     const myAck = useMemo(() => {
-        return appData.acklist.find((ack) => ack.payload.ccid === props.message.author)
+        return appData.acklist.find((ack) => ack.ccid === props.message.author)
     }, [props.message, appData.acklist])
 
     return (
@@ -38,7 +38,9 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                         fontSize: { xs: '0.9rem', sm: '0.95rem' }
                     }}
                 >
-                    {props.message.payload.body.profileOverride?.username || props.message.authorUser?.profile?.payload.body.username || 'anonymous'}
+                    {props.message.payload.body.profileOverride?.username ||
+                        props.message.authorUser?.profile?.payload.body.username ||
+                        'anonymous'}
                 </Typography>
                 {myAck && (
                     <Tooltip arrow title="Ackしています" placement="top">

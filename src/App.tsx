@@ -25,13 +25,18 @@ import { GlobalActionsProvider } from './context/GlobalActions'
 import { EmojiPickerProvider } from './context/EmojiPickerContext'
 
 import { ThinMenu } from './components/Menu/ThinMenu'
-import { type UserAckCollection } from '@concurrent-world/client/dist/types/schemas/userAckCollection'
-import { type StreamEvent, type CollectionItem } from '@concurrent-world/client/dist/types/model/core'
+import { type StreamEvent } from '@concurrent-world/client/dist/types/model/core'
 import { ConcurrentLogo } from './components/theming/ConcurrentLogo'
 import { usePreference } from './context/PreferenceContext'
 import TickerProvider from './context/Ticker'
 import { ContactsPage } from './pages/Contacts'
-import { type CoreAssociation, Schemas, type Subscription, ProfileSchema } from '@concurrent-world/client'
+import {
+    type CoreAssociation,
+    Schemas,
+    type Subscription,
+    type ProfileSchema,
+    type User
+} from '@concurrent-world/client'
 
 export const ApplicationContext = createContext<appData>({
     displayingStream: [],
@@ -41,7 +46,7 @@ export const ApplicationContext = createContext<appData>({
 
 export interface appData {
     displayingStream: string[]
-    acklist: Array<CollectionItem<UserAckCollection>>
+    acklist: User[]
     updateAcklist: () => void
 }
 
@@ -51,14 +56,10 @@ function App(): JSX.Element {
 
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(pref.themeName))
 
-    const [acklist, setAcklist] = useState<Array<CollectionItem<UserAckCollection>>>([])
+    const [acklist, setAcklist] = useState<User[]>([])
     const updateAcklist = useCallback(() => {
-        if (!client) return
-        const collectionID = client.user?.userstreams?.payload.body.ackCollection
-        if (!collectionID) return
-        client.api.readCollection<UserAckCollection>(collectionID).then((ackCollection) => {
-            if (!ackCollection) return
-            setAcklist(ackCollection.items)
+        client.user?.getAcking().then((acklist) => {
+            setAcklist(acklist)
         })
     }, [client, client?.user])
 
@@ -73,7 +74,9 @@ function App(): JSX.Element {
         client.newSubscription().then((sub) => {
             subscription.current = sub
             subscription.current.listen([
-                ...(client?.user?.userstreams?.payload.body.notificationStream ? [client?.user?.userstreams.payload.body.notificationStream] : [])
+                ...(client?.user?.userstreams?.payload.body.notificationStream
+                    ? [client?.user?.userstreams.payload.body.notificationStream]
+                    : [])
             ])
             sub.on('AssociationCreated', (event: StreamEvent) => {
                 const a = event.body as CoreAssociation<any>
