@@ -148,17 +148,17 @@ export const GeneralSettings = (): JSX.Element => {
             <Typography variant="h3" gutterBottom>
                 HomeStream
             </Typography>
-            <Typography gutterBottom>{client.user?.userstreams?.homeStream}</Typography>
+            <Typography gutterBottom>{client.user?.userstreams?.payload.body.homeStream}</Typography>
 
             <Typography variant="h3" gutterBottom>
                 NotificationStream
             </Typography>
-            <Typography gutterBottom>{client.user?.userstreams?.notificationStream}</Typography>
+            <Typography gutterBottom>{client.user?.userstreams?.payload.body.notificationStream}</Typography>
 
             <Typography variant="h3" gutterBottom>
                 AssociationStream
             </Typography>
-            <Typography gutterBottom>{client.user?.userstreams?.associationStream}</Typography>
+            <Typography gutterBottom>{client.user?.userstreams?.payload.body.associationStream}</Typography>
 
             <Divider />
 

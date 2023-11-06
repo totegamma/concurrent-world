@@ -79,8 +79,8 @@ export const ApSetup = (): JSX.Element => {
                 },
                 body: JSON.stringify({
                     id: userID,
-                    homestream: client?.user?.userstreams?.homeStream,
-                    notificationstream: client?.user?.userstreams?.notificationStream,
+                    homestream: client?.user?.userstreams?.payload.body.homeStream,
+                    notificationstream: client?.user?.userstreams?.payload.body.notificationStream,
                     followstream: followstream.id
                 })
             })
@@ -99,13 +99,12 @@ export const ApSetup = (): JSX.Element => {
                 },
                 body: JSON.stringify({
                     id: userID,
-                    name: client?.user?.profile?.username,
-                    summary: client?.user?.profile?.description,
-                    icon_url: client?.user?.profile?.avatar
+                    name: client?.user?.profile?.payload.body.username,
+                    summary: client?.user?.profile?.payload.body.description,
+                    icon_url: client?.user?.profile?.payload.body.avatar
                 })
             })
-            .then(async (res) => await res.json())
-            .catch((e) => {
+            .then(async (res) => await res.json()) .catch((e) => {
                 enqueueSnackbar(`init profile failed: ${e}`, {
                     variant: 'error'
                 })

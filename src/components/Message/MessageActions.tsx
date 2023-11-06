@@ -7,21 +7,21 @@ import AddReactionIcon from '@mui/icons-material/AddReaction'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import RepeatIcon from '@mui/icons-material/Repeat'
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown'
-import { type M_Reply, type M_Current, type M_Reroute } from '@concurrent-world/client'
-import { useState } from 'react'
+import { Association, LikeSchema, Message, ReplyMessageSchema, RerouteMessageSchema, Schemas, SimpleNoteSchema} from '@concurrent-world/client'
+import { useMemo, useState } from 'react'
 import Collapse from '@mui/material/Collapse'
 import Fade from '@mui/material/Fade'
 import { useMessageService } from './MessageContainer'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove'
+// import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove'
 import { useEmojiPicker } from '../../context/EmojiPickerContext'
 import { Link as RouterLink } from 'react-router-dom'
 import { IconButtonWithNumber } from '../ui/IconButtonWithNumber'
 
 export interface MessageActionsProps {
-    message: M_Current | M_Reply | M_Reroute
+    message: Message<SimpleNoteSchema | ReplyMessageSchema | RerouteMessageSchema>
     userCCID: string
 }
 
@@ -30,13 +30,22 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
     const service = useMessageService()
 
-    const favorited = props.message.favorites.find((fav) => fav.author.ccid === props.userCCID)
+    const ownFavorite = useMemo(() => props.message.ownAssociations.find((association) => association.schema === Schemas.like), [props.message])
+    const [favoriteMembers, setFavoriteMembers] = useState<Association<LikeSchema>[]>([])
 
-    const replyCount = props.message.replies.length
-    const likeCount = props.message.favorites.length
-    const rerouteCount = props.message.reroutes.length
+    const postedCommonStreams = useMemo(() => props.message.postedStreams?.filter((stream) => stream.schema === Schemas.commonstream) ?? [], [props.message])
+
+    const replyCount = props.message.associationCounts?.[Schemas.replyAssociation] ?? 0
+    const likeCount = props.message.associationCounts?.[Schemas.like] ?? 0
+    const rerouteCount = props.message.associationCounts?.[Schemas.rerouteAssociation] ?? 0
 
     const emojiPicker = useEmojiPicker()
+
+    const loadFavoriteMembers = () => {
+        props.message.getFavorites().then((favorites) => {
+            setFavoriteMembers(favorites)
+        })
+    }
 
     return (
         <>
@@ -79,9 +88,9 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                     gap: 1
                                 }}
                             >
-                                {props.message.favorites.map((fav) => (
+                                {favoriteMembers.map((fav) => (
                                     <Box
-                                        key={fav.author.ccid}
+                                        key={fav.author}
                                         sx={{
                                             display: 'flex',
                                             alignItems: 'center',
@@ -89,17 +98,17 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                             textDecoration: 'none'
                                         }}
                                         component={RouterLink}
-                                        to={fav.profileOverride?.link ?? '/entity/' + fav.author.ccid}
-                                        target={fav.profileOverride?.link ? '_blank' : undefined}
-                                        rel={fav.profileOverride?.link ? 'noopener noreferrer' : undefined}
+                                        to={fav.payload.body.profileOverride?.link ?? '/entity/' + fav.author}
+                                        target={fav.payload.body.profileOverride?.link ? '_blank' : undefined}
+                                        rel={fav.payload.body.profileOverride?.link ? 'noopener noreferrer' : undefined}
                                     >
                                         <CCAvatar
                                             sx={{
                                                 height: '20px',
                                                 width: '20px'
                                             }}
-                                            avatarURL={fav.profileOverride?.avatar ?? fav.author.profile?.avatar}
-                                            identiconSource={fav.author.ccid}
+                                            avatarURL={fav.payload.body.profileOverride?.avatar ?? fav.authorUser?.profile?.payload.body.avatar}
+                                            identiconSource={fav.author}
                                         />
                                         <Typography
                                             sx={{
@@ -107,8 +116,8 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                                 color: '#fff'
                                             }}
                                         >
-                                            {fav.profileOverride?.username ||
-                                                fav.author.profile?.username ||
+                                            {fav.payload.body.profileOverride?.username ||
+                                                fav.authorUser?.profile?.payload.body.username ||
                                                 'anonymous'}
                                         </Typography>
                                     </Box>
@@ -117,20 +126,21 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         }
                         placement="top"
                         disableHoverListener={likeCount === 0}
+                        onOpen={() => loadFavoriteMembers()}
                     >
                         <IconButtonWithNumber
                             icon={
-                                favorited ? (
+                                ownFavorite ? (
                                     <StarIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
                                 ) : (
                                     <StarOutlineIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />
                                 )
                             }
                             onClick={() => {
-                                if (favorited) {
-                                    service?.removeFavorite()
+                                if (ownFavorite) {
+                                    props.message.deleteAssociation(ownFavorite.id)
                                 } else {
-                                    service?.addFavorite()
+                                    props.message.favorite()
                                 }
                             }}
                             message={likeCount}
@@ -140,7 +150,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         icon={<AddReactionIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />}
                         onClick={(e) => {
                             emojiPicker.open(e.currentTarget, (emoji) => {
-                                service?.addReaction(emoji.shortcode, emoji.imageURL)
+                                props.message.reaction(emoji.shortcode, emoji.imageURL)
                                 emojiPicker.close()
                             })
                         }}
@@ -163,7 +173,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                 >
                     <MenuItem
                         onClick={() => {
-                            props.message.body && navigator.clipboard.writeText(props.message.body)
+                            props.message.payload.body.body && navigator.clipboard.writeText(props.message.payload.body.body)
                             setMenuAnchor(null)
                         }}
                     >
@@ -183,6 +193,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         </ListItemIcon>
                         <ListItemText>詳細</ListItemText>
                     </MenuItem>
+                    {/*
                     {service?.removeFromStream && props.message.author.ccid === props.userCCID && (
                         <MenuItem
                             onClick={() => {
@@ -195,10 +206,11 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                             <ListItemText>このStreamから削除</ListItemText>
                         </MenuItem>
                     )}
-                    {props.message.author.ccid === props.userCCID && (
+                    */}
+                    {props.message.author === props.userCCID && (
                         <MenuItem
                             onClick={() => {
-                                service?.deleteMessage()
+                                props.message.delete()
                             }}
                         >
                             <ListItemIcon>
@@ -209,7 +221,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     )}
                 </Menu>
                 <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 0.5, ml: 'auto' }}>
-                    {props.message.streams.map((e) => (
+                    {postedCommonStreams.map((e) => (
                         <Link
                             component={RouterLink}
                             key={e.id}
@@ -221,13 +233,13 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                             }}
                             to={'/stream#' + e.id}
                         >
-                            {`%${e.shortname}`}
+                            {`%${e.payload.shortname}`}
                         </Link>
                     ))}
                 </Box>
                 <Fade in={!streamListOpen}>
                     <Box sx={{ display: { sm: 'block', md: 'none' }, ml: 'auto', overFlow: 'hidden' }}>
-                        {props.message.streams.length === 1 && (
+                        {postedCommonStreams.length === 1 && (
                             <Link
                                 component={RouterLink}
                                 underline="hover"
@@ -236,16 +248,16 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                     fontSize: '12px',
                                     color: 'text.secondary'
                                 }}
-                                to={'/stream#' + props.message.streams[0].id}
+                                to={'/stream#' + props.message.postedStreams?.[0].id}
                             >
-                                {`%${props.message.streams[0].shortname}`}
+                                {`%${postedCommonStreams[0]?.payload.shortname}`}
                             </Link>
                         )}
                     </Box>
                 </Fade>
                 {streamListOpen || (
                     <Box sx={{ display: { sm: 'block', md: 'none', whiteSpace: 'nowrap' } }}>
-                        {props.message.streams.length > 1 && (
+                        {postedCommonStreams.length > 1 && (
                             <Link
                                 onClick={() => {
                                     setStreamListOpen(true)
@@ -257,7 +269,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                     color: 'text.secondary'
                                 }}
                             >
-                                {`%${props.message.streams[0].shortname}`} +{props.message.streams.length - 1}
+                                {`%${postedCommonStreams[0]?.payload.shortname}`} +{postedCommonStreams.length - 1}
                             </Link>
                         )}
                     </Box>
@@ -288,7 +300,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         gap: 0.5
                     }}
                 >
-                    {props.message.streams.map((e) => (
+                    {postedCommonStreams.map((e) => (
                         <Link
                             key={e.id}
                             underline="hover"
@@ -300,7 +312,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                             }}
                             to={'/stream#' + e.id}
                         >
-                            {`%${e.shortname}`}
+                            {`%${e.payload.shortname}`}
                         </Link>
                     ))}
                 </Box>

@@ -1,7 +1,7 @@
 import { Box, Button, Divider, FormControlLabel, FormGroup, Paper, Switch, TextField, Typography } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
 import { useApi } from '../context/api'
-import { type RawCommonstream, type CoreStream } from '@concurrent-world/client'
+import { type CommonstreamSchema, type CoreStream } from '@concurrent-world/client'
 import Background from '../resources/defaultbg.png'
 import { CCEditor } from './ui/cceditor'
 import { useSnackbar } from 'notistack'
@@ -14,7 +14,7 @@ export interface StreamInfoProps {
 export function StreamInfo(props: StreamInfoProps): JSX.Element {
     const client = useApi()
     const { enqueueSnackbar } = useSnackbar()
-    const [stream, setStream] = useState<CoreStream<RawCommonstream>>()
+    const [stream, setStream] = useState<CoreStream<CommonstreamSchema>>()
     const isAuthor = stream?.author === client.ccid
 
     const [visible, setVisible] = useState(false)
@@ -36,7 +36,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
     }, [props.id])
 
     const updateStream = useCallback(
-        (payload: RawCommonstream) => {
+        (payload: CommonstreamSchema) => {
             if (!stream) return
             client.api
                 .updateStream({

@@ -77,7 +77,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         onClick={props.onClick}
                     >
                         <CCAvatar
-                            avatarURL={client?.user?.profile?.avatar}
+                            avatarURL={client?.user?.profile?.payload.body.avatar}
                             identiconSource={client.ccid}
                             sx={{
                                 width: '40px',
@@ -85,7 +85,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                             }}
                         />
                         <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', flexFlow: 'column' }}>
-                            <Typography color="contrastText">{client?.user?.profile?.username}</Typography>
+                            <Typography color="contrastText">{client?.user?.profile?.payload.body.username}</Typography>
                             <Typography variant="caption" color="background.contrastText">
                                 {client.api.host}
                             </Typography>

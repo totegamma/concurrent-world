@@ -9,7 +9,7 @@ import type {
     TypeText
 } from '@mui/material/styles/createPalette'
 
-import type { CoreStreamItem, Stream } from '@concurrent-world/client'
+import type { CommonstreamSchema, CoreStreamItem, Stream } from '@concurrent-world/client'
 
 export interface StreamItemDated extends CoreStreamItem {
     LastUpdated: number
@@ -91,7 +91,7 @@ export interface userHomeStream {
 
 export interface StreamWithDomain {
     domain: string
-    stream: Stream
+    stream: Stream<CommonstreamSchema>
 }
 
 export type CCID = string

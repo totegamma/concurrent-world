@@ -2,10 +2,10 @@ import { Box, Link, IconButton, Typography } from '@mui/material'
 import { Link as routerLink, Link as RouterLink } from 'react-router-dom'
 import { CCAvatar } from '../ui/CCAvatar'
 import { TimeDiff } from '../ui/TimeDiff'
-import { type M_Current } from '@concurrent-world/client'
+import { Message, ReplyMessageSchema, SimpleNoteSchema } from '@concurrent-world/client'
 
 export interface OneLineMessageViewProps {
-    message: M_Current
+    message: Message<SimpleNoteSchema | ReplyMessageSchema>
 }
 
 export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element => {
@@ -26,12 +26,12 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                     height: { xs: '12px', sm: '18px' }
                 }}
                 component={routerLink}
-                to={'/entity/' + props.message.author.ccid}
+                to={'/entity/' + props.message.author}
             >
                 <CCAvatar
-                    alt={props.message.author.profile?.username}
-                    avatarURL={props.message.author.profile?.avatar}
-                    identiconSource={props.message.author.ccid}
+                    alt={props.message.authorUser?.profile?.payload.body.username}
+                    avatarURL={props.message.authorUser?.profile?.payload.body.avatar}
+                    identiconSource={props.message.author}
                     sx={{
                         width: { xs: '38px', sm: '48px' },
                         height: { xs: '12px', sm: '18px' }
@@ -46,7 +46,7 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                     minWidth={0}
                     sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
                 >
-                    {props.message.body}
+                    {props.message.payload.body.body}
                 </Typography>
             </Box>
             <Link
@@ -54,7 +54,7 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                 underline="hover"
                 color="inherit"
                 fontSize="0.75rem"
-                to={`/message/${props.message.id}@${props.message.author.ccid}`}
+                to={`/message/${props.message.id}@${props.message.author}`}
             >
                 <TimeDiff date={new Date(props.message.cdate)} />
             </Link>

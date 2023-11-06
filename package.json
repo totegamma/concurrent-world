@@ -11,7 +11,7 @@
         "build-storybook": "storybook build"
     },
     "dependencies": {
-        "@concurrent-world/client": "^3.0.7",
+        "@concurrent-world/client": "^4.0.3",
         "@emotion/react": "^11.10.5",
         "@emotion/styled": "^11.10.5",
         "@mui/icons-material": "^5.11.16",
@@ -47,7 +47,7 @@
         "textarea-caret": "^3.1.0",
         "use-sound": "^4.0.1",
         "uuid": "^9.0.0",
-        "virtua": "^0.14.0"
+        "virtua": "^0.16.1"
     },
     "devDependencies": {
         "@storybook/addon-essentials": "7.0.18",

@@ -1,114 +1,120 @@
 import { Box, Button, Divider, Tooltip, Typography, alpha, useTheme } from '@mui/material'
-import { useApi } from '../../context/api'
 import { CCAvatar } from '../ui/CCAvatar'
-import { Fragment } from 'react'
-import { useMessageService } from './MessageContainer'
+import { useMemo, useState } from 'react'
 import { Link as routerLink } from 'react-router-dom'
 
-import { type M_Reply, type M_Current, type M_Reroute, type A_Reaction } from '@concurrent-world/client'
+import { Association, Message, ReplyMessageSchema, RerouteMessageSchema, Schemas, SimpleNoteSchema } from '@concurrent-world/client'
+import { EmojiAssociation } from '@concurrent-world/client/dist/types/schemas/emojiAssociation'
 
 export interface MessageReactionsProps {
-    message: M_Current | M_Reply | M_Reroute
+    message: Message<SimpleNoteSchema | ReplyMessageSchema | RerouteMessageSchema>
 }
 
 export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
-    const client = useApi()
     const theme = useTheme()
-    const service = useMessageService()
 
-    const filteredReactions = props.message.reactions.reduce((acc: Record<string, A_Reaction[]>, cur) => {
-        if (cur.imageUrl in acc) {
-            acc[cur.imageUrl].push(cur)
-        } else {
-            acc[cur.imageUrl] = [cur]
-        }
-        return acc
-    }, {})
+    const [reactionMembers, setReactionMembers] = useState<Record<string, Association<EmojiAssociation>[]>>({})
+
+    const ownReactions = useMemo(() => Object.fromEntries(props.message.ownAssociations.filter((association) => association.schema === Schemas.emojiAssociation).map((association) => [association.payload.body.imageUrl, association])), [props.message])
+
+    if (!props.message.reactionCounts) {
+        return <></>
+    }
+
+    const loadReactionMembers = (reaction: string) => {
+        props.message.getReactions(reaction).then((reactions) => {
+            setReactionMembers((prev) => {
+                return {
+                    ...prev,
+                    [reaction]: reactions
+                }
+            })
+        })
+    }
 
     return (
         <Box display="flex" flexWrap="wrap" gap={1}>
-            {Object.entries(filteredReactions).map((r) => {
-                const [key, reactions]: [string, A_Reaction[]] = r
-                const ownReaction = reactions.find((x) => x.author.ccid === client.ccid)
-                const reactedUsersList = reactions.map((reaction) => {
-                    return reaction !== undefined ? (
-                        <Box
-                            key={reaction.id}
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1,
-                                textDecoration: 'none'
-                            }}
-                            component={routerLink}
-                            to={reaction.profileOverride?.link ?? '/entity/' + reaction.author.ccid}
-                            target={reaction.profileOverride?.link ? '_blank' : undefined}
-                            rel={reaction.profileOverride?.link ? 'noopener noreferrer' : undefined}
-                        >
-                            <CCAvatar
-                                sx={{
-                                    height: '20px',
-                                    width: '20px'
-                                }}
-                                avatarURL={reaction.profileOverride?.avatar ?? reaction.author.profile?.avatar}
-                                identiconSource={reaction.author.ccid}
-                                alt={reaction.author.ccid}
-                            />
-                            <Typography
-                                sx={{
-                                    fontSize: '0.8rem',
-                                    color: '#fff'
-                                }}
-                            >
-                                {reaction.profileOverride?.username ?? reaction.author.profile?.username ?? 'anonymous'}
-                            </Typography>
-                        </Box>
-                    ) : (
-                        <Fragment key={0} />
-                    )
-                })
-
-                return (
-                    <Tooltip
-                        arrow
-                        key={key}
-                        title={
-                            <Box display="flex" flexDirection="column" alignItems="right" gap={1}>
-                                <Box display="flex" alignItems="center" gap={1}>
-                                    <Box component="img" height="20px" src={key}></Box>
-                                    {reactions[0].shortcode}
-                                </Box>
-                                <Divider flexItem></Divider>
-                                {reactedUsersList}
+            {Object.entries(props.message.reactionCounts).map(([imageUrl, value]) => 
+                <Tooltip
+                    arrow
+                    key={imageUrl}
+                    title={
+                        <Box display="flex" flexDirection="column" alignItems="right" gap={1}>
+                            <Box display="flex" alignItems="center" gap={1}>
+                                <Box component="img" height="20px" src={imageUrl}></Box>
+                                {reactionMembers[imageUrl]?.[0].payload.body.shortcode ?? "Loading..."}
                             </Box>
-                        }
-                        placement="top"
-                    >
-                        <Button
-                            sx={{
-                                p: 0,
-                                gap: 1,
-                                display: 'flex',
-                                backgroundColor: ownReaction ? alpha(theme.palette.primary.main, 0.5) : 'transparent',
-                                borderColor: theme.palette.primary.main
-                            }}
-                            variant="outlined"
-                            onClick={() => {
-                                if (ownReaction) {
-                                    service.removeReaction(ownReaction.id)
+                            <Divider flexItem></Divider>
+                            {
+                                reactionMembers[imageUrl]?.map((reaction) => (
+                                    <Box
+                                        key={reaction.id}
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 1,
+                                            textDecoration: 'none'
+                                        }}
+                                        component={routerLink}
+                                        to={reaction.payload.body.profileOverride?.link ?? '/entity/' + reaction.author}
+                                        target={reaction.payload.body.profileOverride?.link ? '_blank' : undefined}
+                                        rel={reaction.payload.body.profileOverride?.link ? 'noopener noreferrer' : undefined}
+                                    >
+                                        <CCAvatar
+                                            avatarURL={reaction.authorUser?.profile?.payload.body.avatar}
+                                            identiconSource={reaction.author}
+                                            sx={{
+                                                width: { xs: '12px', sm: '18px' },
+                                                height: { xs: '12px', sm: '18px' }
+                                            }}
+                                        />
+                                        <Typography
+                                            sx={{
+                                                fontSize: '0.8rem',
+                                                color: '#fff'
+                                            }}
+                                        >
+                                        {reaction.authorUser?.profile?.payload.body.username}</Typography>
+                                    </Box>
+                                ))
+                            }
+                        </Box>
+                    }
+                    placement="top"
+                    onOpen={() => loadReactionMembers(imageUrl)}
+                >
+                    <Button
+                        sx={{
+                            p: 0,
+                            gap: 1,
+                            display: 'flex',
+                            backgroundColor: ownReactions[imageUrl] ? alpha(theme.palette.primary.main, 0.5) : 'transparent',
+                            borderColor: theme.palette.primary.main
+                        }}
+                        variant="outlined"
+                        onClick={() => {
+                            if (ownReactions[imageUrl]) {
+                                props.message.deleteAssociation(ownReactions[imageUrl].id)
+                            } else {
+                                if (reactionMembers[imageUrl]) {
+                                    const shortcode = reactionMembers[imageUrl]?.[0].payload.body.shortcode
+                                    props.message.reaction(shortcode, imageUrl)
                                 } else {
-                                    service.addReaction(reactions[0].shortcode, key)
+                                    props.message.getReactions(imageUrl).then((reactions) => {
+                                        const shortcode = reactions[0].payload.body.shortcode
+                                        props.message.reaction(shortcode, imageUrl)
+                                    })
                                 }
-                            }}
-                        >
-                            <Box component="img" height="20px" src={key} />
-                            <Typography color={ownReaction ? 'primary.contrastText' : 'text.primary'}>
-                                {reactions.length}
-                            </Typography>
-                        </Button>
-                    </Tooltip>
-                )
-            })}
+                            }
+                        }}
+                    >
+                        <Box component="img" height="20px" src={imageUrl} />
+                        <Typography color={ownReactions[imageUrl] ? 'primary.contrastText' : 'text.primary'}>
+                            {value}
+                        </Typography>
+                    </Button>
+                </Tooltip>
+            )}
         </Box>
     )
 }

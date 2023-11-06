@@ -5,7 +5,7 @@ import { usePreference } from '../context/PreferenceContext'
 import { Timeline } from '../components/Timeline'
 import { Draft } from '../components/Draft'
 import { useApi } from '../context/api'
-import { type Stream } from '@concurrent-world/client'
+import { CommonstreamSchema, type Stream } from '@concurrent-world/client'
 import InfoIcon from '@mui/icons-material/Info'
 import ExploreIcon from '@mui/icons-material/Explore'
 import { ListSettings } from '../components/ListSettings'
@@ -23,8 +23,8 @@ export function ListPage(): JSX.Element {
     const id = pref.lists[rawid] ? rawid : Object.keys(pref.lists)[0]
     const [tab, setTab] = useState<string>(id)
 
-    const [streams, setStreams] = useState<Stream[]>([])
-    const [postStreams, setPostStreams] = useState<Stream[]>([])
+    const [streams, setStreams] = useState<Stream<CommonstreamSchema>[]>([])
+    const [postStreams, setPostStreams] = useState<Stream<CommonstreamSchema>[]>([])
     const [listSettingsOpen, setListSettingsOpen] = useState<boolean>(false)
 
     const timelineRef = useRef<VListHandle>(null)
@@ -34,11 +34,11 @@ export function ListPage(): JSX.Element {
         const list = pref.lists[id]
         if (!list) return
         Promise.all(list.streams.map((streamID) => client.getStream(streamID))).then((streams) => {
-            setStreams(streams.filter((e) => e !== null) as Stream[])
+            setStreams(streams.filter((e) => e !== null) as Stream<CommonstreamSchema>[])
         })
 
         Promise.all(list.defaultPostStreams.map((streamID) => client.getStream(streamID))).then((streams) => {
-            setPostStreams(streams.filter((e) => e !== null) as Stream[])
+            setPostStreams(streams.filter((e) => e !== null) as Stream<CommonstreamSchema>[])
         })
     }, [id, pref.lists])
 
