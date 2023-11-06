@@ -114,8 +114,8 @@ dependencies:
     specifier: ^9.0.0
     version: 9.0.0
   virtua:
-    specifier: ^0.14.0
-    version: 0.14.0(react-dom@18.2.0)(react@18.2.0)
+    specifier: ^0.16.1
+    version: 0.16.1(react-dom@18.2.0)(react@18.2.0)
 
 devDependencies:
   '@storybook/addon-essentials':
@@ -10752,8 +10752,8 @@ packages:
       vfile-message: 3.1.4
     dev: false
 
-  /virtua@0.14.0(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-+g3fxgFuQCqw6PpU5qzTRKhbSUGOeMEap0VbPaIRB1RiK5MfLiGXIMwID1iX1DmvUC/SqsBsJfVvlUaPNGWSVQ==}
+  /virtua@0.16.1(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-PiJWO++uDo7efG+gSgedm8sC4aoPL0C7tLxM4bHs62SAPlF8n9NdvpRzgsRhhMj0HA319BXPPKPRvimg4n+2Yw==}
     peerDependencies:
       react: '>=16.14.0'
       react-dom: '>=16.14.0'
