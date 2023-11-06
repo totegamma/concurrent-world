@@ -20,7 +20,7 @@ import { usePersistent } from '../hooks/usePersistent'
 import { Link as RouterLink } from 'react-router-dom'
 
 import Fuzzysort from 'fuzzysort'
-import { VGrid, type VGridHandle } from 'virtua'
+import { experimental_VGrid as VGrid, type VGridHandle } from 'virtua'
 
 export interface EmojiPickerState {
     open: (anchor: HTMLElement, onSelected: (selected: Emoji) => void) => void

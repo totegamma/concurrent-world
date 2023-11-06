@@ -1,11 +1,11 @@
 import { Autocomplete, Box, Chip, InputBase, type SxProps } from '@mui/material'
-import { type Stream } from '@concurrent-world/client'
+import { CommonstreamSchema, type Stream } from '@concurrent-world/client'
 
 export interface StreamPickerProps {
-    selected: Stream[]
-    setSelected: (selected: Stream[]) => void
+    selected: Stream<CommonstreamSchema>[]
+    setSelected: (selected: Stream<CommonstreamSchema>[]) => void
     sx?: SxProps
-    options: Stream[]
+    options: Stream<CommonstreamSchema>[]
 }
 
 export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
@@ -25,7 +25,7 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
                 multiple
                 value={props.selected}
                 options={props.options}
-                getOptionLabel={(option) => option.name}
+                getOptionLabel={(option) => option.payload.name}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 onChange={(_, value) => {
                     props.setSelected(value)
@@ -46,7 +46,7 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
                     value.map((option, index) => (
                         // disabling ESLint here becase 'key' should exist in {..getTagProps({index})}
                         // eslint-disable-next-line
-                        <Chip label={option.name} sx={{ color: 'text.default' }} {...getTagProps({ index })} />
+                        <Chip label={option.payload.name} sx={{ color: 'text.default' }} {...getTagProps({ index })} />
                     ))
                 }
             />

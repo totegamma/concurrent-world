@@ -1,7 +1,7 @@
 import { ListItemButton, type SxProps } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
-import { type User, type Stream } from '@concurrent-world/client'
+import { type User, type Stream, CommonstreamSchema } from '@concurrent-world/client'
 import { useApi } from '../../context/api'
 import PercentIcon from '@mui/icons-material/Percent'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
@@ -15,10 +15,10 @@ export interface StreamLinkProps {
 
 export const StreamLink = (props: StreamLinkProps): JSX.Element | null => {
     const client = useApi()
-    const [stream, SetStream] = useState<Stream | null | undefined>(null)
+    const [stream, SetStream] = useState<Stream<CommonstreamSchema> | null | undefined>(null)
 
     useEffect(() => {
-        client.getStream(props.streamID).then((e) => {
+        client.getStream<CommonstreamSchema>(props.streamID).then((e) => {
             SetStream(e)
         })
     }, [props.streamID])
@@ -41,7 +41,7 @@ export const StreamLink = (props: StreamLinkProps): JSX.Element | null => {
             onClick={props.onClick}
         >
             <PercentIcon />
-            {stream?.name}
+            {stream?.payload.name}
         </ListItemButton>
     )
 }
@@ -87,7 +87,7 @@ export const UserStreamLink = (props: UserStreamLinkProps): JSX.Element | null =
             onClick={props.onClick}
         >
             <AlternateEmailIcon />
-            {user?.profile?.username}
+            {user?.profile?.payload.body.username}
         </ListItemButton>
     )
 }

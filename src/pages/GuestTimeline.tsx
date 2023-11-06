@@ -35,8 +35,8 @@ export function GuestTimelinePage(): JSX.Element {
             )
             client.getUser(id).then((e) => {
                 setUser(e)
-                setTitle(e?.profile?.username ?? '')
-                setTargetStream([e?.userstreams?.homeStream ?? ''])
+                setTitle(e?.profile?.payload.body.username ?? '')
+                setTargetStream([e?.userstreams?.payload.body.homeStream ?? ''])
             })
 
             initializeClient(client)
@@ -46,7 +46,7 @@ export function GuestTimelinePage(): JSX.Element {
             setTargetStream([query])
             const resolver = query.split('@')[1]
             // well-known guest
-            // らたい すいか きけんせい うつる てんない にいがた れきだい つながる あたためる みいら よゆう えもの
+            // らたい すいか きけんせい うつる てんない にいがた れきだい つながる あたためる みいら よゆう えもの
             const client = new Client('8c215bedacf0888470fd2567d03a813f4ae926be4a2cd587979809b629d70592', resolver)
 
             client.api.readStream(query).then((e) => {
@@ -221,7 +221,7 @@ export function GuestTimelinePage(): JSX.Element {
                                                         <Box /* profile */
                                                             sx={{
                                                                 backgroundImage: `url(${
-                                                                    user.profile?.banner || Background
+                                                                    user.profile?.payload.body.banner || Background
                                                                 })`,
                                                                 backgroundPosition: 'center',
                                                                 backgroundSize: 'cover',
@@ -247,8 +247,8 @@ export function GuestTimelinePage(): JSX.Element {
                                                                     }}
                                                                 >
                                                                     <CCAvatar
-                                                                        alt={user.profile?.username}
-                                                                        avatarURL={user.profile?.avatar}
+                                                                        alt={user.profile?.payload.body.username}
+                                                                        avatarURL={user.profile?.payload.body.avatar}
                                                                         identiconSource={user.ccid}
                                                                         sx={{
                                                                             width: '80px',
@@ -282,7 +282,7 @@ export function GuestTimelinePage(): JSX.Element {
                                                                         }}
                                                                     >
                                                                         <Typography>
-                                                                            {user.profile?.description}
+                                                                            {user.profile?.payload.body.description}
                                                                         </Typography>
                                                                     </Box>
                                                                     <Box

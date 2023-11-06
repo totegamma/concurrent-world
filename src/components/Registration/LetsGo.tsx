@@ -3,12 +3,12 @@ import Tilt from 'react-parallax-tilt'
 import { PassportRenderer } from '../theming/Passport'
 import { type ConcurrentTheme } from '../../model'
 import { type Identity } from '../../util'
-import { type CoreDomain, type Profile } from '@concurrent-world/client'
+import { type CoreDomain, type ProfileSchema } from '@concurrent-world/client'
 
 export function RegistrationReady(props: {
     next: () => void
     identity: Identity
-    profile: Profile | null
+    profile: ProfileSchema | null
     host: CoreDomain | null | undefined
 }): JSX.Element {
     const theme = useTheme<ConcurrentTheme>()

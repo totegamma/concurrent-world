@@ -8,7 +8,7 @@ import { Timeline } from '../components/Timeline/main'
 import { StreamInfo } from '../components/StreamInfo'
 import { ApplicationContext } from '../App'
 import { usePreference } from '../context/PreferenceContext'
-import { type Stream } from '@concurrent-world/client'
+import { CommonstreamSchema, type Stream } from '@concurrent-world/client'
 import PercentIcon from '@mui/icons-material/Percent'
 import InfoIcon from '@mui/icons-material/Info'
 import { CCDrawer } from '../components/ui/CCDrawer'
@@ -25,12 +25,12 @@ export const StreamPage = memo((): JSX.Element => {
     const [writeable, setWriteable] = useState<boolean>(true)
 
     const targetStreamID = reactlocation.hash.replace('#', '').split(',')[0]
-    const [targetStream, setTargetStream] = useState<Stream | null | undefined>(null)
+    const [targetStream, setTargetStream] = useState<Stream<CommonstreamSchema> | null | undefined>(null)
 
     const [streamInfoOpen, setStreamInfoOpen] = useState<boolean>(false)
 
     useEffect(() => {
-        client.getStream(targetStreamID).then((stream) => {
+        client.getStream<CommonstreamSchema>(targetStreamID).then((stream) => {
             setTargetStream(stream)
         })
 
@@ -70,7 +70,7 @@ export const StreamPage = memo((): JSX.Element => {
                 }}
             >
                 <TimelineHeader
-                    title={targetStream?.name ?? 'Not Found'}
+                    title={targetStream?.payload.name ?? 'Not Found'}
                     titleIcon={<PercentIcon />}
                     secondaryAction={<InfoIcon />}
                     onTitleClick={() => {

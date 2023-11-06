@@ -10,7 +10,6 @@ import { FollowButton } from '../components/FollowButton'
 import { type User } from '@concurrent-world/client'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import { TimelineHeader } from '../components/TimelineHeader'
-import { type UserAckCollection } from '@concurrent-world/client/dist/types/schemas/userAckCollection'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import { AckList } from '../components/AckList'
 import { AckButton } from '../components/AckButton'
@@ -29,8 +28,8 @@ export function EntityPage(): JSX.Element {
     const timelineRef = useRef<VListHandle>(null)
     const isSelf = id === client.ccid
 
-    const [ackUsers, setAckUsers] = useState<User[]>([])
-    const ackedUsers = user?.profile?.ackedby ?? []
+    const [ackingUsers, setAckingUsers] = useState<User[]>([])
+    const [ackerUsers, setAckerUsers] = useState<User[]>([])
 
     const [detailMode, setDetailMode] = useState<detail>('none')
 
@@ -44,29 +43,29 @@ export function EntityPage(): JSX.Element {
     }, [id])
 
     useEffect(() => {
+        let unmounted = false
         if (!user) return
-        let collectionID = user.userstreams?.ackCollection
-        if (!collectionID) return
-        if (!collectionID.includes('@') && user.domain) {
-            // WORKAROUND
-            collectionID += '@' + user.domain
-        }
-        client.api.readCollection<UserAckCollection>(collectionID).then((ackCollection) => {
-            if (!ackCollection) return
-            Promise.all(ackCollection.items.map((item) => client.getUser(item.payload.ccid!))).then((users) => {
-                setAckUsers(users.filter((user) => user !== null) as User[])
-            })
+        user.getAcker().then((ackers) => {
+            if (unmounted) return
+            setAckerUsers(ackers)
         })
+        user.getAcking().then((acking) => {
+            if (unmounted) return
+            setAckingUsers(acking)
+        })
+        return () => {
+            unmounted = true
+        }
     }, [user])
 
     const targetStreams = useMemo(() => {
         let target
         switch (tab) {
             case 0:
-                target = user?.userstreams?.homeStream
+                target = user?.userstreams?.payload.body.homeStream
                 break
             case 1:
-                target = user?.userstreams?.associationStream
+                target = user?.userstreams?.payload.body.associationStream
                 break
         }
         return target ? [target] : []
@@ -86,7 +85,7 @@ export function EntityPage(): JSX.Element {
             }}
         >
             <TimelineHeader
-                title={user.profile?.username || 'anonymous'}
+                title={user.profile?.payload.body.username || 'anonymous'}
                 titleIcon={<AlternateEmailIcon />}
                 onTitleClick={() => {
                     timelineRef.current?.scrollTo(0)
@@ -105,7 +104,7 @@ export function EntityPage(): JSX.Element {
                     <>
                         <Box /* profile */
                             sx={{
-                                backgroundImage: `url(${user.profile?.banner || Background})`,
+                                backgroundImage: `url(${user.profile?.payload.body.banner || Background})`,
                                 backgroundPosition: 'center',
                                 backgroundSize: 'cover',
                                 display: 'flex',
@@ -135,8 +134,8 @@ export function EntityPage(): JSX.Element {
                                         }}
                                     >
                                         <CCAvatar
-                                            alt={user.profile?.username}
-                                            avatarURL={user.profile?.avatar}
+                                            alt={user.profile?.payload.body.username}
+                                            avatarURL={user.profile?.payload.body.avatar}
                                             identiconSource={user.ccid}
                                             sx={{
                                                 width: { xs: '80px', sm: '60px', md: '80px' },
@@ -161,7 +160,7 @@ export function EntityPage(): JSX.Element {
                                                         setDetailMode('ack')
                                                     }}
                                                 >
-                                                    {ackUsers.length} Ack
+                                                    {ackingUsers.length} Ack
                                                 </Typography>
                                                 <Typography
                                                     component={Link}
@@ -170,7 +169,7 @@ export function EntityPage(): JSX.Element {
                                                         setDetailMode('acker')
                                                     }}
                                                 >
-                                                    {ackedUsers.length} Acker
+                                                    {ackerUsers.length} Acker
                                                 </Typography>
                                             </Box>
                                             {!isSelf ? (
@@ -179,7 +178,7 @@ export function EntityPage(): JSX.Element {
                                                     <FollowButton
                                                         color={theme.palette.secondary.main}
                                                         userCCID={id!}
-                                                        userStreamID={user.userstreams?.homeStream ?? ''}
+                                                        userStreamID={user.userstreams?.payload.body.homeStream ?? ''}
                                                     />
                                                 </>
                                             ) : (
@@ -195,7 +194,7 @@ export function EntityPage(): JSX.Element {
                                             alignItems: 'center'
                                         }}
                                     >
-                                        <Typography>{user.profile?.description}</Typography>
+                                        <Typography>{user.profile?.payload.body.description}</Typography>
                                     </Box>
                                     <Box
                                         sx={{

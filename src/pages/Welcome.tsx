@@ -170,41 +170,18 @@ export default function Welcome(): JSX.Element {
                     </Box>
                     <Box display="flex" flexDirection="column" flex={1} gap={1}>
                         <StreamCard
-                            stream={{
-                                stream: {
-                                    name: 'Arrival Lounge',
-                                    shortname: 'concurrent',
-                                    description:
-                                        'hub.concurrent.worldサーバーへようこそ！わからない事があれば、ここで呟いてみましょう。',
-                                    banner: 'https://cdn.discordapp.com/attachments/812107435833294868/1138120758493708348/image.png',
-                                    id: 'ci8qvhep9dcpltmfq3fg@hub.concurrent.world',
-                                    schema: '',
-                                    author: '',
-                                    maintainer: [],
-                                    writer: [],
-                                    reader: [],
-                                    cdate: new Date()
-                                },
-                                domain: 'hub.concurrent.world'
-                            }}
+                            streamID="ci8qvhep9dcpltmfq3fg@hub.concurrent.world"
+                            name="Arrival Lounge"
+                            description="hub.concurrent.worldサーバーへようこそ！わからない事があれば、ここで呟いてみましょう。"
+                            banner="https://cdn.discordapp.com/attachments/812107435833294868/1138120758493708348/image.png"
+                            domain="hub.concurrent.world"
                         />
                         <StreamCard
-                            stream={{
-                                stream: {
-                                    name: 'Dev Central',
-                                    shortname: 'dev',
-                                    description: '開発者の憩い場',
-                                    banner: 'https://cdn.discordapp.com/attachments/812107435833294868/1138082112646418463/IMG_1983.jpg',
-                                    id: 'chrmsgep9dcl7anfkgcg@dev.concurrent.world',
-                                    schema: '',
-                                    author: '',
-                                    maintainer: [],
-                                    writer: [],
-                                    reader: [],
-                                    cdate: new Date()
-                                },
-                                domain: 'dev.concurrent.world'
-                            }}
+                            streamID="chrmsgep9dcl7anfkgcg@dev.concurrent.world"
+                            name="Dev Central"
+                            description="開発者の憩い場"
+                            banner="https://cdn.discordapp.com/attachments/812107435833294868/1138082112646418463/IMG_1983.jpg"
+                            domain="dev.concurrent.world"
                         />
                     </Box>
                 </Box>

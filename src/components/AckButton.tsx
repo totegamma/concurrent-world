@@ -5,17 +5,15 @@ import PersonRemoveAlt1Icon from '@mui/icons-material/PersonRemoveAlt1'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { type User } from '@concurrent-world/client'
 import { ApplicationContext } from '../App'
-import { useApi } from '../context/api'
 
 export interface AckButtonProps {
     user: User
 }
 
 export const AckButton = (props: AckButtonProps): JSX.Element => {
-    const client = useApi()
     const appData = useContext(ApplicationContext)
     const myAck = useMemo(() => {
-        return appData.acklist.find((ack) => ack.payload.ccid === props.user.ccid)
+        return appData.acklist.find((ack) => ack.ccid === props.user.ccid)
     }, [appData.acklist, props.user.ccid])
 
     const [isHovered, setIsHovered] = useState(false)
@@ -31,11 +29,11 @@ export const AckButton = (props: AckButtonProps): JSX.Element => {
                 }}
                 onClick={() => {
                     if (myAck) {
-                        client.unAckUser(myAck.id).then(() => {
+                        props.user.UnAck().then(() => {
                             appData.updateAcklist()
                         })
                     } else {
-                        client.ackUser(props.user).then(() => {
+                        props.user.Ack().then(() => {
                             appData.updateAcklist()
                         })
                     }

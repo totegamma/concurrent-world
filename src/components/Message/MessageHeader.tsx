@@ -4,17 +4,17 @@ import { Link as RouterLink } from 'react-router-dom'
 import { useContext, useMemo } from 'react'
 import { ApplicationContext } from '../../App'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import { type M_Current, type M_Reply } from '@concurrent-world/client'
+import { type Message, type ReplyMessageSchema, type SimpleNoteSchema } from '@concurrent-world/client'
 
 export interface MessageHeaderProps {
-    message: M_Current | M_Reply
+    message: Message<SimpleNoteSchema | ReplyMessageSchema>
 }
 
 export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
     const appData = useContext(ApplicationContext)
 
     const myAck = useMemo(() => {
-        return appData.acklist.find((ack) => ack.payload.ccid === props.message.author.ccid)
+        return appData.acklist.find((ack) => ack.ccid === props.message.author)
     }, [props.message, appData.acklist])
 
     return (
@@ -38,7 +38,9 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                         fontSize: { xs: '0.9rem', sm: '0.95rem' }
                     }}
                 >
-                    {props.message.profileOverride?.username || props.message.author.profile?.username || 'anonymous'}
+                    {props.message.payload.body.profileOverride?.username ||
+                        props.message.authorUser?.profile?.payload.body.username ||
+                        'anonymous'}
                 </Typography>
                 {myAck && (
                     <Tooltip arrow title="Ackしています" placement="top">
@@ -51,7 +53,7 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                         />
                     </Tooltip>
                 )}
-                {props.message.author.certs?.map((cert, i) => (
+                {props.message.authorUser?.certs?.map((cert, i) => (
                     <Tooltip arrow key={i} title={cert.description} placement="top">
                         <Box
                             component="img"
@@ -69,7 +71,7 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                 underline="hover"
                 color="inherit"
                 fontSize="0.75rem"
-                to={`/message/${props.message.id}@${props.message.author.ccid}`}
+                to={`/message/${props.message.id}@${props.message.author}`}
             >
                 <TimeDiff date={new Date(props.message.cdate)} />
             </Link>

@@ -1,11 +1,11 @@
 import { Box } from '@mui/material'
 import { ProfileEditor } from '../ProfileEditor'
-import { type Client, type Profile } from '@concurrent-world/client'
+import { type Client, type ProfileSchema } from '@concurrent-world/client'
 
 export function CreateProfile(props: {
     next: () => void
     client: Client | undefined
-    setProfile: (_: Profile) => void
+    setProfile: (_: ProfileSchema) => void
 }): JSX.Element {
     return (
         <Box
