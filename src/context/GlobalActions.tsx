@@ -21,6 +21,7 @@ export interface GlobalActionsState {
     openReply: (target: Message<any>) => void
     openReroute: (target: Message<any>) => void
     openMobileMenu: (open?: boolean) => void
+    allKnownStreams: Array<Stream<CommonstreamSchema>>
 }
 
 const GlobalActionsContext = createContext<GlobalActionsState | undefined>(undefined)
@@ -187,9 +188,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     openDraft,
                     openReply,
                     openReroute,
-                    openMobileMenu
+                    openMobileMenu,
+                    allKnownStreams
                 }
-            }, [openDraft, openReply, openReroute, openMobileMenu])}
+            }, [openDraft, openReply, openReroute, openMobileMenu, allKnownStreams])}
         >
             {props.children}
             <Modal

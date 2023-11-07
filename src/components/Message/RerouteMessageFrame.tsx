@@ -1,6 +1,6 @@
 import { Box, IconButton, Link, ListItemIcon, ListItemText, Menu, MenuItem, Typography } from '@mui/material'
 
-import { Message, RerouteMessageSchema } from '@concurrent-world/client'
+import { type Message, type RerouteMessageSchema } from '@concurrent-world/client'
 import RepeatIcon from '@mui/icons-material/Repeat'
 import { CCAvatar } from '../ui/CCAvatar'
 import { Link as routerLink, Link as RouterLink } from 'react-router-dom'
@@ -14,7 +14,6 @@ import { useApi } from '../../context/api'
 
 export interface RerouteMessageFrameProp {
     message: Message<RerouteMessageSchema>
-    reloadMessage: () => void
     lastUpdated?: number
 }
 

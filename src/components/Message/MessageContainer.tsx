@@ -1,4 +1,10 @@
-import { Message, ReplyMessageSchema, RerouteMessageSchema, Schemas, SimpleNoteSchema } from '@concurrent-world/client'
+import {
+    type Message,
+    type ReplyMessageSchema,
+    type RerouteMessageSchema,
+    Schemas,
+    type SimpleNoteSchema
+} from '@concurrent-world/client'
 import { useApi } from '../../context/api'
 import { createContext, memo, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { ReplyMessageFrame } from './ReplyMessageFrame'
@@ -36,7 +42,9 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
     const pref = usePreference()
     const inspector = useInspector()
     const actions = useGlobalActions()
-    const [message, setMessage] = useState<Message<SimpleNoteSchema | ReplyMessageSchema | RerouteMessageSchema> | null>()
+    const [message, setMessage] = useState<Message<
+        SimpleNoteSchema | ReplyMessageSchema | RerouteMessageSchema
+    > | null>()
     const [isFetching, setIsFetching] = useState<boolean>(true)
     const watchingStreams = useWatchingStream()
 
@@ -79,13 +87,9 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
         return {
             openReply,
             openReroute,
-            openInspector,
+            openInspector
         }
-    }, [
-        openInspector,
-        openReply,
-        openReroute,
-    ])
+    }, [openInspector, openReply, openReroute])
 
     if (isFetching) {
         return (
@@ -112,18 +116,19 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
     let body
     switch (message?.schema) {
         case Schemas.simpleNote:
-            body = <MessageView 
+            body = (
+                <MessageView
                     message={message as Message<SimpleNoteSchema>}
                     lastUpdated={props.lastUpdated}
                     userCCID={client.ccid}
                 />
+            )
             break
         case Schemas.replyMessage:
             body = (
                 <ReplyMessageFrame
                     message={message as Message<ReplyMessageSchema>}
                     lastUpdated={props.lastUpdated}
-                    reloadMessage={reloadMessage}
                     userCCID={client.ccid}
                 />
             )
@@ -133,7 +138,6 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
                 <RerouteMessageFrame
                     message={message as Message<RerouteMessageSchema>}
                     lastUpdated={props.lastUpdated}
-                    reloadMessage={reloadMessage}
                 />
             )
             break
