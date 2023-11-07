@@ -194,7 +194,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
             }, [openDraft, openReply, openReroute, openMobileMenu, allKnownStreams])}
         >
             <InspectorProvider>
-                {props.children}
+                <>{props.children}</>
                 <Modal
                     open={mode !== 'none'}
                     onClose={() => {
