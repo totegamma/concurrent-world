@@ -1,6 +1,6 @@
 import { Box, Chip } from '@mui/material'
 
-import { Message, ReplyMessageSchema, SimpleNoteSchema } from '@concurrent-world/client'
+import { type Message, type ReplyMessageSchema, type SimpleNoteSchema } from '@concurrent-world/client'
 import { useApi } from '../../context/api'
 import { MessageView } from './MessageView'
 import { OneLineMessageView } from './OneLineMessageView'
@@ -8,7 +8,6 @@ import { useEffect, useState } from 'react'
 
 export interface ReplyMessageFrameProp {
     message: Message<ReplyMessageSchema>
-    reloadMessage: () => void
     lastUpdated?: number
     userCCID: string
 }
@@ -25,7 +24,6 @@ export const ReplyMessageFrame = (props: ReplyMessageFrameProp): JSX.Element => 
             })
         }
     }, [props.message])
-
 
     return (
         <>

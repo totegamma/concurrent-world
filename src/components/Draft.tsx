@@ -45,6 +45,7 @@ export interface DraftProps {
     onSubmit: (text: string, destinations: string[], emojis?: Record<string, EmojiLite>) => Promise<Error | null>
     allowEmpty?: boolean
     autoFocus?: boolean
+    placeholder?: string
 }
 
 export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
@@ -324,7 +325,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         }
                     }}
                     onPaste={handlePasteImage}
-                    placeholder={t('placeholder')}
+                    placeholder={props.placeholder ?? t('placeholder')}
                     autoFocus={props.autoFocus}
                     sx={{
                         width: 1,
@@ -413,7 +414,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     <Tooltip title={t('emoji')} arrow placement="top" enterDelay={500}>
                         <IconButton
                             sx={{
-                                color: theme.palette.text.secondary
+                                color: 'text.secondary'
                             }}
                             onClick={(e) => {
                                 emojiPicker.open(e.currentTarget, (emoji) => {
@@ -472,7 +473,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         <Fade in={draft.length > 0}>
                             <IconButton
                                 sx={{
-                                    color: theme.palette.text.secondary
+                                    color: 'text.secondary'
                                 }}
                                 onClick={() => {
                                     setOpenPreview(!openPreview)
@@ -526,11 +527,10 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             <Collapse unmountOnExit in={openPreview && draft.length > 0}>
                 <Divider
                     sx={{
-                        mt: 1
+                        my: 1,
+                        borderStyle: 'dashed'
                     }}
-                >
-                    Preview
-                </Divider>
+                />
 
                 <DummyMessageView
                     message={{

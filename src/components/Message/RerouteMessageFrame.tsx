@@ -1,26 +1,26 @@
 import { Box, IconButton, Link, ListItemIcon, ListItemText, Menu, MenuItem, Typography } from '@mui/material'
 
-import { Message, RerouteMessageSchema } from '@concurrent-world/client'
+import { type Message, type RerouteMessageSchema } from '@concurrent-world/client'
 import RepeatIcon from '@mui/icons-material/Repeat'
 import { CCAvatar } from '../ui/CCAvatar'
 import { Link as routerLink, Link as RouterLink } from 'react-router-dom'
 import { TimeDiff } from '../ui/TimeDiff'
-import { MessageContainer, useMessageService } from './MessageContainer'
+import { MessageContainer } from './MessageContainer'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { useState } from 'react'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { useApi } from '../../context/api'
+import { useInspector } from '../../context/Inspector'
 
 export interface RerouteMessageFrameProp {
     message: Message<RerouteMessageSchema>
-    reloadMessage: () => void
     lastUpdated?: number
 }
 
 export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element => {
     const client = useApi()
-    const service = useMessageService()
+    const inspector = useInspector()
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
     return (
@@ -98,7 +98,7 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
             >
                 <MenuItem
                     onClick={() => {
-                        service.openInspector()
+                        inspector.inspectItem({ messageId: props.message.id, author: props.message.author })
                         setMenuAnchor(null)
                     }}
                 >
