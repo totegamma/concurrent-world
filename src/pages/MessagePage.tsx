@@ -146,16 +146,9 @@ export function MessagePage(): JSX.Element {
                     }
                     streamPickerOptions={actions.allKnownStreams}
                     placeholder="Write a reply..."
-                    onSubmit={async (text: string, destinations: string[], emojis) => {
-                        client
-                            .createCurrent(text, destinations, emojis)
-                            .then(() => {
-                                return null
-                            })
-                            .catch((e) => {
-                                return e
-                            })
-                        return await Promise.resolve(null)
+                    onSubmit={async (text: string, streams: string[], emojis) => {
+                        message.reply(streams, text, emojis)
+                        return null
                     }}
                 />
             </Paper>
