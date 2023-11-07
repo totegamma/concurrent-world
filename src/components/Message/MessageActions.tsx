@@ -36,7 +36,7 @@ export interface MessageActionsProps {
 
 export const MessageActions = (props: MessageActionsProps): JSX.Element => {
     const actions = useGlobalActions()
-    const { inspectItem } = useInspector()
+    const inspector = useInspector()
 
     const [streamListOpen, setStreamListOpen] = useState<boolean>(false)
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
@@ -207,7 +207,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     </MenuItem>
                     <MenuItem
                         onClick={() => {
-                            inspectItem({ messageId: props.message.id, author: props.message.author })
+                            inspector.inspectItem({ messageId: props.message.id, author: props.message.author })
                             setMenuAnchor(null)
                         }}
                     >

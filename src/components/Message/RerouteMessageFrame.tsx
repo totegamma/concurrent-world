@@ -20,7 +20,7 @@ export interface RerouteMessageFrameProp {
 
 export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element => {
     const client = useApi()
-    const { inspectItem } = useInspector()
+    const inspector = useInspector()
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
     return (
@@ -98,7 +98,7 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
             >
                 <MenuItem
                     onClick={() => {
-                        inspectItem({ messageId: props.message.id, author: props.message.author })
+                        inspector.inspectItem({ messageId: props.message.id, author: props.message.author })
                         setMenuAnchor(null)
                     }}
                 >
