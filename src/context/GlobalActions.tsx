@@ -1,5 +1,5 @@
 import { Box, Paper, Modal, Typography, Divider, Button, Drawer, useTheme } from '@mui/material'
-
+import { InspectorProvider } from '../context/Inspector'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
 import {
@@ -193,148 +193,150 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                 }
             }, [openDraft, openReply, openReroute, openMobileMenu, allKnownStreams])}
         >
-            {props.children}
-            <Modal
-                open={mode !== 'none'}
-                onClose={() => {
-                    setMode('none')
-                }}
-            >
-                <>
-                    {mode === 'compose' && (
-                        <Paper sx={style}>
-                            <Box sx={{ display: 'flex' }}>
-                                <Draft
-                                    autoFocus
-                                    streamPickerInitial={queriedStreams}
-                                    streamPickerOptions={allKnownStreams}
-                                    onSubmit={async (text: string, destinations: string[], emojis) => {
-                                        client
-                                            .createCurrent(text, destinations, emojis)
-                                            .then(() => {
-                                                return null
-                                            })
-                                            .catch((e) => {
-                                                return e
-                                            })
-                                            .finally(() => {
-                                                setMode('none')
-                                            })
-                                        return await Promise.resolve(null)
-                                    }}
-                                />
-                            </Box>
-                        </Paper>
-                    )}
-                    {targetMessage && (mode === 'reply' || mode === 'reroute') && (
-                        <Paper sx={style}>
-                            <MessageContainer messageID={targetMessage.id} messageOwner={targetMessage.author} />
-                            <Divider />
-                            <Box sx={{ display: 'flex' }}>
-                                <Draft
-                                    autoFocus
-                                    allowEmpty={mode === 'reroute'}
-                                    submitButtonLabel={mode === 'reply' ? 'Reply' : 'Reroute'}
-                                    streamPickerInitial={targetMessage.postedStreams ?? []}
-                                    streamPickerOptions={
-                                        mode === 'reroute' ? allKnownStreams : targetMessage.postedStreams ?? []
-                                    }
-                                    onSubmit={async (text, streams, emojis): Promise<Error | null> => {
-                                        if (mode === 'reroute') {
-                                            targetMessage.reroute(streams, text, emojis)
-                                        } else if (mode === 'reply') {
-                                            targetMessage.reply(streams, text, emojis)
+            <InspectorProvider>
+                {props.children}
+                <Modal
+                    open={mode !== 'none'}
+                    onClose={() => {
+                        setMode('none')
+                    }}
+                >
+                    <>
+                        {mode === 'compose' && (
+                            <Paper sx={style}>
+                                <Box sx={{ display: 'flex' }}>
+                                    <Draft
+                                        autoFocus
+                                        streamPickerInitial={queriedStreams}
+                                        streamPickerOptions={allKnownStreams}
+                                        onSubmit={async (text: string, destinations: string[], emojis) => {
+                                            client
+                                                .createCurrent(text, destinations, emojis)
+                                                .then(() => {
+                                                    return null
+                                                })
+                                                .catch((e) => {
+                                                    return e
+                                                })
+                                                .finally(() => {
+                                                    setMode('none')
+                                                })
+                                            return await Promise.resolve(null)
+                                        }}
+                                    />
+                                </Box>
+                            </Paper>
+                        )}
+                        {targetMessage && (mode === 'reply' || mode === 'reroute') && (
+                            <Paper sx={style}>
+                                <MessageContainer messageID={targetMessage.id} messageOwner={targetMessage.author} />
+                                <Divider />
+                                <Box sx={{ display: 'flex' }}>
+                                    <Draft
+                                        autoFocus
+                                        allowEmpty={mode === 'reroute'}
+                                        submitButtonLabel={mode === 'reply' ? 'Reply' : 'Reroute'}
+                                        streamPickerInitial={targetMessage.postedStreams ?? []}
+                                        streamPickerOptions={
+                                            mode === 'reroute' ? allKnownStreams : targetMessage.postedStreams ?? []
                                         }
-                                        setMode('none')
-                                        return null
-                                    }}
-                                />
-                            </Box>
-                        </Paper>
-                    )}
-                </>
-            </Modal>
-            <Modal open={domainIsOffline} onClose={() => {}}>
-                <Paper sx={style}>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'column'
-                        }}
-                    >
-                        <Typography>
-                            あなたのドメイン{client.api.host}は現在オフラインです。復旧までしばらくお待ちください。
-                        </Typography>
-                        <Button
-                            variant="contained"
-                            onClick={() => {
-                                window.location.reload()
+                                        onSubmit={async (text, streams, emojis): Promise<Error | null> => {
+                                            if (mode === 'reroute') {
+                                                targetMessage.reroute(streams, text, emojis)
+                                            } else if (mode === 'reply') {
+                                                targetMessage.reply(streams, text, emojis)
+                                            }
+                                            setMode('none')
+                                            return null
+                                        }}
+                                    />
+                                </Box>
+                            </Paper>
+                        )}
+                    </>
+                </Modal>
+                <Modal open={domainIsOffline} onClose={() => {}}>
+                    <Paper sx={style}>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column'
                             }}
                         >
-                            Reload
-                        </Button>
-                    </Box>
-                </Paper>
-            </Modal>
-            <Modal open={setupAccountRequired} onClose={() => {}}>
-                <Paper sx={style}>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'column'
-                        }}
-                    >
-                        <Typography variant="h2" component="div">
-                            アカウント設定を完了させましょう！
-                        </Typography>
-                        見つかった問題:
-                        <ul>
-                            {!client?.user?.profile && <li>プロフィールが存在していません</li>}
-                            {!client?.user?.userstreams?.payload.body.homeStream && (
-                                <li>ホームストリームが存在していません</li>
-                            )}
-                            {!client?.user?.userstreams?.payload.body.notificationStream && (
-                                <li>通知ストリームが存在していません</li>
-                            )}
-                            {!client?.user?.userstreams?.payload.body.associationStream && (
-                                <li>アクティビティストリームが存在していません</li>
-                            )}
-                            {!client?.user?.userstreams?.payload.body.ackCollection && (
-                                <li>Ackコレクションが存在していません</li>
-                            )}
-                        </ul>
-                        <ProfileEditor
-                            id={client?.user?.profile?.id}
-                            initial={client?.user?.profile?.payload.body}
-                            onSubmit={(_) => {
-                                fixAccount()
+                            <Typography>
+                                あなたのドメイン{client.api.host}は現在オフラインです。復旧までしばらくお待ちください。
+                            </Typography>
+                            <Button
+                                variant="contained"
+                                onClick={() => {
+                                    window.location.reload()
+                                }}
+                            >
+                                Reload
+                            </Button>
+                        </Box>
+                    </Paper>
+                </Modal>
+                <Modal open={setupAccountRequired} onClose={() => {}}>
+                    <Paper sx={style}>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column'
                             }}
-                        />
-                    </Box>
-                </Paper>
-            </Modal>
-            <Drawer
-                anchor={'left'}
-                open={mobileMenuOpen}
-                onClose={() => {
-                    setMobileMenuOpen(false)
-                }}
-                PaperProps={{
-                    sx: {
-                        width: '200px',
-                        pt: 1,
-                        borderRadius: `0 ${theme.shape.borderRadius * 2}px ${theme.shape.borderRadius * 2}px 0`,
-                        overflow: 'hidden',
-                        backgroundColor: 'background.default'
-                    }
-                }}
-            >
-                <Menu
-                    onClick={() => {
+                        >
+                            <Typography variant="h2" component="div">
+                                アカウント設定を完了させましょう！
+                            </Typography>
+                            見つかった問題:
+                            <ul>
+                                {!client?.user?.profile && <li>プロフィールが存在していません</li>}
+                                {!client?.user?.userstreams?.payload.body.homeStream && (
+                                    <li>ホームストリームが存在していません</li>
+                                )}
+                                {!client?.user?.userstreams?.payload.body.notificationStream && (
+                                    <li>通知ストリームが存在していません</li>
+                                )}
+                                {!client?.user?.userstreams?.payload.body.associationStream && (
+                                    <li>アクティビティストリームが存在していません</li>
+                                )}
+                                {!client?.user?.userstreams?.payload.body.ackCollection && (
+                                    <li>Ackコレクションが存在していません</li>
+                                )}
+                            </ul>
+                            <ProfileEditor
+                                id={client?.user?.profile?.id}
+                                initial={client?.user?.profile?.payload.body}
+                                onSubmit={(_) => {
+                                    fixAccount()
+                                }}
+                            />
+                        </Box>
+                    </Paper>
+                </Modal>
+                <Drawer
+                    anchor={'left'}
+                    open={mobileMenuOpen}
+                    onClose={() => {
                         setMobileMenuOpen(false)
                     }}
-                />
-            </Drawer>
+                    PaperProps={{
+                        sx: {
+                            width: '200px',
+                            pt: 1,
+                            borderRadius: `0 ${theme.shape.borderRadius * 2}px ${theme.shape.borderRadius * 2}px 0`,
+                            overflow: 'hidden',
+                            backgroundColor: 'background.default'
+                        }
+                    }}
+                >
+                    <Menu
+                        onClick={() => {
+                            setMobileMenuOpen(false)
+                        }}
+                    />
+                </Drawer>
+            </InspectorProvider>
         </GlobalActionsContext.Provider>
     )
 }

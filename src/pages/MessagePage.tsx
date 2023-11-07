@@ -1,6 +1,5 @@
 import { Box, Divider, Paper, Typography } from '@mui/material'
 import { useParams } from 'react-router-dom'
-import { InspectorProvider } from '../context/Inspector'
 import { useApi } from '../context/api'
 import { useEffect, useState } from 'react'
 import {
@@ -85,100 +84,98 @@ export function MessagePage(): JSX.Element {
     }
 
     return (
-        <InspectorProvider>
-            <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '5px',
-                    padding: '20px',
-                    backgroundColor: 'background.paper',
-                    minHeight: '100%',
-                    overflow: 'scroll'
-                }}
-            >
-                <Typography variant="h2" gutterBottom>
-                    Message
-                </Typography>
-                <Divider />
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '5px',
+                padding: '20px',
+                backgroundColor: 'background.paper',
+                minHeight: '100%',
+                overflow: 'scroll'
+            }}
+        >
+            <Typography variant="h2" gutterBottom>
+                Message
+            </Typography>
+            <Divider />
 
-                {replyTo && (
-                    <Paper
-                        sx={{
-                            padding: '20px'
-                        }}
-                    >
-                        <MessageView message={replyTo} lastUpdated={lastUpdated} userCCID={client.ccid} />
-                    </Paper>
-                )}
-
-                {(message.schema === Schemas.simpleNote || message.schema === Schemas.replyMessage) && (
-                    <Paper
-                        sx={{
-                            padding: '20px'
-                        }}
-                    >
-                        <MessageView
-                            message={message as Message<SimpleNoteSchema | ReplyMessageSchema>}
-                            lastUpdated={lastUpdated}
-                            userCCID={client.ccid}
-                        />
-                    </Paper>
-                )}
+            {replyTo && (
                 <Paper
-                    variant="outlined"
                     sx={{
-                        padding: 1
+                        padding: '20px'
                     }}
                 >
-                    <Draft
-                        autoFocus
-                        streamPickerInitial={
-                            JSON.parse(
-                                // XXX: this is a hack to remove the circular references in the stream objects
-                                JSON.stringify(message.postedStreams ?? [], (key, value) => {
-                                    if (key === 'client' || key === 'api') {
-                                        return undefined
-                                    }
-                                    return value
-                                })
-                            ).filter((stream: Stream<any>) => stream.schema === Schemas.commonstream) as Array<
-                                Stream<CommonstreamSchema>
-                            >
-                        }
-                        streamPickerOptions={actions.allKnownStreams}
-                        placeholder="Write a reply..."
-                        onSubmit={async (text: string, destinations: string[], emojis) => {
-                            client
-                                .createCurrent(text, destinations, emojis)
-                                .then(() => {
-                                    return null
-                                })
-                                .catch((e) => {
-                                    return e
-                                })
-                            return await Promise.resolve(null)
-                        }}
+                    <MessageView message={replyTo} lastUpdated={lastUpdated} userCCID={client.ccid} />
+                </Paper>
+            )}
+
+            {(message.schema === Schemas.simpleNote || message.schema === Schemas.replyMessage) && (
+                <Paper
+                    sx={{
+                        padding: '20px'
+                    }}
+                >
+                    <MessageView
+                        message={message as Message<SimpleNoteSchema | ReplyMessageSchema>}
+                        lastUpdated={lastUpdated}
+                        userCCID={client.ccid}
                     />
                 </Paper>
-                {replies.length > 0 && (
-                    <>
-                        <Typography variant="h2" gutterBottom>
-                            Replies:
-                        </Typography>
-                        {replies.map((reply) => (
-                            <Paper
-                                key={reply.id}
-                                sx={{
-                                    padding: '20px'
-                                }}
-                            >
-                                <MessageView message={reply} lastUpdated={lastUpdated} userCCID={client.ccid} />
-                            </Paper>
-                        ))}
-                    </>
-                )}
-            </Box>
-        </InspectorProvider>
+            )}
+            <Paper
+                variant="outlined"
+                sx={{
+                    padding: 1
+                }}
+            >
+                <Draft
+                    autoFocus
+                    streamPickerInitial={
+                        JSON.parse(
+                            // XXX: this is a hack to remove the circular references in the stream objects
+                            JSON.stringify(message.postedStreams ?? [], (key, value) => {
+                                if (key === 'client' || key === 'api') {
+                                    return undefined
+                                }
+                                return value
+                            })
+                        ).filter((stream: Stream<any>) => stream.schema === Schemas.commonstream) as Array<
+                            Stream<CommonstreamSchema>
+                        >
+                    }
+                    streamPickerOptions={actions.allKnownStreams}
+                    placeholder="Write a reply..."
+                    onSubmit={async (text: string, destinations: string[], emojis) => {
+                        client
+                            .createCurrent(text, destinations, emojis)
+                            .then(() => {
+                                return null
+                            })
+                            .catch((e) => {
+                                return e
+                            })
+                        return await Promise.resolve(null)
+                    }}
+                />
+            </Paper>
+            {replies.length > 0 && (
+                <>
+                    <Typography variant="h2" gutterBottom>
+                        Replies:
+                    </Typography>
+                    {replies.map((reply) => (
+                        <Paper
+                            key={reply.id}
+                            sx={{
+                                padding: '20px'
+                            }}
+                        >
+                            <MessageView message={reply} lastUpdated={lastUpdated} userCCID={client.ccid} />
+                        </Paper>
+                    ))}
+                </>
+            )}
+        </Box>
     )
 }

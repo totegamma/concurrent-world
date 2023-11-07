@@ -2,7 +2,6 @@ import { Box, Divider, ListItem, ListItemIcon, ListItemText, Typography, useThem
 import React, { memo, useCallback, useEffect, useState, useRef, forwardRef, type ForwardedRef } from 'react'
 import { AssociationFrame } from '../Association/AssociationFrame'
 import { useApi } from '../../context/api'
-import { InspectorProvider } from '../../context/Inspector'
 import { Loading } from '../ui/Loading'
 import { MessageContainer } from '../Message/MessageContainer'
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
@@ -163,7 +162,7 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
     }
 
     return (
-        <InspectorProvider>
+        <>
             <Box
                 sx={{
                     height: `${ptrEnabled ? PTR_HEIGHT : loaderSize}px`,
@@ -276,7 +275,7 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                     {isFetching && <Loading key={0} message="Loading..." color={theme.palette.text.primary} />}
                 </VList>
             </Box>
-        </InspectorProvider>
+        </>
     )
 })
 timeline.displayName = 'timeline'

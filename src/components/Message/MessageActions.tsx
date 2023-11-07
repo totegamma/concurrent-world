@@ -7,11 +7,18 @@ import AddReactionIcon from '@mui/icons-material/AddReaction'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import RepeatIcon from '@mui/icons-material/Repeat'
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown'
-import { Association, LikeSchema, Message, ReplyMessageSchema, RerouteMessageSchema, Schemas, SimpleNoteSchema} from '@concurrent-world/client'
+import {
+    type Association,
+    type LikeSchema,
+    type Message,
+    type ReplyMessageSchema,
+    type RerouteMessageSchema,
+    Schemas,
+    type SimpleNoteSchema
+} from '@concurrent-world/client'
 import { useMemo, useState } from 'react'
 import Collapse from '@mui/material/Collapse'
 import Fade from '@mui/material/Fade'
-import { useMessageService } from './MessageContainer'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
@@ -19,6 +26,8 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { useEmojiPicker } from '../../context/EmojiPickerContext'
 import { Link as RouterLink } from 'react-router-dom'
 import { IconButtonWithNumber } from '../ui/IconButtonWithNumber'
+import { useGlobalActions } from '../../context/GlobalActions'
+import { useInspector } from '../../context/Inspector'
 
 export interface MessageActionsProps {
     message: Message<SimpleNoteSchema | ReplyMessageSchema | RerouteMessageSchema>
@@ -26,14 +35,22 @@ export interface MessageActionsProps {
 }
 
 export const MessageActions = (props: MessageActionsProps): JSX.Element => {
+    const actions = useGlobalActions()
+    const { inspectItem } = useInspector()
+
     const [streamListOpen, setStreamListOpen] = useState<boolean>(false)
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
-    const service = useMessageService()
 
-    const ownFavorite = useMemo(() => props.message.ownAssociations.find((association) => association.schema === Schemas.like), [props.message])
-    const [favoriteMembers, setFavoriteMembers] = useState<Association<LikeSchema>[]>([])
+    const ownFavorite = useMemo(
+        () => props.message.ownAssociations.find((association) => association.schema === Schemas.like),
+        [props.message]
+    )
+    const [favoriteMembers, setFavoriteMembers] = useState<Array<Association<LikeSchema>>>([])
 
-    const postedCommonStreams = useMemo(() => props.message.postedStreams?.filter((stream) => stream.schema === Schemas.commonstream) ?? [], [props.message])
+    const postedCommonStreams = useMemo(
+        () => props.message.postedStreams?.filter((stream) => stream.schema === Schemas.commonstream) ?? [],
+        [props.message]
+    )
 
     const replyCount = props.message.associationCounts?.[Schemas.replyAssociation] ?? 0
     const likeCount = props.message.associationCounts?.[Schemas.like] ?? 0
@@ -41,7 +58,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
 
     const emojiPicker = useEmojiPicker()
 
-    const loadFavoriteMembers = () => {
+    const loadFavoriteMembers = (): void => {
         props.message.getFavorites().then((favorites) => {
             setFavoriteMembers(favorites)
         })
@@ -67,14 +84,14 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     <IconButtonWithNumber
                         icon={<ReplyIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />}
                         onClick={() => {
-                            service?.openReply()
+                            actions.openReply(props.message)
                         }}
                         message={replyCount}
                     />
                     <IconButtonWithNumber
                         icon={<RepeatIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />}
                         onClick={() => {
-                            service?.openReroute()
+                            actions.openReroute(props.message)
                         }}
                         message={rerouteCount}
                     />
@@ -107,7 +124,10 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                                 height: '20px',
                                                 width: '20px'
                                             }}
-                                            avatarURL={fav.payload.body.profileOverride?.avatar ?? fav.authorUser?.profile?.payload.body.avatar}
+                                            avatarURL={
+                                                fav.payload.body.profileOverride?.avatar ??
+                                                fav.authorUser?.profile?.payload.body.avatar
+                                            }
                                             identiconSource={fav.author}
                                         />
                                         <Typography
@@ -126,7 +146,9 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         }
                         placement="top"
                         disableHoverListener={likeCount === 0}
-                        onOpen={() => loadFavoriteMembers()}
+                        onOpen={() => {
+                            loadFavoriteMembers()
+                        }}
                     >
                         <IconButtonWithNumber
                             icon={
@@ -173,7 +195,8 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                 >
                     <MenuItem
                         onClick={() => {
-                            props.message.payload.body.body && navigator.clipboard.writeText(props.message.payload.body.body)
+                            props.message.payload.body.body &&
+                                navigator.clipboard.writeText(props.message.payload.body.body)
                             setMenuAnchor(null)
                         }}
                     >
@@ -184,7 +207,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     </MenuItem>
                     <MenuItem
                         onClick={() => {
-                            service?.openInspector()
+                            inspectItem({ messageId: props.message.id, author: props.message.author })
                             setMenuAnchor(null)
                         }}
                     >
@@ -248,7 +271,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                     fontSize: '12px',
                                     color: 'text.secondary'
                                 }}
-                                to={'/stream#' + props.message.postedStreams?.[0].id}
+                                to={'/stream#' + (props.message.postedStreams?.[0].id ?? '')}
                             >
                                 {`%${postedCommonStreams[0]?.payload.shortname}`}
                             </Link>
