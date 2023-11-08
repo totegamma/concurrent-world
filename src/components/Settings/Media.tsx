@@ -3,6 +3,8 @@ import { useRef, useState } from 'react'
 import { usePreference } from '../../context/PreferenceContext'
 
 import { useTranslation } from 'react-i18next'
+import { MarkdownRenderer } from '../ui/MarkdownRenderer'
+import { Codeblock } from '../ui/Codeblock'
 
 export const MediaSettings = (): JSX.Element => {
     const pref = usePreference()
@@ -70,61 +72,81 @@ export const MediaSettings = (): JSX.Element => {
                 </>
             )}
             {pref.storageProvider === 's3' && (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
-                    <TextField
-                        label="endpoint"
-                        variant="outlined"
-                        fullWidth={true}
-                        defaultValue={pref.s3Config.endpoint}
-                        onChange={(v) => {
-                            handleS3ConfigSave('endpoint', v.target.value)
-                        }}
-                        type="text"
-                    />
-                    <TextField
-                        label="accessKeyId"
-                        variant="outlined"
-                        fullWidth={true}
-                        defaultValue={pref.s3Config.accessKeyId}
-                        onChange={(v) => {
-                            handleS3ConfigSave('accessKeyId', v.target.value)
-                        }}
-                        type="text"
-                    />
-                    <TextField
-                        label="secretAccessKey"
-                        variant="outlined"
-                        fullWidth={true}
-                        defaultValue={pref.s3Config.secretAccessKey}
-                        onChange={(v) => {
-                            handleS3ConfigSave('secretAccessKey', v.target.value)
-                        }}
-                        type="password"
-                    />
-                    <TextField
-                        label="bucketName"
-                        variant="outlined"
-                        fullWidth={true}
-                        defaultValue={pref.s3Config.bucketName}
-                        onChange={(v) => {
-                            handleS3ConfigSave('bucketName', v.target.value)
-                        }}
-                        type="text"
-                    />
-                    <TextField
-                        label="publicUrl"
-                        variant="outlined"
-                        fullWidth={true}
-                        defaultValue={pref.s3Config.publicUrl}
-                        onChange={(v) => {
-                            handleS3ConfigSave('publicUrl', v.target.value)
-                        }}
-                        type="text"
-                    />
-                    <Button variant="contained" onClick={handleSave}>
-                        {buttonText} (未実装)
-                    </Button>
-                </Box>
+                <>
+                    <Typography>CORSの設定はコレ</Typography>
+                    <Codeblock language={'json'}>
+                        {`[{
+    "AllowedOrigins": [
+        "https://localhost:5173",
+        "https://concurrent.world"
+    ],
+        "AllowedMethods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+    ],
+    "AllowedHeaders": [
+        "*"
+    ]
+}]`}
+                    </Codeblock>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
+                        <TextField
+                            label="endpoint"
+                            variant="outlined"
+                            fullWidth={true}
+                            defaultValue={pref.s3Config.endpoint}
+                            onChange={(v) => {
+                                handleS3ConfigSave('endpoint', v.target.value)
+                            }}
+                            type="text"
+                        />
+                        <TextField
+                            label="accessKeyId"
+                            variant="outlined"
+                            fullWidth={true}
+                            defaultValue={pref.s3Config.accessKeyId}
+                            onChange={(v) => {
+                                handleS3ConfigSave('accessKeyId', v.target.value)
+                            }}
+                            type="text"
+                        />
+                        <TextField
+                            label="secretAccessKey"
+                            variant="outlined"
+                            fullWidth={true}
+                            defaultValue={pref.s3Config.secretAccessKey}
+                            onChange={(v) => {
+                                handleS3ConfigSave('secretAccessKey', v.target.value)
+                            }}
+                            type="password"
+                        />
+                        <TextField
+                            label="bucketName"
+                            variant="outlined"
+                            fullWidth={true}
+                            defaultValue={pref.s3Config.bucketName}
+                            onChange={(v) => {
+                                handleS3ConfigSave('bucketName', v.target.value)
+                            }}
+                            type="text"
+                        />
+                        <TextField
+                            label="publicUrl"
+                            variant="outlined"
+                            fullWidth={true}
+                            defaultValue={pref.s3Config.publicUrl}
+                            onChange={(v) => {
+                                handleS3ConfigSave('publicUrl', v.target.value)
+                            }}
+                            type="text"
+                        />
+                        <Button variant="contained" onClick={handleSave}>
+                            {buttonText} (未実装)
+                        </Button>
+                    </Box>
+                </>
             )}
             <Divider />
 
