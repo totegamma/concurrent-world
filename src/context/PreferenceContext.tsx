@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { usePersistent } from '../hooks/usePersistent'
 import { useApi } from './api'
-import { type StreamList } from '../model'
+import { type s3Config, type StreamList } from '../model'
 
 import BubbleSound from '../resources/Bubble.wav'
 import NotificationSound from '../resources/Notification.wav'
@@ -10,8 +10,14 @@ interface PreferenceState {
     themeName: string
     setThemeName: (_: string) => void
 
+    storageProvider: 'imgur' | 's3'
+    setStorageProvider: (_: string) => void
+
     imgurClientID: string
     setImgurClientID: (_: string) => void
+
+    s3Config: s3Config
+    setS3Config: (_: s3Config) => void
 
     mediaProxy: string
     setMediaProxy: (_: string) => void
@@ -52,7 +58,25 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
     const [initialized, setInitialized] = useState<boolean>(false)
 
     const [themeName, setThemeName] = usePersistent<string>('themeName', 'basic')
+
+    const [storageProvider, _setStorageProvider] = usePersistent<'imgur' | 's3'>('storageProvider', 'imgur')
+    const setStorageProvider = useCallback(
+        (v: string) => {
+            console.log(v)
+            _setStorageProvider(v as 'imgur' | 's3')
+        },
+        [_setStorageProvider]
+    )
+
     const [imgurClientID, setImgurClientID] = usePersistent<string>('imgurClientID', '')
+    const [s3Config, setS3Config] = usePersistent<s3Config>('s3Settings', {
+        endpoint: '',
+        accessKeyId: '',
+        bucketName: '',
+        publicUrl: '',
+        secretAccessKey: ''
+    })
+
     const [mediaProxy, setMediaProxy] = usePersistent<string>('mediaProxy', 'https://urlpreview.kokoa.dev/')
     const [defaultPostHome, setDefaultPostHome] = usePersistent<string[]>('defaultPostHome', [])
     const [defaultPostNonHome, setDefaultPostNonHome] = usePersistent<string[]>('defaultPostNonHome', [])
@@ -87,7 +111,9 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
                 if (!storage) return
                 const parsed = JSON.parse(storage)
                 parsed.themeName && setThemeName(parsed.themeName)
+                parsed.storageProvider && setStorageProvider(parsed.storageProvider)
                 parsed.imgurClientID && setImgurClientID(parsed.imgurClientID)
+                parsed.s3Config && setS3Config(parsed.s3Settings)
                 parsed.mediaProxy && setMediaProxy(parsed.mediaProxy)
                 parsed.defaultPostHome && setDefaultPostHome(parsed.defaultPostHome)
                 parsed.defaultPostNonHome && setDefaultPostNonHome(parsed.defaultPostNonHome)
@@ -143,8 +169,12 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
         return {
             themeName,
             setThemeName,
+            storageProvider,
+            setStorageProvider,
             imgurClientID,
             setImgurClientID,
+            s3Config,
+            setS3Config,
             mediaProxy,
             setMediaProxy,
             defaultPostHome,
@@ -171,7 +201,9 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
         }
     }, [
         themeName,
+        storageProvider,
         imgurClientID,
+        s3Config,
         defaultPostHome,
         defaultPostNonHome,
         devMode,

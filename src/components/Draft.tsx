@@ -38,6 +38,9 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { DummyMessageView } from './Message/DummyMessageView'
 
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+
 export interface DraftProps {
     submitButtonLabel?: string
     streamPickerInitial: Array<Stream<CommonstreamSchema>>
@@ -155,15 +158,85 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     const base64Text = event
                     if (!base64Text.target) return
                     try {
-                        const result = await uploadToImgur(base64Text.target.result as string)
-                        setDraft(draft.replace(uploadingText, ''))
-                        if (!result) {
-                            setDraft(draft + `![upload failed]()`)
+                        if (pref.storageProvider === 'imgur') {
+                            const result = await uploadToImgur(base64Text.target.result as string)
+                            setDraft(draft.replace(uploadingText, ''))
+                            if (!result) {
+                                setDraft(draft + `![upload failed]()`)
+                                return
+                            }
+                            setDraft(draft + `![image](${result})`)
+                            return
+                        } else if (pref.storageProvider === 's3') {
+                            console.log('s3 upload')
+
+                            const S3 = new S3Client({
+                                endpoint: pref.s3Config.endpoint,
+                                credentials: {
+                                    accessKeyId: pref.s3Config.accessKeyId,
+                                    secretAccessKey: pref.s3Config.secretAccessKey
+                                },
+                                region: 'auto'
+                            })
+
+                            const base64Data = (base64Text.target.result as string).split(',')[1] // Base64エンコードされたデータを取得
+                            const byteCharacters = atob(base64Data)
+                            const byteNumbers = new Array(byteCharacters.length)
+                            for (let i = 0; i < byteCharacters.length; i++) {
+                                byteNumbers[i] = byteCharacters.charCodeAt(i)
+                            }
+                            const byteArray = new Uint8Array(byteNumbers)
+
+                            const s3Params = {
+                                Bucket: pref.s3Config.bucketName,
+                                Key: imageFile.name,
+                                ContentType: imageFile.type,
+                                ContentEncoding: 'base64', // Base64エンコードされたデータをアップロードすることを示す
+                                Body: byteArray, // データのBody部分
+                                ACL: 'public-read',
+                                ContentDisposition: 'inline',
+                                CreateBucketConfiguration: {
+                                    LocationConstraint: 'apac'
+                                }
+                            }
+
+                            const fileName = `${Date.now()}.png`
+
+                            const url = await getSignedUrl(
+                                S3,
+                                new PutObjectCommand({
+                                    Bucket: pref.s3Config.bucketName,
+                                    Key: fileName
+                                }),
+                                {
+                                    expiresIn: 60 * 60 * 24 * 7 // 7d
+                                }
+                            )
+                            console.log(url)
+
+                            const result = await fetch(url, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'image/png',
+                                    'Content-Encoding': 'base64',
+                                    'x-amz-acl': 'public-read',
+                                    'Content-Disposition': 'inline'
+                                },
+                                body: byteArray
+                            })
+                            console.log(result)
+
+                            setDraft(draft.replace(uploadingText, ''))
+                            if (!result.ok) {
+                                setDraft(draft + `![upload failed]()`)
+                                return
+                            }
+                            setDraft(draft + `![image](${pref.s3Config.publicUrl}/${fileName})`)
                             return
                         }
-                        setDraft(draft + `![image](${result})`)
                     } catch (e) {
                         setDraft(draft + `![upload failed]()`)
+                        console.error(e)
                     }
                 }
                 reader.readAsDataURL(imageFile)
