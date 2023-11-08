@@ -113,7 +113,7 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
                 parsed.themeName && setThemeName(parsed.themeName)
                 parsed.storageProvider && setStorageProvider(parsed.storageProvider)
                 parsed.imgurClientID && setImgurClientID(parsed.imgurClientID)
-                parsed.s3Config && setS3Config(parsed.s3Settings)
+                parsed.s3Config && setS3Config(parsed.s3Config)
                 parsed.mediaProxy && setMediaProxy(parsed.mediaProxy)
                 parsed.defaultPostHome && setDefaultPostHome(parsed.defaultPostHome)
                 parsed.defaultPostNonHome && setDefaultPostNonHome(parsed.defaultPostNonHome)
@@ -143,7 +143,9 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
         if (!initialized) return
         const storage = JSON.stringify({
             themeName,
+            storageProvider,
             imgurClientID,
+            s3Config,
             defaultPostHome,
             defaultPostNonHome,
             devMode,
@@ -155,7 +157,9 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
         client.api.writeKV('world.concurrent.preference', storage)
     }, [
         themeName,
+        storageProvider,
         imgurClientID,
+        s3Config,
         defaultPostHome,
         defaultPostNonHome,
         devMode,
