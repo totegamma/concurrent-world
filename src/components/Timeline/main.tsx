@@ -42,6 +42,8 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
     const [playBubble] = useSound(pref?.postSound, { volume: pref?.volume / 100, interrupt: false })
     const playBubbleRef = useRef(playBubble)
 
+    const [timelineLoading, setTimelineLoading] = useState<boolean>(true)
+
     useEffect(() => {
         playBubbleRef.current = playBubble
     }, [playBubble])
@@ -49,6 +51,7 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
     useEffect(() => {
         let isCancelled = false
         if (props.streams.length === 0) return
+        setTimelineLoading(true)
         const mt = client.newTimeline().then((t) => {
             if (isCancelled) return
             timeline.current = t
@@ -60,9 +63,14 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                     playBubbleRef.current()
                 }
             }
-            timeline.current.listen(props.streams).then((hasMore) => {
-                setHasMoreData(hasMore)
-            })
+            timeline.current
+                .listen(props.streams)
+                .then((hasMore) => {
+                    setHasMoreData(hasMore)
+                })
+                .finally(() => {
+                    setTimelineLoading(false)
+                })
             return t
         })
         return () => {
@@ -127,40 +135,6 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
 
     const count = timeline.current?.body.length ?? 0
 
-    if (timeline.current === null) {
-        return (
-            <Box
-                sx={{
-                    height: '100%',
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}
-            >
-                <Loading key={0} message="Loading..." color={theme.palette.text.primary} />
-            </Box>
-        )
-    }
-
-    if (count === 0) {
-        return (
-            <Box
-                sx={{
-                    height: '100%',
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}
-            >
-                <Typography variant="h6" color="text.secondary">
-                    No posts
-                </Typography>
-            </Box>
-        )
-    }
-
     return (
         <>
             <Box
@@ -212,68 +186,102 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                     overflow: 'hidden'
                 }}
             >
-                <VList
-                    style={{
-                        flex: 1,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        listStyle: 'none',
-                        overflowX: 'hidden',
-                        overflowY: 'auto',
-                        overscrollBehaviorY: 'none'
-                    }}
-                    onScroll={(top) => {
-                        positionRef.current = top
-                    }}
-                    onRangeChange={(_, end) => {
-                        if (end + 3 > count && hasMoreData) {
-                            console.log('readMore!!')
-                            timeline.current?.readMore()
-                        }
-                    }}
-                    ref={ref}
-                >
-                    {props.header}
-                    {timeline.current?.body.map((e) => {
-                        let element
-                        switch (e.type) {
-                            case 'message':
-                                element = (
-                                    <MessageContainer
-                                        messageID={e.objectID}
-                                        messageOwner={e.owner}
-                                        lastUpdated={e.lastUpdate?.getTime() ?? 0}
-                                        after={divider}
-                                        timestamp={e.cdate}
-                                    />
-                                )
-                                break
-                            case 'association':
-                                element = (
-                                    <AssociationFrame
-                                        associationID={e.objectID}
-                                        associationOwner={e.owner}
-                                        lastUpdated={e.lastUpdate?.getTime() ?? 0}
-                                        after={divider}
-                                        perspective={props.perspective}
-                                    />
-                                )
-                                break
-                            default:
-                                element = <Typography>Unknown message type: {e.type}</Typography>
-                                break
-                        }
+                {timelineLoading ? (
+                    <Box
+                        sx={{
+                            height: '100%',
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}
+                    >
+                        <Loading key={0} message="Loading..." color={theme.palette.text.primary} />
+                    </Box>
+                ) : (
+                    <VList
+                        style={{
+                            flex: 1,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            listStyle: 'none',
+                            overflowX: 'hidden',
+                            overflowY: 'auto',
+                            overscrollBehaviorY: 'none'
+                        }}
+                        onScroll={(top) => {
+                            positionRef.current = top
+                        }}
+                        onRangeChange={(_, end) => {
+                            if (end + 3 > count && hasMoreData) {
+                                console.log('readMore!!')
+                                timeline.current?.readMore()
+                            }
+                        }}
+                        ref={ref}
+                    >
+                        {props.header}
 
-                        return (
-                            <React.Fragment key={e.objectID}>
-                                <ErrorBoundary FallbackComponent={renderError}>
-                                    <Box padding={1}>{element}</Box>
-                                </ErrorBoundary>
-                            </React.Fragment>
-                        )
-                    })}
-                    {isFetching && <Loading key={0} message="Loading..." color={theme.palette.text.primary} />}
-                </VList>
+                        {(timeline.current?.body.length ?? 0) === 0 ? (
+                            <Box
+                                sx={{
+                                    width: '100%',
+                                    display: 'flex',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                <Typography
+                                    sx={{
+                                        color: 'text.secondary'
+                                    }}
+                                >
+                                    No currents yet here!
+                                </Typography>
+                            </Box>
+                        ) : (
+                            timeline.current?.body.map((e) => {
+                                let element
+                                switch (e.type) {
+                                    case 'message':
+                                        element = (
+                                            <MessageContainer
+                                                messageID={e.objectID}
+                                                messageOwner={e.owner}
+                                                lastUpdated={e.lastUpdate?.getTime() ?? 0}
+                                                after={divider}
+                                                timestamp={e.cdate}
+                                            />
+                                        )
+                                        break
+                                    case 'association':
+                                        element = (
+                                            <AssociationFrame
+                                                associationID={e.objectID}
+                                                associationOwner={e.owner}
+                                                lastUpdated={e.lastUpdate?.getTime() ?? 0}
+                                                after={divider}
+                                                perspective={props.perspective}
+                                            />
+                                        )
+                                        break
+                                    default:
+                                        element = <Typography>Unknown message type: {e.type}</Typography>
+                                        break
+                                }
+
+                                return (
+                                    <React.Fragment key={e.objectID}>
+                                        <ErrorBoundary FallbackComponent={renderError}>
+                                            <Box padding={1}>{element}</Box>
+                                        </ErrorBoundary>
+                                    </React.Fragment>
+                                )
+                            })
+                        )}
+
+                        {isFetching && <Loading key={0} message="Loading..." color={theme.palette.text.primary} />}
+                    </VList>
+                )}
             </Box>
         </>
     )

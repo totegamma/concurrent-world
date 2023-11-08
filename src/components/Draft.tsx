@@ -542,12 +542,13 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     timestamp={
                         <Typography
                             sx={{
-                                backgroundColor: theme.palette.primary.main,
-                                color: theme.palette.primary.contrastText,
-                                px: 1
+                                backgroundColor: 'divider',
+                                color: 'primary.contrastText',
+                                px: 1,
+                                fontSize: '0.75rem'
                             }}
                         >
-                            Preview
+                            {t('preview')}
                         </Typography>
                     }
                 />

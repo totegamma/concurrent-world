@@ -1,14 +1,30 @@
 import { Autocomplete, Box, Chip, InputBase, type SxProps } from '@mui/material'
-import { CommonstreamSchema, type Stream } from '@concurrent-world/client'
+import { type CommonstreamSchema, Schemas, type Stream } from '@concurrent-world/client'
+import { useMemo } from 'react'
 
 export interface StreamPickerProps {
-    selected: Stream<CommonstreamSchema>[]
-    setSelected: (selected: Stream<CommonstreamSchema>[]) => void
+    selected: Array<Stream<CommonstreamSchema>>
+    setSelected: (selected: Array<Stream<CommonstreamSchema>>) => void
     sx?: SxProps
-    options: Stream<CommonstreamSchema>[]
+    options: Array<Stream<CommonstreamSchema>>
 }
 
 export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
+    const selected = useMemo(
+        () =>
+            JSON.parse(
+                JSON.stringify(props.selected ?? [], (key, value) => {
+                    if (key === 'client' || key === 'api') {
+                        return undefined
+                    }
+                    return value
+                })
+            ).filter((stream: Stream<any>) => stream.schema === Schemas.commonstream) as Array<
+                Stream<CommonstreamSchema>
+            >,
+        [props.selected]
+    )
+
     return (
         <Box
             sx={{
@@ -23,7 +39,7 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
                 filterSelectedOptions
                 sx={{ width: 1 }}
                 multiple
-                value={props.selected}
+                value={selected}
                 options={props.options}
                 getOptionLabel={(option) => option.payload.name}
                 isOptionEqualToValue={(option, value) => option.id === value.id}

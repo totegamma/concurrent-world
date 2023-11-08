@@ -131,19 +131,7 @@ export function MessagePage(): JSX.Element {
             >
                 <Draft
                     autoFocus
-                    streamPickerInitial={
-                        JSON.parse(
-                            // XXX: this is a hack to remove the circular references in the stream objects
-                            JSON.stringify(message.postedStreams ?? [], (key, value) => {
-                                if (key === 'client' || key === 'api') {
-                                    return undefined
-                                }
-                                return value
-                            })
-                        ).filter((stream: Stream<any>) => stream.schema === Schemas.commonstream) as Array<
-                            Stream<CommonstreamSchema>
-                        >
-                    }
+                    streamPickerInitial={message.postedStreams ?? []}
                     streamPickerOptions={actions.allKnownStreams}
                     placeholder="Write a reply..."
                     onSubmit={async (text: string, streams: string[], emojis) => {

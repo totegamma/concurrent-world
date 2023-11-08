@@ -68,6 +68,7 @@
     "placeholder": "What are you up to?",
     "attachImage": "Attach image",
     "cantAttachImage": "Please set up Imgur client ID in settings.",
+    "preview": "Preview",
     "openPreview": "Open preview",
     "closePreview": "Close preview",
     "emoji": "Emojis",
