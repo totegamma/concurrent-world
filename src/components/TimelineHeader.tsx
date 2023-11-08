@@ -1,46 +1,23 @@
-import { type RefObject, useContext, useEffect, useState, memo } from 'react'
+import { memo } from 'react'
 import { IconButton, Box, useTheme, Button } from '@mui/material'
-import InfoIcon from '@mui/icons-material/Info'
-import { Link, type Location as ReactLocation } from 'react-router-dom'
-import { ApplicationContext } from '../App'
-import { ConcurrentLogo } from './ConcurrentLogo'
+import { ConcurrentLogo } from './theming/ConcurrentLogo'
 import type { ConcurrentTheme } from '../model'
-import { useApi } from '../context/api'
+import { useGlobalActions } from '../context/GlobalActions'
 
 export interface TimelineHeaderProps {
-    location: ReactLocation
-    scrollParentRef: RefObject<HTMLDivElement>
-    setMobileMenuOpen: (state: boolean) => void
+    title?: string
+    titleIcon?: JSX.Element
+    onTitleClick?: () => void
+    secondaryAction?: JSX.Element
+    onSecondaryActionClick?: () => void
+    useRawSecondaryAction?: boolean
 }
 
 export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderProps): JSX.Element => {
-    const api = useApi()
-    const appData = useContext(ApplicationContext)
     const theme = useTheme<ConcurrentTheme>()
+    const actions = useGlobalActions()
 
-    const [title, setTitle] = useState<string>('')
-
-    useEffect(() => {
-        if (!props.location.hash || props.location.hash === '#') {
-            setTitle('Home')
-            return
-        }
-        Promise.all(
-            props.location.hash
-                .replace('#', '')
-                .split(',')
-                .map((e) => api.readStream(e))
-        ).then((a) => {
-            setTitle(
-                a
-                    .map((e) => e?.payload.body.name)
-                    .filter((e) => e)
-                    .join(', ')
-            )
-        })
-    }, [props.location.hash])
-
-    const iconColor = appData.websocketState === 1 ? theme.palette.background.contrastText : theme.palette.text.disabled
+    const iconColor = theme.palette.background.contrastText
 
     return (
         <Box
@@ -69,7 +46,7 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
                         display: { xs: 'inherit', sm: 'none' }
                     }}
                     onClick={() => {
-                        props.setMobileMenuOpen(true)
+                        actions.openMobileMenu(true)
                     }}
                 >
                     <ConcurrentLogo size="25px" upperColor={iconColor} lowerColor={iconColor} frameColor={iconColor} />
@@ -77,26 +54,30 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
                 <Button
                     sx={{
                         width: 1,
-                        justifyContent: {
-                            xs: 'flex-left',
-                            xl: 'flex-start'
-                        },
-                        color: 'primary.contrastText',
-                        p: { xs: '0', xl: '8px 0 8 4px' }
+                        color: 'primary.contrastText'
                     }}
-                    onClick={() => {
-                        props.scrollParentRef.current?.scroll({
-                            top: 0,
-                            behavior: 'smooth'
-                        })
-                    }}
+                    onClick={props.onTitleClick}
                     disableRipple
                 >
-                    <b>{title}</b>
+                    {props.titleIcon}
+                    <b>{props.title}</b>
                 </Button>
-                <IconButton sx={{ p: '8px' }} component={Link} to={`/streaminfo${props.location.hash}`}>
-                    <InfoIcon sx={{ color: 'primary.contrastText' }} />
-                </IconButton>
+                <Box sx={{ position: 'relative', width: '40px', height: '40px', mr: '8px' }}>
+                    {props.useRawSecondaryAction ? (
+                        props.secondaryAction
+                    ) : (
+                        <IconButton
+                            sx={{
+                                p: 1,
+                                position: 'absolute',
+                                color: 'primary.contrastText'
+                            }}
+                            onClick={props.onSecondaryActionClick}
+                        >
+                            {props.secondaryAction}
+                        </IconButton>
+                    )}
+                </Box>
             </Box>
         </Box>
     )

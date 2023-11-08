@@ -1,118 +1,134 @@
-import { useState, useContext, useEffect, useRef, memo } from 'react'
-import { InputBase, Box, Button, useTheme, IconButton, Divider } from '@mui/material'
-import { ApplicationContext } from '../App'
+import { useState, useEffect, useRef, memo } from 'react'
+import {
+    InputBase,
+    Box,
+    Button,
+    useTheme,
+    IconButton,
+    Divider,
+    CircularProgress,
+    Tooltip,
+    Paper,
+    List,
+    ListItemIcon,
+    ListItemText,
+    ListItemButton,
+    Collapse,
+    Fade,
+    Typography
+} from '@mui/material'
+import { StreamPicker } from './ui/StreamPicker'
+import { closeSnackbar, useSnackbar } from 'notistack'
+import { usePreference } from '../context/PreferenceContext'
+import { usePersistent } from '../hooks/usePersistent'
+
 import SendIcon from '@mui/icons-material/Send'
 import HomeIcon from '@mui/icons-material/Home'
-import { Schemas } from '../schemas'
-import Picker from '@emoji-mart/react'
-import data from '@emoji-mart/data'
-import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
-import Splitscreen from '@mui/icons-material/Splitscreen'
 import ImageIcon from '@mui/icons-material/Image'
-import { MarkdownRenderer } from './MarkdownRenderer'
-import { StreamPicker } from './StreamPicker'
-import { useLocation } from 'react-router-dom'
-import { usePersistent } from '../hooks/usePersistent'
-import type { SimpleNote } from '../schemas/simpleNote'
+import DeleteIcon from '@mui/icons-material/Delete'
+import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown'
+import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
+import { useEmojiPicker } from '../context/EmojiPickerContext'
+import caretPosition from 'textarea-caret'
+import { type CommonstreamSchema, type Stream } from '@concurrent-world/client'
 import { useApi } from '../context/api'
+import { type Emoji, type EmojiLite } from '../model'
+import { useNavigate } from 'react-router-dom'
 
-export interface EmojiProps {
-    shortcodes: string
-}
+import { useTranslation } from 'react-i18next'
+import { DummyMessageView } from './Message/DummyMessageView'
 
 export interface DraftProps {
-    currentStreams: string
-}
-
-export interface Skin {
-    src: string
-}
-
-export interface Emoji {
-    id: string
-    name: string
-    keywords: string[]
-    skins: Skin[]
-}
-
-export interface CustomEmoji {
-    id?: string
-    name?: string
-    emojis?: Emoji[]
-    keywords?: string[] | undefined
+    submitButtonLabel?: string
+    streamPickerInitial: Array<Stream<CommonstreamSchema>>
+    streamPickerOptions: Array<Stream<CommonstreamSchema>>
+    onSubmit: (text: string, destinations: string[], emojis?: Record<string, EmojiLite>) => Promise<Error | null>
+    allowEmpty?: boolean
+    autoFocus?: boolean
+    placeholder?: string
 }
 
 export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
-    const appData = useContext(ApplicationContext)
-    const api = useApi()
+    const client = useApi()
     const theme = useTheme()
+    const pref = usePreference()
+    const emojiPicker = useEmojiPicker()
+    const navigate = useNavigate()
 
-    const [draft, setDraft] = useState<string>('')
-    const [selectEmoji, setSelectEmoji] = useState<boolean>(false)
-    const [customEmoji, setCustomEmoji] = useState<CustomEmoji[]>([])
-    const [openPreview, setOpenPreview] = useState<boolean>(false)
-    const [messageDestStreams, setMessageDestStreams] = useState<string[]>([])
+    const [destStreams, setDestStreams] = useState<Array<Stream<CommonstreamSchema>>>(props.streamPickerInitial)
 
-    const reactlocation = useLocation()
-    const inputRef = useRef<HTMLInputElement>(null)
+    const [draft, setDraft] = usePersistent<string>('draft', '')
+    const [openPreview, setOpenPreview] = useState<boolean>(true)
 
-    const [defaultPostHome] = usePersistent<string[]>('defaultPostHome', [])
-    const [defaultPostNonHome] = usePersistent<string[]>('defaultPostNonHome', [])
+    const textInputRef = useRef<HTMLInputElement>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
     const [postHome, setPostHome] = useState<boolean>(true)
+    const [sending, setSending] = useState<boolean>(false)
+
+    const [caretPos, setCaretPos] = useState<{ left: number; top: number }>({ left: 0, top: 0 })
+
+    const [enableSuggestions, setEnableSuggestions] = useState<boolean>(false)
+    const [emojiSuggestions, setEmojiSuggestions] = useState<Emoji[]>([])
+
+    const [selectedSuggestions, setSelectedSuggestions] = useState<number>(0)
+
+    const timerRef = useRef<any | null>(null)
+
+    const { enqueueSnackbar } = useSnackbar()
 
     useEffect(() => {
-        setMessageDestStreams([
-            ...new Set([
-                ...(reactlocation.hash ? defaultPostNonHome : defaultPostHome),
-                ...props.currentStreams.split(',')
-            ])
-        ])
-    }, [reactlocation.hash])
+        setDestStreams(props.streamPickerInitial)
+    }, [props.streamPickerInitial])
 
-    useEffect(() => {
-        const emojis: CustomEmoji[] = [
-            {
-                id: 'fluffy',
-                name: 'Fluffy Social',
-                emojis: Object.entries(appData.emojiDict).map(([key, value]) => ({
-                    id: key,
-                    name: value.name,
-                    keywords: value.aliases,
-                    skins: [{ src: value.publicUrl }]
-                }))
-            }
-        ]
+    const [emojiDict, setEmojiDict] = useState<Record<string, EmojiLite>>({})
 
-        setCustomEmoji(emojis)
-    }, [appData.emojiDict])
+    const insertEmoji = (emoji: Emoji): void => {
+        const newDraft = draft.slice(0, caretPos.left) + `:${emoji.shortcode}:` + draft.slice(caretPos.left)
+        setDraft(newDraft)
+        setEnableSuggestions(false)
+        setSelectedSuggestions(0)
+        setEmojiDict((prev) => ({ ...prev, [emoji.shortcode]: { imageURL: emoji.imageURL } }))
+    }
 
     const post = (): void => {
-        const streams = [
-            ...new Set([
-                ...props.currentStreams.split(','),
-                ...messageDestStreams,
-                ...(postHome ? [appData.userstreams?.payload.body.homeStream] : [])
-            ])
-        ].filter((e) => e) as string[]
-        const body = {
-            body: draft
+        if (!props.allowEmpty && (draft.length === 0 || draft.trim().length === 0)) {
+            enqueueSnackbar('Message must not be empty!', { variant: 'error' })
+            return
         }
-
-        api.createMessage<SimpleNote>(Schemas.simpleNote, body, streams).then((_) => {
-            setDraft('')
-        })
+        if (destStreams.length === 0 && !postHome) {
+            enqueueSnackbar('set destination required', { variant: 'error' })
+            return
+        }
+        const destStreamIDs = destStreams.map((s) => s.id)
+        const dest = [
+            ...new Set([...destStreamIDs, ...(postHome ? [client?.user?.userstreams?.payload.body.homeStream] : [])])
+        ].filter((e) => e) as string[]
+        setSending(true)
+        props
+            .onSubmit(draft, dest, emojiDict)
+            .then((error) => {
+                if (error) {
+                    enqueueSnackbar(`Failed to post message: ${error.message}`, { variant: 'error' })
+                } else {
+                    setDraft('')
+                    setEmojiDict({})
+                }
+            })
+            .finally(() => {
+                setSending(false)
+            })
     }
 
     const uploadToImgur = async (base64Data: string): Promise<string> => {
         const url = 'https://api.imgur.com/3/image'
 
-        if (!appData.imgurSettings.clientId) return ''
+        if (!pref.imgurClientID) return ''
 
         const result = await fetch(url, {
             method: 'POST',
             headers: {
-                Authorization: `Client-ID ${appData.imgurSettings.clientId}`,
+                Authorization: `Client-ID ${pref.imgurClientID}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
@@ -128,6 +144,9 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         if (isImage) {
             const imageFile = event.clipboardData?.items[0].getAsFile()
             if (imageFile) {
+                const uploadingText = ' ![uploading...]()'
+                setDraft(draft + uploadingText)
+
                 const URLObj = window.URL || window.webkitURL
                 const imgSrc = URLObj.createObjectURL(imageFile)
                 console.log(imageFile, imgSrc)
@@ -135,9 +154,17 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 reader.onload = async (event) => {
                     const base64Text = event
                     if (!base64Text.target) return
-                    const result = await uploadToImgur(base64Text.target.result as string)
-                    if (!result) return
-                    setDraft(draft + `![image](${result})`)
+                    try {
+                        const result = await uploadToImgur(base64Text.target.result as string)
+                        setDraft(draft.replace(uploadingText, ''))
+                        if (!result) {
+                            setDraft(draft + `![upload failed]()`)
+                            return
+                        }
+                        setDraft(draft + `![image](${result})`)
+                    } catch (e) {
+                        setDraft(draft + `![upload failed]()`)
+                    }
                 }
                 reader.readAsDataURL(imageFile)
             }
@@ -163,10 +190,37 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     }
 
     const onFileUploadClick = (): void => {
-        if (inputRef.current) {
-            inputRef.current.click()
+        if (fileInputRef.current) {
+            fileInputRef.current.click()
         }
     }
+
+    const onEmojiSuggestConfirm = (index: number): void => {
+        console.log('confirm', index)
+        const before = draft.slice(0, textInputRef.current?.selectionEnd ?? 0) ?? ''
+        const colonPos = before.lastIndexOf(':')
+        if (colonPos === -1) return
+        const after = draft.slice(textInputRef.current?.selectionEnd ?? 0) ?? ''
+
+        const selected = emojiSuggestions[index]
+
+        setDraft(before.slice(0, colonPos) + `:${selected.shortcode}:` + after)
+        setSelectedSuggestions(0)
+        setEnableSuggestions(false)
+
+        setEmojiDict((prev) => ({
+            ...prev,
+            [selected.shortcode]: { imageURL: selected.imageURL }
+        }))
+
+        if (timerRef.current) {
+            clearTimeout(timerRef.current)
+            timerRef.current = null
+            textInputRef.current?.focus()
+        }
+    }
+
+    const { t } = useTranslation('', { keyPrefix: 'draft' })
 
     return (
         <Box
@@ -175,9 +229,38 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'stretch',
-                borderColor: 'text.disabled'
+                borderColor: 'text.disabled',
+                width: '100%'
             }}
         >
+            <Paper
+                sx={{
+                    top: `${caretPos.top}px`,
+                    left: `${caretPos.left}px`,
+                    position: 'fixed',
+                    display: enableSuggestions ? 'flex' : 'none',
+                    zIndex: 1000
+                }}
+            >
+                <List dense>
+                    {emojiSuggestions.map((emoji, index) => (
+                        <ListItemButton
+                            dense
+                            key={emoji.imageURL}
+                            selected={index === selectedSuggestions}
+                            onClick={() => {
+                                onEmojiSuggestConfirm(index)
+                            }}
+                        >
+                            <ListItemIcon>
+                                <Box component="img" src={emoji.imageURL} sx={{ width: '1em', height: '1em' }} />
+                            </ListItemIcon>
+                            <ListItemText>{emoji.shortcode}</ListItemText>
+                        </ListItemButton>
+                    ))}
+                </List>
+            </Paper>
+
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Box
                     sx={{
@@ -186,145 +269,290 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         flex: 1
                     }}
                 >
-                    <StreamPicker color="none" selected={messageDestStreams} setSelected={setMessageDestStreams} />
+                    <StreamPicker
+                        options={props.streamPickerOptions}
+                        selected={destStreams}
+                        setSelected={setDestStreams}
+                    />
                 </Box>
-                <IconButton
-                    onClick={() => {
-                        setPostHome(!postHome)
-                    }}
-                >
-                    <HomeIcon color={postHome ? 'primary' : 'disabled'} />
-                </IconButton>
+                <Tooltip title={postHome ? t('postToHome') : t('noPostToHome')} arrow placement="top">
+                    <IconButton
+                        onClick={() => {
+                            setPostHome(!postHome)
+                        }}
+                    >
+                        <HomeIcon color={postHome ? 'primary' : 'disabled'} />
+                    </IconButton>
+                </Tooltip>
             </Box>
             <Box
                 sx={{
                     display: 'flex',
-                    flexDirection: { xs: 'column', md: 'row' }
+                    flexDirection: { xs: 'column', md: 'row' },
+                    alignItems: 'start',
+                    gap: 2,
+                    px: 1
                 }}
             >
                 <InputBase
                     multiline
                     minRows={3}
-                    maxRows={6}
+                    maxRows={7}
                     value={draft}
                     onChange={(e) => {
                         setDraft(e.target.value)
+
+                        const before = e.target.value.slice(0, e.target.selectionEnd ?? 0) ?? ''
+                        const query = /:(\w+)$/.exec(before)?.[1]
+
+                        if (!query) {
+                            setEnableSuggestions(false)
+                            return
+                        }
+
+                        setEmojiSuggestions(emojiPicker.search(query))
+                        setEnableSuggestions(true)
+
+                        // move suggestion box
+                        const pos = caretPosition(e.target, e.target.selectionEnd ?? 0, {})
+                        const parent = textInputRef.current?.getBoundingClientRect()
+                        const offset = 10
+                        if (pos && parent) {
+                            setCaretPos({
+                                top: parent.top + pos.top + offset,
+                                left: parent.left + pos.left + offset
+                            })
+                        }
                     }}
                     onPaste={handlePasteImage}
-                    placeholder="今、なにしてる？"
+                    placeholder={props.placeholder ?? t('placeholder')}
+                    autoFocus={props.autoFocus}
                     sx={{
                         width: 1,
-                        padding: '0'
+                        fontSize: '0.95rem'
                     }}
                     onKeyDown={(e: any) => {
+                        if (enableSuggestions && emojiSuggestions.length > 0) {
+                            if (e.key === 'Enter') {
+                                e.preventDefault()
+                                onEmojiSuggestConfirm(selectedSuggestions)
+                                return
+                            }
+                            if (e.key === 'ArrowUp') {
+                                e.preventDefault()
+                                setSelectedSuggestions(
+                                    (selectedSuggestions - 1 + emojiSuggestions.length) % emojiSuggestions.length
+                                )
+                                return
+                            }
+                            if (e.key === 'ArrowDown') {
+                                e.preventDefault()
+                                setSelectedSuggestions((selectedSuggestions + 1) % emojiSuggestions.length)
+                                return
+                            }
+                            if (e.key === ':') {
+                                e.preventDefault()
+                                onEmojiSuggestConfirm(0)
+                            }
+                        }
                         if (draft.length === 0 || draft.trim().length === 0) return
                         if (e.key === 'Enter' && (e.ctrlKey === true || e.metaKey === true)) {
                             post()
                         }
                     }}
-                />
-                {openPreview && (
-                    <>
-                        <Divider orientation="vertical" />
-                        <Box
-                            sx={{
-                                width: 1,
-                                height: '171px',
-                                overflow: 'scroll',
-                                px: 1
-                            }}
-                        >
-                            <MarkdownRenderer messagebody={draft} />
-                        </Box>
-                    </>
-                )}
-            </Box>
-            {selectEmoji && (
-                <Box
-                    sx={{
-                        position: 'absolute',
-                        top: 150,
-                        right: { xs: 10, mb: 90 },
-                        zIndex: 9
+                    onBlur={() => {
+                        timerRef.current = setTimeout(() => {
+                            if (enableSuggestions) {
+                                setEnableSuggestions(false)
+                                setSelectedSuggestions(0)
+                            }
+                        }, 100)
                     }}
-                >
-                    <Picker
-                        data={data}
-                        categories={['fluffy']}
-                        custom={customEmoji}
-                        searchPosition="static"
-                        onEmojiSelect={(emoji: EmojiProps) => {
-                            console.log(typeof emoji)
-                            setDraft(draft + emoji.shortcodes)
-                            setSelectEmoji(false)
-                        }}
-                    />
-                </Box>
-            )}
+                    inputRef={textInputRef}
+                />
+            </Box>
             <Box
                 sx={{
                     display: 'flex',
-                    justifyContent: 'flex-end'
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
                 }}
             >
-                <IconButton
+                <Box>
+                    <Tooltip
+                        title={pref.imgurClientID === '' ? t('cantAttachImage') : t('attachImage')}
+                        arrow
+                        placement="top"
+                        enterDelay={pref.imgurClientID === '' ? 0 : 500}
+                    >
+                        <span>
+                            <IconButton
+                                sx={{
+                                    color: theme.palette.text.secondary
+                                }}
+                                onClick={() => {
+                                    if (pref.imgurClientID === '') {
+                                        navigate('/settings/media')
+                                    } else {
+                                        onFileUploadClick()
+                                    }
+                                }}
+                            >
+                                <ImageIcon sx={{ fontSize: '80%' }} />
+                                <input
+                                    hidden
+                                    ref={fileInputRef}
+                                    type="file"
+                                    onChange={(e) => {
+                                        onFileInputChange(e)
+                                    }}
+                                    accept={'.png, .jpg, .jpeg, .gif'}
+                                />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
+                    <Tooltip title={t('emoji')} arrow placement="top" enterDelay={500}>
+                        <IconButton
+                            sx={{
+                                color: 'text.secondary'
+                            }}
+                            onClick={(e) => {
+                                emojiPicker.open(e.currentTarget, (emoji) => {
+                                    insertEmoji(emoji)
+                                    emojiPicker.close()
+                                })
+                            }}
+                        >
+                            <EmojiEmotions sx={{ fontSize: '80%' }} />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('clearDraft')} arrow placement="top" enterDelay={500}>
+                        <span>
+                            <IconButton
+                                sx={{
+                                    color: theme.palette.text.secondary
+                                }}
+                                onClick={() => {
+                                    if (draft.length === 0) return
+                                    enqueueSnackbar('Draft Cleared.', {
+                                        autoHideDuration: 5000,
+                                        action: (key) => (
+                                            <Button
+                                                onClick={() => {
+                                                    closeSnackbar(key)
+                                                    setDraft(draft)
+                                                }}
+                                            >
+                                                undo
+                                            </Button>
+                                        )
+                                    })
+                                    setDraft('')
+                                    setEmojiDict({})
+                                }}
+                                disabled={draft.length === 0}
+                            >
+                                <DeleteIcon sx={{ fontSize: '80%' }} />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
+                </Box>
+                <Box
                     sx={{
-                        color: theme.palette.text.secondary
-                    }}
-                    onClick={onFileUploadClick}
-                >
-                    <ImageIcon />
-                    <input
-                        hidden
-                        ref={inputRef}
-                        type="file"
-                        onChange={(e) => {
-                            onFileInputChange(e)
-                        }}
-                        accept={'.png, .jpg, .jpeg, .gif'}
-                    />
-                </IconButton>
-                <IconButton
-                    sx={{
-                        color: theme.palette.text.secondary
-                    }}
-                    onClick={() => {
-                        setOpenPreview(!openPreview)
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1
                     }}
                 >
-                    <Splitscreen sx={{ transform: 'rotate(90deg)' }} />
-                </IconButton>
-                <IconButton
-                    sx={{
-                        color: theme.palette.text.secondary
-                    }}
-                    onClick={() => {
-                        setSelectEmoji(!selectEmoji)
-                    }}
-                >
-                    <EmojiEmotions />
-                </IconButton>
-                <Button
-                    color="primary"
-                    variant="contained"
-                    disabled={draft.length === 0 || draft.trim().length === 0}
-                    onClick={(_) => {
-                        post()
-                    }}
-                    sx={{
-                        padding: '4px 16px',
-                        margin: '4px 0 4px 8px',
-                        '&.Mui-disabled': {
-                            background: theme.palette.divider,
-                            color: theme.palette.text.disabled,
-                            margin: '4px 0 4px 8px'
-                        }
-                    }}
-                    endIcon={<SendIcon />}
-                >
-                    Send
-                </Button>
+                    <Tooltip
+                        arrow
+                        placement="top"
+                        title={openPreview ? t('closePreview') : t('openPreview')}
+                        enterDelay={500}
+                    >
+                        <Fade in={draft.length > 0}>
+                            <IconButton
+                                sx={{
+                                    color: 'text.secondary'
+                                }}
+                                onClick={() => {
+                                    setOpenPreview(!openPreview)
+                                }}
+                            >
+                                <ExpandCircleDownIcon
+                                    sx={{
+                                        fontSize: '80%',
+                                        transform: openPreview ? 'rotate(0deg)' : 'rotate(180deg)',
+                                        transition: 'transform 0.2s ease-in-out'
+                                    }}
+                                />
+                            </IconButton>
+                        </Fade>
+                    </Tooltip>
+
+                    <Box>
+                        <Button
+                            color="primary"
+                            variant="contained"
+                            disabled={sending}
+                            onClick={(_) => {
+                                post()
+                            }}
+                            sx={{
+                                '&.Mui-disabled': {
+                                    background: theme.palette.divider,
+                                    color: theme.palette.text.disabled
+                                }
+                            }}
+                            endIcon={<SendIcon />}
+                        >
+                            {props.submitButtonLabel ?? 'POST'}
+                        </Button>
+                        {sending && (
+                            <CircularProgress
+                                size={24}
+                                sx={{
+                                    color: 'primary.main',
+                                    position: 'absolute',
+                                    top: '50%',
+                                    left: '50%',
+                                    marginTop: '-12px',
+                                    marginLeft: '-12px'
+                                }}
+                            />
+                        )}
+                    </Box>
+                </Box>
             </Box>
+            <Collapse unmountOnExit in={openPreview && draft.length > 0}>
+                <Divider
+                    sx={{
+                        my: 1,
+                        borderStyle: 'dashed'
+                    }}
+                />
+
+                <DummyMessageView
+                    message={{
+                        body: draft,
+                        emojis: emojiDict
+                    }}
+                    user={client.user?.profile?.payload.body}
+                    userCCID={client.user?.ccid}
+                    timestamp={
+                        <Typography
+                            sx={{
+                                backgroundColor: 'divider',
+                                color: 'primary.contrastText',
+                                px: 1,
+                                fontSize: '0.75rem'
+                            }}
+                        >
+                            {t('preview')}
+                        </Typography>
+                    }
+                />
+            </Collapse>
         </Box>
     )
 })

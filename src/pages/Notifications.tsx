@@ -1,24 +1,33 @@
-import { Box, Divider, Typography, useTheme } from '@mui/material'
+import { Box, Divider, Typography } from '@mui/material'
+import { useContext } from 'react'
+import { ApplicationContext } from '../App'
+import { Timeline } from '../components/Timeline'
 
 export function Notifications(): JSX.Element {
-    const theme = useTheme()
+    const appData = useContext(ApplicationContext)
 
     return (
         <Box
             sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '5px',
-                padding: '20px',
-                background: theme.palette.background.paper,
+                width: '100%',
                 minHeight: '100%',
-                overflow: 'scroll'
+                backgroundColor: 'background.paper',
+                display: 'flex',
+                flexDirection: 'column'
             }}
         >
-            <Typography variant="h2" gutterBottom>
-                Notifications
-            </Typography>
-            <Divider />
+            <Box
+                sx={{
+                    padding: '20px 20px 0 20px'
+                }}
+            >
+                <Typography variant="h2" gutterBottom>
+                    Notifications
+                </Typography>
+                <Divider />
+            </Box>
+
+            <Timeline streams={appData.displayingStream} />
         </Box>
     )
 }

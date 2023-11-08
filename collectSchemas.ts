@@ -1,4 +1,4 @@
-import { compile } from 'json-schema-to-typescript'
+import { compile } from 'npm:json-schema-to-typescript'
 import { Schemas } from './src/schemas.ts'
 
 const encoder = new TextEncoder();
@@ -6,7 +6,7 @@ const encoder = new TextEncoder();
 for (const elem in Schemas) {
     console.log("fetching", elem, Schemas[elem])
     const schema = await fetch(Schemas[elem]).then(data => data.json())
-    schema.id = ""
+    schema["$id"] = ""
     const targetPath = `./src/schemas/${elem}.ts`
     await compile(schema as any, elem)
     .then(ts => {

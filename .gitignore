@@ -23,4 +23,5 @@ dist-ssr
 *.sln
 *.sw?
 
+stats.html
 package-lock.yaml

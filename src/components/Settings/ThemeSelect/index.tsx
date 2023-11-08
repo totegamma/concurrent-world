@@ -1,14 +1,13 @@
 import { Box, Button, Paper, Typography } from '@mui/material'
-import { ConcurrentLogo } from '../../ConcurrentLogo'
+import { ConcurrentLogo } from '../../theming/ConcurrentLogo'
 import type { ConcurrentTheme } from '../../../model'
 import { useMemo } from 'react'
 import { createConcurrentTheme, Themes } from '../../../themes'
+import { usePreference } from '../../../context/PreferenceContext'
 
-export interface ThemeSelectProp {
-    setThemeName: (themeName: string) => void
-}
+export const ThemeSelect = (): JSX.Element => {
+    const pref = usePreference()
 
-export const ThemeSelect = (props: ThemeSelectProp): JSX.Element => {
     const previewTheme: Record<string, ConcurrentTheme> = useMemo(
         () => Object.fromEntries(Object.keys(Themes).map((e) => [e, createConcurrentTheme(e)])),
         []
@@ -21,16 +20,16 @@ export const ThemeSelect = (props: ThemeSelectProp): JSX.Element => {
                 sx={{
                     display: { xs: 'flex', md: 'grid' },
                     flexFlow: 'column',
-                    gridTemplateColumns: '1fr 1fr 1fr 1fr',
+                    gridTemplateColumns: { xs: 'repeat(3, minmax(0, 1fr))', lg: 'repeat(4, minmax(0, 1fr))' },
                     gridAutoRows: '1fr',
-                    gap: '10px'
+                    gap: 1
                 }}
             >
                 {Object.keys(previewTheme).map((e) => (
                     <Paper key={e}>
                         <Button
                             onClick={(_) => {
-                                props.setThemeName(e)
+                                pref.setThemeName(e)
                             }}
                             style={{
                                 border: 'none',

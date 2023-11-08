@@ -1,57 +1,62 @@
-import { ec as Ec } from 'elliptic'
-import { keccak256, computeAddress } from 'ethers'
+import { Mnemonic, randomBytes, HDNodeWallet } from 'ethers'
+import { LangJa } from './utils/lang-ja'
 
-export const Sign = (privatekey: string, payload: string): string => {
-    const ellipsis = new Ec('secp256k1')
-    const keyPair = ellipsis.keyFromPrivate(privatekey)
-    const messageHash = keccak256(new TextEncoder().encode(payload)).slice(2)
-    const signature = keyPair.sign(messageHash, 'hex', { canonical: true })
-    const r = toHexString(signature.r.toArray())
-    const s = toHexString(signature.s.toArray())
-    const v = signature.recoveryParam === 0 ? '00' : '01'
-    return r + s + v
+import { useTranslation } from 'react-i18next'
+
+export interface Identity {
+    mnemonic_ja: string
+    mnemonic_en: string
+    privateKey: string
+    publicKey: string
+    CCID: string
 }
 
-export const Keygen = (): key => {
-    const ellipsis = new Ec('secp256k1')
-    const keyPair = ellipsis.genKeyPair()
-    const privatekey = keyPair.getPrivate().toString('hex')
-    const publickey = keyPair.getPublic().encode('hex', false)
-    const ethAddress = computeAddress('0x' + publickey)
-    const ccaddress = 'CC' + ethAddress.slice(2)
+export const generateIdentity = (): Identity => {
+    const entrophy = randomBytes(16)
+    const mnemonicJa = Mnemonic.fromEntropy(entrophy, null, LangJa.wordlist())
+    const mnemonicEn = Mnemonic.fromEntropy(entrophy, null)
+    const wallet = HDNodeWallet.fromPhrase(mnemonicEn.phrase)
+    const CCID = 'CC' + wallet.address.slice(2)
+    const privateKey = wallet.privateKey.slice(2)
+    const publicKey = wallet.publicKey.slice(2)
+
     return {
-        privatekey,
-        publickey,
-        ccaddress
+        mnemonic_ja: mnemonicJa.phrase,
+        mnemonic_en: mnemonicEn.phrase,
+        privateKey,
+        publicKey,
+        CCID
     }
 }
 
-export const LoadKey = (privateKey: string): key | null => {
-    const ellipsis = new Ec('secp256k1')
-    const keyPair = ellipsis.keyFromPrivate(privateKey)
-    console.log(keyPair)
-    if (!keyPair.getPrivate()) return null
-    const privatekey = keyPair.getPrivate().toString('hex')
-    const publickey = keyPair.getPublic().encode('hex', false)
-    const ethAddress = computeAddress('0x' + publickey)
-    const ccaddress = 'CC' + ethAddress.slice(2)
-    return {
-        privatekey,
-        publickey,
-        ccaddress
+export const fetchWithTimeout = async (
+    url: RequestInfo,
+    init: RequestInit,
+    timeoutMs = 15 * 1000
+): Promise<Response> => {
+    const controller = new AbortController()
+    const clientTimeout = setTimeout(() => {
+        controller.abort()
+    }, timeoutMs)
+
+    try {
+        const reqConfig: RequestInit = { ...init, signal: controller.signal }
+        const res = await fetch(url, reqConfig)
+        if (!res.ok) {
+            const description = `${res.status}: ${url as string} traceID: ${res.headers.get('trace-id') ?? 'N/A'}`
+            return await Promise.reject(new Error(description))
+        }
+
+        return res
+    } catch (e: unknown) {
+        if (e instanceof Error) {
+            return await Promise.reject(new Error(`${e.name}: ${e.message}`))
+        } else {
+            return await Promise.reject(new Error('fetch failed with unknown error'))
+        }
+    } finally {
+        clearTimeout(clientTimeout)
     }
-}
-
-function toHexString(byteArray: Uint8Array | number[]): string {
-    return Array.from(byteArray, function (byte) {
-        return ('0' + (byte & 0xff).toString(16)).slice(-2)
-    }).join('')
-}
-
-interface key {
-    privatekey: string
-    publickey: string
-    ccaddress: string
 }
 
 export type DeepPartial<T> = {
@@ -66,12 +71,14 @@ export const humanReadableTimeDiff = (time: Date): string => {
 
     const elapsed = current.getTime() - time.getTime()
 
+    const { t } = useTranslation('', { keyPrefix: 'time' })
+
     if (elapsed < msPerMinute) {
-        return `${Math.round(elapsed / 1000)}秒前`
+        return `${Math.round(elapsed / 1000)}${t('secondsBefore')}`
     } else if (elapsed < msPerHour) {
-        return `${Math.round(elapsed / msPerMinute)}分前`
+        return `${Math.round(elapsed / msPerMinute)}${t('minutesBefore')}`
     } else if (elapsed < msPerDay) {
-        return `${Math.round(elapsed / msPerHour)}時間前`
+        return `${Math.round(elapsed / msPerHour)}${t('hoursBefore')}`
     } else {
         return (
             (current.getFullYear() === time.getFullYear() ? '' : `${time.getFullYear()}年 `) +

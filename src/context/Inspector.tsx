@@ -1,10 +1,15 @@
-import type { Message } from '../model'
-import { Box, Drawer, Typography } from '@mui/material'
-import { createContext, useContext, useMemo, useState } from 'react'
+import { Alert, Box, Paper, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material'
 
-interface InspectorState {
-    inspectingItem: Message<any> | null
-    inspectItem: React.Dispatch<React.SetStateAction<Message<any> | null>>
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { useApi } from './api'
+import { validateSignature, type CoreMessage } from '@concurrent-world/client'
+import { Codeblock } from '../components/ui/Codeblock'
+import { MessageContainer } from '../components/Message/MessageContainer'
+import { CCDrawer } from '../components/ui/CCDrawer'
+
+export interface InspectorState {
+    inspectingItem: { messageId: string; author: string } | null
+    inspectItem: React.Dispatch<React.SetStateAction<{ messageId: string; author: string } | null>>
 }
 
 const InspectorContext = createContext<InspectorState | undefined>(undefined)
@@ -14,7 +19,26 @@ interface InspectorProps {
 }
 
 export const InspectorProvider = (props: InspectorProps): JSX.Element => {
-    const [inspectingItem, inspectItem] = useState<Message<any> | null>(null)
+    const client = useApi()
+    const [inspectingItem, inspectItem] = useState<{ messageId: string; author: string } | null>(null)
+    const [message, setMessage] = useState<CoreMessage<any> | undefined>()
+    const [signatureIsValid, setSignatureIsValid] = useState<boolean>(false)
+    const [currentHost, setCurrentHost] = useState<string>('')
+
+    useEffect(() => {
+        if (!inspectingItem) return
+
+        client.api.readEntity(inspectingItem.author).then((entity) => {
+            if (!entity) return
+            setCurrentHost(entity.domain || client.api.host)
+        })
+
+        client.api.readMessageWithAuthor(inspectingItem.messageId, inspectingItem.author).then((msg) => {
+            if (!msg) return
+            setSignatureIsValid(validateSignature(msg.rawpayload, msg.signature, msg.author))
+            setMessage(msg)
+        })
+    }, [inspectingItem])
 
     return (
         <InspectorContext.Provider
@@ -26,49 +50,100 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
             }, [])}
         >
             {props.children}
-            <Drawer
-                anchor={'right'}
-                open={inspectingItem != null}
+            <CCDrawer
+                open={!!inspectingItem}
                 onClose={() => {
                     inspectItem(null)
                 }}
-                PaperProps={{
-                    sx: {
-                        width: '40vw',
-                        borderRadius: '20px 0 0 20px',
-                        overflow: 'hidden',
-                        padding: '20px'
-                    }
-                }}
             >
-                {inspectingItem ? (
+                {inspectingItem && message ? (
                     <Box
                         sx={{
-                            margin: 0,
+                            p: 1,
                             wordBreak: 'break-all',
-                            whiteSpace: 'pre-wrap',
-                            fontSize: '13px'
+                            whiteSpace: 'pre-wrap'
                         }}
                     >
-                        <Typography>ID: {inspectingItem.id}</Typography>
-                        <Typography>Author: {inspectingItem.author}</Typography>
-                        <Typography>Schema: {inspectingItem.schema}</Typography>
-                        <Typography>Signature: {inspectingItem.signature}</Typography>
-                        <Typography>Streams: {inspectingItem.streams}</Typography>
-                        <Typography>Created: {inspectingItem.cdate}</Typography>
-                        <Typography>Payload:</Typography>
-                        <pre style={{ overflowX: 'scroll' }}>
-                            {JSON.stringify(inspectingItem.payload ?? 'null', null, 4)?.replaceAll('\\n', '\n')}
-                        </pre>
-                        <Typography>Associations:</Typography>
-                        <pre style={{ overflowX: 'scroll' }}>
-                            {JSON.stringify(inspectingItem.associations, null, 4)}
-                        </pre>
+                        <Typography variant="h1">Inspect</Typography>
+                        <Paper sx={{ m: '10px 0', p: '0 20px' }} elevation={0} variant="outlined">
+                            <MessageContainer messageID={message.id} messageOwner={message.author} />
+                        </Paper>
+                        {signatureIsValid ? (
+                            <Alert severity="success">Signature is valid!</Alert>
+                        ) : (
+                            <Alert severity="error">Signature is invalid!</Alert>
+                        )}
+                        <Table sx={{ fontSize: '10px' }}>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell>
+                                        <b>ID</b>
+                                    </TableCell>
+                                    <TableCell>{message.id}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>
+                                        <b>Author</b>
+                                    </TableCell>
+                                    <TableCell>{message.author}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>
+                                        <b>Host</b>
+                                    </TableCell>
+                                    <TableCell>{currentHost}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>
+                                        <b>Schema</b>
+                                    </TableCell>
+                                    <TableCell>{message.schema}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell sx={{ wordBreak: 'keep-all' }}>
+                                        <b>Signature</b>
+                                    </TableCell>
+                                    <TableCell>{message.signature}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>
+                                        <b>Streams</b>
+                                    </TableCell>
+                                    <TableCell>{message.streams.join('\n')}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>
+                                        <b>Created</b>
+                                    </TableCell>
+                                    <TableCell>{new Date(message.cdate).toLocaleString()}</TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                        <Typography variant="h2">Payload:</Typography>
+                        <Box
+                            sx={{
+                                borderRadius: '10px',
+                                overflow: 'hidden'
+                            }}
+                        >
+                            <Codeblock language="json">
+                                {JSON.stringify(message.payload ?? 'null', null, 4)?.replaceAll('\\n', '\n')}
+                            </Codeblock>
+                        </Box>
+                        <Typography variant="h2">Associations:</Typography>
+                        <Box
+                            sx={{
+                                borderRadius: '10px',
+                                overflow: 'hidden'
+                            }}
+                        >
+                            <Codeblock language={'json'}>{JSON.stringify(message.associations, null, 4)}</Codeblock>
+                        </Box>
                     </Box>
                 ) : (
                     <Box>nothing to inspect...</Box>
                 )}
-            </Drawer>
+            </CCDrawer>
         </InspectorContext.Provider>
     )
 }

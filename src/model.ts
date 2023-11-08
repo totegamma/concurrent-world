@@ -1,10 +1,4 @@
-import type {
-    Color,
-    CommonColors,
-    PaletteMode,
-    Theme,
-    TypeBackground
-} from '@mui/material'
+import type { Color, CommonColors, PaletteMode, Theme, TypeBackground } from '@mui/material'
 import type {
     Palette,
     PaletteAugmentColorOptions,
@@ -15,118 +9,40 @@ import type {
     TypeText
 } from '@mui/material/styles/createPalette'
 
-import type { Profile } from './schemas/profile'
+import type { CommonstreamSchema, CoreStreamItem, Stream } from '@concurrent-world/client'
 
-export interface StreamElement {
-    timestamp: string
-    id: string
-    author: string
-    currenthost: string
-}
-
-export interface StreamElementDated extends StreamElement {
+export interface StreamItemDated extends CoreStreamItem {
     LastUpdated: number
 }
 
-export interface Entity {
-    ccaddr: string
-    role: string
-    host: string
-    cdate: string
-}
-
-export interface SignedObject<T> {
-    signer: string
-    type: string
-    schema: string
-    body: T
-    meta: any
-    signedAt: string
-    target?: string
-}
-
-export interface Association<T> {
-    author: string
-    cdate: string
-    id: string
-    payload: T
-    schema: string
-    signature: string
-    targetID: string
-    targetType: string
-}
-
-export interface MessagePostRequest {
-    signedObject: string
-    signature: string
-    streams: string[]
-}
-
-export interface Message<T> {
-    associations: Array<Association<any>>
-    author: string
-    cdate: string
-    id: string
-    payload: SignedObject<T>
-    schema: string
-    signature: string
-    streams: string[]
-}
-
-export interface Character<T> {
-    associations: Array<Association<any>>
-    author: string
-    schema: string
-    id: string
-    payload: SignedObject<T>
-    signature: string
-    cdate: string
-}
-
-export interface ServerEvent {
-    type: string
-    action: string
-    body: StreamedMessage<any> | Association<any>
-}
-
-export interface StreamedMessage<T> extends Message<T> {
-    host: string
+export interface EmojiLite {
+    imageURL?: string
+    animURL?: string
 }
 
 export interface Emoji {
-    publicUrl: string
-    name: string
+    shortcode: string
     aliases: string[]
+    imageURL: string
+    animURL?: string
+    soundURL?: string
 }
 
-export interface ProfileWithAddress extends Profile {
-    // TODO: deprecate
-    ccaddress: string
+export interface RawEmojiPackage {
+    name: string
+    version: string
+    description: string
+    credits: string
+    iconURL: string
+    emojis: Emoji[]
 }
 
-export interface Host {
-    fqdn: string
-    ccaddr: string
-    role: string
-    pubkey: string
-    cdate: Date
-}
-
-export interface Stream<T> {
-    id: string
-    author: string
-    maintainer: string[]
-    writer: string[]
-    reader: string[]
-    schema: string
-    payload: T
-    signature: string
-    cdate: string
+export interface EmojiPackage extends RawEmojiPackage {
+    packageURL: string
 }
 
 export interface ImgurSettings {
     clientId: string
-    clientSecret: string
 }
 
 interface ConcurrentTypeBackground extends TypeBackground {
@@ -157,4 +73,35 @@ interface ConcurrentPalette extends Palette {
 
 export interface ConcurrentTheme extends Theme {
     palette: ConcurrentPalette
+}
+
+export interface StreamList {
+    label: string
+    pinned: boolean
+    expanded: boolean
+    streams: string[]
+    userStreams: userHomeStream[]
+    defaultPostStreams: string[]
+}
+
+export interface userHomeStream {
+    streamID: string
+    userID: string
+}
+
+export interface StreamWithDomain {
+    domain: string
+    stream: Stream<CommonstreamSchema>
+}
+
+export type CCID = string
+
+export interface ApEntity {
+    id: string
+    ccid: string
+    publickey: string
+    privatekey: string
+    homestream: string
+    notificationstream: string
+    followstream: string
 }

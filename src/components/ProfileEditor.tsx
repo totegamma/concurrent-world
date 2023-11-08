@@ -1,49 +1,83 @@
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
-import Typography from '@mui/material/Typography'
-import { useState } from 'react'
-import { Schemas } from '../schemas'
+import { useEffect, useState } from 'react'
+import { type ProfileSchema } from '@concurrent-world/client'
 import Button from '@mui/material/Button'
-import type { Profile } from '../schemas/profile'
 import { useApi } from '../context/api'
-import type { Character } from '../model'
+import { CCAvatar } from './ui/CCAvatar'
+import Background from '../resources/defaultbg.png'
+import { alpha, useTheme } from '@mui/material'
+
+import { useTranslation } from 'react-i18next'
 
 interface ProfileEditorProps {
-    initial?: Character<Profile>
-    onSubmit?: () => void
+    initial?: ProfileSchema
+    onSubmit?: (profile: ProfileSchema) => void
+    id?: string
 }
 
 export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
-    const api = useApi()
-    const [username, setUsername] = useState<string>(props.initial?.payload.body.username ?? '')
-    const [avatar, setAvatar] = useState<string>(props.initial?.payload.body.avatar ?? '')
+    const client = useApi()
+    const theme = useTheme()
+    const [username, setUsername] = useState<string>(props.initial?.username ?? '')
+    const [avatar, setAvatar] = useState<string>(props.initial?.avatar ?? '')
+    const [description, setDescription] = useState<string>(props.initial?.description ?? '')
+    const [banner, setBanner] = useState<string>(props.initial?.banner ?? '')
+
+    const { t, i18n } = useTranslation('', { keyPrefix: 'settings.profileEditor' })
 
     const updateProfile = async (): Promise<void> => {
-        api.upsertCharacter<Profile>(
-            Schemas.profile,
-            {
-                username,
-                avatar,
-                description: ''
-            },
-            props.initial?.id
-        ).then((data) => {
-            console.log(data)
-            props.onSubmit?.()
-        })
+        if (props.id === undefined) {
+            client.createProfile(username, description, avatar, banner).then((data) => {
+                console.log(data)
+                props.onSubmit?.(data)
+            })
+        } else {
+            client.updateProfile(props.id, username, description, avatar, banner).then((data) => {
+                console.log(data)
+                props.onSubmit?.(data)
+            })
+        }
     }
 
+    useEffect(() => {
+        setUsername(props.initial?.username ?? '')
+        setAvatar(props.initial?.avatar ?? '')
+        setDescription(props.initial?.description ?? '')
+        setBanner(props.initial?.banner ?? '')
+    }, [props.initial])
+
     return (
-        <>
-            <Typography variant="h3" gutterBottom>
-                Profile
-            </Typography>
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                gap: '15px',
+                backgroundImage: `url(${banner || Background})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                padding: '15px'
+            }}
+        >
+            <CCAvatar
+                avatarURL={avatar}
+                identiconSource={client.ccid}
+                sx={{
+                    width: '64px',
+                    height: '64px'
+                }}
+            />
+
             <Box
                 sx={{
                     display: 'flex',
                     flexDirection: 'column',
                     padding: '15px',
-                    gap: '5px'
+                    gap: '5px',
+                    flex: 1,
+                    backgroundColor: alpha(theme.palette.background.paper, 0.8),
+                    borderRadius: '5px',
+                    border: '1px solid rgba(255, 255, 255, 0.3)'
                 }}
             >
                 <TextField
@@ -55,11 +89,28 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
                     }}
                 />
                 <TextField
+                    label="description"
+                    variant="outlined"
+                    value={description}
+                    multiline
+                    onChange={(e) => {
+                        setDescription(e.target.value)
+                    }}
+                />
+                <TextField
                     label="avatarURL"
                     variant="outlined"
                     value={avatar}
                     onChange={(e) => {
                         setAvatar(e.target.value)
+                    }}
+                />
+                <TextField
+                    label="bannerURL"
+                    variant="outlined"
+                    value={banner}
+                    onChange={(e) => {
+                        setBanner(e.target.value)
                     }}
                 />
                 <Button
@@ -68,9 +119,9 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
                         updateProfile()
                     }}
                 >
-                    Update
+                    {props.id === undefined ? t('createNew') : t('update')}
                 </Button>
             </Box>
-        </>
+        </Box>
     )
 }
