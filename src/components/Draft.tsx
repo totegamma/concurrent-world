@@ -544,7 +544,8 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             sx={{
                                 backgroundColor: 'divider',
                                 color: 'primary.contrastText',
-                                px: 1
+                                px: 1,
+                                fontSize: '0.75rem'
                             }}
                         >
                             {t('preview')}
