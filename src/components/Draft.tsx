@@ -40,6 +40,7 @@ import { DummyMessageView } from './Message/DummyMessageView'
 
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { useGlobalActions } from '../context/GlobalActions'
 
 export interface DraftProps {
     submitButtonLabel?: string
@@ -57,6 +58,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const pref = usePreference()
     const emojiPicker = useEmojiPicker()
     const navigate = useNavigate()
+    const { uploadFile } = useGlobalActions()
 
     const [destStreams, setDestStreams] = useState<Array<Stream<CommonstreamSchema>>>(props.streamPickerInitial)
 
@@ -123,123 +125,24 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             })
     }
 
-    const uploadToImgur = async (base64Data: string): Promise<string> => {
-        const url = 'https://api.imgur.com/3/image'
-
-        if (!pref.imgurClientID) return ''
-
-        const result = await fetch(url, {
-            method: 'POST',
-            headers: {
-                Authorization: `Client-ID ${pref.imgurClientID}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                type: 'base64',
-                image: base64Data.replace(/^data:image\/[a-zA-Z]*;base64,/, '')
-            })
-        })
-        return (await result.json()).data.link
+    const handlePasteImage = async (event: any): Promise<void> => {
+        const imageFile = event.clipboardData?.items[0].getAsFile()
+        if (!imageFile) return
+        await uploadImage(imageFile)
     }
 
-    const handlePasteImage = (event: any): void => {
-        const isImage = event.clipboardData?.items[0].type?.includes('image')
+    const uploadImage = async (imageFile: File): Promise<void> => {
+        const isImage = imageFile.type.includes('image')
         if (isImage) {
-            const imageFile = event.clipboardData?.items[0].getAsFile()
-            if (imageFile) {
-                const uploadingText = ' ![uploading...]()'
-                setDraft(draft + uploadingText)
-
-                const URLObj = window.URL || window.webkitURL
-                const imgSrc = URLObj.createObjectURL(imageFile)
-                console.log(imageFile, imgSrc)
-                const reader = new FileReader()
-                reader.onload = async (event) => {
-                    const base64Text = event
-                    if (!base64Text.target) return
-                    try {
-                        if (pref.storageProvider === 'imgur') {
-                            const result = await uploadToImgur(base64Text.target.result as string)
-                            setDraft(draft.replace(uploadingText, ''))
-                            if (!result) {
-                                setDraft(draft + `![upload failed]()`)
-                                return
-                            }
-                            setDraft(draft + `![image](${result})`)
-                            return
-                        } else if (pref.storageProvider === 's3') {
-                            console.log('s3 upload')
-
-                            const S3 = new S3Client({
-                                endpoint: pref.s3Config.endpoint,
-                                credentials: {
-                                    accessKeyId: pref.s3Config.accessKeyId,
-                                    secretAccessKey: pref.s3Config.secretAccessKey
-                                },
-                                region: 'auto'
-                            })
-
-                            const base64Data = (base64Text.target.result as string).split(',')[1] // Base64エンコードされたデータを取得
-                            const byteCharacters = atob(base64Data)
-                            const byteNumbers = new Array(byteCharacters.length)
-                            for (let i = 0; i < byteCharacters.length; i++) {
-                                byteNumbers[i] = byteCharacters.charCodeAt(i)
-                            }
-                            const byteArray = new Uint8Array(byteNumbers)
-
-                            const s3Params = {
-                                Bucket: pref.s3Config.bucketName,
-                                Key: imageFile.name,
-                                ContentType: imageFile.type,
-                                ContentEncoding: 'base64', // Base64エンコードされたデータをアップロードすることを示す
-                                Body: byteArray, // データのBody部分
-                                ACL: 'public-read',
-                                ContentDisposition: 'inline',
-                                CreateBucketConfiguration: {
-                                    LocationConstraint: 'apac'
-                                }
-                            }
-
-                            const fileName = `${Date.now()}.png`
-
-                            const url = await getSignedUrl(
-                                S3,
-                                new PutObjectCommand({
-                                    Bucket: pref.s3Config.bucketName,
-                                    Key: fileName
-                                }),
-                                {
-                                    expiresIn: 60 * 60 * 24 * 7 // 7d
-                                }
-                            )
-                            console.log(url)
-
-                            const result = await fetch(url, {
-                                method: 'PUT',
-                                headers: {
-                                    'Content-Type': 'image/png',
-                                    'Content-Encoding': 'base64',
-                                    'x-amz-acl': 'public-read',
-                                    'Content-Disposition': 'inline'
-                                },
-                                body: byteArray
-                            })
-                            console.log(result)
-
-                            setDraft(draft.replace(uploadingText, ''))
-                            if (!result.ok) {
-                                setDraft(draft + `![upload failed]()`)
-                                return
-                            }
-                            setDraft(draft + `![image](${pref.s3Config.publicUrl}/${fileName})`)
-                            return
-                        }
-                    } catch (e) {
-                        setDraft(draft + `![upload failed]()`)
-                        console.error(e)
-                    }
-                }
-                reader.readAsDataURL(imageFile)
+            const uploadingText = ' ![uploading...]()'
+            setDraft(draft + uploadingText)
+            const result = await uploadFile(imageFile)
+            if (!result) {
+                setDraft(draft.replace(uploadingText, ''))
+                setDraft(draft + `![upload failed]()`)
+            } else {
+                setDraft(draft.replace(uploadingText, ''))
+                setDraft(draft + `![image](${result})`)
             }
         }
     }
@@ -247,19 +150,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const onFileInputChange = async (event: any): Promise<void> => {
         const file = event.target.files[0]
         if (!file) return
-        const URLObj = window.URL || window.webkitURL
-        const imgSrc = URLObj.createObjectURL(file)
-        console.log(file, imgSrc)
-        const reader = new FileReader()
-        reader.onload = async (event) => {
-            const base64Text = event
-            if (!base64Text.target) return
-            console.log(event)
-            const result = await uploadToImgur(base64Text.target.result as string)
-            if (!result) return
-            setDraft(draft + `![image](${result})`)
-        }
-        reader.readAsDataURL(file)
+        await uploadImage(file)
     }
 
     const onFileUploadClick = (): void => {
@@ -397,7 +288,9 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             })
                         }
                     }}
-                    onPaste={handlePasteImage}
+                    onPaste={(e) => {
+                        handlePasteImage(e)
+                    }}
                     placeholder={props.placeholder ?? t('placeholder')}
                     autoFocus={props.autoFocus}
                     sx={{

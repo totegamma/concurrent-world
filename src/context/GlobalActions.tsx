@@ -15,6 +15,9 @@ import { usePreference } from './PreferenceContext'
 import { ProfileEditor } from '../components/ProfileEditor'
 import { MessageContainer } from '../components/Message/MessageContainer'
 import { Menu } from '../components/Menu/Menu'
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import { fileToBase64 } from '../util'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
 export interface GlobalActionsState {
     openDraft: () => void
@@ -22,6 +25,7 @@ export interface GlobalActionsState {
     openReroute: (target: Message<any>) => void
     openMobileMenu: (open?: boolean) => void
     allKnownStreams: Array<Stream<CommonstreamSchema>>
+    uploadFile: (file: File) => Promise<string | null>
 }
 
 const GlobalActionsContext = createContext<GlobalActionsState | undefined>(undefined)
@@ -181,6 +185,86 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         }
     }, [handleKeyPress])
 
+    const s3Client = useMemo(() => {
+        if (pref.storageProvider !== 's3') return null
+        return new S3Client({
+            endpoint: pref.s3Config.endpoint,
+            credentials: {
+                accessKeyId: pref.s3Config.accessKeyId,
+                secretAccessKey: pref.s3Config.secretAccessKey
+            },
+            region: 'auto'
+        })
+    }, [pref.storageProvider, pref.s3Config])
+
+    const uploadFile = useCallback(
+        async (file: File) => {
+            const base64Data = await fileToBase64(file)
+            if (!base64Data) return null
+
+            if (pref.storageProvider === 's3') {
+                if (!s3Client) return null
+                const _base64Data = base64Data.split(',')[1]
+                const byteCharacters = atob(_base64Data)
+                const byteNumbers = new Array(byteCharacters.length)
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i)
+                }
+                const byteArray = new Uint8Array(byteNumbers)
+
+                const fileName = `${Date.now()}`
+                const url = await getSignedUrl(
+                    s3Client,
+                    new PutObjectCommand({
+                        Bucket: pref.s3Config.bucketName,
+                        Key: fileName
+                    }),
+                    {
+                        expiresIn: 60 // 1 minute
+                    }
+                )
+                try {
+                    const result = await fetch(url, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': file.type,
+                            'Content-Encoding': 'base64',
+                            'x-amz-acl': 'public-read',
+                            'Content-Disposition': 'inline'
+                        },
+                        body: byteArray
+                    })
+                    if (!result.ok) {
+                        return null
+                    }
+                    return `${pref.s3Config.publicUrl}/${fileName}`
+                } catch (e) {
+                    return null
+                }
+            } else if (pref.storageProvider === 'imgur') {
+                const url = 'https://api.imgur.com/3/image'
+                if (!pref.imgurClientID) return ''
+                const isImage = file.type.includes('image')
+                if (!isImage) return null
+
+                const result = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Client-ID ${pref.imgurClientID}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        type: 'base64',
+                        image: base64Data.replace(/^data:image\/[a-zA-Z]*;base64,/, '')
+                    })
+                })
+                return (await result.json()).data.link
+            }
+            return null
+        },
+        [pref.storageProvider, pref.imgurClientID, pref.s3Config]
+    )
+
     return (
         <GlobalActionsContext.Provider
             value={useMemo(() => {
@@ -189,7 +273,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     openReply,
                     openReroute,
                     openMobileMenu,
-                    allKnownStreams
+                    allKnownStreams,
+                    uploadFile
                 }
             }, [openDraft, openReply, openReroute, openMobileMenu, allKnownStreams])}
         >
