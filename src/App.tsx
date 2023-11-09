@@ -1,6 +1,6 @@
 import { useEffect, useState, createContext, useRef, useMemo, useCallback } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
-import { darken, Box, Paper, ThemeProvider, CssBaseline } from '@mui/material'
+import { darken, Box, Paper, ThemeProvider, CssBaseline, Typography } from '@mui/material'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 
 import { createConcurrentTheme } from './themes'
@@ -98,7 +98,7 @@ function App(): JSX.Element {
                 }
 
                 if (a.schema === Schemas.like) {
-                    client?.api.readMessage(a.targetID).then((m) => {
+                    client?.api.readMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
                         m &&
                             client.api.readCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                 playNotificationRef.current()
@@ -113,15 +113,17 @@ function App(): JSX.Element {
                 }
 
                 if (a.schema === Schemas.emojiAssociation) {
-                    client.api.readMessage(a.targetID).then((m) => {
+                    client.api.readMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
                         console.log(m)
                         m &&
                             client.api.readCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                 playNotificationRef.current()
                                 enqueueSnackbar(
-                                    `${c?.payload.body.username ?? 'anonymous'} reacted to "${
-                                        (m.payload.body.body as string) ?? 'your message.'
-                                    }" with ${(m.associations.at(-1)?.payload.body.shortcode as string) ?? 'emoji'}`
+                                    <Typography>
+                                        {c?.payload.body.username ?? 'anonymous'} reacted to{' '}
+                                        {(m.payload.body.body as string) ?? 'your message.'} with{' '}
+                                        <img src={a.payload.body.imageUrl as string} style={{ height: '1em' }} />
+                                    </Typography>
                                 )
                             })
                     })
