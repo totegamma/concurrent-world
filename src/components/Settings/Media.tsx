@@ -5,6 +5,7 @@ import { usePreference } from '../../context/PreferenceContext'
 import { useTranslation } from 'react-i18next'
 import { MarkdownRenderer } from '../ui/MarkdownRenderer'
 import { Codeblock } from '../ui/Codeblock'
+import { type s3Config } from '../../model'
 
 export const MediaSettings = (): JSX.Element => {
     const pref = usePreference()
@@ -12,8 +13,18 @@ export const MediaSettings = (): JSX.Element => {
 
     const [buttonText, setButtonText] = useState<string>('Save')
 
-    const handleS3ConfigSave = (key: string, value: string): void => {
-        pref.setS3Config({ ...pref.s3Config, [key]: value })
+    const [_s3Config, _setS3Config] = useState<s3Config>(pref.s3Config)
+
+    const handleS3ConfigChange = (key: string, value: string): void => {
+        _setS3Config({ ..._s3Config, [key]: value })
+    }
+
+    const handleS3ConfigSave = (): void => {
+        pref.setS3Config(_s3Config)
+        setButtonText('OK!')
+        setTimeout(() => {
+            setButtonText('Save')
+        }, 2000)
     }
 
     const handleSave = (): void => {
@@ -98,7 +109,7 @@ export const MediaSettings = (): JSX.Element => {
                             fullWidth={true}
                             defaultValue={pref.s3Config.endpoint}
                             onChange={(v) => {
-                                handleS3ConfigSave('endpoint', v.target.value)
+                                handleS3ConfigChange('endpoint', v.target.value)
                             }}
                             type="text"
                         />
@@ -108,7 +119,7 @@ export const MediaSettings = (): JSX.Element => {
                             fullWidth={true}
                             defaultValue={pref.s3Config.accessKeyId}
                             onChange={(v) => {
-                                handleS3ConfigSave('accessKeyId', v.target.value)
+                                handleS3ConfigChange('accessKeyId', v.target.value)
                             }}
                             type="text"
                         />
@@ -118,7 +129,7 @@ export const MediaSettings = (): JSX.Element => {
                             fullWidth={true}
                             defaultValue={pref.s3Config.secretAccessKey}
                             onChange={(v) => {
-                                handleS3ConfigSave('secretAccessKey', v.target.value)
+                                handleS3ConfigChange('secretAccessKey', v.target.value)
                             }}
                             type="password"
                         />
@@ -128,7 +139,7 @@ export const MediaSettings = (): JSX.Element => {
                             fullWidth={true}
                             defaultValue={pref.s3Config.bucketName}
                             onChange={(v) => {
-                                handleS3ConfigSave('bucketName', v.target.value)
+                                handleS3ConfigChange('bucketName', v.target.value)
                             }}
                             type="text"
                         />
@@ -138,12 +149,12 @@ export const MediaSettings = (): JSX.Element => {
                             fullWidth={true}
                             defaultValue={pref.s3Config.publicUrl}
                             onChange={(v) => {
-                                handleS3ConfigSave('publicUrl', v.target.value)
+                                handleS3ConfigChange('publicUrl', v.target.value)
                             }}
                             type="text"
                         />
-                        <Button variant="contained" onClick={handleSave}>
-                            {buttonText} (未実装)
+                        <Button variant="contained" onClick={handleS3ConfigSave}>
+                            {buttonText}
                         </Button>
                     </Box>
                 </>
