@@ -50,6 +50,7 @@
     },
     "media": {
       "storageProviderLabel": "使用するストレージプロバイダ",
+      "corsSettings": "CORS設定",
       "imagePostSettings": "画像投稿設定",
       "afterRegisteringImgur": "Imgurに登録した後、",
       "thisPage": "このページ",

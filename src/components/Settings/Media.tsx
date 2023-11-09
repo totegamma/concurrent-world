@@ -1,9 +1,8 @@
-import { Box, Button, Card, CardContent, Divider, MenuItem, Select, TextField, Typography } from '@mui/material'
+import { Box, Button, Divider, MenuItem, Paper, Select, TextField, Typography } from '@mui/material'
 import { useRef, useState } from 'react'
 import { usePreference } from '../../context/PreferenceContext'
 
 import { useTranslation } from 'react-i18next'
-import { MarkdownRenderer } from '../ui/MarkdownRenderer'
 import { Codeblock } from '../ui/Codeblock'
 import { type s3Config } from '../../model'
 
@@ -62,31 +61,34 @@ export const MediaSettings = (): JSX.Element => {
 
             {pref.storageProvider === 'imgur' && (
                 <>
-                    <Typography>
-                        {t('afterRegisteringImgur')}
-                        <a href={'https://api.imgur.com/oauth2/addclient'}>{t('thisPage')}</a>
-                        {t('oauth2')}
-                    </Typography>
-                    <Box>
-                        <TextField
-                            label="ClientId"
-                            variant="outlined"
-                            fullWidth={true}
-                            defaultValue={pref.imgurClientID}
-                            inputRef={clientIdRef}
-                            type="password"
-                        />
-                    </Box>
-                    <Button variant="contained" onClick={handleSave}>
-                        {buttonText}
-                    </Button>
+                    <Paper sx={{ padding: '1em', display: 'flex', flexDirection: 'column', gap: '1em' }}>
+                        <Typography>
+                            {t('afterRegisteringImgur')}
+                            <a href={'https://api.imgur.com/oauth2/addclient'}>{t('thisPage')}</a>
+                            {t('oauth2')}
+                        </Typography>
+                        <Box>
+                            <TextField
+                                label="ClientId"
+                                variant="outlined"
+                                fullWidth={true}
+                                defaultValue={pref.imgurClientID}
+                                inputRef={clientIdRef}
+                                type="password"
+                            />
+                        </Box>
+                        <Button variant="contained" onClick={handleSave}>
+                            {buttonText}
+                        </Button>
+                    </Paper>
                 </>
             )}
             {pref.storageProvider === 's3' && (
                 <>
-                    <Typography>CORSの設定はコレ</Typography>
-                    <Codeblock language={'json'}>
-                        {`[{
+                    <Paper sx={{ padding: '1em', display: 'flex', flexDirection: 'column', gap: '1em' }}>
+                        <Typography>{t('corsSettings')}</Typography>
+                        <Codeblock language={'json'}>
+                            {`[{
     "AllowedOrigins": [
         "https://localhost:5173",
         "https://concurrent.world"
@@ -101,85 +103,66 @@ export const MediaSettings = (): JSX.Element => {
         "*"
     ]
 }]`}
-                    </Codeblock>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
-                        <TextField
-                            label="endpoint"
-                            variant="outlined"
-                            fullWidth={true}
-                            defaultValue={pref.s3Config.endpoint}
-                            onChange={(v) => {
-                                handleS3ConfigChange('endpoint', v.target.value)
-                            }}
-                            type="text"
-                        />
-                        <TextField
-                            label="accessKeyId"
-                            variant="outlined"
-                            fullWidth={true}
-                            defaultValue={pref.s3Config.accessKeyId}
-                            onChange={(v) => {
-                                handleS3ConfigChange('accessKeyId', v.target.value)
-                            }}
-                            type="text"
-                        />
-                        <TextField
-                            label="secretAccessKey"
-                            variant="outlined"
-                            fullWidth={true}
-                            defaultValue={pref.s3Config.secretAccessKey}
-                            onChange={(v) => {
-                                handleS3ConfigChange('secretAccessKey', v.target.value)
-                            }}
-                            type="password"
-                        />
-                        <TextField
-                            label="bucketName"
-                            variant="outlined"
-                            fullWidth={true}
-                            defaultValue={pref.s3Config.bucketName}
-                            onChange={(v) => {
-                                handleS3ConfigChange('bucketName', v.target.value)
-                            }}
-                            type="text"
-                        />
-                        <TextField
-                            label="publicUrl"
-                            variant="outlined"
-                            fullWidth={true}
-                            defaultValue={pref.s3Config.publicUrl}
-                            onChange={(v) => {
-                                handleS3ConfigChange('publicUrl', v.target.value)
-                            }}
-                            type="text"
-                        />
-                        <Button variant="contained" onClick={handleS3ConfigSave}>
-                            {buttonText}
-                        </Button>
-                    </Box>
+                        </Codeblock>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
+                            <TextField
+                                label="endpoint"
+                                variant="outlined"
+                                fullWidth={true}
+                                defaultValue={pref.s3Config.endpoint}
+                                onChange={(v) => {
+                                    handleS3ConfigChange('endpoint', v.target.value)
+                                }}
+                                type="text"
+                            />
+                            <TextField
+                                label="accessKeyId"
+                                variant="outlined"
+                                fullWidth={true}
+                                defaultValue={pref.s3Config.accessKeyId}
+                                onChange={(v) => {
+                                    handleS3ConfigChange('accessKeyId', v.target.value)
+                                }}
+                                type="text"
+                            />
+                            <TextField
+                                label="secretAccessKey"
+                                variant="outlined"
+                                fullWidth={true}
+                                defaultValue={pref.s3Config.secretAccessKey}
+                                onChange={(v) => {
+                                    handleS3ConfigChange('secretAccessKey', v.target.value)
+                                }}
+                                type="password"
+                            />
+                            <TextField
+                                label="bucketName"
+                                variant="outlined"
+                                fullWidth={true}
+                                defaultValue={pref.s3Config.bucketName}
+                                onChange={(v) => {
+                                    handleS3ConfigChange('bucketName', v.target.value)
+                                }}
+                                type="text"
+                            />
+                            <TextField
+                                label="publicUrl"
+                                variant="outlined"
+                                fullWidth={true}
+                                defaultValue={pref.s3Config.publicUrl}
+                                onChange={(v) => {
+                                    handleS3ConfigChange('publicUrl', v.target.value)
+                                }}
+                                type="text"
+                            />
+                            <Button variant="contained" onClick={handleS3ConfigSave}>
+                                {buttonText}
+                            </Button>
+                        </Box>
+                    </Paper>
                 </>
             )}
             <Divider />
-
-            {/*
-            <Typography variant="h3">URLプレビュー設定</Typography>
-            <Typography>
-                URLプレビューに私用するAPIのURLを設定します。デフォルトでは、いずれアカウントのhostに移行する予定です。
-            </Typography>
-            <Box>
-                <TextField
-                    label="MediaProxyUrl"
-                    variant="outlined"
-                    fullWidth={true}
-                    defaultValue={pref.mediaProxy}
-                    inputRef={mediaProxyRef}
-                    type="text"
-                />
-            </Box>
-            <Button variant="contained" onClick={handleMediaProxySave}>
-                {buttonText}
-            </Button>
-            */}
         </Box>
     )
 }
