@@ -38,8 +38,6 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { DummyMessageView } from './Message/DummyMessageView'
 
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { useGlobalActions } from '../context/GlobalActions'
 
 export interface DraftProps {
