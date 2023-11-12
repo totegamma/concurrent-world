@@ -141,6 +141,7 @@ export function MessagePage(): JSX.Element {
                     }}
                 >
                     <MessageView
+                        forceExpanded
                         message={message as Message<SimpleNoteSchema | ReplyMessageSchema>}
                         lastUpdated={lastUpdated}
                         userCCID={client.ccid}

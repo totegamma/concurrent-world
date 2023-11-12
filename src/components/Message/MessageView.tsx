@@ -1,4 +1,4 @@
-import { Box } from '@mui/material'
+import { Box, Button, alpha, useTheme } from '@mui/material'
 import { SimpleNote } from './SimpleNote'
 import { MessageHeader } from './MessageHeader'
 import { MessageActions } from './MessageActions'
@@ -14,6 +14,7 @@ import { PostedStreams } from './PostedStreams'
 import { ContentWithCCAvatar } from '../ContentWithCCAvatar'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import ReplayIcon from '@mui/icons-material/Replay'
+import { useState } from 'react'
 
 export interface MessageViewProps {
     message: Message<SimpleNoteSchema | ReplyMessageSchema>
@@ -21,9 +22,17 @@ export interface MessageViewProps {
     userCCID: string
     beforeMessage?: JSX.Element
     lastUpdated?: number
+    forceExpanded?: boolean
+    clipHeight?: number
 }
 
+const gradationHeight = 80
+
 export const MessageView = (props: MessageViewProps): JSX.Element => {
+    const theme = useTheme()
+    const clipHeight = props.clipHeight ?? 450
+    const [expanded, setExpanded] = useState(props.forceExpanded ?? false)
+
     const reroutedsame =
         props.rerouted &&
         props.rerouted.streams.length === props.message.streams.length &&
@@ -36,8 +45,42 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
         >
             <MessageHeader message={props.message} />
             {props.beforeMessage}
-            <SimpleNote message={props.message} />
-            <MessageUrlPreview messageBody={props.message.payload.body.body} />
+            <Box
+                sx={{
+                    position: 'relative',
+                    maxHeight: expanded ? 'none' : `${clipHeight}px`,
+                    overflow: 'hidden'
+                }}
+            >
+                <Box
+                    sx={{
+                        display: expanded ? 'none' : 'flex',
+                        position: 'absolute',
+                        top: `${clipHeight - gradationHeight}px`,
+                        left: '0',
+                        width: '100%',
+                        height: `${gradationHeight}px`,
+                        background: `linear-gradient(${alpha(theme.palette.background.paper, 0)}, ${
+                            theme.palette.background.paper
+                        })`,
+                        alignItems: 'center',
+                        zIndex: 1,
+                        justifyContent: 'center'
+                    }}
+                >
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => {
+                            setExpanded(true)
+                        }}
+                    >
+                        Show more
+                    </Button>
+                </Box>
+                <SimpleNote message={props.message} />
+                <MessageUrlPreview messageBody={props.message.payload.body.body} />
+            </Box>
             <MessageReactions message={props.message} />
             <Box
                 sx={{

@@ -75,7 +75,7 @@ export const ContentWithCCAvatar = (props: ContentWithCCAvatarProps): JSX.Elemen
                     flex: 1,
                     flexDirection: 'column',
                     width: '100%',
-                    overflow: 'auto'
+                    overflow: 'hidden'
                 }}
             >
                 {props.children}
