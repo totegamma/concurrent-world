@@ -1,4 +1,4 @@
-import { Box, Divider, List, ListItem, Paper, Tab, Tabs, Typography } from '@mui/material'
+import { Box, Divider, List, Paper, Tab, Tabs, Typography } from '@mui/material'
 import { useParams } from 'react-router-dom'
 import { useApi } from '../context/api'
 import { useEffect, useState } from 'react'
@@ -16,6 +16,8 @@ import { MessageView } from '../components/Message/MessageView'
 import { Draft } from '../components/Draft'
 import { useGlobalActions } from '../context/GlobalActions'
 import { RerouteMessageFrame } from '../components/Message/RerouteMessageFrame'
+import { FavoriteAssociation } from '../components/Association/FavoriteAssociation'
+import { ReactionAssociation } from '../components/Association/ReactionAssociation'
 
 export function MessagePage(): JSX.Element {
     const { id } = useParams()
@@ -37,7 +39,7 @@ export function MessagePage(): JSX.Element {
     const [reactions, setReactions] = useState<Array<Association<EmojiAssociationSchema>>>([])
     const [replyTo, setReplyTo] = useState<Message<ReplyMessageSchema> | null>(null)
 
-    const [tab, setTab] = useState<'replies' | 'reroutes' | 'favorites' | 'reactions'>('replies')
+    const tab = (location.hash.slice(1) as 'replies' | 'reroutes' | 'favorites' | 'reactions') || 'replies'
 
     useEffect(() => {
         setMessage(null)
@@ -149,7 +151,7 @@ export function MessagePage(): JSX.Element {
             <Tabs
                 value={tab}
                 onChange={(_, next) => {
-                    setTab(next)
+                    location.hash = next
                 }}
                 textColor="secondary"
                 indicatorColor="secondary"
@@ -225,14 +227,7 @@ export function MessagePage(): JSX.Element {
                     </Typography>
                     <List>
                         {favorites.map((favorite) => (
-                            <ListItem
-                                key={favorite.id}
-                                sx={{
-                                    padding: '20px'
-                                }}
-                            >
-                                {favorite.authorUser?.profile?.payload.body.username} liked this message
-                            </ListItem>
+                            <FavoriteAssociation key={favorite.id} association={favorite} perspective={client.ccid} />
                         ))}
                     </List>
                 </>
@@ -244,15 +239,7 @@ export function MessagePage(): JSX.Element {
                     </Typography>
                     <List>
                         {reactions.map((reaction) => (
-                            <ListItem
-                                key={reaction.id}
-                                sx={{
-                                    padding: '20px'
-                                }}
-                            >
-                                {reaction.authorUser?.profile?.payload.body.username} reacted with{' '}
-                                {reaction.payload.body.shortcode}
-                            </ListItem>
+                            <ReactionAssociation key={reaction.id} association={reaction} perspective={client.ccid} />
                         ))}
                     </List>
                 </>
