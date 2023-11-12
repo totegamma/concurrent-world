@@ -3,13 +3,11 @@ import { useParams } from 'react-router-dom'
 import { useApi } from '../context/api'
 import { useEffect, useState } from 'react'
 import {
-    type CommonstreamSchema,
     type Message,
     type ReplyMessageSchema,
     type RerouteMessageSchema,
     Schemas,
-    type SimpleNoteSchema,
-    type Stream
+    type SimpleNoteSchema
 } from '@concurrent-world/client'
 import { MessageView } from '../components/Message/MessageView'
 import { Draft } from '../components/Draft'
