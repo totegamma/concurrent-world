@@ -1,6 +1,11 @@
 import { Box, Chip } from '@mui/material'
 
-import { type Message, type ReplyMessageSchema, type SimpleNoteSchema } from '@concurrent-world/client'
+import {
+    type RerouteMessageSchema,
+    type Message,
+    type ReplyMessageSchema,
+    type SimpleNoteSchema
+} from '@concurrent-world/client'
 import { useApi } from '../../context/api'
 import { MessageView } from './MessageView'
 import { OneLineMessageView } from './OneLineMessageView'
@@ -10,6 +15,7 @@ export interface ReplyMessageFrameProp {
     message: Message<ReplyMessageSchema>
     lastUpdated?: number
     userCCID: string
+    rerouted?: Message<RerouteMessageSchema>
 }
 
 export const ReplyMessageFrame = (props: ReplyMessageFrameProp): JSX.Element => {
@@ -39,6 +45,7 @@ export const ReplyMessageFrame = (props: ReplyMessageFrameProp): JSX.Element => 
                             sx={{ width: 'fit-content', mb: 1 }}
                         />
                     }
+                    rerouted={props.rerouted}
                 />
             </Box>
         </>

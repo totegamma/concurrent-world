@@ -20,6 +20,7 @@ interface MessageContainerProps {
     lastUpdated?: number
     after?: JSX.Element | undefined
     timestamp?: Date
+    rerouted?: Message<RerouteMessageSchema>
 }
 
 export const MessageContainer = memo<MessageContainerProps>((props: MessageContainerProps): JSX.Element | null => {
@@ -71,6 +72,7 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
                     message={message as Message<SimpleNoteSchema>}
                     lastUpdated={props.lastUpdated}
                     userCCID={client.ccid}
+                    rerouted={props.rerouted}
                 />
             )
             break
@@ -80,6 +82,7 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
                     message={message as Message<ReplyMessageSchema>}
                     lastUpdated={props.lastUpdated}
                     userCCID={client.ccid}
+                    rerouted={props.rerouted}
                 />
             )
             break

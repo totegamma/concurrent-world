@@ -1,11 +1,17 @@
-import { type Message, type ReplyMessageSchema, Schemas, type SimpleNoteSchema } from '@concurrent-world/client'
+import {
+    type Message,
+    type ReplyMessageSchema,
+    Schemas,
+    type SimpleNoteSchema,
+    type RerouteMessageSchema
+} from '@concurrent-world/client'
 import { Box, Link } from '@mui/material'
 import { useMemo } from 'react'
 
 import { Link as RouterLink } from 'react-router-dom'
 
 export interface PostedStreamsProps {
-    message: Message<SimpleNoteSchema | ReplyMessageSchema>
+    message: Message<SimpleNoteSchema | ReplyMessageSchema | RerouteMessageSchema>
 }
 
 export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
