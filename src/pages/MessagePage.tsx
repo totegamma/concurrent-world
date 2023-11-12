@@ -1,4 +1,4 @@
-import { Box, Divider, Paper, Typography } from '@mui/material'
+import { Box, Divider, List, ListItem, Paper, Tab, Tabs, Typography } from '@mui/material'
 import { useParams } from 'react-router-dom'
 import { useApi } from '../context/api'
 import { useEffect, useState } from 'react'
@@ -7,11 +7,15 @@ import {
     type ReplyMessageSchema,
     type RerouteMessageSchema,
     Schemas,
-    type SimpleNoteSchema
+    type SimpleNoteSchema,
+    type Association,
+    type LikeSchema,
+    type EmojiAssociationSchema
 } from '@concurrent-world/client'
 import { MessageView } from '../components/Message/MessageView'
 import { Draft } from '../components/Draft'
 import { useGlobalActions } from '../context/GlobalActions'
+import { RerouteMessageFrame } from '../components/Message/RerouteMessageFrame'
 
 export function MessagePage(): JSX.Element {
     const { id } = useParams()
@@ -28,7 +32,12 @@ export function MessagePage(): JSX.Element {
     const [isFetching, setIsFetching] = useState<boolean>(true)
 
     const [replies, setReplies] = useState<Array<Message<ReplyMessageSchema>>>([])
+    const [reroutes, setReroutes] = useState<Array<Message<RerouteMessageSchema>>>([])
+    const [favorites, setFavorites] = useState<Array<Association<LikeSchema>>>([])
+    const [reactions, setReactions] = useState<Array<Association<EmojiAssociationSchema>>>([])
     const [replyTo, setReplyTo] = useState<Message<ReplyMessageSchema> | null>(null)
+
+    const [tab, setTab] = useState<'replies' | 'reroutes' | 'favorites' | 'reactions'>('replies')
 
     useEffect(() => {
         setMessage(null)
@@ -47,6 +56,21 @@ export function MessagePage(): JSX.Element {
                 msg.getReplyMessages().then((replies) => {
                     if (!isMounted) return
                     setReplies(replies)
+                })
+
+                msg.getRerouteMessages().then((reroutes) => {
+                    if (!isMounted) return
+                    setReroutes(reroutes)
+                })
+
+                msg.getFavorites().then((favorites) => {
+                    if (!isMounted) return
+                    setFavorites(favorites)
+                })
+
+                msg.getReactions().then((reactions) => {
+                    if (!isMounted) return
+                    setReactions(reactions)
                 })
 
                 if (msg.schema === Schemas.replyMessage) {
@@ -121,37 +145,116 @@ export function MessagePage(): JSX.Element {
                     />
                 </Paper>
             )}
-            <Paper
-                variant="outlined"
-                sx={{
-                    padding: 1
+
+            <Tabs
+                value={tab}
+                onChange={(_, next) => {
+                    setTab(next)
                 }}
+                textColor="secondary"
+                indicatorColor="secondary"
             >
-                <Draft
-                    streamPickerInitial={message.postedStreams ?? []}
-                    streamPickerOptions={actions.allKnownStreams}
-                    placeholder="Write a reply..."
-                    onSubmit={async (text: string, streams: string[], emojis) => {
-                        message.reply(streams, text, emojis)
-                        return null
-                    }}
-                />
-            </Paper>
-            {replies.length > 0 && (
+                <Tab value="replies" label="Replies" />
+                <Tab value="reroutes" label="Reroutes" />
+                <Tab value="favorites" label="Favorites" />
+                <Tab value="reactions" label="Reactions" />
+            </Tabs>
+            <Divider />
+            {tab === 'replies' && (
+                <>
+                    <Paper
+                        variant="outlined"
+                        sx={{
+                            padding: 1
+                        }}
+                    >
+                        <Draft
+                            streamPickerInitial={message.postedStreams ?? []}
+                            streamPickerOptions={actions.allKnownStreams}
+                            placeholder="Write a reply..."
+                            onSubmit={async (text: string, streams: string[], emojis) => {
+                                message.reply(streams, text, emojis)
+                                return null
+                            }}
+                        />
+                    </Paper>
+                    {replies.length > 0 && (
+                        <>
+                            <Typography variant="h2" gutterBottom>
+                                Replies:
+                            </Typography>
+                            {replies.map((reply) => (
+                                <Paper
+                                    key={reply.id}
+                                    sx={{
+                                        padding: '20px'
+                                    }}
+                                >
+                                    <MessageView message={reply} lastUpdated={lastUpdated} userCCID={client.ccid} />
+                                </Paper>
+                            ))}
+                        </>
+                    )}
+                </>
+            )}
+            {tab === 'reroutes' && (
                 <>
                     <Typography variant="h2" gutterBottom>
-                        Replies:
+                        Reroutes:
                     </Typography>
-                    {replies.map((reply) => (
-                        <Paper
-                            key={reply.id}
-                            sx={{
-                                padding: '20px'
-                            }}
-                        >
-                            <MessageView message={reply} lastUpdated={lastUpdated} userCCID={client.ccid} />
-                        </Paper>
-                    ))}
+                    {reroutes.length > 0 && (
+                        <>
+                            {reroutes.map((reroute) => (
+                                <Paper
+                                    key={reroute.id}
+                                    sx={{
+                                        padding: '20px'
+                                    }}
+                                >
+                                    <RerouteMessageFrame message={reroute} />
+                                </Paper>
+                            ))}
+                        </>
+                    )}
+                </>
+            )}
+            {tab === 'favorites' && (
+                <>
+                    <Typography variant="h2" gutterBottom>
+                        Favorites:
+                    </Typography>
+                    <List>
+                        {favorites.map((favorite) => (
+                            <ListItem
+                                key={favorite.id}
+                                sx={{
+                                    padding: '20px'
+                                }}
+                            >
+                                {favorite.authorUser?.profile?.payload.body.username} liked this message
+                            </ListItem>
+                        ))}
+                    </List>
+                </>
+            )}
+            {tab === 'reactions' && (
+                <>
+                    <Typography variant="h2" gutterBottom>
+                        Reactions:
+                    </Typography>
+                    <List>
+                        {reactions.map((reaction) => (
+                            <ListItem
+                                key={reaction.id}
+                                sx={{
+                                    padding: '20px'
+                                }}
+                            >
+                                {reaction.authorUser?.profile?.payload.body.username} reacted with{' '}
+                                {reaction.payload.body.shortcode}
+                            </ListItem>
+                        ))}
+                    </List>
                 </>
             )}
         </Box>
