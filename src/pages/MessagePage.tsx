@@ -128,7 +128,6 @@ export function MessagePage(): JSX.Element {
                 }}
             >
                 <Draft
-                    autoFocus
                     streamPickerInitial={message.postedStreams ?? []}
                     streamPickerOptions={actions.allKnownStreams}
                     placeholder="Write a reply..."
