@@ -7,7 +7,8 @@ import { MessageActions } from './MessageActions'
 import { MessageReactions } from './MessageReactions'
 import { MessageUrlPreview } from './MessageUrlPreview'
 import { UserProfileCard } from '../UserProfileCard'
-import { Message, ReplyMessageSchema, SimpleNoteSchema } from '@concurrent-world/client'
+import { type Message, type ReplyMessageSchema, type SimpleNoteSchema } from '@concurrent-world/client'
+import { PostedStreams } from './PostedStreams'
 
 export interface MessageViewProps {
     message: Message<SimpleNoteSchema | ReplyMessageSchema>
@@ -87,7 +88,19 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                         <SimpleNote message={props.message} />
                         <MessageUrlPreview messageBody={props.message.payload.body.body} />
                         <MessageReactions message={props.message} />
-                        <MessageActions message={props.message} userCCID={props.userCCID} />
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'row-reverse',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                gap: 1,
+                                flexWrap: 'wrap'
+                            }}
+                        >
+                            <PostedStreams message={props.message} />
+                            <MessageActions message={props.message} userCCID={props.userCCID} />
+                        </Box>
                     </Box>
                 </>
             )}
