@@ -37,6 +37,7 @@ import {
     type ProfileSchema,
     type User
 } from '@concurrent-world/client'
+import { UrlSummaryProvider } from './context/urlSummaryContext'
 
 export const ApplicationContext = createContext<appData>({
     displayingStream: [],
@@ -198,9 +199,11 @@ function App(): JSX.Element {
                 <CssBaseline />
                 <TickerProvider>
                     <ApplicationContext.Provider value={applicationContext}>
-                        <EmojiPickerProvider>
-                            <GlobalActionsProvider>{childs}</GlobalActionsProvider>
-                        </EmojiPickerProvider>
+                        <UrlSummaryProvider host={client.host}>
+                            <EmojiPickerProvider>
+                                <GlobalActionsProvider>{childs}</GlobalActionsProvider>
+                            </EmojiPickerProvider>
+                        </UrlSummaryProvider>
                     </ApplicationContext.Provider>
                 </TickerProvider>
             </ThemeProvider>
