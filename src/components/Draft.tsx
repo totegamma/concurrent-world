@@ -17,7 +17,8 @@ import {
     Fade,
     Typography,
     Backdrop,
-    type SxProps
+    type SxProps,
+    Popper
 } from '@mui/material'
 import { StreamPicker } from './ui/StreamPicker'
 import { closeSnackbar, useSnackbar } from 'notistack'
@@ -214,34 +215,6 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 </Backdrop>
             )}
 
-            <Paper
-                sx={{
-                    top: `${caretPos.top}px`,
-                    left: `${caretPos.left}px`,
-                    position: 'fixed',
-                    display: enableSuggestions ? 'flex' : 'none',
-                    zIndex: 1000
-                }}
-            >
-                <List dense>
-                    {emojiSuggestions.map((emoji, index) => (
-                        <ListItemButton
-                            dense
-                            key={emoji.imageURL}
-                            selected={index === selectedSuggestions}
-                            onClick={() => {
-                                onEmojiSuggestConfirm(index)
-                            }}
-                        >
-                            <ListItemIcon>
-                                <Box component="img" src={emoji.imageURL} sx={{ width: '1em', height: '1em' }} />
-                            </ListItemIcon>
-                            <ListItemText>{emoji.shortcode}</ListItemText>
-                        </ListItemButton>
-                    ))}
-                </List>
-            </Paper>
-
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Box
                     sx={{
@@ -296,12 +269,10 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
 
                         // move suggestion box
                         const pos = caretPosition(e.target, e.target.selectionEnd ?? 0, {})
-                        const parent = textInputRef.current?.getBoundingClientRect()
-                        const offset = 10
-                        if (pos && parent) {
+                        if (pos) {
                             setCaretPos({
-                                top: parent.top + pos.top + offset,
-                                left: parent.left + pos.left + offset
+                                top: pos.top - 50,
+                                left: pos.left + 10
                             })
                         }
                     }}
@@ -353,6 +324,46 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     }}
                     inputRef={textInputRef}
                 />
+                <Popper
+                    open={enableSuggestions}
+                    anchorEl={textInputRef.current}
+                    placement="bottom-start"
+                    modifiers={[
+                        {
+                            name: 'offset',
+                            options: {
+                                offset: [caretPos.left, caretPos.top]
+                            }
+                        }
+                    ]}
+                    sx={{
+                        zIndex: (theme) => theme.zIndex.tooltip + 1
+                    }}
+                >
+                    <Paper>
+                        <List dense>
+                            {emojiSuggestions.map((emoji, index) => (
+                                <ListItemButton
+                                    dense
+                                    key={emoji.imageURL}
+                                    selected={index === selectedSuggestions}
+                                    onClick={() => {
+                                        onEmojiSuggestConfirm(index)
+                                    }}
+                                >
+                                    <ListItemIcon>
+                                        <Box
+                                            component="img"
+                                            src={emoji.imageURL}
+                                            sx={{ width: '1em', height: '1em' }}
+                                        />
+                                    </ListItemIcon>
+                                    <ListItemText>{emoji.shortcode}</ListItemText>
+                                </ListItemButton>
+                            ))}
+                        </List>
+                    </Paper>
+                </Popper>
             </Box>
             <Box
                 sx={{
