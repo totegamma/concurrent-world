@@ -165,19 +165,17 @@ export function MessagePage(): JSX.Element {
             <Divider />
             {tab === 'replies' && (
                 <>
-                    <Paper
-                        variant="outlined"
-                        sx={{
-                            padding: 1
-                        }}
-                    >
+                    <Paper variant="outlined">
                         <Draft
                             streamPickerInitial={message.postedStreams ?? []}
                             streamPickerOptions={actions.allKnownStreams}
                             placeholder="Write a reply..."
                             onSubmit={async (text: string, streams: string[], emojis) => {
-                                message.reply(streams, text, emojis)
+                                await message.reply(streams, text, emojis)
                                 return null
+                            }}
+                            sx={{
+                                p: 1
                             }}
                         />
                     </Paper>

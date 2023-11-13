@@ -15,7 +15,9 @@ import {
     ListItemButton,
     Collapse,
     Fade,
-    Typography
+    Typography,
+    Backdrop,
+    type SxProps
 } from '@mui/material'
 import { StreamPicker } from './ui/StreamPicker'
 import { closeSnackbar, useSnackbar } from 'notistack'
@@ -48,6 +50,7 @@ export interface DraftProps {
     allowEmpty?: boolean
     autoFocus?: boolean
     placeholder?: string
+    sx?: SxProps
 }
 
 export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
@@ -192,9 +195,25 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 flexDirection: 'column',
                 alignItems: 'stretch',
                 borderColor: 'text.disabled',
-                width: '100%'
+                width: '100%',
+                ...props.sx
             }}
         >
+            {sending && (
+                <Backdrop
+                    sx={{
+                        position: 'absolute',
+                        zIndex: (theme) => theme.zIndex.drawer + 1,
+                        backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                        height: '100%',
+                        color: '#fff'
+                    }}
+                    open={sending}
+                >
+                    <CircularProgress color="inherit" />
+                </Backdrop>
+            )}
+
             <Paper
                 sx={{
                     top: `${caretPos.top}px`,
@@ -472,19 +491,6 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         >
                             {props.submitButtonLabel ?? 'POST'}
                         </Button>
-                        {sending && (
-                            <CircularProgress
-                                size={24}
-                                sx={{
-                                    color: 'primary.main',
-                                    position: 'absolute',
-                                    top: '50%',
-                                    left: '50%',
-                                    marginTop: '-12px',
-                                    marginLeft: '-12px'
-                                }}
-                            />
-                        )}
                     </Box>
                 </Box>
             </Box>

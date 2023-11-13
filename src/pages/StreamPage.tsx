@@ -8,7 +8,7 @@ import { Timeline } from '../components/Timeline/main'
 import { StreamInfo } from '../components/StreamInfo'
 import { ApplicationContext } from '../App'
 import { usePreference } from '../context/PreferenceContext'
-import { CommonstreamSchema, type Stream } from '@concurrent-world/client'
+import { type CommonstreamSchema, type Stream } from '@concurrent-world/client'
 import PercentIcon from '@mui/icons-material/Percent'
 import InfoIcon from '@mui/icons-material/Info'
 import { CCDrawer } from '../components/ui/CCDrawer'
@@ -94,7 +94,6 @@ export const StreamPage = memo((): JSX.Element => {
                                 >
                                     <Box
                                         sx={{
-                                            px: 1,
                                             display: {
                                                 xs: pref.showEditorOnTopMobile ? 'block' : 'none',
                                                 sm: pref.showEditorOnTop ? 'block' : 'none'
@@ -104,25 +103,21 @@ export const StreamPage = memo((): JSX.Element => {
                                         <Draft
                                             streamPickerInitial={streams}
                                             streamPickerOptions={streams}
-                                            onSubmit={(
+                                            onSubmit={async (
                                                 text: string,
                                                 destinations: string[],
                                                 emojis
                                             ): Promise<Error | null> => {
-                                                client
-                                                    .createCurrent(text, destinations, emojis)
-                                                    .then(() => {
-                                                        return null
-                                                    })
-                                                    .catch((e) => {
-                                                        return e
-                                                    })
-                                                return Promise.resolve(null)
+                                                await client.createCurrent(text, destinations, emojis).catch((e) => e)
+                                                return null
+                                            }}
+                                            sx={{
+                                                p: 1
                                             }}
                                         />
                                         <Divider
                                             sx={{
-                                                my: 1
+                                                mb: 1
                                             }}
                                         />
                                     </Box>

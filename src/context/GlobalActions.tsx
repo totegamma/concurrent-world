@@ -40,8 +40,7 @@ const style = {
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: '700px',
-    maxWidth: '90vw',
-    p: 1
+    maxWidth: '90vw'
 }
 
 export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element => {
@@ -295,18 +294,18 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                         streamPickerInitial={queriedStreams}
                                         streamPickerOptions={allKnownStreams}
                                         onSubmit={async (text: string, destinations: string[], emojis) => {
-                                            client
+                                            await client
                                                 .createCurrent(text, destinations, emojis)
-                                                .then(() => {
-                                                    return null
-                                                })
                                                 .catch((e) => {
                                                     return e
                                                 })
                                                 .finally(() => {
                                                     setMode('none')
                                                 })
-                                            return await Promise.resolve(null)
+                                            return null
+                                        }}
+                                        sx={{
+                                            p: 1
                                         }}
                                     />
                                 </Box>
@@ -327,12 +326,15 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                         }
                                         onSubmit={async (text, streams, emojis): Promise<Error | null> => {
                                             if (mode === 'reroute') {
-                                                targetMessage.reroute(streams, text, emojis)
+                                                await targetMessage.reroute(streams, text, emojis)
                                             } else if (mode === 'reply') {
-                                                targetMessage.reply(streams, text, emojis)
+                                                await targetMessage.reply(streams, text, emojis)
                                             }
                                             setMode('none')
                                             return null
+                                        }}
+                                        sx={{
+                                            p: 1
                                         }}
                                     />
                                 </Box>
