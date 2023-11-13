@@ -35,7 +35,10 @@ export const ReactionAssociation = (props: ReactionAssociationProps): JSX.Elemen
     }, [props.association])
 
     return (
-        <ContentWithCCAvatar author={actionUser} profileOverride={target?.payload.body.profileOverride}>
+        <ContentWithCCAvatar
+            author={actionUser}
+            profileOverride={!isMeToOther ? target?.payload.body.profileOverride : undefined}
+        >
             <Box display="flex" justifyContent="space-between">
                 <Typography>
                     {isMeToOther ? (
