@@ -8,13 +8,14 @@ import {
     type RerouteMessageSchema,
     type Message,
     type ReplyMessageSchema,
-    type SimpleNoteSchema
+    type SimpleNoteSchema,
+    Schemas
 } from '@concurrent-world/client'
 import { PostedStreams } from './PostedStreams'
 import { ContentWithCCAvatar } from '../ContentWithCCAvatar'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import ReplayIcon from '@mui/icons-material/Replay'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 export interface MessageViewProps {
     message: Message<SimpleNoteSchema | ReplyMessageSchema>
@@ -33,10 +34,15 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
     const clipHeight = props.clipHeight ?? 450
     const [expanded, setExpanded] = useState(props.forceExpanded ?? false)
 
-    const reroutedsame =
-        props.rerouted &&
-        props.rerouted.streams.length === props.message.streams.length &&
-        props.rerouted.streams.every((v, i) => v === props.message.streams[i])
+    const reroutedsame = useMemo(() => {
+        if (!props.rerouted) return false
+        const A = props.rerouted.postedStreams?.filter((stream) => stream.schema === Schemas.commonstream) ?? []
+        const B = props.message.postedStreams?.filter((stream) => stream.schema === Schemas.commonstream) ?? []
+        if (A.length !== B.length) return false
+        const Aids = A.map((e) => e.id).sort()
+        const Bids = B.map((e) => e.id).sort()
+        return Aids.every((v, i) => v === Bids[i])
+    }, [props.rerouted, props.message])
 
     return (
         <ContentWithCCAvatar
