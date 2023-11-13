@@ -1,9 +1,7 @@
 import { Box, Paper, Skeleton, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
-import { useApi } from '../../context/api'
-import { fetchWithTimeout } from '@concurrent-world/client'
-// import { usePreference } from '../../context/PreferenceContext'
+import { type Summary, useUrlSummary } from '../../context/urlSummaryContext'
 
 export interface MessageUrlPreviewProps {
     messageBody: string
@@ -16,11 +14,17 @@ export const MessageUrlPreview = (props: MessageUrlPreviewProps): JSX.Element | 
     // strip codeblock
     replaced = replaced.replace(/```[\s\S]*?```/g, '')
 
+    // strip inline code
+    replaced = replaced.replace(/`[\s\S]*?`/g, '')
+
+    // strip img tag
+    replaced = replaced.replace(/<img.*?>/g, '')
+
     // replace markdown link syntax
     replaced = replaced.replace(/\[(.*)\]\((.*)\)/g, '$2')
 
     // extract urls
-    const urls = replaced.match(/(https?:\/\/[^\s]+)/g)
+    const urls = replaced.match(/(https?:\/\/[\w.-?=/&%#,@]+)/g)
 
     if (!urls) return null
 
@@ -40,31 +44,21 @@ export const MessageUrlPreview = (props: MessageUrlPreviewProps): JSX.Element | 
     )
 }
 
-interface Summary {
-    title: string
-    icon: string
-    description: string
-    thumbnail: string
-    sitename: string
-    url: string
-}
-
 export const UrlPreview = (props: { url: string }): JSX.Element | null => {
-    // const pref = usePreference()
-    const client = useApi()
-    const [preview, setPreview] = useState<Summary | null>(null)
+    const service = useUrlSummary()
+    const [preview, setPreview] = useState<Summary | undefined>(undefined)
     const [errored, setErrored] = useState(false)
 
     useEffect(() => {
-        const fetchPreview = async (): Promise<void> => {
-            const response = await fetchWithTimeout(client.host, `/summary?url=${props.url}`, {}).catch(() => {
+        service
+            .getSummary(props.url)
+            .then((summary) => {
+                if (summary) setPreview(summary)
+                else setErrored(true)
+            })
+            .catch((_) => {
                 setErrored(true)
             })
-            if (!response || errored) return
-            const json = await response.json()
-            setPreview(json)
-        }
-        fetchPreview()
     }, [props.url])
 
     if (errored) return null

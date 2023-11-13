@@ -15,7 +15,9 @@ import {
     ListItemButton,
     Collapse,
     Fade,
-    Typography
+    Typography,
+    Backdrop,
+    type SxProps
 } from '@mui/material'
 import { StreamPicker } from './ui/StreamPicker'
 import { closeSnackbar, useSnackbar } from 'notistack'
@@ -38,6 +40,8 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { DummyMessageView } from './Message/DummyMessageView'
 
+import { useGlobalActions } from '../context/GlobalActions'
+
 export interface DraftProps {
     submitButtonLabel?: string
     streamPickerInitial: Array<Stream<CommonstreamSchema>>
@@ -46,6 +50,7 @@ export interface DraftProps {
     allowEmpty?: boolean
     autoFocus?: boolean
     placeholder?: string
+    sx?: SxProps
 }
 
 export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
@@ -54,6 +59,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const pref = usePreference()
     const emojiPicker = useEmojiPicker()
     const navigate = useNavigate()
+    const { uploadFile } = useGlobalActions()
 
     const [destStreams, setDestStreams] = useState<Array<Stream<CommonstreamSchema>>>(props.streamPickerInitial)
 
@@ -120,53 +126,24 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             })
     }
 
-    const uploadToImgur = async (base64Data: string): Promise<string> => {
-        const url = 'https://api.imgur.com/3/image'
-
-        if (!pref.imgurClientID) return ''
-
-        const result = await fetch(url, {
-            method: 'POST',
-            headers: {
-                Authorization: `Client-ID ${pref.imgurClientID}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                type: 'base64',
-                image: base64Data.replace(/^data:image\/[a-zA-Z]*;base64,/, '')
-            })
-        })
-        return (await result.json()).data.link
+    const handlePasteImage = async (event: any): Promise<void> => {
+        const imageFile = event.clipboardData?.items[0].getAsFile()
+        if (!imageFile) return
+        await uploadImage(imageFile)
     }
 
-    const handlePasteImage = (event: any): void => {
-        const isImage = event.clipboardData?.items[0].type?.includes('image')
+    const uploadImage = async (imageFile: File): Promise<void> => {
+        const isImage = imageFile.type.includes('image')
         if (isImage) {
-            const imageFile = event.clipboardData?.items[0].getAsFile()
-            if (imageFile) {
-                const uploadingText = ' ![uploading...]()'
-                setDraft(draft + uploadingText)
-
-                const URLObj = window.URL || window.webkitURL
-                const imgSrc = URLObj.createObjectURL(imageFile)
-                console.log(imageFile, imgSrc)
-                const reader = new FileReader()
-                reader.onload = async (event) => {
-                    const base64Text = event
-                    if (!base64Text.target) return
-                    try {
-                        const result = await uploadToImgur(base64Text.target.result as string)
-                        setDraft(draft.replace(uploadingText, ''))
-                        if (!result) {
-                            setDraft(draft + `![upload failed]()`)
-                            return
-                        }
-                        setDraft(draft + `![image](${result})`)
-                    } catch (e) {
-                        setDraft(draft + `![upload failed]()`)
-                    }
-                }
-                reader.readAsDataURL(imageFile)
+            const uploadingText = ' ![uploading...]()'
+            setDraft(draft + uploadingText)
+            const result = await uploadFile(imageFile)
+            if (!result) {
+                setDraft(draft.replace(uploadingText, ''))
+                setDraft(draft + `![upload failed]()`)
+            } else {
+                setDraft(draft.replace(uploadingText, ''))
+                setDraft(draft + `![image](${result})`)
             }
         }
     }
@@ -174,19 +151,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const onFileInputChange = async (event: any): Promise<void> => {
         const file = event.target.files[0]
         if (!file) return
-        const URLObj = window.URL || window.webkitURL
-        const imgSrc = URLObj.createObjectURL(file)
-        console.log(file, imgSrc)
-        const reader = new FileReader()
-        reader.onload = async (event) => {
-            const base64Text = event
-            if (!base64Text.target) return
-            console.log(event)
-            const result = await uploadToImgur(base64Text.target.result as string)
-            if (!result) return
-            setDraft(draft + `![image](${result})`)
-        }
-        reader.readAsDataURL(file)
+        await uploadImage(file)
     }
 
     const onFileUploadClick = (): void => {
@@ -230,9 +195,25 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 flexDirection: 'column',
                 alignItems: 'stretch',
                 borderColor: 'text.disabled',
-                width: '100%'
+                width: '100%',
+                ...props.sx
             }}
         >
+            {sending && (
+                <Backdrop
+                    sx={{
+                        position: 'absolute',
+                        zIndex: (theme) => theme.zIndex.drawer + 1,
+                        backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                        height: '100%',
+                        color: '#fff'
+                    }}
+                    open={sending}
+                >
+                    <CircularProgress color="inherit" />
+                </Backdrop>
+            )}
+
             <Paper
                 sx={{
                     top: `${caretPos.top}px`,
@@ -324,7 +305,9 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             })
                         }
                     }}
-                    onPaste={handlePasteImage}
+                    onPaste={(e) => {
+                        handlePasteImage(e)
+                    }}
                     placeholder={props.placeholder ?? t('placeholder')}
                     autoFocus={props.autoFocus}
                     sx={{
@@ -508,19 +491,6 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         >
                             {props.submitButtonLabel ?? 'POST'}
                         </Button>
-                        {sending && (
-                            <CircularProgress
-                                size={24}
-                                sx={{
-                                    color: 'primary.main',
-                                    position: 'absolute',
-                                    top: '50%',
-                                    left: '50%',
-                                    marginTop: '-12px',
-                                    marginLeft: '-12px'
-                                }}
-                            />
-                        )}
                     </Box>
                 </Box>
             </Box>

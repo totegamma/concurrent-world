@@ -49,6 +49,8 @@
       "alreadyAdded": "Emoji pack already added"
     },
     "media": {
+      "storageProviderLabel": "Storage provider to use",
+      "corsSettings": "CORS settings",
       "imagePostSettings": "Image post settings",
       "afterRegisteringImgur": "After registering with Imgur, go to ",
       "thisPage": "this page",

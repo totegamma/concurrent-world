@@ -2,7 +2,7 @@ import { Alert, Box, Paper, Table, TableBody, TableCell, TableRow, Typography } 
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
-import { validateSignature, type CoreMessage } from '@concurrent-world/client'
+import { validateSignature, type CoreMessage, type CoreAssociation } from '@concurrent-world/client'
 import { Codeblock } from '../components/ui/Codeblock'
 import { MessageContainer } from '../components/Message/MessageContainer'
 import { CCDrawer } from '../components/ui/CCDrawer'
@@ -22,6 +22,7 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
     const client = useApi()
     const [inspectingItem, inspectItem] = useState<{ messageId: string; author: string } | null>(null)
     const [message, setMessage] = useState<CoreMessage<any> | undefined>()
+    const [associations, setAssociations] = useState<Array<CoreAssociation<any>>>([])
     const [signatureIsValid, setSignatureIsValid] = useState<boolean>(false)
     const [currentHost, setCurrentHost] = useState<string>('')
 
@@ -37,6 +38,10 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
             if (!msg) return
             setSignatureIsValid(validateSignature(msg.rawpayload, msg.signature, msg.author))
             setMessage(msg)
+        })
+
+        client.api.getMessageAssociationsByTarget(inspectingItem.messageId, inspectingItem.author).then((assocs) => {
+            setAssociations(assocs)
         })
     }, [inspectingItem])
 
@@ -137,7 +142,7 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                                 overflow: 'hidden'
                             }}
                         >
-                            <Codeblock language={'json'}>{JSON.stringify(message.associations, null, 4)}</Codeblock>
+                            <Codeblock language={'json'}>{JSON.stringify(associations, null, 4)}</Codeblock>
                         </Box>
                     </Box>
                 ) : (

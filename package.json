@@ -11,7 +11,9 @@
         "build-storybook": "storybook build"
     },
     "dependencies": {
-        "@concurrent-world/client": "^4.0.6",
+        "@aws-sdk/client-s3": "^3.445.0",
+        "@aws-sdk/s3-request-presigner": "^3.445.0",
+        "@concurrent-world/client": "^4.0.8",
         "@emotion/react": "^11.10.5",
         "@emotion/styled": "^11.10.5",
         "@mui/icons-material": "^5.11.16",

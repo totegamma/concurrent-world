@@ -1,96 +1,117 @@
-import { Box, IconButton, ListItem, Paper, Tooltip } from '@mui/material'
-import { Link as routerLink } from 'react-router-dom'
-import { CCAvatar } from '../ui/CCAvatar'
+import { Box, Button, alpha, useTheme } from '@mui/material'
 import { SimpleNote } from './SimpleNote'
 import { MessageHeader } from './MessageHeader'
 import { MessageActions } from './MessageActions'
 import { MessageReactions } from './MessageReactions'
 import { MessageUrlPreview } from './MessageUrlPreview'
-import { UserProfileCard } from '../UserProfileCard'
-import { Message, ReplyMessageSchema, SimpleNoteSchema } from '@concurrent-world/client'
+import {
+    type RerouteMessageSchema,
+    type Message,
+    type ReplyMessageSchema,
+    type SimpleNoteSchema,
+    Schemas
+} from '@concurrent-world/client'
+import { PostedStreams } from './PostedStreams'
+import { ContentWithCCAvatar } from '../ContentWithCCAvatar'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import ReplayIcon from '@mui/icons-material/Replay'
+import { useMemo, useState } from 'react'
 
 export interface MessageViewProps {
     message: Message<SimpleNoteSchema | ReplyMessageSchema>
+    rerouted?: Message<RerouteMessageSchema>
     userCCID: string
     beforeMessage?: JSX.Element
     lastUpdated?: number
+    forceExpanded?: boolean
+    clipHeight?: number
 }
 
+const gradationHeight = 80
+
 export const MessageView = (props: MessageViewProps): JSX.Element => {
+    const theme = useTheme()
+    const clipHeight = props.clipHeight ?? 450
+    const [expanded, setExpanded] = useState(props.forceExpanded ?? false)
+
+    const reroutedsame = useMemo(() => {
+        if (!props.rerouted) return false
+        const A = props.rerouted.postedStreams?.filter((stream) => stream.schema === Schemas.commonstream) ?? []
+        const B = props.message.postedStreams?.filter((stream) => stream.schema === Schemas.commonstream) ?? []
+        if (A.length !== B.length) return false
+        const Aids = A.map((e) => e.id).sort()
+        const Bids = B.map((e) => e.id).sort()
+        return Aids.every((v, i) => v === Bids[i])
+    }, [props.rerouted, props.message])
+
     return (
-        <ListItem
-            sx={{
-                wordBreak: 'break-word',
-                alignItems: 'flex-start',
-                flex: 1,
-                gap: { xs: 1, sm: 2 }
-            }}
-            disablePadding
+        <ContentWithCCAvatar
+            author={props.message.authorUser}
+            profileOverride={props.message.payload.body.profileOverride}
         >
-            {props.message && (
-                <>
-                    <Tooltip
-                        enterDelay={500}
-                        enterNextDelay={500}
-                        leaveDelay={300}
-                        placement="top"
-                        components={{
-                            Tooltip: Paper
-                        }}
-                        componentsProps={{
-                            tooltip: {
-                                sx: {
-                                    p: 1,
-                                    m: 1,
-                                    border: '1px solid',
-                                    borderColor: 'divider',
-                                    minWidth: '300px'
-                                }
-                            }
-                        }}
-                        title={<UserProfileCard user={props.message.authorUser} />}
-                    >
-                        <IconButton
-                            sx={{
-                                width: { xs: '38px', sm: '48px' },
-                                height: { xs: '38px', sm: '48px' },
-                                mt: { xs: '3px', sm: '5px' }
-                            }}
-                            component={routerLink}
-                            to={props.message.payload.body.profileOverride?.link ?? '/entity/' + props.message.author}
-                            target={props.message.payload.body.profileOverride?.link ? '_blank' : undefined}
-                            rel={props.message.payload.body.profileOverride?.link ? 'noopener noreferrer' : undefined}
-                        >
-                            <CCAvatar
-                                alt={props.message.authorUser?.profile?.payload.body.username}
-                                avatarURL={props.message.authorUser?.profile?.payload.body.avatar}
-                                avatarOverride={props.message.payload.body.profileOverride?.avatar}
-                                identiconSource={props.message.author}
-                                sx={{
-                                    width: { xs: '38px', sm: '48px' },
-                                    height: { xs: '38px', sm: '48px' }
-                                }}
-                            />
-                        </IconButton>
-                    </Tooltip>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flex: 1,
-                            flexDirection: 'column',
-                            width: '100%',
-                            overflow: 'auto'
+            <MessageHeader message={props.message} />
+            {props.beforeMessage}
+            <Box
+                sx={{
+                    position: 'relative',
+                    maxHeight: expanded ? 'none' : `${clipHeight}px`,
+                    overflow: 'hidden'
+                }}
+            >
+                <Box
+                    sx={{
+                        display: expanded ? 'none' : 'flex',
+                        position: 'absolute',
+                        top: `${clipHeight - gradationHeight}px`,
+                        left: '0',
+                        width: '100%',
+                        height: `${gradationHeight}px`,
+                        background: `linear-gradient(${alpha(theme.palette.background.paper, 0)}, ${
+                            theme.palette.background.paper
+                        })`,
+                        alignItems: 'center',
+                        zIndex: 1,
+                        justifyContent: 'center'
+                    }}
+                >
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => {
+                            setExpanded(true)
                         }}
                     >
-                        <MessageHeader message={props.message} />
-                        {props.beforeMessage}
-                        <SimpleNote message={props.message} />
-                        <MessageUrlPreview messageBody={props.message.payload.body.body} />
-                        <MessageReactions message={props.message} />
-                        <MessageActions message={props.message} userCCID={props.userCCID} />
-                    </Box>
-                </>
-            )}
-        </ListItem>
+                        Show more
+                    </Button>
+                </Box>
+                <SimpleNote message={props.message} />
+                <MessageUrlPreview messageBody={props.message.payload.body.body} />
+            </Box>
+            <MessageReactions message={props.message} />
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'row-reverse',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: 1,
+                    flexWrap: 'wrap'
+                }}
+            >
+                <Box display="flex" flexDirection="row" alignItems="center">
+                    <PostedStreams message={props.message} />
+                    {props.rerouted &&
+                        (reroutedsame ? (
+                            <ReplayIcon sx={{ color: 'text.secondary', fontSize: '90%' }} />
+                        ) : (
+                            <>
+                                <ArrowForwardIcon sx={{ color: 'text.secondary', fontSize: '90%' }} />
+                                <PostedStreams message={props.rerouted} />
+                            </>
+                        ))}
+                </Box>
+                <MessageActions message={props.message} userCCID={props.userCCID} />
+            </Box>
+        </ContentWithCCAvatar>
     )
 }

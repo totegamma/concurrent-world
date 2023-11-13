@@ -131,7 +131,14 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
             <MessageContainer
                 messageID={props.message.payload.body.rerouteMessageId}
                 messageOwner={props.message.payload.body.rerouteMessageAuthor}
+                rerouted={props.message}
             />
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-end'
+                }}
+            ></Box>
         </>
     )
 }

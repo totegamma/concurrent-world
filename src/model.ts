@@ -105,3 +105,11 @@ export interface ApEntity {
     notificationstream: string
     followstream: string
 }
+
+export interface s3Config {
+    endpoint: string
+    accessKeyId: string
+    secretAccessKey: string
+    bucketName: string
+    publicUrl: string
+}
