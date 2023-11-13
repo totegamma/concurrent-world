@@ -96,10 +96,10 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                     <PostedStreams message={props.message} />
                     {props.rerouted &&
                         (reroutedsame ? (
-                            <ReplayIcon color="secondary" sx={{ fontSize: '90%' }} />
+                            <ReplayIcon sx={{ color: 'text.secondary', fontSize: '90%' }} />
                         ) : (
                             <>
-                                <ArrowForwardIcon color="secondary" sx={{ fontSize: '90%' }} />
+                                <ArrowForwardIcon sx={{ color: 'text.secondary', fontSize: '90%' }} />
                                 <PostedStreams message={props.rerouted} />
                             </>
                         ))}
