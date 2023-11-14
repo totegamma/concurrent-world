@@ -3,6 +3,11 @@ import { LangJa } from './utils/lang-ja'
 
 import { useTranslation } from 'react-i18next'
 
+import { visit } from 'unist-util-visit'
+import { type ReactNode } from 'react'
+
+import type { H, Handler } from 'mdast-util-to-hast'
+
 export interface Identity {
     mnemonic_ja: string
     mnemonic_en: string
@@ -102,4 +107,18 @@ export const fileToBase64 = (file: File): Promise<string | null> => {
             }
         }
     })
+}
+
+export const sampleRemarkPlugin = (): any => {
+    const transformer = (tree: any): any => {
+        visit(tree, 'text', (node) => {
+            const userQuery = /@([^\s@]+)$/.exec(node.value)?.[1]
+            if (!userQuery) return
+            node.type = 'html'
+            node.value = `<userlink url="${userQuery}">`
+        })
+        console.log(tree)
+        return tree
+    }
+    return transformer
 }

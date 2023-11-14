@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo } from 'react'
+import { useState, useEffect, useRef, memo, useContext } from 'react'
 import {
     InputBase,
     Box,
@@ -33,7 +33,7 @@ import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 import { useEmojiPicker } from '../context/EmojiPickerContext'
 import caretPosition from 'textarea-caret'
-import { type CommonstreamSchema, type Stream } from '@concurrent-world/client'
+import { type CommonstreamSchema, type Stream, type User } from '@concurrent-world/client'
 import { useApi } from '../context/api'
 import { type Emoji, type EmojiLite } from '../model'
 import { useNavigate } from 'react-router-dom'
@@ -42,6 +42,7 @@ import { useTranslation } from 'react-i18next'
 import { DummyMessageView } from './Message/DummyMessageView'
 
 import { useGlobalActions } from '../context/GlobalActions'
+import { ApplicationContext } from '../App'
 
 export interface DraftProps {
     submitButtonLabel?: string
@@ -57,6 +58,7 @@ export interface DraftProps {
 export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const client = useApi()
     const theme = useTheme()
+    const { acklist } = useContext(ApplicationContext)
     const pref = usePreference()
     const emojiPicker = useEmojiPicker()
     const navigate = useNavigate()
@@ -77,6 +79,9 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
 
     const [enableSuggestions, setEnableSuggestions] = useState<boolean>(false)
     const [emojiSuggestions, setEmojiSuggestions] = useState<Emoji[]>([])
+
+    const [enableUserPicker, setEnableUserPicker] = useState<boolean>(true)
+    const [userSuggestions, setUserSuggestions] = useState<User[]>([])
 
     const [selectedSuggestions, setSelectedSuggestions] = useState<number>(0)
 
@@ -161,6 +166,14 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         }
     }
 
+    const onSuggestConfirm = (index: number): void => {
+        if (enableSuggestions) {
+            onEmojiSuggestConfirm(index)
+        } else if (enableUserPicker) {
+            onUserSuggestConfirm(index)
+        }
+    }
+
     const onEmojiSuggestConfirm = (index: number): void => {
         console.log('confirm', index)
         const before = draft.slice(0, textInputRef.current?.selectionEnd ?? 0) ?? ''
@@ -178,6 +191,25 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             ...prev,
             [selected.shortcode]: { imageURL: selected.imageURL }
         }))
+
+        if (timerRef.current) {
+            clearTimeout(timerRef.current)
+            timerRef.current = null
+            textInputRef.current?.focus()
+        }
+    }
+
+    const onUserSuggestConfirm = (index: number): void => {
+        console.log('user confirm', index)
+        const before = draft.slice(0, textInputRef.current?.selectionEnd ?? 0) ?? ''
+        const colonPos = before.lastIndexOf('@')
+        if (colonPos === -1) return
+        const after = draft.slice(textInputRef.current?.selectionEnd ?? 0) ?? ''
+
+        const selected = userSuggestions[index]
+
+        setDraft(before.slice(0, colonPos) + `@${selected.ccid} ` + after)
+        setEnableUserPicker(false)
 
         if (timerRef.current) {
             clearTimeout(timerRef.current)
@@ -258,14 +290,34 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
 
                         const before = e.target.value.slice(0, e.target.selectionEnd ?? 0) ?? ''
                         const query = /:(\w+)$/.exec(before)?.[1]
+                        const userQuery = /@([^\s@]+)$/.exec(before)?.[1]
 
                         if (!query) {
                             setEnableSuggestions(false)
+                        }
+
+                        if (!userQuery) {
+                            setEnableUserPicker(false)
+                        }
+
+                        if (!query && !userQuery) {
                             return
                         }
 
-                        setEmojiSuggestions(emojiPicker.search(query))
-                        setEnableSuggestions(true)
+                        if (query) {
+                            setEmojiSuggestions(emojiPicker.search(query))
+                            setEnableSuggestions(true)
+                        }
+
+                        if (userQuery) {
+                            console.log(acklist, userQuery)
+                            setUserSuggestions(
+                                acklist.filter((q) =>
+                                    q.profile?.payload.body.username?.toLowerCase()?.includes(userQuery)
+                                )
+                            )
+                            setEnableUserPicker(true)
+                        }
 
                         // move suggestion box
                         const pos = caretPosition(e.target, e.target.selectionEnd ?? 0, {})
@@ -286,10 +338,13 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         fontSize: '0.95rem'
                     }}
                     onKeyDown={(e: any) => {
-                        if (enableSuggestions && emojiSuggestions.length > 0) {
+                        if (
+                            (enableSuggestions && emojiSuggestions.length > 0) ||
+                            (enableUserPicker && userSuggestions.length > 0)
+                        ) {
                             if (e.key === 'Enter') {
                                 e.preventDefault()
-                                onEmojiSuggestConfirm(selectedSuggestions)
+                                onSuggestConfirm(selectedSuggestions)
                                 return
                             }
                             if (e.key === 'ArrowUp') {
@@ -306,7 +361,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             }
                             if (e.key === ':') {
                                 e.preventDefault()
-                                onEmojiSuggestConfirm(0)
+                                onSuggestConfirm(0)
                             }
                         }
                         if (draft.length === 0 || draft.trim().length === 0) return
@@ -359,6 +414,46 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                         />
                                     </ListItemIcon>
                                     <ListItemText>{emoji.shortcode}</ListItemText>
+                                </ListItemButton>
+                            ))}
+                        </List>
+                    </Paper>
+                </Popper>
+                <Popper
+                    open={enableUserPicker}
+                    anchorEl={textInputRef.current}
+                    placement="bottom-start"
+                    modifiers={[
+                        {
+                            name: 'offset',
+                            options: {
+                                offset: [caretPos.left, caretPos.top]
+                            }
+                        }
+                    ]}
+                    sx={{
+                        zIndex: (theme) => theme.zIndex.tooltip + 1
+                    }}
+                >
+                    <Paper>
+                        <List dense>
+                            {userSuggestions.map((user, index) => (
+                                <ListItemButton
+                                    dense
+                                    key={user.profile?.payload.body.avatar}
+                                    selected={index === selectedSuggestions}
+                                    onClick={() => {
+                                        onUserSuggestConfirm(index)
+                                    }}
+                                >
+                                    <ListItemIcon>
+                                        <Box
+                                            component="img"
+                                            src={user.profile?.payload.body.avatar}
+                                            sx={{ width: '1em', height: '1em' }}
+                                        />
+                                    </ListItemIcon>
+                                    <ListItemText>{user.profile?.payload.body.username}</ListItemText>
                                 </ListItemButton>
                             ))}
                         </List>
