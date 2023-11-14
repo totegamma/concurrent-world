@@ -49,7 +49,7 @@
         "textarea-caret": "^3.1.0",
         "use-sound": "^4.0.1",
         "uuid": "^9.0.0",
-        "virtua": "^0.16.1"
+        "virtua": "github:totegamma/virtua#04375007efaa1a1e49ce0dbdfd6eb641653dd628"
     },
     "devDependencies": {
         "@storybook/addon-essentials": "7.0.18",

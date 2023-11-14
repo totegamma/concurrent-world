@@ -218,7 +218,6 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                                 timeline.current?.readMore()
                             }
                         }}
-                        overscan={1}
                         ref={ref}
                     >
                         {props.header}
