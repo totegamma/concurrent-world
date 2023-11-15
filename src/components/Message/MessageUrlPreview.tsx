@@ -49,6 +49,7 @@ export const MessageUrlPreview = (props: MessageUrlPreviewProps): JSX.Element | 
 
 export const UrlPreview = (props: { url: string }): JSX.Element | null => {
     const service = useUrlSummary()
+    if (!service) return null
     const [preview, setPreview] = useState<Summary | undefined>(undefined)
     const [errored, setErrored] = useState(false)
 
