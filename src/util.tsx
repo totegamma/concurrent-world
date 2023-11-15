@@ -111,7 +111,7 @@ export const fileToBase64 = (file: File): Promise<string | null> => {
 
 export const sampleRemarkPlugin = (): any => {
     const transformer = (tree: any): any => {
-        visit(tree, 'text', (node) => {
+        visit(tree, 'text', (node: any) => {
             const userQuery = /@([^\s@]+)$/.exec(node.value)?.[1]
             if (!userQuery) return
             node.type = 'html'
