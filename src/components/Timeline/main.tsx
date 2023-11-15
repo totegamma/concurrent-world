@@ -134,6 +134,27 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
     }, [scrollParentRef.current, onTouchStart, onTouchMove, onTouchEnd])
 
     const count = timeline.current?.body.length ?? 0
+    let currentFetchTimeout: NodeJS.Timeout | undefined
+
+    const readMore = useCallback(() => {
+        if (isFetching) return
+        setIsFetching(true)
+
+        console.log('try to read')
+
+        if (currentFetchTimeout) clearTimeout(currentFetchTimeout)
+
+        const timer = setTimeout(() => {
+            console.log('readMore!!')
+            timeline.current?.readMore().then((hasMore) => {
+                setHasMoreData(hasMore)
+                setIsFetching(false)
+                currentFetchTimeout = undefined
+            })
+        }, 1)
+
+        currentFetchTimeout = timer
+    }, [isFetching, timeline.current])
 
     return (
         <>
@@ -213,10 +234,7 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                             positionRef.current = top
                         }}
                         onRangeChange={(_, end) => {
-                            if (end + 3 > count && hasMoreData) {
-                                console.log('readMore!!')
-                                timeline.current?.readMore()
-                            }
+                            if (end + 3 > count && hasMoreData) readMore()
                         }}
                         ref={ref}
                     >

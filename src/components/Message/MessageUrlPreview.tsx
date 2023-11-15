@@ -23,8 +23,11 @@ export const MessageUrlPreview = (props: MessageUrlPreviewProps): JSX.Element | 
     // replace markdown link syntax
     replaced = replaced.replace(/\[(.*)\]\((.*)\)/g, '$2')
 
+    // strip a tag body
+    replaced = replaced.replace(/<a(.*?)>.*?<\/a>/g, '$1')
+
     // extract urls
-    const urls = replaced.match(/(https?:\/\/[\w.-?=/&%#,@]+)/g)
+    const urls = replaced.match(/(https?:\/\/[\w.\-?=/&%#,@]+)/g)
 
     if (!urls) return null
 
