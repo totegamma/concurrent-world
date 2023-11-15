@@ -10,7 +10,7 @@ import { Codeblock } from './Codeblock'
 
 import type { EmojiLite } from '../../model'
 import { useApi } from '../../context/api'
-import { sampleRemarkPlugin } from '../../util'
+import { userMentionRemarkPlugin } from '../../util'
 import { type User } from '@concurrent-world/client'
 
 export interface MarkdownRendererProps {
@@ -102,10 +102,10 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
             }}
         >
             <ReactMarkdown
-                remarkPlugins={[breaks, [remarkGfm, { singleTilde: false }], sampleRemarkPlugin]}
+                remarkPlugins={[breaks, [remarkGfm, { singleTilde: false }], userMentionRemarkPlugin]}
                 rehypePlugins={[rehypeRaw]}
                 components={{
-                    userlink: ({ url }) => {
+                    userlink: ({ url, children }) => {
                         const api = useApi()
                         const [user, setUser] = useState<User | null>(null)
 
@@ -119,10 +119,13 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                             return <>...</>
                         }
                         return (
-                            <Chip
-                                label={user?.profile?.payload.body.username}
-                                avatar={<Avatar src={user?.profile?.payload.body.avatar} />}
-                            />
+                            <>
+                                <Chip
+                                    label={user?.profile?.payload.body.username}
+                                    avatar={<Avatar src={user?.profile?.payload.body.avatar} />}
+                                />
+                                <span>{children}</span>
+                            </>
                         )
                     },
                     p: ({ children }) => (

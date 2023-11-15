@@ -106,15 +106,16 @@ export const fileToBase64 = (file: File): Promise<string | null> => {
     })
 }
 
-export const sampleRemarkPlugin = (): any => {
+export const userMentionRemarkPlugin = (): any => {
     const transformer = (tree: any): any => {
         visit(tree, 'text', (node: any) => {
-            const userQuery = /@([^\s@]+)$/.exec(node.value)?.[1]
+            const userQuery = node.value.match(/@([^\s@]+)/g)
             if (!userQuery) return
             node.type = 'html'
-            node.value = `<userlink url="${userQuery}">`
+            for (const match of userQuery) {
+                node.value = node.value.replace(match, `<userlink url="${match.replace('@', '')}">`)
+            }
         })
-        console.log(tree)
         return tree
     }
     return transformer
