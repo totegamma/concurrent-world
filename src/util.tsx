@@ -4,9 +4,6 @@ import { LangJa } from './utils/lang-ja'
 import { useTranslation } from 'react-i18next'
 
 import { visit } from 'unist-util-visit'
-import { type ReactNode } from 'react'
-
-import type { H, Handler } from 'mdast-util-to-hast'
 
 export interface Identity {
     mnemonic_ja: string
