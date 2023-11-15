@@ -6,6 +6,7 @@ import { AckButton } from './AckButton'
 import { FollowButton } from './FollowButton'
 import { useSnackbar } from 'notistack'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
+import { MarkdownRenderer } from './ui/MarkdownRenderer'
 
 export interface UserProfileCardProps {
     user: User | undefined
@@ -19,7 +20,7 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
     if (!props.user) return <></>
 
     return (
-        <Box display="flex" flexDirection="column" alignItems="left" sx={{ m: 1 }} gap={1}>
+        <Box display="flex" flexDirection="column" alignItems="left" sx={{ m: 1 }} gap={1} maxWidth="500px">
             <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
                 <CCAvatar
                     alt={props.user.profile?.payload.body.username}
@@ -53,7 +54,15 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
                     }}
                 />
             </Box>
-            <Typography variant="body1">{props.user.profile?.payload.body.description}</Typography>
+            <Box
+                sx={{
+                    maxHeight: '100px',
+                    overflowX: 'hidden',
+                    overflowY: 'auto'
+                }}
+            >
+                <MarkdownRenderer messagebody={props.user.profile?.payload.body.description ?? ''} emojiDict={{}} />
+            </Box>
         </Box>
     )
 }

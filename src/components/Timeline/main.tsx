@@ -18,6 +18,7 @@ export interface TimelineProps {
     streams: string[]
     perspective?: string
     header?: JSX.Element
+    onScroll?: (top: number) => void
 }
 
 const PTR_HEIGHT = 60
@@ -230,6 +231,7 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                         }}
                         onScroll={(top) => {
                             positionRef.current = top
+                            props.onScroll?.(top)
                         }}
                         onRangeChange={(_, end) => {
                             if (end + 3 > count && hasMoreData) readMore()
