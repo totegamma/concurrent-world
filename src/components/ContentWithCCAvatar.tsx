@@ -38,7 +38,6 @@ export const ContentWithCCAvatar = (props: ContentWithCCAvatarProps): JSX.Elemen
                 componentsProps={{
                     tooltip: {
                         sx: {
-                            p: 1,
                             m: 1,
                             border: '1px solid',
                             borderColor: 'divider',
