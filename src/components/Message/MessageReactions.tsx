@@ -32,10 +32,6 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
         [props.message]
     )
 
-    if (!props.message.reactionCounts) {
-        return <></>
-    }
-
     const loadReactionMembers = (reaction: string): void => {
         props.message.getReactions(reaction).then((reactions) => {
             setReactionMembers((prev) => {
@@ -47,8 +43,12 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
         })
     }
 
+    if (!props.message.reactionCounts) {
+        return <></>
+    }
+
     return (
-        <Box display="flex" flexWrap="wrap" gap={1}>
+        <Box display="flex" flexWrap="wrap" gap={1} mt={1}>
             {Object.entries(props.message.reactionCounts).map(([imageUrl, value]) => (
                 <Tooltip
                     arrow
