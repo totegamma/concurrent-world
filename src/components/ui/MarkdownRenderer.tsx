@@ -108,10 +108,6 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                                     xs: '0.9rem',
                                     sm: '1rem'
                                 },
-                                marginBottom: {
-                                    xs: '4px',
-                                    sm: '8px'
-                                },
                                 mt: 1,
                                 mb: 1,
                                 '&:first-of-type': {
@@ -239,8 +235,9 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                                 <img
                                     {...props}
                                     style={{
-                                        height: '1.5em',
-                                        verticalAlign: '-0.5em'
+                                        height: '1.25em',
+                                        verticalAlign: '-0.45em',
+                                        marginBottom: '4px'
                                     }}
                                 />
                             )

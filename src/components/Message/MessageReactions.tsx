@@ -43,12 +43,12 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
         })
     }
 
-    if (!props.message.reactionCounts) {
+    if (!props.message.reactionCounts || Object.keys(props.message.reactionCounts).length === 0) {
         return <></>
     }
 
     return (
-        <Box display="flex" flexWrap="wrap" gap={1} mt={1}>
+        <Box display="flex" flexWrap="wrap" gap={1}>
             {Object.entries(props.message.reactionCounts).map(([imageUrl, value]) => (
                 <Tooltip
                     arrow
