@@ -13,7 +13,7 @@
     "dependencies": {
         "@aws-sdk/client-s3": "^3.445.0",
         "@aws-sdk/s3-request-presigner": "^3.445.0",
-        "@concurrent-world/client": "^4.0.8",
+        "@concurrent-world/client": "^4.0.9",
         "@emotion/react": "^11.10.5",
         "@emotion/styled": "^11.10.5",
         "@mui/icons-material": "^5.11.16",
@@ -49,7 +49,7 @@
         "textarea-caret": "^3.1.0",
         "use-sound": "^4.0.1",
         "uuid": "^9.0.0",
-        "virtua": "^0.16.1"
+        "virtua": "github:totegamma/virtua#04375007efaa1a1e49ce0dbdfd6eb641653dd628"
     },
     "devDependencies": {
         "@storybook/addon-essentials": "7.0.18",

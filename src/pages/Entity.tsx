@@ -1,19 +1,19 @@
-import { Box, Link, Paper, Tab, Tabs, Typography, alpha, useTheme } from '@mui/material'
+import { Box, Button, Collapse, Divider, Link, Tab, Tabs, Typography, useTheme } from '@mui/material'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams, Link as NavLink } from 'react-router-dom'
 import { useApi } from '../context/api'
 import { CCAvatar } from '../components/ui/CCAvatar'
 import { Timeline } from '../components/Timeline'
 import Background from '../resources/defaultbg.png'
-import CreateIcon from '@mui/icons-material/Create'
 import { FollowButton } from '../components/FollowButton'
 import { type User } from '@concurrent-world/client'
-import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
-import { TimelineHeader } from '../components/TimelineHeader'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import { AckList } from '../components/AckList'
 import { AckButton } from '../components/AckButton'
 import { type VListHandle } from 'virtua'
+import { MarkdownRenderer } from '../components/ui/MarkdownRenderer'
+import { TimelineHeader } from '../components/TimelineHeader'
+import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 
 type detail = 'none' | 'ack' | 'acker'
 
@@ -21,7 +21,6 @@ export function EntityPage(): JSX.Element {
     const client = useApi()
     const theme = useTheme()
     const { id } = useParams()
-    const navigate = useNavigate()
 
     const [user, setUser] = useState<User | null | undefined>(null)
 
@@ -32,6 +31,8 @@ export function EntityPage(): JSX.Element {
     const [ackerUsers, setAckerUsers] = useState<User[]>([])
 
     const [detailMode, setDetailMode] = useState<detail>('none')
+
+    const [showHeader, setShowHeader] = useState(false)
 
     const [tab, setTab] = useState(0)
 
@@ -81,135 +82,122 @@ export function EntityPage(): JSX.Element {
                 display: 'flex',
                 flexDirection: 'column',
                 backgroundColor: 'background.paper',
-                minHeight: '100%'
+                minHeight: '100%',
+                position: 'relative'
             }}
         >
-            <TimelineHeader
-                title={user.profile?.payload.body.username || 'anonymous'}
-                titleIcon={<AlternateEmailIcon />}
-                onTitleClick={() => {
-                    timelineRef.current?.scrollTo(0)
-                }}
-                secondaryAction={isSelf ? <CreateIcon /> : <></>}
-                useRawSecondaryAction={!isSelf}
-                onSecondaryActionClick={() => {
-                    if (isSelf) navigate('/settings')
-                }}
-            />
+            <Box position="absolute" top="0" left="0" width="100%" zIndex="1">
+                <Collapse in={showHeader}>
+                    <TimelineHeader
+                        title={user.profile?.payload.body.username || 'anonymous'}
+                        titleIcon={<AlternateEmailIcon />}
+                        onTitleClick={() => {
+                            timelineRef.current?.scrollTo(0)
+                        }}
+                    />
+                </Collapse>
+            </Box>
             <Timeline
                 ref={timelineRef}
                 streams={targetStreams}
                 perspective={user.ccid}
+                onScroll={(top) => {
+                    setShowHeader(top > 180)
+                }}
                 header={
                     <>
-                        <Box /* profile */
+                        <Box
                             sx={{
                                 backgroundImage: `url(${user.profile?.payload.body.banner || Background})`,
                                 backgroundPosition: 'center',
                                 backgroundSize: 'cover',
+                                height: '150px'
+                            }}
+                        ></Box>
+                        <Box
+                            sx={{
                                 display: 'flex',
-                                flexDirection: 'column'
+                                flexFlow: 'column',
+                                gap: 1,
+                                p: 1,
+                                position: 'relative'
                             }}
                         >
-                            <Paper
-                                sx={{
-                                    margin: 3,
-                                    backgroundColor: alpha(theme.palette.background.paper, 0.8)
-                                }}
-                            >
-                                <Box
+                            <Box position="absolute" top="-50px" left="10px">
+                                <CCAvatar
+                                    alt={user.profile?.payload.body.username}
+                                    avatarURL={user.profile?.payload.body.avatar}
+                                    identiconSource={user.ccid}
                                     sx={{
-                                        p: '10px',
-                                        display: 'flex',
-                                        flexFlow: 'column',
-                                        gap: '15px'
+                                        width: '100px',
+                                        height: '100px'
+                                    }}
+                                />
+                            </Box>
+                            <Box display="flex" alignItems="center" justifyContent="flex-end">
+                                {!isSelf ? (
+                                    <>
+                                        <AckButton user={user} />
+                                        <FollowButton
+                                            color={theme.palette.secondary.main}
+                                            userCCID={id!}
+                                            userStreamID={user.userstreams?.payload.body.homeStream ?? ''}
+                                        />
+                                    </>
+                                ) : (
+                                    <Button variant="outlined" component={NavLink} to="/settings/profile">
+                                        Edit Profile
+                                    </Button>
+                                )}
+                            </Box>
+                            <Box>
+                                <Typography
+                                    variant="h6"
+                                    sx={{
+                                        fontWeight: 'bold',
+                                        fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.5rem' }
                                     }}
                                 >
-                                    <Box
-                                        sx={{
-                                            display: 'flex',
-                                            flexFlow: { xs: 'column', sm: 'row', md: 'row' },
-                                            alignItems: 'center',
-                                            gap: 1
-                                        }}
-                                    >
-                                        <CCAvatar
-                                            alt={user.profile?.payload.body.username}
-                                            avatarURL={user.profile?.payload.body.avatar}
-                                            identiconSource={user.ccid}
-                                            sx={{
-                                                width: { xs: '80px', sm: '60px', md: '80px' },
-                                                height: { xs: '80px', sm: '60px', md: '80px' }
-                                            }}
-                                        />
-                                        <Box
-                                            sx={{
-                                                display: 'flex',
-                                                flexFlow: 'row',
-                                                alignItems: 'center',
-                                                justifyContent: 'flex-end',
-                                                width: '100%',
-                                                gap: 0
-                                            }}
-                                        >
-                                            <Box display="flex" gap={1}>
-                                                <Typography
-                                                    component={Link}
-                                                    underline="hover"
-                                                    onClick={() => {
-                                                        setDetailMode('ack')
-                                                    }}
-                                                >
-                                                    {ackingUsers.length} Ack
-                                                </Typography>
-                                                <Typography
-                                                    component={Link}
-                                                    underline="hover"
-                                                    onClick={() => {
-                                                        setDetailMode('acker')
-                                                    }}
-                                                >
-                                                    {ackerUsers.length} Acker
-                                                </Typography>
-                                            </Box>
-                                            {!isSelf ? (
-                                                <>
-                                                    <AckButton user={user} />
-                                                    <FollowButton
-                                                        color={theme.palette.secondary.main}
-                                                        userCCID={id!}
-                                                        userStreamID={user.userstreams?.payload.body.homeStream ?? ''}
-                                                    />
-                                                </>
-                                            ) : (
-                                                ''
-                                            )}
-                                        </Box>
-                                    </Box>
-
-                                    <Box
-                                        sx={{
-                                            display: 'flex',
-                                            flexFlow: 'column',
-                                            alignItems: 'center'
-                                        }}
-                                    >
-                                        <Typography>{user.profile?.payload.body.description}</Typography>
-                                    </Box>
-                                    <Box
-                                        sx={{
-                                            display: 'flex',
-                                            flexFlow: 'column',
-                                            alignItems: 'flex-end'
-                                        }}
-                                    >
-                                        <Typography variant="caption">
-                                            現住所: {user.domain !== '' ? user.domain : client.api.host}
-                                        </Typography>
-                                        <Typography variant="caption">{user.ccid}</Typography>
-                                    </Box>
-                                </Box>
-                            </Paper>
+                                    {user.profile?.payload.body.username || 'anonymous'}
+                                </Typography>
+                                <Typography variant="caption">{user.ccid}</Typography>
+                            </Box>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexFlow: 'column'
+                                }}
+                            >
+                                <MarkdownRenderer
+                                    messagebody={user.profile?.payload.body.description ?? ''}
+                                    emojiDict={{}}
+                                />
+                            </Box>
+                            <Box>
+                                <Typography variant="caption">
+                                    現住所: {user.domain !== '' ? user.domain : client.api.host}
+                                </Typography>
+                            </Box>
+                            <Box display="flex" gap={1}>
+                                <Typography
+                                    component={Link}
+                                    underline="hover"
+                                    onClick={() => {
+                                        setDetailMode('ack')
+                                    }}
+                                >
+                                    {ackingUsers.length} Ack
+                                </Typography>
+                                <Typography
+                                    component={Link}
+                                    underline="hover"
+                                    onClick={() => {
+                                        setDetailMode('acker')
+                                    }}
+                                >
+                                    {ackerUsers.length} Acker
+                                </Typography>
+                            </Box>
                         </Box>
                         <Tabs
                             value={tab}
@@ -222,6 +210,7 @@ export function EntityPage(): JSX.Element {
                             <Tab label="カレント" />
                             <Tab label="アクティビティ" />
                         </Tabs>
+                        <Divider />
                     </>
                 }
             />

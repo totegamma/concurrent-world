@@ -18,6 +18,7 @@ export interface TimelineProps {
     streams: string[]
     perspective?: string
     header?: JSX.Element
+    onScroll?: (top: number) => void
 }
 
 const PTR_HEIGHT = 60
@@ -134,6 +135,25 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
     }, [scrollParentRef.current, onTouchStart, onTouchMove, onTouchEnd])
 
     const count = timeline.current?.body.length ?? 0
+    let alreadyFetchInThisRender = false
+
+    const readMore = (): void => {
+        if (isFetching || alreadyFetchInThisRender) return
+        setIsFetching(true)
+        alreadyFetchInThisRender = true
+
+        console.log('readMore!!')
+        timeline.current
+            ?.readMore()
+            .then((hasMore) => {
+                setHasMoreData(hasMore)
+                alreadyFetchInThisRender = false
+            })
+            .finally(() => {
+                setIsFetching(false)
+                alreadyFetchInThisRender = false
+            })
+    }
 
     return (
         <>
@@ -211,12 +231,10 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                         }}
                         onScroll={(top) => {
                             positionRef.current = top
+                            props.onScroll?.(top)
                         }}
                         onRangeChange={(_, end) => {
-                            if (end + 3 > count && hasMoreData) {
-                                console.log('readMore!!')
-                                timeline.current?.readMore()
-                            }
+                            if (end + 3 > count && hasMoreData) readMore()
                         }}
                         ref={ref}
                     >

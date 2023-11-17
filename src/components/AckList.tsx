@@ -1,6 +1,5 @@
 import { type User } from '@concurrent-world/client'
 import { useEffect, useState } from 'react'
-import { useApi } from '../context/api'
 import { Box, Link, Tab, Tabs } from '@mui/material'
 import { CCAvatar } from './ui/CCAvatar'
 import { Link as RouterLink } from 'react-router-dom'
@@ -11,7 +10,6 @@ export interface AckListProps {
 }
 
 export const AckList = (props: AckListProps): JSX.Element => {
-    const client = useApi()
     const [mode, setMode] = useState(props.initmode ?? 'acking')
 
     const [ackingUsers, setAckingUsers] = useState<User[]>([])
@@ -19,19 +17,19 @@ export const AckList = (props: AckListProps): JSX.Element => {
 
     useEffect(() => {
         let unmounted = false
-        if (!client.user) return
-        client.user.getAcker().then((ackers) => {
+        if (!props.user) return
+        props.user.getAcker().then((ackers) => {
             if (unmounted) return
             setAckerUsers(ackers)
         })
-        client.user.getAcking().then((acking) => {
+        props.user.getAcking().then((acking) => {
             if (unmounted) return
             setAckingUsers(acking)
         })
         return () => {
             unmounted = true
         }
-    }, [client.user])
+    }, [props.user])
 
     return (
         <>
