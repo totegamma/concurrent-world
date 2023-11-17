@@ -1,9 +1,11 @@
-import { Box, Typography } from '@mui/material'
+import { Box, Button, Typography } from '@mui/material'
 import { forwardRef } from 'react'
 import { useApi } from '../../context/api'
+import { useSnackbar } from 'notistack'
 
 export const Debugger = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
     const client = useApi()
+    const { enqueueSnackbar } = useSnackbar()
 
     return (
         <div ref={ref} {...props}>
@@ -16,6 +18,25 @@ export const Debugger = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
                 }}
             >
                 <Typography variant="h3">Debugger</Typography>
+                <Typography variant="h4">Buttons</Typography>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        gap: '10px'
+                    }}
+                >
+                    <Button
+                        variant="contained"
+                        onClick={() => {
+                            enqueueSnackbar(`Notification${Math.random()}`, {
+                                variant: 'success'
+                            })
+                        }}
+                    >
+                        Show Notification
+                    </Button>
+                </Box>
                 <Typography variant="h4">ConnectedDomains</Typography>
                 {client.api.domainCache &&
                     Object.keys(client.api.domainCache).map((domain, _) => (

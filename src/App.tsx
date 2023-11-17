@@ -1,6 +1,6 @@
 import { useEffect, useState, createContext, useRef, useMemo, useCallback } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
-import { darken, Box, Paper, ThemeProvider, CssBaseline, Typography } from '@mui/material'
+import { darken, Box, Paper, ThemeProvider, CssBaseline, Typography, useMediaQuery } from '@mui/material'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 
 import { createConcurrentTheme } from './themes'
@@ -56,6 +56,7 @@ function App(): JSX.Element {
     const pref = usePreference()
 
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(pref.themeName))
+    const isMobileSize = useMediaQuery(theme.breakpoints.down('sm'))
 
     const [acklist, setAcklist] = useState<User[]>([])
     const updateAcklist = useCallback(() => {
@@ -194,7 +195,10 @@ function App(): JSX.Element {
     }
 
     const providers = (childs: JSX.Element): JSX.Element => (
-        <SnackbarProvider preventDuplicate>
+        <SnackbarProvider
+            preventDuplicate
+            classes={isMobileSize ? { containerRoot: 'snackbar-container-mobile' } : undefined}
+        >
             <ThemeProvider theme={theme}>
                 <CssBaseline />
                 <TickerProvider>

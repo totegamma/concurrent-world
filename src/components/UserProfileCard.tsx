@@ -70,7 +70,15 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
                     </>
                 )}
             </Box>
-            <Box display="flex" flexDirection="row" justifyContent="space-between" gap={1} px={1} mb={1}>
+            <Box
+                display="flex"
+                flexDirection="row"
+                justifyContent="space-between"
+                alignItems="center"
+                gap={1}
+                px={1}
+                mb={1}
+            >
                 <Typography variant="h2">{props.user.profile?.payload.body.username}</Typography>
                 <Chip
                     size="small"
