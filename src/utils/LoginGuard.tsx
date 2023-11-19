@@ -6,10 +6,20 @@ interface Props {
 }
 
 export const LoginGuard = (props: Props): JSX.Element => {
-    const domain = localStorage.getItem('Domain') ?? ''
-    const prvkey = localStorage.getItem('PrivateKey') ?? ''
+    const domainStr = localStorage.getItem('Domain')
+    const prvkeyStr = localStorage.getItem('PrivateKey')
 
-    if (domain === '' || prvkey === '') {
+    let redirect = false
+
+    if (domainStr === null || prvkeyStr === null) redirect = true
+
+    const domain = JSON.parse(domainStr || '')
+    const prvkey = JSON.parse(prvkeyStr || '')
+
+    if (domain === '' || prvkey === '') redirect = true
+
+    if (redirect) {
+        console.log('redirect')
         return <Navigate to={props.redirect} state={{ from: useLocation() }} replace={true} />
     }
 

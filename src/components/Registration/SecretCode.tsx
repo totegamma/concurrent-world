@@ -1,8 +1,8 @@
-import { Box, Button, ButtonGroup, Grid, Paper, Typography } from '@mui/material'
-import ContentPasteIcon from '@mui/icons-material/ContentPaste'
+import { Box, Button, ButtonGroup, Typography } from '@mui/material'
 import { type Identity } from '../../util'
+import { SecretCode } from '../ui/SecretCode'
 
-export function SecretCode(props: {
+export function SaveSecretCode(props: {
     next: () => void
     identity: Identity
     mnemonicLanguage: string
@@ -39,50 +39,7 @@ export function SecretCode(props: {
                     </Button>
                 </ButtonGroup>
             </Box>
-            <Paper
-                variant="outlined"
-                component={Grid}
-                style={{
-                    width: '100%',
-                    margin: 1
-                }}
-                spacing={1}
-                columns={4}
-                container
-            >
-                {mnemonic.split(' ').map((e, i) => (
-                    <Grid
-                        key={i}
-                        item
-                        xs={2}
-                        sm={1}
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '5px',
-                            padding: '5px'
-                        }}
-                    >
-                        {i + 1}:
-                        <Paper
-                            variant="outlined"
-                            sx={{ display: 'inline-block', padding: '5px', width: '100%', textAlign: 'center' }}
-                        >
-                            {e}
-                        </Paper>
-                    </Grid>
-                ))}
-            </Paper>
-            <Button
-                variant="contained"
-                onClick={() => {
-                    navigator.clipboard.writeText(mnemonic)
-                }}
-                startIcon={<ContentPasteIcon />}
-            >
-                シークレットコードをコピー
-            </Button>
+            <SecretCode mnemonic={mnemonic} />
             <Typography>
                 シークレットコードは、あなたが再ログインしたいとき、別の端末からログインしたいときに必要な呪文です。
             </Typography>
