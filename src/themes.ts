@@ -413,6 +413,126 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         shape: {
             borderRadius: 2
         }
+    },
+    christmas: {
+        palette: {
+            primary: {
+                main: '#1f6c29',
+                contrastText: '#ffefb5'
+            },
+            secondary: {
+                main: '#321f3f'
+            },
+            background: {
+                default: '#730a0a',
+                paper: '#edede2',
+                contrastText: '#fafaa1'
+            },
+            text: {
+                primary: '#1e1f1c',
+                secondary: 'rgba(21, 20, 20, 0.7)',
+                disabled: 'rgba(0, 0, 0, 0.5)'
+            },
+            divider: 'rgba(255, 255, 255, 0.2)'
+        },
+        shape: {
+            borderRadius: 2
+        }
+    },
+    trick: {
+        palette: {
+            primary: {
+                main: '#2f0931',
+                contrastText: '#f4870a'
+            },
+            secondary: {
+                main: '#393131'
+            },
+            background: {
+                default: '#29232c',
+                paper: '#9297ab',
+                contrastText: '#d5d038'
+            },
+            text: {
+                primary: '#2a0128',
+                secondary: 'rgba(0, 0, 0, 0.7)',
+                disabled: 'rgba(114, 114, 114, 0.5)'
+            },
+            divider: 'rgba(255, 255, 255, 0.2)'
+        },
+        components: {
+            MuiCssBaseline: {
+                styleOverrides: {
+                    '::-webkit-scrollbar-thumb': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        borderRadius: '10px'
+                    }
+                }
+            }
+        },
+        shape: {
+            borderRadius: 2
+        }
+    },
+    sorcer: {
+        palette: {
+            primary: {
+                main: '#3b3845',
+                contrastText: '#9ed952'
+            },
+            secondary: {
+                main: '#393131'
+            },
+            background: {
+                default: '#362136',
+                paper: '#759697',
+                contrastText: '#e6973e'
+            },
+            text: {
+                primary: '#071f32',
+                secondary: 'rgba(0, 0, 0, 0.7)',
+                disabled: 'rgba(114, 114, 114, 0.5)'
+            },
+            divider: 'rgba(255, 255, 255, 0.2)'
+        },
+        components: {
+            MuiCssBaseline: {
+                styleOverrides: {
+                    '::-webkit-scrollbar-thumb': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        borderRadius: '10px'
+                    }
+                }
+            }
+        },
+        shape: {
+            borderRadius: 2
+        }
+    },
+    winter_panache: {
+        palette: {
+            primary: {
+                main: '#ecd538',
+                contrastText: '#fffefa'
+            },
+            secondary: {
+                main: '#4a5a54'
+            },
+            background: {
+                default: '#e2ecee',
+                paper: '#f6fbff',
+                contrastText: '#4d3721'
+            },
+            text: {
+                primary: '#2e0d03',
+                secondary: '#4c6675',
+                disabled: 'rgba(0, 0, 0, 0.5)'
+            },
+            divider: 'rgba(0, 0, 0, 0.1)'
+        },
+        shape: {
+            borderRadius: 3
+        }
     }
 }
 
