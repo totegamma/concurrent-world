@@ -414,31 +414,6 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
             borderRadius: 2
         }
     },
-    christmas: {
-        palette: {
-            primary: {
-                main: '#1f6c29',
-                contrastText: '#ffefb5'
-            },
-            secondary: {
-                main: '#321f3f'
-            },
-            background: {
-                default: '#730a0a',
-                paper: '#edede2',
-                contrastText: '#fafaa1'
-            },
-            text: {
-                primary: '#1e1f1c',
-                secondary: 'rgba(21, 20, 20, 0.7)',
-                disabled: 'rgba(0, 0, 0, 0.5)'
-            },
-            divider: 'rgba(255, 255, 255, 0.2)'
-        },
-        shape: {
-            borderRadius: 2
-        }
-    },
     trick: {
         palette: {
             primary: {
@@ -504,6 +479,31 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                     }
                 }
             }
+        },
+        shape: {
+            borderRadius: 2
+        }
+    },
+    christmas: {
+        palette: {
+            primary: {
+                main: '#1f6c29',
+                contrastText: '#ffefb5'
+            },
+            secondary: {
+                main: '#321f3f'
+            },
+            background: {
+                default: '#730a0a',
+                paper: '#edede2',
+                contrastText: '#fafaa1'
+            },
+            text: {
+                primary: '#1e1f1c',
+                secondary: 'rgba(21, 20, 20, 0.7)',
+                disabled: 'rgba(0, 0, 0, 0.5)'
+            },
+            divider: 'rgba(255, 255, 255, 0.2)'
         },
         shape: {
             borderRadius: 2
