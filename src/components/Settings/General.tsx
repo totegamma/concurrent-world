@@ -5,6 +5,7 @@ import {
     FormControlLabel,
     FormGroup,
     IconButton,
+    Link,
     MenuItem,
     Select,
     Switch,
@@ -20,6 +21,7 @@ import { useEffect, useState } from 'react'
 import { useSnackbar } from 'notistack'
 import { IssueJWT } from '@concurrent-world/client'
 import { useTranslation } from 'react-i18next'
+import { Link as NavLink } from 'react-router-dom'
 
 export const GeneralSettings = (): JSX.Element => {
     const pref = usePreference()
@@ -55,6 +57,15 @@ export const GeneralSettings = (): JSX.Element => {
                     <Passport />
                 </Tilt>
             </Box>
+
+            <Typography>
+                シークレットコードは
+                <Link component={NavLink} to="/settings/profile">
+                    プロフィール
+                </Link>
+                より確認できます。
+            </Typography>
+
             <Divider />
 
             <Box>
@@ -110,57 +121,61 @@ export const GeneralSettings = (): JSX.Element => {
             </Box>
             <Divider />
 
-            <Typography variant="h3" gutterBottom>
-                CCID
-            </Typography>
-            <Typography>{client.ccid}</Typography>
+            {pref.devMode && (
+                <>
+                    <Typography variant="h3" gutterBottom>
+                        CCID
+                    </Typography>
+                    <Typography>{client.ccid}</Typography>
 
-            <Typography variant="h3" gutterBottom>
-                Host
-            </Typography>
-            <Typography>{client.api.host}</Typography>
+                    <Typography variant="h3" gutterBottom>
+                        Host
+                    </Typography>
+                    <Typography>{client.api.host}</Typography>
 
-            <Typography variant="h3" gutterBottom>
-                Privatekey
-            </Typography>
-            <Typography
-                sx={{
-                    wordBreak: 'break-all',
-                    display: 'flex',
-                    alignItems: 'center'
-                }}
-            >
-                {showPrivateKey ? client.api.privatekey : '•••••••••••••••••••••••••••••••••••••••••••••••••'}
-                <IconButton
-                    sx={{ ml: 'auto' }}
-                    onClick={() => {
-                        setShowPrivateKey(!showPrivateKey)
-                    }}
-                >
-                    {!showPrivateKey ? (
-                        <VisibilityIcon sx={{ color: 'text.primary' }} />
-                    ) : (
-                        <VisibilityOffIcon sx={{ color: 'text.primary' }} />
-                    )}
-                </IconButton>
-            </Typography>
+                    <Typography variant="h3" gutterBottom>
+                        Privatekey
+                    </Typography>
+                    <Typography
+                        sx={{
+                            wordBreak: 'break-all',
+                            display: 'flex',
+                            alignItems: 'center'
+                        }}
+                    >
+                        {showPrivateKey ? client.api.privatekey : '•••••••••••••••••••••••••••••••••••••••••••••••••'}
+                        <IconButton
+                            sx={{ ml: 'auto' }}
+                            onClick={() => {
+                                setShowPrivateKey(!showPrivateKey)
+                            }}
+                        >
+                            {!showPrivateKey ? (
+                                <VisibilityIcon sx={{ color: 'text.primary' }} />
+                            ) : (
+                                <VisibilityOffIcon sx={{ color: 'text.primary' }} />
+                            )}
+                        </IconButton>
+                    </Typography>
 
-            <Typography variant="h3" gutterBottom>
-                HomeStream
-            </Typography>
-            <Typography gutterBottom>{client.user?.userstreams?.payload.body.homeStream}</Typography>
+                    <Typography variant="h3" gutterBottom>
+                        HomeStream
+                    </Typography>
+                    <Typography gutterBottom>{client.user?.userstreams?.payload.body.homeStream}</Typography>
 
-            <Typography variant="h3" gutterBottom>
-                NotificationStream
-            </Typography>
-            <Typography gutterBottom>{client.user?.userstreams?.payload.body.notificationStream}</Typography>
+                    <Typography variant="h3" gutterBottom>
+                        NotificationStream
+                    </Typography>
+                    <Typography gutterBottom>{client.user?.userstreams?.payload.body.notificationStream}</Typography>
 
-            <Typography variant="h3" gutterBottom>
-                AssociationStream
-            </Typography>
-            <Typography gutterBottom>{client.user?.userstreams?.payload.body.associationStream}</Typography>
+                    <Typography variant="h3" gutterBottom>
+                        AssociationStream
+                    </Typography>
+                    <Typography gutterBottom>{client.user?.userstreams?.payload.body.associationStream}</Typography>
 
-            <Divider />
+                    <Divider />
+                </>
+            )}
 
             {tags.includes('_invite') && (
                 <>

@@ -130,6 +130,20 @@ function App(): JSX.Element {
                             })
                     })
                 }
+
+                if (a.schema === Schemas.mention) {
+                    client?.api.readMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
+                        m &&
+                            client.api.readCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
+                                playNotificationRef.current()
+                                enqueueSnackbar(
+                                    `${c?.payload.body.username ?? 'anonymous'} mentioned you in"${
+                                        (m.payload.body.body as string) ?? 'your message.'
+                                    }"`
+                                )
+                            })
+                    })
+                }
             })
         })
     }, [client])

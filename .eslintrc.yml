@@ -23,4 +23,5 @@ rules:
   '@typescript-eslint/restrict-template-expressions': ['off']
   '@typescript-eslint/strict-boolean-expressions': ['off']
   '@typescript-eslint/triple-slash-reference': ['off']
+  "@typescript-eslint/consistent-type-assertions": ["off"]
   'react/react-in-jsx-scope': ['off']

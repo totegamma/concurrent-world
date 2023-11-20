@@ -3,6 +3,8 @@ import { LangJa } from './utils/lang-ja'
 
 import { useTranslation } from 'react-i18next'
 
+import { visit } from 'unist-util-visit'
+
 export interface Identity {
     mnemonic_ja: string
     mnemonic_en: string
@@ -102,4 +104,46 @@ export const fileToBase64 = (file: File): Promise<string | null> => {
             }
         }
     })
+}
+
+export const userMentionRemarkPlugin = (): any => {
+    return (tree: any) => {
+        visit(tree, 'text', (node: any, index?: number, parent?: any) => {
+            const parts = node.value.split(/(@\w+)/)
+            if (parts.length !== 1) {
+                parent.children.splice(
+                    index,
+                    1,
+                    ...parts
+                        .map((part: string) => {
+                            if (part.length === 0) return undefined
+                            if (part.startsWith('@')) return { type: 'userlink', ccid: part.slice(1) }
+                            else return { type: 'text', value: part }
+                        })
+                        .filter((node: any) => node !== undefined)
+                )
+            }
+        })
+    }
+}
+
+export const emojiRemarkPlugin = (): any => {
+    return (tree: any) => {
+        visit(tree, ['text', 'html'], (node: any, index?: number, parent?: any) => {
+            const parts = node.value.split(/(:\w+:)/)
+            if (parts.length !== 1) {
+                parent.children.splice(
+                    index,
+                    1,
+                    ...parts
+                        .map((part: string) => {
+                            if (part.length === 0) return undefined
+                            if (part.startsWith(':')) return { type: 'emoji', shortcode: part.slice(1, -1) }
+                            else return { type: node.type, value: part }
+                        })
+                        .filter((node: any) => node !== undefined)
+                )
+            }
+        })
+    }
 }

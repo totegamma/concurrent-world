@@ -10,6 +10,7 @@ import { useApi } from '../../context/api'
 import { MessageView } from './MessageView'
 import { OneLineMessageView } from './OneLineMessageView'
 import { useEffect, useState } from 'react'
+import { CCUserChip } from '../ui/CCUserChip'
 
 export interface ReplyMessageFrameProp {
     message: Message<ReplyMessageSchema>
@@ -39,11 +40,9 @@ export const ReplyMessageFrame = (props: ReplyMessageFrameProp): JSX.Element => 
                     userCCID={client.ccid}
                     message={props.message}
                     beforeMessage={
-                        <Chip
-                            label={`@${replyTo?.authorUser?.profile?.payload.body.username || 'anonymous'}`}
-                            size="small"
-                            sx={{ width: 'fit-content', mb: 1 }}
-                        />
+                        <Box>
+                            <CCUserChip ccid={props.message.payload.body.replyToMessageAuthor} />
+                        </Box>
                     }
                     rerouted={props.rerouted}
                 />

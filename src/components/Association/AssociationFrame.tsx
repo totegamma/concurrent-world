@@ -14,6 +14,7 @@ import { MessageContainer } from '../Message/MessageContainer'
 import { usePreference } from '../../context/PreferenceContext'
 import { FavoriteAssociation } from './FavoriteAssociation'
 import { ReactionAssociation } from './ReactionAssociation'
+import { MentionAssociation } from './MentionAssociation'
 
 export interface AssociationFrameProp {
     associationID: string
@@ -98,6 +99,16 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
                     messageOwner={(association as Association<ReplyAssociationSchema>).payload.body.messageAuthor}
                     after={props.after}
                 />
+            )
+        case Schemas.mention:
+            return (
+                <>
+                    <MentionAssociation
+                        association={association as Association<EmojiAssociationSchema>}
+                        perspective={props.perspective ?? client.ccid ?? ''}
+                    />
+                    {props.after}
+                </>
             )
         default:
             return (
