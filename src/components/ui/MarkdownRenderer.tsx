@@ -9,7 +9,7 @@ import breaks from 'remark-breaks'
 import { Codeblock } from './Codeblock'
 
 import type { EmojiLite } from '../../model'
-import { userMentionRemarkPlugin } from '../../util'
+import { userMentionRemarkPlugin, emojiRemarkPlugin } from '../../util'
 import { CCUserChip } from './CCUserChip'
 
 export interface MarkdownRendererProps {
@@ -19,28 +19,18 @@ export interface MarkdownRendererProps {
 
 const sanitizeOption = {
     ...defaultSchema,
-    tagNames: [...(defaultSchema.tagNames ?? []), 'marquee', 'video', 'source', 'userlink'],
+    tagNames: [...(defaultSchema.tagNames ?? []), 'marquee', 'video', 'source', 'userlink', 'emoji'],
     attributes: {
         ...defaultSchema.attributes,
         marquee: [...(defaultSchema.attributes?.marquee ?? []), 'direction', 'behavior', 'scrollamount'],
         video: [...(defaultSchema.attributes?.video ?? []), 'width', 'height', 'poster', 'loop'],
         source: [...(defaultSchema.attributes?.source ?? []), 'src', 'type'],
-        userlink: ['ccid']
+        userlink: ['ccid'],
+        emoji: ['shortcode']
     }
 }
 
 export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
-    const genEmojiTag = (name: string, url: string): string => {
-        return `<img src="${url}" alt="emoji:${name}:" title=":${name}:"/>`
-    }
-    const messagebody = props.messagebody.replace(/:\w+:/gi, (name: string) => {
-        const emoji: EmojiLite | undefined = props.emojiDict[name.slice(1, -1)]
-        if (emoji) {
-            return genEmojiTag(name, emoji.animURL ?? emoji.imageURL ?? '')
-        }
-        return `${name}`
-    })
-
     return (
         <Box
             sx={{
@@ -101,13 +91,20 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
             }}
         >
             <ReactMarkdown
-                remarkPlugins={[breaks, [remarkGfm, { singleTilde: false }], userMentionRemarkPlugin]}
+                remarkPlugins={[
+                    breaks,
+                    [remarkGfm, { singleTilde: false }],
+                    userMentionRemarkPlugin,
+                    emojiRemarkPlugin
+                ]}
                 rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeOption]]}
                 remarkRehypeOptions={{
                     handlers: {
                         userlink: (h, node) => {
-                            console.warn(node)
                             return h(node, 'userlink', { ccid: node.ccid })
+                        },
+                        emoji: (h, node) => {
+                            return h(node, 'emoji', { shortcode: node.shortcode })
                         }
                     }
                 }}
@@ -244,18 +241,6 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                         > &
                             ReactMarkdownProps
                     ) => {
-                        if (props.alt?.startsWith('emoji')) {
-                            return (
-                                <img
-                                    {...props}
-                                    style={{
-                                        height: '1.25em',
-                                        verticalAlign: '-0.45em',
-                                        marginBottom: '4px'
-                                    }}
-                                />
-                            )
-                        }
                         return (
                             <a href={props.src} target="_blank" rel="noreferrer">
                                 <Box
@@ -268,6 +253,19 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                                     }}
                                 />
                             </a>
+                        )
+                    },
+                    emoji: ({ shortcode }) => {
+                        const emoji = props.emojiDict[shortcode]
+                        return (
+                            <img
+                                src={emoji?.animURL ?? emoji?.imageURL ?? ''}
+                                style={{
+                                    height: '1.25em',
+                                    verticalAlign: '-0.45em',
+                                    marginBottom: '4px'
+                                }}
+                            />
                         )
                     },
                     video: (props) => {
@@ -287,7 +285,7 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                     }
                 }}
             >
-                {messagebody}
+                {props.messagebody}
             </ReactMarkdown>
         </Box>
     )

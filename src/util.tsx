@@ -108,28 +108,42 @@ export const fileToBase64 = (file: File): Promise<string | null> => {
 
 export const userMentionRemarkPlugin = (): any => {
     return (tree: any) => {
-        visit(tree, 'paragraph', (node: any) => {
-            node.children = node.children
-                ?.map((child: any) => {
-                    if (child.type === 'text') {
-                        const parts = child.value.split(/(@\w+)/)
-                        if (parts.length === 1) return child
-                        else
-                            return parts
-                                .map((part: string) => {
-                                    if (part.length === 0) return undefined
-                                    if (part.startsWith('@')) {
-                                        return { type: 'userlink', ccid: part.slice(1) }
-                                    }
-                                    return { type: 'text', value: part }
-                                })
-                                .filter((node: any) => node !== undefined)
-                    } else {
-                        return child
-                    }
-                })
-                .flat()
+        visit(tree, 'text', (node: any, index?: number, parent?: any) => {
+            const parts = node.value.split(/(@\w+)/)
+            if (parts.length !== 1) {
+                parent.children.splice(
+                    index,
+                    1,
+                    ...parts
+                        .map((part: string) => {
+                            if (part.length === 0) return undefined
+                            if (part.startsWith('@')) return { type: 'userlink', ccid: part.slice(1) }
+                            else return { type: 'text', value: part }
+                        })
+                        .filter((node: any) => node !== undefined)
+                )
+            }
         })
-        console.log(tree)
+    }
+}
+
+export const emojiRemarkPlugin = (): any => {
+    return (tree: any) => {
+        visit(tree, 'text', (node: any, index?: number, parent?: any) => {
+            const parts = node.value.split(/(:\w+:)/)
+            if (parts.length !== 1) {
+                parent.children.splice(
+                    index,
+                    1,
+                    ...parts
+                        .map((part: string) => {
+                            if (part.length === 0) return undefined
+                            if (part.startsWith(':')) return { type: 'emoji', shortcode: part.slice(1, -1) }
+                            else return { type: 'text', value: part }
+                        })
+                        .filter((node: any) => node !== undefined)
+                )
+            }
+        })
     }
 }
