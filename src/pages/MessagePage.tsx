@@ -170,8 +170,8 @@ export function MessagePage(): JSX.Element {
                             streamPickerInitial={message.postedStreams ?? []}
                             streamPickerOptions={actions.allKnownStreams}
                             placeholder="Write a reply..."
-                            onSubmit={async (text: string, streams: string[], emojis) => {
-                                await message.reply(streams, text, emojis)
+                            onSubmit={async (text: string, streams: string[], options) => {
+                                await message.reply(streams, text, options?.emojis)
                                 return null
                             }}
                             sx={{

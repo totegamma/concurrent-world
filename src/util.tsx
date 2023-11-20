@@ -3,6 +3,8 @@ import { LangJa } from './utils/lang-ja'
 
 import { useTranslation } from 'react-i18next'
 
+import { visit } from 'unist-util-visit'
+
 export interface Identity {
     mnemonic_ja: string
     mnemonic_en: string
@@ -102,4 +104,19 @@ export const fileToBase64 = (file: File): Promise<string | null> => {
             }
         }
     })
+}
+
+export const userMentionRemarkPlugin = (): any => {
+    const transformer = (tree: any): any => {
+        visit(tree, 'text', (node: any) => {
+            const userQuery = node.value.match(/@([^\s@]+)/g)
+            if (!userQuery) return
+            node.type = 'html'
+            for (const match of userQuery) {
+                node.value = node.value.replace(match, `<userlink url="${match.replace('@', '')}">`)
+            }
+        })
+        return tree
+    }
+    return transformer
 }

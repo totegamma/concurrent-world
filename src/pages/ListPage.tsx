@@ -5,7 +5,7 @@ import { usePreference } from '../context/PreferenceContext'
 import { Timeline } from '../components/Timeline'
 import { Draft } from '../components/Draft'
 import { useApi } from '../context/api'
-import { type CommonstreamSchema, type Stream } from '@concurrent-world/client'
+import { type CreateCurrentOptions, type CommonstreamSchema, type Stream } from '@concurrent-world/client'
 import InfoIcon from '@mui/icons-material/Info'
 import ExploreIcon from '@mui/icons-material/Explore'
 import { ListSettings } from '../components/ListSettings'
@@ -147,9 +147,9 @@ export function ListPage(): JSX.Element {
                                         onSubmit={async (
                                             text: string,
                                             destinations: string[],
-                                            emojis
+                                            options?: CreateCurrentOptions
                                         ): Promise<Error | null> => {
-                                            await client.createCurrent(text, destinations, emojis).catch((e) => e)
+                                            await client.createCurrent(text, destinations, options).catch((e) => e)
                                             return null
                                         }}
                                         sx={{
