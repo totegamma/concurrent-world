@@ -439,7 +439,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
             MuiCssBaseline: {
                 styleOverrides: {
                     '::-webkit-scrollbar-thumb': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.15)',
                         borderRadius: '10px'
                     }
                 }
@@ -474,7 +474,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
             MuiCssBaseline: {
                 styleOverrides: {
                     '::-webkit-scrollbar-thumb': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.15)',
                         borderRadius: '10px'
                     }
                 }
@@ -529,6 +529,16 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 disabled: 'rgba(0, 0, 0, 0.5)'
             },
             divider: 'rgba(0, 0, 0, 0.1)'
+        },
+        components: {
+            MuiCssBaseline: {
+                styleOverrides: {
+                    '::-webkit-scrollbar-thumb': {
+                        backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                        borderRadius: '10px'
+                    }
+                }
+            }
         },
         shape: {
             borderRadius: 3
