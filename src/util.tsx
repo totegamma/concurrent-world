@@ -129,7 +129,7 @@ export const userMentionRemarkPlugin = (): any => {
 
 export const emojiRemarkPlugin = (): any => {
     return (tree: any) => {
-        visit(tree, 'text', (node: any, index?: number, parent?: any) => {
+        visit(tree, ['text', 'html'], (node: any, index?: number, parent?: any) => {
             const parts = node.value.split(/(:\w+:)/)
             if (parts.length !== 1) {
                 parent.children.splice(
@@ -139,7 +139,7 @@ export const emojiRemarkPlugin = (): any => {
                         .map((part: string) => {
                             if (part.length === 0) return undefined
                             if (part.startsWith(':')) return { type: 'emoji', shortcode: part.slice(1, -1) }
-                            else return { type: 'text', value: part }
+                            else return { type: node.type, value: part }
                         })
                         .filter((node: any) => node !== undefined)
                 )
