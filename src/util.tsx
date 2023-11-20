@@ -107,16 +107,29 @@ export const fileToBase64 = (file: File): Promise<string | null> => {
 }
 
 export const userMentionRemarkPlugin = (): any => {
-    const transformer = (tree: any): any => {
-        visit(tree, 'text', (node: any) => {
-            const userQuery = node.value.match(/@([^\s@]+)/g)
-            if (!userQuery) return
-            node.type = 'html'
-            for (const match of userQuery) {
-                node.value = node.value.replace(match, `<userlink ccid="${match.replace('@', '')}">`)
-            }
+    return (tree: any) => {
+        visit(tree, 'paragraph', (node: any) => {
+            node.children = node.children
+                ?.map((child: any) => {
+                    if (child.type === 'text') {
+                        const parts = child.value.split(/(@\w+)/)
+                        if (parts.length === 1) return child
+                        else
+                            return parts
+                                .map((part: string) => {
+                                    if (part.length === 0) return undefined
+                                    if (part.startsWith('@')) {
+                                        return { type: 'userlink', ccid: part.slice(1) }
+                                    }
+                                    return { type: 'text', value: part }
+                                })
+                                .filter((node: any) => node !== undefined)
+                    } else {
+                        return child
+                    }
+                })
+                .flat()
         })
-        return tree
+        console.log(tree)
     }
-    return transformer
 }

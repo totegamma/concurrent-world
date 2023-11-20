@@ -103,14 +103,17 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
             <ReactMarkdown
                 remarkPlugins={[breaks, [remarkGfm, { singleTilde: false }], userMentionRemarkPlugin]}
                 rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeOption]]}
+                remarkRehypeOptions={{
+                    handlers: {
+                        userlink: (h, node) => {
+                            console.warn(node)
+                            return h(node, 'userlink', { ccid: node.ccid })
+                        }
+                    }
+                }}
                 components={{
-                    userlink: ({ ccid, children }) => {
-                        return (
-                            <>
-                                <CCUserChip ccid={ccid} />
-                                <span>{children}</span>
-                            </>
-                        )
+                    userlink: ({ ccid }) => {
+                        return <CCUserChip ccid={ccid} />
                     },
                     p: ({ children }) => (
                         <Typography
