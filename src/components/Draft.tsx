@@ -33,7 +33,7 @@ import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 import { useEmojiPicker } from '../context/EmojiPickerContext'
 import caretPosition from 'textarea-caret'
-import { type CommonstreamSchema, type Stream, type User } from '@concurrent-world/client'
+import { type CommonstreamSchema, type Stream, type User, type CreateCurrentOptions } from '@concurrent-world/client'
 import { useApi } from '../context/api'
 import { type Emoji, type EmojiLite } from '../model'
 import { useNavigate } from 'react-router-dom'
@@ -48,7 +48,7 @@ export interface DraftProps {
     submitButtonLabel?: string
     streamPickerInitial: Array<Stream<CommonstreamSchema>>
     streamPickerOptions: Array<Stream<CommonstreamSchema>>
-    onSubmit: (text: string, destinations: string[], emojis?: Record<string, EmojiLite>) => Promise<Error | null>
+    onSubmit: (text: string, destinations: string[], options?: CreateCurrentOptions) => Promise<Error | null>
     allowEmpty?: boolean
     autoFocus?: boolean
     placeholder?: string
@@ -116,9 +116,12 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         const dest = [
             ...new Set([...destStreamIDs, ...(postHome ? [client?.user?.userstreams?.payload.body.homeStream] : [])])
         ].filter((e) => e) as string[]
+
+        const mentions = draft.match(/@([^\s@]+)/g)?.map((e) => e.slice(1)) ?? []
+
         setSending(true)
         props
-            .onSubmit(draft, dest, emojiDict)
+            .onSubmit(draft, dest, { emojis: emojiDict, mentions })
             .then((error) => {
                 if (error) {
                     enqueueSnackbar(`Failed to post message: ${error.message}`, { variant: 'error' })

@@ -1,5 +1,5 @@
 import { type ImgHTMLAttributes, type DetailedHTMLProps, useState, useEffect } from 'react'
-import { Avatar, Box, Chip, Link, Typography } from '@mui/material'
+import { Avatar, Box, Chip, Link, Paper, Tooltip, Typography } from '@mui/material'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
@@ -12,6 +12,9 @@ import type { EmojiLite } from '../../model'
 import { useApi } from '../../context/api'
 import { userMentionRemarkPlugin } from '../../util'
 import { type User } from '@concurrent-world/client'
+import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
+import { UserProfileCard } from '../UserProfileCard'
+import { Link as routerLink } from 'react-router-dom'
 
 export interface MarkdownRendererProps {
     messagebody: string
@@ -120,10 +123,34 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                         }
                         return (
                             <>
-                                <Chip
-                                    label={user?.profile?.payload.body.username}
-                                    avatar={<Avatar src={user?.profile?.payload.body.avatar} />}
-                                />
+                                <Tooltip
+                                    enterDelay={500}
+                                    enterNextDelay={500}
+                                    leaveDelay={300}
+                                    placement="top"
+                                    components={{
+                                        Tooltip: Paper
+                                    }}
+                                    componentsProps={{
+                                        tooltip: {
+                                            sx: {
+                                                m: 1,
+                                                border: '1px solid',
+                                                borderColor: 'divider',
+                                                minWidth: '300px'
+                                            }
+                                        }
+                                    }}
+                                    title={<UserProfileCard user={user} />}
+                                >
+                                    <Chip
+                                        component={routerLink}
+                                        to={'/entity/' + (user?.ccid ?? '')}
+                                        size={'small'}
+                                        label={user?.profile?.payload.body.username}
+                                        icon={<AlternateEmailIcon fontSize="small" />}
+                                    />
+                                </Tooltip>
                                 <span>{children}</span>
                             </>
                         )

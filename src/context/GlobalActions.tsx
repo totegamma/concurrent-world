@@ -293,9 +293,9 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                         autoFocus
                                         streamPickerInitial={queriedStreams}
                                         streamPickerOptions={allKnownStreams}
-                                        onSubmit={async (text: string, destinations: string[], emojis) => {
+                                        onSubmit={async (text: string, destinations: string[], options) => {
                                             await client
-                                                .createCurrent(text, destinations, emojis)
+                                                .createCurrent(text, destinations, options)
                                                 .catch((e) => {
                                                     return e
                                                 })
@@ -324,11 +324,11 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                         streamPickerOptions={
                                             mode === 'reroute' ? allKnownStreams : targetMessage.postedStreams ?? []
                                         }
-                                        onSubmit={async (text, streams, emojis): Promise<Error | null> => {
+                                        onSubmit={async (text, streams, options): Promise<Error | null> => {
                                             if (mode === 'reroute') {
-                                                await targetMessage.reroute(streams, text, emojis)
+                                                await targetMessage.reroute(streams, text, options?.emojis)
                                             } else if (mode === 'reply') {
-                                                await targetMessage.reply(streams, text, emojis)
+                                                await targetMessage.reply(streams, text, options?.emojis)
                                             }
                                             setMode('none')
                                             return null

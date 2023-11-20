@@ -106,9 +106,9 @@ export const StreamPage = memo((): JSX.Element => {
                                             onSubmit={async (
                                                 text: string,
                                                 destinations: string[],
-                                                emojis
+                                                options
                                             ): Promise<Error | null> => {
-                                                await client.createCurrent(text, destinations, emojis).catch((e) => e)
+                                                await client.createCurrent(text, destinations, options).catch((e) => e)
                                                 return null
                                             }}
                                             sx={{
