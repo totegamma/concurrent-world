@@ -260,6 +260,26 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     })
                 })
                 return (await result.json()).data.link
+            } else if (pref.storageProvider === 'domain') {
+                const isImage = file.type.includes('image')
+                if (!isImage) return null
+
+                const result = await client.api.fetchWithCredential(client.host, '/storage/files', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': file.type
+                    },
+                    body: file
+                })
+
+                if (!result.ok) {
+                    console.error('upload failed:', result)
+                    return null
+                }
+
+                const json = await result.json()
+
+                return json.content.url
             }
             return null
         },

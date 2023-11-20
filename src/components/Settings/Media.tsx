@@ -5,21 +5,27 @@ import {
     Divider,
     FormControlLabel,
     FormGroup,
+    IconButton,
+    ImageList,
+    ImageListItem,
+    ImageListItemBar,
     MenuItem,
     Paper,
     Select,
     TextField,
     Typography
 } from '@mui/material'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { usePreference } from '../../context/PreferenceContext'
-
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { useTranslation } from 'react-i18next'
 import { Codeblock } from '../ui/Codeblock'
 import { type s3Config } from '../../model'
+import { useApi } from '../../context/api'
 
 export const MediaSettings = (): JSX.Element => {
     const pref = usePreference()
+    const client = useApi()
     const clientIdRef = useRef<HTMLInputElement>(null)
 
     const [buttonText, setButtonText] = useState<string>('Save')
@@ -28,6 +34,32 @@ export const MediaSettings = (): JSX.Element => {
 
     const handleS3ConfigChange = (key: string, value: any): void => {
         _setS3Config({ ..._s3Config, [key]: value })
+    }
+
+    const [myFiles, setMyFiles] = useState<any[]>([])
+
+    useEffect(() => {
+        if (pref.storageProvider !== 'domain') return
+        client.api.fetchWithCredential(client.host, '/storage/files', {}).then((res) => {
+            if (res.ok) {
+                res.json().then((content) => {
+                    console.log(content)
+                    setMyFiles(content.reverse())
+                })
+            }
+        })
+    }, [])
+
+    const deleteFile = (id: string): void => {
+        client.api
+            .fetchWithCredential(client.host, `/storage/file/${id}`, {
+                method: 'DELETE'
+            })
+            .then((res) => {
+                if (res.ok) {
+                    setMyFiles(myFiles.filter((e) => e.id !== id))
+                }
+            })
     }
 
     const handleS3ConfigSave = (): void => {
@@ -69,7 +101,34 @@ export const MediaSettings = (): JSX.Element => {
             >
                 <MenuItem value="imgur">imgur</MenuItem>
                 <MenuItem value="s3">s3</MenuItem>
+                <MenuItem value="domain">domain</MenuItem>
             </Select>
+
+            {pref.storageProvider === 'domain' && (
+                <>
+                    <ImageList cols={3} gap={8}>
+                        {myFiles.map((file) => (
+                            <ImageListItem key={file.id}>
+                                <img src={file.url} alt={file.id} />
+                                <ImageListItemBar
+                                    title={file.id}
+                                    subtitle={file.cdate}
+                                    actionIcon={
+                                        <IconButton
+                                            sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
+                                            onClick={() => {
+                                                deleteFile(file.id)
+                                            }}
+                                        >
+                                            <MoreHorizIcon />
+                                        </IconButton>
+                                    }
+                                />
+                            </ImageListItem>
+                        ))}
+                    </ImageList>
+                </>
+            )}
 
             {pref.storageProvider === 'imgur' && (
                 <>

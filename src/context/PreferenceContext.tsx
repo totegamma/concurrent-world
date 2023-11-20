@@ -10,7 +10,7 @@ interface PreferenceState {
     themeName: string
     setThemeName: (_: string) => void
 
-    storageProvider: 'imgur' | 's3'
+    storageProvider: 'imgur' | 's3' | 'domain'
     setStorageProvider: (_: string) => void
 
     imgurClientID: string
@@ -59,11 +59,11 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
 
     const [themeName, setThemeName] = usePersistent<string>('themeName', 'basic')
 
-    const [storageProvider, _setStorageProvider] = usePersistent<'imgur' | 's3'>('storageProvider', 'imgur')
+    const [storageProvider, _setStorageProvider] = usePersistent<'imgur' | 's3' | 'domain'>('storageProvider', 'imgur')
     const setStorageProvider = useCallback(
         (v: string) => {
             console.log(v)
-            _setStorageProvider(v as 'imgur' | 's3')
+            _setStorageProvider(v as 'imgur' | 's3' | 'domain')
         },
         [_setStorageProvider]
     )
