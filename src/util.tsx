@@ -113,7 +113,7 @@ export const userMentionRemarkPlugin = (): any => {
             if (!userQuery) return
             node.type = 'html'
             for (const match of userQuery) {
-                node.value = node.value.replace(match, `<userlink url="${match.replace('@', '')}">`)
+                node.value = node.value.replace(match, `<userlink ccid="${match.replace('@', '')}">`)
             }
         })
         return tree

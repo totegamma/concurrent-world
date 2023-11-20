@@ -1,5 +1,5 @@
-import { type ImgHTMLAttributes, type DetailedHTMLProps, useState, useEffect } from 'react'
-import { Avatar, Box, Chip, Link, Paper, Tooltip, Typography } from '@mui/material'
+import { type ImgHTMLAttributes, type DetailedHTMLProps } from 'react'
+import { Box, Link, Typography } from '@mui/material'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
@@ -9,12 +9,8 @@ import breaks from 'remark-breaks'
 import { Codeblock } from './Codeblock'
 
 import type { EmojiLite } from '../../model'
-import { useApi } from '../../context/api'
 import { userMentionRemarkPlugin } from '../../util'
-import { type User } from '@concurrent-world/client'
-import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
-import { UserProfileCard } from '../UserProfileCard'
-import { Link as routerLink } from 'react-router-dom'
+import { CCUserChip } from './CCUserChip'
 
 export interface MarkdownRendererProps {
     messagebody: string
@@ -23,17 +19,17 @@ export interface MarkdownRendererProps {
 
 const sanitizeOption = {
     ...defaultSchema,
-    tagNames: [...(defaultSchema.tagNames ?? []), 'marquee', 'video', 'source'],
+    tagNames: [...(defaultSchema.tagNames ?? []), 'marquee', 'video', 'source', 'userlink'],
     attributes: {
         ...defaultSchema.attributes,
         marquee: [...(defaultSchema.attributes?.marquee ?? []), 'direction', 'behavior', 'scrollamount'],
         video: [...(defaultSchema.attributes?.video ?? []), 'width', 'height', 'poster', 'loop'],
-        source: [...(defaultSchema.attributes?.source ?? []), 'src', 'type']
+        source: [...(defaultSchema.attributes?.source ?? []), 'src', 'type'],
+        userlink: ['ccid']
     }
 }
 
 export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
-    const api = useApi()
     const genEmojiTag = (name: string, url: string): string => {
         return `<img src="${url}" alt="emoji:${name}:" title=":${name}:"/>`
     }
@@ -106,51 +102,12 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
         >
             <ReactMarkdown
                 remarkPlugins={[breaks, [remarkGfm, { singleTilde: false }], userMentionRemarkPlugin]}
-                rehypePlugins={[rehypeRaw]}
+                rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeOption]]}
                 components={{
-                    userlink: ({ url, children }) => {
-                        const api = useApi()
-                        const [user, setUser] = useState<User | null>(null)
-
-                        useEffect(() => {
-                            api.getUser(url).then((user) => {
-                                setUser(user)
-                            })
-                        }, [])
-
-                        if (!user) {
-                            return <>...</>
-                        }
+                    userlink: ({ ccid, children }) => {
                         return (
                             <>
-                                <Tooltip
-                                    enterDelay={500}
-                                    enterNextDelay={500}
-                                    leaveDelay={300}
-                                    placement="top"
-                                    components={{
-                                        Tooltip: Paper
-                                    }}
-                                    componentsProps={{
-                                        tooltip: {
-                                            sx: {
-                                                m: 1,
-                                                border: '1px solid',
-                                                borderColor: 'divider',
-                                                minWidth: '300px'
-                                            }
-                                        }
-                                    }}
-                                    title={<UserProfileCard user={user} />}
-                                >
-                                    <Chip
-                                        component={routerLink}
-                                        to={'/entity/' + (user?.ccid ?? '')}
-                                        size={'small'}
-                                        label={user?.profile?.payload.body.username}
-                                        icon={<AlternateEmailIcon fontSize="small" />}
-                                    />
-                                </Tooltip>
+                                <CCUserChip ccid={ccid} />
                                 <span>{children}</span>
                             </>
                         )

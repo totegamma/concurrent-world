@@ -2,14 +2,14 @@ import 'react-markdown'
 
 declare module 'react-markdown' {
     export interface Components {
-        userlink?: React.FC<{ url: string }>
+        userlink?: React.FC<{ ccid: string }>
     }
 }
 
 declare global {
     namespace JSX {
         interface IntrinsicElements {
-            userlink: { url: string } & React.DetailedHTMLProps<
+            userlink: { ccid: string } & React.DetailedHTMLProps<
                 React.AnchorHTMLAttributes<HTMLAnchorElement>,
                 HTMLAnchorElement
             >
