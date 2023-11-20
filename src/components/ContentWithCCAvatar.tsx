@@ -1,5 +1,5 @@
 import { type User } from '@concurrent-world/client'
-import { Box, IconButton, ListItem, Paper, Tooltip } from '@mui/material'
+import { Box, IconButton, ListItem, Paper, type SxProps, Tooltip } from '@mui/material'
 import { UserProfileCard } from './UserProfileCard'
 import { Link as routerLink } from 'react-router-dom'
 import { CCAvatar } from './ui/CCAvatar'
@@ -13,6 +13,7 @@ export interface ContentWithCCAvatarProps {
         link?: string
     }
     children?: JSX.Element | Array<JSX.Element | undefined>
+    sx?: SxProps
 }
 
 export const ContentWithCCAvatar = (props: ContentWithCCAvatarProps): JSX.Element => {
@@ -37,7 +38,6 @@ export const ContentWithCCAvatar = (props: ContentWithCCAvatarProps): JSX.Elemen
                 componentsProps={{
                     tooltip: {
                         sx: {
-                            p: 1,
                             m: 1,
                             border: '1px solid',
                             borderColor: 'divider',
@@ -75,7 +75,8 @@ export const ContentWithCCAvatar = (props: ContentWithCCAvatarProps): JSX.Elemen
                     flex: 1,
                     flexDirection: 'column',
                     width: '100%',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    ...props.sx
                 }}
             >
                 {props.children}

@@ -492,8 +492,14 @@ export const ConcurrentDefaultTheme = {
                     backgroundColor: 'rgba(0, 0, 0, 0.2)',
                     borderRadius: '10px'
                 },
+                html: {
+                    overscrollBehaviorY: 'none'
+                },
                 body: {
                     overflowX: 'hidden'
+                },
+                '.snackbar-container-mobile': {
+                    bottom: 'calc(55px + env(safe-area-inset-bottom))'
                 }
             }
         }

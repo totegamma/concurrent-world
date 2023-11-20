@@ -49,8 +49,7 @@ export const UrlSummaryProvider = (props: UrlSummaryProviderProps): JSX.Element 
     )
 }
 
-export function useUrlSummary(): UrlSummaryState {
+export function useUrlSummary(): UrlSummaryState | undefined {
     const context = useContext(UrlSummaryContext)
-    if (!context) throw new Error('useUrlSummary must be used within a UrlSummaryProvider')
     return context
 }

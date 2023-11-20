@@ -6,6 +6,8 @@ import { AckButton } from './AckButton'
 import { FollowButton } from './FollowButton'
 import { useSnackbar } from 'notistack'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
+import { MarkdownRenderer } from './ui/MarkdownRenderer'
+import Background from '../resources/defaultbg.png'
 
 export interface UserProfileCardProps {
     user: User | undefined
@@ -19,29 +21,64 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
     if (!props.user) return <></>
 
     return (
-        <Box display="flex" flexDirection="column" alignItems="left" sx={{ m: 1 }} gap={1}>
-            <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
-                <CCAvatar
-                    alt={props.user.profile?.payload.body.username}
-                    avatarURL={props.user.profile?.payload.body.avatar}
-                    identiconSource={props.user.ccid ?? ''}
+        <Box display="flex" flexDirection="column" maxWidth="500px">
+            <Box
+                sx={{
+                    backgroundImage: `url(${props.user.profile?.payload.body.banner || Background})`,
+                    backgroundPosition: 'center',
+                    backgroundSize: 'cover',
+                    height: '80px'
+                }}
+            />
+            <Box position="relative" height={0}>
+                <Box
+                    position="relative"
                     sx={{
-                        width: { xs: '38px', sm: '48px' },
-                        height: { xs: '38px', sm: '48px' }
+                        top: '-30px',
+                        left: '10px'
                     }}
-                />
+                >
+                    <CCAvatar
+                        alt={props.user.profile?.payload.body.username}
+                        avatarURL={props.user.profile?.payload.body.avatar}
+                        identiconSource={props.user.ccid ?? ''}
+                        sx={{
+                            width: '60px',
+                            height: '60px'
+                        }}
+                    />
+                </Box>
+            </Box>
+            <Box
+                display="flex"
+                flexDirection="row"
+                justifyContent="flex-end"
+                alignItems="center"
+                height="40px"
+                gap={1}
+                px={1}
+                mb={1}
+            >
                 {!isSelf && (
-                    <Box display="flex" gap={1} flexDirection="row" alignItems="center">
+                    <>
                         <AckButton user={props.user} />
                         <FollowButton
                             userCCID={props.user.ccid}
                             userStreamID={props.user.userstreams?.payload.body.homeStream ?? ''}
                             color="primary.main"
                         />
-                    </Box>
+                    </>
                 )}
             </Box>
-            <Box display="flex" flexDirection="row" alignItems="center" gap={1} justifyContent="space-between">
+            <Box
+                display="flex"
+                flexDirection="row"
+                justifyContent="space-between"
+                alignItems="center"
+                gap={1}
+                px={1}
+                mb={1}
+            >
                 <Typography variant="h2">{props.user.profile?.payload.body.username}</Typography>
                 <Chip
                     size="small"
@@ -53,7 +90,17 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
                     }}
                 />
             </Box>
-            <Typography variant="body1">{props.user.profile?.payload.body.description}</Typography>
+            <Box
+                sx={{
+                    maxHeight: '100px',
+                    overflowX: 'hidden',
+                    overflowY: 'auto',
+                    px: 1,
+                    mb: 1
+                }}
+            >
+                <MarkdownRenderer messagebody={props.user.profile?.payload.body.description ?? ''} emojiDict={{}} />
+            </Box>
         </Box>
     )
 }

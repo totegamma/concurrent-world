@@ -23,8 +23,11 @@ export const MessageUrlPreview = (props: MessageUrlPreviewProps): JSX.Element | 
     // replace markdown link syntax
     replaced = replaced.replace(/\[(.*)\]\((.*)\)/g, '$2')
 
+    // strip a tag body
+    replaced = replaced.replace(/<a(.*?)>.*?<\/a>/g, '$1')
+
     // extract urls
-    const urls = replaced.match(/(https?:\/\/[\w.-?=/&%#,@]+)/g)
+    const urls = replaced.match(/(https?:\/\/[\w.\-?=/&%#,@]+)/g)
 
     if (!urls) return null
 
@@ -46,6 +49,7 @@ export const MessageUrlPreview = (props: MessageUrlPreviewProps): JSX.Element | 
 
 export const UrlPreview = (props: { url: string }): JSX.Element | null => {
     const service = useUrlSummary()
+    if (!service) return null
     const [preview, setPreview] = useState<Summary | undefined>(undefined)
     const [errored, setErrored] = useState(false)
 

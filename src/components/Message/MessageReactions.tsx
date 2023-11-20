@@ -32,10 +32,6 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
         [props.message]
     )
 
-    if (!props.message.reactionCounts) {
-        return <></>
-    }
-
     const loadReactionMembers = (reaction: string): void => {
         props.message.getReactions(reaction).then((reactions) => {
             setReactionMembers((prev) => {
@@ -45,6 +41,10 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                 }
             })
         })
+    }
+
+    if (!props.message.reactionCounts || Object.keys(props.message.reactionCounts).length === 0) {
+        return <></>
     }
 
     return (
