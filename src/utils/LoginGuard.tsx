@@ -13,10 +13,13 @@ export const LoginGuard = (props: Props): JSX.Element => {
 
     if (domainStr === null || prvkeyStr === null) redirect = true
 
-    const domain = JSON.parse(domainStr || '')
-    const prvkey = JSON.parse(prvkeyStr || '')
-
-    if (domain === '' || prvkey === '') redirect = true
+    try {
+        const domain = JSON.parse(domainStr || '')
+        const prvkey = JSON.parse(prvkeyStr || '')
+        if (domain === '' || prvkey === '') redirect = true
+    } catch (e) {
+        redirect = true
+    }
 
     if (redirect) {
         console.log('redirect')
