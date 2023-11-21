@@ -472,10 +472,10 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             >
                 <Box>
                     <Tooltip
-                        title={pref.imgurClientID === '' ? t('cantAttachImage') : t('attachImage')}
+                        title={pref.imgurClientID === '' && pref.s3Config.endpoint === '' ? t('cantAttachImage') : t('attachImage')}
                         arrow
                         placement="top"
-                        enterDelay={pref.imgurClientID === '' ? 0 : 500}
+                        enterDelay={pref.imgurClientID === '' && pref.s3Config.endpoint === '' ? 0 : 500}
                     >
                         <span>
                             <IconButton
@@ -483,7 +483,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                     color: theme.palette.text.secondary
                                 }}
                                 onClick={() => {
-                                    if (pref.imgurClientID === '') {
+                                    if (pref.imgurClientID === '' && pref.s3Config.endpoint === '') {
                                         navigate('/settings/media')
                                     } else {
                                         onFileUploadClick()
