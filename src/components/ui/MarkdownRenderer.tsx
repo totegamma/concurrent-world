@@ -11,6 +11,7 @@ import { Codeblock } from './Codeblock'
 import type { EmojiLite } from '../../model'
 import { userMentionRemarkPlugin, emojiRemarkPlugin } from '../../util'
 import { CCUserChip } from './CCUserChip'
+import { LinkChip } from './LinkChip'
 
 export interface MarkdownRendererProps {
     messagebody: string
@@ -19,14 +20,15 @@ export interface MarkdownRendererProps {
 
 const sanitizeOption = {
     ...defaultSchema,
-    tagNames: [...(defaultSchema.tagNames ?? []), 'marquee', 'video', 'source', 'userlink', 'emoji'],
+    tagNames: [...(defaultSchema.tagNames ?? []), 'marquee', 'video', 'source', 'userlink', 'emoji', 'social'],
     attributes: {
         ...defaultSchema.attributes,
         marquee: [...(defaultSchema.attributes?.marquee ?? []), 'direction', 'behavior', 'scrollamount'],
         video: [...(defaultSchema.attributes?.video ?? []), 'width', 'height', 'poster', 'loop'],
         source: [...(defaultSchema.attributes?.source ?? []), 'src', 'type'],
         userlink: ['ccid'],
-        emoji: ['shortcode']
+        emoji: ['shortcode'],
+        social: ['href', 'service', 'icon']
     }
 }
 
@@ -111,6 +113,13 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                 components={{
                     userlink: ({ ccid }) => {
                         return <CCUserChip ccid={ccid} />
+                    },
+                    social: ({ href, icon, service, children }) => {
+                        return (
+                            <LinkChip href={href} icon={icon} service={service}>
+                                {children}
+                            </LinkChip>
+                        )
                     },
                     p: ({ children }) => (
                         <Typography

@@ -109,7 +109,7 @@ export const fileToBase64 = (file: File): Promise<string | null> => {
 export const userMentionRemarkPlugin = (): any => {
     return (tree: any) => {
         visit(tree, 'text', (node: any, index?: number, parent?: any) => {
-            const parts = node.value.split(/(@\w+)/)
+            const parts = node.value.split(/(@CC\w+)/)
             if (parts.length !== 1) {
                 parent.children.splice(
                     index,
