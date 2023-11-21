@@ -39,12 +39,14 @@ export interface LinkChipProps {
 }
 
 export const LinkChip = ({ href, service, icon, children }: LinkChipProps): JSX.Element => {
+    const useAvatar = icon !== undefined && icon !== ''
+
     return (
         <Chip
             clickable={href !== undefined && href !== ''}
             size="small"
-            icon={iconMap[service] ?? <PublicIcon />}
-            avatar={icon !== undefined && icon !== '' ? <Avatar src={icon} /> : undefined}
+            icon={useAvatar ? undefined : iconMap[service] ?? <PublicIcon />}
+            avatar={useAvatar ? <Avatar src={icon} /> : undefined}
             component={Link}
             href={href}
             label={children}
