@@ -1,4 +1,16 @@
-import { Box, Button, Divider, MenuItem, Paper, Select, TextField, Typography } from '@mui/material'
+import {
+    Box,
+    Button,
+    Checkbox,
+    Divider,
+    FormControlLabel,
+    FormGroup,
+    MenuItem,
+    Paper,
+    Select,
+    TextField,
+    Typography
+} from '@mui/material'
 import { useRef, useState } from 'react'
 import { usePreference } from '../../context/PreferenceContext'
 
@@ -14,7 +26,7 @@ export const MediaSettings = (): JSX.Element => {
 
     const [_s3Config, _setS3Config] = useState<s3Config>(pref.s3Config)
 
-    const handleS3ConfigChange = (key: string, value: string): void => {
+    const handleS3ConfigChange = (key: string, value: any): void => {
         _setS3Config({ ..._s3Config, [key]: value })
     }
 
@@ -155,6 +167,19 @@ export const MediaSettings = (): JSX.Element => {
                                 }}
                                 type="text"
                             />
+                            <FormGroup>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={_s3Config.forcePathStyle}
+                                            onChange={(v) => {
+                                                handleS3ConfigChange('forcePathStyle', v.target.checked)
+                                            }}
+                                        />
+                                    }
+                                    label="forcePathStyle"
+                                />
+                            </FormGroup>
                             <Button variant="contained" onClick={handleS3ConfigSave}>
                                 {buttonText}
                             </Button>

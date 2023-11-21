@@ -16,6 +16,8 @@
         "@concurrent-world/client": "^4.0.11",
         "@emotion/react": "^11.10.5",
         "@emotion/styled": "^11.10.5",
+        "@fortawesome/free-brands-svg-icons": "^6.4.2",
+        "@fortawesome/react-fontawesome": "^0.2.0",
         "@mui/icons-material": "^5.11.16",
         "@mui/material": "^5.11.7",
         "@rjsf/core": "^5.7.3",
