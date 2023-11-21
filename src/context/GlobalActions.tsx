@@ -193,7 +193,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                 accessKeyId: pref.s3Config.accessKeyId,
                 secretAccessKey: pref.s3Config.secretAccessKey
             },
-            region: 'auto'
+            region: 'auto',
+            forcePathStyle: pref.s3Config.forcePathStyle
         })
     }, [pref.storageProvider, pref.s3Config])
 

@@ -74,7 +74,8 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
         accessKeyId: '',
         bucketName: '',
         publicUrl: '',
-        secretAccessKey: ''
+        secretAccessKey: '',
+        forcePathStyle: false
     })
 
     const [mediaProxy, setMediaProxy] = usePersistent<string>('mediaProxy', 'https://urlpreview.kokoa.dev/')

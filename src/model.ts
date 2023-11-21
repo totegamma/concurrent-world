@@ -112,4 +112,5 @@ export interface s3Config {
     secretAccessKey: string
     bucketName: string
     publicUrl: string
+    forcePathStyle: boolean
 }
