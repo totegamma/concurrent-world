@@ -20,6 +20,9 @@ export const MessageUrlPreview = (props: MessageUrlPreviewProps): JSX.Element | 
     // strip img tag
     replaced = replaced.replace(/<img.*?>/g, '')
 
+    // strip social tag
+    replaced = replaced.replace(/<social.*?>.*?<\/social>/g, '')
+
     // replace markdown link syntax
     replaced = replaced.replace(/\[(.*)\]\((.*)\)/g, '$2')
 
