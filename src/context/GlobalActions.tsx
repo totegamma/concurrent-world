@@ -26,6 +26,7 @@ export interface GlobalActionsState {
     openMobileMenu: (open?: boolean) => void
     allKnownStreams: Array<Stream<CommonstreamSchema>>
     uploadFile: (file: File) => Promise<string | null>
+    isUploadReady: boolean
 }
 
 const GlobalActionsContext = createContext<GlobalActionsState | undefined>(undefined)
@@ -264,6 +265,15 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         [pref.storageProvider, pref.imgurClientID, pref.s3Config]
     )
 
+    const isUploadReady = useMemo(() => {
+        if (pref.storageProvider === 's3') {
+            return !!pref.s3Config.endpoint
+        } else if (pref.storageProvider === 'imgur') {
+            return !!pref.imgurClientID
+        }
+        return false
+    }, [pref.storageProvider, pref.imgurClientID, s3Client])
+
     return (
         <GlobalActionsContext.Provider
             value={useMemo(() => {
@@ -273,9 +283,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     openReroute,
                     openMobileMenu,
                     allKnownStreams,
-                    uploadFile
+                    uploadFile,
+                    isUploadReady
                 }
-            }, [openDraft, openReply, openReroute, openMobileMenu, allKnownStreams])}
+            }, [openDraft, openReply, openReroute, openMobileMenu, allKnownStreams, uploadFile, isUploadReady])}
         >
             <InspectorProvider>
                 <>{props.children}</>

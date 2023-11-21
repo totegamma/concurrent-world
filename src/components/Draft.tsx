@@ -62,7 +62,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const pref = usePreference()
     const emojiPicker = useEmojiPicker()
     const navigate = useNavigate()
-    const { uploadFile } = useGlobalActions()
+    const { uploadFile, isUploadReady } = useGlobalActions()
 
     const [destStreams, setDestStreams] = useState<Array<Stream<CommonstreamSchema>>>(props.streamPickerInitial)
 
@@ -472,10 +472,10 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             >
                 <Box>
                     <Tooltip
-                        title={pref.imgurClientID === '' && pref.s3Config.endpoint === '' ? t('cantAttachImage') : t('attachImage')}
+                        title={isUploadReady ? t('attachImage') : t('cantAttachImage')}
                         arrow
                         placement="top"
-                        enterDelay={pref.imgurClientID === '' && pref.s3Config.endpoint === '' ? 0 : 500}
+                        enterDelay={isUploadReady ? 500 : 0}
                     >
                         <span>
                             <IconButton
@@ -483,10 +483,10 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                     color: theme.palette.text.secondary
                                 }}
                                 onClick={() => {
-                                    if (pref.imgurClientID === '' && pref.s3Config.endpoint === '') {
-                                        navigate('/settings/media')
-                                    } else {
+                                    if (isUploadReady) {
                                         onFileUploadClick()
+                                    } else {
+                                        navigate('/settings/media')
                                     }
                                 }}
                             >
