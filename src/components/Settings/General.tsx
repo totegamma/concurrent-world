@@ -174,6 +174,11 @@ export const GeneralSettings = (): JSX.Element => {
                     <Typography gutterBottom>{client.user?.userstreams?.payload.body.associationStream}</Typography>
 
                     <Divider />
+                    <Typography variant="h3" gutterBottom>
+                        Services
+                    </Typography>
+
+                    <Typography>{JSON.stringify(client.domainServices)}</Typography>
                 </>
             )}
 

@@ -9,6 +9,7 @@ import Background from '../resources/defaultbg.png'
 import { alpha, useTheme } from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
+import { MediaInput } from './ui/MediaInput'
 
 interface ProfileEditorProps {
     initial?: ProfileSchema
@@ -97,20 +98,18 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
                         setDescription(e.target.value)
                     }}
                 />
-                <TextField
+                <MediaInput
                     label="avatarURL"
-                    variant="outlined"
                     value={avatar}
                     onChange={(e) => {
-                        setAvatar(e.target.value)
+                        setAvatar(e)
                     }}
                 />
-                <TextField
+                <MediaInput
                     label="bannerURL"
-                    variant="outlined"
                     value={banner}
                     onChange={(e) => {
-                        setBanner(e.target.value)
+                        setBanner(e)
                     }}
                 />
                 <Button
