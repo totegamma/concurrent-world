@@ -2052,7 +2052,7 @@ const data = [
 ]
 
 function loadWords(): string[] {
-    return data.map((w) => w.normalize('NFKD'))
+    return data
 }
 
 let wordlist: null | LangJa = null
