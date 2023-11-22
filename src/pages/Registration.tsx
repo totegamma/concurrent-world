@@ -54,7 +54,9 @@ export function Registration(): JSX.Element {
     }
 
     useEffect(() => {
-        initializeClient(new Client(identity.privateKey, domain))
+        Client.create(identity.privateKey, domain).then((client) => {
+            initializeClient(client)
+        })
     }, [])
 
     useEffect(() => {

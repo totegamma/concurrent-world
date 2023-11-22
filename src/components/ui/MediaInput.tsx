@@ -1,7 +1,7 @@
 import { Box, Button, TextField } from '@mui/material'
-import { useGlobalActions } from '../../context/GlobalActions'
 import { useRef, useState } from 'react'
 import { useSnackbar } from 'notistack'
+import { useStorage } from '../../context/StorageContext'
 
 interface MediaInputProps {
     value: string
@@ -10,7 +10,7 @@ interface MediaInputProps {
 }
 
 export function MediaInput(props: MediaInputProps): JSX.Element {
-    const actions = useGlobalActions()
+    const storage = useStorage()
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [uploading, setUploading] = useState(false)
     const { enqueueSnackbar } = useSnackbar()
@@ -19,7 +19,7 @@ export function MediaInput(props: MediaInputProps): JSX.Element {
         const isImage = imageFile.type.includes('image')
         if (isImage) {
             setUploading(true)
-            const result = await actions.uploadFile(imageFile).finally(() => {
+            const result = await storage.uploadFile(imageFile).finally(() => {
                 setUploading(false)
             })
             if (!result) {
@@ -53,7 +53,7 @@ export function MediaInput(props: MediaInputProps): JSX.Element {
                 label={props.label}
                 variant="outlined"
             />
-            {actions?.isUploadReady && (
+            {storage?.isUploadReady && (
                 <Button
                     sx={{
                         display: 'flex',
