@@ -1,4 +1,6 @@
 import {
+    Alert,
+    AlertTitle,
     Box,
     Button,
     Checkbox,
@@ -52,7 +54,7 @@ export const MediaSettings = (): JSX.Element => {
                 })
             }
         })
-    }, [])
+    }, [pref.storageProvider])
 
     const deleteFile = (id: string): void => {
         client.api
@@ -103,15 +105,21 @@ export const MediaSettings = (): JSX.Element => {
                     pref.setStorageProvider(v.target.value)
                 }}
             >
-                <MenuItem value="imgur">imgur</MenuItem>
-                <MenuItem value="s3">s3</MenuItem>
                 <MenuItem value="domain" disabled={!domainProfileAvailable}>
                     domain {domainProfileAvailable ? '' : '(not available)'}
                 </MenuItem>
+                <MenuItem value="imgur">imgur</MenuItem>
+                <MenuItem value="s3">s3</MenuItem>
             </Select>
 
             {pref.storageProvider === 'domain' && (
                 <>
+                    <Alert severity="info">
+                        <AlertTitle>Domain Storage</AlertTitle>
+                        Domain Storageはこのドメインが提供するストレージです。
+                        設定なしに利用できますが、最大容量が設定されています。
+                        また、ファイルのリストは管理者によって閲覧される可能性があり、規約に違反するファイルは削除される可能性があります。
+                    </Alert>
                     <ImageList cols={3} gap={8}>
                         {myFiles.map((file) => (
                             <ImageListItem key={file.id}>
@@ -138,6 +146,12 @@ export const MediaSettings = (): JSX.Element => {
 
             {pref.storageProvider === 'imgur' && (
                 <>
+                    <Alert severity="info">
+                        <AlertTitle>Imgur</AlertTitle>
+                        画像のアップロードにImgurを利用します。
+                        比較的簡単にセットアップできます。アップロード可能な内容はImgurの規約に従います。
+                    </Alert>
+
                     <Paper sx={{ padding: '1em', display: 'flex', flexDirection: 'column', gap: '1em' }}>
                         <Typography>
                             {t('afterRegisteringImgur')}
@@ -162,6 +176,13 @@ export const MediaSettings = (): JSX.Element => {
             )}
             {pref.storageProvider === 's3' && (
                 <>
+                    <Alert severity="info">
+                        <AlertTitle>S3</AlertTitle>
+                        画像のアップロードにS3を利用します。CloudFlare R2などのS3互換サービスも利用できます。
+                        設定に手間がかかりますが、ファイルを自身の管理下に置くことができます。
+                        サービスによって料金が発生しますが、たいていの場合無料枠に収まります。
+                    </Alert>
+
                     <Paper sx={{ padding: '1em', display: 'flex', flexDirection: 'column', gap: '1em' }}>
                         <Typography>{t('corsSettings')}</Typography>
                         <Codeblock language={'json'}>

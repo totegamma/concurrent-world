@@ -59,7 +59,7 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
 
     const [themeName, setThemeName] = usePersistent<string>('themeName', 'basic')
 
-    const [storageProvider, _setStorageProvider] = usePersistent<'imgur' | 's3' | 'domain'>('storageProvider', 'imgur')
+    const [storageProvider, _setStorageProvider] = usePersistent<'imgur' | 's3' | 'domain'>('storageProvider', 'domain')
     const setStorageProvider = useCallback(
         (v: string) => {
             console.log(v)
