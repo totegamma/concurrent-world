@@ -16,7 +16,6 @@ import {
     Typography
 } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { Link as RouterLink } from 'react-router-dom'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import { type Identity } from '../../util'
 
@@ -46,6 +45,22 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
         }
     }, [server])
 
+    const jumpToDomain = (fqdn: string): void => {
+        let next = window.location.href
+        // strip hash
+        const hashIndex = next.indexOf('#')
+        if (hashIndex !== -1) {
+            next = next.substring(0, hashIndex)
+        }
+        // add next hash
+        next = `${next}#5`
+
+        const token = IssueJWT(props.identity.privateKey, { iss: props.identity.CCID, aud: fqdn }) ?? ''
+        const link = `http://${fqdn}/web/register?token=${token}&callback=${encodeURIComponent(next)}`
+
+        window.location.href = link
+    }
+
     return (
         <Box
             sx={{
@@ -70,17 +85,10 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
                 <Typography variant="h3">リストから選択</Typography>
                 <List>
                     <ListItemButton
-                        component={RouterLink}
-                        to={`https://hub.concurrent.world/web/register?token=${
-                            IssueJWT(props.identity.privateKey, {
-                                iss: props.identity.CCID,
-                                aud: 'hub.concurrent.world'
-                            }) ?? ''
-                        }`}
-                        target="_blank"
                         onClick={() => {
                             setJumped(true)
                             setServer('hub.concurrent.world')
+                            jumpToDomain('hub.concurrent.world')
                         }}
                     >
                         <ListItemAvatar>
@@ -117,18 +125,10 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
                     />
                     <Button
                         variant="contained"
-                        component={RouterLink}
-                        to={
-                            'http://' +
-                            (props.host?.fqdn ?? '') +
-                            '/web/register?token=' +
-                            (IssueJWT(props.identity.privateKey, { iss: props.identity.CCID, aud: props.host?.fqdn }) ??
-                                '')
-                        }
-                        target="_blank"
                         disabled={!props.host}
                         onClick={() => {
                             setJumped(true)
+                            jumpToDomain(server)
                         }}
                     >
                         登録ページへ
