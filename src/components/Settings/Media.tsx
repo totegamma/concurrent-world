@@ -11,6 +11,9 @@ import {
     ImageList,
     ImageListItem,
     ImageListItemBar,
+    ListItemIcon,
+    ListItemText,
+    Menu,
     MenuItem,
     Paper,
     Select,
@@ -24,11 +27,13 @@ import { useTranslation } from 'react-i18next'
 import { Codeblock } from '../ui/Codeblock'
 import { type s3Config } from '../../model'
 import { useApi } from '../../context/api'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 
 export const MediaSettings = (): JSX.Element => {
     const pref = usePreference()
     const client = useApi()
     const clientIdRef = useRef<HTMLInputElement>(null)
+    const [selectedImageID, setSelectedImageID] = useState<string | null>(null)
 
     const [buttonText, setButtonText] = useState<string>('Save')
 
@@ -43,6 +48,8 @@ export const MediaSettings = (): JSX.Element => {
     const domainProfileAvailable = useMemo(() => {
         return 'mediaserver' in client.domainServices
     }, [client.domainServices])
+
+    const [deleteMenu, setDeleteMenu] = useState<null | HTMLElement>(null)
 
     useEffect(() => {
         if (pref.storageProvider !== 'domain') return
@@ -130,8 +137,9 @@ export const MediaSettings = (): JSX.Element => {
                                     actionIcon={
                                         <IconButton
                                             sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
-                                            onClick={() => {
-                                                deleteFile(file.id)
+                                            onClick={(e) => {
+                                                setSelectedImageID(file.id)
+                                                setDeleteMenu(e.currentTarget)
                                             }}
                                         >
                                             <MoreHorizIcon />
@@ -141,6 +149,25 @@ export const MediaSettings = (): JSX.Element => {
                             </ImageListItem>
                         ))}
                     </ImageList>
+                    <Menu
+                        anchorEl={deleteMenu}
+                        open={Boolean(deleteMenu)}
+                        onClose={() => {
+                            setDeleteMenu(null)
+                        }}
+                    >
+                        <MenuItem
+                            onClick={() => {
+                                selectedImageID && deleteFile(selectedImageID)
+                                setDeleteMenu(null)
+                            }}
+                        >
+                            <ListItemIcon>
+                                <DeleteForeverIcon />
+                            </ListItemIcon>
+                            <ListItemText>完全に削除</ListItemText>
+                        </MenuItem>
+                    </Menu>
                 </>
             )}
 
