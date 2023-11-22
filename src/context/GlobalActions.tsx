@@ -291,6 +291,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
             return !!pref.s3Config.endpoint
         } else if (pref.storageProvider === 'imgur') {
             return !!pref.imgurClientID
+        } else if (pref.storageProvider === 'domain') {
+            return 'mediaserver' in client.domainServices
         }
         return false
     }, [pref.storageProvider, pref.imgurClientID, s3Client])
