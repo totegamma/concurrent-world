@@ -41,8 +41,8 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { DummyMessageView } from './Message/DummyMessageView'
 
-import { useGlobalActions } from '../context/GlobalActions'
 import { ApplicationContext } from '../App'
+import { useStorage } from '../context/StorageContext'
 
 export interface DraftProps {
     submitButtonLabel?: string
@@ -59,10 +59,9 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const client = useApi()
     const theme = useTheme()
     const { acklist } = useContext(ApplicationContext)
-    const pref = usePreference()
     const emojiPicker = useEmojiPicker()
     const navigate = useNavigate()
-    const { uploadFile, isUploadReady } = useGlobalActions()
+    const { uploadFile, isUploadReady } = useStorage()
 
     const [destStreams, setDestStreams] = useState<Array<Stream<CommonstreamSchema>>>(props.streamPickerInitial)
 

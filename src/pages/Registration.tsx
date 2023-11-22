@@ -33,6 +33,7 @@ export function Registration(): JSX.Element {
     const { i18n } = useTranslation('', { keyPrefix: 'registration' })
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue')
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
+    const [domain, setDomain] = usePersistent<string>('Domain', 'hub.concurrent.world')
     const [client, initializeClient] = useState<Client>()
     const [host, setHost] = useState<CoreDomain | null | undefined>()
     const [identity, setIdentity] = usePersistent<Identity>('CreatedIdentity', generateIdentity())
@@ -53,7 +54,9 @@ export function Registration(): JSX.Element {
     }
 
     useEffect(() => {
-        initializeClient(new Client(identity.privateKey, 'hub.concurrent.world'))
+        Client.create(identity.privateKey, domain).then((client) => {
+            initializeClient(client)
+        })
     }, [])
 
     useEffect(() => {
@@ -64,6 +67,7 @@ export function Registration(): JSX.Element {
 
     useEffect(() => {
         if (!host) return
+        setDomain(host.fqdn)
         const api = new Client(identity.privateKey, host.fqdn)
         initializeClient(api)
     }, [host])

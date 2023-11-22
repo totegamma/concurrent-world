@@ -38,6 +38,7 @@ import {
     type User
 } from '@concurrent-world/client'
 import { UrlSummaryProvider } from './context/urlSummaryContext'
+import { StorageProvider } from './context/StorageContext'
 
 export const ApplicationContext = createContext<appData>({
     displayingStream: [],
@@ -219,7 +220,9 @@ function App(): JSX.Element {
                     <ApplicationContext.Provider value={applicationContext}>
                         <UrlSummaryProvider host={client.host}>
                             <EmojiPickerProvider>
-                                <GlobalActionsProvider>{childs}</GlobalActionsProvider>
+                                <StorageProvider>
+                                    <GlobalActionsProvider>{childs}</GlobalActionsProvider>
+                                </StorageProvider>
                             </EmojiPickerProvider>
                         </UrlSummaryProvider>
                     </ApplicationContext.Provider>

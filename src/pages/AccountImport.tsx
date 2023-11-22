@@ -6,7 +6,7 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { HDNodeWallet } from 'ethers'
+import { HDNodeWallet, LangEn } from 'ethers'
 import { LangJa } from '../utils/lang-ja'
 import { Client, LoadKey, type CoreDomain, CommputeCCID } from '@concurrent-world/client'
 import type { ConcurrentTheme } from '../model'
@@ -101,7 +101,13 @@ export function AccountImport(): JSX.Element {
                 setPrivatekey(wallet.privateKey.slice(2))
             } else {
                 console.log('japanese')
-                const wallet = HDNodeWallet.fromPhrase(normalized, undefined, undefined, LangJa.wordlist())
+                const ja2en = split
+                    .map((word) => {
+                        const wordIndex = LangJa.wordlist().getWordIndex(word)
+                        return LangEn.wordlist().getWord(wordIndex)
+                    })
+                    .join(' ')
+                const wallet = HDNodeWallet.fromPhrase(ja2en)
                 setMnemonic(normalized)
                 setPrivatekey(wallet.privateKey.slice(2))
             }
