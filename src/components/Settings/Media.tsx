@@ -15,7 +15,7 @@ import {
     TextField,
     Typography
 } from '@mui/material'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { usePreference } from '../../context/PreferenceContext'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { useTranslation } from 'react-i18next'
@@ -37,6 +37,10 @@ export const MediaSettings = (): JSX.Element => {
     }
 
     const [myFiles, setMyFiles] = useState<any[]>([])
+
+    const domainProfileAvailable = useMemo(() => {
+        return 'mediaserver' in client.domainServices
+    }, [client.domainServices])
 
     useEffect(() => {
         if (pref.storageProvider !== 'domain') return
@@ -101,7 +105,9 @@ export const MediaSettings = (): JSX.Element => {
             >
                 <MenuItem value="imgur">imgur</MenuItem>
                 <MenuItem value="s3">s3</MenuItem>
-                <MenuItem value="domain">domain</MenuItem>
+                <MenuItem value="domain" disabled={!domainProfileAvailable}>
+                    domain {domainProfileAvailable ? '' : '(not available)'}
+                </MenuItem>
             </Select>
 
             {pref.storageProvider === 'domain' && (
