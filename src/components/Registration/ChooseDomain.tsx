@@ -58,7 +58,8 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
         const token = IssueJWT(props.identity.privateKey, { iss: props.identity.CCID, aud: fqdn }) ?? ''
         const link = `http://${fqdn}/web/register?token=${token}&callback=${encodeURIComponent(next)}`
 
-        window.location.href = link
+        // window.location.href = link // TODO: ドメイン側のアップデートが行われるまで新規タブで開く
+        window.open(link, '_blank')
     }
 
     return (
