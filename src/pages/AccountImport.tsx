@@ -45,6 +45,8 @@ export function AccountImport(): JSX.Element {
     const [privatekey, setPrivatekey] = useState<string>('')
     const [ccid, setCcid] = useState<string>('')
 
+    const [legacySearched, setLegacySearched] = useState<boolean>(false)
+
     useEffect(() => {
         if (!privatekey) return
         const key = LoadKey(privatekey)
@@ -68,6 +70,21 @@ export function AccountImport(): JSX.Element {
             })
             .catch((e) => {
                 console.log(e)
+
+                if (!legacySearched) {
+                    // try legacy
+                    console.log('try legacy')
+
+                    const normalized = secret.trim().normalize('NFKD')
+                    console.log(normalized)
+                    const wallet = HDNodeWallet.fromPhrase(normalized, undefined, undefined, LangJa.wordlist())
+                    setMnemonic(normalized)
+                    setPrivatekey(wallet.privateKey.slice(2))
+
+                    setLegacySearched(true)
+                    return
+                }
+
                 setErrorMessage('お住まいのサーバーが見つかりませんでした。手動入力することで継続できます。')
                 setSuggestFailed(true)
             })
@@ -87,7 +104,7 @@ export function AccountImport(): JSX.Element {
             return
         }
 
-        const normalized = secret.trim().normalize().replaceAll('　', ' ')
+        const normalized = secret.trim().normalize('NFKD')
         const split = normalized.split(' ')
         console.log(split)
         if (split.length !== 12) return
