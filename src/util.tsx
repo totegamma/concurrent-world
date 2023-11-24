@@ -23,7 +23,7 @@ export const generateIdentity = (): Identity => {
     const publicKey = wallet.publicKey.slice(2)
 
     return {
-        mnemonic_ja: mnemonicJa.phrase,
+        mnemonic_ja: mnemonicJa.phrase.normalize().replaceAll('　', ' '),
         mnemonic_en: mnemonicEn.phrase,
         privateKey,
         publicKey,
