@@ -1,0 +1,86 @@
+{
+  "test": "Test",
+  "common": {
+    "home": "홈",
+    "notifications": "알림",
+    "associations": "Associations",
+    "contacts": "연락하기",
+    "explore": "탐험하기",
+    "devtool": "개발자 도구",
+    "settings": "설정"
+  },
+  "settings": {
+    "general": {
+      "basic": "Basic",
+      "showEditorOnTop": "타임라인 상단에 글 작성란을 표시",
+      "showEditorOnTopMobile": "타임라인 상단에 글 작성란을 표시(모바일)",
+      "developerMode": "개발자 모드",
+      "generateInviteCode": "초대코드 생성하기",
+      "inviteCode": "초대코드 (24시간 동안만 유효함)",
+      "copyInviteCode": "초대코드 복사",
+      "copied": "복사됨",
+      "language": "언어"
+    },
+    "profileEditor": {
+      "update": "업데이트",
+      "updateSuccess": "업데이트 완료",
+      "updateFailed": "업데이트 실패",
+      "createNew": "새로 만들기"
+    },
+    "profile": {
+      "title": "프로필",
+      "update": "업데이트",
+      "updated": "업데이트됨"
+    },
+    "sound": {
+      "sound": "소리",
+      "volume": "볼륨",
+      "override": {
+        "title": "Override",
+        "postSound": "게시음",
+        "notificationSound": "알림음"
+      }
+    },
+    "emoji": {
+      "emojiPackage": "이모지 팩",
+      "emojiPackageURL": "이모지 팩 URL",
+      "packageNotFound": "팩이 없습니다.",
+      "copied": "복사됨",
+      "alreadyAdded": "이모지팩이 이미 추가되었습니다."
+    },
+    "media": {
+      "storageProviderLabel": "사용량",
+      "corsSettings": "CORS 설정",
+      "imagePostSettings": "이미지 업로드 설정",
+      "afterRegisteringImgur": "Imgur 등록 후, 이동하는 곳: ",
+      "thisPage": "이 페이지",
+      "oauth2": "옵션과 함께 앱 생성하기 \"callback URL 없이 OAuth 2 authorization\""
+    },
+    "ap": {
+      "setup": "액티비티펍 아이디 설정.",
+      "cantBeChangedOnceRegistered": "**한번 등록되면 변경 불가능합니다.",
+      "confirming": "승인 중...",
+      "register": "가입 완료",
+      "helperText": "숫자, 알파벳(소문자, 대문자)를 사용할 수 있습니다: a-z, A-Z, 0-9",
+      "alreadyRegistered": "이미 존재하는 유저입니다.",
+      "tryAnotherID": "다른 ID로 등록하세요."
+    }
+  },
+  "draft": {
+    "placeholder": "오늘 무슨 일 있니??",
+    "attachImage": "이미지 붙여넣기",
+    "cantAttachImage": "살정에서 Imgur 클라이언트 ID를 완료하세요.",
+    "preview": "프리뷰",
+    "openPreview": "프리뷰 열기",
+    "closePreview": "프리뷰 닫기",
+    "emoji": "이모지들",
+    "clearDraft": "Clear draft",
+    "postToHome": "홈에도 올리기",
+    "noPostToHome": "홈에는 올리지 않기"
+  },
+  "time": {
+    "secondsBefore": "초",
+    "minutesBefore": "분",
+    "hoursBefore": "시"
+  }
+}
