@@ -30,7 +30,8 @@ import { Link, useLocation } from 'react-router-dom'
 
 export function Registration(): JSX.Element {
     const location = useLocation()
-    const { i18n } = useTranslation('', { keyPrefix: 'registration' })
+
+    const { t, i18n } = useTranslation('', { keyPrefix: 'registration' })
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue')
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
     const [domain, setDomain] = usePersistent<string>('Domain', 'hub.concurrent.world')
@@ -124,7 +125,7 @@ export function Registration(): JSX.Element {
 
     const steps = [
         {
-            title: 'Concurrentアカウントを作成しましょう！',
+            title: t('welcome.title'),
             component: (
                 <RegistrationWelcome
                     identity={identity}
@@ -135,7 +136,7 @@ export function Registration(): JSX.Element {
             )
         },
         {
-            title: 'あなたのID',
+            title: t('yourID.title'),
             component: (
                 <YourID
                     identity={identity}
@@ -146,7 +147,7 @@ export function Registration(): JSX.Element {
             )
         },
         {
-            title: 'シークレットコード',
+            title: t('saveSecret.title'),
             component: (
                 <SaveSecretCode
                     identity={identity}
@@ -159,7 +160,7 @@ export function Registration(): JSX.Element {
             )
         },
         {
-            title: 'シークレットコードの確認',
+            title: t('verifyCode.title'),
             component: (
                 <VerifyCode
                     identity={identity}
@@ -170,7 +171,7 @@ export function Registration(): JSX.Element {
             )
         },
         {
-            title: 'ドメインの選択',
+            title: t('chooseDomain.title'),
             component: (
                 <ChooseDomain
                     identity={identity}
@@ -184,7 +185,7 @@ export function Registration(): JSX.Element {
             )
         },
         {
-            title: 'プロフィールの作成',
+            title: t('createProfile.title'),
             component: (
                 <CreateProfile
                     next={() => {
@@ -196,7 +197,7 @@ export function Registration(): JSX.Element {
             )
         },
         {
-            title: '準備完了!',
+            title: t('ready.title'),
             component: (
                 <RegistrationReady
                     identity={identity}
@@ -337,9 +338,9 @@ export function Registration(): JSX.Element {
                                 alignItems: 'center'
                             }}
                         >
-                            <Typography color="background.contrastText">もうアカウントを持っている？</Typography>
+                            <Typography color="background.contrastText">{t('alreadyHaveAccount')}</Typography>
                             <Button variant="contained" component={Link} to="/import">
-                                アカウントのインポート
+                                {t('importAccount')}
                             </Button>
                         </Box>
                     )}

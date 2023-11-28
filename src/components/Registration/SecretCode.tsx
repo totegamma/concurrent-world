@@ -1,6 +1,7 @@
 import { Box, Button, ButtonGroup, Typography } from '@mui/material'
 import { type Identity } from '../../util'
 import { SecretCode } from '../ui/SecretCode'
+import { useTranslation } from 'react-i18next'
 
 export function SaveSecretCode(props: {
     next: () => void
@@ -9,6 +10,8 @@ export function SaveSecretCode(props: {
     setMnemonicLanguage: (value: 'ja' | 'en') => void
 }): JSX.Element {
     const mnemonic = props.mnemonicLanguage === 'ja' ? props.identity.mnemonic_ja : props.identity.mnemonic_en
+
+    const { t } = useTranslation('', { keyPrefix: 'registration.saveSecret' })
 
     return (
         <Box
@@ -27,7 +30,7 @@ export function SaveSecretCode(props: {
                             props.setMnemonicLanguage('ja')
                         }}
                     >
-                        ja
+                        あ
                     </Button>
                     <Button
                         variant={props.mnemonicLanguage === 'en' ? 'contained' : 'outlined'}
@@ -35,30 +38,22 @@ export function SaveSecretCode(props: {
                             props.setMnemonicLanguage('en')
                         }}
                     >
-                        en
+                        A
                     </Button>
                 </ButtonGroup>
             </Box>
             <SecretCode mnemonic={mnemonic} />
-            <Typography>
-                シークレットコードは、あなたが再ログインしたいとき、別の端末からログインしたいときに必要な呪文です。
-            </Typography>
-            <Typography>
-                <b>絶対に紛失しないように</b>そして、
-                <b>絶対に誰にも知られないように</b>してください。
-            </Typography>
-            <Typography>
-                紛失すると、二度とあなたのアカウントにアクセスできなくなります。
-                また、他人に知られると、あなたのアカウントがハッカーとの共有アカウントになってしまいます。
-            </Typography>
-            <Typography>メモを取りましたか？</Typography>
+            <Typography>{t('desc1')}</Typography>
+            <Typography>{t('desc2')}</Typography>
+            <Typography>{t('desc3')}</Typography>
+            <Typography>{t('didyousave')}</Typography>
             <Button
                 variant="contained"
                 onClick={(): void => {
                     props.next()
                 }}
             >
-                Next: シークレットコードの確認
+                {t('next')}
             </Button>
         </Box>
     )

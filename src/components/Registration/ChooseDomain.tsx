@@ -18,6 +18,7 @@ import {
 import { useEffect, useState } from 'react'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import { type Identity } from '../../util'
+import { useTranslation } from 'react-i18next'
 
 interface ChooseDomainProps {
     next: () => void
@@ -28,6 +29,7 @@ interface ChooseDomainProps {
 }
 
 export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
+    const { t } = useTranslation('', { keyPrefix: 'registration.chooseDomain' })
     const [server, setServer] = useState<string>('')
     const [jumped, setJumped] = useState<boolean>(false)
 
@@ -72,18 +74,17 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
             }}
         >
             <Typography>
-                あなたのメッセージを保存・配信してくれるドメインを探しましょう。
+                {t('desc1')}
                 <br />
-                どのドメインを選択しても、だれとでもつながる事ができます。
+                {t('desc2')}
                 <br />
-                また、(鯖管が頑張れば)いつでも別のドメインに移行する事ができます。
+                {t('desc3')}
             </Typography>
             <Alert severity="info">
-                <AlertTitle>ここで一度concurrent.worldからドメイン管轄サイトへ移動します</AlertTitle>
-                ドメインでのアカウント作成後、またこのページに戻ってくる必要があります。このタブを閉じないでください。
+                <AlertTitle>{t('notice')}</AlertTitle>
             </Alert>
             <Box width="100%" display="flex" flexDirection="column">
-                <Typography variant="h3">リストから選択</Typography>
+                <Typography variant="h3">{t('chooseFromList')}</Typography>
                 <List>
                     <ListItemButton
                         onClick={() => {
@@ -101,8 +102,8 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
                         </ListItemIcon>
                     </ListItemButton>
                 </List>
-                <Divider>または</Divider>
-                <Typography variant="h3">URLから直接入力</Typography>
+                <Divider>{t('or')}</Divider>
+                <Typography variant="h3">{t('directInput')}</Typography>
                 <Typography
                     color="text.primary"
                     component={Link}
@@ -110,7 +111,7 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
                     href="https://github.com/totegamma/concurrent"
                     target="_blank"
                 >
-                    Tips: 自分でサーバーを建てる場合はこちら
+                    {t('tips')}
                 </Typography>
                 <Box flex="1" />
                 <Box sx={{ display: 'flex', gap: '10px' }}>
@@ -132,7 +133,7 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
                             jumpToDomain(server)
                         }}
                     >
-                        登録ページへ
+                        {t('jump')}
                     </Button>
                 </Box>
             </Box>
@@ -147,15 +148,15 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
                             if (e?.ccid != null) {
                                 props.next()
                             } else {
-                                alert('ドメインでの登録が確認できません。ジャンプ先のドメインで登録を行ってください。')
+                                alert(t('notRegistered'))
                             }
                         })
                         .catch(() => {
-                            alert('ドメインでの登録が確認できません。ジャンプ先のドメインで登録を行ってください。')
+                            alert(t('notRegistered'))
                         })
                 }}
             >
-                {jumped ? 'Next: プロフィールの作成' : 'ドメインでの登録が完了したら次に進めます'}
+                {jumped ? t('next') : t('nextDisabled')}
             </Button>
         </Box>
     )
