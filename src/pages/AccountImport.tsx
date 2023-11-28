@@ -19,8 +19,11 @@ import { IsValid256k1PrivateKey } from '@concurrent-world/client'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import { useTranslation } from 'react-i18next'
 
 export function AccountImport(): JSX.Element {
+    const { t } = useTranslation('', { keyPrefix: 'import' })
+
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue2')
     const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
 
@@ -54,7 +57,7 @@ export function AccountImport(): JSX.Element {
         const ccid = CommputeCCID(key.publickey)
         setCcid(ccid)
 
-        setErrorMessage('検索中...')
+        setErrorMessage(t('searching'))
         const hubClient = new Client(privatekey, 'hub.concurrent.world', 'stab-client')
         hubClient.api
             .readEntity(ccid)
@@ -64,7 +67,7 @@ export function AccountImport(): JSX.Element {
                     setServer(entity.domain || 'hub.concurrent.world')
                     setEntityFound(true)
                 } else {
-                    setErrorMessage('お住まいのサーバーが見つかりませんでした。手動入力することで継続できます。')
+                    setErrorMessage(t('notFound'))
                     setSuggestFailed(true)
                 }
             })
@@ -85,7 +88,7 @@ export function AccountImport(): JSX.Element {
                     return
                 }
 
-                setErrorMessage('お住まいのサーバーが見つかりませんでした。手動入力することで継続できます。')
+                setErrorMessage(t('notFound'))
                 setSuggestFailed(true)
             })
     }, [privatekey])
@@ -132,7 +135,7 @@ export function AccountImport(): JSX.Element {
             console.log(e)
         }
 
-        setErrorMessage('シークレットコードが正しくありません。')
+        setErrorMessage(t('invalidSecret'))
     }, [secret])
 
     useEffect(() => {
@@ -151,7 +154,7 @@ export function AccountImport(): JSX.Element {
                             if (unmounted) return
                             console.log(entity)
                             if (!entity || entity.ccid !== client.ccid) {
-                                setErrorMessage('指定のサーバーにあなたのアカウントは見つかりませんでした。')
+                                setErrorMessage(t('notFoundOnServer'))
                                 return
                             }
                             setErrorMessage('')
@@ -160,13 +163,13 @@ export function AccountImport(): JSX.Element {
                         })
                         .catch((_) => {
                             if (unmounted) return
-                            setErrorMessage('指定のサーバーにあなたのアカウントは見つかりませんでした。')
+                            setErrorMessage(t('notFoundOnServer'))
                         })
                     console.log(fqdn)
                 })
                 .catch((_) => {
                     if (unmounted) return
-                    setErrorMessage('指定のサーバーに接続できませんでした。')
+                    setErrorMessage(t('connectError'))
                 })
         } catch (e) {
             console.log(e)
@@ -232,10 +235,10 @@ export function AccountImport(): JSX.Element {
                         gap: '20px'
                     }}
                 >
-                    <Typography variant="h3">シークレットコードまたは秘密鍵を入力</Typography>
+                    <Typography variant="h3">{t('input')}</Typography>
                     <TextField
                         type={showSecret ? 'text' : 'password'}
-                        placeholder="12個の単語からなる呪文"
+                        placeholder={t('secretPlaceholder')}
                         value={secret}
                         onChange={(e) => {
                             setSecret(e.target.value)
@@ -262,11 +265,15 @@ export function AccountImport(): JSX.Element {
                             )
                         }}
                     />
-                    {ccid && <Typography sx={{ wordBreak: 'break-all' }}>ようこそ: {ccid}</Typography>}
+                    {ccid && (
+                        <Typography sx={{ wordBreak: 'break-all' }}>
+                            {t('welcome')}: {ccid}
+                        </Typography>
+                    )}
                     {suggestFailed && (
                         <>
                             <Divider sx={{ my: '30px' }} />
-                            <Typography variant="h3">ドメイン</Typography>
+                            <Typography variant="h3">{t('ドメイン')}</Typography>
                             <TextField
                                 placeholder="https://example.tld/"
                                 value={server}
@@ -278,7 +285,7 @@ export function AccountImport(): JSX.Element {
                     )}
                     {errorMessage}
                     <Button disabled={!entityFound} variant="contained" onClick={accountImport}>
-                        インポート
+                        {t('import')}
                     </Button>
                 </Paper>
                 <Box
@@ -290,9 +297,9 @@ export function AccountImport(): JSX.Element {
                         alignItems: 'center'
                     }}
                 >
-                    <Typography color="background.contrastText">まだアカウントを作ってない？</Typography>
+                    <Typography color="background.contrastText">{t('noAccount')}</Typography>
                     <Button variant="contained" component={Link} to="/register">
-                        アカウントを作成
+                        {t('createAccount')}
                     </Button>
                 </Box>
             </Box>

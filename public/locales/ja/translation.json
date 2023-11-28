@@ -172,5 +172,19 @@
       },
       "alreadyHaveAccount": "すでにアカウントをお持ちですか？",
       "importAccount": "アカウントのインポート"
+  },
+  "import": {
+      "searching": "検索中…",
+      "notFound": "お住まいのサーバーが見つかりませんでした。手動入力することで継続できます。",
+      "invalidSecret": "シークレットコードが正しくありません。",
+      "notFoundOnServer": "指定のサーバーにあなたのアカウントは見つかりませんでした。",
+      "connectionError": "指定のサーバーに接続できませんでした。",
+      "input": "シークレットコードまたは秘密鍵を入力",
+      "secretPlaceholder": "12個の単語からなる呪文",
+      "welcome": "ようこそ",
+      "domain": "ドメイン",
+      "import": "インポート",
+      "noAccount": "まだアカウントを作ってない？",
+      "createAccount": "アカウントを作成"
   }
 }
