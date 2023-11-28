@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box'
 import { Themes, createConcurrentTheme } from '../themes'
-import { Button, CssBaseline, IconButton, Link, ThemeProvider, Typography } from '@mui/material'
+import { Button, CssBaseline, IconButton, ThemeProvider, Typography } from '@mui/material'
 import { useState } from 'react'
 import { usePersistent } from '../hooks/usePersistent'
 import type { ConcurrentTheme } from '../model'
@@ -171,7 +171,7 @@ export default function Welcome(): JSX.Element {
 
                 <Box display="flex" flexDirection="column" alignItems="center">
                     <Typography gutterBottom variant="h1">
-                        {t('getStarted')}
+                        {t('gettingStarted')}
                     </Typography>
                     <Button
                         variant="contained"

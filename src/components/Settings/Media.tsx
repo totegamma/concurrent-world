@@ -123,9 +123,7 @@ export const MediaSettings = (): JSX.Element => {
                 <>
                     <Alert severity="info">
                         <AlertTitle>Domain Storage</AlertTitle>
-                        Domain Storageはこのドメインが提供するストレージです。
-                        設定なしに利用できますが、最大容量が設定されています。
-                        また、ファイルのリストは管理者によって閲覧される可能性があり、規約に違反するファイルは削除される可能性があります。
+                        {t('descs.domain')}
                     </Alert>
                     <ImageList cols={3} gap={8}>
                         {myFiles.map((file) => (
@@ -165,7 +163,7 @@ export const MediaSettings = (): JSX.Element => {
                             <ListItemIcon>
                                 <DeleteForeverIcon />
                             </ListItemIcon>
-                            <ListItemText>完全に削除</ListItemText>
+                            <ListItemText>{t('deleteCompletely')}</ListItemText>
                         </MenuItem>
                     </Menu>
                 </>
@@ -175,8 +173,7 @@ export const MediaSettings = (): JSX.Element => {
                 <>
                     <Alert severity="info">
                         <AlertTitle>Imgur</AlertTitle>
-                        画像のアップロードにImgurを利用します。
-                        比較的簡単にセットアップできます。アップロード可能な内容はImgurの規約に従います。
+                        {t('descs.imgur')}
                     </Alert>
 
                     <Paper sx={{ padding: '1em', display: 'flex', flexDirection: 'column', gap: '1em' }}>
@@ -205,9 +202,7 @@ export const MediaSettings = (): JSX.Element => {
                 <>
                     <Alert severity="info">
                         <AlertTitle>S3</AlertTitle>
-                        画像のアップロードにS3を利用します。CloudFlare R2などのS3互換サービスも利用できます。
-                        設定に手間がかかりますが、ファイルを自身の管理下に置くことができます。
-                        サービスによって料金が発生しますが、たいていの場合無料枠に収まります。
+                        {t('descs.s3')}
                     </Alert>
 
                     <Paper sx={{ padding: '1em', display: 'flex', flexDirection: 'column', gap: '1em' }}>

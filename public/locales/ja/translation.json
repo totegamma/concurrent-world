@@ -1,190 +1,252 @@
 {
-  "test": "テスト",
-  "common": {
-    "home": "ホーム",
-    "notifications": "通知",
-    "associations": "リアクション",
-    "contacts": "連絡先",
-    "explore": "探索",
-    "devtool": "開発者ツール",
-    "settings": "設定"
-  },
-  "settings": {
-    "general": {
-      "basic": "基本",
-      "showEditorOnTop": "投稿エディタを上部に表示",
-      "showEditorOnTopMobile": "投稿エディタを上部に表示（モバイル）",
-      "developerMode": "開発者モード",
-      "generateInviteCode": "招待コードを生成",
-      "inviteCode": "招待コード(24時間有効)",
-      "copyInviteCode": "招待コードをコピー",
-      "copied": "コピーしました",
-      "language": "言語"
+    "test": "テスト",
+    "pages": {
+        "home": {
+            "title": "ホーム"
+        },
+        "notifications": {
+            "title": "通知"
+        },
+        "associations": {
+            "title": "リアクション"
+        },
+        "contacts": {
+            "title": "連絡先"
+        },
+        "explore": {
+            "title": "探索",
+            "domains": "ドメイン",
+            "streams": "ストリーム",
+            "createNew": "新しく作る",
+            "createNewStream": {
+                "title": "ストリーム新規作成",
+                "desc1": "あなたの管轄ドメイン",
+                "desc2": "に新しいストリームを作成します。"
+            }
+        },
+        "devtool": {
+            "title": "開発者ツール"
+        },
+        "settings": {
+            "title": "設定",
+            "actions": {
+                "title": "アクション",
+                "clearCache": "キャッシュをクリア",
+                "forceReload": "強制再読み込み",
+                "logout": "ログアウト",
+                "areYouSure": "本当にログアウトしますか？",
+                "logoutWarn": "シークレットコードのバックアップがないと、アカウントを復元できません。"
+            }
+        },
+        "lists": {
+            "title": "リスト"
+        }
     },
-    "profileEditor": {
-      "update": "更新",
-      "updateSuccess": "更新成功",
-      "updateFailed": "更新失敗",
-      "createNew": "新規作成"
+    "time": {
+        "secondsBefore": "秒前",
+        "minutesBefore": "分前",
+        "hoursBefore": "時間前"
     },
-    "profile": {
-      "title": "プロフィール",
-      "update": "更新",
-      "updated": "更新しました"
+    "ui": {
+        "profileEditor": {
+            "update": "更新",
+            "updateSuccess": "更新成功",
+            "updateFailed": "更新失敗",
+            "createNew": "新規作成"
+        },
+        "draft": {
+            "placeholder": "今、なにしてる？",
+            "attachImage": "画像の添付",
+            "cantAttachImage": "設定から画像投稿設定をしてください",
+            "preview": "プレビュー",
+            "openPreview": "プレビューを開く",
+            "closePreview": "プレビューを閉じる",
+            "emoji": "絵文字",
+            "clearDraft": "下書きを削除",
+            "postToHome": "ホーム同時投稿モード",
+            "noPostToHome": "ストリーム限定投稿モード",
+            "current": "カレント"
+        },
+        "secret": {
+            "clickToReveal": "クリックして表示",
+            "warn": "背後に人がないか、画面を配信していないか確認してください。",
+            "copy": "シークレットコードをコピー"
+        },
+        "listSettings": {
+            "title": "リスト設定",
+            "name": "リスト名",
+            "update": "更新",
+            "defaultDest": "デフォルト投稿先",
+            "update": "更新",
+            "stream": "ストリーム",
+            "user": "ユーザー",
+            "pin": "ピン留め",
+            "delete": "リストを削除"
+        }
     },
-    "sound": {
-      "sound": "サウンド",
-      "volume": "音量",
-      "override": {
-        "title": "Override",
-        "postSound": "投稿音",
-        "notificationSound": "通知音"
-      }
+    "settings": {
+        "title": "設定",
+        "general": {
+            "title": "一般",
+            "basic": "基本",
+            "showEditorOnTop": "投稿エディタを上部に表示",
+            "showEditorOnTopMobile": "投稿エディタを上部に表示（モバイル）",
+            "developerMode": "開発者モード",
+            "generateInviteCode": "招待コードを生成",
+            "inviteCode": "招待コード(24時間有効)",
+            "copyInviteCode": "招待コードをコピー",
+            "copied": "コピーしました",
+            "language": "言語"
+        },
+        "profile": {
+            "title": "プロフィール",
+            "update": "更新",
+            "updated": "更新しました"
+        },
+        "theme": {
+            "title": "テーマ"
+        },
+        "sound": {
+            "title": "サウンド",
+            "sound": "サウンド",
+            "volume": "音量",
+            "override": {
+                "title": "Override",
+                "postSound": "投稿音",
+                "notificationSound": "通知音"
+            }
+        },
+        "emoji": {
+            "title": "絵文字",
+            "emojiPackage": "絵文字パッケージ",
+            "emojiPackageURL": "絵文字パッケージURL",
+            "packageNotFound": "パッケージが見つかりませんでした",
+            "copied": "コピーしました",
+            "alreadyAdded": "すでに追加されています"
+        },
+        "media": {
+            "title": "メディア",
+            "storageProviderLabel": "使用するストレージプロバイダ",
+            "corsSettings": "CORS設定",
+            "imagePostSettings": "画像投稿設定",
+            "afterRegisteringImgur": "Imgurに登録した後、",
+            "thisPage": "このページ",
+            "deleteCompletely": "完全に削除",
+            "copyURL": "URLをコピー",
+            "copyID": "IDをコピー",
+            "oauth2": "でアプリケーションを\"OAuth 2 authorization without a callback URL\"で作成してください。",
+            "descs": {
+                "domain": "Domain Storageはこのドメインが提供するストレージです。設定なしに利用できますが、最大容量が設定されています。また、ファイルのリストは管理者によって閲覧される可能性があり、規約に違反するファイルは削除される可能性があります。",
+                "imgur": "画像のアップロードにImgurを利用します。比較的簡単にセットアップできます。アップロード可能な内容はImgurの規約に従います。",
+                "s3": "画像のアップロードにS3を利用します。CloudFlare R2などのS3互換サービスも利用できます。設定に手間がかかりますが、ファイルを自身の管理下に置くことができます。サービスによって料金が発生しますが、たいていの場合無料枠に収まります。"
+            }
+        },
+        "ap": {
+            "title": "ActivityPub",
+            "setup": "ActivityPubにおけるIDを設定します。",
+            "cantBeChangedOnceRegistered": "一度登録すると変更できません",
+            "confirming": "確認中…",
+            "register": "登録",
+            "helperText": "a-z, A-Z, 0-9, _が使用できます",
+            "alreadyRegistered": "このユーザーは既に登録されています。",
+            "tryAnotherID": "他のIDを試してください"
+        }
     },
-    "emoji": {
-      "emojiPackage": "絵文字パッケージ",
-      "emojiPackageURL": "絵文字パッケージURL",
-      "packageNotFound": "パッケージが見つかりませんでした",
-      "copied": "コピーしました",
-      "alreadyAdded": "すでに追加されています"
+    "welcome": {
+        "tagline1": "世界は1つ。",
+        "tagline2": "環境は無数。",
+        "description": "Concurrentは1つのアカウントで無数のサーバーとつながれる、新しい分散型SNSです。",
+        "createAccount": "アカウントを作成",
+        "import": "インポート",
+        "gettingStarted": "さあ、始めよう",
+        "feature1": {
+            "title": "もうサーバーごとにアカウントを作る必要はありません",
+            "description": "従来の分散型SNSは、サーバーごとにアカウントを作る必要がありました。Concurrentは秘密鍵を使って、1つのアカウントで無数のサーバーに対して自己を証明できます。"
+        },
+        "feature2": {
+            "title": "話題ごとのタイムライン",
+            "description": "Concurrentは「ストリーム」と呼ばれる、コミュニティタイムラインを自由に作成できます。従来SNSの、「このアカウントのフォロワーにこういう話をするのはちょっと・・・」という気持ちから複数アカウントを切り替える煩雑さからオサラバ。好きな話題を、ふわさしいストリームで興味のある人同士で集まって盛り上がりましょう。"
+        },
+        "wip": {
+            "title": "Concurrentは現在開発中のソフトウェアです。",
+            "description": "絶賛機能追加途中で現在はまだたくさんの機能は使えません。観光程度に遊んでもらえると嬉しいです！",
+            "contribute": "バグを見つけたり、いいアイディアを思いついたらGithubからIssueを建てて今すぐ開発に参加しよう！",
+            "milestones": {
+                "title": "開発予定の機能",
+                "item1": "- プライベートタイムライン",
+                "item2": "- メディア専用投稿・ユーザーのメディア一覧",
+                "item3": "- ミュートなどの各種フィルタリング",
+                "item4": "- 他のユーザーのアクティビティのタイムライン",
+                "item5": "- etc..."
+            }
+        }
     },
-    "media": {
-      "storageProviderLabel": "使用するストレージプロバイダ",
-      "corsSettings": "CORS設定",
-      "imagePostSettings": "画像投稿設定",
-      "afterRegisteringImgur": "Imgurに登録した後、",
-      "thisPage": "このページ",
-      "oauth2": "でアプリケーションを\"OAuth 2 authorization without a callback URL\"で作成してください。"
+    "registration": {
+        "welcome": {
+            "title": "Concurrentアカウントを作成しましょう！",
+            "noticeTitle": "Concurrentは現在開発中のソフトウェアです。",
+            "notice": "絶賛機能追加途中で説明も少ないです。観光程度に遊んでもらえると嬉しいです！",
+            "next": "IDカードを作成する"
+        },
+        "yourID": {
+            "title": "あなたのID",
+            "desc1": "これは、Concurrentの世界であなたを特定する文字列です。",
+            "desc2": "どのサーバーからもあなたを等しく識別できるよう、ランダムな文字列になっています。",
+            "desc3": "次に、あなたがこのIDの持ち主であることを証明するためのシークレットコードを作成します。",
+            "next": "Next: IDのシークレットコードの作成"
+        },
+        "saveSecret": {
+            "title": "シークレットコード",
+            "desc1": "シークレットコードは、あなたが再ログインしたいとき、別の端末からログインしたいときに必要な呪文です。",
+            "desc2": "<絶対に紛失しないようにそして、絶対に誰にも知られないようにしてください。",
+            "desc3": "紛失すると、二度とあなたのアカウントにアクセスできなくなります。また、他人に知られると、あなたのアカウントがハッカーとの共有アカウントになってしまいます。",
+            "didyousave": "メモを取りましたか？",
+            "next": "Next: シークレットコードの確認"
+        },
+        "verifyCode": {
+            "title": "シークレットコードの確認",
+            "match": "OK!",
+            "notMatch": "シークレットコードが一致しません",
+            "next": "Next: ドメインの選択"
+        },
+        "chooseDomain": {
+            "title": "ドメインの選択",
+            "desc1": "あなたのメッセージを保存・配信してくれるドメインを探しましょう。",
+            "desc2": "どのドメインを選択しても、だれとでもつながる事ができます。",
+            "desc3": "また、(鯖管が頑張れば)いつでも別のドメインに移行する事ができます。",
+            "notice": "ここで一度concurrent.worldからドメイン管轄サイトへ移動します",
+            "chooseFromList": "一覧から選択",
+            "or": "または",
+            "directInput": "URLを直接入力",
+            "tips": "Tips: 自分でサーバーを建てる場合はこちら",
+            "jump": "登録ページへ",
+            "notRegistered": "ドメインでの登録が確認できません。ジャンプ先のドメインで登録を行ってください。",
+            "nextDisabled": "ドメインでの登録が完了したら次に進めます",
+            "next": "Next: プロフィールの作成"
+        },
+        "createProfile": {
+            "title": "プロフィールの作成",
+            "desc": "ここで名前・アイコン・自己紹介を設定します。"
+        },
+        "ready": {
+            "title": "準備完了！",
+            "next": "はじめる"
+        },
+        "alreadyHaveAccount": "すでにアカウントをお持ちですか？",
+        "importAccount": "アカウントのインポート"
     },
-    "ap": {
-      "setup": "ActivityPubにおけるIDを設定します。",
-      "cantBeChangedOnceRegistered": "一度登録すると変更できません",
-      "confirming": "確認中…",
-      "register": "登録",
-      "helperText": "a-z, A-Z, 0-9, _が使用できます",
-      "alreadyRegistered": "このユーザーは既に登録されています。",
-      "tryAnotherID": "他のIDを試してください"
+    "import": {
+        "searching": "検索中…",
+        "notFound": "お住まいのサーバーが見つかりませんでした。手動入力することで継続できます。",
+        "invalidSecret": "シークレットコードが正しくありません。",
+        "notFoundOnServer": "指定のサーバーにあなたのアカウントは見つかりませんでした。",
+        "connectionError": "指定のサーバーに接続できませんでした。",
+        "input": "シークレットコードまたは秘密鍵を入力",
+        "secretPlaceholder": "12個の単語からなる呪文",
+        "welcome": "ようこそ",
+        "domain": "ドメイン",
+        "import": "インポート",
+        "noAccount": "まだアカウントを作ってない？",
+        "createAccount": "アカウントを作成"
     }
-  },
-  "draft": {
-    "placeholder": "今、なにしてる？",
-    "attachImage": "画像の添付",
-    "cantAttachImage": "設定から画像投稿設定をしてください",
-    "preview": "プレビュー",
-    "openPreview": "プレビューを開く",
-    "closePreview": "プレビューを閉じる",
-    "emoji": "絵文字",
-    "clearDraft": "下書きを削除",
-    "postToHome": "ホーム同時投稿モード",
-    "noPostToHome": "ストリーム限定投稿モード"
-  },
-  "time": {
-    "secondsBefore": "秒前",
-    "minutesBefore": "分前",
-    "hoursBefore": "時間前"
-  },
-  "secret": {
-      "clickToReveal": "クリックして表示",
-      "warn": "背後に人がないか、画面を配信していないか確認してください。",
-      "copy": "シークレットコードをコピー"
-  },
-  "welcome": {
-      "tagline1": "世界は1つ。",
-      "tagline2": "環境は無数。",
-      "description": "Concurrentは1つのアカウントで無数のサーバーとつながれる、新しい分散型SNSです。",
-      "createAccount": "アカウントを作成",
-      "import": "インポート",
-      "gettingStarted": "さあ、始めよう",
-      "feature1": {
-          "title": "もうサーバーごとにアカウントを作る必要はありません",
-          "description": "従来の分散型SNSは、サーバーごとにアカウントを作る必要がありました。Concurrentは秘密鍵を使って、1つのアカウントで無数のサーバーに対して自己を証明できます。"
-      },
-      "feature2": {
-          "title": "話題ごとのタイムライン",
-          "description": "Concurrentは「ストリーム」と呼ばれる、コミュニティタイムラインを自由に作成できます。従来SNSの、「このアカウントのフォロワーにこういう話をするのはちょっと・・・」という気持ちから複数アカウントを切り替える煩雑さからオサラバ。好きな話題を、ふわさしいストリームで興味のある人同士で集まって盛り上がりましょう。"
-      },
-      "wip": {
-          "title": "Concurrentは現在開発中のソフトウェアです。",
-          "description": "絶賛機能追加途中で現在はまだたくさんの機能は使えません。観光程度に遊んでもらえると嬉しいです！",
-          "contribute": "バグを見つけたり、いいアイディアを思いついたらGithubからIssueを建てて今すぐ開発に参加しよう！",
-          "milestones": {
-              "title": "開発予定の機能",
-              "item1": "- プライベートタイムライン",
-              "item2": "- メディア専用投稿・ユーザーのメディア一覧",
-              "item3": "- ミュートなどの各種フィルタリング",
-              "item4": "- 他のユーザーのアクティビティのタイムライン",
-              "item5": "- etc..."
-          }
-
-      }
-  },
-  "registration": {
-      "welcome": {
-          "title": "Concurrentアカウントを作成しましょう！",
-          "noticeTitle": "Concurrentは現在開発中のソフトウェアです。",
-          "notice": "絶賛機能追加途中で説明も少ないです。観光程度に遊んでもらえると嬉しいです！",
-          "next": "IDカードを作成する"
-      },
-      "yourID": {
-          "title": "あなたのID",
-          "desc1": "これは、Concurrentの世界であなたを特定する文字列です。",
-          "desc2": "どのサーバーからもあなたを等しく識別できるよう、ランダムな文字列になっています。",
-          "desc3": "次に、あなたがこのIDの持ち主であることを証明するためのシークレットコードを作成します。",
-          "next": "Next: IDのシークレットコードの作成"
-      },
-      "saveSecret": {
-          "title": "シークレットコード",
-          "desc1": "シークレットコードは、あなたが再ログインしたいとき、別の端末からログインしたいときに必要な呪文です。",
-          "desc2": "<絶対に紛失しないようにそして、絶対に誰にも知られないようにしてください。",
-          "desc3": "紛失すると、二度とあなたのアカウントにアクセスできなくなります。また、他人に知られると、あなたのアカウントがハッカーとの共有アカウントになってしまいます。",
-          "didyousave": "メモを取りましたか？",
-          "next": "Next: シークレットコードの確認"
-      },
-      "verifyCode": {
-          "title": "シークレットコードの確認",
-          "match": "OK!",
-          "notMatch": "シークレットコードが一致しません",
-          "next": "Next: ドメインの選択"
-      },
-      "chooseDomain": {
-          "title": "ドメインの選択",
-          "desc1": "あなたのメッセージを保存・配信してくれるドメインを探しましょう。",
-          "desc2": "どのドメインを選択しても、だれとでもつながる事ができます。",
-          "desc3": "また、(鯖管が頑張れば)いつでも別のドメインに移行する事ができます。",
-          "notice": "ここで一度concurrent.worldからドメイン管轄サイトへ移動します",
-          "chooseFromList": "一覧から選択",
-          "or": "または",
-          "directInput": "URLを直接入力",
-          "tips": "Tips: 自分でサーバーを建てる場合はこちら",
-          "jump": "登録ページへ",
-          "notRegistered": "ドメインでの登録が確認できません。ジャンプ先のドメインで登録を行ってください。",
-          "nextDisabled": "ドメインでの登録が完了したら次に進めます",
-          "next": "Next: プロフィールの作成"
-
-      },
-      "createProfile": {
-          "title": "プロフィールの作成",
-          "desc": "ここで名前・アイコン・自己紹介を設定します。"
-      },
-      "ready": {
-          "title": "準備完了！",
-          "next": "はじめる"
-      },
-      "alreadyHaveAccount": "すでにアカウントをお持ちですか？",
-      "importAccount": "アカウントのインポート"
-  },
-  "import": {
-      "searching": "検索中…",
-      "notFound": "お住まいのサーバーが見つかりませんでした。手動入力することで継続できます。",
-      "invalidSecret": "シークレットコードが正しくありません。",
-      "notFoundOnServer": "指定のサーバーにあなたのアカウントは見つかりませんでした。",
-      "connectionError": "指定のサーバーに接続できませんでした。",
-      "input": "シークレットコードまたは秘密鍵を入力",
-      "secretPlaceholder": "12個の単語からなる呪文",
-      "welcome": "ようこそ",
-      "domain": "ドメイン",
-      "import": "インポート",
-      "noAccount": "まだアカウントを作ってない？",
-      "createAccount": "アカウントを作成"
-  }
 }

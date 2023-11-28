@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 export function SecretCode(props: { mnemonic: string }): JSX.Element {
-    const { t } = useTranslation('', { keyPrefix: 'secret' })
+    const { t } = useTranslation('', { keyPrefix: 'ui.secret' })
     const [reveal, setReveal] = useState(false)
     return (
         <Box>

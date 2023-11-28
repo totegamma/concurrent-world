@@ -2,10 +2,11 @@ import { Box, Button, IconButton, List, ListItem, Switch, Tab, Tabs, TextField, 
 import { StreamPicker } from './ui/StreamPicker'
 import { useEffect, useState } from 'react'
 import { usePreference } from '../context/PreferenceContext'
-import { CommonstreamSchema, type Stream } from '@concurrent-world/client'
+import { type CommonstreamSchema, type Stream } from '@concurrent-world/client'
 import { useApi } from '../context/api'
 import { StreamLink, UserStreamLink } from './StreamList/StreamLink'
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove'
+import { useTranslation } from 'react-i18next'
 
 export interface ListSettingsProps {
     id: string
@@ -16,10 +17,12 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
     const pref = usePreference()
     const [listName, setListName] = useState<string>('')
 
+    const { t } = useTranslation('', { keyPrefix: 'ui.listSettings' })
+
     const list = pref.lists[props.id]
 
-    const [options, setOptions] = useState<Stream<CommonstreamSchema>[]>([])
-    const [postStreams, setPostStreams] = useState<Stream<CommonstreamSchema>[]>([])
+    const [options, setOptions] = useState<Array<Stream<CommonstreamSchema>>>([])
+    const [postStreams, setPostStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
 
     const [tab, setTab] = useState<'stream' | 'user'>('stream')
 
@@ -34,11 +37,11 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
 
     useEffect(() => {
         Promise.all(list.streams.map((streamID) => client.getStream(streamID))).then((streams) => {
-            setOptions(streams.filter((e) => e !== null) as Stream<CommonstreamSchema>[])
+            setOptions(streams.filter((e) => e !== null) as Array<Stream<CommonstreamSchema>>)
         })
 
         Promise.all(list.defaultPostStreams.map((streamID) => client.getStream(streamID))).then((streams) => {
-            setPostStreams(streams.filter((stream) => stream !== null) as Stream<CommonstreamSchema>[])
+            setPostStreams(streams.filter((stream) => stream !== null) as Array<Stream<CommonstreamSchema>>)
         })
     }, [props.id])
 
@@ -51,8 +54,8 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                 p: 1
             }}
         >
-            <Typography variant="h2">リスト設定</Typography>
-            <Typography variant="h3">リスト名</Typography>
+            <Typography variant="h2">{t('title')}</Typography>
+            <Typography variant="h3">{t('name')}</Typography>
             <Box display="flex" flexDirection="row">
                 <TextField
                     label="list name"
@@ -74,10 +77,10 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                         })
                     }}
                 >
-                    Update
+                    {t('update')}
                 </Button>
             </Box>
-            <Typography variant="h3">デフォルト投稿先</Typography>
+            <Typography variant="h3">{t('defaultDest')}</Typography>
             <Box
                 sx={{
                     display: 'flex',
@@ -99,7 +102,7 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
             </Box>
             {props.id !== 'home' && (
                 <>
-                    <Typography variant="h3">リストのピン</Typography>
+                    <Typography variant="h3">{t('pin')}</Typography>
                     <Switch
                         checked={list.pinned}
                         onChange={(_) => {
@@ -118,7 +121,7 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                             pref.setLists(JSON.parse(JSON.stringify(old)))
                         }}
                     >
-                        リストを削除
+                        {t('delete')}
                     </Button>
                 </>
             )}
@@ -130,8 +133,8 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                 textColor="secondary"
                 indicatorColor="secondary"
             >
-                <Tab label="ストリーム" value="stream" />
-                <Tab label="ユーザー" value="user" />
+                <Tab label={t('stream')} value="stream" />
+                <Tab label={t('user')} value="user" />
             </Tabs>
             <List>
                 {tab === 'stream' &&

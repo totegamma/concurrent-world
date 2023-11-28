@@ -2,8 +2,10 @@ import { Box, Divider, Typography } from '@mui/material'
 import { useContext } from 'react'
 import { ApplicationContext } from '../App'
 import { Timeline } from '../components/Timeline'
+import { useTranslation } from 'react-i18next'
 
 export function Notifications(): JSX.Element {
+    const { t } = useTranslation('', { keyPrefix: 'pages.notifications' })
     const appData = useContext(ApplicationContext)
 
     return (
@@ -22,7 +24,7 @@ export function Notifications(): JSX.Element {
                 }}
             >
                 <Typography variant="h2" gutterBottom>
-                    Notifications
+                    {t('title')}
                 </Typography>
                 <Divider />
             </Box>
