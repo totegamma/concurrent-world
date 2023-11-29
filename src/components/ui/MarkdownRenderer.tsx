@@ -266,7 +266,7 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                     },
                     emoji: ({ shortcode }) => {
                         const emoji = props.emojiDict[shortcode]
-                        return (
+                        return emoji ? (
                             <img
                                 src={emoji?.animURL ?? emoji?.imageURL ?? ''}
                                 style={{
@@ -275,6 +275,8 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                                     marginBottom: '4px'
                                 }}
                             />
+                        ) : (
+                            <span>:{shortcode}:</span>
                         )
                     },
                     video: (props) => {
