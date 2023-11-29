@@ -83,7 +83,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         })
     }, [client.user])
 
-    const openDraft = useCallback(() => {
+    const updateQueriedStreams = useCallback(() => {
         let streamIDs: string[] = []
         switch (path.pathname) {
             case '/stream': {
@@ -102,9 +102,12 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         Promise.all(streamIDs.map((id) => client.getStream(id))).then((streams) => {
             setQueriedStreams(streams.filter((e) => e !== null) as Array<Stream<CommonstreamSchema>>)
         })
-
-        setMode('compose')
     }, [path.pathname, path.hash, pref.lists])
+
+    const openDraft = useCallback(() => {
+        updateQueriedStreams()
+        setMode('compose')
+    }, [updateQueriedStreams])
 
     const openReply = useCallback((target: Message<any>) => {
         setTargetMessage(target)
@@ -113,10 +116,11 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
 
     const openReroute = useCallback(
         (target: Message<any>) => {
+            updateQueriedStreams()
             setTargetMessage(target)
             setMode('reroute')
         },
-        [setTargetMessage, setMode]
+        [setTargetMessage, setMode, updateQueriedStreams]
     )
 
     const openMobileMenu = useCallback((open?: boolean) => {
@@ -240,7 +244,9 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                         autoFocus
                                         allowEmpty={mode === 'reroute'}
                                         submitButtonLabel={mode === 'reply' ? 'Reply' : 'Reroute'}
-                                        streamPickerInitial={targetMessage.postedStreams ?? []}
+                                        streamPickerInitial={
+                                            mode === 'reroute' ? queriedStreams : targetMessage.postedStreams ?? []
+                                        }
                                         streamPickerOptions={
                                             mode === 'reroute' ? allKnownStreams : targetMessage.postedStreams ?? []
                                         }
