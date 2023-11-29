@@ -1,4 +1,5 @@
-import { Box, Chip } from '@mui/material'
+import { Box } from '@mui/material'
+import ReplyIcon from '@mui/icons-material/Reply'
 
 import {
     type RerouteMessageSchema,
@@ -41,7 +42,10 @@ export const ReplyMessageFrame = (props: ReplyMessageFrameProp): JSX.Element => 
                     message={props.message}
                     beforeMessage={
                         <Box>
-                            <CCUserChip ccid={props.message.payload.body.replyToMessageAuthor} />
+                            <CCUserChip
+                                iconOverride={<ReplyIcon fontSize="small" />}
+                                ccid={props.message.payload.body.replyToMessageAuthor}
+                            />
                         </Box>
                     }
                     rerouted={props.rerouted}
