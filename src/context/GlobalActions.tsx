@@ -228,7 +228,12 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                         )}
                         {targetMessage && (mode === 'reply' || mode === 'reroute') && (
                             <Paper sx={style}>
-                                <MessageContainer messageID={targetMessage.id} messageOwner={targetMessage.author} />
+                                <Box p={1}>
+                                    <MessageContainer
+                                        messageID={targetMessage.id}
+                                        messageOwner={targetMessage.author}
+                                    />
+                                </Box>
                                 <Divider />
                                 <Box sx={{ display: 'flex' }}>
                                     <Draft
