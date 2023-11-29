@@ -2,12 +2,15 @@ import { Box } from '@mui/material'
 import { ProfileEditor } from '../ProfileEditor'
 import { type Client, type ProfileSchema } from '@concurrent-world/client'
 import { StorageProvider } from '../../context/StorageContext'
+import { useTranslation } from 'react-i18next'
 
 export function CreateProfile(props: {
     next: () => void
     client: Client | undefined
     setProfile: (_: ProfileSchema) => void
 }): JSX.Element {
+    const { t } = useTranslation('', { keyPrefix: 'registration.createProfile' })
+
     return (
         <StorageProvider>
             <Box
@@ -18,7 +21,7 @@ export function CreateProfile(props: {
                     gap: '20px'
                 }}
             >
-                ここで名前・アイコン・自己紹介を設定します。
+                {t('desc')}
                 <Box
                     sx={{
                         width: '100%',

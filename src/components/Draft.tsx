@@ -22,7 +22,6 @@ import {
 } from '@mui/material'
 import { StreamPicker } from './ui/StreamPicker'
 import { closeSnackbar, useSnackbar } from 'notistack'
-import { usePreference } from '../context/PreferenceContext'
 import { usePersistent } from '../hooks/usePersistent'
 
 import SendIcon from '@mui/icons-material/Send'
@@ -220,7 +219,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         }
     }
 
-    const { t } = useTranslation('', { keyPrefix: 'draft' })
+    const { t } = useTranslation('', { keyPrefix: 'ui.draft' })
 
     return (
         <Box
@@ -597,7 +596,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             }}
                             endIcon={<SendIcon />}
                         >
-                            {props.submitButtonLabel ?? 'POST'}
+                            {props.submitButtonLabel ?? t('current')}
                         </Button>
                     </Box>
                 </Box>

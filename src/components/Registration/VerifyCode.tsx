@@ -1,11 +1,14 @@
-import { Box, Button, TextField } from '@mui/material'
+import { Box, Button, TextField, Typography } from '@mui/material'
 import { useState } from 'react'
 import { type Identity } from '../../util'
+import { useTranslation } from 'react-i18next'
 
 export function VerifyCode(props: { next: () => void; identity: Identity }): JSX.Element {
     const [mnemonicTest, setMnemonicTest] = useState<string>('')
 
     const match = props.identity.mnemonic_ja === mnemonicTest || props.identity.mnemonic_en === mnemonicTest
+
+    const { t } = useTranslation('', { keyPrefix: 'registration.verifyCode' })
 
     return (
         <Box
@@ -26,7 +29,7 @@ export function VerifyCode(props: { next: () => void; identity: Identity }): JSX
                     width: '100%'
                 }}
             />
-            {match ? '一致しています' : '一致していません'}
+            <Typography>{match ? t('match') : t('notMatch')}</Typography>
             <Button
                 variant="contained"
                 disabled={!match}
@@ -34,7 +37,7 @@ export function VerifyCode(props: { next: () => void; identity: Identity }): JSX
                     props.next()
                 }}
             >
-                Next: ドメインの選択
+                {t('next')}
             </Button>
         </Box>
     )

@@ -8,9 +8,12 @@ import { SoundSettings } from '../components/Settings/Sound'
 import { EmojiSettings } from '../components/Settings/Emoji'
 import { MediaSettings } from '../components/Settings/Media'
 import { APSettings } from '../components/Settings/APSettings'
+import { useTranslation } from 'react-i18next'
 
 export function Settings(): JSX.Element {
     const path = useLocation()
+
+    const { t } = useTranslation('', { keyPrefix: 'pages.settings' })
 
     return (
         <Box
@@ -26,7 +29,7 @@ export function Settings(): JSX.Element {
         >
             <Breadcrumbs>
                 <Link variant="h2" component={RouterLink} underline="hover" color="text.primary" to="/settings">
-                    Settings
+                    {t('title')}
                 </Link>
                 {path.pathname !== '/settings' && (
                     <Link

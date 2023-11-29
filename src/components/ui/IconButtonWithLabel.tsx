@@ -31,7 +31,14 @@ export const IconButtonWithLabel = (props: {
                     fontSize: '40px'
                 }}
             />
-            <Typography color="text.primary">{props.label}</Typography>
+            <Typography
+                color="text.primary"
+                sx={{
+                    wordBreak: 'keep-all'
+                }}
+            >
+                {props.label}
+            </Typography>
         </ButtonBase>
     )
 }

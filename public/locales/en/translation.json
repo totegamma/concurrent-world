@@ -1,86 +1,252 @@
 {
-  "test": "Test",
-  "common": {
-    "home": "Home",
-    "notifications": "Notifications",
-    "associations": "Associations",
-    "contacts": "Contacts",
-    "explore": "Explore",
-    "devtool": "Devtool",
-    "settings": "Settings"
-  },
-  "settings": {
-    "general": {
-      "basic": "Basic",
-      "showEditorOnTop": "Show editor on top",
-      "showEditorOnTopMobile": "Show editor on top (mobile)",
-      "developerMode": "Developer mode",
-      "generateInviteCode": "Generate invite code",
-      "inviteCode": "Invite code (valid for 24 hours)",
-      "copyInviteCode": "Copy invite code",
-      "copied": "Copied",
-      "language": "Language"
+    "test": "Test",
+    "pages": {
+        "home": {
+            "title": "Home"
+        },
+        "notifications": {
+            "title": "Notifications"
+        },
+        "associations": {
+            "title": "Associations"
+        },
+        "contacts": {
+            "title": "Contacts"
+        },
+        "explore": {
+            "title": "Explore",
+            "domains": "Domains",
+            "streams": "Streams",
+            "createNew": "Create new",
+            "createNewStream": {
+                "title": "Create new stream",
+                "desc1": "Create a new stream on ",
+                "desc2": " with the following settings."
+            }
+        },
+        "devtool": {
+            "title": "Devtool"
+        },
+        "settings": {
+            "title": "Settings",
+            "actions": {
+                "title": "Actions",
+                "clearCache": "Clear cache",
+                "forceReload": "Force reload",
+                "logout": "Logout",
+                "areYouSure": "Are you sure?",
+                "logoutWarn": "You cannot log in again without the secret"
+            }
+        },
+        "lists": {
+            "title": "Lists"
+        }
     },
-    "profileEditor": {
-      "update": "Update",
-      "updateSuccess": "Updated Successfully",
-      "updateFailed": "Update Failed",
-      "createNew": "Create"
+    "time": {
+        "secondsBefore": "s",
+        "minutesBefore": "m",
+        "hoursBefore": "h"
     },
-    "profile": {
-      "title": "Profile",
-      "update": "Update",
-      "updated": "Updated"
+    "ui": {
+        "profileEditor": {
+            "update": "Update",
+            "updateSuccess": "Updated Successfully",
+            "updateFailed": "Update Failed",
+            "createNew": "Create"
+        },
+        "draft": {
+            "placeholder": "What are you up to?",
+            "attachImage": "Attach image",
+            "cantAttachImage": "Please set up Imgur client ID in settings.",
+            "preview": "Preview",
+            "openPreview": "Open preview",
+            "closePreview": "Close preview",
+            "emoji": "Emojis",
+            "clearDraft": "Clear draft",
+            "postToHome": "Also posting to home stream",
+            "noPostToHome": "Not posting to home stream",
+            "current": "Post"
+        },
+        "secret": {
+            "clickToReveal": "Click to reveal",
+            "warn": "Make sure no one is looking at your screen.",
+            "copy": "Copy"
+        },
+        "listSettings": {
+            "title": "List settings",
+            "name": "List name",
+            "update": "Update",
+            "defaultDest": "Default destination",
+            "update": "Update",
+            "stream": "Stream",
+            "user": "User",
+            "pin": "Pin",
+            "delete": "Delete"
+        }
     },
-    "sound": {
-      "sound": "Sound",
-      "volume": "Volume",
-      "override": {
-        "title": "Override",
-        "postSound": "Post sound",
-        "notificationSound": "Notification sound"
-      }
+    "settings": {
+        "title": "Settings",
+        "general": {
+            "title": "General",
+            "basic": "Basic",
+            "showEditorOnTop": "Show editor on top",
+            "showEditorOnTopMobile": "Show editor on top (mobile)",
+            "developerMode": "Developer mode",
+            "generateInviteCode": "Generate invite code",
+            "inviteCode": "Invite code (valid for 24 hours)",
+            "copyInviteCode": "Copy invite code",
+            "copied": "Copied",
+            "language": "Language"
+        },
+        "profile": {
+            "title": "Profile",
+            "update": "Update",
+            "updated": "Updated"
+        },
+        "theme": {
+            "title": "Theme"
+        },
+        "sound": {
+            "title": "Sound",
+            "sound": "Sound",
+            "volume": "Volume",
+            "override": {
+                "title": "Override",
+                "postSound": "Post sound",
+                "notificationSound": "Notification sound"
+            }
+        },
+        "emoji": {
+            "title": "Emoji",
+            "emojiPackage": "Emoji packages",
+            "emojiPackageURL": "Emoji package URL",
+            "packageNotFound": "Package not found",
+            "copied": "Copied",
+            "alreadyAdded": "Emoji pack already added"
+        },
+        "media": {
+            "title": "Media",
+            "storageProviderLabel": "Storage provider to use",
+            "corsSettings": "CORS settings",
+            "imagePostSettings": "Image post settings",
+            "afterRegisteringImgur": "After registering with Imgur, go to ",
+            "thisPage": "this page",
+            "deleteCompletely": "Delete completely",
+            "copyURL": "Copy URL",
+            "copyID": "Copy ID",
+            "oauth2": "and create application with option \"OAuth 2 authorization without a callback URL\"",
+            "descs": {
+                "domain": "Domain Storage refers to the storage provided by this domain. It can be used without any setup, but there is a maximum capacity set. Additionally, the list of files may be viewed by administrators and files that violate the terms may be deleted.",
+                "imgur": "Imgur is used for image uploads. It can be set up relatively easily. The content that can be uploaded is subject to Imgur's terms.",
+                "s3": "S3 is used for image uploads. S3-compatible services like CloudFlare R2 can also be used. It requires more effort to set up, but allows you to keep files under your own control. Charges may apply depending on the service, but in most cases, it will fit within the free tier."
+            }
+        },
+        "ap": {
+            "title": "ActivityPub",
+            "setup": "ActivityPub ID setup.",
+            "cantBeChangedOnceRegistered": "**Can't be changed once registered.",
+            "confirming": "Confirming...",
+            "register": "Register",
+            "helperText": "The following charaters can be used: a-z, A-Z, 0-9",
+            "alreadyRegistered": "This user is already registered.",
+            "tryAnotherID": "Try another ID."
+        }
     },
-    "emoji": {
-      "emojiPackage": "Emoji packages",
-      "emojiPackageURL": "Emoji package URL",
-      "packageNotFound": "Package not found",
-      "copied": "Copied",
-      "alreadyAdded": "Emoji pack already added"
+    "welcome": {
+        "tagline1": "One World,",
+        "tagline2": "Infinite Environments.",
+        "description": "Concurrent is a new type of decentralized social networking service that connects you to countless servers with just one account.",
+        "createAccount": "Create an Account",
+        "import": "Import",
+        "gettingStarted": "Let's get started",
+        "feature1": {
+            "title": "No need to create an account for each server anymore",
+            "description": "Traditional decentralized SNS required you to create an account for each server. Concurrent uses a secret key to prove your identity across countless servers with just one account."
+        },
+        "feature2": {
+            "title": "Timelines for different topics",
+            "description": "Concurrent allows you to freely create community timelines called 'Streams'. Say goodbye to the hassle of switching between multiple accounts on traditional social networks because you feel a bit hesitant to discuss certain topics with all of your followers. Gather and enjoy conversations about your favorite topics in casual streams with like-minded people."
+        },
+        "wip": {
+            "title": "Concurrent is currently under development.",
+            "description": "We are in the middle of adding exciting features and many functionalities are not available yet. We would be delighted if you could play around with it as a form of sightseeing!",
+            "contribute": "If you find any bugs or have great ideas, raise an issue on Github and join the development now!",
+            "milestones": {
+                "title": "Planned features",
+                "item1": "- Private Timelines",
+                "item2": "- Media-specific Posts & Media Lists for Users",
+                "item3": "- Various Filtering Options such as Muting",
+                "item4": "- Timelines of Other Users' Activities",
+                "item5": "- etc..."
+            }
+        }
     },
-    "media": {
-      "storageProviderLabel": "Storage provider to use",
-      "corsSettings": "CORS settings",
-      "imagePostSettings": "Image post settings",
-      "afterRegisteringImgur": "After registering with Imgur, go to ",
-      "thisPage": "this page",
-      "oauth2": "and create application with option \"OAuth 2 authorization without a callback URL\""
+    "registration": {
+        "welcome": {
+            "title": "Let's create your Concurrent account!",
+            "noticeTitle": "Concurrent is currently under development.",
+            "notice": "We are still adding features and the explanations are brief. We would be happy if you could play with it as a form of sightseeing!",
+            "next": "Create an ID Card"
+        },
+        "yourID": {
+            "title": "Your ID",
+            "desc1": "This is the string that identifies you in the world of Concurrent.",
+            "desc2": "It is a random string so that you can be equally identified from any server.",
+            "desc3": "Next, we will create a secret code to prove that you are the owner of this ID.",
+            "next": "Next: Creating your ID's Secret Code"
+        },
+        "saveSecret": {
+            "title": "Secret Code",
+            "desc1": "The secret code is a spell you need when you want to log in again or log in from a different device.",
+            "desc2": "Make sure you never lose it and that nobody else ever finds out about it.",
+            "desc3": "If you lose it, you will never be able to access your account again. If someone else finds out, your account will become a shared account with a hacker.",
+            "didyousave": "Have you taken a note of it?",
+            "next": "Next: Confirming the Secret Code"
+        },
+        "verifyCode": {
+            "title": "Confirming the Secret Code",
+            "match": "OK!",
+            "notMatch": "The secret code does not match",
+            "next": "Next: Choosing a Domain"
+        },
+        "chooseDomain": {
+            "title": "Choosing a Domain",
+            "desc1": "Let's find a domain that will store and deliver your messages.",
+            "desc2": "No matter which domain you choose, you can connect with anyone.",
+            "desc3": "Also, (if the server manager works hard) you can always move to a different domain.",
+            "notice": "You will now move from concurrent.world to a domain jurisdiction site",
+            "chooseFromList": "Choose from the list",
+            "or": "or",
+            "directInput": "Enter URL directly",
+            "tips": "Tips: If you're setting up your own server, click here",
+            "jump": "Go to the registration page",
+            "notRegistered": "Registration at the domain is not confirmed. Please register at the domain you jump to.",
+            "nextDisabled": "You can proceed to the next step once registration at the domain is complete",
+            "next": "Next: Creating a Profile"
+        },
+        "createProfile": {
+            "title": "Creating a Profile",
+            "desc": "Here you set your name, icon, and self-introduction."
+        },
+        "ready": {
+            "title": "Ready to go!",
+            "next": "Start"
+        },
+        "alreadyHaveAccount": "Already have an account?",
+        "importAccount": "Import Account"
     },
-    "ap": {
-      "setup": "ActivityPub ID setup.",
-      "cantBeChangedOnceRegistered": "**Can't be changed once registered.",
-      "confirming": "Confirming...",
-      "register": "Register",
-      "helperText": "The following charaters can be used: a-z, A-Z, 0-9",
-      "alreadyRegistered": "This user is already registered.",
-      "tryAnotherID": "Try another ID."
+    "import": {
+        "searching": "Searching…",
+        "notFound": "Your server could not be found. You can continue by entering it manually.",
+        "invalidSecret": "The secret code is not correct.",
+        "notFoundOnServer": "Your account could not be found on the specified server.",
+        "connectionError": "Could not connect to the specified server.",
+        "input": "Enter the secret code or private key",
+        "secretPlaceholder": "A spell made of 12 words",
+        "welcome": "Welcome",
+        "domain": "Domain",
+        "import": "Import",
+        "noAccount": "Don’t have an account yet?",
+        "createAccount": "Create an Account"
     }
-  },
-  "draft": {
-    "placeholder": "What are you up to?",
-    "attachImage": "Attach image",
-    "cantAttachImage": "Please set up Imgur client ID in settings.",
-    "preview": "Preview",
-    "openPreview": "Open preview",
-    "closePreview": "Close preview",
-    "emoji": "Emojis",
-    "clearDraft": "Clear draft",
-    "postToHome": "Also posting to home stream",
-    "noPostToHome": "Not posting to home stream"
-  },
-  "time": {
-    "secondsBefore": "s",
-    "minutesBefore": "m",
-    "hoursBefore": "h"
-  }
 }

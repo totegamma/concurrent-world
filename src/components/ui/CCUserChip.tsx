@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 export interface CCUserChipProps {
     user?: User
     ccid?: string
+    iconOverride?: JSX.Element
 }
 
 export const CCUserChip = (props: CCUserChipProps): JSX.Element => {
@@ -49,7 +50,7 @@ export const CCUserChip = (props: CCUserChipProps): JSX.Element => {
                 to={'/entity/' + (user?.ccid ?? '')}
                 size={'small'}
                 label={user?.profile?.payload.body.username ?? 'anonymous'}
-                icon={<AlternateEmailIcon fontSize="small" />}
+                icon={props.iconOverride ?? <AlternateEmailIcon fontSize="small" />}
             />
         </Tooltip>
     )

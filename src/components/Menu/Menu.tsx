@@ -43,7 +43,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
     const appData = useContext(ApplicationContext)
     const actions = useGlobalActions()
 
-    const { t } = useTranslation('', { keyPrefix: 'common' })
+    const { t } = useTranslation('', { keyPrefix: 'pages' })
 
     if (!appData) {
         return <>loading...</>
@@ -108,7 +108,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                         color: 'background.contrastText'
                                     }}
                                 />
-                                <ListItemText primary={t('home')} />
+                                <ListItemText primary={t('home.title')} />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
@@ -124,7 +124,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                     }}
                                 />
 
-                                <ListItemText primary={t('notifications')} />
+                                <ListItemText primary={t('notifications.title')} />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
@@ -135,7 +135,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                     }}
                                 />
 
-                                <ListItemText primary={t('contacts')} />
+                                <ListItemText primary={t('contacts.title')} />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
@@ -146,7 +146,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                     }}
                                 />
 
-                                <ListItemText primary={t('explore')} />
+                                <ListItemText primary={t('explore.title')} />
                             </ListItemButton>
                         </ListItem>
                         {pref.devMode && (
@@ -158,7 +158,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                         }}
                                     />
 
-                                    <ListItemText primary={t('devtool')} />
+                                    <ListItemText primary={t('devtool.title')} />
                                 </ListItemButton>
                             </ListItem>
                         )}
@@ -169,7 +169,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                         color: 'background.contrastText'
                                     }}
                                 />
-                                <ListItemText primary={t('settings')} />
+                                <ListItemText primary={t('settings.title')} />
                             </ListItemButton>
                         </ListItem>
                     </List>

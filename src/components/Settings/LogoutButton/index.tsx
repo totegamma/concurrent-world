@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { Box, Button, Modal, Typography, useTheme } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 export const LogoutButton = (): JSX.Element => {
     const [openLogoutModal, setOpenLogoutModal] = useState(false)
     const theme = useTheme()
     const navigate = useNavigate()
+
+    const { t } = useTranslation('', { keyPrefix: 'pages.settings.actions' })
 
     const logout = (): void => {
         for (const key in localStorage) {
@@ -36,11 +39,9 @@ export const LogoutButton = (): JSX.Element => {
                     }}
                 >
                     <Typography component="h2" sx={{ color: theme.palette.text.primary }}>
-                        Are you sure?
+                        {t('areYouSure')}
                     </Typography>
-                    <Typography sx={{ color: theme.palette.text.primary }}>
-                        秘密鍵のバックアップがないと、アカウントを復元できません。
-                    </Typography>
+                    <Typography sx={{ color: theme.palette.text.primary }}>{t('logoutWarn')}</Typography>
                     <Button
                         variant="contained"
                         color="error"
@@ -50,7 +51,7 @@ export const LogoutButton = (): JSX.Element => {
                             navigate('/welcome')
                         }}
                     >
-                        Logout
+                        {t('logout')}
                     </Button>
                 </Box>
             </Modal>
@@ -61,7 +62,7 @@ export const LogoutButton = (): JSX.Element => {
                     setOpenLogoutModal(true)
                 }}
             >
-                Logout
+                {t('logout')}
             </Button>
         </>
     )

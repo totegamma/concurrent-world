@@ -1,8 +1,10 @@
 import { Box, Button, Grid, Paper, Typography } from '@mui/material'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export function SecretCode(props: { mnemonic: string }): JSX.Element {
+    const { t } = useTranslation('', { keyPrefix: 'ui.secret' })
     const [reveal, setReveal] = useState(false)
     return (
         <Box>
@@ -61,10 +63,8 @@ export function SecretCode(props: { mnemonic: string }): JSX.Element {
                         setReveal(true)
                     }}
                 >
-                    <Typography variant="h3">クリックして表示</Typography>
-                    <Typography variant="caption">
-                        背後に人がないか、画面を配信していないか確認してください。
-                    </Typography>
+                    <Typography variant="h3">{t('clickToReveal')}</Typography>
+                    <Typography variant="caption">{t('warn')}</Typography>
                 </Box>
             </Paper>
             <Box
@@ -83,7 +83,7 @@ export function SecretCode(props: { mnemonic: string }): JSX.Element {
                     }}
                     startIcon={<ContentPasteIcon />}
                 >
-                    シークレットコードをコピー
+                    {t('copy')}
                 </Button>
             </Box>
         </Box>

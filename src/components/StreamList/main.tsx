@@ -5,8 +5,10 @@ import { StreamListItem } from './StreamListItem'
 import AddIcon from '@mui/icons-material/Add'
 import ListIcon from '@mui/icons-material/List'
 import { useGlobalActions } from '../../context/GlobalActions'
+import { useTranslation } from 'react-i18next'
 
 export const StreamList = (): JSX.Element => {
+    const { t } = useTranslation('', { keyPrefix: 'pages' })
     const pref = usePreference()
     const actions = useGlobalActions()
     return (
@@ -50,7 +52,7 @@ export const StreamList = (): JSX.Element => {
                         color: 'background.contrastText'
                     }}
                 />
-                <ListItemText primary="Lists" />
+                <ListItemText primary={t('lists.title')} />
             </ListItem>
             {Object.keys(pref.lists).map((key) => (
                 <StreamListItem

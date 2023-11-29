@@ -4,6 +4,7 @@ import { PassportRenderer } from '../theming/Passport'
 import { type ConcurrentTheme } from '../../model'
 import { type Identity } from '../../util'
 import { type CoreDomain, type ProfileSchema } from '@concurrent-world/client'
+import { useTranslation } from 'react-i18next'
 
 export function RegistrationReady(props: {
     next: () => void
@@ -12,6 +13,8 @@ export function RegistrationReady(props: {
     host: CoreDomain | null | undefined
 }): JSX.Element {
     const theme = useTheme<ConcurrentTheme>()
+
+    const { t } = useTranslation('', { keyPrefix: 'registration.ready' })
 
     return (
         <>
@@ -44,7 +47,7 @@ export function RegistrationReady(props: {
                 }}
             >
                 <Button variant="contained" onClick={props.next}>
-                    はじめる
+                    {t('next')}
                 </Button>
             </Box>
         </>

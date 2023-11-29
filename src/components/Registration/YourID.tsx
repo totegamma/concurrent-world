@@ -1,8 +1,10 @@
 import { Box, Button, Divider, Paper, Typography } from '@mui/material'
 import { CCAvatar } from '../ui/CCAvatar'
 import { type Identity } from '../../util'
+import { useTranslation } from 'react-i18next'
 
 export function YourID(props: { next: () => void; identity: Identity }): JSX.Element {
+    const { t } = useTranslation('', { keyPrefix: 'registration.yourID' })
     return (
         <Box
             sx={{
@@ -42,21 +44,16 @@ export function YourID(props: { next: () => void; identity: Identity }): JSX.Ele
                         {props.identity.CCID}
                     </Typography>
                 </Paper>
-                <Typography>これは、Concurrentの世界であなたを特定する文字列です。</Typography>
-                <Typography>
-                    どのサーバーからもあなたを等しく識別できるよう、ランダムな文字列になっています。
-                </Typography>
-                <Divider />
-                <Typography>
-                    次に、あなたがこのIDの持ち主であることを証明するためのシークレットコードを作成します。
-                </Typography>
+                <Typography>{t('desc1')}</Typography>
+                <Typography>{t('desc2')}</Typography>
+                <Typography>{t('desc3')}</Typography>
                 <Button
                     variant="contained"
                     onClick={(): void => {
                         props.next()
                     }}
                 >
-                    Next: IDのシークレットコードの作成
+                    {t('next')}
                 </Button>
             </Box>
         </Box>

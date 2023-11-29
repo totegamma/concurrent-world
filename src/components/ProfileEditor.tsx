@@ -25,7 +25,7 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
     const [description, setDescription] = useState<string>(props.initial?.description ?? '')
     const [banner, setBanner] = useState<string>(props.initial?.banner ?? '')
 
-    const { t, i18n } = useTranslation('', { keyPrefix: 'settings.profileEditor' })
+    const { t } = useTranslation('', { keyPrefix: 'ui.profileEditor' })
 
     const updateProfile = async (): Promise<void> => {
         if (props.id === undefined) {
