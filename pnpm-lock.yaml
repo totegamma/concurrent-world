@@ -129,8 +129,8 @@ dependencies:
     specifier: ^9.0.0
     version: 9.0.0
   virtua:
-    specifier: github:totegamma/virtua#04375007efaa1a1e49ce0dbdfd6eb641653dd628
-    version: github.com/totegamma/virtua/04375007efaa1a1e49ce0dbdfd6eb641653dd628(react-dom@18.2.0)(react@18.2.0)
+    specifier: ^0.17.4
+    version: 0.17.4(react-dom@18.2.0)(react@18.2.0)
 
 devDependencies:
   '@storybook/addon-essentials':
@@ -11887,6 +11887,16 @@ packages:
       vfile-message: 3.1.4
     dev: false
 
+  /virtua@0.17.4(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-969hSYRIpRkiAp39RWD5i1CneeIVl7qZ4NSn0M6tnQcc6Z5dfNTW713MCrtPMef3xVSOVJAHCKCP9xR/3ALFaA==}
+    peerDependencies:
+      react: '>=16.14.0'
+      react-dom: '>=16.14.0'
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
   /vite-plugin-pwa@0.14.7(vite@4.0.0)(workbox-build@6.5.4)(workbox-window@6.5.4):
     resolution: {integrity: sha512-dNJaf0fYOWncmjxv9HiSa2xrSjipjff7IkYE5oIUJ2x5HKu3cXgA8LRgzOwTc5MhwyFYRSU0xyN0Phbx3NsQYw==}
     peerDependencies:
@@ -12366,17 +12376,4 @@ packages:
     version: 1.7.0
     dependencies:
       uuid: 9.0.0
-    dev: false
-
-  github.com/totegamma/virtua/04375007efaa1a1e49ce0dbdfd6eb641653dd628(react-dom@18.2.0)(react@18.2.0):
-    resolution: {tarball: https://codeload.github.com/totegamma/virtua/tar.gz/04375007efaa1a1e49ce0dbdfd6eb641653dd628}
-    id: github.com/totegamma/virtua/04375007efaa1a1e49ce0dbdfd6eb641653dd628
-    name: virtua
-    version: 0.16.2
-    peerDependencies:
-      react: '>=16.14.0'
-      react-dom: '>=16.14.0'
-    dependencies:
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
     dev: false
