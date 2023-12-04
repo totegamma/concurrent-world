@@ -41,7 +41,8 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
                 multiple
                 value={selected}
                 options={props.options}
-                getOptionLabel={(option) => option.payload.name}
+                getOptionKey={(option: Stream<CommonstreamSchema>) => option.id ?? ''}
+                getOptionLabel={(option: Stream<CommonstreamSchema>) => option.payload.name}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 onChange={(_, value) => {
                     props.setSelected(value)
@@ -60,9 +61,12 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
                 }}
                 renderTags={(value, getTagProps) =>
                     value.map((option, index) => (
-                        // disabling ESLint here becase 'key' should exist in {..getTagProps({index})}
-                        // eslint-disable-next-line
-                        <Chip label={option.payload.name} sx={{ color: 'text.default' }} {...getTagProps({ index })} />
+                        <Chip
+                            label={option.payload.name}
+                            sx={{ color: 'text.default' }}
+                            {...getTagProps({ index })}
+                            key={option.id}
+                        />
                     ))
                 }
             />

@@ -62,6 +62,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
             !client?.user.userstreams.payload.body.ackCollection)
 
     useEffect(() => {
+        setAllKnownStreams([])
         const allStreams = Object.values(pref.lists)
             .map((list) => list.streams)
             .flat()
