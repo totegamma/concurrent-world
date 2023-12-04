@@ -19,7 +19,7 @@
         "@fortawesome/free-brands-svg-icons": "^6.4.2",
         "@fortawesome/react-fontawesome": "^0.2.0",
         "@mui/icons-material": "^5.11.16",
-        "@mui/material": "^5.11.7",
+        "@mui/material": "^5.14.19",
         "@rjsf/core": "^5.7.3",
         "@rjsf/mui": "^5.7.3",
         "@rjsf/utils": "^5.7.3",
@@ -52,7 +52,7 @@
         "unist-util-visit": "^5.0.0",
         "use-sound": "^4.0.1",
         "uuid": "^9.0.0",
-        "virtua": "github:totegamma/virtua#04375007efaa1a1e49ce0dbdfd6eb641653dd628"
+        "virtua": "^0.17.4"
     },
     "devDependencies": {
         "@storybook/addon-essentials": "7.0.18",
