@@ -72,6 +72,7 @@ interface ConcurrentPalette extends Palette {
 }
 
 export interface ConcurrentThemeMeta {
+    name?: string
     author?: string
     comment?: string
 }
