@@ -71,8 +71,14 @@ interface ConcurrentPalette extends Palette {
     augmentColor: (options: PaletteAugmentColorOptions) => PaletteColor
 }
 
+export interface ConcurrentThemeMeta {
+    author?: string
+    comment?: string
+}
+
 export interface ConcurrentTheme extends Theme {
     palette: ConcurrentPalette
+    meta?: ConcurrentThemeMeta
 }
 
 export interface StreamList {

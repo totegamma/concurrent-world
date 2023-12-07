@@ -1,21 +1,73 @@
-import { Box, Button, Paper, Typography } from '@mui/material'
+import { Box, Button, Paper, Typography, useTheme } from '@mui/material'
 import { ConcurrentLogo } from '../../theming/ConcurrentLogo'
 import type { ConcurrentTheme } from '../../../model'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { createConcurrentTheme, Themes } from '../../../themes'
 import { usePreference } from '../../../context/PreferenceContext'
+import { DummyMessageView } from '../../Message/DummyMessageView'
+import { useTranslation } from 'react-i18next'
+import { useApi } from '../../../context/api'
+import { type User } from '@concurrent-world/client'
 
 export const ThemeSelect = (): JSX.Element => {
     const pref = usePreference()
-
+    const client = useApi()
+    const theme = useTheme<ConcurrentTheme>()
+    const { t } = useTranslation('', { keyPrefix: 'ui' })
     const previewTheme: Record<string, ConcurrentTheme> = useMemo(
         () => Object.fromEntries(Object.keys(Themes).map((e) => [e, createConcurrentTheme(e)])),
         []
     )
 
+    const [themeAuthor, setThemeAuthor] = useState<User | undefined>(undefined)
+
+    useEffect(() => {
+        if (theme.meta?.author) {
+            client
+                .getUser(theme.meta.author)
+                .then((e) => {
+                    setThemeAuthor(e ?? undefined)
+                })
+                .catch((_) => {
+                    setThemeAuthor(undefined)
+                })
+        } else {
+            setThemeAuthor(undefined)
+        }
+    }, [theme])
+
     return (
         <Box>
-            <Typography variant="h3">Theme</Typography>
+            <Box py={1} mb={1}>
+                <Typography variant="h3">Current Theme: {pref.themeName}</Typography>
+                <Typography variant="h5">Theme Createor:</Typography>
+                <Paper
+                    sx={{
+                        p: 1
+                    }}
+                    variant="outlined"
+                >
+                    <DummyMessageView
+                        message={{
+                            body: theme.meta?.comment ?? 'I made this theme!'
+                        }}
+                        user={themeAuthor?.profile?.payload.body}
+                        timestamp={
+                            <Typography
+                                sx={{
+                                    backgroundColor: 'divider',
+                                    color: 'primary.contrastText',
+                                    px: 1,
+                                    fontSize: '0.75rem'
+                                }}
+                            >
+                                {t('draft.preview')}
+                            </Typography>
+                        }
+                    />
+                </Paper>
+            </Box>
+            <Typography variant="h3">Select Theme:</Typography>
             <Box
                 sx={{
                     display: { xs: 'flex', md: 'grid' },
@@ -26,7 +78,7 @@ export const ThemeSelect = (): JSX.Element => {
                 }}
             >
                 {Object.keys(previewTheme).map((e) => (
-                    <Paper key={e}>
+                    <Paper key={e} variant="outlined">
                         <Button
                             onClick={(_) => {
                                 pref.setThemeName(e)
