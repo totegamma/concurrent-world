@@ -266,7 +266,7 @@ export const ThemeCreator = (): JSX.Element => {
 
                             <ColorPicker
                                 label="Background"
-                                value={contentText}
+                                value={contentBackground}
                                 onChange={setContentBackground}
                                 color={'text.primary'}
                             />
