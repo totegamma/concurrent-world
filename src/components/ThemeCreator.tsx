@@ -1,10 +1,104 @@
-import { Box, Button, Divider, Paper, TextField, ThemeProvider, Typography, useTheme } from '@mui/material'
+import {
+    Box,
+    Button,
+    Divider,
+    IconButton,
+    InputAdornment,
+    Paper,
+    Popover,
+    TextField,
+    ThemeProvider,
+    Typography,
+    useTheme
+} from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
 import { type ConcurrentTheme } from '../model'
 import { createConcurrentThemeFromObject } from '../themes'
 import { ConcurrentLogo } from './theming/ConcurrentLogo'
 import { usePreference } from '../context/PreferenceContext'
 import { useApi } from '../context/api'
+import { HexColorPicker } from 'react-colorful'
+import ColorizeIcon from '@mui/icons-material/Colorize'
+
+export interface ColorPickerProps {
+    label: string
+    value: string
+    onChange: (value: string) => void
+    color: string
+}
+
+export const ColorPicker = (props: ColorPickerProps): JSX.Element => {
+    const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
+
+    return (
+        <Box>
+            <TextField
+                label={props.label}
+                value={props.value}
+                onChange={(e) => {
+                    props.onChange(e.target.value)
+                }}
+                sx={{
+                    '& .MuiInputBase-root': {
+                        color: props.color
+                    },
+                    '& label': {
+                        color: props.color
+                    },
+                    '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                            color: props.color
+                        },
+                        '&:hover fieldset': {
+                            color: props.color
+                        },
+                        '&.Mui-focused fieldset': {
+                            color: props.color
+                        }
+                    }
+                }}
+                InputProps={{
+                    endAdornment: (
+                        <InputAdornment position="end">
+                            <IconButton
+                                aria-label="toggle color picker"
+                                onClick={(e) => {
+                                    setAnchorEl(e.currentTarget)
+                                }}
+                            >
+                                <ColorizeIcon sx={{ color: props.color }} />
+                            </IconButton>
+                        </InputAdornment>
+                    )
+                }}
+            />
+            <Popover
+                open={Boolean(anchorEl)}
+                anchorEl={anchorEl}
+                onClose={() => {
+                    setAnchorEl(null)
+                }}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left'
+                }}
+                sx={{
+                    '& .MuiPaper-root': {
+                        bgcolor: 'transparent',
+                        overflow: 'hidden'
+                    }
+                }}
+            >
+                <HexColorPicker
+                    color={props.value}
+                    onChange={(color) => {
+                        props.onChange(color)
+                    }}
+                />
+            </Popover>
+        </Box>
+    )
+}
 
 export const ThemeCreator = (): JSX.Element => {
     const client = useApi()
@@ -23,6 +117,8 @@ export const ThemeCreator = (): JSX.Element => {
     const [underlayBackground, setUnderlayBackground] = useState(theme.palette.background.default)
     const [underlayText, setUnderlayText] = useState(theme.palette.background.contrastText)
 
+    const [newTheme, setNewTheme] = useState<ConcurrentTheme>(pref.customTheme ?? theme)
+
     useEffect(() => {
         setTitle(theme.meta?.name ?? 'My Theme')
         setContentBackground(pref.customTheme?.palette?.background?.paper ?? theme.palette.background.paper)
@@ -34,8 +130,13 @@ export const ThemeCreator = (): JSX.Element => {
         setUnderlayText(pref.customTheme?.palette?.background?.contrastText ?? theme.palette.background.contrastText)
     }, [theme])
 
-    const newTheme = useMemo(
-        () =>
+    const validateColor = (color: string): boolean => {
+        // The following formats are supported: #nnn, #nnnnnn, rgb(), rgba(), hsl(), hsla(), color().
+        const regex = /(#[a-zA-Z0-9]{3,6}|(rgb|rgba|hsl|hsla|color)\((\s*\d+(\.\d+)?,?){3,4}\))/i
+        return regex.test(color)
+    }
+    useEffect(() => {
+        setNewTheme(
             createConcurrentThemeFromObject({
                 meta: {
                     name: title,
@@ -43,33 +144,47 @@ export const ThemeCreator = (): JSX.Element => {
                 },
                 palette: {
                     primary: {
-                        main: uiBackground,
-                        contrastText: uiText
+                        main: validateColor(uiBackground) ? uiBackground : newTheme?.palette.primary.main,
+                        contrastText: validateColor(uiText) ? uiText : newTheme?.palette.primary.contrastText
                     },
                     secondary: {
-                        main: contentLink
+                        main: validateColor(contentLink) ? contentLink : newTheme?.palette.secondary.main
                     },
                     background: {
-                        default: underlayBackground,
-                        paper: contentBackground,
-                        contrastText: underlayText
+                        default: validateColor(underlayBackground)
+                            ? underlayBackground
+                            : newTheme?.palette.background.default,
+                        paper: validateColor(contentBackground)
+                            ? contentBackground
+                            : newTheme?.palette.background.paper,
+                        contrastText: validateColor(underlayText)
+                            ? underlayText
+                            : newTheme?.palette.background.contrastText
                     },
                     text: {
-                        primary: contentText,
-                        secondary: contentLink
+                        primary: validateColor(contentText) ? contentText : newTheme?.palette.text.primary,
+                        secondary: validateColor(contentLink) ? contentLink : newTheme?.palette.text.secondary
                     }
                 }
-            }),
-        [contentBackground, contentLink, contentText, uiBackground, uiText, underlayBackground, underlayText]
-    )
+            })
+        )
+    }, [contentBackground, contentLink, contentText, uiBackground, uiText, underlayBackground, underlayText])
 
-    const serialized = useMemo(
-        () =>
-            [contentBackground, contentLink, contentText, uiBackground, uiText, underlayBackground, underlayText].join(
-                ','
-            ),
-        [contentBackground, contentLink, contentText, uiBackground, uiText, underlayBackground, underlayText]
-    )
+    const serialized = useMemo(() => {
+        const colors = [
+            contentBackground,
+            contentLink,
+            contentText,
+            uiBackground,
+            uiText,
+            underlayBackground,
+            underlayText
+        ]
+        if (colors.some((color) => !validateColor(color))) {
+            return ''
+        }
+        return colors.join(';')
+    }, [contentBackground, contentLink, contentText, uiBackground, uiText, underlayBackground, underlayText])
 
     return (
         <ThemeProvider theme={newTheme}>
@@ -132,26 +247,26 @@ export const ThemeCreator = (): JSX.Element => {
                                 </Typography>
                             </Box>
                             <Divider />
-                            <TextField
+
+                            <ColorPicker
                                 label="Text"
                                 value={contentText}
-                                onChange={(e) => {
-                                    setContentText(e.target.value)
-                                }}
+                                onChange={setContentText}
+                                color={'text.primary'}
                             />
-                            <TextField
+
+                            <ColorPicker
                                 label="Link"
                                 value={contentLink}
-                                onChange={(e) => {
-                                    setContentLink(e.target.value)
-                                }}
+                                onChange={setContentLink}
+                                color={'text.primary'}
                             />
-                            <TextField
+
+                            <ColorPicker
                                 label="Background"
-                                value={contentBackground}
-                                onChange={(e) => {
-                                    setContentBackground(e.target.value)
-                                }}
+                                value={contentText}
+                                onChange={setContentBackground}
+                                color={'text.primary'}
                             />
                         </Box>
                         <Box
@@ -171,57 +286,19 @@ export const ThemeCreator = (): JSX.Element => {
                                 </Typography>
                             </Box>
                             <Divider />
-                            <TextField
+
+                            <ColorPicker
                                 label="Text"
                                 value={uiText}
-                                onChange={(e) => {
-                                    setUiText(e.target.value)
-                                }}
-                                sx={{
-                                    '& .MuiInputBase-root': {
-                                        color: 'primary.contrastText'
-                                    },
-                                    '& label': {
-                                        color: 'primary.contrastText'
-                                    },
-                                    '& .MuiOutlinedInput-root': {
-                                        '& fieldset': {
-                                            color: 'primary.contrastText'
-                                        },
-                                        '&:hover fieldset': {
-                                            color: 'primary.contrastText'
-                                        },
-                                        '&.Mui-focused fieldset': {
-                                            color: 'primary.contrastText'
-                                        }
-                                    }
-                                }}
+                                onChange={setUiText}
+                                color={'primary.contrastText'}
                             />
-                            <TextField
+
+                            <ColorPicker
                                 label="Background"
                                 value={uiBackground}
-                                onChange={(e) => {
-                                    setUiBackground(e.target.value)
-                                }}
-                                sx={{
-                                    '& .MuiInputBase-root': {
-                                        color: 'primary.contrastText'
-                                    },
-                                    '& label': {
-                                        color: 'primary.contrastText'
-                                    },
-                                    '& .MuiOutlinedInput-root': {
-                                        '& fieldset': {
-                                            color: 'primary.contrastText'
-                                        },
-                                        '&:hover fieldset': {
-                                            color: 'primary.contrastText'
-                                        },
-                                        '&.Mui-focused fieldset': {
-                                            color: 'primary.contrastText'
-                                        }
-                                    }
-                                }}
+                                onChange={setUiBackground}
+                                color={'primary.contrastText'}
                             />
                         </Box>
                         <Box
@@ -240,57 +317,19 @@ export const ThemeCreator = (): JSX.Element => {
                                 </Typography>
                             </Box>
                             <Divider />
-                            <TextField
+
+                            <ColorPicker
                                 label="Text"
                                 value={underlayText}
-                                onChange={(e) => {
-                                    setUnderlayText(e.target.value)
-                                }}
-                                sx={{
-                                    '& .MuiInputBase-root': {
-                                        color: 'background.contrastText'
-                                    },
-                                    '& label': {
-                                        color: 'background.contrastText'
-                                    },
-                                    '& .MuiOutlinedInput-root': {
-                                        '& fieldset': {
-                                            borderColor: 'background.contrastText'
-                                        },
-                                        '&:hover fieldset': {
-                                            borderColor: 'background.contrastText'
-                                        },
-                                        '&.Mui-focused fieldset': {
-                                            borderColor: 'background.contrastText'
-                                        }
-                                    }
-                                }}
+                                onChange={setUnderlayText}
+                                color={'background.contrastText'}
                             />
-                            <TextField
+
+                            <ColorPicker
                                 label="Background"
                                 value={underlayBackground}
-                                onChange={(e) => {
-                                    setUnderlayBackground(e.target.value)
-                                }}
-                                sx={{
-                                    '& .MuiInputBase-root': {
-                                        color: 'background.contrastText'
-                                    },
-                                    '& label': {
-                                        color: 'background.contrastText'
-                                    },
-                                    '& .MuiOutlinedInput-root': {
-                                        '& fieldset': {
-                                            borderColor: 'background.contrastText'
-                                        },
-                                        '&:hover fieldset': {
-                                            borderColor: 'background.contrastText'
-                                        },
-                                        '&.Mui-focused fieldset': {
-                                            borderColor: 'background.contrastText'
-                                        }
-                                    }
-                                }}
+                                onChange={setUnderlayBackground}
+                                color={'background.contrastText'}
                             />
                         </Box>
                     </Box>
@@ -308,7 +347,7 @@ export const ThemeCreator = (): JSX.Element => {
                             uiText,
                             underlayBackground,
                             underlayText
-                        ] = e.target.value.split(',')
+                        ] = e.target.value.split(';')
                         setContentBackground(contentBackground)
                         setContentLink(contentLink)
                         setContentText(contentText)
