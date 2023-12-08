@@ -82,6 +82,7 @@ export const ThemeSelect = (): JSX.Element => {
                         <Button
                             onClick={(_) => {
                                 pref.setThemeName(e)
+                                pref.setCustomTheme(undefined)
                             }}
                             style={{
                                 border: 'none',

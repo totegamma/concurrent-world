@@ -3,7 +3,7 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider, CssBaseline, Typography, useMediaQuery } from '@mui/material'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 
-import { createConcurrentTheme } from './themes'
+import { createConcurrentTheme, createConcurrentThemeFromObject } from './themes'
 import { Menu } from './components/Menu/Menu'
 import type { ConcurrentTheme } from './model'
 import {
@@ -56,7 +56,9 @@ function App(): JSX.Element {
     const client = useApi()
     const pref = usePreference()
 
-    const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(pref.themeName))
+    const [theme, setTheme] = useState<ConcurrentTheme>(
+        pref.customTheme ? createConcurrentThemeFromObject(pref.customTheme) : createConcurrentTheme(pref.themeName)
+    )
     const isMobileSize = useMediaQuery(theme.breakpoints.down('sm'))
 
     const [acklist, setAcklist] = useState<User[]>([])
@@ -186,6 +188,11 @@ function App(): JSX.Element {
     }, [playNotification])
 
     useEffect(() => {
+        if (pref.customTheme) {
+            setTheme(createConcurrentThemeFromObject(pref.customTheme))
+            return
+        }
+
         const newtheme = createConcurrentTheme(pref.themeName)
         setTheme(newtheme)
         let themeColorMetaTag: HTMLMetaElement = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement
@@ -195,7 +202,7 @@ function App(): JSX.Element {
             document.head.appendChild(themeColorMetaTag)
         }
         themeColorMetaTag.content = newtheme.palette.background.default
-    }, [pref.themeName])
+    }, [pref.themeName, pref.customTheme])
 
     const applicationContext = useMemo(() => {
         return {

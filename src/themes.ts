@@ -751,3 +751,8 @@ export const createConcurrentTheme = (name: string): ConcurrentTheme => {
     const theme: ConcurrentTheme = deepMerge(ConcurrentDefaultTheme, Themes[name])
     return createTheme(theme) as ConcurrentTheme
 }
+
+export const createConcurrentThemeFromObject = (base: any): ConcurrentTheme => {
+    const theme: ConcurrentTheme = deepMerge(ConcurrentDefaultTheme, base)
+    return createTheme(theme) as ConcurrentTheme
+}

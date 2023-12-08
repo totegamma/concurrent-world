@@ -1,5 +1,6 @@
 import { Box } from '@mui/material'
 import { ThemeSelect } from './ThemeSelect'
+import { ThemeCreator } from '../ThemeCreator'
 
 export const ThemeSettings = (): JSX.Element => {
     return (
@@ -11,6 +12,7 @@ export const ThemeSettings = (): JSX.Element => {
             }}
         >
             <ThemeSelect />
+            <ThemeCreator />
         </Box>
     )
 }

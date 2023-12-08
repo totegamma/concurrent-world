@@ -10,6 +10,9 @@ interface PreferenceState {
     themeName: string
     setThemeName: (_: string) => void
 
+    customTheme: any
+    setCustomTheme: (_: any) => void
+
     storageProvider: 'imgur' | 's3' | 'domain'
     setStorageProvider: (_: string) => void
 
@@ -56,8 +59,8 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
     const client = useApi()
 
     const [initialized, setInitialized] = useState<boolean>(false)
-
     const [themeName, setThemeName] = usePersistent<string>('themeName', 'basic')
+    const [customTheme, setCustomTheme] = usePersistent<any>('customTheme', undefined)
 
     const [storageProvider, _setStorageProvider] = usePersistent<'imgur' | 's3' | 'domain'>('storageProvider', 'domain')
     const setStorageProvider = useCallback(
@@ -174,6 +177,8 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
         return {
             themeName,
             setThemeName,
+            customTheme,
+            setCustomTheme,
             storageProvider,
             setStorageProvider,
             imgurClientID,
@@ -206,6 +211,7 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
         }
     }, [
         themeName,
+        customTheme,
         storageProvider,
         imgurClientID,
         s3Config,
