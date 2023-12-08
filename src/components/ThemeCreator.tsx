@@ -117,7 +117,11 @@ export const ThemeCreator = (): JSX.Element => {
     const [underlayBackground, setUnderlayBackground] = useState(theme.palette.background.default)
     const [underlayText, setUnderlayText] = useState(theme.palette.background.contrastText)
 
-    const [newTheme, setNewTheme] = useState<ConcurrentTheme>(pref.customTheme ?? theme)
+    const [newThemeBase, setNewThemeBase] = useState<any>(pref.customTheme ?? theme)
+
+    const newTheme = useMemo(() => {
+        return createConcurrentThemeFromObject(newThemeBase)
+    }, [newThemeBase])
 
     useEffect(() => {
         setTitle(theme.meta?.name ?? 'My Theme')
@@ -136,38 +140,36 @@ export const ThemeCreator = (): JSX.Element => {
         return regex.test(color)
     }
     useEffect(() => {
-        setNewTheme(
-            createConcurrentThemeFromObject({
-                meta: {
-                    name: title,
-                    author: client.user?.ccid
+        setNewThemeBase({
+            meta: {
+                name: title,
+                author: client.user?.ccid
+            },
+            palette: {
+                primary: {
+                    main: validateColor(uiBackground) ? uiBackground : newThemeBase?.palette.primary.main,
+                    contrastText: validateColor(uiText) ? uiText : newThemeBase?.palette.primary.contrastText
                 },
-                palette: {
-                    primary: {
-                        main: validateColor(uiBackground) ? uiBackground : newTheme?.palette.primary.main,
-                        contrastText: validateColor(uiText) ? uiText : newTheme?.palette.primary.contrastText
-                    },
-                    secondary: {
-                        main: validateColor(contentLink) ? contentLink : newTheme?.palette.secondary.main
-                    },
-                    background: {
-                        default: validateColor(underlayBackground)
-                            ? underlayBackground
-                            : newTheme?.palette.background.default,
-                        paper: validateColor(contentBackground)
-                            ? contentBackground
-                            : newTheme?.palette.background.paper,
-                        contrastText: validateColor(underlayText)
-                            ? underlayText
-                            : newTheme?.palette.background.contrastText
-                    },
-                    text: {
-                        primary: validateColor(contentText) ? contentText : newTheme?.palette.text.primary,
-                        secondary: validateColor(contentLink) ? contentLink : newTheme?.palette.text.secondary
-                    }
+                secondary: {
+                    main: validateColor(contentLink) ? contentLink : newThemeBase?.palette.secondary.main
+                },
+                background: {
+                    default: validateColor(underlayBackground)
+                        ? underlayBackground
+                        : newThemeBase?.palette.background.default,
+                    paper: validateColor(contentBackground)
+                        ? contentBackground
+                        : newThemeBase?.palette.background.paper,
+                    contrastText: validateColor(underlayText)
+                        ? underlayText
+                        : newThemeBase?.palette.background.contrastText
+                },
+                text: {
+                    primary: validateColor(contentText) ? contentText : newThemeBase?.palette.text.primary,
+                    secondary: validateColor(contentLink) ? contentLink : newThemeBase?.palette.text.secondary
                 }
-            })
-        )
+            }
+        })
     }, [contentBackground, contentLink, contentText, uiBackground, uiText, underlayBackground, underlayText])
 
     const serialized = useMemo(() => {
@@ -216,7 +218,7 @@ export const ThemeCreator = (): JSX.Element => {
                                 height: '50px'
                             }}
                             onClick={() => {
-                                pref.setCustomTheme(newTheme)
+                                pref.setCustomTheme(newThemeBase)
                             }}
                         >
                             Apply
