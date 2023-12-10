@@ -4,7 +4,7 @@ import { usePreference } from '../../context/PreferenceContext'
 import { Link as RouterLink } from 'react-router-dom'
 
 export const MinimalStreamList = (): JSX.Element => {
-    const pref = usePreference()
+    const [lists] = usePreference('lists')
     return (
         <Box
             sx={{
@@ -16,7 +16,7 @@ export const MinimalStreamList = (): JSX.Element => {
                 p: 1
             }}
         >
-            {Object.keys(pref.lists).map((key) => (
+            {Object.keys(lists).map((key) => (
                 <Avatar
                     key={key}
                     component={RouterLink}
@@ -25,7 +25,7 @@ export const MinimalStreamList = (): JSX.Element => {
                         textDecoration: 'none'
                     }}
                 >
-                    {pref.lists[key].label}
+                    {lists[key].label}
                 </Avatar>
             ))}
         </Box>

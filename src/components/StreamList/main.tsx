@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next'
 
 export const StreamList = (): JSX.Element => {
     const { t } = useTranslation('', { keyPrefix: 'pages' })
-    const pref = usePreference()
+    const [lists, setLists] = usePreference('lists')
     const actions = useGlobalActions()
     return (
         <List
@@ -28,7 +28,7 @@ export const StreamList = (): JSX.Element => {
                             color: 'background.contrastText'
                         }}
                         onClick={() => {
-                            const old = pref.lists
+                            const old = lists
                             old[uuidv4()] = {
                                 label: 'new list',
                                 pinned: false,
@@ -37,7 +37,7 @@ export const StreamList = (): JSX.Element => {
                                 userStreams: [],
                                 defaultPostStreams: []
                             }
-                            pref.setLists(JSON.parse(JSON.stringify(old)))
+                            setLists(old)
                         }}
                     >
                         <AddIcon />
@@ -54,11 +54,11 @@ export const StreamList = (): JSX.Element => {
                 />
                 <ListItemText primary={t('lists.title')} />
             </ListItem>
-            {Object.keys(pref.lists).map((key) => (
+            {Object.keys(lists).map((key) => (
                 <StreamListItem
                     key={key}
                     id={key}
-                    body={pref.lists[key]}
+                    body={lists[key]}
                     onClick={() => {
                         actions.openMobileMenu(false)
                     }}

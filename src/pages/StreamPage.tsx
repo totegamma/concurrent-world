@@ -18,7 +18,9 @@ import { type VListHandle } from 'virtua'
 export const StreamPage = memo((): JSX.Element => {
     const client = useApi()
     const appData = useContext(ApplicationContext)
-    const pref = usePreference()
+
+    const [showEditorOnTop] = usePreference('showEditorOnTop')
+    const [showEditorOnTopMobile] = usePreference('showEditorOnTopMobile')
 
     const reactlocation = useLocation()
     const timelineRef = useRef<VListHandle>(null)
@@ -95,8 +97,8 @@ export const StreamPage = memo((): JSX.Element => {
                                     <Box
                                         sx={{
                                             display: {
-                                                xs: pref.showEditorOnTopMobile ? 'block' : 'none',
-                                                sm: pref.showEditorOnTop ? 'block' : 'none'
+                                                xs: showEditorOnTopMobile ? 'block' : 'none',
+                                                sm: showEditorOnTop ? 'block' : 'none'
                                             }
                                         }}
                                     >

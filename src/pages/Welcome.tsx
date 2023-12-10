@@ -1,5 +1,5 @@
 import Box from '@mui/material/Box'
-import { Themes, createConcurrentTheme } from '../themes'
+import { Themes, loadConcurrentTheme } from '../themes'
 import { Button, CssBaseline, IconButton, ThemeProvider, Typography } from '@mui/material'
 import { useState } from 'react'
 import { usePersistent } from '../hooks/usePersistent'
@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next'
 
 export default function Welcome(): JSX.Element {
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue')
-    const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
+    const [theme, setTheme] = useState<ConcurrentTheme>(loadConcurrentTheme(themeName))
 
     const themes: string[] = Object.keys(Themes)
 
@@ -23,7 +23,7 @@ export default function Welcome(): JSX.Element {
         const box = themes.filter((e) => e !== themeName)
         const newThemeName = box[Math.floor(Math.random() * box.length)]
         setThemeName(newThemeName)
-        setTheme(createConcurrentTheme(newThemeName))
+        setTheme(loadConcurrentTheme(newThemeName))
     }
 
     const { t } = useTranslation('', { keyPrefix: 'welcome' })

@@ -15,27 +15,29 @@ const StorageContext = createContext<StorageState | undefined>(undefined)
 
 export const StorageProvider = ({ children }: { children: JSX.Element | JSX.Element[] }): JSX.Element => {
     const client = useApi()
-    const pref = usePreference()
+    const [storageProvider] = usePreference('storageProvider')
+    const [s3Config] = usePreference('s3Config')
+    const [imgurClientID] = usePreference('imgurClientID')
 
     const s3Client = useMemo(() => {
-        if (pref?.storageProvider !== 's3') return null
+        if (storageProvider !== 's3') return null
         return new S3Client({
-            endpoint: pref.s3Config.endpoint,
+            endpoint: s3Config.endpoint,
             credentials: {
-                accessKeyId: pref.s3Config.accessKeyId,
-                secretAccessKey: pref.s3Config.secretAccessKey
+                accessKeyId: s3Config.accessKeyId,
+                secretAccessKey: s3Config.secretAccessKey
             },
             region: 'auto',
-            forcePathStyle: pref.s3Config.forcePathStyle
+            forcePathStyle: s3Config.forcePathStyle
         })
-    }, [pref?.storageProvider, pref?.s3Config])
+    }, [storageProvider, s3Config])
 
     const uploadFile = useCallback(
         async (file: File) => {
             const base64Data = await fileToBase64(file)
             if (!base64Data) return null
 
-            if (pref?.storageProvider === 's3') {
+            if (storageProvider === 's3') {
                 if (!s3Client) return null
                 const _base64Data = base64Data.split(',')[1]
                 const byteCharacters = atob(_base64Data)
@@ -49,7 +51,7 @@ export const StorageProvider = ({ children }: { children: JSX.Element | JSX.Elem
                 const url = await getSignedUrl(
                     s3Client,
                     new PutObjectCommand({
-                        Bucket: pref.s3Config.bucketName,
+                        Bucket: s3Config.bucketName,
                         Key: fileName
                     }),
                     {
@@ -70,20 +72,20 @@ export const StorageProvider = ({ children }: { children: JSX.Element | JSX.Elem
                     if (!result.ok) {
                         return null
                     }
-                    return `${pref.s3Config.publicUrl}/${fileName}`
+                    return `${s3Config.publicUrl}/${fileName}`
                 } catch (e) {
                     return null
                 }
-            } else if (pref?.storageProvider === 'imgur') {
+            } else if (storageProvider === 'imgur') {
                 const url = 'https://api.imgur.com/3/image'
-                if (!pref.imgurClientID) return ''
+                if (imgurClientID) return ''
                 const isImage = file.type.includes('image')
                 if (!isImage) return null
 
                 const result = await fetch(url, {
                     method: 'POST',
                     headers: {
-                        Authorization: `Client-ID ${pref.imgurClientID}`,
+                        Authorization: `Client-ID ${imgurClientID}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
@@ -114,19 +116,19 @@ export const StorageProvider = ({ children }: { children: JSX.Element | JSX.Elem
                 return json.content.url
             }
         },
-        [pref?.storageProvider, pref?.imgurClientID, pref?.s3Config]
+        [storageProvider, imgurClientID, s3Config]
     )
 
     const isUploadReady = useMemo(() => {
         console.log(client.domainServices)
-        if (pref?.storageProvider === 's3') {
-            return !!pref.s3Config.endpoint
-        } else if (pref?.storageProvider === 'imgur') {
-            return !!pref?.imgurClientID
+        if (storageProvider === 's3') {
+            return !!s3Config.endpoint
+        } else if (storageProvider === 'imgur') {
+            return !!imgurClientID
         } else {
             return 'mediaserver' in client.domainServices
         }
-    }, [pref?.storageProvider, pref?.imgurClientID, s3Client, client.domainServices])
+    }, [storageProvider, imgurClientID, s3Client, client.domainServices])
 
     return (
         <StorageContext.Provider

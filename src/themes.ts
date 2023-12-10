@@ -747,8 +747,12 @@ export function deepMerge(target: Record<string, any>, source: Record<string, an
     return output as ConcurrentTheme
 }
 
-export const createConcurrentTheme = (name: string): ConcurrentTheme => {
-    const theme: ConcurrentTheme = deepMerge(ConcurrentDefaultTheme, Themes[name])
+export const loadConcurrentTheme = (
+    name: string,
+    customs: Record<string, DeepPartial<ConcurrentTheme>> = {}
+): ConcurrentTheme => {
+    const base = customs[name] ?? Themes[name] ?? Themes.basic
+    const theme: ConcurrentTheme = deepMerge(ConcurrentDefaultTheme, base)
     return createTheme(theme) as ConcurrentTheme
 }
 

@@ -25,11 +25,11 @@ interface MessageContainerProps {
 
 export const MessageContainer = memo<MessageContainerProps>((props: MessageContainerProps): JSX.Element | null => {
     const client = useApi()
-    const pref = usePreference()
     const [message, setMessage] = useState<Message<
         SimpleNoteSchema | ReplyMessageSchema | RerouteMessageSchema
     > | null>()
     const [isFetching, setIsFetching] = useState<boolean>(true)
+    const [devMode] = usePreference('devMode')
 
     useEffect(() => {
         client
@@ -52,7 +52,7 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
     }
 
     if (!message) {
-        if (pref?.devMode) {
+        if (devMode) {
             return (
                 <>
                     <Typography>Message not found</Typography>

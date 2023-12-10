@@ -18,9 +18,11 @@ export function ListPage(): JSX.Element {
     const client = useApi()
     const path = useLocation()
     const navigate = useNavigate()
-    const pref = usePreference()
+    const [lists, setLists] = usePreference('lists')
+    const [showEditorOnTop] = usePreference('showEditorOnTop')
+    const [showEditorOnTopMobile] = usePreference('showEditorOnTopMobile')
     const rawid = path.hash.replace('#', '')
-    const id = pref.lists[rawid] ? rawid : Object.keys(pref.lists)[0]
+    const id = lists[rawid] ? rawid : Object.keys(lists)[0]
     const [tab, setTab] = useState<string>(id)
 
     const [streams, setStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
@@ -31,7 +33,7 @@ export function ListPage(): JSX.Element {
 
     useEffect(() => {
         if (!id) return
-        const list = pref.lists[id]
+        const list = lists[id]
         if (!list) return
         Promise.all(list.streams.map((streamID) => client.getStream(streamID))).then((streams) => {
             setStreams(streams.filter((e) => e !== null) as Array<Stream<CommonstreamSchema>>)
@@ -40,7 +42,7 @@ export function ListPage(): JSX.Element {
         Promise.all(list.defaultPostStreams.map((streamID) => client.getStream(streamID))).then((streams) => {
             setPostStreams(streams.filter((e) => e !== null) as Array<Stream<CommonstreamSchema>>)
         })
-    }, [id, pref.lists])
+    }, [id, lists])
 
     useEffect(() => {
         if (id) {
@@ -53,17 +55,17 @@ export function ListPage(): JSX.Element {
     }, [tab])
 
     const streamIDs = useMemo(() => {
-        return [...(pref.lists[id]?.streams ?? []), pref.lists[id]?.userStreams.map((e) => e.streamID) ?? []].flat()
-    }, [id, pref.lists])
+        return [...(lists[id]?.streams ?? []), lists[id]?.userStreams.map((e) => e.streamID) ?? []].flat()
+    }, [id, lists])
 
-    if (!pref.lists[id]) {
+    if (!lists[id]) {
         return (
             <Box>
                 <div>list not found</div>
                 <Button
                     variant="contained"
                     onClick={() => {
-                        pref.setLists({
+                        setLists({
                             home: {
                                 label: 'Home',
                                 pinned: true,
@@ -94,7 +96,7 @@ export function ListPage(): JSX.Element {
                 }}
             >
                 <TimelineHeader
-                    title={pref.lists[id].label}
+                    title={lists[id].label}
                     titleIcon={<ListIcon />}
                     secondaryAction={<InfoIcon />}
                     onSecondaryActionClick={() => {
@@ -112,13 +114,13 @@ export function ListPage(): JSX.Element {
                     textColor="secondary"
                     indicatorColor="secondary"
                 >
-                    {Object.keys(pref.lists)
-                        .filter((e) => pref.lists[e].pinned)
+                    {Object.keys(lists)
+                        .filter((e) => lists[e].pinned)
                         .map((e) => (
                             <Tab
                                 key={e}
                                 value={e}
-                                label={pref.lists[e].label}
+                                label={lists[e].label}
                                 onClick={() => {
                                     console.log('click', e, tab)
                                     if (e === tab) {
@@ -136,8 +138,8 @@ export function ListPage(): JSX.Element {
                                 <Box
                                     sx={{
                                         display: {
-                                            xs: pref.showEditorOnTopMobile ? 'block' : 'none',
-                                            sm: pref.showEditorOnTop ? 'block' : 'none'
+                                            xs: showEditorOnTopMobile ? 'block' : 'none',
+                                            sm: showEditorOnTop ? 'block' : 'none'
                                         }
                                     }}
                                 >

@@ -23,9 +23,10 @@ export interface MenuProps {
 
 export const ThinMenu = memo<MenuProps>((props: MenuProps): JSX.Element => {
     const client = useApi()
-    const pref = usePreference()
     const appData = useContext(ApplicationContext)
     const actions = useGlobalActions()
+    const [devMode] = usePreference('devMode')
+    const [showEditorOnTop] = usePreference('showEditorOnTop')
 
     if (!appData) {
         return <>loading...</>
@@ -104,7 +105,7 @@ export const ThinMenu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                             }}
                         />
                     </IconButton>
-                    {pref.devMode && (
+                    {devMode && (
                         <IconButton sx={{ p: 0.5 }} component={Link} to="/devtool" onClick={props.onClick}>
                             <TerminalIcon
                                 sx={{
@@ -137,7 +138,7 @@ export const ThinMenu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                 </Box>
                 <Divider />
                 <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center">
-                    {!pref.showEditorOnTop && (
+                    {!showEditorOnTop && (
                         <IconButton
                             onClick={() => {
                                 actions.openDraft()

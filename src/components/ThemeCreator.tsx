@@ -13,7 +13,7 @@ import {
 } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
 import { type ConcurrentTheme } from '../model'
-import { createConcurrentThemeFromObject } from '../themes'
+import { Themes, createConcurrentThemeFromObject } from '../themes'
 import { ConcurrentLogo } from './theming/ConcurrentLogo'
 import { usePreference } from '../context/PreferenceContext'
 import { useApi } from '../context/api'
@@ -102,10 +102,13 @@ export const ColorPicker = (props: ColorPickerProps): JSX.Element => {
 
 export const ThemeCreator = (): JSX.Element => {
     const client = useApi()
-    const pref = usePreference()
     const theme = useTheme<ConcurrentTheme>()
+    const [currentTheme, setCurrentTheme] = usePreference('themeName')
+    const [customThemes, setCustomThemes] = usePreference('customThemes')
 
-    const [title, setTitle] = useState(pref.customTheme?.meta?.name ?? theme.meta?.name ?? 'My Theme')
+    const [title, setTitle] = useState(currentTheme ?? 'My Theme')
+    const modifyDisabled = title in Themes
+    const themeExists = customThemes[title] !== undefined
 
     const [contentBackground, setContentBackground] = useState(theme.palette.background.paper)
     const [contentText, setContentText] = useState(theme.palette.text.primary)
@@ -117,7 +120,7 @@ export const ThemeCreator = (): JSX.Element => {
     const [underlayBackground, setUnderlayBackground] = useState(theme.palette.background.default)
     const [underlayText, setUnderlayText] = useState(theme.palette.background.contrastText)
 
-    const [newThemeBase, setNewThemeBase] = useState<any>(pref.customTheme ?? theme)
+    const [newThemeBase, setNewThemeBase] = useState<any>(theme)
 
     const newTheme = useMemo(() => {
         return createConcurrentThemeFromObject(newThemeBase)
@@ -125,14 +128,18 @@ export const ThemeCreator = (): JSX.Element => {
 
     useEffect(() => {
         setTitle(theme.meta?.name ?? 'My Theme')
-        setContentBackground(pref.customTheme?.palette?.background?.paper ?? theme.palette.background.paper)
-        setContentText(pref.customTheme?.palette?.text?.primary ?? theme.palette.text.primary)
-        setContentLink(pref.customTheme?.palette?.text?.secondary ?? theme.palette.text.secondary)
-        setUiBackground(pref.customTheme?.palette?.primary?.main ?? theme.palette.primary.main)
-        setUiText(pref.customTheme?.palette?.primary?.contrastText ?? theme.palette.primary.contrastText)
-        setUnderlayBackground(pref.customTheme?.palette?.background?.default ?? theme.palette.background.default)
-        setUnderlayText(pref.customTheme?.palette?.background?.contrastText ?? theme.palette.background.contrastText)
+        setContentBackground(theme.palette.background.paper)
+        setContentText(theme.palette.text.primary)
+        setContentLink(theme.palette.text.secondary)
+        setUiBackground(theme.palette.primary.main)
+        setUiText(theme.palette.primary.contrastText)
+        setUnderlayBackground(theme.palette.background.default)
+        setUnderlayText(theme.palette.background.contrastText)
     }, [theme])
+
+    useEffect(() => {
+        setTitle(currentTheme)
+    }, [currentTheme])
 
     const validateColor = (color: string): boolean => {
         // The following formats are supported: #nnn, #nnnnnn, rgb(), rgba(), hsl(), hsla(), color().
@@ -218,10 +225,22 @@ export const ThemeCreator = (): JSX.Element => {
                                 height: '50px'
                             }}
                             onClick={() => {
-                                pref.setCustomTheme(newThemeBase)
+                                if (themeExists) {
+                                    setCustomThemes({
+                                        ...customThemes,
+                                        [title]: newThemeBase
+                                    })
+                                } else {
+                                    setCustomThemes({
+                                        ...customThemes,
+                                        [title]: newThemeBase
+                                    })
+                                }
+                                setCurrentTheme(title)
                             }}
+                            disabled={modifyDisabled}
                         >
-                            Apply
+                            {themeExists ? 'Modify' : 'Create'}
                         </Button>
                     </Box>
                     <Box
