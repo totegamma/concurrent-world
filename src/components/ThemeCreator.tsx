@@ -19,6 +19,7 @@ import { usePreference } from '../context/PreferenceContext'
 import { useApi } from '../context/api'
 import { HexColorPicker } from 'react-colorful'
 import ColorizeIcon from '@mui/icons-material/Colorize'
+import { useGlobalActions } from '../context/GlobalActions'
 
 export interface ColorPickerProps {
     label: string
@@ -102,6 +103,7 @@ export const ColorPicker = (props: ColorPickerProps): JSX.Element => {
 
 export const ThemeCreator = (): JSX.Element => {
     const client = useApi()
+    const actions = useGlobalActions()
     const theme = useTheme<ConcurrentTheme>()
     const [currentTheme, setCurrentTheme] = usePreference('themeName')
     const [customThemes, setCustomThemes] = usePreference('customThemes')
@@ -122,12 +124,16 @@ export const ThemeCreator = (): JSX.Element => {
 
     const [newThemeBase, setNewThemeBase] = useState<any>(theme)
 
+    useEffect(() => {
+        console.log('currentTHeme:', currentTheme)
+        setTitle(currentTheme)
+    }, [currentTheme])
+
     const newTheme = useMemo(() => {
         return createConcurrentThemeFromObject(newThemeBase)
     }, [newThemeBase])
 
     useEffect(() => {
-        setTitle(theme.meta?.name ?? 'My Theme')
         setContentBackground(theme.palette.background.paper)
         setContentText(theme.palette.text.primary)
         setContentLink(theme.palette.text.secondary)
@@ -136,10 +142,6 @@ export const ThemeCreator = (): JSX.Element => {
         setUnderlayBackground(theme.palette.background.default)
         setUnderlayText(theme.palette.background.contrastText)
     }, [theme])
-
-    useEffect(() => {
-        setTitle(currentTheme)
-    }, [currentTheme])
 
     const validateColor = (color: string): boolean => {
         // The following formats are supported: #nnn, #nnnnnn, rgb(), rgba(), hsl(), hsla(), color().
@@ -193,12 +195,20 @@ export const ThemeCreator = (): JSX.Element => {
                     }}
                 >
                     <Box p={2} display="flex" flexDirection="row" alignItems="center" gap={2}>
-                        <ConcurrentLogo
-                            size="50px"
-                            upperColor={newTheme.palette.primary.main}
-                            lowerColor={newTheme.palette.background.default}
-                            frameColor={newTheme.palette.background.default}
-                        />
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                borderRadius: '100px',
+                                background: newTheme.palette.primary.contrastText
+                            }}
+                        >
+                            <ConcurrentLogo
+                                size="50px"
+                                upperColor={newTheme.palette.primary.main}
+                                lowerColor={newTheme.palette.background.default}
+                                frameColor={newTheme.palette.background.default}
+                            />
+                        </Box>
                         <TextField
                             fullWidth
                             placeholder="Theme Name"
@@ -343,7 +353,21 @@ export const ThemeCreator = (): JSX.Element => {
                         </Box>
                     </Box>
                 </Paper>
-                <TextField fullWidth multiline value={serialized} />
+                <Box display="flex" gap={1}>
+                    <TextField fullWidth multiline value={serialized} />
+                    <Button
+                        variant="contained"
+                        onClick={() => {
+                            actions.setDraft(`
+\`\`\`theme
+${serialized}
+\`\`\``)
+                            actions.openDraft()
+                        }}
+                    >
+                        Share
+                    </Button>
+                </Box>
             </Box>
         </ThemeProvider>
     )

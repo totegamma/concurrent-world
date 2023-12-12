@@ -15,6 +15,7 @@ import { usePreference } from './PreferenceContext'
 import { ProfileEditor } from '../components/ProfileEditor'
 import { MessageContainer } from '../components/Message/MessageContainer'
 import { Menu } from '../components/Menu/Menu'
+import { usePersistent } from '../hooks/usePersistent'
 
 export interface GlobalActionsState {
     openDraft: () => void
@@ -22,6 +23,8 @@ export interface GlobalActionsState {
     openReroute: (target: Message<any>) => void
     openMobileMenu: (open?: boolean) => void
     allKnownStreams: Array<Stream<CommonstreamSchema>>
+    draft: string
+    setDraft: (text: string) => void
 }
 
 const GlobalActionsContext = createContext<GlobalActionsState | undefined>(undefined)
@@ -44,6 +47,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const [lists] = usePreference('lists')
     const path = useLocation()
     const theme = useTheme()
+    const [draft, setDraft] = useState<string>('')
     const [mode, setMode] = useState<'compose' | 'reply' | 'reroute' | 'none'>('none')
     const [targetMessage, setTargetMessage] = useState<Message<any> | null>(null)
 
@@ -193,7 +197,9 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     openReply,
                     openReroute,
                     openMobileMenu,
-                    allKnownStreams
+                    allKnownStreams,
+                    draft,
+                    setDraft
                 }
             }, [openDraft, openReply, openReroute, openMobileMenu, allKnownStreams])}
         >
@@ -211,6 +217,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                 <Box sx={{ display: 'flex' }}>
                                     <Draft
                                         autoFocus
+                                        value={draft}
                                         streamPickerInitial={queriedStreams}
                                         streamPickerOptions={allKnownStreams}
                                         onSubmit={async (text: string, destinations: string[], options) => {
