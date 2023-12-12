@@ -28,7 +28,7 @@ const divider = <Divider variant="inset" component="li" sx={{ mx: 1, mt: 1 }} />
 const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle>): JSX.Element => {
     const client = useApi()
     const theme = useTheme()
-    const pref = usePreference()
+    const [sound] = usePreference('sound')
 
     const [timeline, timelineChanged] = useRefWithForceUpdate<CoreTimeline | null>(null)
 
@@ -40,7 +40,7 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
     const [loadable, setLoadable] = useState<boolean>(false)
     const [ptrEnabled, setPtrEnabled] = useState<boolean>(false)
 
-    const [playBubble] = useSound(pref?.postSound, { volume: pref?.volume / 100, interrupt: false })
+    const [playBubble] = useSound(sound.post, { volume: sound.volume / 100, interrupt: false })
     const playBubbleRef = useRef(playBubble)
 
     const [timelineLoading, setTimelineLoading] = useState<boolean>(true)

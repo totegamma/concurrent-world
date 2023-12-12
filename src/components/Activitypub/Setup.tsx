@@ -6,10 +6,11 @@ import { Schemas } from '@concurrent-world/client'
 import { usePreference } from '../../context/PreferenceContext'
 
 import { useTranslation } from 'react-i18next'
+import { type StreamList } from '../../model'
 
 export const ApSetup = (): JSX.Element => {
     const client = useApi()
-    const pref = usePreference()
+    const [lists, setLists] = usePreference('lists')
     const [userID, setUserID] = useState('')
     const { enqueueSnackbar } = useSnackbar()
 
@@ -17,6 +18,12 @@ export const ApSetup = (): JSX.Element => {
     const [entityFound, setEntityFound] = useState<boolean>(false)
 
     const { t } = useTranslation('', { keyPrefix: 'settings.ap' })
+
+    const updateList = (id: string, list: StreamList): void => {
+        const old = lists
+        old[id] = list
+        setLists(JSON.parse(JSON.stringify(old)))
+    }
 
     useEffect(() => {
         setLoading(true)
@@ -65,10 +72,10 @@ export const ApSetup = (): JSX.Element => {
             }
         )
 
-        const oldhome = pref.lists.home
+        const oldhome = lists.home
         if (oldhome) {
             oldhome.streams.push(followstream.id)
-            pref.updateList('home', oldhome)
+            updateList('home', oldhome)
         }
 
         await client.api
@@ -104,7 +111,8 @@ export const ApSetup = (): JSX.Element => {
                     icon_url: client?.user?.profile?.payload.body.avatar
                 })
             })
-            .then(async (res) => await res.json()) .catch((e) => {
+            .then(async (res) => await res.json())
+            .catch((e) => {
                 enqueueSnackbar(`init profile failed: ${e}`, {
                     variant: 'error'
                 })

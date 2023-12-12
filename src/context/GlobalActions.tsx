@@ -41,7 +41,7 @@ const style = {
 
 export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element => {
     const client = useApi()
-    const pref = usePreference()
+    const [lists] = usePreference('lists')
     const path = useLocation()
     const theme = useTheme()
     const [mode, setMode] = useState<'compose' | 'reply' | 'reroute' | 'none'>('none')
@@ -63,7 +63,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
 
     useEffect(() => {
         setAllKnownStreams([])
-        const allStreams = Object.values(pref.lists)
+        const allStreams = Object.values(lists)
             .map((list) => list.streams)
             .flat()
         const uniq = [...new Set(allStreams)]
@@ -74,7 +74,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                 }
             })
         })
-    }, [pref.lists])
+    }, [lists])
 
     useEffect(() => {
         client.api.readDomain(client.api.host).then((domain) => {
@@ -93,7 +93,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
             }
             default: {
                 const rawid = path.hash.replace('#', '')
-                const list = pref.lists[rawid] ?? Object.values(pref.lists)[0]
+                const list = lists[rawid] ?? Object.values(lists)[0]
                 if (!list) break
                 streamIDs = list.defaultPostStreams
                 break
@@ -103,7 +103,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         Promise.all(streamIDs.map((id) => client.getStream(id))).then((streams) => {
             setQueriedStreams(streams.filter((e) => e !== null) as Array<Stream<CommonstreamSchema>>)
         })
-    }, [path.pathname, path.hash, pref.lists])
+    }, [path.pathname, path.hash, lists])
 
     const openDraft = useCallback(() => {
         updateQueriedStreams()

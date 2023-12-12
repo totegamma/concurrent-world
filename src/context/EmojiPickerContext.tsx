@@ -35,7 +35,7 @@ interface EmojiPickerProps {
 }
 
 export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
-    const pref = usePreference()
+    const [emojiPackageSource] = usePreference('emojiPackages')
     const theme = useTheme()
 
     const RowEmojiCount = 6
@@ -118,7 +118,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
 
     useEffect(() => {
         Promise.all(
-            pref.emojiPackages.map(async (url) => {
+            emojiPackageSource.map(async (url) => {
                 const rawpackage = await fetch(url).then((j) => j.json())
                 const packages: EmojiPackage = {
                     ...rawpackage,
@@ -130,7 +130,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
             setEmojiPackages(packages)
             setAllEmojis(packages.flatMap((p) => p.emojis))
         })
-    }, [pref.emojiPackages])
+    }, [emojiPackageSource])
 
     useEffect(() => {
         if (query.length > 0) {

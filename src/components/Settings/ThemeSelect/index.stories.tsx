@@ -1,7 +1,7 @@
 import type { Meta } from '@storybook/react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import type { ConcurrentTheme } from '../../../model'
-import { createConcurrentTheme, Themes } from '../../../themes'
+import { loadConcurrentTheme, Themes } from '../../../themes'
 import { CssBaseline, ThemeProvider } from '@mui/material'
 import { ThemeSelect } from './index'
 
@@ -28,16 +28,26 @@ const meta = {
 export default meta
 
 export const Default = (arg: Props): JSX.Element => {
-    const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(arg.themeName ?? 'basic'))
+    const [theme, setTheme] = useState<ConcurrentTheme>(loadConcurrentTheme(arg.themeName ?? 'basic'))
 
     useEffect(() => {
-        setTheme(createConcurrentTheme(arg.themeName ?? 'basic'))
+        setTheme(loadConcurrentTheme(arg.themeName ?? 'basic'))
     }, [arg.themeName])
+
+    const previewTheme: Record<string, ConcurrentTheme> = useMemo(
+        () => Object.fromEntries(Object.keys(Themes).map((e) => [e, loadConcurrentTheme(e)])),
+        []
+    )
 
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline>
-                <ThemeSelect />
+                <ThemeSelect
+                    themes={previewTheme}
+                    setThemeName={(name) => {
+                        setTheme(loadConcurrentTheme(name))
+                    }}
+                />
             </CssBaseline>
         </ThemeProvider>
     )

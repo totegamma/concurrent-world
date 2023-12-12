@@ -6,7 +6,7 @@ import ApiProvider from '../context/api'
 import type { ConcurrentTheme } from '../model'
 import { CssBaseline, Fade, IconButton, Paper, ThemeProvider, darken } from '@mui/material'
 import { usePersistent } from '../hooks/usePersistent'
-import { Themes, createConcurrentTheme } from '../themes'
+import { Themes, loadConcurrentTheme } from '../themes'
 import { type Identity, generateIdentity } from '../util'
 import { ConcurrentWordmark } from '../components/theming/ConcurrentWordmark'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
@@ -33,7 +33,7 @@ export function Registration(): JSX.Element {
 
     const { t, i18n } = useTranslation('', { keyPrefix: 'registration' })
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue')
-    const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
+    const [theme, setTheme] = useState<ConcurrentTheme>(loadConcurrentTheme(themeName))
     const [domain, setDomain] = usePersistent<string>('Domain', 'hub.concurrent.world')
     const [client, initializeClient] = useState<Client>()
     const [host, setHost] = useState<CoreDomain | null | undefined>()
@@ -51,7 +51,7 @@ export function Registration(): JSX.Element {
         const box = themes.filter((e) => e !== themeName)
         const newThemeName = box[Math.floor(Math.random() * box.length)]
         setThemeName(newThemeName)
-        setTheme(createConcurrentTheme(newThemeName))
+        setTheme(loadConcurrentTheme(newThemeName))
     }
 
     useEffect(() => {

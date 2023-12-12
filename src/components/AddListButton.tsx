@@ -8,11 +8,10 @@ export interface AddListButtonProps {
 }
 
 export const AddListButton = (props: AddListButtonProps): JSX.Element => {
-    const pref = usePreference()
-
+    const [lists, setLists] = usePreference('lists')
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
-    if (!pref?.lists) return <></>
+    if (!lists) return <></>
 
     return (
         <>
@@ -37,19 +36,19 @@ export const AddListButton = (props: AddListButtonProps): JSX.Element => {
                     setMenuAnchor(null)
                 }}
             >
-                {Object.keys(pref.lists).map((e) => (
+                {Object.keys(lists).map((e) => (
                     <MenuItem key={e} onClick={() => {}}>
-                        {pref.lists[e].label}
+                        {lists[e].label}
                         <Checkbox
-                            checked={pref.lists[e].streams.includes(props.stream)}
+                            checked={lists[e].streams.includes(props.stream)}
                             onChange={(check) => {
-                                const old = pref.lists
+                                const old = lists
                                 if (check.target.checked) {
                                     old[e].streams.push(props.stream)
-                                    pref.setLists(JSON.parse(JSON.stringify(old)))
+                                    setLists(JSON.parse(JSON.stringify(old)))
                                 } else {
                                     old[e].streams = old[e].streams.filter((e) => e !== props.stream)
-                                    pref.setLists(JSON.parse(JSON.stringify(old)))
+                                    setLists(JSON.parse(JSON.stringify(old)))
                                 }
                             }}
                         />

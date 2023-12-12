@@ -12,7 +12,7 @@ import { useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 export const EmojiSettings = (): JSX.Element => {
-    const pref = usePreference()
+    const [emojiPackages, setEmojiPackages] = usePreference('emojiPackages')
     const path = useLocation()
     const { enqueueSnackbar } = useSnackbar()
 
@@ -31,7 +31,7 @@ export const EmojiSettings = (): JSX.Element => {
 
     useEffect(() => {
         Promise.all(
-            pref.emojiPackages.map((url) =>
+            emojiPackages.map((url) =>
                 fetch(url)
                     .then((j) => j.json())
                     .then((p: RawEmojiPackage) => ({ ...p, packageURL: url }))
@@ -39,7 +39,7 @@ export const EmojiSettings = (): JSX.Element => {
         ).then((packages: EmojiPackage[]) => {
             setPackages(packages)
         })
-    }, [pref.emojiPackages])
+    }, [emojiPackages])
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -100,7 +100,7 @@ export const EmojiSettings = (): JSX.Element => {
                             </Typography>
                             <IconButton
                                 onClick={() => {
-                                    pref.setEmojiPackages(pref.emojiPackages.filter((p) => p !== e.packageURL))
+                                    setEmojiPackages(emojiPackages.filter((p) => p !== e.packageURL))
                                 }}
                                 sx={{
                                     position: 'absolute',
@@ -136,7 +136,7 @@ export const EmojiSettings = (): JSX.Element => {
                     <IconButton
                         onClick={() => {
                             if (!packages.find((p) => p.packageURL === preview.packageURL)) {
-                                pref.setEmojiPackages([...pref.emojiPackages, addingPackageURL])
+                                setEmojiPackages([...emojiPackages, addingPackageURL])
                                 setAddingPackageURL('')
                                 setPreview(null)
                             } else {

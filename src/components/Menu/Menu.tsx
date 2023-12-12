@@ -39,11 +39,11 @@ export interface MenuProps {
 
 export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
     const client = useApi()
-    const pref = usePreference()
     const appData = useContext(ApplicationContext)
     const actions = useGlobalActions()
-
     const { t } = useTranslation('', { keyPrefix: 'pages' })
+    const [devMode] = usePreference('devMode')
+    const [showEditorOnTop] = usePreference('showEditorOnTop')
 
     if (!appData) {
         return <>loading...</>
@@ -149,7 +149,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                 <ListItemText primary={t('explore.title')} />
                             </ListItemButton>
                         </ListItem>
-                        {pref.devMode && (
+                        {devMode && (
                             <ListItem disablePadding>
                                 <ListItemButton sx={{ gap: 1 }} component={Link} to="/devtool" onClick={props.onClick}>
                                     <TerminalIcon
@@ -188,7 +188,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                 >
                     <StreamList />
                 </Box>
-                {!pref.showEditorOnTop && (
+                {!showEditorOnTop && (
                     <Button
                         variant="contained"
                         endIcon={<CreateIcon />}

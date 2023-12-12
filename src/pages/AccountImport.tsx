@@ -11,7 +11,7 @@ import { LangJa } from '../utils/lang-ja'
 import { Client, LoadKey, type CoreDomain, CommputeCCID } from '@concurrent-world/client'
 import type { ConcurrentTheme } from '../model'
 import { usePersistent } from '../hooks/usePersistent'
-import { Themes, createConcurrentTheme } from '../themes'
+import { Themes, loadConcurrentTheme } from '../themes'
 import { ThemeProvider } from '@emotion/react'
 import { CssBaseline, IconButton, InputAdornment, darken } from '@mui/material'
 import { ConcurrentWordmark } from '../components/theming/ConcurrentWordmark'
@@ -25,14 +25,14 @@ export function AccountImport(): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'import' })
 
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue2')
-    const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
+    const [theme, setTheme] = useState<ConcurrentTheme>(loadConcurrentTheme(themeName))
 
     const themes: string[] = Object.keys(Themes)
     const randomTheme = (): void => {
         const box = themes.filter((e) => e !== themeName)
         const newThemeName = box[Math.floor(Math.random() * box.length)]
         setThemeName(newThemeName)
-        setTheme(createConcurrentTheme(newThemeName))
+        setTheme(loadConcurrentTheme(newThemeName))
     }
 
     const [secret, setSecret] = useState<string>('')
