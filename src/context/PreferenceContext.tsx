@@ -109,7 +109,7 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
 
 export function usePreference<K extends keyof Preference>(
     key: K,
-    silent?: boolean
+    silent: boolean = false
 ): [value: Preference[K], set: (value: Preference[K]) => void] {
     const client = useApi()
     const ctx = useContext(PreferenceContext)

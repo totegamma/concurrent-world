@@ -9,11 +9,12 @@ import { usePreference } from '../../context/PreferenceContext'
 import { type ConcurrentTheme } from '../../model'
 import { Themes, loadConcurrentTheme } from '../../themes'
 import { DummyMessageView } from '../Message/DummyMessageView'
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle'
 
 export const ThemeSettings = (): JSX.Element => {
     const client = useApi()
     const [themeName, setThemeName] = usePreference('themeName')
-    const [customThemes] = usePreference('customThemes')
+    const [customThemes, setCustomTheme] = usePreference('customThemes')
     const theme = useTheme<ConcurrentTheme>()
     const { t } = useTranslation('', { keyPrefix: 'ui' })
 
@@ -86,7 +87,15 @@ export const ThemeSettings = (): JSX.Element => {
             <ThemeSelect themes={previewTheme} setThemeName={setThemeName} />
 
             <Typography variant="h3">Custom Themes:</Typography>
-            <ThemeSelect themes={renderedCustomThemes} setThemeName={setThemeName} />
+            <ThemeSelect
+                additionalButtonIcon={<RemoveCircleIcon />}
+                themes={renderedCustomThemes}
+                setThemeName={setThemeName}
+                onAdditionalButtonClick={(themeName) => {
+                    delete customThemes[themeName]
+                    setCustomTheme({ ...customThemes })
+                }}
+            />
 
             <ThemeCreator />
         </Box>

@@ -1,10 +1,12 @@
-import { Box, Button, Paper, Typography } from '@mui/material'
+import { Box, Button, IconButton, Paper, Typography } from '@mui/material'
 import { ConcurrentLogo } from '../../theming/ConcurrentLogo'
 import type { ConcurrentTheme } from '../../../model'
 
 export interface ThemeSelectProps {
     themes: Record<string, ConcurrentTheme>
     setThemeName: (name: string) => void
+    additionalButtonIcon?: JSX.Element
+    onAdditionalButtonClick?: (id: string) => void
 }
 
 export const ThemeSelect = (props: ThemeSelectProps): JSX.Element => {
@@ -51,12 +53,25 @@ export const ThemeSelect = (props: ThemeSelectProps): JSX.Element => {
                         </Box>
                         <Typography
                             sx={{
-                                color: props.themes[e].palette.text.primary
+                                color: props.themes[e].palette.text.primary,
+                                flexGrow: 1
                             }}
                             variant="button"
                         >
                             {e}
                         </Typography>
+                        {props.additionalButtonIcon && (
+                            <IconButton
+                                onClick={() => {
+                                    props.onAdditionalButtonClick?.(e)
+                                }}
+                                sx={{
+                                    color: props.themes[e].palette.text.primary
+                                }}
+                            >
+                                {props.additionalButtonIcon}
+                            </IconButton>
+                        )}
                     </Button>
                 </Paper>
             ))}
