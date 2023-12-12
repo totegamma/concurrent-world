@@ -12,6 +12,7 @@ import type { EmojiLite } from '../../model'
 import { userMentionRemarkPlugin, emojiRemarkPlugin } from '../../util'
 import { CCUserChip } from './CCUserChip'
 import { LinkChip } from './LinkChip'
+import { ThemeCard } from '../ThemeCard'
 
 export interface MarkdownRendererProps {
     messagebody: string
@@ -225,6 +226,18 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                                   .split('\n')[0]
                                   .slice(3)
                             : ''
+
+                        if (language === 'theme') {
+                            try {
+                                const theme = JSON.parse(String(children))
+                                if (theme?.meta?.author) {
+                                    return <ThemeCard theme={theme} />
+                                }
+                            } catch (e) {
+                                console.error(e)
+                            }
+                        }
+
                         return inline ? (
                             <Box
                                 component="span"

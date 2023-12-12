@@ -180,20 +180,8 @@ export const ThemeCreator = (): JSX.Element => {
     }, [contentBackground, contentLink, contentText, uiBackground, uiText, underlayBackground, underlayText])
 
     const serialized = useMemo(() => {
-        const colors = [
-            contentBackground,
-            contentLink,
-            contentText,
-            uiBackground,
-            uiText,
-            underlayBackground,
-            underlayText
-        ]
-        if (colors.some((color) => !validateColor(color))) {
-            return ''
-        }
-        return colors.join(';')
-    }, [contentBackground, contentLink, contentText, uiBackground, uiText, underlayBackground, underlayText])
+        return JSON.stringify(newThemeBase)
+    }, [newThemeBase])
 
     return (
         <ThemeProvider theme={newTheme}>
@@ -355,29 +343,7 @@ export const ThemeCreator = (): JSX.Element => {
                         </Box>
                     </Box>
                 </Paper>
-                <TextField
-                    fullWidth
-                    multiline
-                    value={serialized}
-                    onChange={(e) => {
-                        const [
-                            contentBackground,
-                            contentLink,
-                            contentText,
-                            uiBackground,
-                            uiText,
-                            underlayBackground,
-                            underlayText
-                        ] = e.target.value.split(';')
-                        setContentBackground(contentBackground)
-                        setContentLink(contentLink)
-                        setContentText(contentText)
-                        setUiBackground(uiBackground)
-                        setUiText(uiText)
-                        setUnderlayBackground(underlayBackground)
-                        setUnderlayText(underlayText)
-                    }}
-                />
+                <TextField fullWidth multiline value={serialized} />
             </Box>
         </ThemeProvider>
     )
