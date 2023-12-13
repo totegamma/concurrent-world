@@ -1,4 +1,4 @@
-import { createTheme } from '@mui/material'
+import { alpha, createTheme } from '@mui/material'
 import type { ConcurrentTheme } from './model'
 import { type DeepPartial } from './util'
 
@@ -645,6 +645,11 @@ export const ConcurrentDefaultTheme = {
         background: {
             default: '#9e9e9e',
             contrastText: '#ffffff'
+        },
+        text: {
+            primary: '#000000',
+            secondary: '#000000',
+            disabled: 'rgba(0, 0, 0, 0.5)'
         }
     },
     typography: {
@@ -747,16 +752,32 @@ export function deepMerge(target: Record<string, any>, source: Record<string, an
     return output as ConcurrentTheme
 }
 
+export const createConcurrentThemeFromObject = (base: any): ConcurrentTheme => {
+    if (base.palette.text !== undefined) {
+        if (base.palette.text.hint === undefined) base.palette.text.hint = alpha(base.palette.text.primary, 0.5)
+        if (base.palette.text.disabled === undefined) base.palette.text.disabled = alpha(base.palette.text.primary, 0.5)
+        if (base.palette.divider === undefined) base.palette.divider = alpha(base.palette.text.primary, 0.12)
+    }
+
+    if (base.palette.text?.primary && !base.components)
+        base.components = {
+            MuiCssBaseline: {
+                styleOverrides: {
+                    '::-webkit-scrollbar-thumb': {
+                        backgroundColor: alpha(base.palette.text.primary, 0.2)
+                    }
+                }
+            }
+        }
+
+    const theme: ConcurrentTheme = deepMerge(ConcurrentDefaultTheme, base)
+    return createTheme(theme) as ConcurrentTheme
+}
+
 export const loadConcurrentTheme = (
     name: string,
     customs: Record<string, DeepPartial<ConcurrentTheme>> = {}
 ): ConcurrentTheme => {
     const base = customs[name] ?? Themes[name] ?? Themes.basic
-    const theme: ConcurrentTheme = deepMerge(ConcurrentDefaultTheme, base)
-    return createTheme(theme) as ConcurrentTheme
-}
-
-export const createConcurrentThemeFromObject = (base: any): ConcurrentTheme => {
-    const theme: ConcurrentTheme = deepMerge(ConcurrentDefaultTheme, base)
-    return createTheme(theme) as ConcurrentTheme
+    return createConcurrentThemeFromObject(base)
 }
