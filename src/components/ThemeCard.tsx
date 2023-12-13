@@ -3,13 +3,15 @@ import { type ConcurrentTheme } from '../model'
 import { ConcurrentLogo } from './theming/ConcurrentLogo'
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline'
 import { usePreference } from '../context/PreferenceContext'
+import { closeSnackbar, useSnackbar } from 'notistack'
 
 export interface ThemeCardProps {
     theme: ConcurrentTheme
 }
 
 export const ThemeCard = (props: ThemeCardProps): JSX.Element => {
-    const [_, setThemeName] = usePreference('themeName')
+    const { enqueueSnackbar } = useSnackbar()
+    const [themeName, setThemeName] = usePreference('themeName')
     const [customThemes, setCustomThemes] = usePreference('customThemes')
 
     return (
@@ -52,6 +54,19 @@ export const ThemeCard = (props: ThemeCardProps): JSX.Element => {
                 <IconButton
                     onClick={() => {
                         if (!props.theme.meta?.name) return
+                        enqueueSnackbar(`Theme downloaded: ${props.theme.meta.name}`, {
+                            autoHideDuration: 15000,
+                            action: (key) => (
+                                <Button
+                                    onClick={() => {
+                                        setThemeName(themeName)
+                                        closeSnackbar(key)
+                                    }}
+                                >
+                                    undo
+                                </Button>
+                            )
+                        })
                         setThemeName(props.theme.meta.name)
                         setCustomThemes({
                             ...customThemes,
