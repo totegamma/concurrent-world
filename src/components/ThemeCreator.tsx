@@ -122,7 +122,11 @@ export const ThemeCreator = (): JSX.Element => {
     const [underlayBackground, setUnderlayBackground] = useState(theme.palette.background.default)
     const [underlayText, setUnderlayText] = useState(theme.palette.background.contrastText)
 
+    const [_comment, setComment] = useState<string>(theme.meta?.comment ?? '')
+
     const [newThemeBase, setNewThemeBase] = useState<any>(theme)
+
+    const comment = _comment.trim().length > 0 ? _comment : undefined
 
     useEffect(() => {
         console.log('currentTHeme:', currentTheme)
@@ -152,7 +156,8 @@ export const ThemeCreator = (): JSX.Element => {
         setNewThemeBase({
             meta: {
                 name: title,
-                author: client.user?.ccid
+                author: client.user?.ccid,
+                comment
             },
             palette: {
                 primary: {
@@ -179,7 +184,7 @@ export const ThemeCreator = (): JSX.Element => {
                 }
             }
         })
-    }, [contentBackground, contentLink, contentText, uiBackground, uiText, underlayBackground, underlayText])
+    }, [contentBackground, contentLink, contentText, uiBackground, uiText, underlayBackground, underlayText, comment])
 
     const serialized = useMemo(() => {
         return JSON.stringify(newThemeBase)
@@ -211,10 +216,20 @@ export const ThemeCreator = (): JSX.Element => {
                         </Box>
                         <TextField
                             fullWidth
-                            placeholder="Theme Name"
                             value={title}
+                            label="Title"
                             onChange={(e) => {
                                 setTitle(e.target.value)
+                            }}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    '& fieldset': {
+                                        borderColor: 'text.disabled'
+                                    },
+                                    '&:hover fieldset': {
+                                        borderColor: 'text.primary'
+                                    }
+                                }
                             }}
                         />
                         <Button
@@ -354,7 +369,28 @@ export const ThemeCreator = (): JSX.Element => {
                     </Box>
                 </Paper>
                 <Box display="flex" gap={1}>
-                    <TextField fullWidth multiline value={serialized} />
+                    <TextField
+                        label="Comment"
+                        fullWidth
+                        multiline
+                        value={_comment}
+                        onChange={(e) => {
+                            setComment(e.target.value)
+                        }}
+                        sx={{
+                            '& .MuiOutlinedInput-root': {
+                                '& fieldset': {
+                                    borderColor: 'text.disabled'
+                                },
+                                '&:hover fieldset': {
+                                    borderColor: 'text.primary'
+                                }
+                            }
+                        }}
+                    />
+                    {/*
+                        <TextField fullWidth multiline value={serialized} />
+                    */}
                     <Button
                         variant="contained"
                         onClick={() => {
