@@ -2,6 +2,7 @@ import { Box, Button, ButtonGroup, Checkbox, Menu, MenuItem, useTheme } from '@m
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import { usePreference } from '../context/PreferenceContext'
 import { useState } from 'react'
+import { type StreamList } from '../model'
 
 export interface FollowButtonProps {
     color?: string
@@ -10,15 +11,20 @@ export interface FollowButtonProps {
 }
 
 export const FollowButton = (props: FollowButtonProps): JSX.Element => {
-    const pref = usePreference()
+    const [lists, setLists] = usePreference('lists')
     const theme = useTheme()
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
-    const followed =
-        pref?.lists !== undefined && pref.lists.home.userStreams.map((e) => e.userID).includes(props.userCCID)
+    const followed = lists ? lists.home.userStreams.map((e) => e.userID).includes(props.userCCID) : []
 
-    if (pref?.lists === undefined) {
+    if (lists === undefined) {
         return <></>
+    }
+
+    const updateList = (id: string, list: StreamList): void => {
+        const old = lists
+        old[id] = list
+        setLists(JSON.parse(JSON.stringify(old)))
     }
 
     return (
@@ -27,15 +33,15 @@ export const FollowButton = (props: FollowButtonProps): JSX.Element => {
                 <Button
                     onClick={(_) => {
                         if (followed) {
-                            pref.updateList('home', {
-                                ...pref.lists.home,
-                                userStreams: pref.lists.home.userStreams.filter((e) => e.userID !== props.userCCID)
+                            updateList('home', {
+                                ...lists.home,
+                                userStreams: lists.home.userStreams.filter((e) => e.userID !== props.userCCID)
                             })
                         } else {
-                            pref.updateList('home', {
-                                ...pref.lists.home,
+                            updateList('home', {
+                                ...lists.home,
                                 userStreams: [
-                                    ...pref.lists.home.userStreams,
+                                    ...lists.home.userStreams,
                                     {
                                         streamID: props.userStreamID,
                                         userID: props.userCCID
@@ -69,17 +75,17 @@ export const FollowButton = (props: FollowButtonProps): JSX.Element => {
                     zIndex: theme.zIndex.tooltip + 1
                 }}
             >
-                {Object.keys(pref.lists).map((id) => (
+                {Object.keys(lists).map((id) => (
                     <MenuItem key={id} onClick={() => {}}>
-                        {pref.lists[id].label}
+                        {lists[id].label}
                         <Checkbox
-                            checked={pref.lists[id].userStreams.map((e) => e.userID).includes(props.userCCID)}
+                            checked={lists[id].userStreams.map((e) => e.userID).includes(props.userCCID)}
                             onChange={(check) => {
                                 if (check.target.checked) {
-                                    pref.updateList(id, {
-                                        ...pref.lists[id],
+                                    updateList(id, {
+                                        ...lists[id],
                                         userStreams: [
-                                            ...pref.lists[id].userStreams,
+                                            ...lists[id].userStreams,
                                             {
                                                 streamID: props.userStreamID,
                                                 userID: props.userCCID
@@ -87,11 +93,9 @@ export const FollowButton = (props: FollowButtonProps): JSX.Element => {
                                         ]
                                     })
                                 } else {
-                                    pref.updateList(id, {
-                                        ...pref.lists[id],
-                                        userStreams: pref.lists[id].userStreams.filter(
-                                            (e) => e.userID !== props.userCCID
-                                        )
+                                    updateList(id, {
+                                        ...lists[id],
+                                        userStreams: lists[id].userStreams.filter((e) => e.userID !== props.userCCID)
                                     })
                                 }
                             }}

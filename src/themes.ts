@@ -1,9 +1,13 @@
-import { createTheme } from '@mui/material'
+import { alpha, createTheme } from '@mui/material'
 import type { ConcurrentTheme } from './model'
 import { type DeepPartial } from './util'
 
 export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     basic: {
+        meta: {
+            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            comment: undefined
+        },
         palette: {
             primary: {
                 main: '#7e7e7e'
@@ -18,6 +22,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         }
     },
     red: {
+        meta: {
+            author: 'CCb72AAc9dcF088F7088b6718BE5a494fBB3861439', // totegamma
+            comment: undefined
+        },
         palette: {
             primary: {
                 main: '#E0576F'
@@ -32,6 +40,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         }
     },
     blue: {
+        meta: {
+            author: 'CCb72AAc9dcF088F7088b6718BE5a494fBB3861439', // totegamma
+            comment: 'コンカレで一番最初に作られたテーマです！'
+        },
         palette: {
             primary: {
                 main: '#0476d9'
@@ -46,6 +58,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         }
     },
     orange: {
+        meta: {
+            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            comment: undefined
+        },
         palette: {
             primary: {
                 main: '#c52b26'
@@ -60,6 +76,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         }
     },
     highcontrast_bw: {
+        meta: {
+            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            comment: undefined
+        },
         palette: {
             primary: {
                 main: '#ffffff'
@@ -94,6 +114,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         }
     },
     highcontrast_yb: {
+        meta: {
+            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            comment: undefined
+        },
         palette: {
             primary: {
                 main: '#f7cd12'
@@ -128,6 +152,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         }
     },
     rabbuttz: {
+        meta: {
+            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            comment: undefined
+        },
         palette: {
             primary: {
                 main: '#c52b26'
@@ -143,6 +171,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         }
     },
     gammalab: {
+        meta: {
+            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            comment: undefined
+        },
         palette: {
             primary: {
                 main: '#FFF',
@@ -163,6 +195,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         }
     },
     tote: {
+        meta: {
+            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            comment: undefined
+        },
         palette: {
             primary: {
                 main: '#0469c1',
@@ -185,6 +221,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         }
     },
     cafe: {
+        meta: {
+            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            comment: undefined
+        },
         palette: {
             primary: {
                 main: '#663741'
@@ -203,6 +243,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         }
     },
     rainyday: {
+        meta: {
+            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            comment: undefined
+        },
         palette: {
             primary: {
                 main: '#70868b'
@@ -227,6 +271,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         }
     },
     oldcomputing: {
+        meta: {
+            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            comment: undefined
+        },
         palette: {
             primary: {
                 main: '#939195'
@@ -245,6 +293,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         }
     },
     redmond: {
+        meta: {
+            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            comment: undefined
+        },
         palette: {
             primary: {
                 main: '#00007C',
@@ -264,6 +316,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         }
     },
     ニンテン: {
+        meta: {
+            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            comment: undefined
+        },
         palette: {
             primary: {
                 main: '#7f2f2f',
@@ -289,6 +345,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         }
     },
     sacher: {
+        meta: {
+            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            comment: undefined
+        },
         palette: {
             primary: {
                 main: '#c77e18',
@@ -314,6 +374,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         }
     },
     blue2: {
+        meta: {
+            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            comment: undefined
+        },
         palette: {
             primary: {
                 main: '#116691'
@@ -345,6 +409,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         }
     },
     darkgray: {
+        meta: {
+            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            comment: undefined
+        },
         palette: {
             primary: {
                 main: '#555',
@@ -380,6 +448,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         }
     },
     messy: {
+        meta: {
+            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            comment: undefined
+        },
         palette: {
             primary: {
                 main: '#7f2f2f',
@@ -415,6 +487,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         }
     },
     trick: {
+        meta: {
+            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            comment: undefined
+        },
         palette: {
             primary: {
                 main: '#2f0931',
@@ -450,6 +526,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         }
     },
     sorcer: {
+        meta: {
+            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            comment: undefined
+        },
         palette: {
             primary: {
                 main: '#3b3845',
@@ -485,6 +565,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         }
     },
     christmas: {
+        meta: {
+            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            comment: undefined
+        },
         palette: {
             primary: {
                 main: '#1f6c29',
@@ -510,6 +594,10 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         }
     },
     winter_panache: {
+        meta: {
+            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            comment: undefined
+        },
         palette: {
             primary: {
                 main: '#ecd538',
@@ -557,6 +645,11 @@ export const ConcurrentDefaultTheme = {
         background: {
             default: '#9e9e9e',
             contrastText: '#ffffff'
+        },
+        text: {
+            primary: '#000000',
+            secondary: '#000000',
+            disabled: 'rgba(0, 0, 0, 0.5)'
         }
     },
     typography: {
@@ -659,7 +752,32 @@ export function deepMerge(target: Record<string, any>, source: Record<string, an
     return output as ConcurrentTheme
 }
 
-export const createConcurrentTheme = (name: string): ConcurrentTheme => {
-    const theme: ConcurrentTheme = deepMerge(ConcurrentDefaultTheme, Themes[name])
+export const createConcurrentThemeFromObject = (base: any): ConcurrentTheme => {
+    if (base.palette.text !== undefined) {
+        if (base.palette.text.hint === undefined) base.palette.text.hint = alpha(base.palette.text.primary, 0.5)
+        if (base.palette.text.disabled === undefined) base.palette.text.disabled = alpha(base.palette.text.primary, 0.5)
+        if (base.palette.divider === undefined) base.palette.divider = alpha(base.palette.text.primary, 0.12)
+    }
+
+    if (base.palette.text?.primary && !base.components)
+        base.components = {
+            MuiCssBaseline: {
+                styleOverrides: {
+                    '::-webkit-scrollbar-thumb': {
+                        backgroundColor: alpha(base.palette.text.primary, 0.2)
+                    }
+                }
+            }
+        }
+
+    const theme: ConcurrentTheme = deepMerge(ConcurrentDefaultTheme, base)
     return createTheme(theme) as ConcurrentTheme
+}
+
+export const loadConcurrentTheme = (
+    name: string,
+    customs: Record<string, DeepPartial<ConcurrentTheme>> = {}
+): ConcurrentTheme => {
+    const base = customs[name] ?? Themes[name] ?? Themes.basic
+    return createConcurrentThemeFromObject(base)
 }

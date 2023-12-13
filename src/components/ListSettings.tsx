@@ -7,6 +7,7 @@ import { useApi } from '../context/api'
 import { StreamLink, UserStreamLink } from './StreamList/StreamLink'
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove'
 import { useTranslation } from 'react-i18next'
+import { type StreamList } from '../model'
 
 export interface ListSettingsProps {
     id: string
@@ -14,12 +15,12 @@ export interface ListSettingsProps {
 
 export function ListSettings(props: ListSettingsProps): JSX.Element {
     const client = useApi()
-    const pref = usePreference()
+    const [lists, setLists] = usePreference('lists')
     const [listName, setListName] = useState<string>('')
 
     const { t } = useTranslation('', { keyPrefix: 'ui.listSettings' })
 
-    const list = pref.lists[props.id]
+    const list = lists[props.id]
 
     const [options, setOptions] = useState<Array<Stream<CommonstreamSchema>>>([])
     const [postStreams, setPostStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
@@ -28,7 +29,7 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
 
     useEffect(() => {
         if (props.id) {
-            const list = pref.lists[props.id]
+            const list = lists[props.id]
             if (list) {
                 setListName(list.label)
             }
@@ -44,6 +45,12 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
             setPostStreams(streams.filter((stream) => stream !== null) as Array<Stream<CommonstreamSchema>>)
         })
     }, [props.id])
+
+    const updateList = (id: string, list: StreamList): void => {
+        const old = lists
+        old[id] = list
+        setLists(JSON.parse(JSON.stringify(old)))
+    }
 
     return (
         <Box
@@ -71,7 +78,7 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                 <Button
                     variant="contained"
                     onClick={(_) => {
-                        pref.updateList(props.id, {
+                        updateList(props.id, {
                             ...list,
                             label: listName
                         })
@@ -92,7 +99,7 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                     options={options}
                     selected={postStreams}
                     setSelected={(value) => {
-                        pref.updateList(props.id, {
+                        updateList(props.id, {
                             ...list,
                             defaultPostStreams: value.map((e) => e.id)
                         })
@@ -106,7 +113,7 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                     <Switch
                         checked={list.pinned}
                         onChange={(_) => {
-                            pref.updateList(props.id, {
+                            updateList(props.id, {
                                 ...list,
                                 pinned: !list.pinned
                             })
@@ -116,9 +123,9 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                         variant="contained"
                         color="error"
                         onClick={(_) => {
-                            const old = pref.lists
+                            const old = lists
                             delete old[props.id]
-                            pref.setLists(JSON.parse(JSON.stringify(old)))
+                            setLists(JSON.parse(JSON.stringify(old)))
                         }}
                     >
                         {t('delete')}
@@ -145,7 +152,7 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                             secondaryAction={
                                 <IconButton
                                     onClick={(_) => {
-                                        pref.updateList(props.id, {
+                                        updateList(props.id, {
                                             ...list,
                                             streams: list.streams.filter((e) => e !== streamID)
                                         })
@@ -166,7 +173,7 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                             secondaryAction={
                                 <IconButton
                                     onClick={(_) => {
-                                        pref.updateList(props.id, {
+                                        updateList(props.id, {
                                             ...list,
                                             userStreams: list.userStreams.filter(
                                                 (e) => e.streamID !== userstream.streamID

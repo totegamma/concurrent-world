@@ -24,10 +24,13 @@ import { useTranslation } from 'react-i18next'
 import { Link as NavLink } from 'react-router-dom'
 
 export const GeneralSettings = (): JSX.Element => {
-    const pref = usePreference()
     const client = useApi()
     const [showPrivateKey, setShowPrivateKey] = useState(false)
     const [invitationCode, setInvitationCode] = useState<string>('')
+
+    const [showEditorOnTop, setShowEditorOnTop] = usePreference('showEditorOnTop')
+    const [showEditorOnTopMobile, setShowEditorOnTopMobile] = usePreference('showEditorOnTopMobile')
+    const [devMode, setDevMode] = usePreference('devMode')
 
     const tags = client?.api?.getTokenClaims()?.tag?.split(',') ?? []
     const { enqueueSnackbar } = useSnackbar()
@@ -88,9 +91,9 @@ export const GeneralSettings = (): JSX.Element => {
                     <FormControlLabel
                         control={
                             <Switch
-                                checked={pref.showEditorOnTop}
+                                checked={showEditorOnTop}
                                 onChange={(e) => {
-                                    pref.setShowEditorOnTop(e.target.checked)
+                                    setShowEditorOnTop(e.target.checked)
                                 }}
                             />
                         }
@@ -99,9 +102,9 @@ export const GeneralSettings = (): JSX.Element => {
                     <FormControlLabel
                         control={
                             <Switch
-                                checked={pref.showEditorOnTopMobile}
+                                checked={showEditorOnTopMobile}
                                 onChange={(e) => {
-                                    pref.setShowEditorOnTopMobile(e.target.checked)
+                                    setShowEditorOnTopMobile(e.target.checked)
                                 }}
                             />
                         }
@@ -110,9 +113,9 @@ export const GeneralSettings = (): JSX.Element => {
                     <FormControlLabel
                         control={
                             <Switch
-                                checked={pref.devMode}
+                                checked={devMode}
                                 onChange={(e) => {
-                                    pref.setDevMode(e.target.checked)
+                                    setDevMode(e.target.checked)
                                 }}
                             />
                         }
@@ -122,7 +125,7 @@ export const GeneralSettings = (): JSX.Element => {
             </Box>
             <Divider />
 
-            {pref.devMode && (
+            {devMode && (
                 <>
                     <Typography variant="h3" gutterBottom>
                         CCID

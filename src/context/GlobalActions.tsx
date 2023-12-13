@@ -15,6 +15,7 @@ import { usePreference } from './PreferenceContext'
 import { ProfileEditor } from '../components/ProfileEditor'
 import { MessageContainer } from '../components/Message/MessageContainer'
 import { Menu } from '../components/Menu/Menu'
+import { usePersistent } from '../hooks/usePersistent'
 
 export interface GlobalActionsState {
     openDraft: () => void
@@ -22,6 +23,8 @@ export interface GlobalActionsState {
     openReroute: (target: Message<any>) => void
     openMobileMenu: (open?: boolean) => void
     allKnownStreams: Array<Stream<CommonstreamSchema>>
+    draft: string
+    setDraft: (text: string) => void
 }
 
 const GlobalActionsContext = createContext<GlobalActionsState | undefined>(undefined)
@@ -41,9 +44,10 @@ const style = {
 
 export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element => {
     const client = useApi()
-    const pref = usePreference()
+    const [lists] = usePreference('lists')
     const path = useLocation()
     const theme = useTheme()
+    const [draft, setDraft] = useState<string>('')
     const [mode, setMode] = useState<'compose' | 'reply' | 'reroute' | 'none'>('none')
     const [targetMessage, setTargetMessage] = useState<Message<any> | null>(null)
 
@@ -63,7 +67,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
 
     useEffect(() => {
         setAllKnownStreams([])
-        const allStreams = Object.values(pref.lists)
+        const allStreams = Object.values(lists)
             .map((list) => list.streams)
             .flat()
         const uniq = [...new Set(allStreams)]
@@ -74,7 +78,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                 }
             })
         })
-    }, [pref.lists])
+    }, [lists])
 
     useEffect(() => {
         client.api.readDomain(client.api.host).then((domain) => {
@@ -93,7 +97,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
             }
             default: {
                 const rawid = path.hash.replace('#', '')
-                const list = pref.lists[rawid] ?? Object.values(pref.lists)[0]
+                const list = lists[rawid] ?? Object.values(lists)[0]
                 if (!list) break
                 streamIDs = list.defaultPostStreams
                 break
@@ -103,7 +107,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         Promise.all(streamIDs.map((id) => client.getStream(id))).then((streams) => {
             setQueriedStreams(streams.filter((e) => e !== null) as Array<Stream<CommonstreamSchema>>)
         })
-    }, [path.pathname, path.hash, pref.lists])
+    }, [path.pathname, path.hash, lists])
 
     const openDraft = useCallback(() => {
         updateQueriedStreams()
@@ -193,7 +197,9 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     openReply,
                     openReroute,
                     openMobileMenu,
-                    allKnownStreams
+                    allKnownStreams,
+                    draft,
+                    setDraft
                 }
             }, [openDraft, openReply, openReroute, openMobileMenu, allKnownStreams])}
         >
@@ -211,6 +217,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                 <Box sx={{ display: 'flex' }}>
                                     <Draft
                                         autoFocus
+                                        value={draft}
                                         streamPickerInitial={queriedStreams}
                                         streamPickerOptions={allKnownStreams}
                                         onSubmit={async (text: string, destinations: string[], options) => {

@@ -30,14 +30,16 @@ import { useApi } from '../../context/api'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 
 export const MediaSettings = (): JSX.Element => {
-    const pref = usePreference()
     const client = useApi()
+    const [s3Config, setS3Config] = usePreference('s3Config')
+    const [storageProvider, setStorageProvider] = usePreference('storageProvider')
+    const [imgurClientID, setImgurClientID] = usePreference('imgurClientID')
     const clientIdRef = useRef<HTMLInputElement>(null)
     const [selectedImageID, setSelectedImageID] = useState<string | null>(null)
 
     const [buttonText, setButtonText] = useState<string>('Save')
 
-    const [_s3Config, _setS3Config] = useState<s3Config>(pref.s3Config)
+    const [_s3Config, _setS3Config] = useState<s3Config>(s3Config)
 
     const handleS3ConfigChange = (key: string, value: any): void => {
         _setS3Config({ ..._s3Config, [key]: value })
@@ -52,7 +54,7 @@ export const MediaSettings = (): JSX.Element => {
     const [deleteMenu, setDeleteMenu] = useState<null | HTMLElement>(null)
 
     useEffect(() => {
-        if (pref.storageProvider !== 'domain') return
+        if (storageProvider !== 'domain') return
         client.api.fetchWithCredential(client.host, '/storage/files', {}).then((res) => {
             if (res.ok) {
                 res.json().then((content) => {
@@ -61,7 +63,7 @@ export const MediaSettings = (): JSX.Element => {
                 })
             }
         })
-    }, [pref.storageProvider])
+    }, [storageProvider])
 
     const deleteFile = (id: string): void => {
         client.api
@@ -76,7 +78,7 @@ export const MediaSettings = (): JSX.Element => {
     }
 
     const handleS3ConfigSave = (): void => {
-        pref.setS3Config(_s3Config)
+        setS3Config(_s3Config)
         setButtonText('OK!')
         setTimeout(() => {
             setButtonText('Save')
@@ -85,7 +87,7 @@ export const MediaSettings = (): JSX.Element => {
 
     const handleSave = (): void => {
         if (clientIdRef.current) {
-            pref.setImgurClientID(clientIdRef.current.value)
+            setImgurClientID(clientIdRef.current.value)
             setButtonText('OK!')
             setTimeout(() => {
                 setButtonText('Save')
@@ -107,9 +109,9 @@ export const MediaSettings = (): JSX.Element => {
 
             <Typography>{t('storageProviderLabel')}</Typography>
             <Select
-                value={pref.storageProvider}
+                value={storageProvider}
                 onChange={(v) => {
-                    pref.setStorageProvider(v.target.value)
+                    setStorageProvider(v.target.value as 'domain' | 'imgur' | 's3')
                 }}
             >
                 <MenuItem value="domain" disabled={!domainProfileAvailable}>
@@ -119,7 +121,7 @@ export const MediaSettings = (): JSX.Element => {
                 <MenuItem value="s3">s3</MenuItem>
             </Select>
 
-            {pref.storageProvider === 'domain' && (
+            {storageProvider === 'domain' && (
                 <>
                     <Alert severity="info">
                         <AlertTitle>Domain Storage</AlertTitle>
@@ -169,7 +171,7 @@ export const MediaSettings = (): JSX.Element => {
                 </>
             )}
 
-            {pref.storageProvider === 'imgur' && (
+            {storageProvider === 'imgur' && (
                 <>
                     <Alert severity="info">
                         <AlertTitle>Imgur</AlertTitle>
@@ -187,7 +189,7 @@ export const MediaSettings = (): JSX.Element => {
                                 label="ClientId"
                                 variant="outlined"
                                 fullWidth={true}
-                                defaultValue={pref.imgurClientID}
+                                defaultValue={imgurClientID}
                                 inputRef={clientIdRef}
                                 type="password"
                             />
@@ -198,7 +200,7 @@ export const MediaSettings = (): JSX.Element => {
                     </Paper>
                 </>
             )}
-            {pref.storageProvider === 's3' && (
+            {storageProvider === 's3' && (
                 <>
                     <Alert severity="info">
                         <AlertTitle>S3</AlertTitle>
@@ -229,7 +231,7 @@ export const MediaSettings = (): JSX.Element => {
                                 label="endpoint"
                                 variant="outlined"
                                 fullWidth={true}
-                                defaultValue={pref.s3Config.endpoint}
+                                defaultValue={s3Config.endpoint}
                                 onChange={(v) => {
                                     handleS3ConfigChange('endpoint', v.target.value)
                                 }}
@@ -239,7 +241,7 @@ export const MediaSettings = (): JSX.Element => {
                                 label="accessKeyId"
                                 variant="outlined"
                                 fullWidth={true}
-                                defaultValue={pref.s3Config.accessKeyId}
+                                defaultValue={s3Config.accessKeyId}
                                 onChange={(v) => {
                                     handleS3ConfigChange('accessKeyId', v.target.value)
                                 }}
@@ -249,7 +251,7 @@ export const MediaSettings = (): JSX.Element => {
                                 label="secretAccessKey"
                                 variant="outlined"
                                 fullWidth={true}
-                                defaultValue={pref.s3Config.secretAccessKey}
+                                defaultValue={s3Config.secretAccessKey}
                                 onChange={(v) => {
                                     handleS3ConfigChange('secretAccessKey', v.target.value)
                                 }}
@@ -259,7 +261,7 @@ export const MediaSettings = (): JSX.Element => {
                                 label="bucketName"
                                 variant="outlined"
                                 fullWidth={true}
-                                defaultValue={pref.s3Config.bucketName}
+                                defaultValue={s3Config.bucketName}
                                 onChange={(v) => {
                                     handleS3ConfigChange('bucketName', v.target.value)
                                 }}
@@ -269,7 +271,7 @@ export const MediaSettings = (): JSX.Element => {
                                 label="publicUrl"
                                 variant="outlined"
                                 fullWidth={true}
-                                defaultValue={pref.s3Config.publicUrl}
+                                defaultValue={s3Config.publicUrl}
                                 onChange={(v) => {
                                     handleS3ConfigChange('publicUrl', v.target.value)
                                 }}

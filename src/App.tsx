@@ -3,7 +3,7 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider, CssBaseline, Typography, useMediaQuery } from '@mui/material'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 
-import { createConcurrentTheme } from './themes'
+import { loadConcurrentTheme } from './themes'
 import { Menu } from './components/Menu/Menu'
 import type { ConcurrentTheme } from './model'
 import {
@@ -54,9 +54,12 @@ export interface appData {
 
 function App(): JSX.Element {
     const client = useApi()
-    const pref = usePreference()
+    const [themeName] = usePreference('themeName')
+    const [lists] = usePreference('lists')
+    const [sound] = usePreference('sound')
+    const [customThemes] = usePreference('customThemes')
 
-    const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(pref.themeName))
+    const [theme, setTheme] = useState<ConcurrentTheme>(loadConcurrentTheme(themeName, customThemes))
     const isMobileSize = useMediaQuery(theme.breakpoints.down('sm'))
 
     const [acklist, setAcklist] = useState<User[]>([])
@@ -154,7 +157,7 @@ function App(): JSX.Element {
         switch (path.pathname) {
             case '/': {
                 const rawid = path.hash.replace('#', '')
-                const list = pref.lists[rawid] ?? Object.values(pref.lists)[0]
+                const list = lists[rawid] ?? Object.values(lists)[0]
                 if (!list) return []
                 console.log(list)
                 return [...list.streams, list.userStreams.map((e) => e.streamID)].flat()
@@ -179,14 +182,14 @@ function App(): JSX.Element {
         }
     }, [client, path])
 
-    const [playNotification] = useSound(pref.notificationSound, { volume: pref.volume / 100 })
+    const [playNotification] = useSound(sound.notification, { volume: sound.volume / 100 })
     const playNotificationRef = useRef(playNotification)
     useEffect(() => {
         playNotificationRef.current = playNotification
     }, [playNotification])
 
     useEffect(() => {
-        const newtheme = createConcurrentTheme(pref.themeName)
+        const newtheme = loadConcurrentTheme(themeName, customThemes)
         setTheme(newtheme)
         let themeColorMetaTag: HTMLMetaElement = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement
         if (!themeColorMetaTag) {
@@ -195,7 +198,7 @@ function App(): JSX.Element {
             document.head.appendChild(themeColorMetaTag)
         }
         themeColorMetaTag.content = newtheme.palette.background.default
-    }, [pref.themeName])
+    }, [themeName, customThemes])
 
     const applicationContext = useMemo(() => {
         return {

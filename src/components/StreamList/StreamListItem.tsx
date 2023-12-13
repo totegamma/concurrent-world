@@ -13,14 +13,16 @@ export interface StreamListItemProps {
 }
 
 export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
-    const pref = usePreference()
+    const [lists, updateLists] = usePreference('lists')
 
     const open = props.body.expanded
     const setOpen = (newOpen: boolean): void => {
-        pref.updateList(props.id, {
+        const old = lists
+        old[props.id] = {
             ...props.body,
             expanded: newOpen
-        })
+        }
+        updateLists(old)
     }
 
     return (

@@ -6,7 +6,7 @@ import ApiProvider from '../context/api'
 import type { ConcurrentTheme } from '../model'
 import { CssBaseline, Fade, IconButton, Paper, ThemeProvider, darken } from '@mui/material'
 import { usePersistent } from '../hooks/usePersistent'
-import { Themes, createConcurrentTheme } from '../themes'
+import { Themes, loadConcurrentTheme } from '../themes'
 import { type Identity, generateIdentity } from '../util'
 import { ConcurrentWordmark } from '../components/theming/ConcurrentWordmark'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
@@ -27,13 +27,14 @@ import { CreateProfile } from '../components/Registration/CreateProfile'
 import { RegistrationReady } from '../components/Registration/LetsGo'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation } from 'react-router-dom'
+import { defaultPreference } from '../context/PreferenceContext'
 
 export function Registration(): JSX.Element {
     const location = useLocation()
 
     const { t, i18n } = useTranslation('', { keyPrefix: 'registration' })
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue')
-    const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
+    const [theme, setTheme] = useState<ConcurrentTheme>(loadConcurrentTheme(themeName))
     const [domain, setDomain] = usePersistent<string>('Domain', 'hub.concurrent.world')
     const [client, initializeClient] = useState<Client>()
     const [host, setHost] = useState<CoreDomain | null | undefined>()
@@ -51,7 +52,7 @@ export function Registration(): JSX.Element {
         const box = themes.filter((e) => e !== themeName)
         const newThemeName = box[Math.floor(Math.random() * box.length)]
         setThemeName(newThemeName)
-        setTheme(createConcurrentTheme(newThemeName))
+        setTheme(loadConcurrentTheme(newThemeName))
     }
 
     useEffect(() => {
@@ -103,8 +104,15 @@ export function Registration(): JSX.Element {
                             : []
                     }
                 }
-                console.log(list)
-                localStorage.setItem('lists', JSON.stringify(list))
+
+                const pref = {
+                    ...defaultPreference,
+                    lists: list
+                }
+
+                const storage = JSON.stringify(pref)
+                client.api.writeKV('world.concurrent.preference', storage)
+
                 window.location.href = '/'
             })
             .catch((_) => {
@@ -118,7 +126,15 @@ export function Registration(): JSX.Element {
                         defaultPostStreams: []
                     }
                 }
-                localStorage.setItem('lists', JSON.stringify(list))
+
+                const pref = {
+                    ...defaultPreference,
+                    lists: list
+                }
+
+                const storage = JSON.stringify(pref)
+                client.api.writeKV('world.concurrent.preference', storage)
+
                 window.location.href = '/'
             })
     }

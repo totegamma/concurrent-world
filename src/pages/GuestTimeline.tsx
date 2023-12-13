@@ -6,7 +6,7 @@ import { Timeline } from '../components/Timeline/main'
 import { Client, type User } from '@concurrent-world/client'
 import { FullScreenLoading } from '../components/ui/FullScreenLoading'
 import ApiProvider from '../context/api'
-import { Themes, createConcurrentTheme } from '../themes'
+import { Themes, loadConcurrentTheme } from '../themes'
 import { usePersistent } from '../hooks/usePersistent'
 import { ConcurrentWordmark } from '../components/theming/ConcurrentWordmark'
 import TickerProvider from '../context/Ticker'
@@ -59,13 +59,13 @@ export function GuestTimelinePage(): JSX.Element {
     }, [])
 
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'sacher')
-    const [theme, setTheme] = useState<ConcurrentTheme>(createConcurrentTheme(themeName))
+    const [theme, setTheme] = useState<ConcurrentTheme>(loadConcurrentTheme(themeName))
     const themes: string[] = Object.keys(Themes)
     const randomTheme = (): void => {
         const box = themes.filter((e) => e !== themeName)
         const newThemeName = box[Math.floor(Math.random() * box.length)]
         setThemeName(newThemeName)
-        setTheme(createConcurrentTheme(newThemeName))
+        setTheme(loadConcurrentTheme(newThemeName))
     }
 
     const scrollParentRef = useRef<HTMLDivElement>(null)

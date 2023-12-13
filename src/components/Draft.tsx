@@ -52,6 +52,7 @@ export interface DraftProps {
     autoFocus?: boolean
     placeholder?: string
     sx?: SxProps
+    value?: string
 }
 
 export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
@@ -90,6 +91,12 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     useEffect(() => {
         setDestStreams(props.streamPickerInitial)
     }, [props.streamPickerInitial])
+
+    useEffect(() => {
+        if (props.value && props.value !== '') {
+            setDraft(props.value)
+        }
+    }, [props.value])
 
     const [emojiDict, setEmojiDict] = useState<Record<string, EmojiLite>>({})
 

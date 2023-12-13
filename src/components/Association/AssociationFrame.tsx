@@ -26,7 +26,7 @@ export interface AssociationFrameProp {
 
 export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFrameProp): JSX.Element | null => {
     const client = useApi()
-    const pref = usePreference()
+    const [isDevMode] = usePreference('devMode')
     const [association, setAssociation] = useState<Association<
         LikeSchema | EmojiAssociationSchema | ReplyAssociationSchema | RerouteAssociationSchema
     > | null>(null)
@@ -51,7 +51,7 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
 
     if (fetching) return <MessageSkeleton />
     if (!association) {
-        if (pref?.devMode) {
+        if (isDevMode) {
             return (
                 <>
                     <Typography>Association not found</Typography>

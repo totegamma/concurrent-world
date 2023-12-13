@@ -1,9 +1,9 @@
-import { Box, Slider, TextField, Typography } from '@mui/material'
-import { usePreference } from '../../context/PreferenceContext'
+import { Box, Button, Slider, TextField, Typography } from '@mui/material'
+import { defaultPreference, usePreference } from '../../context/PreferenceContext'
 import { useTranslation } from 'react-i18next'
 
 export const SoundSettings = (): JSX.Element => {
-    const pref = usePreference()
+    const [pref, setPref] = usePreference('sound')
 
     const { t } = useTranslation('', { keyPrefix: 'settings.sound' })
 
@@ -22,27 +22,44 @@ export const SoundSettings = (): JSX.Element => {
                     aria-label="Volume"
                     value={pref.volume}
                     onChange={(_, value) => {
-                        pref.setVolume(value as number)
+                        setPref({
+                            ...pref,
+                            volume: value as number
+                        })
                     }}
                 />
                 <Typography variant="h4">{t('override.title')}</Typography>
                 <TextField
                     label={t('override.postSound')}
                     placeholder="https://example.com/sound.mp3"
-                    value={pref.postSound}
+                    value={pref.post}
                     onChange={(e) => {
-                        pref.setPostSound(e.target.value)
+                        setPref({
+                            ...pref,
+                            post: e.target.value
+                        })
                     }}
                 />
                 <TextField
                     label={t('override.notificationSound')}
                     placeholder="https://example.com/sound.mp3"
-                    value={pref.notificationSound}
+                    value={pref.notification}
                     onChange={(e) => {
-                        pref.setNotificationSound(e.target.value)
+                        setPref({
+                            ...pref,
+                            notification: e.target.value
+                        })
                     }}
                 />
             </Box>
+            <Button
+                variant="contained"
+                onClick={() => {
+                    setPref(defaultPreference.sound)
+                }}
+            >
+                reset
+            </Button>
         </Box>
     )
 }
