@@ -27,6 +27,7 @@ import { CreateProfile } from '../components/Registration/CreateProfile'
 import { RegistrationReady } from '../components/Registration/LetsGo'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation } from 'react-router-dom'
+import { defaultPreference } from '../context/PreferenceContext'
 
 export function Registration(): JSX.Element {
     const location = useLocation()
@@ -103,8 +104,15 @@ export function Registration(): JSX.Element {
                             : []
                     }
                 }
-                console.log(list)
-                localStorage.setItem('lists', JSON.stringify(list))
+
+                const pref = {
+                    ...defaultPreference,
+                    lists: list
+                }
+
+                const storage = JSON.stringify(pref)
+                client.api.writeKV('world.concurrent.preference', storage)
+
                 window.location.href = '/'
             })
             .catch((_) => {
@@ -118,7 +126,15 @@ export function Registration(): JSX.Element {
                         defaultPostStreams: []
                     }
                 }
-                localStorage.setItem('lists', JSON.stringify(list))
+
+                const pref = {
+                    ...defaultPreference,
+                    lists: list
+                }
+
+                const storage = JSON.stringify(pref)
+                client.api.writeKV('world.concurrent.preference', storage)
+
                 window.location.href = '/'
             })
     }
