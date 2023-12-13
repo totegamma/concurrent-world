@@ -96,8 +96,13 @@ export const ThemeSettings = (): JSX.Element => {
                     setCustomTheme({ ...customThemes })
                 }}
             />
-
-            <ThemeCreator />
+            <Typography variant="h3">Theme Creator:</Typography>
+            <Box sx={{ display: { xs: 'none', sm: 'none', md: 'block' } }}>
+                <ThemeCreator />
+            </Box>
+            <Box sx={{ display: { xs: 'block', sm: 'block', md: 'none' } }}>
+                <Typography variant="body1">Theme Creator is not available on mobile.</Typography>
+            </Box>
         </Box>
     )
 }
