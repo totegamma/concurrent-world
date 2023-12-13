@@ -25,7 +25,7 @@ export interface Preference {
     customThemes: Record<string, DeepPartial<ConcurrentTheme>>
 }
 
-const defaultPreference: Preference = {
+export const defaultPreference: Preference = {
     themeName: 'basic',
     storageProvider: 'domain',
     imgurClientID: '',

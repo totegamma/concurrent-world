@@ -1,5 +1,5 @@
-import { Box, Slider, TextField, Typography } from '@mui/material'
-import { usePreference } from '../../context/PreferenceContext'
+import { Box, Button, Slider, TextField, Typography } from '@mui/material'
+import { defaultPreference, usePreference } from '../../context/PreferenceContext'
 import { useTranslation } from 'react-i18next'
 
 export const SoundSettings = (): JSX.Element => {
@@ -52,6 +52,14 @@ export const SoundSettings = (): JSX.Element => {
                     }}
                 />
             </Box>
+            <Button
+                variant="contained"
+                onClick={() => {
+                    setPref(defaultPreference.sound)
+                }}
+            >
+                reset
+            </Button>
         </Box>
     )
 }
