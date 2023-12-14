@@ -26,6 +26,7 @@ export const MobileMenu = (): JSX.Element => {
         >
             <Button
                 disableRipple
+                variant="text"
                 onClick={() => {
                     actions.openMobileMenu()
                 }}
@@ -44,19 +45,35 @@ export const MobileMenu = (): JSX.Element => {
                     }}
                 />
             </Button>
-            <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/">
+            <Button variant="text" sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/">
                 <HomeIcon />
             </Button>
-            <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/notifications">
+            <Button
+                variant="text"
+                sx={{ color: 'background.contrastText', width: 1 }}
+                component={NavLink}
+                to="/notifications"
+            >
                 <NotificationsIcon />
             </Button>
-            <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/contacts">
+            <Button
+                variant="text"
+                sx={{ color: 'background.contrastText', width: 1 }}
+                component={NavLink}
+                to="/contacts"
+            >
                 <ContactsIcon />
             </Button>
-            <Button sx={{ color: 'background.contrastText', width: 1 }} component={NavLink} to="/explorer">
+            <Button
+                variant="text"
+                sx={{ color: 'background.contrastText', width: 1 }}
+                component={NavLink}
+                to="/explorer"
+            >
                 <ExploreIcon />
             </Button>
             <Button
+                variant="text"
                 sx={{
                     height: 36,
                     my: 'auto',
