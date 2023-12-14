@@ -190,7 +190,6 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                 </Box>
                 {!showEditorOnTop && (
                     <Button
-                        variant="contained"
                         endIcon={<CreateIcon />}
                         onClick={() => {
                             actions.openDraft()

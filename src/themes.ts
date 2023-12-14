@@ -703,6 +703,9 @@ export const ConcurrentDefaultTheme = {
                 root: {
                     padding: '4px 16px'
                 }
+            },
+            defaultProps: {
+                variant: 'contained'
             }
         },
         MuiCssBaseline: {

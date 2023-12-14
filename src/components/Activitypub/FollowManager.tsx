@@ -122,7 +122,6 @@ export const ApFollowManager = (): JSX.Element => {
                         }}
                     />
                     <Button
-                        variant="contained"
                         onClick={() => {
                             follow(userID)
                         }}

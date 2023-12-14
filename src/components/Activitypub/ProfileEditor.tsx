@@ -125,7 +125,6 @@ export const ApProfileEditor = (props: { entity: ApEntity }): JSX.Element => {
                     }}
                 />
                 <Button
-                    variant="contained"
                     onClick={(_) => {
                         updateProfile()
                     }}

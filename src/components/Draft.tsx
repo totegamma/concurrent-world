@@ -590,7 +590,6 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     <Box>
                         <Button
                             color="primary"
-                            variant="contained"
                             disabled={sending}
                             onClick={(_) => {
                                 post()

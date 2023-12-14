@@ -48,7 +48,6 @@ export function SaveSecretCode(props: {
             <Typography>{t('desc3')}</Typography>
             <Typography>{t('didyousave')}</Typography>
             <Button
-                variant="contained"
                 onClick={(): void => {
                     props.next()
                 }}

@@ -42,13 +42,10 @@ export const UserJWT = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
                         setSubject(e.target.value)
                     }}
                 />
-                <Button variant="contained" onClick={issueJwt}>
-                    issue
-                </Button>
+                <Button onClick={issueJwt}>issue</Button>
                 <Typography>result:</Typography>
                 <Typography sx={{ wordBreak: 'break-all' }}>{issuedJwt}</Typography>
                 <Button
-                    variant="contained"
                     onClick={() => {
                         navigator.clipboard.writeText(issuedJwt)
                     }}

@@ -145,6 +145,7 @@ export const ThemeCreator = (): JSX.Element => {
         setUiText(theme.palette.primary.contrastText)
         setUnderlayBackground(theme.palette.background.default)
         setUnderlayText(theme.palette.background.contrastText)
+        setComment(theme.meta?.comment ?? '')
     }, [theme])
 
     const validateColor = (color: string): boolean => {
@@ -233,7 +234,6 @@ export const ThemeCreator = (): JSX.Element => {
                             }}
                         />
                         <Button
-                            variant="contained"
                             sx={{
                                 height: '50px'
                             }}
@@ -392,7 +392,6 @@ export const ThemeCreator = (): JSX.Element => {
                         <TextField fullWidth multiline value={serialized} />
                     */}
                     <Button
-                        variant="contained"
                         onClick={() => {
                             actions.setDraft(`
 \`\`\`theme

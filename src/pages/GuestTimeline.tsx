@@ -132,10 +132,8 @@ export function GuestTimelinePage(): JSX.Element {
                                             gap: '10px'
                                         }}
                                     >
-                                        <Button variant="contained" onClick={randomTheme}>
-                                            ✨
-                                        </Button>
-                                        <Button variant="contained" component={Link} to="/register">
+                                        <Button onClick={randomTheme}>✨</Button>
+                                        <Button component={Link} to="/register">
                                             はじめる
                                         </Button>
                                     </Box>

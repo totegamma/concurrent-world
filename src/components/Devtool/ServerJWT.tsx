@@ -22,13 +22,10 @@ export const ServerJWT = forwardRef<HTMLDivElement>((props, ref): JSX.Element =>
                 }}
             >
                 <Typography variant="h3">Server signed JWT</Typography>
-                <Button variant="contained" onClick={getServersignedJwt}>
-                    issue
-                </Button>
+                <Button onClick={getServersignedJwt}>issue</Button>
                 <Typography>result:</Typography>
                 <Typography sx={{ wordBreak: 'break-all' }}>{serverSignedJwt}</Typography>
                 <Button
-                    variant="contained"
                     onClick={() => {
                         navigator.clipboard.writeText(serverSignedJwt)
                     }}

@@ -77,7 +77,6 @@ export function SecretCode(props: { mnemonic: string }): JSX.Element {
                 }}
             >
                 <Button
-                    variant="contained"
                     onClick={() => {
                         navigator.clipboard.writeText(props.mnemonic)
                     }}

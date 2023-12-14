@@ -147,7 +147,6 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                         <CCEditor schemaURL={schemaDraft} init={stream.payload} onSubmit={updateStream} />
                     </Box>
                     <Button
-                        variant="contained"
                         color="error"
                         onClick={() => {
                             client.api.deleteStream(props.id).then((_) => {

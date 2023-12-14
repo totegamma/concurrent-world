@@ -126,7 +126,6 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
                         }}
                     />
                     <Button
-                        variant="contained"
                         disabled={!props.host}
                         onClick={() => {
                             setJumped(true)
@@ -138,7 +137,6 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
                 </Box>
             </Box>
             <Button
-                variant="contained"
                 disabled={!jumped}
                 onClick={(): void => {
                     props.client?.api.invalidateEntity(props.identity.CCID)

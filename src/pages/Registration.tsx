@@ -252,6 +252,7 @@ export function Registration(): JSX.Element {
                 >
                     <Button
                         disableRipple
+                        variant="text"
                         sx={{
                             display: 'flex',
                             justifyContent: 'center',
@@ -355,7 +356,7 @@ export function Registration(): JSX.Element {
                             }}
                         >
                             <Typography color="background.contrastText">{t('alreadyHaveAccount')}</Typography>
-                            <Button variant="contained" component={Link} to="/import">
+                            <Button component={Link} to="/import">
                                 {t('importAccount')}
                             </Button>
                         </Box>

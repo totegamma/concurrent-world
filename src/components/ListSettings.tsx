@@ -76,7 +76,6 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                     }}
                 />
                 <Button
-                    variant="contained"
                     onClick={(_) => {
                         updateList(props.id, {
                             ...list,
@@ -120,7 +119,6 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                         }}
                     />
                     <Button
-                        variant="contained"
                         color="error"
                         onClick={(_) => {
                             const old = lists

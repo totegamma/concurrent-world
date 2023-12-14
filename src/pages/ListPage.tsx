@@ -63,7 +63,6 @@ export function ListPage(): JSX.Element {
             <Box>
                 <div>list not found</div>
                 <Button
-                    variant="contained"
                     onClick={() => {
                         setLists({
                             home: {
@@ -189,7 +188,7 @@ export function ListPage(): JSX.Element {
                                 alignItems: 'center'
                             }}
                         >
-                            <Button variant="contained" component={RouterLink} to="/explorer">
+                            <Button component={RouterLink} to="/explorer">
                                 <Typography variant="h1" sx={{ fontWeight: 600, mx: 1 }}>
                                     Go Explore
                                 </Typography>

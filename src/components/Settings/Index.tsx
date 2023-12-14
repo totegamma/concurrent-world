@@ -69,7 +69,6 @@ export function SettingsIndex(): JSX.Element {
                     </Box>
                 </ButtonBase>
                 <Button
-                    variant="contained"
                     onClick={(_) => {
                         if (client.api.host === undefined) {
                             return
@@ -132,7 +131,6 @@ export function SettingsIndex(): JSX.Element {
                     {t('pages.settings.actions.title')}
                 </Typography>
                 <Button
-                    variant="contained"
                     onClick={(_) => {
                         deleteAllCache()
                     }}
@@ -140,7 +138,6 @@ export function SettingsIndex(): JSX.Element {
                     {t('pages.settings.actions.clearCache')}
                 </Button>
                 <Button
-                    variant="contained"
                     onClick={(_) => {
                         window.location.reload()
                     }}

@@ -146,7 +146,6 @@ export const ApSetup = (): JSX.Element => {
                 </Typography>
             )}
             <Button
-                variant="contained"
                 onClick={() => {
                     register()
                 }}

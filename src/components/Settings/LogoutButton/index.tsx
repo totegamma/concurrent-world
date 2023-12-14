@@ -43,7 +43,6 @@ export const LogoutButton = (): JSX.Element => {
                     </Typography>
                     <Typography sx={{ color: theme.palette.text.primary }}>{t('logoutWarn')}</Typography>
                     <Button
-                        variant="contained"
                         color="error"
                         onClick={() => {
                             logout()
@@ -57,7 +56,6 @@ export const LogoutButton = (): JSX.Element => {
             </Modal>
             <Button
                 color="error"
-                variant="contained"
                 onClick={(_) => {
                     setOpenLogoutModal(true)
                 }}

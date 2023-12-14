@@ -60,11 +60,9 @@ export default function Welcome(): JSX.Element {
                             gap: '10px'
                         }}
                     >
-                        <Button variant="contained" onClick={randomTheme}>
-                            ✨
-                        </Button>
+                        <Button onClick={randomTheme}>✨</Button>
 
-                        <Button variant="contained" component={NavLink} to="/import">
+                        <Button component={NavLink} to="/import">
                             {t('import')}
                         </Button>
                     </Box>
@@ -79,7 +77,6 @@ export default function Welcome(): JSX.Element {
                         </Typography>
                         <Typography>{t('description')}</Typography>
                         <Button
-                            variant="contained"
                             component={NavLink}
                             to="/register"
                             sx={{
@@ -174,7 +171,6 @@ export default function Welcome(): JSX.Element {
                         {t('gettingStarted')}
                     </Typography>
                     <Button
-                        variant="contained"
                         component={NavLink}
                         to="/register"
                         sx={{

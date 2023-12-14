@@ -59,7 +59,6 @@ export function MediaInput(props: MediaInputProps): JSX.Element {
                         display: 'flex',
                         height: '100%'
                     }}
-                    variant="contained"
                     color="primary"
                     disabled={uploading}
                     onClick={() => {

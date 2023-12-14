@@ -122,7 +122,6 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
                     }}
                 />
                 <Button
-                    variant="contained"
                     onClick={() => {
                         if (cctype === 'character') {
                             client.api.readCharacter(client.ccid, schemaURLDraft).then((e) => {
