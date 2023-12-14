@@ -104,7 +104,6 @@ export const APSettings = (): JSX.Element => {
                             }}
                         />
                         <Button
-                            variant="contained"
                             onClick={() => {
                                 inquery(url)
                             }}

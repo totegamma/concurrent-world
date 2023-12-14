@@ -53,7 +53,6 @@ export const SoundSettings = (): JSX.Element => {
                 />
             </Box>
             <Button
-                variant="contained"
                 onClick={() => {
                     setPref(defaultPreference.sound)
                 }}

@@ -48,7 +48,6 @@ export function YourID(props: { next: () => void; identity: Identity }): JSX.Ele
                 <Typography>{t('desc2')}</Typography>
                 <Typography>{t('desc3')}</Typography>
                 <Button
-                    variant="contained"
                     onClick={(): void => {
                         props.next()
                     }}

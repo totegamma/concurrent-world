@@ -190,7 +190,6 @@ export const GeneralSettings = (): JSX.Element => {
                 <>
                     {invitationCode === '' ? (
                         <Button
-                            variant="contained"
                             onClick={(_) => {
                                 if (client.api.host === undefined) {
                                     return
@@ -222,7 +221,6 @@ export const GeneralSettings = (): JSX.Element => {
                                 {invitationCode}
                             </pre>
                             <Button
-                                variant="contained"
                                 onClick={(_) => {
                                     navigator.clipboard.writeText(invitationCode)
                                     enqueueSnackbar(t('copied'), { variant: 'success' })

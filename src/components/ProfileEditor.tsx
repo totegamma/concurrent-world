@@ -113,7 +113,6 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
                     }}
                 />
                 <Button
-                    variant="contained"
                     onClick={(_) => {
                         updateProfile()
                     }}

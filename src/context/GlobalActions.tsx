@@ -288,7 +288,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                 あなたのドメイン{client.api.host}は現在オフラインです。復旧までしばらくお待ちください。
                             </Typography>
                             <Button
-                                variant="contained"
                                 onClick={() => {
                                     window.location.reload()
                                 }}

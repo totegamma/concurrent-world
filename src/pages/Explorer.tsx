@@ -193,7 +193,6 @@ export function Explorer(): JSX.Element {
                     {t('streams')}
                 </Typography>
                 <Button
-                    variant="contained"
                     onClick={() => {
                         setDrawerOpen(true)
                     }}

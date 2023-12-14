@@ -44,7 +44,6 @@ export function RegistrationWelcome(props: { next: () => void; identity: Identit
                 }}
             >
                 <Button
-                    variant="contained"
                     onClick={(): void => {
                         props.next()
                     }}

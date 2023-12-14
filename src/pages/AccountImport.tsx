@@ -211,6 +211,7 @@ export function AccountImport(): JSX.Element {
             >
                 <Button
                     disableRipple
+                    variant="text"
                     sx={{
                         display: 'flex',
                         justifyContent: 'center',
@@ -284,7 +285,7 @@ export function AccountImport(): JSX.Element {
                         </>
                     )}
                     {errorMessage}
-                    <Button disabled={!entityFound} variant="contained" onClick={accountImport}>
+                    <Button disabled={!entityFound} onClick={accountImport}>
                         {t('import')}
                     </Button>
                 </Paper>
@@ -298,7 +299,7 @@ export function AccountImport(): JSX.Element {
                     }}
                 >
                     <Typography color="background.contrastText">{t('noAccount')}</Typography>
-                    <Button variant="contained" component={Link} to="/register">
+                    <Button component={Link} to="/register">
                         {t('createAccount')}
                     </Button>
                 </Box>

@@ -27,7 +27,6 @@ export const Debugger = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
                     }}
                 >
                     <Button
-                        variant="contained"
                         onClick={() => {
                             enqueueSnackbar(`Notification${Math.random()}`, {
                                 variant: 'success'

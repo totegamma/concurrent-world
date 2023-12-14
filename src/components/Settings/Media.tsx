@@ -194,9 +194,7 @@ export const MediaSettings = (): JSX.Element => {
                                 type="password"
                             />
                         </Box>
-                        <Button variant="contained" onClick={handleSave}>
-                            {buttonText}
-                        </Button>
+                        <Button onClick={handleSave}>{buttonText}</Button>
                     </Paper>
                 </>
             )}
@@ -290,9 +288,7 @@ export const MediaSettings = (): JSX.Element => {
                                     label="forcePathStyle"
                                 />
                             </FormGroup>
-                            <Button variant="contained" onClick={handleS3ConfigSave}>
-                                {buttonText}
-                            </Button>
+                            <Button onClick={handleS3ConfigSave}>{buttonText}</Button>
                         </Box>
                     </Paper>
                 </>

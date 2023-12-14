@@ -78,7 +78,7 @@ export const StorageProvider = ({ children }: { children: JSX.Element | JSX.Elem
                 }
             } else if (storageProvider === 'imgur') {
                 const url = 'https://api.imgur.com/3/image'
-                if (imgurClientID) return ''
+                if (!imgurClientID) return ''
                 const isImage = file.type.includes('image')
                 if (!isImage) return null
 

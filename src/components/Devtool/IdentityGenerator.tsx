@@ -27,14 +27,11 @@ export const IdentityGenerator = forwardRef<HTMLDivElement>((props, ref): JSX.El
                 }}
             >
                 <Typography variant="h3">IdentityGenerator</Typography>
-                <Button variant="contained" onClick={generate}>
-                    Generate
-                </Button>
+                <Button onClick={generate}>Generate</Button>
                 <Typography variant="h3">mnemonic</Typography>
                 <Box>
                     <Typography>{mnemonic}</Typography>
                     <Button
-                        variant="contained"
                         onClick={() => {
                             navigator.clipboard.writeText(mnemonic)
                         }}
@@ -47,7 +44,6 @@ export const IdentityGenerator = forwardRef<HTMLDivElement>((props, ref): JSX.El
                 <Box>
                     <Typography>{CCID}</Typography>
                     <Button
-                        variant="contained"
                         onClick={() => {
                             navigator.clipboard.writeText(CCID)
                         }}
@@ -60,7 +56,6 @@ export const IdentityGenerator = forwardRef<HTMLDivElement>((props, ref): JSX.El
                 <Box>
                     <Typography>{publicKey}</Typography>
                     <Button
-                        variant="contained"
                         onClick={() => {
                             navigator.clipboard.writeText(publicKey)
                         }}
@@ -73,7 +68,6 @@ export const IdentityGenerator = forwardRef<HTMLDivElement>((props, ref): JSX.El
                 <Box>
                     <Typography>{privateKey}</Typography>
                     <Button
-                        variant="contained"
                         onClick={() => {
                             navigator.clipboard.writeText(privateKey)
                         }}

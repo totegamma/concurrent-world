@@ -31,7 +31,6 @@ export function VerifyCode(props: { next: () => void; identity: Identity }): JSX
             />
             <Typography>{match ? t('match') : t('notMatch')}</Typography>
             <Button
-                variant="contained"
                 disabled={!match}
                 onClick={(): void => {
                     props.next()

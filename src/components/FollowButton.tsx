@@ -29,7 +29,7 @@ export const FollowButton = (props: FollowButtonProps): JSX.Element => {
 
     return (
         <Box>
-            <ButtonGroup variant="contained" color="primary">
+            <ButtonGroup color="primary">
                 <Button
                     onClick={(_) => {
                         if (followed) {

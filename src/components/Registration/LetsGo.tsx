@@ -46,9 +46,7 @@ export function RegistrationReady(props: {
                     gap: '20px'
                 }}
             >
-                <Button variant="contained" onClick={props.next}>
-                    {t('next')}
-                </Button>
+                <Button onClick={props.next}>{t('next')}</Button>
             </Box>
         </>
     )
