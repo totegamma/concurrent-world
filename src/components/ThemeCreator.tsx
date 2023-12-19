@@ -425,24 +425,19 @@ export const ThemeCreator = (): JSX.Element => {
                             alignItems: 'center'
                         }}
                     >
-                        <Typography variant="h3" color={'background.contrastText'}>
-                            Button Style
-                        </Typography>
+                        <Typography variant="h3">Button Style</Typography>
                         <ToggleButtonGroup
                             value={buttonVariant}
                             exclusive
                             onChange={(_, value) => {
                                 setButtonVariant(value)
                             }}
-                            sx={{
-                                color: 'background.contrastText'
-                            }}
                         >
                             <ToggleButton value="contained">
-                                <Typography color={'background.contrastText'}>contained</Typography>
+                                <Typography>contained</Typography>
                             </ToggleButton>
                             <ToggleButton value="outlined">
-                                <Typography color={'background.contrastText'}>outlined</Typography>
+                                <Typography>outlined</Typography>
                             </ToggleButton>
                         </ToggleButtonGroup>
                     </Box>
@@ -455,24 +450,19 @@ export const ThemeCreator = (): JSX.Element => {
                             alignItems: 'center'
                         }}
                     >
-                        <Typography variant="h3" color={'background.contrastText'}>
-                            Paper Style
-                        </Typography>
+                        <Typography variant="h3">Paper Style</Typography>
                         <ToggleButtonGroup
                             value={paperVariant}
                             exclusive
                             onChange={(_, value) => {
                                 setPaperVariant(value)
                             }}
-                            sx={{
-                                color: 'background.contrastText'
-                            }}
                         >
                             <ToggleButton value="elevation">
-                                <Typography color={'background.contrastText'}>elevation</Typography>
+                                <Typography>elevation</Typography>
                             </ToggleButton>
                             <ToggleButton value="outlined">
-                                <Typography color={'background.contrastText'}>outlined</Typography>
+                                <Typography>outlined</Typography>
                             </ToggleButton>
                         </ToggleButtonGroup>
                     </Box>
@@ -485,24 +475,19 @@ export const ThemeCreator = (): JSX.Element => {
                             alignItems: 'center'
                         }}
                     >
-                        <Typography variant="h3" color={'background.contrastText'}>
-                            AppBar Style
-                        </Typography>
+                        <Typography variant="h3">AppBar Style</Typography>
                         <ToggleButtonGroup
                             value={appBarVariant}
                             exclusive
                             onChange={(_, value) => {
                                 setAppBarVariant(value)
                             }}
-                            sx={{
-                                color: 'background.contrastText'
-                            }}
                         >
                             <ToggleButton value="default">
-                                <Typography color={'background.contrastText'}>default</Typography>
+                                <Typography>default</Typography>
                             </ToggleButton>
                             <ToggleButton value="transparent">
-                                <Typography color={'background.contrastText'}>transparent</Typography>
+                                <Typography>transparent</Typography>
                             </ToggleButton>
                         </ToggleButtonGroup>
                     </Box>
@@ -527,9 +512,6 @@ export const ThemeCreator = (): JSX.Element => {
                             }
                         }}
                     />
-                    {/*
-                        <TextField fullWidth multiline value={serialized} />
-                    */}
                     <Button
                         onClick={() => {
                             actions.setDraft(`
