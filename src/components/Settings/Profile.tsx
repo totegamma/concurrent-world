@@ -39,14 +39,8 @@ export const ProfileSettings = (): JSX.Element => {
                         }}
                     />
                 </Box>
-                <Typography variant="h3">シークレットコード</Typography>
-                {mnemonic ? (
-                    <SecretCode mnemonic={mnemonic} />
-                ) : (
-                    <Typography>
-                        このアカウントのインポートがシークレットコードではなく秘密鍵直接入力によるインポートであったため、シークレットコードを復元できません。
-                    </Typography>
-                )}
+                <Typography variant="h3">{t('secret')}</Typography>
+                {mnemonic ? <SecretCode mnemonic={mnemonic} /> : <Typography>{t('secretCannotBeRestored')}</Typography>}
             </Box>
         </Box>
     )
