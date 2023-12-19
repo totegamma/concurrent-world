@@ -88,6 +88,7 @@
         "title": "設定",
         "general": {
             "title": "一般",
+            "checkSecret": "シークレットコードは<l>プロフィール</l>より確認できます。",
             "basic": "基本",
             "showEditorOnTop": "投稿エディタを上部に表示",
             "showEditorOnTopMobile": "投稿エディタを上部に表示（モバイル）",
@@ -101,7 +102,9 @@
         "profile": {
             "title": "プロフィール",
             "update": "更新",
-            "updated": "更新しました"
+            "updated": "更新しました",
+            "secret": "シークレットコード",
+            "secretCannotBeRestored": "このアカウントのインポートがシークレットコードではなく秘密鍵直接入力によるインポートであったため、シークレットコードを復元できません。"
         },
         "theme": {
             "title": "テーマ"

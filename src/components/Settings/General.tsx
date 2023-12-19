@@ -20,7 +20,7 @@ import { useApi } from '../../context/api'
 import { useEffect, useState } from 'react'
 import { useSnackbar } from 'notistack'
 import { IssueJWT } from '@concurrent-world/client'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, Trans } from 'react-i18next'
 import { Link as NavLink } from 'react-router-dom'
 
 export const GeneralSettings = (): JSX.Element => {
@@ -62,11 +62,10 @@ export const GeneralSettings = (): JSX.Element => {
             </Box>
 
             <Typography>
-                シークレットコードは
-                <Link component={NavLink} to="/settings/profile">
-                    プロフィール
-                </Link>
-                より確認できます。
+                <Trans
+                    i18nKey={t('checkSecret')}
+                    components={{ l: <Link component={NavLink} to="/settings/profile" /> }}
+                />
             </Typography>
 
             <Divider />

@@ -88,6 +88,7 @@
         "title": "Settings",
         "general": {
             "title": "General",
+            "checkSecret": "Your secret code can be confirmed from the <l>profile</l>.",
             "basic": "Basic",
             "showEditorOnTop": "Show editor on top",
             "showEditorOnTopMobile": "Show editor on top (mobile)",
@@ -101,7 +102,9 @@
         "profile": {
             "title": "Profile",
             "update": "Update",
-            "updated": "Updated"
+            "updated": "Updated",
+            "secret": "Secret code",
+            "secretCannotBeRestored": "Since this account was imported using the private key instead of the secret code, the secret code cannot be restored."
         },
         "theme": {
             "title": "Theme"
