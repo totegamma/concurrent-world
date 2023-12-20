@@ -23,6 +23,8 @@ export const LoginGuard = (props: Props): JSX.Element => {
 
     if (redirect) {
         console.log('redirect')
+        console.log('domainStr', domainStr)
+        console.log('prvkeyStr', prvkeyStr)
         return <Navigate to={props.redirect} state={{ from: useLocation() }} replace={true} />
     }
 

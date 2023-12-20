@@ -15,8 +15,15 @@ import './i18n'
 const AppPage = lazy(() => import('./App'))
 const Welcome = lazy(() => import('./pages/Welcome'))
 
-const domain = localStorage.getItem('Domain') ?? ''
-const prvkey = localStorage.getItem('PrivateKey') ?? ''
+let domain = ''
+let prvkey = ''
+
+try {
+    domain = JSON.parse(localStorage.getItem('Domain') || '')
+    prvkey = JSON.parse(localStorage.getItem('PrivateKey') || '')
+} catch (e) {
+    console.log(e)
+}
 
 const logined = domain !== '' && prvkey !== ''
 
