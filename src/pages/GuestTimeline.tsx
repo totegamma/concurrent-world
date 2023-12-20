@@ -17,8 +17,13 @@ import { TimelineHeader } from '../components/TimelineHeader'
 import ListIcon from '@mui/icons-material/List'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import { Profile } from '../components/Profile'
+import { MessageContainer } from '../components/Message/MessageContainer'
 
-export function GuestTimelinePage(): JSX.Element {
+export interface GuestPageProps {
+    page: 'stream' | 'entity' | 'message'
+}
+
+export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
     const reactlocation = useLocation()
     const [title, setTitle] = useState<string>('')
     const [user, setUser] = useState<User | null | undefined>(null)
@@ -30,36 +35,64 @@ export function GuestTimelinePage(): JSX.Element {
 
     const [client, initializeClient] = useState<Client>()
     useEffect(() => {
-        if (id) {
-            // entity mode
-            const client = new Client(
-                '8c215bedacf0888470fd2567d03a813f4ae926be4a2cd587979809b629d70592',
-                'hub.concurrent.world'
-            )
-            client.getUser(id).then((e) => {
-                setUser(e)
-                setTitle(e?.profile?.payload.body.username ?? '')
-                setTargetStream([e?.userstreams?.payload.body.homeStream ?? ''])
-            })
+        if (!id) return
 
-            initializeClient(client)
-        } else {
-            // stream mode
-            const query = reactlocation.hash.replace('#', '')
-            setTargetStream([query])
-            const resolver = query.split('@')[1]
-            // well-known guest
-            // らたい すいか きけんせい うつる てんない にいがた れきだい つながる あたためる みいら よゆう えもの
-            const client = new Client('8c215bedacf0888470fd2567d03a813f4ae926be4a2cd587979809b629d70592', resolver)
+        switch (props.page) {
+            case 'stream':
+                {
+                    const query = reactlocation.hash.replace('#', '')
+                    setTargetStream([query])
+                    const resolver = query.split('@')[1]
+                    // well-known guest
+                    // らたい すいか きけんせい うつる てんない にいがた れきだい つながる あたためる みいら よゆう えもの
+                    const client = new Client(
+                        '8c215bedacf0888470fd2567d03a813f4ae926be4a2cd587979809b629d70592',
+                        resolver
+                    )
 
-            client.api.readStream(query).then((e) => {
-                console.log(e)
-                setTitle(e?.payload.name ?? '')
-            })
+                    client.api.readStream(query).then((e) => {
+                        console.log(e)
+                        setTitle(e?.payload.name ?? '')
+                    })
+                    setUser(undefined)
 
-            initializeClient(client)
+                    initializeClient(client)
+                }
+                break
+            case 'entity':
+                {
+                    const client = new Client(
+                        '8c215bedacf0888470fd2567d03a813f4ae926be4a2cd587979809b629d70592',
+                        'hub.concurrent.world'
+                    )
+                    client.getUser(id).then((e) => {
+                        setUser(e)
+                        setTitle(e?.profile?.payload.body.username ?? '')
+                        setTargetStream([e?.userstreams?.payload.body.homeStream ?? ''])
+                    })
+
+                    initializeClient(client)
+                }
+                break
+            case 'message':
+                {
+                    const client = new Client(
+                        '8c215bedacf0888470fd2567d03a813f4ae926be4a2cd587979809b629d70592',
+                        'hub.concurrent.world'
+                    )
+                    initializeClient(client)
+
+                    const authorID = id.split('@')[1]
+
+                    client.getUser(authorID).then((e) => {
+                        setUser(e)
+                        setTitle(e?.profile?.payload.body.username ?? '')
+                        setTargetStream([e?.userstreams?.payload.body.homeStream ?? ''])
+                    })
+                }
+                break
         }
-    }, [])
+    }, [props.page, id, reactlocation.hash])
 
     const [themeName, setThemeName] = usePersistent<string>('Theme', 'sacher')
     const [theme, setTheme] = useState<ConcurrentTheme>(loadConcurrentTheme(themeName))
@@ -142,6 +175,22 @@ export function GuestTimelinePage(): JSX.Element {
                                         </Button>
                                     </Box>
                                 </Box>
+
+                                {props.page === 'message' && (
+                                    <Paper
+                                        sx={{
+                                            margin: { xs: 0.5, sm: 1 },
+                                            display: 'flex',
+                                            flexFlow: 'column',
+                                            p: 2
+                                        }}
+                                    >
+                                        <MessageContainer
+                                            messageID={id?.split('@')[0] ?? ''}
+                                            messageOwner={id?.split('@')[1] ?? ''}
+                                        />
+                                    </Paper>
+                                )}
 
                                 <Paper
                                     sx={{

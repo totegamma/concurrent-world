@@ -35,8 +35,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                     <Route path="/welcome" element={<Welcome />} />
                     <Route path="/register" element={<Registration />} />
                     <Route path="/import" element={<AccountImport />} />
-                    {!logined && <Route path="/stream" element={<GuestTimelinePage />} />}
-                    {!logined && <Route path="/entity/:id" element={<GuestTimelinePage />} />}
+                    {!logined && <Route path="/stream" element={<GuestTimelinePage page="stream" />} />}
+                    {!logined && <Route path="/entity/:id" element={<GuestTimelinePage page="entity" />} />}
+                    {!logined && <Route path="/message/:id" element={<GuestTimelinePage page="message" />} />}
                     <Route
                         path="*"
                         element={
