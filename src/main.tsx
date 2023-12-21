@@ -15,8 +15,15 @@ import './i18n'
 const AppPage = lazy(() => import('./App'))
 const Welcome = lazy(() => import('./pages/Welcome'))
 
-const domain = localStorage.getItem('Domain') ?? ''
-const prvkey = localStorage.getItem('PrivateKey') ?? ''
+let domain = ''
+let prvkey = ''
+
+try {
+    domain = JSON.parse(localStorage.getItem('Domain') || '')
+    prvkey = JSON.parse(localStorage.getItem('PrivateKey') || '')
+} catch (e) {
+    console.log(e)
+}
 
 const logined = domain !== '' && prvkey !== ''
 
@@ -28,8 +35,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                     <Route path="/welcome" element={<Welcome />} />
                     <Route path="/register" element={<Registration />} />
                     <Route path="/import" element={<AccountImport />} />
-                    {!logined && <Route path="/stream" element={<GuestTimelinePage />} />}
-                    {!logined && <Route path="/entity/:id" element={<GuestTimelinePage />} />}
+                    {!logined && <Route path="/stream" element={<GuestTimelinePage page="stream" />} />}
+                    {!logined && <Route path="/entity/:id" element={<GuestTimelinePage page="entity" />} />}
+                    {!logined && <Route path="/message/:id" element={<GuestTimelinePage page="message" />} />}
                     <Route
                         path="*"
                         element={

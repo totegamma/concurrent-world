@@ -8,6 +8,8 @@ import {
     Popover,
     TextField,
     ThemeProvider,
+    ToggleButton,
+    ToggleButtonGroup,
     Typography,
     useTheme
 } from '@mui/material'
@@ -126,6 +128,10 @@ export const ThemeCreator = (): JSX.Element => {
 
     const [newThemeBase, setNewThemeBase] = useState<any>(theme)
 
+    const [buttonVariant, setButtonVariant] = useState<'contained' | 'outlined' | 'text'>('contained')
+    const [paperVariant, setPaperVariant] = useState<'elevation' | 'outlined'>('elevation')
+    const [appBarVariant, setAppBarVariant] = useState<'default' | 'transparent'>('default')
+
     const comment = _comment.trim().length > 0 ? _comment : undefined
 
     useEffect(() => {
@@ -146,6 +152,9 @@ export const ThemeCreator = (): JSX.Element => {
         setUnderlayBackground(theme.palette.background.default)
         setUnderlayText(theme.palette.background.contrastText)
         setComment(theme.meta?.comment ?? '')
+        setButtonVariant(theme.components?.MuiButton?.defaultProps?.variant ?? 'contained')
+        setPaperVariant(theme.components?.MuiPaper?.defaultProps?.variant ?? 'elevation')
+        setAppBarVariant(theme.components?.MuiAppBar?.defaultProps?.color === 'transparent' ? 'transparent' : 'default')
     }, [theme])
 
     const validateColor = (color: string): boolean => {
@@ -183,9 +192,39 @@ export const ThemeCreator = (): JSX.Element => {
                     primary: validateColor(contentText) ? contentText : newThemeBase?.palette.text.primary,
                     secondary: validateColor(contentLink) ? contentLink : newThemeBase?.palette.text.secondary
                 }
+            },
+            components: {
+                MuiButton: {
+                    defaultProps: {
+                        variant: buttonVariant,
+                        disableElevation: paperVariant === 'outlined'
+                    }
+                },
+                MuiPaper: {
+                    defaultProps: {
+                        variant: paperVariant
+                    }
+                },
+                MuiAppBar: {
+                    defaultProps: {
+                        color: appBarVariant
+                    }
+                }
             }
         })
-    }, [contentBackground, contentLink, contentText, uiBackground, uiText, underlayBackground, underlayText, comment])
+    }, [
+        contentBackground,
+        contentLink,
+        contentText,
+        uiBackground,
+        uiText,
+        underlayBackground,
+        underlayText,
+        comment,
+        buttonVariant,
+        paperVariant,
+        appBarVariant
+    ])
 
     const serialized = useMemo(() => {
         return JSON.stringify(newThemeBase)
@@ -368,6 +407,91 @@ export const ThemeCreator = (): JSX.Element => {
                         </Box>
                     </Box>
                 </Paper>
+                <Paper
+                    variant="outlined"
+                    sx={{
+                        width: '100%',
+                        p: 2,
+                        gap: 1,
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }}
+                >
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}
+                    >
+                        <Typography variant="h3">Button Style</Typography>
+                        <ToggleButtonGroup
+                            value={buttonVariant}
+                            exclusive
+                            onChange={(_, value) => {
+                                setButtonVariant(value)
+                            }}
+                        >
+                            <ToggleButton value="contained">
+                                <Typography>contained</Typography>
+                            </ToggleButton>
+                            <ToggleButton value="outlined">
+                                <Typography>outlined</Typography>
+                            </ToggleButton>
+                        </ToggleButtonGroup>
+                    </Box>
+
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}
+                    >
+                        <Typography variant="h3">Paper Style</Typography>
+                        <ToggleButtonGroup
+                            value={paperVariant}
+                            exclusive
+                            onChange={(_, value) => {
+                                setPaperVariant(value)
+                            }}
+                        >
+                            <ToggleButton value="elevation">
+                                <Typography>elevation</Typography>
+                            </ToggleButton>
+                            <ToggleButton value="outlined">
+                                <Typography>outlined</Typography>
+                            </ToggleButton>
+                        </ToggleButtonGroup>
+                    </Box>
+
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}
+                    >
+                        <Typography variant="h3">AppBar Style</Typography>
+                        <ToggleButtonGroup
+                            value={appBarVariant}
+                            exclusive
+                            onChange={(_, value) => {
+                                setAppBarVariant(value)
+                            }}
+                        >
+                            <ToggleButton value="default">
+                                <Typography>default</Typography>
+                            </ToggleButton>
+                            <ToggleButton value="transparent">
+                                <Typography>transparent</Typography>
+                            </ToggleButton>
+                        </ToggleButtonGroup>
+                    </Box>
+                </Paper>
                 <Box display="flex" gap={1}>
                     <TextField
                         label="Comment"
@@ -388,9 +512,6 @@ export const ThemeCreator = (): JSX.Element => {
                             }
                         }}
                     />
-                    {/*
-                        <TextField fullWidth multiline value={serialized} />
-                    */}
                     <Button
                         onClick={() => {
                             actions.setDraft(`

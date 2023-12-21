@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { IconButton, Box, useTheme, Button, ButtonBase, AppBar, Toolbar } from '@mui/material'
+import { IconButton, Box, useTheme, AppBar, Toolbar } from '@mui/material'
 import { ConcurrentLogo } from './theming/ConcurrentLogo'
 import type { ConcurrentTheme } from '../model'
 import { useGlobalActions } from '../context/GlobalActions'
