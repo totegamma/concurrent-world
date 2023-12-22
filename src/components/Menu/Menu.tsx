@@ -197,7 +197,6 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         sx={{
                             display: { xs: 'none', sm: 'flex' },
                             height: 36,
-                            my: 'auto',
                             borderRadius: `100px`
                         }}
                     >
