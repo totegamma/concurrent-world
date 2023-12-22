@@ -1,4 +1,5 @@
 import {
+    AppBar,
     Box,
     Button,
     Divider,
@@ -10,6 +11,7 @@ import {
     ThemeProvider,
     ToggleButton,
     ToggleButtonGroup,
+    Toolbar,
     Typography,
     useTheme
 } from '@mui/material'
@@ -230,15 +232,39 @@ export const ThemeCreator = (): JSX.Element => {
         return JSON.stringify(newThemeBase)
     }, [newThemeBase])
 
+    const color =
+        newTheme.components?.MuiAppBar?.defaultProps?.color === 'transparent'
+            ? newTheme.palette.primary.main
+            : newTheme.palette.primary.contrastText
+
     return (
         <ThemeProvider theme={newTheme}>
             <Box display="flex" flexDirection="column" gap={1}>
                 <Paper
                     variant="outlined"
                     sx={{
-                        width: '100%'
+                        width: '100%',
+                        overflow: 'hidden'
                     }}
                 >
+                    <AppBar
+                        elevation={0}
+                        position="relative"
+                        sx={{
+                            borderLeft: 'none',
+                            borderTop: 'none',
+                            borderRight: 'none'
+                        }}
+                    >
+                        <Toolbar
+                            variant="dense"
+                            sx={{
+                                color
+                            }}
+                        >
+                            <b>Theme Creator</b>
+                        </Toolbar>
+                    </AppBar>
                     <Box p={2} display="flex" flexDirection="row" alignItems="center" gap={2}>
                         <Box
                             sx={{
@@ -295,6 +321,7 @@ export const ThemeCreator = (): JSX.Element => {
                             {themeExists ? 'Modify' : 'Create'}
                         </Button>
                     </Box>
+                    <Divider />
                     <Box
                         sx={{
                             display: 'flex',
@@ -406,124 +433,122 @@ export const ThemeCreator = (): JSX.Element => {
                             />
                         </Box>
                     </Box>
-                </Paper>
-                <Paper
-                    variant="outlined"
-                    sx={{
-                        width: '100%',
-                        p: 2,
-                        gap: 1,
-                        display: 'flex',
-                        flexDirection: 'column'
-                    }}
-                >
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            alignItems: 'center'
-                        }}
-                    >
-                        <Typography variant="h3">Button Style</Typography>
-                        <ToggleButtonGroup
-                            value={buttonVariant}
-                            exclusive
-                            onChange={(_, value) => {
-                                setButtonVariant(value)
+                    <Divider />
+                    <Box p={2} gap={1} display="flex" flexDirection="column">
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center'
                             }}
                         >
-                            <ToggleButton value="contained">
-                                <Typography>contained</Typography>
-                            </ToggleButton>
-                            <ToggleButton value="outlined">
-                                <Typography>outlined</Typography>
-                            </ToggleButton>
-                        </ToggleButtonGroup>
-                    </Box>
+                            <Typography variant="h3">Button Style</Typography>
+                            <ToggleButtonGroup
+                                value={buttonVariant}
+                                exclusive
+                                onChange={(_, value) => {
+                                    if (value === null) return
+                                    setButtonVariant(value)
+                                }}
+                            >
+                                <ToggleButton value="contained">
+                                    <Typography>contained</Typography>
+                                </ToggleButton>
+                                <ToggleButton value="outlined">
+                                    <Typography>outlined</Typography>
+                                </ToggleButton>
+                            </ToggleButtonGroup>
+                        </Box>
 
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            alignItems: 'center'
-                        }}
-                    >
-                        <Typography variant="h3">Paper Style</Typography>
-                        <ToggleButtonGroup
-                            value={paperVariant}
-                            exclusive
-                            onChange={(_, value) => {
-                                setPaperVariant(value)
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center'
                             }}
                         >
-                            <ToggleButton value="elevation">
-                                <Typography>elevation</Typography>
-                            </ToggleButton>
-                            <ToggleButton value="outlined">
-                                <Typography>outlined</Typography>
-                            </ToggleButton>
-                        </ToggleButtonGroup>
-                    </Box>
+                            <Typography variant="h3">Paper Style</Typography>
+                            <ToggleButtonGroup
+                                value={paperVariant}
+                                exclusive
+                                onChange={(_, value) => {
+                                    if (value === null) return
+                                    setPaperVariant(value)
+                                }}
+                            >
+                                <ToggleButton value="elevation">
+                                    <Typography>elevation</Typography>
+                                </ToggleButton>
+                                <ToggleButton value="outlined">
+                                    <Typography>outlined</Typography>
+                                </ToggleButton>
+                            </ToggleButtonGroup>
+                        </Box>
 
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            alignItems: 'center'
-                        }}
-                    >
-                        <Typography variant="h3">AppBar Style</Typography>
-                        <ToggleButtonGroup
-                            value={appBarVariant}
-                            exclusive
-                            onChange={(_, value) => {
-                                setAppBarVariant(value)
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center'
                             }}
                         >
-                            <ToggleButton value="primary">
-                                <Typography>default</Typography>
-                            </ToggleButton>
-                            <ToggleButton value="transparent">
-                                <Typography>transparent</Typography>
-                            </ToggleButton>
-                        </ToggleButtonGroup>
+                            <Typography variant="h3">AppBar Style</Typography>
+                            <ToggleButtonGroup
+                                value={appBarVariant}
+                                exclusive
+                                onChange={(_, value) => {
+                                    if (value === null) return
+                                    setAppBarVariant(value)
+                                }}
+                            >
+                                <ToggleButton value="primary">
+                                    <Typography>default</Typography>
+                                </ToggleButton>
+                                <ToggleButton value="transparent">
+                                    <Typography>transparent</Typography>
+                                </ToggleButton>
+                            </ToggleButtonGroup>
+                        </Box>
+                    </Box>
+                    <Divider />
+                    <Box p={2}>
+                        <Box display="flex" gap={1}>
+                            <TextField
+                                label="Comment"
+                                fullWidth
+                                multiline
+                                value={_comment}
+                                onChange={(e) => {
+                                    setComment(e.target.value)
+                                }}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        '& fieldset': {
+                                            borderColor: 'text.disabled'
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: 'text.primary'
+                                        }
+                                    }
+                                }}
+                            />
+                            <Button
+                                onClick={() => {
+                                    actions.setDraft(`
+    \`\`\`theme
+    ${serialized}
+    \`\`\``)
+                                    actions.openDraft()
+                                }}
+                            >
+                                Share
+                            </Button>
+                        </Box>
                     </Box>
                 </Paper>
-                <Box display="flex" gap={1}>
-                    <TextField
-                        label="Comment"
-                        fullWidth
-                        multiline
-                        value={_comment}
-                        onChange={(e) => {
-                            setComment(e.target.value)
-                        }}
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                    borderColor: 'text.disabled'
-                                },
-                                '&:hover fieldset': {
-                                    borderColor: 'text.primary'
-                                }
-                            }
-                        }}
-                    />
-                    <Button
-                        onClick={() => {
-                            actions.setDraft(`
-\`\`\`theme
-${serialized}
-\`\`\``)
-                            actions.openDraft()
-                        }}
-                    >
-                        Share
-                    </Button>
-                </Box>
             </Box>
         </ThemeProvider>
     )

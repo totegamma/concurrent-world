@@ -1,4 +1,4 @@
-import { Box, Paper, Typography, useTheme } from '@mui/material'
+import { Box, ListItemIcon, ListItemText, Menu, MenuItem, Paper, Typography, useTheme } from '@mui/material'
 import { ThemeSelect } from './ThemeSelect'
 import { ThemeCreator } from '../ThemeCreator'
 import { useEffect, useMemo, useState } from 'react'
@@ -9,7 +9,8 @@ import { usePreference } from '../../context/PreferenceContext'
 import { type ConcurrentTheme } from '../../model'
 import { Themes, loadConcurrentTheme } from '../../themes'
 import { DummyMessageView } from '../Message/DummyMessageView'
-import RemoveCircleIcon from '@mui/icons-material/RemoveCircle'
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 
 export const ThemeSettings = (): JSX.Element => {
     const client = useApi()
@@ -29,6 +30,8 @@ export const ThemeSettings = (): JSX.Element => {
     )
 
     const [themeAuthor, setThemeAuthor] = useState<User | undefined>(undefined)
+
+    const [menuElem, setMenuElem] = useState<[string, null | HTMLElement]>(['', null])
 
     useEffect(() => {
         if (theme.meta?.author) {
@@ -88,21 +91,39 @@ export const ThemeSettings = (): JSX.Element => {
 
             <Typography variant="h3">Custom Themes:</Typography>
             <ThemeSelect
-                additionalButtonIcon={<RemoveCircleIcon />}
+                additionalButtonIcon={<MoreHorizIcon />}
                 themes={renderedCustomThemes}
                 setThemeName={setThemeName}
-                onAdditionalButtonClick={(themeName) => {
-                    delete customThemes[themeName]
-                    setCustomTheme({ ...customThemes })
+                onAdditionalButtonClick={(themeName, elem) => {
+                    setMenuElem([themeName, elem])
                 }}
             />
-            <Typography variant="h3">Theme Creator:</Typography>
             <Box sx={{ display: { xs: 'none', sm: 'none', md: 'block' } }}>
                 <ThemeCreator />
             </Box>
             <Box sx={{ display: { xs: 'block', sm: 'block', md: 'none' } }}>
                 <Typography variant="body1">Theme Creator is not available on mobile.</Typography>
             </Box>
+            <Menu
+                open={Boolean(menuElem[1])}
+                onClose={() => {
+                    setMenuElem(['', null])
+                }}
+                anchorEl={menuElem[1]}
+            >
+                <MenuItem
+                    onClick={() => {
+                        delete customThemes[menuElem[0]]
+                        setCustomTheme({ ...customThemes })
+                        setMenuElem(['', null])
+                    }}
+                >
+                    <ListItemIcon>
+                        <DeleteForeverIcon />
+                    </ListItemIcon>
+                    <ListItemText>Delete</ListItemText>
+                </MenuItem>
+            </Menu>
         </Box>
     )
 }

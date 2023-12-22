@@ -6,7 +6,7 @@ export interface ThemeSelectProps {
     themes: Record<string, ConcurrentTheme>
     setThemeName: (name: string) => void
     additionalButtonIcon?: JSX.Element
-    onAdditionalButtonClick?: (id: string) => void
+    onAdditionalButtonClick?: (id: string, el: HTMLElement) => void
 }
 
 export const ThemeSelect = (props: ThemeSelectProps): JSX.Element => {
@@ -21,7 +21,13 @@ export const ThemeSelect = (props: ThemeSelectProps): JSX.Element => {
             }}
         >
             {Object.keys(props.themes).map((e) => (
-                <Paper key={e} variant="outlined">
+                <Paper
+                    key={e}
+                    variant="outlined"
+                    sx={{
+                        overflow: 'hidden'
+                    }}
+                >
                     <Button
                         onClick={(_) => {
                             props.setThemeName(e)
@@ -33,7 +39,8 @@ export const ThemeSelect = (props: ThemeSelectProps): JSX.Element => {
                             alignItems: 'center',
                             gap: '10px',
                             width: '100%',
-                            justifyContent: 'flex-start'
+                            justifyContent: 'flex-start',
+                            overflow: 'hidden'
                         }}
                         color="info"
                     >
@@ -54,7 +61,11 @@ export const ThemeSelect = (props: ThemeSelectProps): JSX.Element => {
                         <Typography
                             sx={{
                                 color: props.themes[e].palette.text.primary,
-                                flexGrow: 1
+                                flexGrow: 1,
+                                textOverflow: 'ellipsis',
+                                display: 'block',
+                                overflow: 'hidden',
+                                whiteSpace: 'nowrap'
                             }}
                             variant="button"
                         >
@@ -62,8 +73,9 @@ export const ThemeSelect = (props: ThemeSelectProps): JSX.Element => {
                         </Typography>
                         {props.additionalButtonIcon && (
                             <IconButton
-                                onClick={() => {
-                                    props.onAdditionalButtonClick?.(e)
+                                onClick={(event) => {
+                                    props.onAdditionalButtonClick?.(e, event.currentTarget)
+                                    event.stopPropagation()
                                 }}
                                 sx={{
                                     color: props.themes[e].palette.text.primary
