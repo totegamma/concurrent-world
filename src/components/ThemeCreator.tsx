@@ -130,7 +130,7 @@ export const ThemeCreator = (): JSX.Element => {
 
     const [buttonVariant, setButtonVariant] = useState<'contained' | 'outlined' | 'text'>('contained')
     const [paperVariant, setPaperVariant] = useState<'elevation' | 'outlined'>('elevation')
-    const [appBarVariant, setAppBarVariant] = useState<'default' | 'transparent'>('default')
+    const [appBarVariant, setAppBarVariant] = useState<'primary' | 'transparent'>('primary')
 
     const comment = _comment.trim().length > 0 ? _comment : undefined
 
@@ -154,7 +154,7 @@ export const ThemeCreator = (): JSX.Element => {
         setComment(theme.meta?.comment ?? '')
         setButtonVariant(theme.components?.MuiButton?.defaultProps?.variant ?? 'contained')
         setPaperVariant(theme.components?.MuiPaper?.defaultProps?.variant ?? 'elevation')
-        setAppBarVariant(theme.components?.MuiAppBar?.defaultProps?.color === 'transparent' ? 'transparent' : 'default')
+        setAppBarVariant(theme.components?.MuiAppBar?.defaultProps?.color === 'transparent' ? 'transparent' : 'primary')
     }, [theme])
 
     const validateColor = (color: string): boolean => {
@@ -483,7 +483,7 @@ export const ThemeCreator = (): JSX.Element => {
                                 setAppBarVariant(value)
                             }}
                         >
-                            <ToggleButton value="default">
+                            <ToggleButton value="primary">
                                 <Typography>default</Typography>
                             </ToggleButton>
                             <ToggleButton value="transparent">
