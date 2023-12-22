@@ -96,7 +96,6 @@ export const ThemeSettings = (): JSX.Element => {
                     setCustomTheme({ ...customThemes })
                 }}
             />
-            <Typography variant="h3">Theme Creator:</Typography>
             <Box sx={{ display: { xs: 'none', sm: 'none', md: 'block' } }}>
                 <ThemeCreator />
             </Box>
