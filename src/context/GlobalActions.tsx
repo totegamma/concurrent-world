@@ -15,16 +15,14 @@ import { usePreference } from './PreferenceContext'
 import { ProfileEditor } from '../components/ProfileEditor'
 import { MessageContainer } from '../components/Message/MessageContainer'
 import { Menu } from '../components/Menu/Menu'
-import { usePersistent } from '../hooks/usePersistent'
 
 export interface GlobalActionsState {
-    openDraft: () => void
+    openDraft: (text?: string) => void
     openReply: (target: Message<any>) => void
     openReroute: (target: Message<any>) => void
     openMobileMenu: (open?: boolean) => void
     allKnownStreams: Array<Stream<CommonstreamSchema>>
     draft: string
-    setDraft: (text: string) => void
 }
 
 const GlobalActionsContext = createContext<GlobalActionsState | undefined>(undefined)
@@ -109,10 +107,14 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         })
     }, [path.pathname, path.hash, lists])
 
-    const openDraft = useCallback(() => {
-        updateQueriedStreams()
-        setMode('compose')
-    }, [updateQueriedStreams])
+    const openDraft = useCallback(
+        (draft?: string) => {
+            setDraft(draft ?? '')
+            updateQueriedStreams()
+            setMode('compose')
+        },
+        [updateQueriedStreams]
+    )
 
     const openReply = useCallback((target: Message<any>) => {
         setTargetMessage(target)
@@ -198,8 +200,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     openReroute,
                     openMobileMenu,
                     allKnownStreams,
-                    draft,
-                    setDraft
+                    draft
                 }
             }, [openDraft, openReply, openReroute, openMobileMenu, allKnownStreams])}
         >

@@ -535,11 +535,10 @@ export const ThemeCreator = (): JSX.Element => {
                             />
                             <Button
                                 onClick={() => {
-                                    actions.setDraft(`
-    \`\`\`theme
-    ${serialized}
-    \`\`\``)
-                                    actions.openDraft()
+                                    actions.openDraft(`
+\`\`\`theme
+${serialized}
+\`\`\``)
                                 }}
                             >
                                 Share
