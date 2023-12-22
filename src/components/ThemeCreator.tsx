@@ -430,6 +430,7 @@ export const ThemeCreator = (): JSX.Element => {
                             value={buttonVariant}
                             exclusive
                             onChange={(_, value) => {
+                                if (value === null) return
                                 setButtonVariant(value)
                             }}
                         >
@@ -455,6 +456,7 @@ export const ThemeCreator = (): JSX.Element => {
                             value={paperVariant}
                             exclusive
                             onChange={(_, value) => {
+                                if (value === null) return
                                 setPaperVariant(value)
                             }}
                         >
@@ -480,6 +482,7 @@ export const ThemeCreator = (): JSX.Element => {
                             value={appBarVariant}
                             exclusive
                             onChange={(_, value) => {
+                                if (value === null) return
                                 setAppBarVariant(value)
                             }}
                         >
