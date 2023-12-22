@@ -265,7 +265,7 @@ export const ThemeCreator = (): JSX.Element => {
                             <b>Theme Creator</b>
                         </Toolbar>
                     </AppBar>
-                    <Box p={2} display="flex" flexDirection="row" alignItems="center" gap={2}>
+                    <Box p={2} display="flex" alignItems="center" gap={2}>
                         <Box
                             sx={{
                                 display: 'flex',
@@ -322,12 +322,7 @@ export const ThemeCreator = (): JSX.Element => {
                         </Button>
                     </Box>
                     <Divider />
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'row'
-                        }}
-                    >
+                    <Box display="flex" flexDirection={{ xs: 'column', sm: 'column', md: 'row' }}>
                         <Box
                             sx={{
                                 bgcolor: 'background.paper',
@@ -438,10 +433,11 @@ export const ThemeCreator = (): JSX.Element => {
                         <Box
                             sx={{
                                 display: 'flex',
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
+                                justifyContent: 'space-between'
                             }}
+                            gap={1}
+                            flexDirection={{ xs: 'column', sm: 'column', md: 'row' }}
+                            alignItems={{ xs: 'flex-start', sm: 'flex-start', md: 'center' }}
                         >
                             <Typography variant="h3">Button Style</Typography>
                             <ToggleButtonGroup
@@ -464,10 +460,11 @@ export const ThemeCreator = (): JSX.Element => {
                         <Box
                             sx={{
                                 display: 'flex',
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
+                                justifyContent: 'space-between'
                             }}
+                            gap={1}
+                            flexDirection={{ xs: 'column', sm: 'column', md: 'row' }}
+                            alignItems={{ xs: 'flex-start', sm: 'flex-start', md: 'center' }}
                         >
                             <Typography variant="h3">Paper Style</Typography>
                             <ToggleButtonGroup
@@ -490,10 +487,11 @@ export const ThemeCreator = (): JSX.Element => {
                         <Box
                             sx={{
                                 display: 'flex',
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
+                                justifyContent: 'space-between'
                             }}
+                            gap={1}
+                            flexDirection={{ xs: 'column', sm: 'column', md: 'row' }}
+                            alignItems={{ xs: 'flex-start', sm: 'flex-start', md: 'center' }}
                         >
                             <Typography variant="h3">AppBar Style</Typography>
                             <ToggleButtonGroup

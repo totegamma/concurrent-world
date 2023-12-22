@@ -98,12 +98,7 @@ export const ThemeSettings = (): JSX.Element => {
                     setMenuElem([themeName, elem])
                 }}
             />
-            <Box sx={{ display: { xs: 'none', sm: 'none', md: 'block' } }}>
-                <ThemeCreator />
-            </Box>
-            <Box sx={{ display: { xs: 'block', sm: 'block', md: 'none' } }}>
-                <Typography variant="body1">Theme Creator is not available on mobile.</Typography>
-            </Box>
+            <ThemeCreator />
             <Menu
                 open={Boolean(menuElem[1])}
                 onClose={() => {
