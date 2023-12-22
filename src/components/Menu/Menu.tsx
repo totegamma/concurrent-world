@@ -195,7 +195,9 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                             actions.openDraft()
                         }}
                         sx={{
-                            display: { xs: 'none', sm: 'flex' }
+                            display: { xs: 'none', sm: 'flex' },
+                            height: 36,
+                            borderRadius: `100px`
                         }}
                     >
                         投稿する

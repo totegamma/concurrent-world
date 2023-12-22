@@ -55,6 +55,7 @@ export const LogoutButton = (): JSX.Element => {
                 </Box>
             </Modal>
             <Button
+                sx={{ borderRadius: '100px' }}
                 color="error"
                 onClick={(_) => {
                     setOpenLogoutModal(true)
