@@ -154,7 +154,7 @@ export const ThemeCreator = (): JSX.Element => {
         setComment(theme.meta?.comment ?? '')
         setButtonVariant(theme.components?.MuiButton?.defaultProps?.variant ?? 'contained')
         setPaperVariant(theme.components?.MuiPaper?.defaultProps?.variant ?? 'elevation')
-        setAppBarVariant(theme.components?.MuiAppBar?.defaultProps?.color === 'transparent' ? 'transparent' : 'default')
+        setAppBarVariant(theme.components?.MuiAppBar?.defaultProps?.color === 'transparent' ? 'transparent' : 'primary')
     }, [theme])
 
     const validateColor = (color: string): boolean => {
