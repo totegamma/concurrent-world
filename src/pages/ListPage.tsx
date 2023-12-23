@@ -102,7 +102,7 @@ export function ListPage(): JSX.Element {
                         setListSettingsOpen(true)
                     }}
                     onTitleClick={() => {
-                        timelineRef.current?.scrollTo(0)
+                        timelineRef.current?.scrollToIndex(0, { align: 'start', smooth: true })
                     }}
                 />
                 <Tabs
@@ -123,7 +123,7 @@ export function ListPage(): JSX.Element {
                                 onClick={() => {
                                     console.log('click', e, tab)
                                     if (e === tab) {
-                                        timelineRef.current?.scrollTo(0)
+                                        timelineRef.current?.scrollToIndex(0, { align: 'start', smooth: true })
                                     }
                                 }}
                             />

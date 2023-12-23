@@ -31,6 +31,7 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
                 borderTop: 'none',
                 borderRight: 'none'
             }}
+            onClick={props.onTitleClick}
         >
             <Toolbar variant="dense">
                 <Box width="40px" height="40px">

@@ -76,7 +76,7 @@ export const StreamPage = memo((): JSX.Element => {
                     titleIcon={<PercentIcon />}
                     secondaryAction={<InfoIcon />}
                     onTitleClick={() => {
-                        timelineRef.current?.scrollTo(0)
+                        timelineRef.current?.scrollToIndex(0, { align: 'start', smooth: true })
                     }}
                     onSecondaryActionClick={() => {
                         setStreamInfoOpen(true)
