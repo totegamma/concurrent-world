@@ -22,6 +22,11 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
             ? theme.palette.primary.main
             : theme.palette.primary.contrastText
 
+    const bgColor =
+        theme.components?.MuiAppBar?.defaultProps?.color === 'transparent'
+            ? theme.palette.background.paper
+            : theme.palette.primary.main
+
     return (
         <AppBar
             elevation={0}
@@ -29,7 +34,8 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
             sx={{
                 borderLeft: 'none',
                 borderTop: 'none',
-                borderRight: 'none'
+                borderRight: 'none',
+                backgroundColor: bgColor
             }}
             onClick={props.onTitleClick}
         >
