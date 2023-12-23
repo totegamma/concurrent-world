@@ -21,17 +21,17 @@ const meta = {
         }
     },
     args: {
-        themeName: 'basic'
+        themeName: 'blue'
     }
 } satisfies Meta<Props>
 
 export default meta
 
 export const Default = (arg: Props): JSX.Element => {
-    const [theme, setTheme] = useState<ConcurrentTheme>(loadConcurrentTheme(arg.themeName ?? 'basic'))
+    const [theme, setTheme] = useState<ConcurrentTheme>(loadConcurrentTheme(arg.themeName ?? 'blue'))
 
     useEffect(() => {
-        setTheme(loadConcurrentTheme(arg.themeName ?? 'basic'))
+        setTheme(loadConcurrentTheme(arg.themeName ?? 'blue'))
     }, [arg.themeName])
 
     const previewTheme: Record<string, ConcurrentTheme> = useMemo(

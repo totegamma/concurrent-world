@@ -26,7 +26,7 @@ export interface Preference {
 }
 
 export const defaultPreference: Preference = {
-    themeName: 'basic',
+    themeName: 'blue',
     storageProvider: 'domain',
     imgurClientID: '',
     s3Config: {

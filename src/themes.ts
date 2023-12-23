@@ -3,42 +3,6 @@ import type { ConcurrentTheme } from './model'
 import { type DeepPartial } from './util'
 
 export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
-    basic: {
-        meta: {
-            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
-            comment: undefined
-        },
-        palette: {
-            primary: {
-                main: '#7e7e7e'
-            },
-            secondary: {
-                main: '#737373'
-            },
-            background: {
-                default: '#9e9e9e',
-                contrastText: '#ffffff'
-            }
-        }
-    },
-    red: {
-        meta: {
-            author: 'CCb72AAc9dcF088F7088b6718BE5a494fBB3861439', // totegamma
-            comment: undefined
-        },
-        palette: {
-            primary: {
-                main: '#E0576F'
-            },
-            secondary: {
-                main: '#81225b'
-            },
-            background: {
-                default: '#C74E64',
-                contrastText: '#ffffff'
-            }
-        }
-    },
     blue: {
         meta: {
             author: 'CCb72AAc9dcF088F7088b6718BE5a494fBB3861439', // totegamma
@@ -55,322 +19,6 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
                 default: '#023059',
                 contrastText: '#ffffff'
             }
-        }
-    },
-    orange: {
-        meta: {
-            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
-            comment: undefined
-        },
-        palette: {
-            primary: {
-                main: '#c52b26'
-            },
-            secondary: {
-                main: '#663916'
-            },
-            background: {
-                default: '#e07d43',
-                contrastText: '#ffffff'
-            }
-        }
-    },
-    highcontrast_bw: {
-        meta: {
-            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
-            comment: undefined
-        },
-        palette: {
-            primary: {
-                main: '#ffffff'
-            },
-            secondary: {
-                main: '#ffffff'
-            },
-            background: {
-                default: '#000000',
-                paper: '#000000',
-                contrastText: '#ffffff'
-            },
-            text: {
-                primary: '#ffffff',
-                secondary: 'rgba(255, 255, 255, 0.797)',
-                disabled: 'rgba(255, 255, 255, 0.703)'
-            },
-            divider: 'rgba(255, 255, 255, 0.2)'
-        },
-        shape: {
-            borderRadius: 1
-        },
-        components: {
-            MuiCssBaseline: {
-                styleOverrides: {
-                    '::-webkit-scrollbar-thumb': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                        borderRadius: '10px'
-                    }
-                }
-            }
-        }
-    },
-    highcontrast_yb: {
-        meta: {
-            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
-            comment: undefined
-        },
-        palette: {
-            primary: {
-                main: '#f7cd12'
-            },
-            secondary: {
-                main: '#f7cd12'
-            },
-            background: {
-                default: '#000057',
-                paper: '#000000',
-                contrastText: '#fffF46'
-            },
-            text: {
-                primary: '#ffffff',
-                secondary: 'rgba(255, 255, 255, 0.7)',
-                disabled: 'rgba(255, 255, 255, 0.5)'
-            },
-            divider: 'rgba(255, 255, 255, 0.2)'
-        },
-        shape: {
-            borderRadius: 1
-        },
-        components: {
-            MuiCssBaseline: {
-                styleOverrides: {
-                    '::-webkit-scrollbar-thumb': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                        borderRadius: '10px'
-                    }
-                }
-            }
-        }
-    },
-    rabbuttz: {
-        meta: {
-            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
-            comment: undefined
-        },
-        palette: {
-            primary: {
-                main: '#c52b26'
-            },
-            secondary: {
-                main: '#90591e'
-            },
-            background: {
-                default: '#e07d43',
-                paper: '#f8efdd',
-                contrastText: '#ffffff'
-            }
-        }
-    },
-    gammalab: {
-        meta: {
-            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
-            comment: undefined
-        },
-        palette: {
-            primary: {
-                main: '#FFF',
-                contrastText: '#000'
-            },
-            secondary: {
-                main: '#156a84'
-            },
-            background: {
-                default: '#0476D9',
-                paper: '#FFF',
-                contrastText: '#FFF'
-            },
-            divider: 'rgba(0, 0, 0, 0.2)'
-        },
-        shape: {
-            borderRadius: 4
-        }
-    },
-    tote: {
-        meta: {
-            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
-            comment: undefined
-        },
-        palette: {
-            primary: {
-                main: '#0469c1',
-                contrastText: '#cffffe'
-            },
-            secondary: {
-                main: '#154f90'
-            },
-            background: {
-                default: '#ffd54c',
-                paper: '#FFF',
-                contrastText: '#423e3e'
-            },
-            text: {
-                primary: '#363636',
-                secondary: 'rgba(58, 35, 32, 0.8)',
-                disabled: 'rgba(164, 164, 164, 0.6)'
-            },
-            divider: 'rgba(0, 0, 0, 0.2)'
-        }
-    },
-    cafe: {
-        meta: {
-            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
-            comment: undefined
-        },
-        palette: {
-            primary: {
-                main: '#663741'
-            },
-            secondary: {
-                main: '#663e37'
-            },
-            background: {
-                default: '#a99996',
-                paper: '#f7efea',
-                contrastText: '#ffffff'
-            }
-        },
-        shape: {
-            borderRadius: 2
-        }
-    },
-    rainyday: {
-        meta: {
-            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
-            comment: undefined
-        },
-        palette: {
-            primary: {
-                main: '#70868b'
-            },
-            secondary: {
-                main: '#4d6662'
-            },
-            background: {
-                default: '#839fa1',
-                paper: '#ebf3f5',
-                contrastText: '#ffffff'
-            },
-            text: {
-                primary: '#232d31',
-                secondary: 'rgba(52, 61, 66, 0.7)',
-                disabled: 'rgba(0, 0, 0, 0.5)'
-            },
-            divider: 'rgba(0, 0, 0, 0.2)'
-        },
-        shape: {
-            borderRadius: 0
-        }
-    },
-    oldcomputing: {
-        meta: {
-            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
-            comment: undefined
-        },
-        palette: {
-            primary: {
-                main: '#939195'
-            },
-            secondary: {
-                main: '#4b4b56'
-            },
-            background: {
-                default: '#6d6d70',
-                paper: '#f0edf1',
-                contrastText: '#ffffff'
-            }
-        },
-        shape: {
-            borderRadius: 2
-        }
-    },
-    redmond: {
-        meta: {
-            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
-            comment: undefined
-        },
-        palette: {
-            primary: {
-                main: '#00007C',
-                contrastText: '#FFF'
-            },
-            secondary: {
-                main: '#00007C'
-            },
-            background: {
-                default: '#377E7F',
-                paper: '#ffffff',
-                contrastText: '#ffffff'
-            }
-        },
-        shape: {
-            borderRadius: 0
-        }
-    },
-    ニンテン: {
-        meta: {
-            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
-            comment: undefined
-        },
-        palette: {
-            primary: {
-                main: '#7f2f2f',
-                contrastText: '#ffeba8'
-            },
-            secondary: {
-                main: '#5f4d3c'
-            },
-            background: {
-                default: '#e3dccc',
-                paper: '#f6f1e0',
-                contrastText: '#514a29'
-            },
-            text: {
-                primary: '#1a1a18',
-                secondary: 'rgba(0, 0, 0, 0.7)',
-                disabled: 'rgba(0, 0, 0, 0.5)'
-            },
-            divider: 'rgba(0, 0, 0, 0.2)'
-        },
-        shape: {
-            borderRadius: 0
-        }
-    },
-    sacher: {
-        meta: {
-            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
-            comment: undefined
-        },
-        palette: {
-            primary: {
-                main: '#c77e18',
-                contrastText: '#fffefa'
-            },
-            secondary: {
-                main: '#4a5a54'
-            },
-            background: {
-                default: '#188aa3',
-                paper: '#f6f1e0',
-                contrastText: '#fffef8'
-            },
-            text: {
-                primary: '#2e0d03',
-                secondary: '#4c6675',
-                disabled: 'rgba(0, 0, 0, 0.5)'
-            },
-            divider: 'rgba(0, 0, 0, 0.2)'
-        },
-        shape: {
-            borderRadius: 3
         }
     },
     blue2: {
@@ -447,186 +95,80 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
             borderRadius: 2
         }
     },
-    messy: {
+    cafe: {
         meta: {
             author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
             comment: undefined
         },
         palette: {
             primary: {
-                main: '#7f2f2f',
-                contrastText: '#fff2c3'
+                main: '#663741'
             },
             secondary: {
-                main: '#9b7298'
+                main: '#663e37'
             },
             background: {
-                default: '#18171d',
-                paper: '#242023',
-                contrastText: '#f1f1ca'
-            },
-            text: {
-                primary: '#fbffd4',
-                secondary: 'rgba(255, 255, 255, 0.7)',
-                disabled: 'rgba(255, 255, 255, 0.5)'
-            },
-            divider: 'rgba(255, 255, 255, 0.2)'
-        },
-        components: {
-            MuiCssBaseline: {
-                styleOverrides: {
-                    '::-webkit-scrollbar-thumb': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                        borderRadius: '10px'
-                    }
-                }
+                default: '#a99996',
+                paper: '#f7efea',
+                contrastText: '#ffffff'
             }
         },
         shape: {
             borderRadius: 2
         }
     },
-    trick: {
+    rainyday: {
         meta: {
             author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
             comment: undefined
         },
         palette: {
             primary: {
-                main: '#2f0931',
-                contrastText: '#f4870a'
+                main: '#70868b'
             },
             secondary: {
-                main: '#393131'
+                main: '#4d6662'
             },
             background: {
-                default: '#29232c',
-                paper: '#9297ab',
-                contrastText: '#d5d038'
+                default: '#839fa1',
+                paper: '#ebf3f5',
+                contrastText: '#ffffff'
             },
             text: {
-                primary: '#2a0128',
-                secondary: 'rgba(0, 0, 0, 0.7)',
-                disabled: 'rgba(114, 114, 114, 0.5)'
-            },
-            divider: 'rgba(255, 255, 255, 0.2)'
-        },
-        components: {
-            MuiCssBaseline: {
-                styleOverrides: {
-                    '::-webkit-scrollbar-thumb': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                        borderRadius: '10px'
-                    }
-                }
-            }
-        },
-        shape: {
-            borderRadius: 2
-        }
-    },
-    sorcer: {
-        meta: {
-            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
-            comment: undefined
-        },
-        palette: {
-            primary: {
-                main: '#3b3845',
-                contrastText: '#9ed952'
-            },
-            secondary: {
-                main: '#393131'
-            },
-            background: {
-                default: '#362136',
-                paper: '#759697',
-                contrastText: '#e6973e'
-            },
-            text: {
-                primary: '#071f32',
-                secondary: 'rgba(0, 0, 0, 0.7)',
-                disabled: 'rgba(114, 114, 114, 0.5)'
-            },
-            divider: 'rgba(255, 255, 255, 0.2)'
-        },
-        components: {
-            MuiCssBaseline: {
-                styleOverrides: {
-                    '::-webkit-scrollbar-thumb': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                        borderRadius: '10px'
-                    }
-                }
-            }
-        },
-        shape: {
-            borderRadius: 2
-        }
-    },
-    christmas: {
-        meta: {
-            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
-            comment: undefined
-        },
-        palette: {
-            primary: {
-                main: '#1f6c29',
-                contrastText: '#ffefb5'
-            },
-            secondary: {
-                main: '#321f3f'
-            },
-            background: {
-                default: '#730a0a',
-                paper: '#edede2',
-                contrastText: '#fafaa1'
-            },
-            text: {
-                primary: '#1e1f1c',
-                secondary: 'rgba(21, 20, 20, 0.7)',
+                primary: '#232d31',
+                secondary: 'rgba(52, 61, 66, 0.7)',
                 disabled: 'rgba(0, 0, 0, 0.5)'
             },
-            divider: 'rgba(255, 255, 255, 0.2)'
+            divider: 'rgba(0, 0, 0, 0.2)'
         },
         shape: {
-            borderRadius: 2
+            borderRadius: 0
         }
     },
-    winter_panache: {
+    sacher: {
         meta: {
             author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
             comment: undefined
         },
         palette: {
             primary: {
-                main: '#ecd538',
+                main: '#c77e18',
                 contrastText: '#fffefa'
             },
             secondary: {
                 main: '#4a5a54'
             },
             background: {
-                default: '#e2ecee',
-                paper: '#f6fbff',
-                contrastText: '#4d3721'
+                default: '#188aa3',
+                paper: '#f6f1e0',
+                contrastText: '#fffef8'
             },
             text: {
                 primary: '#2e0d03',
                 secondary: '#4c6675',
                 disabled: 'rgba(0, 0, 0, 0.5)'
             },
-            divider: 'rgba(0, 0, 0, 0.1)'
-        },
-        components: {
-            MuiCssBaseline: {
-                styleOverrides: {
-                    '::-webkit-scrollbar-thumb': {
-                        backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                        borderRadius: '10px'
-                    }
-                }
-            }
+            divider: 'rgba(0, 0, 0, 0.2)'
         },
         shape: {
             borderRadius: 3
@@ -781,6 +323,6 @@ export const loadConcurrentTheme = (
     name: string,
     customs: Record<string, DeepPartial<ConcurrentTheme>> = {}
 ): ConcurrentTheme => {
-    const base = customs[name] ?? Themes[name] ?? Themes.basic
+    const base = customs[name] ?? Themes[name] ?? Themes.blue
     return createConcurrentThemeFromObject(base)
 }
