@@ -13,6 +13,7 @@ import { userMentionRemarkPlugin, emojiRemarkPlugin } from '../../util'
 import { CCUserChip } from './CCUserChip'
 import { LinkChip } from './LinkChip'
 import { ThemeCard } from '../ThemeCard'
+import { createConcurrentThemeFromObject } from '../../themes'
 
 export interface MarkdownRendererProps {
     messagebody: string
@@ -229,10 +230,9 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
 
                         if (language === 'theme') {
                             try {
-                                const theme = JSON.parse(String(children))
-                                if (theme?.meta?.author) {
-                                    return <ThemeCard theme={theme} />
-                                }
+                                const rawtheme = JSON.parse(String(children))
+                                const theme = createConcurrentThemeFromObject(rawtheme)
+                                return <ThemeCard theme={theme} />
                             } catch (e) {
                                 console.error(e)
                             }

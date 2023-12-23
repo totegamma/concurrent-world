@@ -1,4 +1,4 @@
-import { Box, ListItemIcon, ListItemText, Menu, MenuItem, Paper, Typography, useTheme } from '@mui/material'
+import { Box, Divider, ListItemIcon, ListItemText, Menu, MenuItem, Paper, Typography, useTheme } from '@mui/material'
 import { ThemeSelect } from './ThemeSelect'
 import { ThemeCreator } from '../ThemeCreator'
 import { useEffect, useMemo, useState } from 'react'
@@ -49,14 +49,8 @@ export const ThemeSettings = (): JSX.Element => {
     }, [theme])
 
     return (
-        <Box
-            sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '30px'
-            }}
-        >
-            <Box py={1} mb={1}>
+        <Box display="flex" flexDirection="column" gap={1}>
+            <Box py={1}>
                 <Typography variant="h3">Current Theme: {themeName}</Typography>
                 <Typography variant="h5">Theme Createor:</Typography>
                 <Paper
@@ -85,19 +79,20 @@ export const ThemeSettings = (): JSX.Element => {
                     />
                 </Paper>
             </Box>
-            <Typography variant="h3">Select Theme:</Typography>
-
-            <ThemeSelect themes={previewTheme} setThemeName={setThemeName} />
-
-            <Typography variant="h3">Custom Themes:</Typography>
-            <ThemeSelect
-                additionalButtonIcon={<MoreHorizIcon />}
-                themes={renderedCustomThemes}
-                setThemeName={setThemeName}
-                onAdditionalButtonClick={(themeName, elem) => {
-                    setMenuElem([themeName, elem])
-                }}
-            />
+            <Box display="flex" flexDirection="column" gap={1}>
+                <Typography variant="h3">Select Theme:</Typography>
+                <ThemeSelect themes={previewTheme} setThemeName={setThemeName} />
+                <Divider />
+                <ThemeSelect
+                    additionalButtonIcon={<MoreHorizIcon />}
+                    themes={renderedCustomThemes}
+                    setThemeName={setThemeName}
+                    onAdditionalButtonClick={(themeName, elem) => {
+                        setMenuElem([themeName, elem])
+                    }}
+                />
+            </Box>
+            <Divider sx={{ my: 1 }} />
             <ThemeCreator />
             <Menu
                 open={Boolean(menuElem[1])}
