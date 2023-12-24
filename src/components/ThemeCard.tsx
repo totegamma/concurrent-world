@@ -4,6 +4,7 @@ import { ConcurrentLogo } from './theming/ConcurrentLogo'
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline'
 import { usePreference } from '../context/PreferenceContext'
 import { closeSnackbar, useSnackbar } from 'notistack'
+import { createConcurrentThemeFromObject } from '../themes'
 
 export interface ThemeCardProps {
     theme: ConcurrentTheme
@@ -14,12 +15,14 @@ export const ThemeCard = (props: ThemeCardProps): JSX.Element => {
     const [themeName, setThemeName] = usePreference('themeName')
     const [customThemes, setCustomThemes] = usePreference('customThemes')
 
+    const theme = createConcurrentThemeFromObject(props.theme)
+
     return (
         <Paper variant="outlined">
             <Button
                 style={{
                     border: 'none',
-                    background: props.theme.palette.background.paper,
+                    background: theme.palette.background.paper,
                     display: 'flex',
                     alignItems: 'center',
                     gap: '10px',
@@ -32,24 +35,24 @@ export const ThemeCard = (props: ThemeCardProps): JSX.Element => {
                     sx={{
                         display: 'flex',
                         borderRadius: '100px',
-                        background: props.theme.palette.primary.contrastText
+                        background: theme.palette.primary.contrastText
                     }}
                 >
                     <ConcurrentLogo
                         size="40px"
-                        upperColor={props.theme.palette.primary.main}
-                        lowerColor={props.theme.palette.background.default}
-                        frameColor={props.theme.palette.background.default}
+                        upperColor={theme.palette.primary.main}
+                        lowerColor={theme.palette.background.default}
+                        frameColor={theme.palette.background.default}
                     />
                 </Box>
                 <Typography
                     sx={{
-                        color: props.theme.palette.text.primary,
+                        color: theme.palette.text.primary,
                         flexGrow: 1
                     }}
                     variant="button"
                 >
-                    {props.theme.meta?.name}
+                    {theme.meta?.name}
                 </Typography>
                 <IconButton
                     onClick={() => {
