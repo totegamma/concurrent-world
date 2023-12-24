@@ -75,6 +75,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                     }}
                 >
                     <Button
+                        variant="contained"
                         color="secondary"
                         onClick={() => {
                             setExpanded(true)

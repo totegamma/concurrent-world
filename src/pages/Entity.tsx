@@ -61,7 +61,7 @@ export function EntityPage(): JSX.Element {
                         title={user.profile?.payload.body.username || 'anonymous'}
                         titleIcon={<AlternateEmailIcon />}
                         onTitleClick={() => {
-                            timelineRef.current?.scrollTo(0)
+                            timelineRef.current?.scrollToIndex(0, { align: 'start', smooth: true })
                         }}
                     />
                 </Collapse>
