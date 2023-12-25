@@ -48,7 +48,8 @@ export const ThemeCard = (props: ThemeCardProps): JSX.Element => {
                 <Typography
                     sx={{
                         color: theme.palette.text.primary,
-                        flexGrow: 1
+                        flexGrow: 1,
+                        textTransform: 'none'
                     }}
                     variant="button"
                 >
@@ -66,7 +67,7 @@ export const ThemeCard = (props: ThemeCardProps): JSX.Element => {
                                         closeSnackbar(key)
                                     }}
                                 >
-                                    undo
+                                    Undo
                                 </Button>
                             )
                         })
@@ -77,7 +78,7 @@ export const ThemeCard = (props: ThemeCardProps): JSX.Element => {
                         })
                     }}
                     sx={{
-                        color: props.theme.palette.text.primary
+                        color: theme.palette.text.primary
                     }}
                 >
                     <DownloadForOfflineIcon />

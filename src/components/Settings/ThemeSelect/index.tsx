@@ -65,7 +65,8 @@ export const ThemeSelect = (props: ThemeSelectProps): JSX.Element => {
                                 textOverflow: 'ellipsis',
                                 display: 'block',
                                 overflow: 'hidden',
-                                whiteSpace: 'nowrap'
+                                whiteSpace: 'nowrap',
+                                textTransform: 'none'
                             }}
                             variant="button"
                         >
