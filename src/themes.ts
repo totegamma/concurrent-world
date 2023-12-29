@@ -24,7 +24,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     blue2: {
         meta: {
             author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
-            comment: undefined
+            comment: 'コンカレで二番目に作られたわけではないテーマです！'
         },
         palette: {
             primary: {
@@ -59,7 +59,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     darkgray: {
         meta: {
             author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
-            comment: undefined
+            comment: '黒背景よりはダークグレーの方が落ち着くんだ'
         },
         palette: {
             primary: {
@@ -98,7 +98,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     cafe: {
         meta: {
             author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
-            comment: undefined
+            comment: 'すくなくともスタバではなさそうだ'
         },
         palette: {
             primary: {
@@ -120,7 +120,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     rainyday: {
         meta: {
             author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
-            comment: undefined
+            comment: 'そういう日もある'
         },
         palette: {
             primary: {
@@ -148,7 +148,8 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     sacher: {
         meta: {
             author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
-            comment: undefined
+            comment:
+                '![ザッハさん](https://worldfile.cc/CCBFe6f64AEE52A200B7C47D3D83680A226967d83C/988bf80b-96ca-4bb9-83ff-cd962932b616)'
         },
         palette: {
             primary: {
