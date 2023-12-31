@@ -50,6 +50,7 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                     <MarkdownRendererLite
                         messagebody={props.message.payload.body.body}
                         emojiDict={props.message.payload.body.emojis ?? {}}
+                        forceOneline={true}
                     />
                 </Typography>
             </Box>

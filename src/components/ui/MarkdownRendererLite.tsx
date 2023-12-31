@@ -13,6 +13,7 @@ import { LinkChip } from './LinkChip'
 export interface MarkdownRendererProps {
     messagebody: string
     emojiDict: Record<string, EmojiLite>
+    forceOneline?: boolean
 }
 
 export function MarkdownRendererLite(props: MarkdownRendererProps): JSX.Element {
@@ -106,81 +107,102 @@ export function MarkdownRendererLite(props: MarkdownRendererProps): JSX.Element 
                             </LinkChip>
                         )
                     },
-                    p: ({ children }) => (
-                        <Typography
-                            sx={{
-                                fontSize: {
-                                    xs: '0.9rem',
-                                    sm: '1rem'
-                                },
-                                mt: 1,
-                                mb: 1,
-                                '&:first-of-type': {
-                                    mt: 0
-                                },
-                                '&:last-child': {
-                                    mb: 0
-                                }
-                            }}
-                            paragraph
-                        >
-                            {children}
-                        </Typography>
-                    ),
-                    h1: ({ children }) => (
-                        <Typography
-                            sx={{
-                                mt: 1.8,
-                                mb: 1,
-                                '&:first-of-type': {
-                                    mt: 0
-                                }
-                            }}
-                            variant="h1"
-                        >
-                            {children}
-                        </Typography>
-                    ),
-                    h2: ({ children }) => (
-                        <Typography
-                            sx={{
-                                mt: 1.5,
-                                mb: 1,
-                                '&:first-of-type': {
-                                    mt: 0
-                                },
-                                '&:last-child': {
-                                    mb: 0
-                                }
-                            }}
-                            variant="h2"
-                        >
-                            {children}
-                        </Typography>
-                    ),
-                    h3: ({ children }) => (
-                        <Typography
-                            sx={{
-                                mt: 1,
-                                mb: 1,
-                                '&:first-of-type': {
-                                    mt: 0
-                                },
-                                '&:last-child': {
-                                    mb: 0
-                                }
-                            }}
-                            variant="h3"
-                        >
-                            {children}
-                        </Typography>
-                    ),
-                    h4: ({ children }) => <Typography variant="h4">{children}</Typography>,
-                    h5: ({ children }) => <Typography variant="h5">{children}</Typography>,
-                    h6: ({ children }) => <Typography variant="h6">{children}</Typography>,
-                    ul: ({ children }) => <ul style={{}}>{children}</ul>,
-                    ol: ({ children }) => <ol style={{}}>{children}</ol>,
-                    li: ({ children }) => <li style={{ marginLeft: 0 }}>{children}</li>,
+                    p: ({ children }) => {
+                        if (props.forceOneline) return <span>{children}</span>
+                        return (
+                            <Typography
+                                sx={{
+                                    fontSize: {
+                                        xs: '0.9rem',
+                                        sm: '1rem'
+                                    },
+                                    mt: 1,
+                                    mb: 1,
+                                    '&:first-of-type': {
+                                        mt: 0
+                                    },
+                                    '&:last-child': {
+                                        mb: 0
+                                    }
+                                }}
+                                paragraph
+                            >
+                                {children}
+                            </Typography>
+                        )
+                    },
+                    h1: ({ children }) => {
+                        if (props.forceOneline) return <b>{children}</b>
+                        return (
+                            <Typography
+                                sx={{
+                                    mt: 1.8,
+                                    mb: 1,
+                                    '&:first-of-type': {
+                                        mt: 0
+                                    }
+                                }}
+                                variant="h1"
+                            >
+                                {children}
+                            </Typography>
+                        )
+                    },
+                    h2: ({ children }) => {
+                        if (props.forceOneline) return <b>{children}</b>
+                        return (
+                            <Typography
+                                sx={{
+                                    mt: 1.5,
+                                    mb: 1,
+                                    '&:first-of-type': {
+                                        mt: 0
+                                    },
+                                    '&:last-child': {
+                                        mb: 0
+                                    }
+                                }}
+                                variant="h2"
+                            >
+                                {children}
+                            </Typography>
+                        )
+                    },
+                    h3: ({ children }) => {
+                        if (props.forceOneline) return <b>{children}</b>
+                        return (
+                            <Typography
+                                sx={{
+                                    mt: 1,
+                                    mb: 1,
+                                    '&:first-of-type': {
+                                        mt: 0
+                                    },
+                                    '&:last-child': {
+                                        mb: 0
+                                    }
+                                }}
+                                variant="h3"
+                            >
+                                {children}
+                            </Typography>
+                        )
+                    },
+                    h4: ({ children }) =>
+                        props.forceOneline ? <b>{children}</b> : <Typography variant="h4">{children}</Typography>,
+                    h5: ({ children }) =>
+                        props.forceOneline ? <b>{children}</b> : <Typography variant="h5">{children}</Typography>,
+                    h6: ({ children }) =>
+                        props.forceOneline ? <b>{children}</b> : <Typography variant="h6">{children}</Typography>,
+                    ul: ({ children }) => (props.forceOneline ? <>{children}</> : <ul style={{}}>{children}</ul>),
+                    ol: ({ children }) => (props.forceOneline ? <>{children}</> : <ol style={{}}>{children}</ol>),
+                    li: ({ children }) => {
+                        if (props.forceOneline) {
+                            return <span>- {children} </span>
+                        } else {
+                            return <li style={{ marginLeft: 0 }}>{children}</li>
+                        }
+                    },
                     blockquote: ({ children }) => (
                         <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
                             {children}
