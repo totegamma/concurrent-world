@@ -11,6 +11,7 @@ import { Box, Link, Typography } from '@mui/material'
 import { TimeDiff } from '../ui/TimeDiff'
 import { Link as RouterLink } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { MarkdownRendererLite } from '../ui/MarkdownRendererLite'
 
 export interface ReactionAssociationProps {
     association: Association<EmojiAssociationSchema>
@@ -73,7 +74,10 @@ export const ReactionAssociation = (props: ReactionAssociationProps): JSX.Elemen
             </Box>
             {(!props.withoutContent && (
                 <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
-                    {target?.payload.body.body}
+                    <MarkdownRendererLite
+                        messagebody={target?.payload.body.body ?? 'no content'}
+                        emojiDict={target?.payload.body.emojis ?? {}}
+                    />
                 </blockquote>
             )) ||
                 undefined}
