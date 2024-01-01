@@ -35,10 +35,13 @@ import {
     Schemas,
     type Subscription,
     type ProfileSchema,
-    type User
+    type User,
+    type Association,
+    type ReplyAssociationSchema
 } from '@concurrent-world/client'
 import { UrlSummaryProvider } from './context/urlSummaryContext'
 import { StorageProvider } from './context/StorageContext'
+import { MarkdownRendererLite } from './components/ui/MarkdownRendererLite'
 
 export const ApplicationContext = createContext<appData>({
     displayingStream: [],
@@ -88,17 +91,52 @@ function App(): JSX.Element {
                 const a = event.body as CoreAssociation<any>
                 if (!a) return
                 if (a.schema === Schemas.replyAssociation) {
-                    client?.api.readCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
-                        playNotificationRef.current()
-                        enqueueSnackbar(`${c?.payload.body.username ?? 'anonymous'} replied to your message.`)
-                    })
+                    const replyassociation = a as Association<ReplyAssociationSchema>
+                    console.log(replyassociation)
+                    client?.api
+                        .readMessageWithAuthor(
+                            replyassociation.payload.body.messageId,
+                            replyassociation.payload.body.messageAuthor
+                        )
+                        .then((m) => {
+                            m &&
+                                client?.api.readCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
+                                    playNotificationRef.current()
+                                    enqueueSnackbar(
+                                        <Box display="flex" flexDirection="column">
+                                            <Typography>
+                                                {c?.payload.body.username ?? 'anonymous'} replied to your message:{' '}
+                                            </Typography>
+                                            <MarkdownRendererLite
+                                                messagebody={m.payload.body.body as string}
+                                                emojiDict={m.payload.body.emojis ?? {}}
+                                                limit={128}
+                                            />
+                                        </Box>
+                                    )
+                                })
+                        })
                     return
                 }
 
                 if (a.schema === Schemas.rerouteAssociation) {
-                    client?.api.readCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
-                        playNotificationRef.current()
-                        enqueueSnackbar(`${c?.payload.body.username ?? 'anonymous'} rerouted to your message.`)
+                    client?.api.readMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
+                        m &&
+                            client?.api.readCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
+                                playNotificationRef.current()
+                                enqueueSnackbar(
+                                    <Box display="flex" flexDirection="column">
+                                        <Typography>
+                                            {c?.payload.body.username ?? 'anonymous'} rerouted to your message:{' '}
+                                        </Typography>
+                                        <MarkdownRendererLite
+                                            messagebody={m.payload.body.body as string}
+                                            emojiDict={m.payload.body.emojis ?? {}}
+                                            limit={128}
+                                        />
+                                    </Box>
+                                )
+                            })
                     })
                     return
                 }
@@ -109,9 +147,14 @@ function App(): JSX.Element {
                             client.api.readCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                 playNotificationRef.current()
                                 enqueueSnackbar(
-                                    `${c?.payload.body.username ?? 'anonymous'} favorited "${
-                                        (m.payload.body.body as string) ?? 'your message.'
-                                    }"`
+                                    <Box display="flex" flexDirection="column">
+                                        <Typography>{c?.payload.body.username ?? 'anonymous'} favorited</Typography>
+                                        <MarkdownRendererLite
+                                            messagebody={m.payload.body.body as string}
+                                            emojiDict={m.payload.body.emojis ?? {}}
+                                            limit={128}
+                                        />
+                                    </Box>
                                 )
                             })
                     })
@@ -125,11 +168,17 @@ function App(): JSX.Element {
                             client.api.readCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                 playNotificationRef.current()
                                 enqueueSnackbar(
-                                    <Typography>
-                                        {c?.payload.body.username ?? 'anonymous'} reacted to{' '}
-                                        {(m.payload.body.body as string) ?? 'your message.'} with{' '}
-                                        <img src={a.payload.body.imageUrl as string} style={{ height: '1em' }} />
-                                    </Typography>
+                                    <Box display="flex" flexDirection="column">
+                                        <Typography>
+                                            {c?.payload.body.username ?? 'anonymous'} reacted{' '}
+                                            <img src={a.payload.body.imageUrl as string} style={{ height: '1em' }} />
+                                        </Typography>
+                                        <MarkdownRendererLite
+                                            messagebody={m.payload.body.body as string}
+                                            emojiDict={m.payload.body.emojis ?? {}}
+                                            limit={128}
+                                        />
+                                    </Box>
                                 )
                             })
                     })
@@ -141,9 +190,14 @@ function App(): JSX.Element {
                             client.api.readCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                 playNotificationRef.current()
                                 enqueueSnackbar(
-                                    `${c?.payload.body.username ?? 'anonymous'} mentioned you in"${
-                                        (m.payload.body.body as string) ?? 'your message.'
-                                    }"`
+                                    <Box display="flex" flexDirection="column">
+                                        {c?.payload.body.username ?? 'anonymous'} mentioned you:{' '}
+                                        <MarkdownRendererLite
+                                            messagebody={m.payload.body.body as string}
+                                            emojiDict={m.payload.body.emojis ?? {}}
+                                            limit={128}
+                                        />
+                                    </Box>
                                 )
                             })
                     })

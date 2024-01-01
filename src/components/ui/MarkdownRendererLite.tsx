@@ -14,6 +14,7 @@ export interface MarkdownRendererProps {
     messagebody: string
     emojiDict: Record<string, EmojiLite>
     forceOneline?: boolean
+    limit?: number
 }
 
 export function MarkdownRendererLite(props: MarkdownRendererProps): JSX.Element {
@@ -289,7 +290,9 @@ export function MarkdownRendererLite(props: MarkdownRendererProps): JSX.Element 
                     }
                 }}
             >
-                {props.messagebody}
+                {props.limit
+                    ? props.messagebody.slice(0, props.limit) + (props.messagebody.length > props.limit ? '...' : '')
+                    : props.messagebody}
             </ReactMarkdown>
         </Box>
     )
