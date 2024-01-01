@@ -2,7 +2,8 @@ import { Box, Link, IconButton, Typography } from '@mui/material'
 import { Link as routerLink, Link as RouterLink } from 'react-router-dom'
 import { CCAvatar } from '../ui/CCAvatar'
 import { TimeDiff } from '../ui/TimeDiff'
-import { Message, ReplyMessageSchema, SimpleNoteSchema } from '@concurrent-world/client'
+import { type Message, type ReplyMessageSchema, type SimpleNoteSchema } from '@concurrent-world/client'
+import { MarkdownRendererLite } from '../ui/MarkdownRendererLite'
 
 export interface OneLineMessageViewProps {
     message: Message<SimpleNoteSchema | ReplyMessageSchema>
@@ -46,7 +47,11 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                     minWidth={0}
                     sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
                 >
-                    {props.message.payload.body.body}
+                    <MarkdownRendererLite
+                        messagebody={props.message.payload.body.body}
+                        emojiDict={props.message.payload.body.emojis ?? {}}
+                        forceOneline={true}
+                    />
                 </Typography>
             </Box>
             <Link
