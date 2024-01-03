@@ -33,11 +33,13 @@ interface GlobalActionsProps {
 
 const style = {
     position: 'absolute',
-    top: '30%',
+    top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: '700px',
-    maxWidth: '90vw'
+    maxWidth: '90vw',
+    maxHeight: '90vh',
+    overflow: 'scroll'
 }
 
 export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element => {
