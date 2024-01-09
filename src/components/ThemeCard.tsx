@@ -17,6 +17,11 @@ export const ThemeCard = (props: ThemeCardProps): JSX.Element => {
 
     const theme = createConcurrentThemeFromObject(props.theme)
 
+    const bgColor =
+        theme.components?.MuiAppBar?.defaultProps?.color === 'transparent'
+            ? theme.palette.background.paper
+            : theme.palette.primary.contrastText
+
     return (
         <Paper variant="outlined">
             <Button
@@ -35,7 +40,7 @@ export const ThemeCard = (props: ThemeCardProps): JSX.Element => {
                     sx={{
                         display: 'flex',
                         borderRadius: '100px',
-                        background: theme.palette.primary.contrastText
+                        background: bgColor
                     }}
                 >
                     <ConcurrentLogo
