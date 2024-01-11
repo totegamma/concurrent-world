@@ -233,8 +233,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                         display: 'flex',
                                         flexDirection: 'column',
                                         overflow: 'hidden',
-                                        p: 1,
-                                        gap: 1
+                                        pt: 1,
+                                        px: 1,
+                                        pb: 'env(safe-area-inset-bottom)',
+                                        borderRadius: 0
                                     }}
                                 >
                                     <MobileDraft
