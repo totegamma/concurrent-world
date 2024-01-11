@@ -1,4 +1,4 @@
-import { Box, Paper, Modal, Typography, Divider, Button, Drawer, useTheme } from '@mui/material'
+import { Box, Paper, Modal, Typography, Divider, Button, Drawer, useTheme, useMediaQuery } from '@mui/material'
 import { InspectorProvider } from '../context/Inspector'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
@@ -10,6 +10,7 @@ import {
     type DomainProfileSchema
 } from '@concurrent-world/client'
 import { Draft } from '../components/Draft'
+import { MobileDraft } from '../components/MobileDraft'
 import { useLocation } from 'react-router-dom'
 import { usePreference } from './PreferenceContext'
 import { ProfileEditor } from '../components/ProfileEditor'
@@ -53,6 +54,17 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const [allKnownStreams, setAllKnownStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
     const [domainIsOffline, setDomainIsOffline] = useState<boolean>(false)
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
+
+    const isMobileSize = useMediaQuery(theme.breakpoints.down('sm'))
+
+    const [viewportHeight, setViewportHeight] = useState<number>(visualViewport?.height ?? 0)
+    useEffect(() => {
+        function handleResize(): void {
+            setViewportHeight(visualViewport?.height ?? 0)
+        }
+        visualViewport?.addEventListener('resize', handleResize)
+        return () => visualViewport?.removeEventListener('resize', handleResize)
+    }, [])
 
     const setupAccountRequired =
         client?.user !== null &&
@@ -213,12 +225,19 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     }}
                 >
                     <>
-                        {mode === 'compose' && (
-                            <Paper sx={style}>
-                                <Box sx={{ display: 'flex' }}>
-                                    <Draft
-                                        autoFocus
-                                        value={draft}
+                        {mode === 'compose' &&
+                            (isMobileSize ? (
+                                <Paper
+                                    sx={{
+                                        height: viewportHeight,
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        overflow: 'hidden',
+                                        p: 1,
+                                        gap: 1
+                                    }}
+                                >
+                                    <MobileDraft
                                         streamPickerInitial={queriedStreams}
                                         streamPickerOptions={allKnownStreams}
                                         onSubmit={async (text: string, destinations: string[], options) => {
@@ -232,13 +251,37 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                 })
                                             return null
                                         }}
-                                        sx={{
-                                            p: 1
+                                        onCancel={() => {
+                                            setMode('none')
                                         }}
                                     />
-                                </Box>
-                            </Paper>
-                        )}
+                                </Paper>
+                            ) : (
+                                <Paper sx={style}>
+                                    <Box sx={{ display: 'flex' }}>
+                                        <Draft
+                                            autoFocus
+                                            value={draft}
+                                            streamPickerInitial={queriedStreams}
+                                            streamPickerOptions={allKnownStreams}
+                                            onSubmit={async (text: string, destinations: string[], options) => {
+                                                await client
+                                                    .createCurrent(text, destinations, options)
+                                                    .catch((e) => {
+                                                        return e
+                                                    })
+                                                    .finally(() => {
+                                                        setMode('none')
+                                                    })
+                                                return null
+                                            }}
+                                            sx={{
+                                                p: 1
+                                            }}
+                                        />
+                                    </Box>
+                                </Paper>
+                            ))}
                         {targetMessage && (mode === 'reply' || mode === 'reroute') && (
                             <Paper sx={style}>
                                 <Box p={1}>
