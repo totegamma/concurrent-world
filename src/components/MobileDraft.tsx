@@ -12,7 +12,6 @@ import {
     ListItemText,
     ListItemButton,
     Popper,
-    Collapse,
     Divider,
     Typography
 } from '@mui/material'

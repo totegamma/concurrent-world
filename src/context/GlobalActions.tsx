@@ -233,9 +233,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                         display: 'flex',
                                         flexDirection: 'column',
                                         overflow: 'hidden',
-                                        pt: 1,
-                                        px: 1,
-                                        pb: 'env(safe-area-inset-bottom)',
+                                        p: 1,
                                         borderRadius: 0
                                     }}
                                 >
