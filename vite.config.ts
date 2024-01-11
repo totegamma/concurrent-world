@@ -105,7 +105,6 @@ export default defineConfig({
             }
         }),
         BuildInfo(),
-        basicSsl(),
         visualizer(),
     ],
 })

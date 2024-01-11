@@ -11,7 +11,10 @@ import {
     ListItemIcon,
     ListItemText,
     ListItemButton,
-    Popper
+    Popper,
+    Collapse,
+    Divider,
+    Typography
 } from '@mui/material'
 import { StreamPicker } from './ui/StreamPicker'
 import { closeSnackbar, useSnackbar } from 'notistack'
@@ -33,6 +36,7 @@ import { useTranslation } from 'react-i18next'
 
 import { ApplicationContext } from '../App'
 import { useStorage } from '../context/StorageContext'
+import { DummyMessageView } from './Message/DummyMessageView'
 
 export interface MobileDraftProps {
     streamPickerInitial: Array<Stream<CommonstreamSchema>>
@@ -459,6 +463,40 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
                         </List>
                     </Paper>
                 </Popper>
+            </Box>
+            <Divider
+                sx={{
+                    my: 1,
+                    borderStyle: 'dashed'
+                }}
+            />
+            <Box
+                sx={{
+                    maxHeight: '20%',
+                    overflowY: 'auto'
+                }}
+            >
+                <DummyMessageView
+                    hideActions
+                    message={{
+                        body: draft,
+                        emojis: emojiDict
+                    }}
+                    user={client.user?.profile?.payload.body}
+                    userCCID={client.user?.ccid}
+                    timestamp={
+                        <Typography
+                            sx={{
+                                backgroundColor: 'divider',
+                                color: 'primary.contrastText',
+                                px: 1,
+                                fontSize: '0.75rem'
+                            }}
+                        >
+                            {t('preview')}
+                        </Typography>
+                    }
+                />
             </Box>
             <Box
                 sx={{

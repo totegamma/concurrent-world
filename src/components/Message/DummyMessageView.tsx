@@ -16,6 +16,7 @@ export interface DummyMessageViewProps {
     user?: ProfileSchema
     userCCID?: string
     timestamp?: JSX.Element
+    hideActions?: boolean
 }
 
 export const DummyMessageView = (props: DummyMessageViewProps): JSX.Element => {
@@ -93,7 +94,7 @@ export const DummyMessageView = (props: DummyMessageViewProps): JSX.Element => {
                         <MarkdownRenderer messagebody={props.message.body} emojiDict={props.message.emojis ?? {}} />
                         <Box
                             sx={{
-                                display: 'flex',
+                                display: props.hideActions ? 'none' : 'flex',
                                 justifyContent: 'space-between',
                                 height: '1.5rem',
                                 overflow: 'hidden'
