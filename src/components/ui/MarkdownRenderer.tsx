@@ -1,5 +1,5 @@
 import { type ImgHTMLAttributes, type DetailedHTMLProps } from 'react'
-import { Box, Link, Typography } from '@mui/material'
+import { Box, Button, IconButton, Link, Typography } from '@mui/material'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
@@ -13,6 +13,9 @@ import { userMentionRemarkPlugin, emojiRemarkPlugin } from '../../util'
 import { CCUserChip } from './CCUserChip'
 import { LinkChip } from './LinkChip'
 import { ThemeCard } from '../ThemeCard'
+import { closeSnackbar, useSnackbar } from 'notistack'
+import { usePreference } from '../../context/PreferenceContext'
+import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline'
 
 export interface MarkdownRendererProps {
     messagebody: string
@@ -34,6 +37,10 @@ const sanitizeOption = {
 }
 
 export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
+    const { enqueueSnackbar } = useSnackbar()
+    const [themeName, setThemeName] = usePreference('themeName')
+    const [customThemes, setCustomThemes] = usePreference('customThemes')
+
     return (
         <Box
             sx={{
@@ -230,7 +237,41 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                         if (language === 'theme') {
                             try {
                                 const theme = JSON.parse(String(children))
-                                return <ThemeCard theme={theme} />
+                                return (
+                                    <ThemeCard
+                                        theme={theme}
+                                        additionalButton={
+                                            <IconButton
+                                                onClick={() => {
+                                                    if (!theme.meta?.name) return
+                                                    enqueueSnackbar(`Theme downloaded: ${theme.meta.name}`, {
+                                                        autoHideDuration: 15000,
+                                                        action: (key) => (
+                                                            <Button
+                                                                onClick={() => {
+                                                                    setThemeName(themeName)
+                                                                    closeSnackbar(key)
+                                                                }}
+                                                            >
+                                                                Undo
+                                                            </Button>
+                                                        )
+                                                    })
+                                                    setThemeName(theme.meta.name)
+                                                    setCustomThemes({
+                                                        ...customThemes,
+                                                        [theme.meta.name]: theme
+                                                    })
+                                                }}
+                                                sx={{
+                                                    color: theme.palette.text.primary
+                                                }}
+                                            >
+                                                <DownloadForOfflineIcon />
+                                            </IconButton>
+                                        }
+                                    />
+                                )
                             } catch (e) {
                                 console.error(e)
                             }

@@ -1,20 +1,15 @@
-import { Box, Button, IconButton, Paper, Typography } from '@mui/material'
+import { Box, Button, Paper, Typography } from '@mui/material'
 import { type ConcurrentTheme } from '../model'
 import { ConcurrentLogo } from './theming/ConcurrentLogo'
-import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline'
-import { usePreference } from '../context/PreferenceContext'
-import { closeSnackbar, useSnackbar } from 'notistack'
 import { createConcurrentThemeFromObject } from '../themes'
 
 export interface ThemeCardProps {
     theme: ConcurrentTheme
+    onClick?: () => void
+    additionalButton?: JSX.Element
 }
 
 export const ThemeCard = (props: ThemeCardProps): JSX.Element => {
-    const { enqueueSnackbar } = useSnackbar()
-    const [themeName, setThemeName] = usePreference('themeName')
-    const [customThemes, setCustomThemes] = usePreference('customThemes')
-
     const theme = createConcurrentThemeFromObject(props.theme)
 
     const bgColor =
@@ -35,6 +30,7 @@ export const ThemeCard = (props: ThemeCardProps): JSX.Element => {
                     justifyContent: 'flex-start'
                 }}
                 color="info"
+                onClick={props.onClick}
             >
                 <Box
                     sx={{
@@ -54,40 +50,17 @@ export const ThemeCard = (props: ThemeCardProps): JSX.Element => {
                     sx={{
                         color: theme.palette.text.primary,
                         flexGrow: 1,
-                        textTransform: 'none'
+                        textTransform: 'none',
+                        textOverflow: 'ellipsis',
+                        display: 'block',
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap'
                     }}
                     variant="button"
                 >
                     {theme.meta?.name}
                 </Typography>
-                <IconButton
-                    onClick={() => {
-                        if (!props.theme.meta?.name) return
-                        enqueueSnackbar(`Theme downloaded: ${props.theme.meta.name}`, {
-                            autoHideDuration: 15000,
-                            action: (key) => (
-                                <Button
-                                    onClick={() => {
-                                        setThemeName(themeName)
-                                        closeSnackbar(key)
-                                    }}
-                                >
-                                    Undo
-                                </Button>
-                            )
-                        })
-                        setThemeName(props.theme.meta.name)
-                        setCustomThemes({
-                            ...customThemes,
-                            [props.theme.meta.name]: props.theme
-                        })
-                    }}
-                    sx={{
-                        color: theme.palette.text.primary
-                    }}
-                >
-                    <DownloadForOfflineIcon />
-                </IconButton>
+                {props.additionalButton}
             </Button>
         </Paper>
     )
