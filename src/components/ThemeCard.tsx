@@ -13,7 +13,7 @@ export const ThemeCard = (props: ThemeCardProps): JSX.Element => {
     const theme = createConcurrentThemeFromObject(props.theme)
 
     const bgColor =
-        theme.components?.MuiAppBar?.defaultProps?.color === 'transparent'
+        theme.palette.background.default === theme.palette.primary.contrastText
             ? theme.palette.primary.main
             : theme.palette.background.default
 
