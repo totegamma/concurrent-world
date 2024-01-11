@@ -17,6 +17,11 @@ export const ThemeCard = (props: ThemeCardProps): JSX.Element => {
 
     const theme = createConcurrentThemeFromObject(props.theme)
 
+    const bgColor =
+        theme.components?.MuiAppBar?.defaultProps?.color === 'transparent'
+            ? theme.palette.primary.main
+            : theme.palette.background.default
+
     return (
         <Paper variant="outlined">
             <Button
@@ -41,8 +46,8 @@ export const ThemeCard = (props: ThemeCardProps): JSX.Element => {
                     <ConcurrentLogo
                         size="40px"
                         upperColor={theme.palette.primary.main}
-                        lowerColor={theme.palette.background.default}
-                        frameColor={theme.palette.background.default}
+                        lowerColor={bgColor}
+                        frameColor={bgColor}
                     />
                 </Box>
                 <Typography
