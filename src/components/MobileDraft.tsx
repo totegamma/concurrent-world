@@ -243,6 +243,7 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
                     Cancel
                 </Button>
             </Box>
+            <Divider />
             <Box
                 sx={{
                     display: 'flex',
@@ -497,6 +498,11 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
                     }
                 />
             </Box>
+            <Divider
+                sx={{
+                    my: 1
+                }}
+            />
             <Box
                 sx={{
                     display: 'flex',

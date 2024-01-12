@@ -227,35 +227,45 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     <>
                         {mode === 'compose' &&
                             (isMobileSize ? (
-                                <Paper
+                                <Box
                                     sx={{
                                         height: viewportHeight,
                                         display: 'flex',
                                         flexDirection: 'column',
                                         overflow: 'hidden',
-                                        p: 1,
-                                        borderRadius: 0
+                                        p: 0.5,
+                                        backgroundColor: 'background.default'
                                     }}
                                 >
-                                    <MobileDraft
-                                        streamPickerInitial={queriedStreams}
-                                        streamPickerOptions={allKnownStreams}
-                                        onSubmit={async (text: string, destinations: string[], options) => {
-                                            await client
-                                                .createCurrent(text, destinations, options)
-                                                .catch((e) => {
-                                                    return e
-                                                })
-                                                .finally(() => {
-                                                    setMode('none')
-                                                })
-                                            return null
+                                    <Paper
+                                        sx={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            overflow: 'hidden',
+                                            flex: 1,
+                                            p: 0.5
                                         }}
-                                        onCancel={() => {
-                                            setMode('none')
-                                        }}
-                                    />
-                                </Paper>
+                                    >
+                                        <MobileDraft
+                                            streamPickerInitial={queriedStreams}
+                                            streamPickerOptions={allKnownStreams}
+                                            onSubmit={async (text: string, destinations: string[], options) => {
+                                                await client
+                                                    .createCurrent(text, destinations, options)
+                                                    .catch((e) => {
+                                                        return e
+                                                    })
+                                                    .finally(() => {
+                                                        setMode('none')
+                                                    })
+                                                return null
+                                            }}
+                                            onCancel={() => {
+                                                setMode('none')
+                                            }}
+                                        />
+                                    </Paper>
+                                </Box>
                             ) : (
                                 <Paper sx={style}>
                                     <Box sx={{ display: 'flex' }}>
