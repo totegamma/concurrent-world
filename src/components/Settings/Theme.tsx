@@ -1,5 +1,15 @@
-import { Box, Divider, ListItemIcon, ListItemText, Menu, MenuItem, Paper, Typography, useTheme } from '@mui/material'
-import { ThemeSelect } from './ThemeSelect'
+import {
+    Box,
+    Divider,
+    IconButton,
+    ListItemIcon,
+    ListItemText,
+    Menu,
+    MenuItem,
+    Paper,
+    Typography,
+    useTheme
+} from '@mui/material'
 import { ThemeCreator } from '../ThemeCreator'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -11,6 +21,7 @@ import { Themes, loadConcurrentTheme } from '../../themes'
 import { DummyMessageView } from '../Message/DummyMessageView'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import { ThemeCard } from '../ThemeCard'
 
 export const ThemeSettings = (): JSX.Element => {
     const client = useApi()
@@ -81,16 +92,54 @@ export const ThemeSettings = (): JSX.Element => {
             </Box>
             <Box display="flex" flexDirection="column" gap={1}>
                 <Typography variant="h3">Select Theme:</Typography>
-                <ThemeSelect themes={previewTheme} setThemeName={setThemeName} />
-                <Divider />
-                <ThemeSelect
-                    additionalButtonIcon={<MoreHorizIcon />}
-                    themes={renderedCustomThemes}
-                    setThemeName={setThemeName}
-                    onAdditionalButtonClick={(themeName, elem) => {
-                        setMenuElem([themeName, elem])
+                <Box
+                    sx={{
+                        display: { xs: 'flex', md: 'grid' },
+                        flexFlow: 'column',
+                        gridTemplateColumns: { xs: 'repeat(3, minmax(0, 1fr))', lg: 'repeat(4, minmax(0, 1fr))' },
+                        gridAutoRows: '1fr',
+                        gap: 1
                     }}
-                />
+                >
+                    {Object.keys(previewTheme).map((e) => (
+                        <ThemeCard
+                            key={e}
+                            theme={previewTheme[e]}
+                            onClick={() => {
+                                setThemeName(e)
+                            }}
+                        />
+                    ))}
+                </Box>
+                <Divider />
+                <Box
+                    sx={{
+                        display: { xs: 'flex', md: 'grid' },
+                        flexFlow: 'column',
+                        gridTemplateColumns: { xs: 'repeat(3, minmax(0, 1fr))', lg: 'repeat(4, minmax(0, 1fr))' },
+                        gridAutoRows: '1fr',
+                        gap: 1
+                    }}
+                >
+                    {Object.keys(renderedCustomThemes).map((e) => (
+                        <ThemeCard
+                            key={e}
+                            theme={renderedCustomThemes[e]}
+                            onClick={() => {
+                                setThemeName(e)
+                            }}
+                            additionalButton={
+                                <IconButton
+                                    onClick={(event) => {
+                                        setMenuElem([e, event.currentTarget])
+                                    }}
+                                >
+                                    <MoreHorizIcon />
+                                </IconButton>
+                            }
+                        />
+                    ))}
+                </Box>
             </Box>
             <Divider sx={{ my: 1 }} />
             <ThemeCreator />

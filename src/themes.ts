@@ -5,6 +5,7 @@ import { type DeepPartial } from './util'
 export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     blue: {
         meta: {
+            name: 'blue',
             author: 'CCb72AAc9dcF088F7088b6718BE5a494fBB3861439', // totegamma
             comment: 'コンカレで一番最初に作られたテーマです！'
         },
@@ -23,6 +24,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     },
     blue2: {
         meta: {
+            name: 'blue2',
             author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
             comment: 'コンカレで二番目に作られたわけではないテーマです！'
         },
@@ -58,6 +60,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     },
     darkgray: {
         meta: {
+            name: 'darkgray',
             author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
             comment: '黒背景よりはダークグレーの方が落ち着くんだ'
         },
@@ -97,6 +100,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     },
     cafe: {
         meta: {
+            name: 'cafe',
             author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
             comment: 'すくなくともスタバではなさそうだ'
         },
@@ -119,6 +123,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     },
     rainyday: {
         meta: {
+            name: 'rainyday',
             author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
             comment: 'そういう日もある'
         },
@@ -147,6 +152,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     },
     sacher: {
         meta: {
+            name: 'sacher',
             author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
             comment:
                 '![ザッハさん](https://worldfile.cc/CCBFe6f64AEE52A200B7C47D3D83680A226967d83C/988bf80b-96ca-4bb9-83ff-cd962932b616)'
