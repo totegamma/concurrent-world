@@ -13,7 +13,8 @@ import {
     ListItemButton,
     Popper,
     Divider,
-    Typography
+    Typography,
+    Collapse
 } from '@mui/material'
 import { StreamPicker } from './ui/StreamPicker'
 import { closeSnackbar, useSnackbar } from 'notistack'
@@ -383,86 +384,6 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
                     }}
                     inputRef={textInputRef}
                 />
-                <Popper
-                    open={enableSuggestions}
-                    anchorEl={textInputRef.current}
-                    placement="bottom-start"
-                    modifiers={[
-                        {
-                            name: 'offset',
-                            options: {
-                                offset: [caretPos.left, caretPos.top]
-                            }
-                        }
-                    ]}
-                    sx={{
-                        zIndex: (theme) => theme.zIndex.tooltip + 1
-                    }}
-                >
-                    <Paper>
-                        <List dense>
-                            {emojiSuggestions.map((emoji, index) => (
-                                <ListItemButton
-                                    dense
-                                    key={emoji.imageURL}
-                                    selected={index === selectedSuggestions}
-                                    onClick={() => {
-                                        onEmojiSuggestConfirm(index)
-                                    }}
-                                >
-                                    <ListItemIcon>
-                                        <Box
-                                            component="img"
-                                            src={emoji.imageURL}
-                                            sx={{ width: '1em', height: '1em' }}
-                                        />
-                                    </ListItemIcon>
-                                    <ListItemText>{emoji.shortcode}</ListItemText>
-                                </ListItemButton>
-                            ))}
-                        </List>
-                    </Paper>
-                </Popper>
-                <Popper
-                    open={enableUserPicker}
-                    anchorEl={textInputRef.current}
-                    placement="bottom-start"
-                    modifiers={[
-                        {
-                            name: 'offset',
-                            options: {
-                                offset: [caretPos.left, caretPos.top]
-                            }
-                        }
-                    ]}
-                    sx={{
-                        zIndex: (theme) => theme.zIndex.tooltip + 1
-                    }}
-                >
-                    <Paper>
-                        <List dense>
-                            {userSuggestions.map((user, index) => (
-                                <ListItemButton
-                                    dense
-                                    key={user.profile?.payload.body.avatar}
-                                    selected={index === selectedSuggestions}
-                                    onClick={() => {
-                                        onUserSuggestConfirm(index)
-                                    }}
-                                >
-                                    <ListItemIcon>
-                                        <Box
-                                            component="img"
-                                            src={user.profile?.payload.body.avatar}
-                                            sx={{ width: '1em', height: '1em' }}
-                                        />
-                                    </ListItemIcon>
-                                    <ListItemText>{user.profile?.payload.body.username}</ListItemText>
-                                </ListItemButton>
-                            ))}
-                        </List>
-                    </Paper>
-                </Popper>
             </Box>
             <Divider
                 sx={{
@@ -476,27 +397,104 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
                     overflowY: 'auto'
                 }}
             >
-                <DummyMessageView
-                    hideActions
-                    message={{
-                        body: draft,
-                        emojis: emojiDict
-                    }}
-                    user={client.user?.profile?.payload.body}
-                    userCCID={client.user?.ccid}
-                    timestamp={
-                        <Typography
-                            sx={{
-                                backgroundColor: 'divider',
-                                color: 'primary.contrastText',
-                                px: 1,
-                                fontSize: '0.75rem'
-                            }}
-                        >
-                            {t('preview')}
-                        </Typography>
-                    }
-                />
+                <Collapse in={!enableSuggestions && !enableUserPicker}>
+                    <DummyMessageView
+                        hideActions
+                        message={{
+                            body: draft,
+                            emojis: emojiDict
+                        }}
+                        user={client.user?.profile?.payload.body}
+                        userCCID={client.user?.ccid}
+                        timestamp={
+                            <Typography
+                                sx={{
+                                    backgroundColor: 'divider',
+                                    color: 'primary.contrastText',
+                                    px: 1,
+                                    fontSize: '0.75rem'
+                                }}
+                            >
+                                {t('preview')}
+                            </Typography>
+                        }
+                    />
+                </Collapse>
+                <Collapse in={enableSuggestions}>
+                    <List
+                        dense
+                        sx={{
+                            display: 'flex',
+                            overflowX: 'auto',
+                            alignItems: 'center',
+                            justifyContent: 'flex-start',
+                            gap: 0.5
+                        }}
+                    >
+                        {emojiSuggestions.map((emoji, index) => (
+                            <ListItemButton
+                                key={emoji.imageURL}
+                                selected={index === selectedSuggestions}
+                                onClick={() => {
+                                    onEmojiSuggestConfirm(index)
+                                }}
+                                sx={{
+                                    p: 0,
+                                    width: '2em',
+                                    height: '2em',
+                                    maxWidth: '2em',
+                                    maxHeight: '2em'
+                                }}
+                            >
+                                <Box
+                                    component="img"
+                                    src={emoji.imageURL}
+                                    sx={{
+                                        width: '100%',
+                                        height: '100%'
+                                    }}
+                                />
+                            </ListItemButton>
+                        ))}
+                    </List>
+                </Collapse>
+                <Collapse in={enableUserPicker}>
+                    <List
+                        dense
+                        sx={{
+                            display: 'flex',
+                            overflowX: 'auto',
+                            alignItems: 'center',
+                            justifyContent: 'flex-start'
+                        }}
+                    >
+                        {userSuggestions.map((user, index) => (
+                            <ListItemButton
+                                key={user.profile?.payload.body.avatar}
+                                selected={index === selectedSuggestions}
+                                onClick={() => {
+                                    onUserSuggestConfirm(index)
+                                }}
+                                sx={{
+                                    p: 0,
+                                    width: '2em',
+                                    height: '2em',
+                                    maxWidth: '2em',
+                                    maxHeight: '2em'
+                                }}
+                            >
+                                <Box
+                                    component="img"
+                                    src={user.profile?.payload.body.avatar}
+                                    sx={{
+                                        width: '100%',
+                                        height: '100%'
+                                    }}
+                                />
+                            </ListItemButton>
+                        ))}
+                    </List>
+                </Collapse>
             </Box>
             <Divider
                 sx={{

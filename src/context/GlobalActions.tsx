@@ -1,4 +1,16 @@
-import { Box, Paper, Modal, Typography, Divider, Button, Drawer, useTheme, useMediaQuery } from '@mui/material'
+import {
+    Box,
+    Paper,
+    Modal,
+    Typography,
+    Divider,
+    Button,
+    Drawer,
+    useTheme,
+    useMediaQuery,
+    Fade,
+    Grow
+} from '@mui/material'
 import { InspectorProvider } from '../context/Inspector'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
@@ -203,6 +215,16 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         }
     }, [handleKeyPress])
 
+    const modalProps = isMobileSize
+        ? {
+              backdrop: {
+                  sx: {
+                      backgroundColor: 'background.default'
+                  }
+              }
+          }
+        : {}
+
     return (
         <GlobalActionsContext.Provider
             value={useMemo(() => {
@@ -223,75 +245,76 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     onClose={() => {
                         setMode('none')
                     }}
+                    slotProps={modalProps}
                 >
                     <>
-                        {mode === 'compose' &&
-                            (isMobileSize ? (
-                                <Box
+                        {isMobileSize && mode === 'compose' && (
+                            <Box
+                                sx={{
+                                    height: viewportHeight,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    overflow: 'hidden',
+                                    p: 0.5,
+                                    backgroundColor: 'background.default'
+                                }}
+                            >
+                                <Paper
                                     sx={{
-                                        height: viewportHeight,
                                         display: 'flex',
                                         flexDirection: 'column',
                                         overflow: 'hidden',
-                                        p: 0.5,
-                                        backgroundColor: 'background.default'
+                                        flex: 1,
+                                        p: 0.5
                                     }}
                                 >
-                                    <Paper
-                                        sx={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            overflow: 'hidden',
-                                            flex: 1,
-                                            p: 0.5
+                                    <MobileDraft
+                                        streamPickerInitial={queriedStreams}
+                                        streamPickerOptions={allKnownStreams}
+                                        onSubmit={async (text: string, destinations: string[], options) => {
+                                            await client
+                                                .createCurrent(text, destinations, options)
+                                                .catch((e) => {
+                                                    return e
+                                                })
+                                                .finally(() => {
+                                                    setMode('none')
+                                                })
+                                            return null
                                         }}
-                                    >
-                                        <MobileDraft
-                                            streamPickerInitial={queriedStreams}
-                                            streamPickerOptions={allKnownStreams}
-                                            onSubmit={async (text: string, destinations: string[], options) => {
-                                                await client
-                                                    .createCurrent(text, destinations, options)
-                                                    .catch((e) => {
-                                                        return e
-                                                    })
-                                                    .finally(() => {
-                                                        setMode('none')
-                                                    })
-                                                return null
-                                            }}
-                                            onCancel={() => {
-                                                setMode('none')
-                                            }}
-                                        />
-                                    </Paper>
-                                </Box>
-                            ) : (
-                                <Paper sx={style}>
-                                    <Box sx={{ display: 'flex' }}>
-                                        <Draft
-                                            autoFocus
-                                            value={draft}
-                                            streamPickerInitial={queriedStreams}
-                                            streamPickerOptions={allKnownStreams}
-                                            onSubmit={async (text: string, destinations: string[], options) => {
-                                                await client
-                                                    .createCurrent(text, destinations, options)
-                                                    .catch((e) => {
-                                                        return e
-                                                    })
-                                                    .finally(() => {
-                                                        setMode('none')
-                                                    })
-                                                return null
-                                            }}
-                                            sx={{
-                                                p: 1
-                                            }}
-                                        />
-                                    </Box>
+                                        onCancel={() => {
+                                            setMode('none')
+                                        }}
+                                    />
                                 </Paper>
-                            ))}
+                            </Box>
+                        )}
+                        {mode === 'compose' && !isMobileSize && (
+                            <Paper sx={style}>
+                                <Box sx={{ display: 'flex' }}>
+                                    <Draft
+                                        autoFocus
+                                        value={draft}
+                                        streamPickerInitial={queriedStreams}
+                                        streamPickerOptions={allKnownStreams}
+                                        onSubmit={async (text: string, destinations: string[], options) => {
+                                            await client
+                                                .createCurrent(text, destinations, options)
+                                                .catch((e) => {
+                                                    return e
+                                                })
+                                                .finally(() => {
+                                                    setMode('none')
+                                                })
+                                            return null
+                                        }}
+                                        sx={{
+                                            p: 1
+                                        }}
+                                    />
+                                </Box>
+                            </Paper>
+                        )}
                         {targetMessage && (mode === 'reply' || mode === 'reroute') && (
                             <Paper sx={style}>
                                 <Box p={1}>
