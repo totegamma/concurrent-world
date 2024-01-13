@@ -22,7 +22,6 @@ import ImageIcon from '@mui/icons-material/Image'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 import { useEmojiPicker } from '../context/EmojiPickerContext'
-import caretPosition from 'textarea-caret'
 import { type CommonstreamSchema, type Stream, type User, type CreateCurrentOptions } from '@concurrent-world/client'
 import { useApi } from '../context/api'
 import { type Emoji, type EmojiLite } from '../model'
@@ -64,8 +63,6 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
     const [postHome, setPostHome] = useState<boolean>(true)
     const [sending, setSending] = useState<boolean>(false)
 
-    const [caretPos, setCaretPos] = useState<{ left: number; top: number }>({ left: 0, top: 0 })
-
     const [enableSuggestions, setEnableSuggestions] = useState<boolean>(false)
     const [emojiSuggestions, setEmojiSuggestions] = useState<Emoji[]>([])
 
@@ -86,12 +83,16 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
         if (props.value && props.value !== '') {
             setDraft(props.value)
         }
+        textInputRef.current?.setSelectionRange(draft.length, draft.length)
     }, [props.value])
 
     const [emojiDict, setEmojiDict] = useState<Record<string, EmojiLite>>({})
 
     const insertEmoji = (emoji: Emoji): void => {
-        const newDraft = draft.slice(0, caretPos.left) + `:${emoji.shortcode}:` + draft.slice(caretPos.left)
+        const newDraft =
+            draft.slice(0, textInputRef.current?.selectionEnd ?? 0) +
+            `:${emoji.shortcode}:` +
+            draft.slice(textInputRef.current?.selectionEnd ?? 0)
         setDraft(newDraft)
         setEnableSuggestions(false)
         setSelectedSuggestions(0)
@@ -343,15 +344,6 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
                                 )
                             )
                             setEnableUserPicker(true)
-                        }
-
-                        // move suggestion box
-                        const pos = caretPosition(e.target, e.target.selectionEnd ?? 0, {})
-                        if (pos) {
-                            setCaretPos({
-                                top: pos.top - 50,
-                                left: pos.left + 10
-                            })
                         }
                     }}
                     onKeyDown={(e: any) => {
