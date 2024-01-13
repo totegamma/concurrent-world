@@ -16,6 +16,7 @@ import { useInspector } from '../../context/Inspector'
 export interface RerouteMessageFrameProp {
     message: Message<RerouteMessageSchema>
     lastUpdated?: number
+    simple?: boolean
 }
 
 export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element => {
@@ -129,6 +130,7 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
                 </Box>
             )}
             <MessageContainer
+                simple={props.simple}
                 messageID={props.message.payload.body.rerouteMessageId}
                 messageOwner={props.message.payload.body.rerouteMessageAuthor}
                 rerouted={props.message}

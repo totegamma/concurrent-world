@@ -21,6 +21,7 @@ interface MessageContainerProps {
     after?: JSX.Element | undefined
     timestamp?: Date
     rerouted?: Message<RerouteMessageSchema>
+    simple?: boolean
 }
 
 export const MessageContainer = memo<MessageContainerProps>((props: MessageContainerProps): JSX.Element | null => {
@@ -69,6 +70,7 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
         case Schemas.simpleNote:
             body = (
                 <MessageView
+                    simple={props.simple}
                     message={message as Message<SimpleNoteSchema>}
                     lastUpdated={props.lastUpdated}
                     userCCID={client.ccid}
@@ -79,6 +81,7 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
         case Schemas.replyMessage:
             body = (
                 <ReplyMessageFrame
+                    simple={props.simple}
                     message={message as Message<ReplyMessageSchema>}
                     lastUpdated={props.lastUpdated}
                     userCCID={client.ccid}
@@ -89,6 +92,7 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
         case Schemas.rerouteMessage:
             body = (
                 <RerouteMessageFrame
+                    simple={props.simple}
                     message={message as Message<RerouteMessageSchema>}
                     lastUpdated={props.lastUpdated}
                 />

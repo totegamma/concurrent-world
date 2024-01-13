@@ -6,12 +6,8 @@ import {
     useTheme,
     IconButton,
     Tooltip,
-    Paper,
     List,
-    ListItemIcon,
-    ListItemText,
     ListItemButton,
-    Popper,
     Divider,
     Typography,
     Collapse
@@ -47,6 +43,7 @@ export interface MobileDraftProps {
     allowEmpty?: boolean
     placeholder?: string
     value?: string
+    context?: JSX.Element
 }
 
 export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX.Element => {
@@ -244,6 +241,21 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
                     Cancel
                 </Button>
             </Box>
+            {props.context && (
+                <>
+                    <Divider />
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            py: 1
+                        }}
+                    >
+                        {props.context}
+                    </Box>
+                </>
+            )}
             <Divider />
             <Box
                 sx={{
