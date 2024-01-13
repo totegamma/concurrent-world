@@ -69,7 +69,7 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
     const [enableSuggestions, setEnableSuggestions] = useState<boolean>(false)
     const [emojiSuggestions, setEmojiSuggestions] = useState<Emoji[]>([])
 
-    const [enableUserPicker, setEnableUserPicker] = useState<boolean>(true)
+    const [enableUserPicker, setEnableUserPicker] = useState<boolean>(false)
     const [userSuggestions, setUserSuggestions] = useState<User[]>([])
 
     const [selectedSuggestions, setSelectedSuggestions] = useState<number>(0)
