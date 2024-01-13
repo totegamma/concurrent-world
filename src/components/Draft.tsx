@@ -101,7 +101,10 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const [emojiDict, setEmojiDict] = useState<Record<string, EmojiLite>>({})
 
     const insertEmoji = (emoji: Emoji): void => {
-        const newDraft = draft.slice(0, caretPos.left) + `:${emoji.shortcode}:` + draft.slice(caretPos.left)
+        const newDraft =
+            draft.slice(0, textInputRef.current?.selectionEnd ?? 0) +
+            `:${emoji.shortcode}:` +
+            draft.slice(textInputRef.current?.selectionEnd ?? 0)
         setDraft(newDraft)
         setEnableSuggestions(false)
         setSelectedSuggestions(0)
