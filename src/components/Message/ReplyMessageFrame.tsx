@@ -18,6 +18,7 @@ export interface ReplyMessageFrameProp {
     lastUpdated?: number
     userCCID: string
     rerouted?: Message<RerouteMessageSchema>
+    simple?: boolean
 }
 
 export const ReplyMessageFrame = (props: ReplyMessageFrameProp): JSX.Element => {
@@ -38,6 +39,7 @@ export const ReplyMessageFrame = (props: ReplyMessageFrameProp): JSX.Element => 
             {replyTo && <OneLineMessageView message={replyTo} />}
             <Box>
                 <MessageView
+                    simple={props.simple}
                     userCCID={client.ccid}
                     message={props.message}
                     beforeMessage={

@@ -25,6 +25,7 @@ export interface MessageViewProps {
     lastUpdated?: number
     forceExpanded?: boolean
     clipHeight?: number
+    simple?: boolean
 }
 
 const gradationHeight = 80
@@ -85,33 +86,38 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                     </Button>
                 </Box>
                 <SimpleNote message={props.message} />
-                <MessageUrlPreview messageBody={props.message.payload.body.body} />
+                {!props.simple && <MessageUrlPreview messageBody={props.message.payload.body.body} />}
             </Box>
-            <MessageReactions message={props.message} />
-            <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'row-reverse',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    gap: 1,
-                    flexWrap: 'wrap'
-                }}
-            >
-                <Box display="flex" flexDirection="row" alignItems="center">
-                    <PostedStreams message={props.message} />
-                    {props.rerouted &&
-                        (reroutedsame ? (
-                            <ReplayIcon sx={{ color: 'text.secondary', fontSize: '90%' }} />
-                        ) : (
-                            <>
-                                <ArrowForwardIcon sx={{ color: 'text.secondary', fontSize: '90%' }} />
-                                <PostedStreams message={props.rerouted} />
-                            </>
-                        ))}
-                </Box>
-                <MessageActions message={props.message} userCCID={props.userCCID} />
-            </Box>
+            {(!props.simple && (
+                <>
+                    <MessageReactions message={props.message} />
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'row-reverse',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            gap: 1,
+                            flexWrap: 'wrap'
+                        }}
+                    >
+                        <Box display="flex" flexDirection="row" alignItems="center">
+                            <PostedStreams message={props.message} />
+                            {props.rerouted &&
+                                (reroutedsame ? (
+                                    <ReplayIcon sx={{ color: 'text.secondary', fontSize: '90%' }} />
+                                ) : (
+                                    <>
+                                        <ArrowForwardIcon sx={{ color: 'text.secondary', fontSize: '90%' }} />
+                                        <PostedStreams message={props.rerouted} />
+                                    </>
+                                ))}
+                        </Box>
+                        <MessageActions message={props.message} userCCID={props.userCCID} />
+                    </Box>
+                </>
+            )) ||
+                undefined}
         </ContentWithCCAvatar>
     )
 }

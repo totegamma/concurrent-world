@@ -248,108 +248,156 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     slotProps={modalProps}
                 >
                     <>
-                        {isMobileSize && mode === 'compose' && (
-                            <Box
-                                sx={{
-                                    height: viewportHeight,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    overflow: 'hidden',
-                                    p: 0.5,
-                                    backgroundColor: 'background.default'
-                                }}
-                            >
-                                <Paper
+                        {isMobileSize ? (
+                            <>
+                                <Box
                                     sx={{
+                                        height: viewportHeight,
                                         display: 'flex',
                                         flexDirection: 'column',
                                         overflow: 'hidden',
-                                        flex: 1,
-                                        p: 0.5
+                                        p: 0.5,
+                                        backgroundColor: 'background.default'
                                     }}
                                 >
-                                    <MobileDraft
-                                        streamPickerInitial={queriedStreams}
-                                        streamPickerOptions={allKnownStreams}
-                                        onSubmit={async (text: string, destinations: string[], options) => {
-                                            await client
-                                                .createCurrent(text, destinations, options)
-                                                .catch((e) => {
-                                                    return e
-                                                })
-                                                .finally(() => {
-                                                    setMode('none')
-                                                })
-                                            return null
-                                        }}
-                                        onCancel={() => {
-                                            setMode('none')
-                                        }}
-                                    />
-                                </Paper>
-                            </Box>
-                        )}
-                        {mode === 'compose' && !isMobileSize && (
-                            <Paper sx={style}>
-                                <Box sx={{ display: 'flex' }}>
-                                    <Draft
-                                        autoFocus
-                                        value={draft}
-                                        streamPickerInitial={queriedStreams}
-                                        streamPickerOptions={allKnownStreams}
-                                        onSubmit={async (text: string, destinations: string[], options) => {
-                                            await client
-                                                .createCurrent(text, destinations, options)
-                                                .catch((e) => {
-                                                    return e
-                                                })
-                                                .finally(() => {
-                                                    setMode('none')
-                                                })
-                                            return null
-                                        }}
+                                    <Paper
                                         sx={{
-                                            p: 1
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            overflow: 'hidden',
+                                            flex: 1,
+                                            p: 0.5
                                         }}
-                                    />
+                                    >
+                                        {mode === 'compose' && (
+                                            <MobileDraft
+                                                streamPickerInitial={queriedStreams}
+                                                streamPickerOptions={allKnownStreams}
+                                                onSubmit={async (text: string, destinations: string[], options) => {
+                                                    await client
+                                                        .createCurrent(text, destinations, options)
+                                                        .catch((e) => {
+                                                            return e
+                                                        })
+                                                        .finally(() => {
+                                                            setMode('none')
+                                                        })
+                                                    return null
+                                                }}
+                                                onCancel={() => {
+                                                    setMode('none')
+                                                }}
+                                            />
+                                        )}
+                                        {targetMessage && (mode === 'reply' || mode === 'reroute') && (
+                                            <MobileDraft
+                                                allowEmpty={mode === 'reroute'}
+                                                submitButtonLabel={mode === 'reply' ? 'Reply' : 'Reroute'}
+                                                streamPickerInitial={
+                                                    mode === 'reroute'
+                                                        ? queriedStreams
+                                                        : targetMessage.postedStreams ?? []
+                                                }
+                                                streamPickerOptions={
+                                                    mode === 'reroute'
+                                                        ? allKnownStreams
+                                                        : targetMessage.postedStreams ?? []
+                                                }
+                                                onSubmit={async (text, streams, options): Promise<Error | null> => {
+                                                    if (mode === 'reroute') {
+                                                        await targetMessage.reroute(streams, text, options?.emojis)
+                                                    } else if (mode === 'reply') {
+                                                        await targetMessage.reply(streams, text, options?.emojis)
+                                                    }
+                                                    setMode('none')
+                                                    return null
+                                                }}
+                                                onCancel={() => {
+                                                    setMode('none')
+                                                }}
+                                                context={
+                                                    <Box width="100%" maxHeight="3rem" overflow="auto">
+                                                        <MessageContainer
+                                                            simple
+                                                            messageID={targetMessage.id}
+                                                            messageOwner={targetMessage.author}
+                                                        />
+                                                    </Box>
+                                                }
+                                            />
+                                        )}
+                                    </Paper>
                                 </Box>
-                            </Paper>
-                        )}
-                        {targetMessage && (mode === 'reply' || mode === 'reroute') && (
-                            <Paper sx={style}>
-                                <Box p={1}>
-                                    <MessageContainer
-                                        messageID={targetMessage.id}
-                                        messageOwner={targetMessage.author}
-                                    />
-                                </Box>
-                                <Divider />
-                                <Box sx={{ display: 'flex' }}>
-                                    <Draft
-                                        autoFocus
-                                        allowEmpty={mode === 'reroute'}
-                                        submitButtonLabel={mode === 'reply' ? 'Reply' : 'Reroute'}
-                                        streamPickerInitial={
-                                            mode === 'reroute' ? queriedStreams : targetMessage.postedStreams ?? []
-                                        }
-                                        streamPickerOptions={
-                                            mode === 'reroute' ? allKnownStreams : targetMessage.postedStreams ?? []
-                                        }
-                                        onSubmit={async (text, streams, options): Promise<Error | null> => {
-                                            if (mode === 'reroute') {
-                                                await targetMessage.reroute(streams, text, options?.emojis)
-                                            } else if (mode === 'reply') {
-                                                await targetMessage.reply(streams, text, options?.emojis)
-                                            }
-                                            setMode('none')
-                                            return null
-                                        }}
-                                        sx={{
-                                            p: 1
-                                        }}
-                                    />
-                                </Box>
-                            </Paper>
+                            </>
+                        ) : (
+                            <>
+                                {mode === 'compose' && (
+                                    <Paper sx={style}>
+                                        <Box sx={{ display: 'flex' }}>
+                                            <Draft
+                                                autoFocus
+                                                value={draft}
+                                                streamPickerInitial={queriedStreams}
+                                                streamPickerOptions={allKnownStreams}
+                                                onSubmit={async (text: string, destinations: string[], options) => {
+                                                    await client
+                                                        .createCurrent(text, destinations, options)
+                                                        .catch((e) => {
+                                                            return e
+                                                        })
+                                                        .finally(() => {
+                                                            setMode('none')
+                                                        })
+                                                    return null
+                                                }}
+                                                sx={{
+                                                    p: 1
+                                                }}
+                                            />
+                                        </Box>
+                                    </Paper>
+                                )}
+                                {targetMessage && (mode === 'reply' || mode === 'reroute') && (
+                                    <Paper sx={style}>
+                                        <Box p={1}>
+                                            <MessageContainer
+                                                messageID={targetMessage.id}
+                                                messageOwner={targetMessage.author}
+                                            />
+                                        </Box>
+                                        <Divider />
+                                        <Box sx={{ display: 'flex' }}>
+                                            <Draft
+                                                autoFocus
+                                                allowEmpty={mode === 'reroute'}
+                                                submitButtonLabel={mode === 'reply' ? 'Reply' : 'Reroute'}
+                                                streamPickerInitial={
+                                                    mode === 'reroute'
+                                                        ? queriedStreams
+                                                        : targetMessage.postedStreams ?? []
+                                                }
+                                                streamPickerOptions={
+                                                    mode === 'reroute'
+                                                        ? allKnownStreams
+                                                        : targetMessage.postedStreams ?? []
+                                                }
+                                                onSubmit={async (text, streams, options): Promise<Error | null> => {
+                                                    if (mode === 'reroute') {
+                                                        await targetMessage.reroute(streams, text, options?.emojis)
+                                                    } else if (mode === 'reply') {
+                                                        await targetMessage.reply(streams, text, options?.emojis)
+                                                    }
+                                                    setMode('none')
+                                                    return null
+                                                }}
+                                                sx={{
+                                                    p: 1
+                                                }}
+                                            />
+                                        </Box>
+                                    </Paper>
+                                )}
+                            </>
                         )}
                     </>
                 </Modal>
