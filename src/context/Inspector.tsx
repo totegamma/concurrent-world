@@ -29,12 +29,12 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
     useEffect(() => {
         if (!inspectingItem) return
 
-        client.api.readEntity(inspectingItem.author).then((entity) => {
+        client.api.getEntity(inspectingItem.author).then((entity) => {
             if (!entity) return
             setCurrentHost(entity.domain || client.api.host)
         })
 
-        client.api.readMessageWithAuthor(inspectingItem.messageId, inspectingItem.author).then((msg) => {
+        client.api.getMessageWithAuthor(inspectingItem.messageId, inspectingItem.author).then((msg) => {
             if (!msg) return
             setSignatureIsValid(validateSignature(msg.rawpayload, msg.signature, msg.author))
             setMessage(msg)

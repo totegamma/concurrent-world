@@ -25,7 +25,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
 
     useEffect(() => {
         if (!props.id) return
-        client.api.readStream(props.id).then((e) => {
+        client.api.getStream(props.id).then((e) => {
             if (!e) return
             setStream(e)
             setVisible(e.visible)

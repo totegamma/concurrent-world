@@ -94,13 +94,13 @@ function App(): JSX.Element {
                     const replyassociation = a as Association<ReplyAssociationSchema>
                     console.log(replyassociation)
                     client?.api
-                        .readMessageWithAuthor(
+                        .getMessageWithAuthor(
                             replyassociation.payload.body.messageId,
                             replyassociation.payload.body.messageAuthor
                         )
                         .then((m) => {
                             m &&
-                                client?.api.readCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
+                                client?.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                     playNotificationRef.current()
                                     enqueueSnackbar(
                                         <Box display="flex" flexDirection="column">
@@ -120,9 +120,9 @@ function App(): JSX.Element {
                 }
 
                 if (a.schema === Schemas.rerouteAssociation) {
-                    client?.api.readMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
+                    client?.api.getMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
                         m &&
-                            client?.api.readCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
+                            client?.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                 playNotificationRef.current()
                                 enqueueSnackbar(
                                     <Box display="flex" flexDirection="column">
@@ -142,9 +142,9 @@ function App(): JSX.Element {
                 }
 
                 if (a.schema === Schemas.like) {
-                    client?.api.readMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
+                    client?.api.getMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
                         m &&
-                            client.api.readCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
+                            client.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                 playNotificationRef.current()
                                 enqueueSnackbar(
                                     <Box display="flex" flexDirection="column">
@@ -162,10 +162,10 @@ function App(): JSX.Element {
                 }
 
                 if (a.schema === Schemas.emojiAssociation) {
-                    client.api.readMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
+                    client.api.getMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
                         console.log(m)
                         m &&
-                            client.api.readCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
+                            client.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                 playNotificationRef.current()
                                 enqueueSnackbar(
                                     <Box display="flex" flexDirection="column">
@@ -185,9 +185,9 @@ function App(): JSX.Element {
                 }
 
                 if (a.schema === Schemas.mention) {
-                    client?.api.readMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
+                    client?.api.getMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
                         m &&
-                            client.api.readCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
+                            client.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                 playNotificationRef.current()
                                 enqueueSnackbar(
                                     <Box display="flex" flexDirection="column">

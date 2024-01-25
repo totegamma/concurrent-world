@@ -1,13 +1,12 @@
 import { memo } from 'react'
 import { Box, Divider, Fade, Tab, Tabs, Typography } from '@mui/material'
-import { ServerJWT } from '../components/Devtool/ServerJWT'
 import { UserJWT } from '../components/Devtool/UserJWT'
 import { CCComposer } from '../components/Devtool/CCComposer'
 import { IdentityGenerator } from '../components/Devtool/IdentityGenerator'
 import { useLocation } from 'react-router-dom'
 import { Debugger } from '../components/Devtool/Debugger'
 
-type widgets = 'debug' | 'composer' | 'serverJWT' | 'userJWT' | 'idgen'
+type widgets = 'debug' | 'composer' | 'userJWT' | 'idgen'
 
 export const Devtool = memo((): JSX.Element => {
     const path = useLocation()
@@ -35,7 +34,6 @@ export const Devtool = memo((): JSX.Element => {
             >
                 <Tab value="debug" label="Debugger" />
                 <Tab value="composer" label="Composer" />
-                <Tab value="serverJWT" label="ServerJWT" />
                 <Tab value="userJWT" label="UserJWT" />
                 <Tab value="idgen" label="IdentityGenerator" />
             </Tabs>
@@ -49,11 +47,6 @@ export const Devtool = memo((): JSX.Element => {
                 <Fade in={tab === 'composer'} unmountOnExit>
                     <Box sx={{ position: 'absolute', width: '100%' }}>
                         <CCComposer />
-                    </Box>
-                </Fade>
-                <Fade in={tab === 'serverJWT'} unmountOnExit>
-                    <Box sx={{ position: 'absolute', width: '100%' }}>
-                        <ServerJWT />
                     </Box>
                 </Fade>
                 <Fade in={tab === 'userJWT'} unmountOnExit>
