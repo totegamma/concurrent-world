@@ -78,6 +78,11 @@ export function AccountImport(): JSX.Element {
                     // try legacy
                     console.log('try legacy')
 
+                    if (IsValid256k1PrivateKey(secret)) {
+                        setErrorMessage(t('notFound'))
+                        setSuggestFailed(true)
+                        return
+                    }
                     const normalized = secret.trim().normalize('NFKD')
                     console.log(normalized)
                     const wallet = HDNodeWallet.fromPhrase(normalized, undefined, undefined, LangJa.wordlist())
