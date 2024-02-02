@@ -50,7 +50,7 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
                         resolver
                     )
 
-                    client.api.readStream(query).then((e) => {
+                    client.api.getStream(query).then((e) => {
                         console.log(e)
                         setTitle(e?.payload.name ?? '')
                     })

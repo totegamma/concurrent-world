@@ -10,7 +10,7 @@ import { memo, useEffect, useState } from 'react'
 import { ReplyMessageFrame } from './ReplyMessageFrame'
 import { RerouteMessageFrame } from './RerouteMessageFrame'
 import { MessageSkeleton } from '../MessageSkeleton'
-import { Typography } from '@mui/material'
+import { Box, type SxProps, Typography } from '@mui/material'
 import { MessageView } from './MessageView'
 import { usePreference } from '../../context/PreferenceContext'
 
@@ -22,6 +22,7 @@ interface MessageContainerProps {
     timestamp?: Date
     rerouted?: Message<RerouteMessageSchema>
     simple?: boolean
+    sx?: SxProps
 }
 
 export const MessageContainer = memo<MessageContainerProps>((props: MessageContainerProps): JSX.Element | null => {
@@ -45,10 +46,10 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
 
     if (isFetching) {
         return (
-            <>
+            <Box sx={props.sx}>
                 <MessageSkeleton />
                 {props.after}
-            </>
+            </Box>
         )
     }
 
@@ -62,40 +63,46 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
                 </>
             )
         }
-        return null
+        return <></>
     }
 
     let body
     switch (message?.schema) {
         case Schemas.simpleNote:
             body = (
-                <MessageView
-                    simple={props.simple}
-                    message={message as Message<SimpleNoteSchema>}
-                    lastUpdated={props.lastUpdated}
-                    userCCID={client.ccid}
-                    rerouted={props.rerouted}
-                />
+                <Box sx={props.sx}>
+                    <MessageView
+                        simple={props.simple}
+                        message={message as Message<SimpleNoteSchema>}
+                        lastUpdated={props.lastUpdated}
+                        userCCID={client.ccid}
+                        rerouted={props.rerouted}
+                    />
+                </Box>
             )
             break
         case Schemas.replyMessage:
             body = (
-                <ReplyMessageFrame
-                    simple={props.simple}
-                    message={message as Message<ReplyMessageSchema>}
-                    lastUpdated={props.lastUpdated}
-                    userCCID={client.ccid}
-                    rerouted={props.rerouted}
-                />
+                <Box sx={props.sx}>
+                    <ReplyMessageFrame
+                        simple={props.simple}
+                        message={message as Message<ReplyMessageSchema>}
+                        lastUpdated={props.lastUpdated}
+                        userCCID={client.ccid}
+                        rerouted={props.rerouted}
+                    />
+                </Box>
             )
             break
         case Schemas.rerouteMessage:
             body = (
-                <RerouteMessageFrame
-                    simple={props.simple}
-                    message={message as Message<RerouteMessageSchema>}
-                    lastUpdated={props.lastUpdated}
-                />
+                <Box sx={props.sx}>
+                    <RerouteMessageFrame
+                        simple={props.simple}
+                        message={message as Message<RerouteMessageSchema>}
+                        lastUpdated={props.lastUpdated}
+                    />
+                </Box>
             )
             break
         default:

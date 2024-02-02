@@ -83,11 +83,11 @@ export const humanReadableTimeDiff = (time: Date): string => {
         return `${Math.round(elapsed / msPerHour)}${t('hoursBefore')}`
     } else {
         return (
-            (current.getFullYear() === time.getFullYear() ? '' : `${time.getFullYear()}年 `) +
-            `${String(time.getMonth() + 1).padStart(2, '0')}月` +
-            `${String(time.getDate()).padStart(2, '0')}日 ` +
-            `${String(time.getHours()).padStart(2, '0')}時` +
-            `${String(time.getMinutes()).padStart(2, '0')}分`
+            (current.getFullYear() === time.getFullYear() ? '' : `${time.getFullYear()}-`) +
+            `${String(time.getMonth() + 1).padStart(2, '0')}-` +
+            `${String(time.getDate()).padStart(2, '0')} ` +
+            `${String(time.getHours()).padStart(2, '0')}:` +
+            `${String(time.getMinutes()).padStart(2, '0')}`
         )
     }
 }

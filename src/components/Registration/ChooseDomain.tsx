@@ -1,4 +1,4 @@
-import { type Client, type CoreDomain, IssueJWT } from '@concurrent-world/client'
+import { type Client, type CoreDomain, IssueJWT, SignedObject, Sign } from '@concurrent-world/client'
 import {
     Alert,
     AlertTitle,
@@ -37,7 +37,7 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
         let unmounted = false
         if (!props.client) return
         const fqdn = server.replace('https://', '').replace('/', '')
-        props.client.api.readDomain(fqdn).then((e) => {
+        props.client.api.getDomain(fqdn).then((e) => {
             if (unmounted) return
             props.setHost(e)
         })
@@ -57,11 +57,25 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
         // add next hash
         next = `${next}#5`
 
-        const token = IssueJWT(props.identity.privateKey, { iss: props.identity.CCID, aud: fqdn }) ?? ''
-        const link = `http://${fqdn}/web/register?token=${token}&callback=${encodeURIComponent(next)}`
+        const signObject = {
+            signer: props.identity.CCID,
+            type: 'Entity',
+            body: {
+                domain: fqdn
+            },
+            signedAt: new Date().toISOString()
+        }
 
-        // window.location.href = link // TODO: ドメイン側のアップデートが行われるまで新規タブで開く
-        window.open(link, '_blank')
+        const signedObject = JSON.stringify(signObject)
+        const signature = Sign(props.identity.privateKey, signedObject)
+
+        const encodedObject = btoa(signedObject).replace('+', '-').replace('/', '_').replace('==', '')
+
+        const link = `http://${fqdn}/web/register?registration=${encodedObject}&signature=${signature}&callback=${encodeURIComponent(
+            next
+        )}`
+
+        window.location.href = link
     }
 
     return (
@@ -141,7 +155,7 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
                 onClick={(): void => {
                     props.client?.api.invalidateEntity(props.identity.CCID)
                     props.client?.api
-                        .readEntity(props.identity.CCID)
+                        .getEntity(props.identity.CCID)
                         .then((e) => {
                             if (e?.ccid != null) {
                                 props.next()

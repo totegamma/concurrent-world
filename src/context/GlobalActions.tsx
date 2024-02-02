@@ -1,16 +1,4 @@
-import {
-    Box,
-    Paper,
-    Modal,
-    Typography,
-    Divider,
-    Button,
-    Drawer,
-    useTheme,
-    useMediaQuery,
-    Fade,
-    Grow
-} from '@mui/material'
+import { Box, Paper, Modal, Typography, Divider, Button, Drawer, useTheme, useMediaQuery } from '@mui/material'
 import { InspectorProvider } from '../context/Inspector'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
@@ -103,7 +91,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     }, [lists])
 
     useEffect(() => {
-        client.api.readDomain(client.api.host).then((domain) => {
+        client.api.getDomain(client.api.host).then((domain) => {
             if (domain === null) {
                 setDomainIsOffline(true)
             }
@@ -179,13 +167,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         console.log('starting account fix')
         await client.setupUserstreams()
         console.log('userstream setup complete')
-        const domain = await client.api.readDomain(client.api.host)
+        const domain = await client.api.getDomain(client.api.host)
         if (!domain) throw new Error('Domain not found')
         try {
-            const domainProfile = await client.api.readCharacter<DomainProfileSchema>(
-                domain.ccid,
-                Schemas.domainProfile
-            )
+            const domainProfile = await client.api.getCharacter<DomainProfileSchema>(domain.ccid, Schemas.domainProfile)
             if (!domainProfile) throw new Error('Domain profile not found')
             if (domainProfile.payload.body.defaultBookmarkStreams)
                 localStorage.setItem(

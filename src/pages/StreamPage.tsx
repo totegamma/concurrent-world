@@ -37,7 +37,7 @@ export const StreamPage = memo((): JSX.Element => {
         })
 
         client.api
-            .readStream(targetStreamID)
+            .getStream(targetStreamID)
             .then((stream) => {
                 if (!stream) {
                     setWriteable(false)

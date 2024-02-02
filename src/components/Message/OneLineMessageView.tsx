@@ -1,9 +1,10 @@
-import { Box, Link, IconButton, Typography } from '@mui/material'
+import { Box, Link, IconButton, Typography, Tooltip } from '@mui/material'
 import { Link as routerLink, Link as RouterLink } from 'react-router-dom'
 import { CCAvatar } from '../ui/CCAvatar'
 import { TimeDiff } from '../ui/TimeDiff'
 import { type Message, type ReplyMessageSchema, type SimpleNoteSchema } from '@concurrent-world/client'
 import { MarkdownRendererLite } from '../ui/MarkdownRendererLite'
+import { MarkdownRenderer } from '../ui/MarkdownRenderer'
 
 export interface OneLineMessageViewProps {
     message: Message<SimpleNoteSchema | ReplyMessageSchema>
@@ -47,11 +48,25 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                     minWidth={0}
                     sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
                 >
-                    <MarkdownRendererLite
-                        messagebody={props.message.payload.body.body}
-                        emojiDict={props.message.payload.body.emojis ?? {}}
-                        forceOneline={true}
-                    />
+                    <Tooltip
+                        arrow
+                        followCursor
+                        placement="top"
+                        title={
+                            <MarkdownRenderer
+                                messagebody={props.message.payload.body.body}
+                                emojiDict={props.message.payload.body.emojis ?? {}}
+                            />
+                        }
+                    >
+                        <Box>
+                            <MarkdownRendererLite
+                                messagebody={props.message.payload.body.body}
+                                emojiDict={props.message.payload.body.emojis ?? {}}
+                                forceOneline={true}
+                            />
+                        </Box>
+                    </Tooltip>
                 </Typography>
             </Box>
             <Link
