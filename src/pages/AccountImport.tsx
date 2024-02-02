@@ -60,7 +60,7 @@ export function AccountImport(): JSX.Element {
         setErrorMessage(t('searching'))
         const hubClient = new Client(privatekey, 'hub.concurrent.world', 'stab-client')
         hubClient.api
-            .readEntity(ccid)
+            .getEntity(ccid)
             .then((entity) => {
                 console.log(entity)
                 if (entity && entity.ccid === ccid) {
@@ -141,15 +141,44 @@ export function AccountImport(): JSX.Element {
     useEffect(() => {
         let unmounted = false
         const fqdn = server.replace('https://', '').replace('/', '')
+
+        const normalized = secret.trim().normalize('NFKD')
+        const split = normalized.split(' ')
+        console.log(split)
+        if (split.length !== 12) return
+
+        // try to parse as mnemonic
+        try {
+            if (normalized[0].match(/[a-z]/)) {
+                console.log('english')
+                const wallet = HDNodeWallet.fromPhrase(normalized)
+                setMnemonic(normalized)
+                setPrivatekey(wallet.privateKey.slice(2))
+            } else {
+                console.log('japanese')
+                const ja2en = split
+                    .map((word) => {
+                        const wordIndex = LangJa.wordlist().getWordIndex(word)
+                        return LangEn.wordlist().getWord(wordIndex)
+                    })
+                    .join(' ')
+                const wallet = HDNodeWallet.fromPhrase(ja2en)
+                setMnemonic(normalized)
+                setPrivatekey(wallet.privateKey.slice(2))
+            }
+        } catch (e) {
+            console.log(e)
+        }
+
         try {
             const client = new Client(privatekey, fqdn)
             client.api
-                .readDomain(fqdn)
+                .getDomain(fqdn)
                 .then((e: any) => {
                     if (unmounted) return
                     setHost(e)
                     client.api
-                        .readEntity(client.ccid)
+                        .getEntity(client.ccid)
                         .then((entity) => {
                             if (unmounted) return
                             console.log(entity)
@@ -161,15 +190,17 @@ export function AccountImport(): JSX.Element {
                             setEntityFound(entity.ccid === client.ccid)
                             initializeClient(client)
                         })
-                        .catch((_) => {
+                        .catch((e) => {
+                            console.error(e)
                             if (unmounted) return
                             setErrorMessage(t('notFoundOnServer'))
                         })
                     console.log(fqdn)
                 })
-                .catch((_) => {
+                .catch((e) => {
                     if (unmounted) return
                     setErrorMessage(t('connectError'))
+                    console.error(e)
                 })
         } catch (e) {
             console.log(e)

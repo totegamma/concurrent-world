@@ -79,7 +79,7 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
         if (!client) return
         if (initialized) return
         client.api
-            .readKV('world.concurrent.preference')
+            .getKV('world.concurrent.preference')
             .then((storage: string | null | undefined) => {
                 setInitialized(true)
                 if (!storage) return

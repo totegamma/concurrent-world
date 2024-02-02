@@ -73,9 +73,11 @@ export function SettingsIndex(): JSX.Element {
                         if (client.api.host === undefined) {
                             return
                         }
-                        client.api.getJWT().then((jwt) => {
-                            window.open(`https://${client.api.host}/web/login?token=${jwt}`, '_blank', 'noreferrer')
-                        })
+                        window.open(
+                            `https://${client.api.host}/web/login?token=${client.api.generateApiToken()}`,
+                            '_blank',
+                            'noreferrer'
+                        )
                     }}
                 >
                     Goto Domain Home
