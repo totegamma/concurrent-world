@@ -287,7 +287,8 @@ export function MarkdownRendererLite(props: MarkdownRendererProps): JSX.Element 
                     },
                     video: (_props) => {
                         return <span>[Video]</span>
-                    }
+                    },
+                    br: () => <></>
                 }}
             >
                 {props.limit
