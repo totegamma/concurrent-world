@@ -1,5 +1,5 @@
 import { type ImgHTMLAttributes, type DetailedHTMLProps } from 'react'
-import { Box, Button, IconButton, Link, Typography } from '@mui/material'
+import { Box, Button, Divider, IconButton, Link, Tooltip, Typography } from '@mui/material'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
@@ -319,14 +319,33 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                     emoji: ({ shortcode }) => {
                         const emoji = props.emojiDict[shortcode]
                         return emoji ? (
-                            <img
-                                src={emoji?.animURL ?? emoji?.imageURL ?? ''}
-                                style={{
-                                    height: '1.25em',
-                                    verticalAlign: '-0.45em',
-                                    marginBottom: '4px'
-                                }}
-                            />
+                            <Tooltip
+                                arrow
+                                placement="top"
+                                title={
+                                    <Box display="flex" flexDirection="column" alignItems="center">
+                                        <img
+                                            src={emoji?.animURL ?? emoji?.imageURL ?? ''}
+                                            style={{
+                                                height: '5em'
+                                            }}
+                                        />
+                                        <Divider />
+                                        <Typography variant="caption" align="center">
+                                            {shortcode}
+                                        </Typography>
+                                    </Box>
+                                }
+                            >
+                                <img
+                                    src={emoji?.animURL ?? emoji?.imageURL ?? ''}
+                                    style={{
+                                        height: '1.25em',
+                                        verticalAlign: '-0.45em',
+                                        marginBottom: '4px'
+                                    }}
+                                />
+                            </Tooltip>
                         ) : (
                             <span>:{shortcode}:</span>
                         )
