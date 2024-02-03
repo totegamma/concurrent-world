@@ -63,7 +63,7 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
                 </>
             )
         }
-        return <></>
+        return null
     }
 
     let body
