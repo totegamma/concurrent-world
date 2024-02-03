@@ -263,7 +263,6 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                                     case 'message':
                                         element = (
                                             <MessageContainer
-                                                sx={{ p: 0.5 }}
                                                 messageID={e.objectID}
                                                 messageOwner={e.owner}
                                                 lastUpdated={e.lastUpdate?.getTime() ?? 0}
@@ -275,7 +274,6 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                                     case 'association':
                                         element = (
                                             <AssociationFrame
-                                                sx={{ p: 0.5 }}
                                                 associationID={e.objectID}
                                                 associationOwner={e.owner}
                                                 lastUpdated={e.lastUpdate?.getTime() ?? 0}
@@ -292,7 +290,7 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                                 return (
                                     <React.Fragment key={e.objectID}>
                                         <ErrorBoundary FallbackComponent={renderError}>
-                                            <Box>{element}</Box>
+                                            <Box padding={1}>{element}</Box>
                                         </ErrorBoundary>
                                     </React.Fragment>
                                 )

@@ -22,7 +22,6 @@ interface MessageContainerProps {
     timestamp?: Date
     rerouted?: Message<RerouteMessageSchema>
     simple?: boolean
-    sx?: SxProps
 }
 
 export const MessageContainer = memo<MessageContainerProps>((props: MessageContainerProps): JSX.Element | null => {
