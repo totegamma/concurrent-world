@@ -4,18 +4,17 @@ import Divider from '@mui/material/Divider'
 import Paper from '@mui/material/Paper'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { HDNodeWallet, LangEn } from 'ethers'
 import { LangJa } from '../utils/lang-ja'
-import { Client, LoadKey, type CoreDomain, CommputeCCID } from '@concurrent-world/client'
+import { Client, LoadKey, CommputeCCID, IsValid256k1PrivateKey } from '@concurrent-world/client'
 import type { ConcurrentTheme } from '../model'
 import { usePersistent } from '../hooks/usePersistent'
 import { Themes, loadConcurrentTheme } from '../themes'
 import { ThemeProvider } from '@emotion/react'
 import { CssBaseline, IconButton, InputAdornment, darken } from '@mui/material'
 import { ConcurrentWordmark } from '../components/theming/ConcurrentWordmark'
-import { IsValid256k1PrivateKey } from '@concurrent-world/client'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
@@ -35,97 +34,35 @@ export function AccountImport(): JSX.Element {
         setTheme(loadConcurrentTheme(newThemeName))
     }
 
-    const [secret, setSecret] = useState<string>('')
-    const [mnemonic, setMnemonic] = useState<string>('')
-    const [server, setServer] = useState<string>('')
-    const [host, setHost] = useState<CoreDomain>()
-    const [entityFound, setEntityFound] = useState<boolean>(false)
-    const [client, initializeClient] = useState<Client>()
-    const [errorMessage, setErrorMessage] = useState<string>('')
-    const [suggestFailed, setSuggestFailed] = useState<boolean>(false)
+    const [secretInput, setSecretInput] = useState<string>('')
     const [showSecret, setShowSecret] = useState<boolean>(false)
+    const [domainInput, setDomainInput] = useState<string>('')
 
-    const [privatekey, setPrivatekey] = useState<string>('')
-    const [ccid, setCcid] = useState<string>('')
+    const [suggestFailed, setSuggestFailed] = useState<boolean>(false)
+    const [domain, setDomain] = useState<string>('')
+    const [properKey, setProperKey] = useState<string>('')
+    const [errorMessage, setErrorMessage] = useState<string>('')
 
-    const [legacySearched, setLegacySearched] = useState<boolean>(false)
+    const primaryKey = useMemo(() => {
+        if (secretInput.length === 0) return
 
-    useEffect(() => {
-        if (!privatekey) return
-        const key = LoadKey(privatekey)
-        if (!key) return
-        const ccid = CommputeCCID(key.publickey)
-        setCcid(ccid)
-
-        setErrorMessage(t('searching'))
-        const hubClient = new Client(privatekey, 'hub.concurrent.world', 'stab-client')
-        hubClient.api
-            .getEntity(ccid)
-            .then((entity) => {
-                console.log(entity)
-                if (entity && entity.ccid === ccid) {
-                    setServer(entity.domain || 'hub.concurrent.world')
-                    setEntityFound(true)
-                } else {
-                    setErrorMessage(t('notFound'))
-                    setSuggestFailed(true)
-                }
-            })
-            .catch((e) => {
-                console.log(e)
-
-                if (!legacySearched) {
-                    // try legacy
-                    console.log('try legacy')
-
-                    if (IsValid256k1PrivateKey(secret)) {
-                        setErrorMessage(t('notFound'))
-                        setSuggestFailed(true)
-                        return
-                    }
-                    const normalized = secret.trim().normalize('NFKD')
-                    console.log(normalized)
-                    const wallet = HDNodeWallet.fromPhrase(normalized, undefined, undefined, LangJa.wordlist())
-                    setMnemonic(normalized)
-                    setPrivatekey(wallet.privateKey.slice(2))
-
-                    setLegacySearched(true)
-                    return
-                }
-
-                setErrorMessage(t('notFound'))
-                setSuggestFailed(true)
-            })
-    }, [privatekey])
-
-    useEffect(() => {
-        setServer('')
-        setErrorMessage('')
-        setEntityFound(false)
-        if (secret.length === 0) return
-
-        // try to parse as private key
-        if (IsValid256k1PrivateKey(secret)) {
-            const key = LoadKey(secret)
+        if (IsValid256k1PrivateKey(secretInput)) {
+            const key = LoadKey(secretInput)
             if (!key) return
-            setPrivatekey(key.privatekey)
-            return
+            return key.privatekey
         }
 
-        const normalized = secret.trim().normalize('NFKD')
+        const normalized = secretInput.trim().normalize('NFKD')
         const split = normalized.split(' ')
-        console.log(split)
-        if (split.length !== 12) return
+        if (split.length !== 12) {
+            setErrorMessage(t('invalidSecret'))
+        }
 
-        // try to parse as mnemonic
         try {
             if (normalized[0].match(/[a-z]/)) {
-                console.log('english')
                 const wallet = HDNodeWallet.fromPhrase(normalized)
-                setMnemonic(normalized)
-                setPrivatekey(wallet.privateKey.slice(2))
+                return wallet.privateKey.slice(2)
             } else {
-                console.log('japanese')
                 const ja2en = split
                     .map((word) => {
                         const wordIndex = LangJa.wordlist().getWordIndex(word)
@@ -133,95 +70,95 @@ export function AccountImport(): JSX.Element {
                     })
                     .join(' ')
                 const wallet = HDNodeWallet.fromPhrase(ja2en)
-                setMnemonic(normalized)
-                setPrivatekey(wallet.privateKey.slice(2))
+                return wallet.privateKey.slice(2)
             }
         } catch (e) {
+            setErrorMessage(t('invalidSecret'))
             console.log(e)
         }
+    }, [secretInput])
 
-        setErrorMessage(t('invalidSecret'))
-    }, [secret])
+    const primaryCCID = useMemo(() => {
+        if (!primaryKey) return
+        return CommputeCCID(primaryKey)
+    }, [primaryKey])
 
+    const legacyKey = useMemo(() => {
+        try {
+            const normalized = secretInput.trim().normalize('NFKD')
+            const split = normalized.split(' ')
+            if (split.length !== 12) return
+
+            const wallet = HDNodeWallet.fromPhrase(normalized, undefined, undefined, LangJa.wordlist())
+            return wallet.privateKey.slice(2)
+        } catch (e) {
+            console.error(e)
+        }
+    }, [secretInput])
+
+    const legacyCCID = useMemo(() => {
+        if (!legacyKey) return
+        return CommputeCCID(legacyKey)
+    }, [legacyKey])
+
+    const properCCID = useMemo(() => {
+        if (!properKey) return
+        return CommputeCCID(properKey)
+    }, [properKey])
+
+    // suggest
     useEffect(() => {
-        let unmounted = false
-        const fqdn = server.replace('https://', '').replace('/', '')
+        if (!primaryKey || !primaryCCID) return
 
-        const normalized = secret.trim().normalize('NFKD')
-        const split = normalized.split(' ')
-        console.log(split)
-        if (split.length !== 12) return
+        const searchTarget = domainInput || 'hub.concurrent.world'
 
-        // try to parse as mnemonic
-        try {
-            if (normalized[0].match(/[a-z]/)) {
-                console.log('english')
-                const wallet = HDNodeWallet.fromPhrase(normalized)
-                setMnemonic(normalized)
-                setPrivatekey(wallet.privateKey.slice(2))
-            } else {
-                console.log('japanese')
-                const ja2en = split
-                    .map((word) => {
-                        const wordIndex = LangJa.wordlist().getWordIndex(word)
-                        return LangEn.wordlist().getWord(wordIndex)
-                    })
-                    .join(' ')
-                const wallet = HDNodeWallet.fromPhrase(ja2en)
-                setMnemonic(normalized)
-                setPrivatekey(wallet.privateKey.slice(2))
-            }
-        } catch (e) {
-            console.log(e)
-        }
-
-        try {
-            const client = new Client(privatekey, fqdn)
-            client.api
-                .getDomain(fqdn)
-                .then((e: any) => {
-                    if (unmounted) return
-                    setHost(e)
-                    client.api
-                        .getEntity(client.ccid)
-                        .then((entity) => {
-                            if (unmounted) return
-                            console.log(entity)
-                            if (!entity || entity.ccid !== client.ccid) {
-                                setErrorMessage(t('notFoundOnServer'))
-                                return
-                            }
+        const timer = setTimeout(() => {
+            setDomain('')
+            setProperKey('')
+            try {
+                const client = new Client(primaryKey, searchTarget, 'stab-client')
+                client.api
+                    .resolveAddress(primaryCCID)
+                    .then((address) => {
+                        if (address) {
+                            setProperKey(primaryKey)
+                            setDomain(address)
                             setErrorMessage('')
-                            setEntityFound(entity.ccid === client.ccid)
-                            initializeClient(client)
-                        })
-                        .catch((e) => {
-                            console.error(e)
-                            if (unmounted) return
-                            setErrorMessage(t('notFoundOnServer'))
-                        })
-                    console.log(fqdn)
-                })
-                .catch((e) => {
-                    if (unmounted) return
-                    setErrorMessage(t('connectError'))
-                    console.error(e)
-                })
-        } catch (e) {
-            console.log(e)
-            return
-        }
+                        }
+                    })
+                    .catch((_) => {
+                        if (!legacyKey || !legacyCCID) return
+                        client.api
+                            .resolveAddress(legacyCCID)
+                            .then((address) => {
+                                if (address) {
+                                    setProperKey(legacyKey)
+                                    setDomain(address)
+                                    setErrorMessage('')
+                                }
+                            })
+                            .catch((e) => {
+                                console.error(e)
+                                setSuggestFailed(true)
+                                setErrorMessage(t('notFound'))
+                            })
+                    })
+            } catch (e) {
+                console.error(e)
+            }
+        }, 300)
+
         return () => {
-            unmounted = true
+            clearTimeout(timer)
         }
-    }, [server])
+    }, [primaryCCID, legacyCCID, domainInput])
 
     const accountImport = (): void => {
-        if (!client) return
-        if (!host) return
-        localStorage.setItem('Domain', JSON.stringify(host.fqdn))
-        localStorage.setItem('PrivateKey', JSON.stringify(client.api.privatekey))
-        localStorage.setItem('Mnemonic', JSON.stringify(mnemonic))
+        localStorage.setItem('Domain', JSON.stringify(domain))
+        localStorage.setItem('PrivateKey', JSON.stringify(properKey))
+        if (secretInput.split(' ').length === 12) {
+            localStorage.setItem('Mnemonic', JSON.stringify(secretInput))
+        }
         window.location.href = '/'
     }
 
@@ -276,11 +213,11 @@ export function AccountImport(): JSX.Element {
                     <TextField
                         type={showSecret ? 'text' : 'password'}
                         placeholder={t('secretPlaceholder')}
-                        value={secret}
+                        value={secretInput}
                         onChange={(e) => {
-                            setSecret(e.target.value)
+                            setSecretInput(e.target.value)
                         }}
-                        disabled={!!privatekey}
+                        disabled={!!properKey}
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position="end">
@@ -290,7 +227,7 @@ export function AccountImport(): JSX.Element {
                                         }}
                                         color="primary"
                                     >
-                                        {privatekey ? (
+                                        {properKey ? (
                                             <CheckCircleIcon />
                                         ) : showSecret ? (
                                             <VisibilityOff />
@@ -302,9 +239,9 @@ export function AccountImport(): JSX.Element {
                             )
                         }}
                     />
-                    {ccid && (
+                    {properCCID && (
                         <Typography sx={{ wordBreak: 'break-all' }}>
-                            {t('welcome')}: {ccid}
+                            {t('welcome')}: {properCCID}
                         </Typography>
                     )}
                     {suggestFailed && (
@@ -313,15 +250,15 @@ export function AccountImport(): JSX.Element {
                             <Typography variant="h3">{t('ドメイン')}</Typography>
                             <TextField
                                 placeholder="https://example.tld/"
-                                value={server}
+                                value={domainInput}
                                 onChange={(e) => {
-                                    setServer(e.target.value)
+                                    setDomainInput(e.target.value)
                                 }}
                             />
                         </>
                     )}
                     {errorMessage}
-                    <Button disabled={!entityFound} onClick={accountImport}>
+                    <Button disabled={!properCCID} onClick={accountImport}>
                         {t('import')}
                     </Button>
                 </Paper>
