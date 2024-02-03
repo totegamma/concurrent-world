@@ -1,5 +1,5 @@
-import { Box, Divider, ListItem, ListItemIcon, ListItemText, Typography, useTheme } from '@mui/material'
-import React, { memo, useCallback, useEffect, useState, useRef, forwardRef, type ForwardedRef } from 'react'
+import { Box, Divider, ListItem, ListItemIcon, ListItemText, type SxProps, Typography, useTheme } from '@mui/material'
+import React, { memo, useCallback, useEffect, useState, useRef, forwardRef, type ForwardedRef, useMemo } from 'react'
 import { AssociationFrame } from '../Association/AssociationFrame'
 import { useApi } from '../../context/api'
 import { Loading } from '../ui/Loading'
@@ -155,6 +155,12 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
             })
     }
 
+    const timelineElemSx: SxProps = useMemo(() => {
+        return {
+            p: 0.5
+        }
+    }, [])
+
     return (
         <>
             <Box
@@ -263,7 +269,7 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                                     case 'message':
                                         element = (
                                             <MessageContainer
-                                                sx={{ p: 0.5 }}
+                                                sx={timelineElemSx}
                                                 messageID={e.objectID}
                                                 messageOwner={e.owner}
                                                 lastUpdated={e.lastUpdate?.getTime() ?? 0}
@@ -275,7 +281,7 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                                     case 'association':
                                         element = (
                                             <AssociationFrame
-                                                sx={{ p: 0.5 }}
+                                                sx={timelineElemSx}
                                                 associationID={e.objectID}
                                                 associationOwner={e.owner}
                                                 lastUpdated={e.lastUpdate?.getTime() ?? 0}
