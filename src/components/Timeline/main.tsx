@@ -263,6 +263,7 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                                     case 'message':
                                         element = (
                                             <MessageContainer
+                                                sx={{ p: 0.5 }}
                                                 messageID={e.objectID}
                                                 messageOwner={e.owner}
                                                 lastUpdated={e.lastUpdate?.getTime() ?? 0}
