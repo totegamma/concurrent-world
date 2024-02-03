@@ -291,7 +291,9 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
 
                                 return (
                                     <React.Fragment key={e.objectID}>
-                                        <ErrorBoundary FallbackComponent={renderError}>{element}</ErrorBoundary>
+                                        <ErrorBoundary FallbackComponent={renderError}>
+                                            <Box>{element}</Box>
+                                        </ErrorBoundary>
                                     </React.Fragment>
                                 )
                             })
