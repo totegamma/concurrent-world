@@ -16,6 +16,7 @@ import { usePreference } from './PreferenceContext'
 import { ProfileEditor } from '../components/ProfileEditor'
 import { MessageContainer } from '../components/Message/MessageContainer'
 import { Menu } from '../components/Menu/Menu'
+import { LogoutButton } from '../components/Settings/LogoutButton'
 
 export interface GlobalActionsState {
     openDraft: (text?: string) => void
@@ -391,7 +392,9 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                         <Box
                             sx={{
                                 display: 'flex',
-                                flexDirection: 'column'
+                                flexDirection: 'column',
+                                p: 1,
+                                gap: 1
                             }}
                         >
                             <Typography>
@@ -404,6 +407,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                             >
                                 Reload
                             </Button>
+                            <LogoutButton />
                         </Box>
                     </Paper>
                 </Modal>

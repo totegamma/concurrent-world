@@ -143,7 +143,7 @@ export const APUserCard = memo<{ url: string; remove?: (_: string) => void }>(
 
         useEffect(() => {
             client.api
-                .fetchWithCredential(client.api.host, `/ap/api/resolve/${encodeURI(props.url)}`, {
+                .fetchWithCredential(client.api.host, `/ap/api/resolve/${encodeURIComponent(props.url)}`, {
                     method: 'GET',
                     headers: {
                         accept: 'application/ld+json'
