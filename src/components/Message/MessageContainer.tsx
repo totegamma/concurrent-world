@@ -70,39 +70,33 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
     switch (message?.schema) {
         case Schemas.simpleNote:
             body = (
-                <Box sx={props.sx}>
-                    <MessageView
-                        simple={props.simple}
-                        message={message as Message<SimpleNoteSchema>}
-                        lastUpdated={props.lastUpdated}
-                        userCCID={client.ccid}
-                        rerouted={props.rerouted}
-                    />
-                </Box>
+                <MessageView
+                    simple={props.simple}
+                    message={message as Message<SimpleNoteSchema>}
+                    lastUpdated={props.lastUpdated}
+                    userCCID={client.ccid}
+                    rerouted={props.rerouted}
+                />
             )
             break
         case Schemas.replyMessage:
             body = (
-                <Box sx={props.sx}>
-                    <ReplyMessageFrame
-                        simple={props.simple}
-                        message={message as Message<ReplyMessageSchema>}
-                        lastUpdated={props.lastUpdated}
-                        userCCID={client.ccid}
-                        rerouted={props.rerouted}
-                    />
-                </Box>
+                <ReplyMessageFrame
+                    simple={props.simple}
+                    message={message as Message<ReplyMessageSchema>}
+                    lastUpdated={props.lastUpdated}
+                    userCCID={client.ccid}
+                    rerouted={props.rerouted}
+                />
             )
             break
         case Schemas.rerouteMessage:
             body = (
-                <Box sx={props.sx}>
-                    <RerouteMessageFrame
-                        simple={props.simple}
-                        message={message as Message<RerouteMessageSchema>}
-                        lastUpdated={props.lastUpdated}
-                    />
-                </Box>
+                <RerouteMessageFrame
+                    simple={props.simple}
+                    message={message as Message<RerouteMessageSchema>}
+                    lastUpdated={props.lastUpdated}
+                />
             )
             break
         default:
