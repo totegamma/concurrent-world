@@ -48,25 +48,11 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                     minWidth={0}
                     sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
                 >
-                    <Tooltip
-                        arrow
-                        followCursor
-                        placement="top"
-                        title={
-                            <MarkdownRenderer
-                                messagebody={props.message.payload.body.body}
-                                emojiDict={props.message.payload.body.emojis ?? {}}
-                            />
-                        }
-                    >
-                        <Box>
-                            <MarkdownRendererLite
-                                messagebody={props.message.payload.body.body}
-                                emojiDict={props.message.payload.body.emojis ?? {}}
-                                forceOneline={true}
-                            />
-                        </Box>
-                    </Tooltip>
+                    <MarkdownRendererLite
+                        messagebody={props.message.payload.body.body}
+                        emojiDict={props.message.payload.body.emojis ?? {}}
+                        forceOneline={true}
+                    />
                 </Typography>
             </Box>
             <Link
