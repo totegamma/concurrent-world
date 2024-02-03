@@ -1,4 +1,4 @@
-import { Box, IconButton, Link, ListItemIcon, ListItemText, Menu, MenuItem, Typography } from '@mui/material'
+import { Box, IconButton, Link, ListItemIcon, ListItemText, Menu, MenuItem, Tooltip, Typography } from '@mui/material'
 
 import { type Message, type RerouteMessageSchema } from '@concurrent-world/client'
 import RepeatIcon from '@mui/icons-material/Repeat'
@@ -12,6 +12,8 @@ import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { useApi } from '../../context/api'
 import { useInspector } from '../../context/Inspector'
+import { MarkdownRendererLite } from '../ui/MarkdownRendererLite'
+import { MarkdownRenderer } from '../ui/MarkdownRenderer'
 
 export interface RerouteMessageFrameProp {
     message: Message<RerouteMessageSchema>
@@ -124,8 +126,31 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
             {props.message.payload.body.body && (
                 <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 2 }}>
                     <Box display="flex" flexDirection="row-reverse" width={{ xs: '38px', sm: '48px' }} flexShrink={0} />
-                    <Typography overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
-                        {props.message.payload.body.body}
+                    <Typography
+                        overflow="hidden"
+                        whiteSpace="nowrap"
+                        textOverflow="ellipsis"
+                        minWidth={0}
+                        sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
+                    >
+                        <Tooltip
+                            arrow
+                            placement="top"
+                            title={
+                                <MarkdownRenderer
+                                    messagebody={props.message.payload.body.body}
+                                    emojiDict={props.message.payload.body.emojis ?? {}}
+                                />
+                            }
+                        >
+                            <Box>
+                                <MarkdownRendererLite
+                                    messagebody={props.message.payload.body.body}
+                                    emojiDict={props.message.payload.body.emojis ?? {}}
+                                    forceOneline={true}
+                                />
+                            </Box>
+                        </Tooltip>
                     </Typography>
                 </Box>
             )}
