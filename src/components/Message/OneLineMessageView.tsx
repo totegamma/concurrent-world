@@ -50,7 +50,6 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                 >
                     <Tooltip
                         arrow
-                        followCursor
                         placement="top"
                         title={
                             <MarkdownRenderer

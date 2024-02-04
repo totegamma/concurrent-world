@@ -23,6 +23,9 @@ export const MessageUrlPreview = (props: MessageUrlPreviewProps): JSX.Element | 
     // strip social tag
     replaced = replaced.replace(/<social.*?>.*?<\/social>/g, '')
 
+    // strip emojipack tag
+    replaced = replaced.replace(/<emojipack.*?\/>/g, '')
+
     // replace markdown link syntax
     replaced = replaced.replace(/\[(.*)\]\((.*)\)/g, '$2')
 

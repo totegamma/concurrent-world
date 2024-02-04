@@ -5,6 +5,7 @@ declare module 'react-markdown' {
         userlink?: React.FC<{ ccid: string }>
         emoji?: React.FC<{ shortcode: string }>
         social?: React.FC<{ type: string; icon: string; service: string; children: string }>
+        emojipack?: React.FC<{ src: string }>
     }
 }
 
@@ -23,6 +24,7 @@ declare global {
                 React.AnchorHTMLAttributes<HTMLAnchorElement>,
                 HTMLAnchorElement
             >
+            emojipack: { src: string } & React.DetailedHTMLProps<React.HTMLAttributes<HTMLSpanElement>, HTMLSpanElement>
         }
     }
 }
