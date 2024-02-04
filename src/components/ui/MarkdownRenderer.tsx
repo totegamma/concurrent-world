@@ -16,6 +16,9 @@ import { ThemeCard } from '../ThemeCard'
 import { closeSnackbar, useSnackbar } from 'notistack'
 import { usePreference } from '../../context/PreferenceContext'
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline'
+import { EmojipackCard } from '../EmojipackCard'
+import ManageSearchIcon from '@mui/icons-material/ManageSearch'
+import { useGlobalActions } from '../../context/GlobalActions'
 
 export interface MarkdownRendererProps {
     messagebody: string
@@ -24,7 +27,16 @@ export interface MarkdownRendererProps {
 
 const sanitizeOption = {
     ...defaultSchema,
-    tagNames: [...(defaultSchema.tagNames ?? []), 'marquee', 'video', 'source', 'userlink', 'emoji', 'social'],
+    tagNames: [
+        ...(defaultSchema.tagNames ?? []),
+        'marquee',
+        'video',
+        'source',
+        'userlink',
+        'emoji',
+        'social',
+        'emojipack'
+    ],
     attributes: {
         ...defaultSchema.attributes,
         marquee: [...(defaultSchema.attributes?.marquee ?? []), 'direction', 'behavior', 'scrollamount'],
@@ -32,11 +44,13 @@ const sanitizeOption = {
         source: [...(defaultSchema.attributes?.source ?? []), 'src', 'type'],
         userlink: ['ccid'],
         emoji: ['shortcode'],
-        social: ['href', 'service', 'icon']
+        social: ['href', 'service', 'icon'],
+        emojipack: ['src']
     }
 }
 
 export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
+    const actions = useGlobalActions()
     const { enqueueSnackbar } = useSnackbar()
     const [themeName, setThemeName] = usePreference('themeName')
     const [customThemes, setCustomThemes] = usePreference('customThemes')
@@ -364,6 +378,9 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                                 preload="metadata"
                             />
                         )
+                    },
+                    emojipack: ({ src }) => {
+                        return <EmojipackCard src={src} icon={<ManageSearchIcon />} onClick={actions.openEmojipack} />
                     }
                 }}
             >

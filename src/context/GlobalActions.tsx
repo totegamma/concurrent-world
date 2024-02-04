@@ -1,4 +1,4 @@
-import { Box, Paper, Modal, Typography, Divider, Button, Drawer, useTheme, useMediaQuery } from '@mui/material'
+import { Box, Paper, Modal, Typography, Divider, Button, Drawer, useTheme, useMediaQuery, Tooltip } from '@mui/material'
 import { InspectorProvider } from '../context/Inspector'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
@@ -17,6 +17,11 @@ import { ProfileEditor } from '../components/ProfileEditor'
 import { MessageContainer } from '../components/Message/MessageContainer'
 import { Menu } from '../components/Menu/Menu'
 import { LogoutButton } from '../components/Settings/LogoutButton'
+import { CCDrawer } from '../components/ui/CCDrawer'
+import { type EmojiPackage } from '../model'
+import { experimental_VGrid as VGrid, type VGridHandle } from 'virtua'
+import { useSnackbar } from 'notistack'
+import { useTranslation } from 'react-i18next'
 
 export interface GlobalActionsState {
     openDraft: (text?: string) => void
@@ -25,6 +30,7 @@ export interface GlobalActionsState {
     openMobileMenu: (open?: boolean) => void
     allKnownStreams: Array<Stream<CommonstreamSchema>>
     draft: string
+    openEmojipack: (url: EmojiPackage) => void
 }
 
 const GlobalActionsContext = createContext<GlobalActionsState | undefined>(undefined)
@@ -42,9 +48,13 @@ const style = {
     maxWidth: '90vw'
 }
 
+const RowEmojiCount = 8
+
 export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element => {
     const client = useApi()
     const [lists] = usePreference('lists')
+    const [emojiPackages, setEmojiPackages] = usePreference('emojiPackages')
+    const { enqueueSnackbar } = useSnackbar()
     const path = useLocation()
     const theme = useTheme()
     const [draft, setDraft] = useState<string>('')
@@ -56,7 +66,14 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const [domainIsOffline, setDomainIsOffline] = useState<boolean>(false)
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
 
+    const [emojiPack, setEmojiPack] = useState<EmojiPackage>()
+    const emojiPackAlreadyAdded = useMemo(() => {
+        return emojiPackages.find((p) => p === emojiPack?.packageURL) !== undefined
+    }, [emojiPack, emojiPackages])
+
     const isMobileSize = useMediaQuery(theme.breakpoints.down('sm'))
+
+    const { t } = useTranslation('')
 
     const [viewportHeight, setViewportHeight] = useState<number>(visualViewport?.height ?? 0)
     useEffect(() => {
@@ -164,6 +181,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         [openDraft]
     )
 
+    const openEmojipack = useCallback((pack: EmojiPackage) => {
+        setEmojiPack(pack)
+    }, [])
+
     const fixAccount = useCallback(async () => {
         console.log('starting account fix')
         await client.setupUserstreams()
@@ -220,7 +241,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     openReroute,
                     openMobileMenu,
                     allKnownStreams,
-                    draft
+                    draft,
+                    openEmojipack
                 }
             }, [openDraft, openReply, openReroute, openMobileMenu, allKnownStreams])}
         >
@@ -470,6 +492,92 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                         }}
                     />
                 </Drawer>
+                <CCDrawer
+                    open={!!emojiPack}
+                    onClose={() => {
+                        setEmojiPack(undefined)
+                    }}
+                >
+                    <Box p={2}>
+                        {emojiPack && (
+                            <>
+                                <Box display="flex" flexDirection="row" alignItems="center" gap={1}>
+                                    <Typography variant="h1">{emojiPack.name}</Typography>
+                                    <img src={emojiPack.iconURL} alt={emojiPack.name} height="30px" />
+                                </Box>
+                                <Typography variant="h3">{emojiPack.description}</Typography>
+                                <Typography variant="h4">by {emojiPack.credits}</Typography>
+                                <Divider />
+                                <Typography variant="h2">preview</Typography>
+                                <Box
+                                    display="flex"
+                                    flexDirection="column"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                    gap={1}
+                                >
+                                    <VGrid
+                                        row={Math.max(Math.ceil(emojiPack.emojis.length / RowEmojiCount), 4)} // HACK: 画面の高さを割るとvirtuaが壊れる
+                                        col={RowEmojiCount}
+                                        style={{
+                                            overflowX: 'hidden',
+                                            overflowY: 'auto',
+                                            width: '410px',
+                                            height: '300px'
+                                        }}
+                                        cellHeight={50}
+                                        cellWidth={50}
+                                    >
+                                        {({ colIndex, rowIndex }) => {
+                                            const emoji = emojiPack.emojis[rowIndex * RowEmojiCount + colIndex]
+                                            if (!emoji) {
+                                                return null
+                                            }
+                                            return (
+                                                <Tooltip
+                                                    arrow
+                                                    placement="top"
+                                                    title={
+                                                        <Box display="flex" flexDirection="column" alignItems="center">
+                                                            <img
+                                                                src={emoji?.animURL ?? emoji?.imageURL ?? ''}
+                                                                style={{
+                                                                    height: '5em'
+                                                                }}
+                                                            />
+                                                            <Divider />
+                                                            <Typography variant="caption" align="center">
+                                                                {emoji.shortcode}
+                                                            </Typography>
+                                                        </Box>
+                                                    }
+                                                >
+                                                    <img
+                                                        src={emoji.imageURL}
+                                                        alt={emoji.shortcode}
+                                                        height="30px"
+                                                        width="30px"
+                                                    />
+                                                </Tooltip>
+                                            )
+                                        }}
+                                    </VGrid>
+                                    <Button
+                                        fullWidth
+                                        onClick={() => {
+                                            setEmojiPackages([...emojiPackages, emojiPack.packageURL])
+                                            setEmojiPack(undefined)
+                                            enqueueSnackbar('added!', { variant: 'success' })
+                                        }}
+                                        disabled={emojiPackAlreadyAdded}
+                                    >
+                                        {emojiPackAlreadyAdded ? ' (already added)' : 'Add to your collection'}
+                                    </Button>
+                                </Box>
+                            </>
+                        )}
+                    </Box>
+                </CCDrawer>
             </InspectorProvider>
         </GlobalActionsContext.Provider>
     )
