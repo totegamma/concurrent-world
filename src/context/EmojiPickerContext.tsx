@@ -289,7 +289,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                 overflowX: 'hidden',
                                 overflowY: 'auto',
                                 width: '310px',
-                                height: '300px'
+                                height: '190px'
                             }}
                             cellHeight={50}
                             cellWidth={50}
