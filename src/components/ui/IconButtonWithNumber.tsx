@@ -14,7 +14,8 @@ const _IconButtonWithNumber: ForwardRefRenderFunction<HTMLDivElement, IconButton
             {...props}
             sx={{
                 display: 'flex',
-                width: '3rem'
+                width: '3rem',
+                alignItems: 'center'
             }}
             ref={ref}
         >
@@ -28,7 +29,7 @@ const _IconButtonWithNumber: ForwardRefRenderFunction<HTMLDivElement, IconButton
             >
                 {props.icon}
             </IconButton>
-            <Typography sx={{ fontSize: 13, lineHeight: 2 }}>{props.message > 0 ? props.message : <></>}</Typography>
+            <Typography sx={{ fontSize: 13, lineHeight: 1 }}>{props.message > 0 ? props.message : <></>}</Typography>
         </Box>
     )
 }
