@@ -306,6 +306,9 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                         onMouseDown={() => {
                                             onSelectEmoji(emoji)
                                         }}
+                                        onMouseOver={() => {
+                                            setSelected(index)
+                                        }}
                                         sx={{
                                             bgcolor:
                                                 selected === index && searchBoxFocused
