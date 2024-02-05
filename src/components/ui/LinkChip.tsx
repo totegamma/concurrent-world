@@ -13,7 +13,8 @@ import {
     faSteam,
     faPatreon,
     faBandcamp,
-    faSoundcloud
+    faSoundcloud,
+    faXTwitter
 } from '@fortawesome/free-brands-svg-icons'
 
 const iconMap: Record<string, JSX.Element> = {
@@ -28,7 +29,8 @@ const iconMap: Record<string, JSX.Element> = {
     steam: <FontAwesomeIcon icon={faSteam} />,
     patreon: <FontAwesomeIcon icon={faPatreon} />,
     bandcamp: <FontAwesomeIcon icon={faBandcamp} />,
-    soundcloud: <FontAwesomeIcon icon={faSoundcloud} />
+    soundcloud: <FontAwesomeIcon icon={faSoundcloud} />,
+    x: <FontAwesomeIcon icon={faXTwitter} />
 }
 
 export interface LinkChipProps {
