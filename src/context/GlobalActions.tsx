@@ -19,7 +19,7 @@ import { Menu } from '../components/Menu/Menu'
 import { LogoutButton } from '../components/Settings/LogoutButton'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import { type EmojiPackage } from '../model'
-import { experimental_VGrid as VGrid, type VGridHandle } from 'virtua'
+import { experimental_VGrid as VGrid } from 'virtua'
 import { useSnackbar } from 'notistack'
 import { useTranslation } from 'react-i18next'
 
@@ -48,7 +48,7 @@ const style = {
     maxWidth: '90vw'
 }
 
-const RowEmojiCount = 8
+const RowEmojiCount = 6
 
 export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element => {
     const client = useApi()
@@ -522,7 +522,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                         style={{
                                             overflowX: 'hidden',
                                             overflowY: 'auto',
-                                            width: '410px',
+                                            width: '310px',
                                             height: '300px'
                                         }}
                                         cellHeight={50}
