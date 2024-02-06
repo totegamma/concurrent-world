@@ -1,4 +1,4 @@
-import { type ImgHTMLAttributes, type DetailedHTMLProps } from 'react'
+import { type ImgHTMLAttributes, type DetailedHTMLProps, memo } from 'react'
 import { Box, Button, Divider, IconButton, Link, Tooltip, Typography } from '@mui/material'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -49,7 +49,7 @@ const sanitizeOption = {
     }
 }
 
-export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
+export const MarkdownRenderer = memo<MarkdownRendererProps>((props: MarkdownRendererProps): JSX.Element => {
     const actions = useGlobalActions()
     const { enqueueSnackbar } = useSnackbar()
     const [themeName, setThemeName] = usePreference('themeName')
@@ -468,4 +468,6 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
             </ReactMarkdown>
         </Box>
     )
-}
+})
+
+MarkdownRenderer.displayName = 'MarkdownRenderer'
