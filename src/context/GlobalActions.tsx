@@ -94,18 +94,23 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
             !client?.user.userstreams.payload.body.ackCollection)
 
     useEffect(() => {
+        let unmounted = false
         setAllKnownStreams([])
         const allStreams = Object.values(lists)
             .map((list) => list.streams)
             .flat()
         const uniq = [...new Set(allStreams)]
+        console.log('uniq: ', uniq)
         uniq.forEach((id) => {
             client.getStream<CommonstreamSchema>(id).then((stream) => {
-                if (stream) {
+                if (stream && !unmounted) {
                     setAllKnownStreams((prev) => [...prev, stream])
                 }
             })
         })
+        return () => {
+            unmounted = true
+        }
     }, [lists])
 
     useEffect(() => {

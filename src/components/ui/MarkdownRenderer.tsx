@@ -1,4 +1,4 @@
-import { type ImgHTMLAttributes, type DetailedHTMLProps } from 'react'
+import { type ImgHTMLAttributes, type DetailedHTMLProps, memo } from 'react'
 import { Box, Button, Divider, IconButton, Link, Tooltip, Typography } from '@mui/material'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -49,7 +49,7 @@ const sanitizeOption = {
     }
 }
 
-export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
+export const MarkdownRenderer = memo<MarkdownRendererProps>((props: MarkdownRendererProps): JSX.Element => {
     const actions = useGlobalActions()
     const { enqueueSnackbar } = useSnackbar()
     const [themeName, setThemeName] = usePreference('themeName')
@@ -288,6 +288,32 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                                 </LinkChip>
                             )
                         }
+                        const matchYoutubeVideo = href?.match(/https:\/\/www\.youtube\.com\/watch\?v=(\w+)$/)
+                        if (matchYoutubeVideo) {
+                            return (
+                                <Box
+                                    sx={{
+                                        aspectRatio: '16 / 9',
+                                        overflow: 'hidden',
+                                        width: '100%',
+                                        borderRadius: 1,
+                                        maxWidth: '500px'
+                                    }}
+                                >
+                                    <iframe
+                                        allowFullScreen
+                                        src={`https://www.youtube.com/embed/${matchYoutubeVideo[1]}`}
+                                        title="YouTube video player"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            border: 'none'
+                                        }}
+                                    />
+                                </Box>
+                            )
+                        }
                         return (
                             <Link href={href} target="_blank" color="secondary" underline="hover">
                                 {children}
@@ -442,4 +468,6 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
             </ReactMarkdown>
         </Box>
     )
-}
+})
+
+MarkdownRenderer.displayName = 'MarkdownRenderer'
