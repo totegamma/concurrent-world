@@ -24,8 +24,6 @@ export const ImagePreviewModal = (props: ImagePreviewModalProps): JSX.Element =>
     const transformComponentRef = useRef<ReactZoomPanPinchRef | null>(null)
     const imageRef = useRef<HTMLImageElement | null>(null)
 
-    const [lastTouch, setLastTouch] = useState<{ x: number; y: number; time: number } | null>(null)
-
     const imageScale = useMemo(() => {
         if (containerWidth === 0 || containerHeight === 0 || imageNaturalWidth === 0 || imageNaturalHeight === 0)
             return 0
@@ -63,7 +61,6 @@ export const ImagePreviewModal = (props: ImagePreviewModalProps): JSX.Element =>
     }, [handleResize])
 
     const handleImageOnLoad = (image: HTMLImageElement): void => {
-        console.log('image loaded!', image.naturalWidth, image.naturalHeight)
         setImageNaturalWidth(image.naturalWidth)
         setImageNaturalHeight(image.naturalHeight)
     }
@@ -80,6 +77,10 @@ export const ImagePreviewModal = (props: ImagePreviewModalProps): JSX.Element =>
             handleImageOnLoad(image)
         }
     }, [props.src])
+
+    let lastTouch: { x: number; y: number } | null = null
+    let lastTime = 0
+    let lastVelocity = 0
 
     return (
         <Modal
@@ -111,21 +112,13 @@ export const ImagePreviewModal = (props: ImagePreviewModalProps): JSX.Element =>
                             props.onClose()
                         }
                     }}
-                    onTouchStart={(e) => {
-                        if (e.touches.length === 1) {
-                            setLastTouch({ x: e.touches[0].clientX, y: e.touches[0].clientY, time: Date.now() })
-                        }
-                    }}
-                    onTouchEnd={(e) => {
-                        if (e.touches.length === 1) {
-                            const touch = e.touches[0]
-                            if (lastTouch !== null) {
-                                const dx = touch.clientX - lastTouch.x
-                                const dy = touch.clientY - lastTouch.y
-                                const dt = Date.now() - lastTouch.time
-                                if (Math.sqrt(dx * dx + dy * dy) > 20 && dt < 100) {
-                                    props.onClose()
-                                }
+                    onTouchEnd={() => {
+                        if (transformComponentRef.current !== null) {
+                            if (
+                                transformComponentRef.current.instance.transformState.scale === imageScale &&
+                                lastVelocity > 1
+                            ) {
+                                props.onClose()
                             }
                         }
                     }}
@@ -141,6 +134,26 @@ export const ImagePreviewModal = (props: ImagePreviewModalProps): JSX.Element =>
                             minScale={imageScale}
                             maxScale={imageScale * zoomFactor}
                             ref={transformComponentRef}
+                            doubleClick={{
+                                disabled: false,
+                                mode: 'reset'
+                            }}
+                            onTransformed={(
+                                _: ReactZoomPanPinchRef,
+                                state: { scale: number; positionX: number; positionY: number }
+                            ) => {
+                                const now = Date.now()
+                                const dt = now - lastTime
+                                lastTime = now
+                                if (lastTouch !== null) {
+                                    const dx = state.positionX - lastTouch.x
+                                    const dy = state.positionY - lastTouch.y
+                                    const distance = Math.sqrt(dx * dx + dy * dy)
+                                    const velocity = distance / dt
+                                    lastVelocity = velocity
+                                }
+                                lastTouch = { x: state.positionX, y: state.positionY }
+                            }}
                         >
                             <TransformComponent
                                 wrapperStyle={{
