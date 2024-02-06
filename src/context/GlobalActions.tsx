@@ -31,6 +31,7 @@ export interface GlobalActionsState {
     allKnownStreams: Array<Stream<CommonstreamSchema>>
     draft: string
     openEmojipack: (url: EmojiPackage) => void
+    openImageViewer: (url: string) => void
 }
 
 const GlobalActionsContext = createContext<GlobalActionsState | undefined>(undefined)
@@ -65,6 +66,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const [allKnownStreams, setAllKnownStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
     const [domainIsOffline, setDomainIsOffline] = useState<boolean>(false)
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
+    const [previewImage, setPreviewImage] = useState<string | undefined>()
 
     const [emojiPack, setEmojiPack] = useState<EmojiPackage>()
     const emojiPackAlreadyAdded = useMemo(() => {
@@ -190,6 +192,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         setEmojiPack(pack)
     }, [])
 
+    const openImageViewer = useCallback((url: string) => {
+        setPreviewImage(url)
+    }, [])
+
     const fixAccount = useCallback(async () => {
         console.log('starting account fix')
         await client.setupUserstreams()
@@ -247,7 +253,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     openMobileMenu,
                     allKnownStreams,
                     draft,
-                    openEmojipack
+                    openEmojipack,
+                    openImageViewer
                 }
             }, [openDraft, openReply, openReroute, openMobileMenu, allKnownStreams])}
         >
@@ -474,6 +481,19 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                             />
                         </Box>
                     </Paper>
+                </Modal>
+                <Modal
+                    open={!!previewImage}
+                    onClose={() => {
+                        setPreviewImage(undefined)
+                    }}
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}
+                >
+                    <img src={previewImage} alt="preview" style={{ maxHeight: '100%', maxWidth: '100%' }} />
                 </Modal>
                 <Drawer
                     anchor={'left'}

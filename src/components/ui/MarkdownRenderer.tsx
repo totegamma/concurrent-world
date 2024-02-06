@@ -397,17 +397,18 @@ export const MarkdownRenderer = memo<MarkdownRendererProps>((props: MarkdownRend
                             ReactMarkdownProps
                     ) => {
                         return (
-                            <a href={props.src} target="_blank" rel="noreferrer">
-                                <Box
-                                    {...props}
-                                    component="img"
-                                    maxWidth="100%"
-                                    borderRadius={1}
-                                    sx={{
-                                        maxHeight: '20vh'
-                                    }}
-                                />
-                            </a>
+                            <Box
+                                {...props}
+                                component="img"
+                                maxWidth="100%"
+                                borderRadius={1}
+                                sx={{
+                                    maxHeight: '20vh'
+                                }}
+                                onClick={() => {
+                                    actions.openImageViewer(props.src ?? '')
+                                }}
+                            />
                         )
                     },
                     emoji: ({ shortcode }) => {
