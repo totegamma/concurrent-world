@@ -7,7 +7,7 @@ export interface ImagePreviewModalProps {
     onClose: () => void
 }
 
-const scaleUp = true
+const padding = 80
 const zoomFactor = 8
 
 export const ImagePreviewModal = (props: ImagePreviewModalProps): JSX.Element => {
@@ -24,9 +24,11 @@ export const ImagePreviewModal = (props: ImagePreviewModalProps): JSX.Element =>
     const imageScale = useMemo(() => {
         if (containerWidth === 0 || containerHeight === 0 || imageNaturalWidth === 0 || imageNaturalHeight === 0)
             return 0
-        const scale = Math.min(containerWidth / imageNaturalWidth, containerHeight / imageNaturalHeight)
-        return scaleUp ? scale : Math.max(scale, 1)
-    }, [scaleUp, containerWidth, containerHeight, imageNaturalWidth, imageNaturalHeight])
+        return Math.min(
+            (containerWidth - padding) / imageNaturalWidth,
+            (containerHeight - padding) / imageNaturalHeight
+        )
+    }, [containerWidth, containerHeight, imageNaturalWidth, imageNaturalHeight])
 
     const centerPosition = useMemo(() => {
         if (containerWidth === 0 || containerHeight === 0 || imageNaturalWidth === 0 || imageNaturalHeight === 0)
@@ -96,7 +98,6 @@ export const ImagePreviewModal = (props: ImagePreviewModalProps): JSX.Element =>
                     height="100dvh"
                     top={0}
                     left={0}
-                    p={2}
                     ref={(el: HTMLDivElement | null) => {
                         setContainer(el)
                     }}
@@ -149,7 +150,7 @@ export const ImagePreviewModal = (props: ImagePreviewModalProps): JSX.Element =>
                     flexDirection="row"
                     p={1}
                     position="absolute"
-                    bottom={0}
+                    bottom={'env(safe-area-inset-bottom)'}
                 >
                     <Button
                         onClick={() => {
