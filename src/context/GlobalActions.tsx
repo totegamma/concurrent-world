@@ -22,6 +22,7 @@ import { type EmojiPackage } from '../model'
 import { experimental_VGrid as VGrid } from 'virtua'
 import { useSnackbar } from 'notistack'
 import { useTranslation } from 'react-i18next'
+import { ImagePreviewModal } from '../components/ui/ImagePreviewModal'
 
 export interface GlobalActionsState {
     openDraft: (text?: string) => void
@@ -482,19 +483,12 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                         </Box>
                     </Paper>
                 </Modal>
-                <Modal
-                    open={!!previewImage}
+                <ImagePreviewModal
+                    src={previewImage}
                     onClose={() => {
                         setPreviewImage(undefined)
                     }}
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}
-                >
-                    <img src={previewImage} alt="preview" style={{ maxHeight: '100%', maxWidth: '100%' }} />
-                </Modal>
+                />
                 <Drawer
                     anchor={'left'}
                     open={mobileMenuOpen}
