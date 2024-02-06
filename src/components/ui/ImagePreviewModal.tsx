@@ -24,6 +24,8 @@ export const ImagePreviewModal = (props: ImagePreviewModalProps): JSX.Element =>
     const transformComponentRef = useRef<ReactZoomPanPinchRef | null>(null)
     const imageRef = useRef<HTMLImageElement | null>(null)
 
+    const [lastTouch, setLastTouch] = useState<{ x: number; y: number; time: number } | null>(null)
+
     const imageScale = useMemo(() => {
         if (containerWidth === 0 || containerHeight === 0 || imageNaturalWidth === 0 || imageNaturalHeight === 0)
             return 0
@@ -107,6 +109,24 @@ export const ImagePreviewModal = (props: ImagePreviewModalProps): JSX.Element =>
                     onClick={(e) => {
                         if (e.target !== imageRef.current?.parentElement) {
                             props.onClose()
+                        }
+                    }}
+                    onTouchStart={(e) => {
+                        if (e.touches.length === 1) {
+                            setLastTouch({ x: e.touches[0].clientX, y: e.touches[0].clientY, time: Date.now() })
+                        }
+                    }}
+                    onTouchEnd={(e) => {
+                        if (e.touches.length === 1) {
+                            const touch = e.touches[0]
+                            if (lastTouch !== null) {
+                                const dx = touch.clientX - lastTouch.x
+                                const dy = touch.clientY - lastTouch.y
+                                const dt = Date.now() - lastTouch.time
+                                if (Math.sqrt(dx * dx + dy * dy) > 20 && dt < 100) {
+                                    props.onClose()
+                                }
+                            }
                         }
                     }}
                     display="flex"
