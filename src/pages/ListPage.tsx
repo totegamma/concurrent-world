@@ -13,11 +13,13 @@ import ListIcon from '@mui/icons-material/List'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import { TimelineHeader } from '../components/TimelineHeader'
 import { type VListHandle } from 'virtua'
+import { useGlobalActions } from '../context/GlobalActions'
 
 export function ListPage(): JSX.Element {
     const client = useApi()
     const path = useLocation()
     const navigate = useNavigate()
+    const actions = useGlobalActions()
     const [lists, setLists] = usePreference('lists')
     const [showEditorOnTop] = usePreference('showEditorOnTop')
     const [showEditorOnTopMobile] = usePreference('showEditorOnTopMobile')
@@ -25,7 +27,6 @@ export function ListPage(): JSX.Element {
     const id = lists[rawid] ? rawid : Object.keys(lists)[0]
     const [tab, setTab] = useState<string>(id)
 
-    const [streams, setStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
     const [postStreams, setPostStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
     const [listSettingsOpen, setListSettingsOpen] = useState<boolean>(false)
 
@@ -35,9 +36,6 @@ export function ListPage(): JSX.Element {
         if (!id) return
         const list = lists[id]
         if (!list) return
-        Promise.all(list.streams.map((streamID) => client.getStream(streamID))).then((streams) => {
-            setStreams(streams.filter((e) => e !== null) as Array<Stream<CommonstreamSchema>>)
-        })
 
         Promise.all(list.defaultPostStreams.map((streamID) => client.getStream(streamID))).then((streams) => {
             setPostStreams(streams.filter((e) => e !== null) as Array<Stream<CommonstreamSchema>>)
@@ -143,7 +141,7 @@ export function ListPage(): JSX.Element {
                                     }}
                                 >
                                     <Draft
-                                        streamPickerOptions={streams}
+                                        streamPickerOptions={actions.allKnownStreams}
                                         streamPickerInitial={postStreams}
                                         onSubmit={async (
                                             text: string,
