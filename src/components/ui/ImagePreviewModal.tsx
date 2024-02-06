@@ -1,4 +1,4 @@
-import { Box, Button, Modal } from '@mui/material'
+import { Box, Button, CircularProgress, Modal } from '@mui/material'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { TransformWrapper, TransformComponent, type ReactZoomPanPinchRef } from 'react-zoom-pan-pinch'
 
@@ -28,6 +28,14 @@ export const ImagePreviewModal = (props: ImagePreviewModalProps): JSX.Element =>
         return scaleUp ? scale : Math.max(scale, 1)
     }, [scaleUp, containerWidth, containerHeight, imageNaturalWidth, imageNaturalHeight])
 
+    const centerPosition = useMemo(() => {
+        if (containerWidth === 0 || containerHeight === 0 || imageNaturalWidth === 0 || imageNaturalHeight === 0)
+            return { x: 0, y: 0 }
+        const x = (containerWidth - imageNaturalWidth * imageScale) / 2
+        const y = (containerHeight - imageNaturalHeight * imageScale) / 2
+        return { x, y }
+    }, [containerWidth, containerHeight, imageNaturalWidth, imageNaturalHeight, imageScale])
+
     const handleResize = useCallback(() => {
         if (container !== null) {
             const rect = container.getBoundingClientRect()
@@ -51,13 +59,14 @@ export const ImagePreviewModal = (props: ImagePreviewModalProps): JSX.Element =>
         console.log('image loaded!', image.naturalWidth, image.naturalHeight)
         setImageNaturalWidth(image.naturalWidth)
         setImageNaturalHeight(image.naturalHeight)
-        setTimeout(() => {
-            transformComponentRef.current?.resetTransform()
-        }, 10)
     }
 
     useEffect(() => {
-        if (props.src === undefined) return
+        if (props.src === undefined) {
+            setImageNaturalWidth(0)
+            setImageNaturalHeight(0)
+            return
+        }
         const image = new Image()
         image.src = props.src
         image.onload = () => {
@@ -75,13 +84,19 @@ export const ImagePreviewModal = (props: ImagePreviewModalProps): JSX.Element =>
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                flexDirection: 'column'
+                flexDirection: 'column',
+                position: 'absolute'
             }}
         >
             <>
                 <Box
                     flex={1}
-                    width="100%"
+                    position="absolute"
+                    width="100vw"
+                    height="100dvh"
+                    top={0}
+                    left={0}
+                    p={2}
                     ref={(el: HTMLDivElement | null) => {
                         setContainer(el)
                     }}
@@ -90,11 +105,15 @@ export const ImagePreviewModal = (props: ImagePreviewModalProps): JSX.Element =>
                             props.onClose()
                         }
                     }}
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
                 >
-                    {imageScale > 0 && (
+                    {imageScale > 0 ? (
                         <TransformWrapper
-                            centerOnInit
                             initialScale={imageScale}
+                            initialPositionX={centerPosition.x}
+                            initialPositionY={centerPosition.y}
                             minScale={imageScale}
                             maxScale={imageScale * zoomFactor}
                             ref={transformComponentRef}
@@ -114,9 +133,24 @@ export const ImagePreviewModal = (props: ImagePreviewModalProps): JSX.Element =>
                                 />
                             </TransformComponent>
                         </TransformWrapper>
+                    ) : (
+                        <CircularProgress
+                            sx={{
+                                color: 'white'
+                            }}
+                        />
                     )}
                 </Box>
-                <Box width="100%" display="flex" justifyContent="center" alignItems="center" flexDirection="row" p={1}>
+                <Box
+                    width="100%"
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    flexDirection="row"
+                    p={1}
+                    position="absolute"
+                    bottom={0}
+                >
                     <Button
                         onClick={() => {
                             props.onClose()
