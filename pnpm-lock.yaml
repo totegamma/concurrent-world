@@ -107,6 +107,9 @@ dependencies:
   react-use-websocket:
     specifier: ^4.3.1
     version: 4.3.1(react-dom@18.2.0)(react@18.2.0)
+  react-zoom-pan-pinch:
+    specifier: ^3.4.2
+    version: 3.4.2(react-dom@18.2.0)(react@18.2.0)
   rehype-raw:
     specifier: ^6.1.1
     version: 6.1.1
@@ -10501,6 +10504,17 @@ packages:
     peerDependencies:
       react: '>= 18.0.0'
       react-dom: '>= 18.0.0'
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /react-zoom-pan-pinch@3.4.2(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-Gg44aKCmfO4d19TmPaswwUeBtJkizR45YXxRd3MMK7FIINuSyqBF5/jDYPMZbMSjTvOI3v1p0FfKtebkTamP+w==}
+    engines: {node: '>=8', npm: '>=5'}
+    peerDependencies:
+      react: '*'
+      react-dom: '*'
     dependencies:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)

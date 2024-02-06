@@ -22,6 +22,7 @@ import { type EmojiPackage } from '../model'
 import { experimental_VGrid as VGrid } from 'virtua'
 import { useSnackbar } from 'notistack'
 import { useTranslation } from 'react-i18next'
+import { ImagePreviewModal } from '../components/ui/ImagePreviewModal'
 
 export interface GlobalActionsState {
     openDraft: (text?: string) => void
@@ -31,6 +32,7 @@ export interface GlobalActionsState {
     allKnownStreams: Array<Stream<CommonstreamSchema>>
     draft: string
     openEmojipack: (url: EmojiPackage) => void
+    openImageViewer: (url: string) => void
 }
 
 const GlobalActionsContext = createContext<GlobalActionsState | undefined>(undefined)
@@ -65,6 +67,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const [allKnownStreams, setAllKnownStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
     const [domainIsOffline, setDomainIsOffline] = useState<boolean>(false)
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
+    const [previewImage, setPreviewImage] = useState<string | undefined>()
 
     const [emojiPack, setEmojiPack] = useState<EmojiPackage>()
     const emojiPackAlreadyAdded = useMemo(() => {
@@ -190,6 +193,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         setEmojiPack(pack)
     }, [])
 
+    const openImageViewer = useCallback((url: string) => {
+        setPreviewImage(url)
+    }, [])
+
     const fixAccount = useCallback(async () => {
         console.log('starting account fix')
         await client.setupUserstreams()
@@ -247,7 +254,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     openMobileMenu,
                     allKnownStreams,
                     draft,
-                    openEmojipack
+                    openEmojipack,
+                    openImageViewer
                 }
             }, [openDraft, openReply, openReroute, openMobileMenu, allKnownStreams])}
         >
@@ -475,6 +483,12 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                         </Box>
                     </Paper>
                 </Modal>
+                <ImagePreviewModal
+                    src={previewImage}
+                    onClose={() => {
+                        setPreviewImage(undefined)
+                    }}
+                />
                 <Drawer
                     anchor={'left'}
                     open={mobileMenuOpen}
