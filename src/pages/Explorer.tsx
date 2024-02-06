@@ -165,6 +165,9 @@ export function Explorer(): JSX.Element {
                                     ? '2px solid ' + theme.palette.primary.main
                                     : 'none'
                             }}
+                            onClick={() => {
+                                setSelectedDomains([e])
+                            }}
                         >
                             <Typography variant="h4" gutterBottom>
                                 {e}
