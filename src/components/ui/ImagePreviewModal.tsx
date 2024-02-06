@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Modal } from '@mui/material'
+import { Box, Button, CircularProgress, Modal, useMediaQuery, useTheme } from '@mui/material'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { TransformWrapper, TransformComponent, type ReactZoomPanPinchRef } from 'react-zoom-pan-pinch'
 
@@ -7,10 +7,13 @@ export interface ImagePreviewModalProps {
     onClose: () => void
 }
 
-const padding = 80
 const zoomFactor = 8
 
 export const ImagePreviewModal = (props: ImagePreviewModalProps): JSX.Element => {
+    const theme = useTheme()
+    const isMobileSize = useMediaQuery(theme.breakpoints.down('sm'))
+    const padding = isMobileSize ? 20 : 100
+
     const [container, setContainer] = useState<HTMLDivElement | null>(null)
 
     const [containerWidth, setContainerWidth] = useState<number>(0)
