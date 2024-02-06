@@ -288,6 +288,32 @@ export function MarkdownRenderer(props: MarkdownRendererProps): JSX.Element {
                                 </LinkChip>
                             )
                         }
+                        const matchYoutubeVideo = href?.match(/https:\/\/www\.youtube\.com\/watch\?v=(\w+)$/)
+                        if (matchYoutubeVideo) {
+                            return (
+                                <Box
+                                    sx={{
+                                        aspectRatio: '16 / 9',
+                                        overflow: 'hidden',
+                                        width: '100%',
+                                        borderRadius: 1,
+                                        maxWidth: '500px'
+                                    }}
+                                >
+                                    <iframe
+                                        allowFullScreen
+                                        src={`https://www.youtube.com/embed/${matchYoutubeVideo[1]}`}
+                                        title="YouTube video player"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            border: 'none'
+                                        }}
+                                    />
+                                </Box>
+                            )
+                        }
                         return (
                             <Link href={href} target="_blank" color="secondary" underline="hover">
                                 {children}
