@@ -9,14 +9,22 @@ import { Box, Link } from '@mui/material'
 import { useMemo } from 'react'
 
 import { Link as RouterLink } from 'react-router-dom'
+import { useApi } from '../../context/api'
+import { CCUserIcon } from '../ui/CCUserIcon'
 
 export interface PostedStreamsProps {
     message: Message<SimpleNoteSchema | ReplyMessageSchema | RerouteMessageSchema>
 }
 
 export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
-    const postedCommonStreams = useMemo(
-        () => props.message.postedStreams?.filter((stream) => stream.schema === Schemas.commonstream) ?? [],
+    const client = useApi()
+    const postedStreams = useMemo(
+        () =>
+            props.message.postedStreams?.filter(
+                (stream) =>
+                    (stream.schema === Schemas.commonstream && (stream.author === client.ccid || stream.visible)) ||
+                    stream.schema === Schemas.utilitystream
+            ) ?? [],
         [props.message]
     )
 
@@ -30,22 +38,39 @@ export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
                 ml: 'auto'
             }}
         >
-            {postedCommonStreams.map((e) => (
-                <Link
-                    key={e.id}
-                    component={RouterLink}
-                    to={'/stream#' + e.id}
-                    underline="hover"
-                    sx={{
-                        fontweight: '400',
-                        fontSize: '12px',
-                        color: 'text.secondary',
-                        borderColor: 'divider'
-                    }}
-                >
-                    %{e.payload.shortname}
-                </Link>
-            ))}
+            {postedStreams.map((e) => {
+                switch (e.schema) {
+                    case Schemas.commonstream:
+                        return (
+                            <Link
+                                key={e.id}
+                                component={RouterLink}
+                                to={'/stream#' + e.id}
+                                underline="hover"
+                                sx={{
+                                    fontweight: '400',
+                                    fontSize: '12px',
+                                    color: 'text.secondary',
+                                    borderColor: 'divider'
+                                }}
+                            >
+                                %{e.payload.shortname}
+                            </Link>
+                        )
+                    case Schemas.utilitystream:
+                        return (
+                            <CCUserIcon
+                                sx={{
+                                    height: '1rem',
+                                    width: '1rem'
+                                }}
+                                ccid={e.author}
+                            />
+                        )
+                    default:
+                        return null
+                }
+            })}
         </Box>
     )
 }
