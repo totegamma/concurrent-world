@@ -22,8 +22,8 @@ export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
         () =>
             props.message.postedStreams?.filter(
                 (stream) =>
-                    (stream.schema === Schemas.commonstream || stream.schema === Schemas.utilitystream) &&
-                    (stream.author === client.ccid || stream.visible)
+                    (stream.schema === Schemas.commonstream && (stream.author === client.ccid || stream.visible)) ||
+                    stream.schema === Schemas.utilitystream
             ) ?? [],
         [props.message]
     )
