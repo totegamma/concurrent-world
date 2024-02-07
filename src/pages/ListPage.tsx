@@ -53,8 +53,12 @@ export function ListPage(): JSX.Element {
     }, [tab])
 
     const streamIDs = useMemo(() => {
-        return [...(lists[id]?.streams ?? []), lists[id]?.userStreams.map((e) => e.streamID) ?? []].flat()
-    }, [id, lists])
+        return [
+            client?.user?.userstreams?.payload.body.homeStream ?? [],
+            ...(lists[id]?.streams ?? []),
+            lists[id]?.userStreams.map((e) => e.streamID) ?? []
+        ].flat()
+    }, [id, lists, client?.user?.userstreams?.payload.body.homeStream])
 
     if (!lists[id]) {
         return (
