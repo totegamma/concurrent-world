@@ -9,14 +9,19 @@ import { Box, Link } from '@mui/material'
 import { useMemo } from 'react'
 
 import { Link as RouterLink } from 'react-router-dom'
+import { useApi } from '../../context/api'
 
 export interface PostedStreamsProps {
     message: Message<SimpleNoteSchema | ReplyMessageSchema | RerouteMessageSchema>
 }
 
 export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
+    const client = useApi()
     const postedCommonStreams = useMemo(
-        () => props.message.postedStreams?.filter((stream) => stream.schema === Schemas.commonstream) ?? [],
+        () =>
+            props.message.postedStreams?.filter(
+                (stream) => stream.schema === Schemas.commonstream && (stream.author === client.ccid || stream.visible)
+            ) ?? [],
         [props.message]
     )
 
