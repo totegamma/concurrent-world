@@ -35,7 +35,7 @@ export function AccountImport(): JSX.Element {
     }
 
     const [secretInput, setSecretInput] = useState<string>('')
-    const [showSecret, setShowSecret] = useState<boolean>(false)
+    const [showSecret, setShowSecret] = useState<boolean>(true)
     const [domainInput, setDomainInput] = useState<string>('')
 
     const [suggestFailed, setSuggestFailed] = useState<boolean>(false)
@@ -218,6 +218,9 @@ export function AccountImport(): JSX.Element {
                             setSecretInput(e.target.value)
                         }}
                         disabled={!!properKey}
+                        onPaste={() => {
+                            setShowSecret(false)
+                        }}
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position="end">
