@@ -14,9 +14,11 @@ import InfoIcon from '@mui/icons-material/Info'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import WatchingStreamContextProvider from '../context/WatchingStreamContext'
 import { type VListHandle } from 'virtua'
+import { useGlobalActions } from '../context/GlobalActions'
 
 export const StreamPage = memo((): JSX.Element => {
     const client = useApi()
+    const actions = useGlobalActions()
     const appData = useContext(ApplicationContext)
 
     const [showEditorOnTop] = usePreference('showEditorOnTop')
@@ -104,7 +106,7 @@ export const StreamPage = memo((): JSX.Element => {
                                     >
                                         <Draft
                                             streamPickerInitial={streams}
-                                            streamPickerOptions={streams}
+                                            streamPickerOptions={[...new Set([...actions.allKnownStreams, ...streams])]}
                                             onSubmit={async (
                                                 text: string,
                                                 destinations: string[],
