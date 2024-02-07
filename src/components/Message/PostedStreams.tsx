@@ -5,14 +5,16 @@ import {
     type SimpleNoteSchema,
     type RerouteMessageSchema
 } from '@concurrent-world/client'
-import { Box, Link } from '@mui/material'
+import { Box, Link, Tooltip } from '@mui/material'
 import { useMemo } from 'react'
 
 import { Link as RouterLink } from 'react-router-dom'
 import { useApi } from '../../context/api'
 import { CCUserIcon } from '../ui/CCUserIcon'
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'
 
 export interface PostedStreamsProps {
+    useUserIcon?: boolean
     message: Message<SimpleNoteSchema | ReplyMessageSchema | RerouteMessageSchema>
 }
 
@@ -58,7 +60,7 @@ export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
                             </Link>
                         )
                     case Schemas.utilitystream:
-                        return (
+                        return props.useUserIcon ? (
                             <CCUserIcon
                                 sx={{
                                     height: '1rem',
@@ -66,6 +68,28 @@ export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
                                 }}
                                 ccid={e.author}
                             />
+                        ) : (
+                            <Tooltip
+                                arrow
+                                placement="top"
+                                title={
+                                    <CCUserIcon
+                                        sx={{
+                                            height: '1rem',
+                                            width: '1rem'
+                                        }}
+                                        ccid={e.author}
+                                    />
+                                }
+                            >
+                                <HomeOutlinedIcon
+                                    sx={{
+                                        height: '1rem',
+                                        width: '1rem',
+                                        color: 'text.secondary'
+                                    }}
+                                />
+                            </Tooltip>
                         )
                     default:
                         return null

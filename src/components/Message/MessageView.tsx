@@ -37,8 +37,14 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
 
     const reroutedsame = useMemo(() => {
         if (!props.rerouted) return false
-        const A = props.rerouted.postedStreams?.filter((stream) => stream.schema === Schemas.commonstream) ?? []
-        const B = props.message.postedStreams?.filter((stream) => stream.schema === Schemas.commonstream) ?? []
+        const A =
+            props.rerouted.postedStreams?.filter(
+                (stream) => stream.schema === Schemas.commonstream || stream.schema === Schemas.utilitystream
+            ) ?? []
+        const B =
+            props.message.postedStreams?.filter(
+                (stream) => stream.schema === Schemas.commonstream || stream.schema === Schemas.utilitystream
+            ) ?? []
         if (A.length !== B.length) return false
         const Aids = A.map((e) => e.id).sort()
         const Bids = B.map((e) => e.id).sort()
@@ -102,14 +108,14 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                         }}
                     >
                         <Box display="flex" flexDirection="row" alignItems="center">
-                            <PostedStreams message={props.message} />
+                            <PostedStreams useUserIcon={!!props.rerouted} message={props.message} />
                             {props.rerouted &&
                                 (reroutedsame ? (
                                     <ReplayIcon sx={{ color: 'text.secondary', fontSize: '90%' }} />
                                 ) : (
                                     <>
                                         <ArrowForwardIcon sx={{ color: 'text.secondary', fontSize: '90%' }} />
-                                        <PostedStreams message={props.rerouted} />
+                                        <PostedStreams useUserIcon message={props.rerouted} />
                                     </>
                                 ))}
                         </Box>
