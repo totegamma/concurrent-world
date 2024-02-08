@@ -12,6 +12,7 @@ import { Link as RouterLink } from 'react-router-dom'
 import { useApi } from '../../context/api'
 import { CCUserIcon } from '../ui/CCUserIcon'
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 
 export interface PostedStreamsProps {
     useUserIcon?: boolean
@@ -40,6 +41,15 @@ export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
                 ml: 'auto'
             }}
         >
+            {postedStreams.length === 0 && (
+                <HelpOutlineIcon
+                    sx={{
+                        height: '1rem',
+                        width: '1rem',
+                        color: 'text.secondary'
+                    }}
+                />
+            )}
             {postedStreams.map((e) => {
                 switch (e.schema) {
                     case Schemas.commonstream:
