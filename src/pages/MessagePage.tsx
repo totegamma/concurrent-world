@@ -156,6 +156,7 @@ export function MessagePage(): JSX.Element {
                 }}
                 textColor="secondary"
                 indicatorColor="secondary"
+                variant="scrollable"
             >
                 <Tab value="replies" label="Replies" />
                 <Tab value="reroutes" label="Reroutes" />
