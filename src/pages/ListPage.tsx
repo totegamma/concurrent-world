@@ -114,6 +114,8 @@ export function ListPage(): JSX.Element {
                     }}
                     textColor="secondary"
                     indicatorColor="secondary"
+                    variant="scrollable"
+                    scrollButtons={false}
                 >
                     {Object.keys(lists)
                         .filter((e) => lists[e].pinned)
