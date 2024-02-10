@@ -1,4 +1,4 @@
-import { Box, Divider, List, Paper, Tab, Tabs, Typography } from '@mui/material'
+import { Box, Divider, List, Paper, Tab, Tabs, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { useParams } from 'react-router-dom'
 import { useApi } from '../context/api'
 import { useEffect, useState } from 'react'
@@ -40,6 +40,8 @@ export function MessagePage(): JSX.Element {
     const [replyTo, setReplyTo] = useState<Message<ReplyMessageSchema> | null>(null)
 
     const tab = (location.hash.slice(1) as 'replies' | 'reroutes' | 'favorites' | 'reactions') || 'replies'
+    const theme = useTheme()
+    const isMobileSize = useMediaQuery(theme.breakpoints.down('sm'))
 
     useEffect(() => {
         setMessage(null)
@@ -156,11 +158,28 @@ export function MessagePage(): JSX.Element {
                 }}
                 textColor="secondary"
                 indicatorColor="secondary"
+                variant={isMobileSize ? 'fullWidth' : 'standard'}
             >
-                <Tab value="replies" label="Replies" />
-                <Tab value="reroutes" label="Reroutes" />
-                <Tab value="favorites" label="Favorites" />
-                <Tab value="reactions" label="Reactions" />
+                <Tab
+                    value="replies"
+                    label="Replies"
+                    sx={{ fontSize: '0.9rem', padding: '0', textTransform: 'none', minWidth: { xs: '0', sm: '80px' } }}
+                />
+                <Tab
+                    value="reroutes"
+                    label="Reroutes"
+                    sx={{ fontSize: '0.9rem', padding: '0', textTransform: 'none', minWidth: { xs: '0', sm: '80px' } }}
+                />
+                <Tab
+                    value="favorites"
+                    label="Favorites"
+                    sx={{ fontSize: '0.9rem', padding: '0', textTransform: 'none', minWidth: { xs: '0', sm: '80px' } }}
+                />
+                <Tab
+                    value="reactions"
+                    label="Reactions"
+                    sx={{ fontSize: '0.9rem', padding: '0', textTransform: 'none', minWidth: { xs: '0', sm: '80px' } }}
+                />
             </Tabs>
             <Divider />
             {tab === 'replies' && (
