@@ -130,6 +130,7 @@ export function ListPage(): JSX.Element {
                                         timelineRef.current?.scrollToIndex(0, { align: 'start', smooth: true })
                                     }
                                 }}
+                                sx={{ fontSize: '0.9rem', padding: '0', textTransform: 'none' }}
                             />
                         ))}
                 </Tabs>
