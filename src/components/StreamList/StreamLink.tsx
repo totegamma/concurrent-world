@@ -1,7 +1,7 @@
 import { ListItemButton, type SxProps } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
-import { type User, type Stream, CommonstreamSchema } from '@concurrent-world/client'
+import { type User, type Stream, type CommonstreamSchema } from '@concurrent-world/client'
 import { useApi } from '../../context/api'
 import PercentIcon from '@mui/icons-material/Percent'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
@@ -25,7 +25,7 @@ export const StreamLink = (props: StreamLinkProps): JSX.Element | null => {
 
     if (!stream) {
         return (
-            <ListItemButton dense disabled component={RouterLink} to={`/stream#${props.streamID}`} sx={props.sx}>
+            <ListItemButton dense disabled component={RouterLink} to={`/stream/${props.streamID}`} sx={props.sx}>
                 <PercentIcon />
                 offline
             </ListItemButton>
@@ -36,7 +36,7 @@ export const StreamLink = (props: StreamLinkProps): JSX.Element | null => {
         <ListItemButton
             dense
             component={RouterLink}
-            to={`/stream#${props.streamID}`}
+            to={`/stream/${props.streamID}`}
             sx={props.sx}
             onClick={props.onClick}
         >

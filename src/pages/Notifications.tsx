@@ -1,12 +1,17 @@
 import { Box, Divider, Typography } from '@mui/material'
-import { useContext } from 'react'
-import { ApplicationContext } from '../App'
+import { useMemo } from 'react'
 import { Timeline } from '../components/Timeline'
 import { useTranslation } from 'react-i18next'
+import { useApi } from '../context/api'
 
 export function Notifications(): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'pages.notifications' })
-    const appData = useContext(ApplicationContext)
+    const client = useApi()
+
+    const streams = useMemo(() => {
+        const target = client.user?.userstreams?.payload.body.notificationStream
+        return target ? [target] : []
+    }, [client])
 
     return (
         <Box
@@ -28,8 +33,7 @@ export function Notifications(): JSX.Element {
                 </Typography>
                 <Divider />
             </Box>
-
-            <Timeline streams={appData.displayingStream} />
+            <Timeline streams={streams} />
         </Box>
     )
 }
