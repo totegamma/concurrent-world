@@ -1,5 +1,5 @@
 import { useEffect, useState, createContext, useRef, useMemo, useCallback } from 'react'
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider, CssBaseline, Typography, useMediaQuery } from '@mui/material'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 
@@ -44,13 +44,11 @@ import { StorageProvider } from './context/StorageContext'
 import { MarkdownRendererLite } from './components/ui/MarkdownRendererLite'
 
 export const ApplicationContext = createContext<appData>({
-    displayingStream: [],
     acklist: [],
     updateAcklist: () => {}
 })
 
 export interface appData {
-    displayingStream: string[]
     acklist: User[]
     updateAcklist: () => void
 }
@@ -58,7 +56,6 @@ export interface appData {
 function App(): JSX.Element {
     const client = useApi()
     const [themeName] = usePreference('themeName')
-    const [lists] = usePreference('lists')
     const [sound] = usePreference('sound')
     const [customThemes] = usePreference('customThemes')
 
@@ -206,36 +203,6 @@ function App(): JSX.Element {
         })
     }, [client])
 
-    const path = useLocation()
-    const displayingStream: string[] = useMemo(() => {
-        switch (path.pathname) {
-            case '/': {
-                const rawid = path.hash.replace('#', '')
-                const list = lists[rawid] ?? Object.values(lists)[0]
-                if (!list) return []
-                console.log(list)
-                return [...list.streams, list.userStreams.map((e) => e.streamID)].flat()
-            }
-            case '/stream':
-            case '/stream/': {
-                return path.hash.replace('#', '').split(',')
-            }
-            case '/notifications': {
-                const notifications = client?.user?.userstreams?.payload.body.notificationStream
-                if (!notifications) return []
-                return [notifications]
-            }
-            case '/associations': {
-                const associations = client?.user?.userstreams?.payload.body.associationStream
-                if (!associations) return []
-                return [associations]
-            }
-            default: {
-                return []
-            }
-        }
-    }, [client, path])
-
     const [playNotification] = useSound(sound.notification, { volume: sound.volume / 100 })
     const playNotificationRef = useRef(playNotification)
     useEffect(() => {
@@ -256,11 +223,10 @@ function App(): JSX.Element {
 
     const applicationContext = useMemo(() => {
         return {
-            displayingStream,
             acklist,
             updateAcklist
         }
-    }, [displayingStream, acklist, updateAcklist])
+    }, [acklist, updateAcklist])
 
     if (!client) {
         return <>building api service...</>
@@ -362,7 +328,7 @@ function App(): JSX.Element {
                         >
                             <Routes>
                                 <Route index element={<ListPage />} />
-                                <Route path="/stream" element={<StreamPage />} />
+                                <Route path="/stream/:id" element={<StreamPage />} />
                                 <Route path="/associations" element={<Associations />} />
                                 <Route path="/contacts" element={<ContactsPage />} />
                                 <Route path="/explorer" element={<Explorer />} />

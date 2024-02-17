@@ -40,12 +40,11 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
         switch (props.page) {
             case 'stream':
                 {
-                    const query = reactlocation.hash.replace('#', '')
-                    setTargetStream([query])
-                    const resolver = query.split('@')[1]
+                    setTargetStream([id])
+                    const resolver = id.split('@')[1]
                     const client = new Client(resolver)
 
-                    client.api.getStream(query).then((e) => {
+                    client.api.getStream(id).then((e) => {
                         console.log(e)
                         setTitle(e?.payload.name ?? '')
                     })

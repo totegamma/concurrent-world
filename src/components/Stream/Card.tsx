@@ -16,7 +16,7 @@ interface StreamCardProps {
 export function StreamCard(props: StreamCardProps): JSX.Element {
     return (
         <Card>
-            <CardActionArea component={Link} to={'/stream#' + props.streamID}>
+            <CardActionArea component={Link} to={'/stream/' + props.streamID}>
                 <CardMedia component="img" height="140" image={props.banner || Background} />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
