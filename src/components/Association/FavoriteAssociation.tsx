@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react'
 
 export interface FavoriteAssociationProps {
     association: Association<LikeSchema>
-    perspective: string
+    perspective?: string
     withoutContent?: boolean
 }
 

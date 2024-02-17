@@ -12,8 +12,8 @@ dependencies:
     specifier: ^3.445.0
     version: 3.445.0
   '@concurrent-world/client':
-    specifier: ^4.1.7
-    version: 4.1.7
+    specifier: ^4.2.0
+    version: 4.2.0
   '@emotion/react':
     specifier: ^11.10.5
     version: 11.10.5(@babel/core@7.21.8)(@types/react@18.0.26)(react@18.2.0)
@@ -2284,8 +2284,8 @@ packages:
     dev: true
     optional: true
 
-  /@concurrent-world/client@4.1.7:
-    resolution: {integrity: sha512-RxwRhTWomx0MbraVh0I8cfiruk9KWOjDmGe+QViXPvPPsxteTGlPown+sszuwcf6fXmZ4T18QSRmi1725gw3dg==}
+  /@concurrent-world/client@4.2.0:
+    resolution: {integrity: sha512-dJAMfD/nAUiuzvEvI7NY0npQ3/PbgFGlsVqEbHn8hfxbFl8qZTR+YhvAT24iKcgOyTabCK02wX9vUYwR3qLzOw==}
     dependencies:
       elliptic: 6.5.4
       ethers: 6.11.1

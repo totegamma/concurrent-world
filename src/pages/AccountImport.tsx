@@ -8,7 +8,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { HDNodeWallet, LangEn } from 'ethers'
 import { LangJa } from '../utils/lang-ja'
-import { Client, LoadKey, CommputeCCID, IsValid256k1PrivateKey } from '@concurrent-world/client'
+import { Client, LoadKey, ComputeCCID, IsValid256k1PrivateKey } from '@concurrent-world/client'
 import type { ConcurrentTheme } from '../model'
 import { usePersistent } from '../hooks/usePersistent'
 import { Themes, loadConcurrentTheme } from '../themes'
@@ -80,7 +80,7 @@ export function AccountImport(): JSX.Element {
 
     const primaryCCID = useMemo(() => {
         if (!primaryKey) return
-        return CommputeCCID(primaryKey)
+        return ComputeCCID(primaryKey)
     }, [primaryKey])
 
     const legacyKey = useMemo(() => {
@@ -98,12 +98,12 @@ export function AccountImport(): JSX.Element {
 
     const legacyCCID = useMemo(() => {
         if (!legacyKey) return
-        return CommputeCCID(legacyKey)
+        return ComputeCCID(legacyKey)
     }, [legacyKey])
 
     const properCCID = useMemo(() => {
         if (!properKey) return
-        return CommputeCCID(properKey)
+        return ComputeCCID(properKey)
     }, [properKey])
 
     // suggest
@@ -111,12 +111,14 @@ export function AccountImport(): JSX.Element {
         if (!primaryKey || !primaryCCID) return
 
         const searchTarget = domainInput || 'hub.concurrent.world'
+        const keyPair = LoadKey(primaryKey)
+        if (!keyPair) return
 
         const timer = setTimeout(() => {
             setDomain('')
             setProperKey('')
             try {
-                const client = new Client(primaryKey, searchTarget, 'stab-client')
+                const client = new Client(searchTarget, keyPair, primaryCCID)
                 client.api
                     .resolveAddress(primaryCCID)
                     .then((address) => {

@@ -47,7 +47,7 @@ export const StreamPage = memo((): JSX.Element => {
                     setWriteable(true)
                 } else if (stream.writer.length === 0) {
                     setWriteable(true)
-                } else if (stream.writer.includes(client.ccid)) {
+                } else if (stream.writer.includes(client.ccid ?? '')) {
                     setWriteable(true)
                 }
             })

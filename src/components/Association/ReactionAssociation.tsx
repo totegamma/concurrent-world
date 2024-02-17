@@ -15,7 +15,7 @@ import { MarkdownRendererLite } from '../ui/MarkdownRendererLite'
 
 export interface ReactionAssociationProps {
     association: Association<EmojiAssociationSchema>
-    perspective: string
+    perspective?: string
     withoutContent?: boolean
 }
 

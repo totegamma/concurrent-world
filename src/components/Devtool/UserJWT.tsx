@@ -11,7 +11,8 @@ export const UserJWT = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
     const [subject, setSubject] = useState<string>('')
 
     const issueJwt = (): void => {
-        setIssuedJwt(IssueJWT(client?.keyPair.privatekey, { iss: client?.ccid, aud: audience, sub: subject }))
+        if (!client?.keyPair?.privatekey) return
+        setIssuedJwt(IssueJWT(client.keyPair.privatekey, { iss: client?.ccid, aud: audience, sub: subject }))
     }
 
     return (
