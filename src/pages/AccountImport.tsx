@@ -127,7 +127,11 @@ export function AccountImport(): JSX.Element {
                         }
                     })
                     .catch((_) => {
-                        if (!legacyKey || !legacyCCID) return
+                        if (!legacyKey || !legacyCCID) {
+                            setSuggestFailed(true)
+                            setErrorMessage(t('notFound'))
+                            return
+                        }
                         client.api
                             .resolveAddress(legacyCCID)
                             .then((address) => {
