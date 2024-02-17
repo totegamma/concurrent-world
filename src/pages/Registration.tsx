@@ -16,7 +16,8 @@ import {
     type CoreCharacter,
     type CoreDomain,
     type ProfileSchema,
-    type DomainProfileSchema
+    type DomainProfileSchema,
+    LoadKey
 } from '@concurrent-world/client'
 import { RegistrationWelcome } from '../components/Registration/Welcome'
 import { YourID } from '../components/Registration/YourID'
@@ -70,7 +71,9 @@ export function Registration(): JSX.Element {
     useEffect(() => {
         if (!host) return
         setDomain(host.fqdn)
-        const api = new Client(identity.privateKey, host.fqdn)
+        const keyPair = LoadKey(identity.privateKey)
+        if (!keyPair) return
+        const api = new Client(host.fqdn, keyPair, identity.CCID)
         initializeClient(api)
     }, [host])
 

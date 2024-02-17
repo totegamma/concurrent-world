@@ -43,12 +43,7 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
                     const query = reactlocation.hash.replace('#', '')
                     setTargetStream([query])
                     const resolver = query.split('@')[1]
-                    // well-known guest
-                    // らたい すいか きけんせい うつる てんない にいがた れきだい つながる あたためる みいら よゆう えもの
-                    const client = new Client(
-                        '8c215bedacf0888470fd2567d03a813f4ae926be4a2cd587979809b629d70592',
-                        resolver
-                    )
+                    const client = new Client(resolver)
 
                     client.api.getStream(query).then((e) => {
                         console.log(e)
@@ -61,10 +56,7 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
                 break
             case 'entity':
                 {
-                    const client = new Client(
-                        '8c215bedacf0888470fd2567d03a813f4ae926be4a2cd587979809b629d70592',
-                        'hub.concurrent.world'
-                    )
+                    const client = new Client('hub.concurrent.world')
                     client.getUser(id).then((e) => {
                         setUser(e)
                         setTitle(e?.profile?.payload.body.username ?? '')
@@ -76,10 +68,7 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
                 break
             case 'message':
                 {
-                    const client = new Client(
-                        '8c215bedacf0888470fd2567d03a813f4ae926be4a2cd587979809b629d70592',
-                        'hub.concurrent.world'
-                    )
+                    const client = new Client('hub.concurrent.world')
                     initializeClient(client)
 
                     const authorID = id.split('@')[1]

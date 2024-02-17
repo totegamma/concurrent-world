@@ -193,6 +193,7 @@ export const GeneralSettings = (): JSX.Element => {
                                 if (client.api.host === undefined) {
                                     return
                                 }
+                                if (!client?.keyPair?.privatekey) return
                                 const jwt = IssueJWT(client.keyPair.privatekey, {
                                     iss: client.ccid,
                                     aud: client.host,

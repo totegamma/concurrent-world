@@ -6,7 +6,7 @@ export interface CCAvatarProps {
     alt?: string
     avatarURL?: string
     avatarOverride?: string
-    identiconSource: string
+    identiconSource?: string
 }
 
 export const CCAvatar = (props: CCAvatarProps): JSX.Element => {
