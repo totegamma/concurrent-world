@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { useApi } from '../../context/api'
 import { type ApEntity } from '../../model'
 import { Box, Button, TextField, Typography, alpha, useTheme } from '@mui/material'
-import Background from '../../resources/defaultbg.png'
 import { CCAvatar } from '../ui/CCAvatar'
 import { useSnackbar } from 'notistack'
+import { CCWallpaper } from '../ui/CCWallpaper'
 
 export const ApProfileEditor = (props: { entity: ApEntity }): JSX.Element => {
     const client = useApi()
@@ -65,15 +65,12 @@ export const ApProfileEditor = (props: { entity: ApEntity }): JSX.Element => {
     }, [props.entity])
 
     return (
-        <Box
-            sx={{
+        <CCWallpaper
+            innerSx={{
                 display: 'flex',
                 flexDirection: 'row',
-                gap: '15px',
-                backgroundImage: `url(${Background})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                padding: '15px'
+                gap: 2,
+                padding: 2
             }}
         >
             <CCAvatar
@@ -132,6 +129,6 @@ export const ApProfileEditor = (props: { entity: ApEntity }): JSX.Element => {
                     更新
                 </Button>
             </Box>
-        </Box>
+        </CCWallpaper>
     )
 }

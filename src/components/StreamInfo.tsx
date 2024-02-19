@@ -2,10 +2,10 @@ import { Box, Button, Divider, FormControlLabel, FormGroup, Paper, Switch, TextF
 import { useCallback, useEffect, useState } from 'react'
 import { useApi } from '../context/api'
 import { type CommonstreamSchema, type CoreStream } from '@concurrent-world/client'
-import Background from '../resources/defaultbg.png'
 import { CCEditor } from './ui/cceditor'
 import { useSnackbar } from 'notistack'
 import { AddListButton } from './AddListButton'
+import { CCWallpaper } from './ui/CCWallpaper'
 
 export interface StreamInfoProps {
     id: string
@@ -63,17 +63,20 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
 
     return (
         <>
-            <Box
+            <CCWallpaper
+                override={stream.payload.banner}
                 sx={{
-                    padding: '20px',
+                    height: '150px'
+                }}
+                innerSx={{
                     display: 'flex',
-                    backgroundImage: `url(${stream.payload.banner || Background})`,
-                    backgroundPosition: 'center',
-                    objectFit: 'cover',
-                    gap: '10px'
+                    padding: 2,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 1
                 }}
             >
-                <Paper sx={{ flex: 2, padding: '20px' }}>
+                <Paper sx={{ flex: 2, padding: 2 }}>
                     <Box
                         sx={{
                             display: 'flex',
@@ -89,7 +92,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                     <Divider />
                     <Typography>{stream.payload.description || 'まだ説明はありません'}</Typography>
                 </Paper>
-            </Box>
+            </CCWallpaper>
             {isAuthor && (
                 <Box
                     sx={{

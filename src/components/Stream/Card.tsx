@@ -1,8 +1,8 @@
-import { Card, CardActionArea, CardActions, CardContent, CardMedia, Typography } from '@mui/material'
+import { Card, CardActionArea, CardActions, CardContent, Typography } from '@mui/material'
 import { AddListButton } from '../AddListButton'
 import { Link } from 'react-router-dom'
 
-import Background from '../../resources/defaultbg.png'
+import { CCWallpaper } from '../ui/CCWallpaper'
 
 interface StreamCardProps {
     streamID: string
@@ -17,7 +17,12 @@ export function StreamCard(props: StreamCardProps): JSX.Element {
     return (
         <Card>
             <CardActionArea component={Link} to={'/stream#' + props.streamID}>
-                <CardMedia component="img" height="140" image={props.banner || Background} />
+                <CCWallpaper
+                    sx={{
+                        height: '140px'
+                    }}
+                    override={props.banner}
+                />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
                         {props.name}

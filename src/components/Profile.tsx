@@ -7,12 +7,12 @@ import { MarkdownRenderer } from '../components/ui/MarkdownRenderer'
 
 import { Link as NavLink } from 'react-router-dom'
 
-import Background from '../resources/defaultbg.png'
 import { useEffect, useState } from 'react'
 import { type User } from '@concurrent-world/client'
 import { useApi } from '../context/api'
 import { CCDrawer } from './ui/CCDrawer'
 import { AckList } from '../components/AckList'
+import { CCWallpaper } from './ui/CCWallpaper'
 
 export interface ProfileProps {
     user: User
@@ -50,14 +50,31 @@ export function Profile(props: ProfileProps): JSX.Element {
 
     return (
         <>
+            {/*
             <Box
                 sx={{
-                    backgroundImage: `url(${props.user.profile?.payload.body.banner || Background})`,
-                    backgroundPosition: 'center',
-                    backgroundSize: 'cover',
+                    backgroundColor: theme.palette.primary.main,
+                    height: '150px',
+                }}
+            >
+                <Box
+                    sx={{
+                        backgroundImage: `url(${props.user.profile?.payload.body.banner || Wallpaper})`,
+                        backgroundPosition: 'center',
+                        backgroundSize: 'cover',
+                        mixBlendMode: props.user.profile?.payload.body.banner ? 'normal' : 'hard-light',
+                        width: '100%',
+                        height: '100%',
+                    }}
+                />
+            </Box>
+            */}
+            <CCWallpaper
+                override={props.user.profile?.payload.body.banner}
+                sx={{
                     height: '150px'
                 }}
-            ></Box>
+            />
             <Box
                 sx={{
                     display: 'flex',

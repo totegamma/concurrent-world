@@ -7,7 +7,7 @@ import { FollowButton } from './FollowButton'
 import { useSnackbar } from 'notistack'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import { MarkdownRenderer } from './ui/MarkdownRenderer'
-import Background from '../resources/defaultbg.png'
+import { CCWallpaper } from './ui/CCWallpaper'
 
 export interface UserProfileCardProps {
     user: User | undefined
@@ -22,13 +22,11 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
 
     return (
         <Box display="flex" flexDirection="column" maxWidth="500px">
-            <Box
+            <CCWallpaper
                 sx={{
-                    backgroundImage: `url(${props.user.profile?.payload.body.banner || Background})`,
-                    backgroundPosition: 'center',
-                    backgroundSize: 'cover',
                     height: '80px'
                 }}
+                override={props.user.profile?.payload.body.banner}
             />
             <Box position="relative" height={0}>
                 <Box
