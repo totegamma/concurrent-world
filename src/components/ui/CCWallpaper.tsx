@@ -13,15 +13,25 @@ export const CCWallpaper = (props: CCWallpaperProps): JSX.Element => {
         <Box
             sx={{
                 backgroundColor: 'primary.main',
+                position: 'relative',
                 ...props.sx
             }}
         >
             <Box
                 sx={{
+                    position: 'absolute',
                     backgroundImage: `url(${props.override || Wallpaper})`,
                     backgroundPosition: 'center',
                     backgroundSize: 'cover',
                     mixBlendMode: props.override ? 'normal' : 'hard-light',
+                    width: '100%',
+                    height: '100%'
+                }}
+            ></Box>
+            <Box
+                sx={{
+                    position: 'relative',
+                    zIndex: 1,
                     width: '100%',
                     height: '100%',
                     ...props.innerSx
