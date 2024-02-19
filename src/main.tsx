@@ -17,15 +17,33 @@ const Welcome = lazy(() => import('./pages/Welcome'))
 
 let domain = ''
 let prvkey = ''
+let subkey = ''
 
 try {
     domain = JSON.parse(localStorage.getItem('Domain') || '')
+} catch (e) {
+    console.log(e)
+}
+
+console.log('domain', domain)
+
+try {
     prvkey = JSON.parse(localStorage.getItem('PrivateKey') || '')
 } catch (e) {
     console.log(e)
 }
 
-const logined = domain !== '' && prvkey !== ''
+console.log('prvkey', prvkey)
+
+try {
+    subkey = JSON.parse(localStorage.getItem('SubKey') || '')
+} catch (e) {
+    console.log(e)
+}
+
+console.log('subkey', subkey)
+
+const logined = domain !== '' && (prvkey !== '' || subkey !== '')
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <ErrorBoundary FallbackComponent={EmergencyKit}>
