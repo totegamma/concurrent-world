@@ -14,14 +14,33 @@ export const LoginGuard = (props: Props): JSX.Element => {
 
     if (domainStr === null || (prvkeyStr === null && subKeyStr === null)) redirect = true
 
+    let domain = ''
+    let prvkey = ''
+    let subkey = ''
+
     try {
-        const domain = JSON.parse(domainStr || '')
-        const prvkey = JSON.parse(prvkeyStr || '')
-        const subkey = JSON.parse(subKeyStr || '')
-        if (domain === '' || (prvkey === '' && subkey === '')) redirect = true
+        domain = JSON.parse(localStorage.getItem('Domain') || '')
     } catch (e) {
-        redirect = true
+        console.log(e)
     }
+
+    console.log('domain', domain)
+
+    try {
+        prvkey = JSON.parse(localStorage.getItem('PrivateKey') || '')
+    } catch (e) {
+        console.log(e)
+    }
+
+    console.log('prvkey', prvkey)
+
+    try {
+        subkey = JSON.parse(localStorage.getItem('SubKey') || '')
+    } catch (e) {
+        console.log(e)
+    }
+
+    if (domain === '' || (prvkey === '' && subkey === '')) redirect = true
 
     if (redirect) {
         return <Navigate to={props.redirect} state={{ from: useLocation() }} replace={true} />
