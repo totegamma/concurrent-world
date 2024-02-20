@@ -1,7 +1,5 @@
-import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
-import Paper from '@mui/material/Paper'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { useEffect, useMemo, useState } from 'react'
@@ -149,66 +147,55 @@ export function ImportMasterKey(): JSX.Element {
 
     return (
         <>
-            <Paper
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    width: '100%',
-                    padding: '20px',
-                    flex: 1,
-                    gap: '20px'
+            <Typography variant="h3">{t('input')}</Typography>
+            <TextField
+                type={showSecret ? 'text' : 'password'}
+                placeholder={t('secretPlaceholder')}
+                value={secretInput}
+                onChange={(e) => {
+                    setSecretInput(e.target.value)
                 }}
-            >
-                <Typography variant="h3">{t('input')}</Typography>
-                <TextField
-                    type={showSecret ? 'text' : 'password'}
-                    placeholder={t('secretPlaceholder')}
-                    value={secretInput}
-                    onChange={(e) => {
-                        setSecretInput(e.target.value)
-                    }}
-                    disabled={!!properKey}
-                    onPaste={() => {
-                        setShowSecret(false)
-                    }}
-                    InputProps={{
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                <IconButton
-                                    onClick={() => {
-                                        setShowSecret(!showSecret)
-                                    }}
-                                    color="primary"
-                                >
-                                    {properKey ? <CheckCircleIcon /> : showSecret ? <VisibilityOff /> : <Visibility />}
-                                </IconButton>
-                            </InputAdornment>
-                        )
-                    }}
-                />
-                {properCCID && (
-                    <Typography sx={{ wordBreak: 'break-all' }}>
-                        {t('welcome')}: {properCCID}
-                    </Typography>
-                )}
-                {suggestFailed && (
-                    <>
-                        <Divider sx={{ my: '30px' }} />
-                        <Typography variant="h3">{t('ドメイン')}</Typography>
-                        <TextField
-                            placeholder="https://example.tld/"
-                            value={domainInput}
-                            onChange={(e) => {
-                                setDomainInput(e.target.value)
-                            }}
-                        />
-                    </>
-                )}
-                {errorMessage}
-                <Button disabled={!properCCID} onClick={accountImport}>
-                    {t('import')}
-                </Button>
-            </Paper>
+                disabled={!!properKey}
+                onPaste={() => {
+                    setShowSecret(false)
+                }}
+                InputProps={{
+                    endAdornment: (
+                        <InputAdornment position="end">
+                            <IconButton
+                                onClick={() => {
+                                    setShowSecret(!showSecret)
+                                }}
+                                color="primary"
+                            >
+                                {properKey ? <CheckCircleIcon /> : showSecret ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                        </InputAdornment>
+                    )
+                }}
+            />
+            {properCCID && (
+                <Typography sx={{ wordBreak: 'break-all' }}>
+                    {t('welcome')}: {properCCID}
+                </Typography>
+            )}
+            {suggestFailed && (
+                <>
+                    <Divider sx={{ my: '30px' }} />
+                    <Typography variant="h3">{t('ドメイン')}</Typography>
+                    <TextField
+                        placeholder="https://example.tld/"
+                        value={domainInput}
+                        onChange={(e) => {
+                            setDomainInput(e.target.value)
+                        }}
+                    />
+                </>
+            )}
+            {errorMessage}
+            <Button disabled={!properCCID} onClick={accountImport}>
+                {t('import')}
+            </Button>
         </>
     )
 }

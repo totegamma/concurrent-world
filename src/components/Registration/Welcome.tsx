@@ -1,12 +1,10 @@
-import { Alert, AlertTitle, Box, Button, useTheme } from '@mui/material'
+import { Alert, AlertTitle, Box, Button } from '@mui/material'
 import Tilt from 'react-parallax-tilt'
 import { PassportRenderer } from '../theming/Passport'
-import { type ConcurrentTheme } from '../../model'
 import { type Identity } from '../../util'
 import { useTranslation } from 'react-i18next'
 
 export function RegistrationWelcome(props: { next: () => void; identity: Identity }): JSX.Element {
-    const theme = useTheme<ConcurrentTheme>()
     const { t } = useTranslation('', { keyPrefix: 'registration.welcome' })
     return (
         <>
@@ -23,15 +21,7 @@ export function RegistrationWelcome(props: { next: () => void; identity: Identit
                 }}
             >
                 <Tilt glareEnable={true} glareBorderRadius="5%">
-                    <PassportRenderer
-                        theme={theme}
-                        ccid={props.identity.CCID}
-                        name={''}
-                        avatar={''}
-                        host={''}
-                        cdate={''}
-                        trust={0}
-                    />
+                    <PassportRenderer ccid={props.identity.CCID} name={''} avatar={''} host={''} cdate={''} trust={0} />
                 </Tilt>
             </Box>
 

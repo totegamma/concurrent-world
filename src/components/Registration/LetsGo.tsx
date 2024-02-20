@@ -1,7 +1,6 @@
-import { Box, Button, useTheme } from '@mui/material'
+import { Box, Button } from '@mui/material'
 import Tilt from 'react-parallax-tilt'
 import { PassportRenderer } from '../theming/Passport'
-import { type ConcurrentTheme } from '../../model'
 import { type Identity } from '../../util'
 import { type CoreDomain, type ProfileSchema } from '@concurrent-world/client'
 import { useTranslation } from 'react-i18next'
@@ -12,8 +11,6 @@ export function RegistrationReady(props: {
     profile: ProfileSchema | null
     host: CoreDomain | null | undefined
 }): JSX.Element {
-    const theme = useTheme<ConcurrentTheme>()
-
     const { t } = useTranslation('', { keyPrefix: 'registration.ready' })
 
     return (
@@ -27,7 +24,6 @@ export function RegistrationReady(props: {
             >
                 <Tilt glareEnable={true} glareBorderRadius="5%">
                     <PassportRenderer
-                        theme={theme}
                         ccid={props.identity.CCID}
                         name={props.profile?.username ?? ''}
                         avatar={props.profile?.avatar ?? ''}
