@@ -3,12 +3,9 @@ import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
 import ApiProvider from '../context/api'
-import type { ConcurrentTheme } from '../model'
-import { CssBaseline, Fade, IconButton, Paper, ThemeProvider, darken } from '@mui/material'
+import { Fade, IconButton, Paper } from '@mui/material'
 import { usePersistent } from '../hooks/usePersistent'
-import { Themes, loadConcurrentTheme } from '../themes'
 import { type Identity, generateIdentity } from '../util'
-import { ConcurrentWordmark } from '../components/theming/ConcurrentWordmark'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import {
     Client,
@@ -29,13 +26,12 @@ import { RegistrationReady } from '../components/Registration/LetsGo'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation } from 'react-router-dom'
 import { defaultPreference } from '../context/PreferenceContext'
+import { GuestBase } from '../components/GuestBase'
 
 export function Registration(): JSX.Element {
     const location = useLocation()
 
     const { t, i18n } = useTranslation('', { keyPrefix: 'registration' })
-    const [themeName, setThemeName] = usePersistent<string>('Theme', 'blue')
-    const [theme, setTheme] = useState<ConcurrentTheme>(loadConcurrentTheme(themeName))
     const [domain, setDomain] = usePersistent<string>('Domain', 'hub.concurrent.world')
     const [client, initializeClient] = useState<Client>()
     const [host, setHost] = useState<CoreDomain | null | undefined>()
@@ -46,14 +42,6 @@ export function Registration(): JSX.Element {
     const activeStep = parseInt(location.hash.replace('#', '')) || 0
     const setActiveStep = (step: number): void => {
         window.location.hash = step.toString()
-    }
-
-    const themes: string[] = Object.keys(Themes)
-    const randomTheme = (): void => {
-        const box = themes.filter((e) => e !== themeName)
-        const newThemeName = box[Math.floor(Math.random() * box.length)]
-        setThemeName(newThemeName)
-        setTheme(loadConcurrentTheme(newThemeName))
     }
 
     useEffect(() => {
@@ -233,43 +221,22 @@ export function Registration(): JSX.Element {
     if (!client) return <>api constructing...</>
 
     return (
-        <ThemeProvider theme={theme}>
-            <CssBaseline />
+        <GuestBase
+            sx={{
+                padding: 2,
+                display: 'flex',
+                flexDirection: 'column',
+                flex: 1,
+                gap: 2
+            }}
+            additionalButton={
+                <Button component={Link} to="/import">
+                    {t('importAccount')}
+                </Button>
+            }
+        >
             <ApiProvider client={client}>
-                <Box
-                    sx={{
-                        padding: '20px',
-                        gap: '20px',
-                        display: 'flex',
-                        width: '100vw',
-                        minHeight: '100dvh',
-                        flexDirection: 'column',
-                        background: [
-                            theme.palette.background.default,
-                            `linear-gradient(${theme.palette.background.default}, ${darken(
-                                theme.palette.background.default,
-                                0.1
-                            )})`
-                        ]
-                    }}
-                >
-                    <Button
-                        disableRipple
-                        variant="text"
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            flexDirection: 'row',
-                            textTransform: 'none',
-                            '&:hover': {
-                                background: 'none'
-                            }
-                        }}
-                        onClick={randomTheme}
-                    >
-                        <ConcurrentWordmark color={theme.palette.background.contrastText} />
-                    </Button>
+                <>
                     <Paper
                         sx={{
                             display: 'flex',
@@ -348,24 +315,8 @@ export function Registration(): JSX.Element {
                             }}
                         ></Box>
                     </Paper>
-                    {activeStep === 0 && (
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'row',
-                                justifyContent: 'flex-end',
-                                gap: '10px',
-                                alignItems: 'center'
-                            }}
-                        >
-                            <Typography color="background.contrastText">{t('alreadyHaveAccount')}</Typography>
-                            <Button component={Link} to="/import">
-                                {t('importAccount')}
-                            </Button>
-                        </Box>
-                    )}
-                </Box>
+                </>
             </ApiProvider>
-        </ThemeProvider>
+        </GuestBase>
     )
 }
