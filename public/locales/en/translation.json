@@ -159,7 +159,7 @@
         "tagline2": "Infinite Environments.",
         "description": "Concurrent is a new type of decentralized social networking service that connects you to countless servers with just one account.",
         "createAccount": "Create an Account",
-        "import": "Import",
+        "import": "Sign in",
         "gettingStarted": "Let's get started",
         "feature1": {
             "title": "No need to create an account for each server anymore",
@@ -235,7 +235,7 @@
             "next": "Start"
         },
         "alreadyHaveAccount": "Already have an account?",
-        "importAccount": "Import Account"
+        "importAccount": "Sign in"
     },
     "import": {
         "searching": "Searching…",
@@ -247,7 +247,7 @@
         "secretPlaceholder": "A spell made of 12 words",
         "welcome": "Welcome",
         "domain": "Domain",
-        "import": "Import",
+        "import": "Sign in",
         "noAccount": "Don’t have an account yet?",
         "createAccount": "Create an Account"
     }

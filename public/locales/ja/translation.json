@@ -159,7 +159,7 @@
         "tagline2": "環境は無数。",
         "description": "Concurrentは1つのアカウントで無数のサーバーとつながれる、新しい分散型SNSです。",
         "createAccount": "アカウントを作成",
-        "import": "インポート",
+        "import": "ログイン",
         "gettingStarted": "さあ、始めよう",
         "feature1": {
             "title": "もうサーバーごとにアカウントを作る必要はありません",
@@ -235,7 +235,7 @@
             "next": "はじめる"
         },
         "alreadyHaveAccount": "すでにアカウントをお持ちですか？",
-        "importAccount": "アカウントのインポート"
+        "importAccount": "ログイン"
     },
     "import": {
         "searching": "検索中…",
@@ -247,7 +247,7 @@
         "secretPlaceholder": "12個の単語からなる呪文",
         "welcome": "ようこそ",
         "domain": "ドメイン",
-        "import": "インポート",
+        "import": "ログイン",
         "noAccount": "まだアカウントを作ってない？",
         "createAccount": "アカウントを作成"
     }
