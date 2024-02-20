@@ -76,7 +76,7 @@ export function AccountImport(): JSX.Element {
                         </Alert>
                         <Suspense fallback={<Typography>loading...</Typography>}>
                             <QRCodeReader
-                                onRead={(result: string) => {
+                                onRead={(result) => {
                                     console.log(result)
                                     try {
                                         Client.createFromSubkey(result).then((client) => {
@@ -103,4 +103,3 @@ export function AccountImport(): JSX.Element {
         </GuestBase>
     )
 }
-
