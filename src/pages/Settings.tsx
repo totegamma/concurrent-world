@@ -9,6 +9,7 @@ import { EmojiSettings } from '../components/Settings/Emoji'
 import { MediaSettings } from '../components/Settings/Media'
 import { APSettings } from '../components/Settings/APSettings'
 import { useTranslation } from 'react-i18next'
+import { IdentitySettings } from '../components/Settings/Identity'
 
 export function Settings(): JSX.Element {
     const path = useLocation()
@@ -52,6 +53,7 @@ export function Settings(): JSX.Element {
                 <Route path="/" element={<SettingsIndex />} />
                 <Route path="/general" element={<GeneralSettings />} />
                 <Route path="/profile" element={<ProfileSettings />} />
+                <Route path="/identity" element={<IdentitySettings />} />
                 <Route path="/theme" element={<ThemeSettings />} />
                 <Route path="/sound" element={<SoundSettings />} />
                 <Route path="/emoji" element={<EmojiSettings />} />
