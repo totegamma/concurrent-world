@@ -3,15 +3,12 @@ import { ProfileEditor } from '../ProfileEditor'
 import { useApi } from '../../context/api'
 import { useSnackbar } from 'notistack'
 import { useTranslation } from 'react-i18next'
-import { SecretCode } from '../ui/SecretCode'
 
 export const ProfileSettings = (): JSX.Element => {
     const client = useApi()
     const { enqueueSnackbar } = useSnackbar()
 
     const { t } = useTranslation('', { keyPrefix: 'settings.profile' })
-
-    const mnemonic = JSON.parse(localStorage.getItem('Mnemonic') || 'null')
 
     return (
         <Box
@@ -39,8 +36,6 @@ export const ProfileSettings = (): JSX.Element => {
                         }}
                     />
                 </Box>
-                <Typography variant="h3">{t('secret')}</Typography>
-                {mnemonic ? <SecretCode mnemonic={mnemonic} /> : <Typography>{t('secretCannotBeRestored')}</Typography>}
             </Box>
         </Box>
     )
