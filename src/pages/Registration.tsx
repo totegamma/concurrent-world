@@ -32,7 +32,7 @@ export function Registration(): JSX.Element {
     const [client, initializeClient] = useState<Client>()
     const [host, setHost] = useState<CoreDomain | null | undefined>()
     const [identity, setIdentity] = usePersistent<Identity>('CreatedIdentity', generateIdentity())
-    const [profile, setProfile] = useState<ProfileSchema | null>(null)
+    const [profile, setProfile] = useState<CoreCharacter<ProfileSchema> | null>(null)
 
     const activeStep = parseInt(location.hash.replace('#', '')) || 0
     const setActiveStep = (step: number): void => {
