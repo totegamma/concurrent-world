@@ -3,6 +3,7 @@ import SubkeyInfo from '../SubkeyInfo'
 import { useState } from 'react'
 import { ComputeCKID, generateIdentity } from '@concurrent-world/client'
 import { useApi } from '../../context/api'
+import { useTranslation } from 'react-i18next'
 
 export function LoginQR(): JSX.Element {
     const client = useApi()
@@ -10,6 +11,8 @@ export function LoginQR(): JSX.Element {
     const [tab, setTab] = useState(0)
 
     const [generated, setGenerated] = useState<null | string>(null)
+
+    const { t } = useTranslation('', { keyPrefix: 'settings.qr' })
 
     return (
         <>
@@ -19,14 +22,12 @@ export function LoginQR(): JSX.Element {
                     setTab(newValue)
                 }}
             >
-                <Tab label="新しく作成" />
-                <Tab label="この端末のキーを表示" />
+                <Tab label={t('createNew')} />
+                <Tab label={t('showInstalled')} />
             </Tabs>
             {tab === 0 && (
                 <>
-                    <Alert severity="warning">
-                        ここで作成したサブキーの認証情報は、この画面を離れると再度表示されません。使わなかった場合作り直しになってしまう為、必要な時のみ生成して、必要に応じてメモを取るなどしてください。
-                    </Alert>
+                    <Alert severity="warning">{t('tip1')}</Alert>
 
                     {generated ? (
                         <>
@@ -52,7 +53,7 @@ export function LoginQR(): JSX.Element {
                                     })
                             }}
                         >
-                            サブキーを新しく生成する
+                            {t('createNewSubKey')}
                         </Button>
                     )}
                 </>
@@ -64,7 +65,7 @@ export function LoginQR(): JSX.Element {
                 </>
             )}
 
-            <Typography>アカウントが持つキーのリストは設定のIdentityページから確認できます。</Typography>
+            <Typography>{t('tip2')}</Typography>
         </>
     )
 }
