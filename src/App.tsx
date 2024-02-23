@@ -303,6 +303,7 @@ function App(): JSX.Element {
                         flex: 1,
                         maxWidth: '1280px',
                         width: '100%',
+                        height: '100%',
                         marginLeft: 'env(safe-area-inset-left)',
                         marginRight: 'env(safe-area-inset-right)'
                     }}
@@ -370,7 +371,8 @@ function App(): JSX.Element {
                             sx={{
                                 display: {
                                     xs: 'block',
-                                    sm: 'none'
+                                    sm: 'none',
+                                    md: 'none'
                                 }
                             }}
                         >
