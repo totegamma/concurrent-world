@@ -1,10 +1,9 @@
-import { Alert, Box, Divider } from '@mui/material'
+import { Alert, Box } from '@mui/material'
 import Tilt from 'react-parallax-tilt'
 import { Passport } from '../theming/Passport'
 import { Suspense, lazy } from 'react'
 
 const SwitchMasterToSub = lazy(() => import('../SwitchMasterToSub'))
-const SubkeyInfo = lazy(() => import('../SubkeyInfo'))
 
 export const IdentitySettings = (): JSX.Element => {
     const mnemonic = JSON.parse(localStorage.getItem('Mnemonic') || 'null')
@@ -55,10 +54,6 @@ export const IdentitySettings = (): JSX.Element => {
                     }}
                 >
                     <Alert severity="info">現在サブキーでログインしています。</Alert>
-                    <Divider />
-                    <Suspense fallback={<>loading...</>}>
-                        <SubkeyInfo subkey={subkey} />
-                    </Suspense>
                 </Box>
             )}
 
