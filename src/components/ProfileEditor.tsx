@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import { useEffect, useState } from 'react'
-import { type ProfileSchema } from '@concurrent-world/client'
+import { type CoreCharacter, type ProfileSchema } from '@concurrent-world/client'
 import Button from '@mui/material/Button'
 import { useApi } from '../context/api'
 import { CCAvatar } from './ui/CCAvatar'
@@ -13,7 +13,7 @@ import { MediaInput } from './ui/MediaInput'
 
 interface ProfileEditorProps {
     initial?: ProfileSchema
-    onSubmit?: (profile: ProfileSchema) => void
+    onSubmit?: (profile: CoreCharacter<ProfileSchema>) => void
     id?: string
 }
 
