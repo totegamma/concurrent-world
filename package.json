@@ -26,6 +26,8 @@
         "@rjsf/validator-ajv6": "^5.7.3",
         "@rjsf/validator-ajv8": "^5.7.3",
         "@vitejs/plugin-basic-ssl": "^1.0.1",
+        "@zxing/browser": "^0.1.4",
+        "@zxing/library": "^0.20.0",
         "boring-avatars": "github:totegamma/boring-avatars#49ed345027665e1d6135ae6b0b6f2a442ff52915",
         "elliptic": "^6.5.4",
         "ethers": "^6.3.0",
