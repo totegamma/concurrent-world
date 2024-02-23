@@ -1,4 +1,17 @@
-import { Alert, Box, Button, Grid, Step, StepContent, StepLabel, Stepper, TextField, Typography } from '@mui/material'
+import {
+    Alert,
+    Box,
+    Button,
+    Grid,
+    MenuItem,
+    Select,
+    Step,
+    StepContent,
+    StepLabel,
+    Stepper,
+    TextField,
+    Typography
+} from '@mui/material'
 import { useApi } from '../context/api'
 import { useMemo, useRef, useState } from 'react'
 import EmailIcon from '@mui/icons-material/Email'
@@ -8,7 +21,8 @@ import { LangJa } from '../utils/lang-ja'
 import html2canvas from 'html2canvas'
 import JsPDF from 'jspdf'
 import ccPaper from '../resources/cc-paper.svg'
-import { ComputeCKID, generateIdentity } from '@concurrent-world/client'
+import { ComputeCKID, LoadKey, generateIdentity } from '@concurrent-world/client'
+import { useTranslation } from 'react-i18next'
 
 export interface SwitchMasterToSubProps {
     mnemonic: string
@@ -19,6 +33,9 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
     const [mnemonicTest, setMnemonicTest] = useState<string>('')
     const [activeStep, setActiveStep] = useState(0)
     const [processing, setProcessing] = useState(false)
+
+    const { t, i18n } = useTranslation('', { keyPrefix: 'registration' })
+    const [keyFormat, setKeyFormat] = useState<'ja' | 'en'>(i18n.language === 'ja' ? 'ja' : 'en')
 
     const mnemonicToPrivateKey = (mnemonic: string): string => {
         const normalized = mnemonic.trim().normalize('NFKD')
@@ -41,6 +58,54 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
             return wallet.privateKey.slice(2)
         }
     }
+
+    const toEnMnemonic = (mnemonic: string): string => {
+        const normalized = mnemonic.trim().normalize('NFKD')
+        const split = normalized.split(' ')
+        if (split.length !== 12) {
+            throw new Error('Invalid mnemonic')
+        }
+
+        if (normalized[0].match(/[a-z]/)) {
+            return mnemonic // nothing to do
+        } else {
+            const ja2en = split
+                .map((word) => {
+                    const wordIndex = LangJa.wordlist().getWordIndex(word)
+                    return LangEn.wordlist().getWord(wordIndex)
+                })
+                .join(' ')
+            return ja2en
+        }
+    }
+
+    const toJaMnemonic = (mnemonic: string): string => {
+        const normalized = mnemonic.trim().normalize('NFKD')
+        const split = normalized.split(' ')
+        if (split.length !== 12) {
+            throw new Error('Invalid mnemonic')
+        }
+
+        if (normalized[0].match(/[a-z]/)) {
+            const en2ja = split
+                .map((word) => {
+                    const wordIndex = LangEn.wordlist().getWordIndex(word)
+                    return LangJa.wordlist().getWord(wordIndex)
+                })
+                .join(' ')
+            return en2ja
+        } else {
+            return mnemonic // nothing to do
+        }
+    }
+
+    const mnemonic = useMemo(() => {
+        if (keyFormat === 'ja') {
+            return toJaMnemonic(props.mnemonic)
+        } else {
+            return toEnMnemonic(props.mnemonic)
+        }
+    }, [props.mnemonic, keyFormat])
 
     const testOK = useMemo(() => {
         try {
@@ -66,6 +131,18 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                         このステップがマスターキーをダウンロードできる最後の機会です！ここで保管を怠ると、このアカウントは絶対に復旧できません。
                         印刷して金庫に保管するなど、安全で確実な方法で保管することをお勧めします。
                     </Alert>
+                    <Box display="flex" alignItems="center" flexDirection="row" gap={1}>
+                        <Typography>マスターキーのフォーマット:</Typography>
+                        <Select
+                            value={keyFormat}
+                            onChange={(e) => {
+                                setKeyFormat(e.target.value as 'ja' | 'en')
+                            }}
+                        >
+                            <MenuItem value="ja">日本語</MenuItem>
+                            <MenuItem value="en">English</MenuItem>
+                        </Select>
+                    </Box>
                     <Box display="flex" gap={1}>
                         <Button
                             component="a"
@@ -75,7 +152,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
 %0D%0A
 === 識別情報 ===%0D%0A
 識別子: ${client?.ccid}%0D%0A
-マスターキー: ${props.mnemonic}%0D%0A
+マスターキー: ${mnemonic}%0D%0A
 ================%0D%0A
 %0D%0A
 %0D%0A
@@ -324,7 +401,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                                         columns={3}
                                         container
                                     >
-                                        {props.mnemonic.split(' ').map((e: string, i: number) => (
+                                        {mnemonic.split(' ').map((e: string, i: number) => (
                                             <Grid
                                                 key={i}
                                                 item
