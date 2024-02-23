@@ -48,8 +48,19 @@ export const KeyCard = (props: { item: Key; endItem?: JSX.Element; short?: boole
                 ) : (
                     <>
                         <Typography>ID: {props.item.id}</Typography>
-                        <Typography>Created: {props.item.cdate}</Typography>
                         <Typography>Parent: {props.item.parent}</Typography>
+
+                        {valid ? (
+                            <>
+                                <Typography>Valid Since: {props.item.validSince}</Typography>
+                            </>
+                        ) : (
+                            <>
+                                <Typography>
+                                    Valid From: {props.item.validSince} to {props.item.validUntil}
+                                </Typography>
+                            </>
+                        )}
                     </>
                 )}
             </Box>

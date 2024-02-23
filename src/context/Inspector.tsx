@@ -35,7 +35,6 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
             setMessage(msg)
             if (msg.payload.keyID && msg.payload.keyID !== '') {
                 client.api.getKeychain(msg.payload.keyID).then((keys) => {
-                    console.log('resolution:', keys)
                     setKeyResolution(keys)
                 })
             }
@@ -73,46 +72,82 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
         return false
     }, [message])
 
-    const isKeyResolutionOK = useMemo(() => {
-        const allKeyValid = keyResolution.every((key) => {
-            try {
-                return validateSignature(key.enactPayload, key.enactSignature, key.parent)
-            } catch (e) {
-                return false
-            }
-        })
-
-        if (!allKeyValid) return false
-
-        const allKeyNotRevoked = keyResolution.every((key) => {
-            console.log('checking key:', key)
-            if (key.revokePayload?.startsWith('{') && key.revokeSignature) {
-                try {
-                    const obj = JSON.parse(key.revokePayload)
-                    return !validateSignature(key.revokePayload, key.revokeSignature, obj.keyID ?? obj.signer)
-                } catch (e) {
-                    return true
-                }
-            } else {
-                console.log('none')
-            }
-            return true
-        })
-
-        if (!allKeyNotRevoked) return false
-
+    const KeyResolutionSummary: { valid: boolean; reason?: string; since?: Date; until?: Date } = useMemo(() => {
         const rootkey = keyResolution[0]?.root
-        if (!rootkey) return true
+        if (!rootkey) {
+            console.error('keychain has no root')
+            return {
+                valid: true
+            }
+        }
 
         let previousKey: string | null = null
 
-        for (let i = 1; i < keyResolution.length; i++) {
-            if (keyResolution[i].root !== rootkey) return false
-            if (previousKey && keyResolution[i].parent !== previousKey) return false
+        let valid
+        let reason
+        let since
+        let until
+
+        for (let i = 0; i < keyResolution.length; i++) {
+            const key = keyResolution[i]
+
+            if (key.root !== rootkey) {
+                valid = false
+                reason = 'keychain has multiple roots'
+                break
+            }
+
+            if (previousKey && key.parent !== previousKey) {
+                valid = false
+                reason = 'keychain is not linear'
+                break
+            }
+
+            if (!validateSignature(key.enactPayload, key.enactSignature, key.parent)) {
+                valid = false
+                reason = 'failed to validate enact signature of key ' + key.id
+                break
+            }
+            if (!since || new Date(keyResolution[i].validSince) < since) {
+                since = new Date(keyResolution[i].validSince)
+            }
+
+            if (key.revokePayload?.startsWith('{') && key.revokeSignature) {
+                try {
+                    const obj = JSON.parse(key.revokePayload)
+                    if (validateSignature(key.revokePayload, key.revokeSignature, obj.keyID ?? obj.signer)) {
+                        if (!until || new Date(keyResolution[i].validUntil) > until) {
+                            until = new Date(keyResolution[i].validUntil)
+                        }
+                    }
+                } catch (e) {
+                    valid = false
+                    reason = 'failed to parse revoke payload of key ' + key.id
+                    break
+                }
+            }
+
             previousKey = keyResolution[i].id
         }
 
-        return true
+        if (valid === undefined) {
+            if (since && message && since > new Date(message.payload.signedAt)) {
+                valid = false
+                reason = 'keychain is not valid at the time of signing'
+            } else if (until && message && until < new Date(message.payload.signedAt)) {
+                valid = false
+                reason = 'keychain is not valid at the time of signing'
+            } else {
+                valid = true
+            }
+        }
+
+        return {
+            valid,
+            reason,
+            since,
+            until
+        }
     }, [keyResolution])
 
     return (
@@ -176,10 +211,21 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                                         gap: 1
                                     }}
                                 >
-                                    {isKeyResolutionOK ? (
-                                        <Alert severity="success">Key resolution is valid!</Alert>
+                                    {KeyResolutionSummary.valid ? (
+                                        KeyResolutionSummary.until ? (
+                                            <Alert severity="warning">
+                                                Key resolution is valid at the time of signing, but signed key is
+                                                currently revoked at {KeyResolutionSummary.until.toLocaleString()}
+                                            </Alert>
+                                        ) : (
+                                            <Alert severity="success">Key resolution is valid!</Alert>
+                                        )
                                     ) : (
-                                        <Alert severity="error">Key resolution is invalid!</Alert>
+                                        <Alert severity="error">
+                                            Key resolution is invalid!
+                                            <br />
+                                            reason: {KeyResolutionSummary.reason}
+                                        </Alert>
                                     )}
 
                                     {keyResolution.map((key) => (
