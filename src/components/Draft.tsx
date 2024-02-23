@@ -79,7 +79,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const [enableSuggestions, setEnableSuggestions] = useState<boolean>(false)
     const [emojiSuggestions, setEmojiSuggestions] = useState<Emoji[]>([])
 
-    const [enableUserPicker, setEnableUserPicker] = useState<boolean>(true)
+    const [enableUserPicker, setEnableUserPicker] = useState<boolean>(false)
     const [userSuggestions, setUserSuggestions] = useState<User[]>([])
 
     const [selectedSuggestions, setSelectedSuggestions] = useState<number>(0)
@@ -392,7 +392,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 />
                 <Popper
                     open={enableSuggestions}
-                    anchorEl={textInputRef.current}
+                    anchorEl={textInputRef.current ?? undefined}
                     placement="bottom-start"
                     modifiers={[
                         {
@@ -432,7 +432,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 </Popper>
                 <Popper
                     open={enableUserPicker}
-                    anchorEl={textInputRef.current}
+                    anchorEl={textInputRef.current ?? undefined}
                     placement="bottom-start"
                     modifiers={[
                         {

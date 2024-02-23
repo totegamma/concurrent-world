@@ -25,23 +25,17 @@ try {
     console.log(e)
 }
 
-console.log('domain', domain)
-
 try {
     prvkey = JSON.parse(localStorage.getItem('PrivateKey') || '')
 } catch (e) {
     console.log(e)
 }
 
-console.log('prvkey', prvkey)
-
 try {
     subkey = JSON.parse(localStorage.getItem('SubKey') || '')
 } catch (e) {
     console.log(e)
 }
-
-console.log('subkey', subkey)
 
 const logined = domain !== '' && (prvkey !== '' || subkey !== '')
 
