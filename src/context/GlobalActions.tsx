@@ -103,7 +103,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
             .map((list) => list.streams)
             .flat()
         const uniq = [...new Set(allStreams)]
-        console.log('uniq: ', uniq)
         uniq.forEach((id) => {
             client.getStream<CommonstreamSchema>(id).then((stream) => {
                 if (stream && !unmounted) {

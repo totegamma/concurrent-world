@@ -75,7 +75,6 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
     const KeyResolutionSummary: { valid: boolean; reason?: string; since?: Date; until?: Date } = useMemo(() => {
         const rootkey = keyResolution[0]?.root
         if (!rootkey) {
-            console.error('keychain has no root')
             return {
                 valid: true
             }
