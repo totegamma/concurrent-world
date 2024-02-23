@@ -25,6 +25,7 @@ export const IconButtonWithLabel = (props: {
             }}
             component={props.link ? RouterLink : 'button'}
             to={props.to}
+            onClick={props.onClick}
         >
             <props.icon
                 sx={{

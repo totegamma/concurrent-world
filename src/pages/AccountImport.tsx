@@ -1,10 +1,23 @@
-import { Button, Divider, Paper } from '@mui/material'
+import { Alert, Box, Button, Divider, Paper, Typography } from '@mui/material'
 import { GuestBase } from '../components/GuestBase'
 import { ImportMasterKey } from '../components/Importer/ImportMasterkey'
 import { Link } from 'react-router-dom'
 import { ImportSubkey } from '../components/Importer/ImportSubkey'
 
+import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner'
+import PasswordIcon from '@mui/icons-material/Password'
+import { IconButtonWithLabel } from '../components/ui/IconButtonWithLabel'
+import { useTranslation } from 'react-i18next'
+import { Suspense, lazy, useState } from 'react'
+import { Client } from '@concurrent-world/client'
+
+const QRCodeReader = lazy(() => import('../components/ui/QRCodeReader'))
+
 export function AccountImport(): JSX.Element {
+    const { t } = useTranslation('', { keyPrefix: 'import' })
+
+    const [importMode, setImportMode] = useState<'none' | 'scan' | 'manual'>('none')
+
     return (
         <GuestBase
             sx={{
@@ -30,9 +43,62 @@ export function AccountImport(): JSX.Element {
                     gap: '20px'
                 }}
             >
-                <ImportSubkey />
-                <Divider>または</Divider>
-                <ImportMasterKey />
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        gap: 2,
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}
+                >
+                    <IconButtonWithLabel
+                        icon={QrCodeScannerIcon}
+                        label={t('scan')}
+                        onClick={() => {
+                            setImportMode('scan')
+                        }}
+                    />
+                    <Divider orientation="vertical">または</Divider>
+                    <IconButtonWithLabel
+                        icon={PasswordIcon}
+                        label={t('manual')}
+                        onClick={() => {
+                            setImportMode('manual')
+                        }}
+                    />
+                </Box>
+
+                {importMode === 'scan' && (
+                    <>
+                        <Alert severity="info">
+                            {'ログイン用のQRコードは、ログイン済みのデバイスの「設定 > ログインQR」から取得できます。'}
+                        </Alert>
+                        <Suspense fallback={<Typography>loading...</Typography>}>
+                            <QRCodeReader
+                                onRead={(result) => {
+                                    console.log(result)
+                                    try {
+                                        Client.createFromSubkey(result).then((client) => {
+                                            localStorage.setItem('Domain', JSON.stringify(client.host))
+                                            localStorage.setItem('SubKey', JSON.stringify(result))
+                                            window.location.href = '/'
+                                        })
+                                    } catch (e) {
+                                        console.error(e)
+                                    }
+                                }}
+                            />
+                        </Suspense>
+                    </>
+                )}
+                {importMode === 'manual' && (
+                    <>
+                        <ImportSubkey />
+                        <Divider>または</Divider>
+                        <ImportMasterKey />
+                    </>
+                )}
             </Paper>
         </GuestBase>
     )
