@@ -1,5 +1,5 @@
 import { useEffect, useState, createContext, useRef, useMemo, useCallback } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Link as RouterLink } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider, CssBaseline, Typography, useMediaQuery } from '@mui/material'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 
@@ -61,6 +61,8 @@ function App(): JSX.Element {
 
     const [theme, setTheme] = useState<ConcurrentTheme>(loadConcurrentTheme(themeName, customThemes))
     const isMobileSize = useMediaQuery(theme.breakpoints.down('sm'))
+
+    const mnemonic = JSON.parse(localStorage.getItem('Mnemonic') || 'null')
 
     const [acklist, setAcklist] = useState<User[]>([])
     const updateAcklist = useCallback(() => {
@@ -259,7 +261,8 @@ function App(): JSX.Element {
             <Box
                 sx={{
                     display: 'flex',
-                    justifyContent: 'center',
+                    flexDirection: 'column',
+                    alignItems: 'center',
                     background: `${theme.palette.background.default}, 
                                  linear-gradient(${theme.palette.background.default}, ${darken(
                         theme.palette.background.default,
@@ -270,6 +273,30 @@ function App(): JSX.Element {
                     overflow: 'hidden'
                 }}
             >
+                <Box
+                    sx={{
+                        backgroundColor: 'error.main',
+                        width: '100%',
+                        display: 'flex',
+                        justifyContent: 'center'
+                    }}
+                >
+                    {mnemonic && (
+                        <Typography
+                            sx={{
+                                textAlign: 'center',
+                                color: 'error.contrastText',
+                                fontSize: '0.8em',
+                                fontWeight: 'bold',
+                                padding: '10px'
+                            }}
+                            component={RouterLink}
+                            to="/settings/identity"
+                        >
+                            現在マスターキーを使ってログインしています。ここをクリックして、より安全なサブキーによるログインに今すぐ切り替えましょう。
+                        </Typography>
+                    )}
+                </Box>
                 <Box
                     sx={{
                         display: 'flex',
