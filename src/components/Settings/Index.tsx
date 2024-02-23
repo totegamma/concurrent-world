@@ -10,6 +10,7 @@ import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions'
 import PhotoIcon from '@mui/icons-material/Photo'
 import SettingsEthernetIcon from '@mui/icons-material/SettingsEthernet'
 import BadgeIcon from '@mui/icons-material/Badge'
+import QrCodeIcon from '@mui/icons-material/QrCode'
 import { useSnackbar } from 'notistack'
 import { LogoutButton } from './LogoutButton'
 import { IconButtonWithLabel } from '../ui/IconButtonWithLabel'
@@ -126,6 +127,7 @@ export function SettingsIndex(): JSX.Element {
                     label={t('settings.ap.title')}
                     to="/settings/activitypub"
                 />
+                <IconButtonWithLabel link icon={QrCodeIcon} label={t('settings.qr.title')} to="/settings/loginqr" />
             </Paper>
             <Paper
                 variant="outlined"
