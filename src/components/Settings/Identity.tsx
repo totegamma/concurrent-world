@@ -5,9 +5,8 @@ import { Suspense, lazy, useEffect, useState } from 'react'
 import { useApi } from '../../context/api'
 import { type Key } from '@concurrent-world/client/dist/types/model/core'
 
-import KeyIcon from '@mui/icons-material/Key'
-import KeyOffIcon from '@mui/icons-material/KeyOff'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
+import { KeyCard } from '../ui/KeyCard'
 
 const SwitchMasterToSub = lazy(() => import('../SwitchMasterToSub'))
 
@@ -84,57 +83,24 @@ export const IdentitySettings = (): JSX.Element => {
                 }}
             >
                 {keys.map((key) => (
-                    <Paper
+                    <KeyCard
                         key={key.id}
-                        variant="outlined"
-                        sx={{
-                            padding: 1,
-                            display: 'flex',
-                            flexDirection: 'row',
-                            gap: 1,
-                            alignItems: 'center'
-                        }}
-                    >
-                        {key.revokePayload === 'null' ? (
-                            <KeyIcon
+                        item={key}
+                        endItem={
+                            <IconButton
                                 sx={{
                                     width: '40px',
                                     height: '40px'
                                 }}
-                            />
-                        ) : (
-                            <KeyOffIcon
-                                sx={{
-                                    width: '40px',
-                                    height: '40px'
+                                onClick={(event) => {
+                                    setTarget(key.id)
+                                    setAnchorEl(event.currentTarget)
                                 }}
-                            />
-                        )}
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: 1,
-                                flex: 1
-                            }}
-                        >
-                            <Typography>ID: {key.id}</Typography>
-                            <Typography>Created: {key.cdate}</Typography>
-                            <Typography>Parent: {key.parent}</Typography>
-                        </Box>
-                        <IconButton
-                            sx={{
-                                width: '40px',
-                                height: '40px'
-                            }}
-                            onClick={(event) => {
-                                setTarget(key.id)
-                                setAnchorEl(event.currentTarget)
-                            }}
-                        >
-                            <MoreHorizIcon />
-                        </IconButton>
-                    </Paper>
+                            >
+                                <MoreHorizIcon />
+                            </IconButton>
+                        }
+                    />
                 ))}
                 <Menu
                     anchorEl={anchorEl}
