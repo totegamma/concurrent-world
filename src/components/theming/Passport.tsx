@@ -5,12 +5,10 @@ import { useApi } from '../../context/api'
 
 export function Passport(): JSX.Element {
     const client = useApi()
-    const theme = useTheme<ConcurrentTheme>()
 
     return (
         <PassportRenderer
-            theme={theme}
-            ccid={client.ccid}
+            ccid={client.ccid || ''}
             name={client?.user?.profile?.payload.body.username || ''}
             avatar={client?.user?.profile?.payload.body.avatar || ''}
             host={client.api.host || ''}
@@ -21,7 +19,6 @@ export function Passport(): JSX.Element {
 }
 
 export interface PassportRendererProps {
-    theme: ConcurrentTheme
     ccid: string
     name: string
     avatar: string
@@ -31,27 +28,29 @@ export interface PassportRendererProps {
 }
 
 export function PassportRenderer(props: PassportRendererProps): JSX.Element {
+    const theme = useTheme<ConcurrentTheme>()
+
     const line1 = 'P<' + props.ccid
     let line2 = props.host.toUpperCase().replace(/(\.|-)/g, '<') ?? 'UNKNOWN'
     line2 += '<'.repeat(40 - line2.length) + '0xFF'
 
     const style1 = {
         fontSize: '5px',
-        fill: props.theme.palette.primary.contrastText,
+        fill: theme.palette.primary.contrastText,
         fontFamily: 'SourceCodeProRoman-Regular, Source Code Pro',
         fontVariationSettings: 'wght 400'
     }
 
     const style2 = {
         fontSize: '6px',
-        fill: props.theme.palette.primary.contrastText,
+        fill: theme.palette.primary.contrastText,
         fontFamily: 'SourceCodeProRoman-Regular, Source Code Pro',
         fontVariationSettings: 'wght 400'
     }
 
     const style3 = {
         fontSize: '8px',
-        fill: props.theme.palette.primary.contrastText,
+        fill: theme.palette.primary.contrastText,
         fontFamily: 'SourceCodeProRoman-Regular, Source Code Pro',
         fontVariationSettings: 'wght 600'
     }
@@ -66,7 +65,7 @@ export function PassportRenderer(props: PassportRendererProps): JSX.Element {
         >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 242.65 153" style={{ display: 'block' }}>
                 <path
-                    fill={props.theme.palette.primary.main}
+                    fill={theme.palette.primary.main}
                     d="m233.21,0H9.44C4.23,0,0,4.23,0,9.44v134.14c0,5.21,4.23,9.44,9.44,9.44h223.77c5.21,0,9.44-4.23,9.44-9.44V9.44c0-5.21-4.23-9.44-9.44-9.44Zm-93.33,14.34h-37.1c-2.2,0-3.98-1.78-3.98-3.98s1.78-3.98,3.98-3.98h37.1c2.2,0,3.98,1.78,3.98,3.98s-1.78,3.98-3.98,3.98Z"
                 />
 

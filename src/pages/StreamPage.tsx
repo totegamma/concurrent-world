@@ -1,7 +1,7 @@
 import { memo, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { Box, Divider } from '@mui/material'
 import { Draft } from '../components/Draft'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { TimelineHeader } from '../components/TimelineHeader'
 import { useApi } from '../context/api'
 import { Timeline } from '../components/Timeline/main'
@@ -21,6 +21,8 @@ export const StreamPage = memo((): JSX.Element => {
     const actions = useGlobalActions()
     const appData = useContext(ApplicationContext)
 
+    const { id } = useParams()
+
     const [showEditorOnTop] = usePreference('showEditorOnTop')
     const [showEditorOnTopMobile] = usePreference('showEditorOnTopMobile')
 
@@ -28,7 +30,7 @@ export const StreamPage = memo((): JSX.Element => {
     const timelineRef = useRef<VListHandle>(null)
     const [writeable, setWriteable] = useState<boolean>(true)
 
-    const targetStreamID = reactlocation.hash.replace('#', '').split(',')[0]
+    const targetStreamID = id ?? ''
     const [targetStream, setTargetStream] = useState<Stream<CommonstreamSchema> | null | undefined>(null)
 
     const [streamInfoOpen, setStreamInfoOpen] = useState<boolean>(false)
@@ -47,7 +49,7 @@ export const StreamPage = memo((): JSX.Element => {
                     setWriteable(true)
                 } else if (stream.writer.length === 0) {
                     setWriteable(true)
-                } else if (stream.writer.includes(client.ccid)) {
+                } else if (stream.writer.includes(client.ccid ?? '')) {
                     setWriteable(true)
                 }
             })
@@ -86,7 +88,7 @@ export const StreamPage = memo((): JSX.Element => {
                 />
                 <WatchingStreamContextProvider watchingStreams={streamIDs}>
                     <Timeline
-                        streams={appData.displayingStream}
+                        streams={streamIDs}
                         ref={timelineRef}
                         header={
                             (writeable && (

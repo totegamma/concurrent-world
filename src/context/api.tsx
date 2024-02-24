@@ -19,16 +19,28 @@ export interface ApiProviderProps {
 export default function ApiProvider(props: ApiProviderProps): JSX.Element {
     const [domain] = usePersistent<string>('Domain', '')
     const [prvkey] = usePersistent<string>('PrivateKey', '')
+    const [subkey] = usePersistent<string>('SubKey', '')
     const [client, initializeClient] = useState<Client>()
     useEffect(() => {
         if (props.client) return
-        Client.create(prvkey, domain, versionString)
-            .then((client) => {
-                initializeClient(client)
-            })
-            .catch((e) => {
-                console.error(e)
-            })
+
+        if (prvkey !== '') {
+            Client.create(prvkey, domain, versionString)
+                .then((client) => {
+                    initializeClient(client)
+                })
+                .catch((e) => {
+                    console.error(e)
+                })
+        } else if (subkey !== '') {
+            Client.createFromSubkey(subkey, versionString)
+                .then((client) => {
+                    initializeClient(client)
+                })
+                .catch((e) => {
+                    console.error(e)
+                })
+        }
     }, [domain, prvkey])
 
     if (!(client ?? props.client)) {

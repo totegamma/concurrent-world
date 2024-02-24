@@ -124,6 +124,7 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
                 <Button
                     onClick={() => {
                         if (cctype === 'character') {
+                            if (!client.ccid) return
                             client.api.getCharacter(client.ccid, schemaURLDraft).then((e) => {
                                 setCharacter(e)
                                 setSchemaURL(schemaURLDraft)

@@ -4,6 +4,38 @@ import { LangJa } from './utils/lang-ja'
 import { useTranslation } from 'react-i18next'
 
 import { visit } from 'unist-util-visit'
+import { Sign } from '@concurrent-world/client'
+
+export const jumpToDomainRegistration = (ccid: string, privateKey: string, fqdn: string): void => {
+    let next = window.location.href
+    // strip hash
+    const hashIndex = next.indexOf('#')
+    if (hashIndex !== -1) {
+        next = next.substring(0, hashIndex)
+    }
+    // add next hash
+    next = `${next}#2`
+
+    const signObject = {
+        signer: ccid,
+        type: 'Entity',
+        body: {
+            domain: fqdn
+        },
+        signedAt: new Date().toISOString()
+    }
+
+    const signedObject = JSON.stringify(signObject)
+    const signature = Sign(privateKey, signedObject)
+
+    const encodedObject = btoa(signedObject).replace('+', '-').replace('/', '_').replace('==', '')
+
+    const link = `http://${fqdn}/web/register?registration=${encodedObject}&signature=${signature}&callback=${encodeURIComponent(
+        next
+    )}`
+
+    window.location.href = link
+}
 
 export interface Identity {
     mnemonic_ja: string

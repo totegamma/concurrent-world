@@ -17,15 +17,27 @@ const Welcome = lazy(() => import('./pages/Welcome'))
 
 let domain = ''
 let prvkey = ''
+let subkey = ''
 
 try {
     domain = JSON.parse(localStorage.getItem('Domain') || '')
+} catch (e) {
+    console.log(e)
+}
+
+try {
     prvkey = JSON.parse(localStorage.getItem('PrivateKey') || '')
 } catch (e) {
     console.log(e)
 }
 
-const logined = domain !== '' && prvkey !== ''
+try {
+    subkey = JSON.parse(localStorage.getItem('SubKey') || '')
+} catch (e) {
+    console.log(e)
+}
+
+const logined = domain !== '' && (prvkey !== '' || subkey !== '')
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <ErrorBoundary FallbackComponent={EmergencyKit}>
@@ -35,7 +47,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                     <Route path="/welcome" element={<Welcome />} />
                     <Route path="/register" element={<Registration />} />
                     <Route path="/import" element={<AccountImport />} />
-                    {!logined && <Route path="/stream" element={<GuestTimelinePage page="stream" />} />}
+                    {!logined && <Route path="/stream/:id" element={<GuestTimelinePage page="stream" />} />}
                     {!logined && <Route path="/entity/:id" element={<GuestTimelinePage page="entity" />} />}
                     {!logined && <Route path="/message/:id" element={<GuestTimelinePage page="message" />} />}
                     <Route

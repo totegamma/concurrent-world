@@ -105,6 +105,9 @@
             "secret": "Secret code",
             "secretCannotBeRestored": "Since this account was imported using the private key instead of the secret code, the secret code cannot be restored."
         },
+        "identity": {
+                "title": "Identity"
+        },
         "theme": {
             "title": "Theme"
         },
@@ -136,7 +139,7 @@
             "deleteCompletely": "Delete completely",
             "copyURL": "Copy URL",
             "copyID": "Copy ID",
-            "oauth2": "and create application with option \"OAuth 2 authorization without a callback URL\"",
+            "oauth2": " and create application with option \"OAuth 2 authorization without a callback URL\"",
             "descs": {
                 "domain": "Domain Storage refers to the storage provided by this domain. It can be used without any setup, but there is a maximum capacity set. Additionally, the list of files may be viewed by administrators and files that violate the terms may be deleted.",
                 "imgur": "Imgur is used for image uploads. It can be set up relatively easily. The content that can be uploaded is subject to Imgur's terms.",
@@ -152,6 +155,14 @@
             "helperText": "The following charaters can be used: a-z, A-Z, 0-9",
             "alreadyRegistered": "This user is already registered.",
             "tryAnotherID": "Try another ID."
+        },
+        "qr": {
+            "title": "Login Code",
+            "createNew": "Create new",
+            "showInstalled": "Show installed",
+            "tip1": "You can only see generated codes once. Generate a new code only when you need it.",
+            "tip2": "You can check created keys in the Settings > Identity page.",
+            "createNewSubKey": "Create New Sub Key"
         }
     },
     "welcome": {
@@ -159,7 +170,7 @@
         "tagline2": "Infinite Environments.",
         "description": "Concurrent is a new type of decentralized social networking service that connects you to countless servers with just one account.",
         "createAccount": "Create an Account",
-        "import": "Import",
+        "import": "Sign in",
         "gettingStarted": "Let's get started",
         "feature1": {
             "title": "No need to create an account for each server anymore",
@@ -235,7 +246,7 @@
             "next": "Start"
         },
         "alreadyHaveAccount": "Already have an account?",
-        "importAccount": "Import Account"
+        "importAccount": "Sign in"
     },
     "import": {
         "searching": "Searching…",
@@ -247,7 +258,7 @@
         "secretPlaceholder": "A spell made of 12 words",
         "welcome": "Welcome",
         "domain": "Domain",
-        "import": "Import",
+        "import": "Sign in",
         "noAccount": "Don’t have an account yet?",
         "createAccount": "Create an Account"
     }

@@ -20,7 +20,7 @@ import { useMemo, useState } from 'react'
 export interface MessageViewProps {
     message: Message<SimpleNoteSchema | ReplyMessageSchema>
     rerouted?: Message<RerouteMessageSchema>
-    userCCID: string
+    userCCID?: string
     beforeMessage?: JSX.Element
     lastUpdated?: number
     forceExpanded?: boolean

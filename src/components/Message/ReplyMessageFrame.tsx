@@ -16,7 +16,7 @@ import { CCUserChip } from '../ui/CCUserChip'
 export interface ReplyMessageFrameProp {
     message: Message<ReplyMessageSchema>
     lastUpdated?: number
-    userCCID: string
+    userCCID?: string
     rerouted?: Message<RerouteMessageSchema>
     simple?: boolean
 }

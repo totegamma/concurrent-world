@@ -17,6 +17,7 @@ import { usePreference } from '../../context/PreferenceContext'
 interface MessageContainerProps {
     messageID: string
     messageOwner: string
+    resolveHint?: string
     lastUpdated?: number
     after?: JSX.Element | undefined
     timestamp?: Date
@@ -35,7 +36,7 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
 
     useEffect(() => {
         client
-            .getMessage<any>(props.messageID, props.messageOwner)
+            .getMessage<any>(props.messageID, props.messageOwner, props.resolveHint)
             .then((msg) => {
                 setMessage(msg)
             })
