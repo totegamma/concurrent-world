@@ -1,4 +1,4 @@
-import { Alert, Box, IconButton, Menu, MenuItem, Paper, Typography } from '@mui/material'
+import { Alert, Box, IconButton, Menu, MenuItem } from '@mui/material'
 import Tilt from 'react-parallax-tilt'
 import { Passport } from '../theming/Passport'
 import { Suspense, lazy, useEffect, useState } from 'react'
@@ -73,7 +73,9 @@ export const IdentitySettings = (): JSX.Element => {
                 </Box>
             )}
 
-            {!subkey && !mnemonic && <Alert severity="error">特殊なログイン状態のようです。</Alert>}
+            {!subkey && !mnemonic && (
+                <Alert severity="error">現在秘密鍵直接入力によるマスターキーでログインしています。</Alert>
+            )}
 
             <Box
                 sx={{
