@@ -1,4 +1,4 @@
-import { type Client, type CoreDomain, IssueJWT, SignedObject, Sign } from '@concurrent-world/client'
+import { type Client, type CoreDomain } from '@concurrent-world/client'
 import {
     Alert,
     AlertTitle,
@@ -17,7 +17,7 @@ import {
 } from '@mui/material'
 import { useEffect, useState } from 'react'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
-import { type Identity } from '../../util'
+import { jumpToDomainRegistration, type Identity } from '../../util'
 import { useTranslation } from 'react-i18next'
 
 interface ChooseDomainProps {
@@ -47,37 +47,6 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
         }
     }, [server])
 
-    const jumpToDomain = (fqdn: string): void => {
-        let next = window.location.href
-        // strip hash
-        const hashIndex = next.indexOf('#')
-        if (hashIndex !== -1) {
-            next = next.substring(0, hashIndex)
-        }
-        // add next hash
-        next = `${next}#5`
-
-        const signObject = {
-            signer: props.identity.CCID,
-            type: 'Entity',
-            body: {
-                domain: fqdn
-            },
-            signedAt: new Date().toISOString()
-        }
-
-        const signedObject = JSON.stringify(signObject)
-        const signature = Sign(props.identity.privateKey, signedObject)
-
-        const encodedObject = btoa(signedObject).replace('+', '-').replace('/', '_').replace('==', '')
-
-        const link = `http://${fqdn}/web/register?registration=${encodedObject}&signature=${signature}&callback=${encodeURIComponent(
-            next
-        )}`
-
-        window.location.href = link
-    }
-
     return (
         <Box
             sx={{
@@ -104,7 +73,11 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
                         onClick={() => {
                             setJumped(true)
                             setServer('hub.concurrent.world')
-                            jumpToDomain('hub.concurrent.world')
+                            jumpToDomainRegistration(
+                                props.identity.CCID,
+                                props.identity.privateKey,
+                                'hub.concurrent.world'
+                            )
                         }}
                     >
                         <ListItemAvatar>
@@ -143,7 +116,7 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
                         disabled={!props.host}
                         onClick={() => {
                             setJumped(true)
-                            jumpToDomain(server)
+                            jumpToDomainRegistration(props.identity.CCID, props.identity.privateKey, server)
                         }}
                     >
                         {t('jump')}

@@ -272,6 +272,7 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                                                 sx={timelineElemSx}
                                                 messageID={e.objectID}
                                                 messageOwner={e.owner}
+                                                resolveHint={e.streamID.split('@')[1]}
                                                 lastUpdated={e.lastUpdate?.getTime() ?? 0}
                                                 after={divider}
                                                 timestamp={e.cdate}

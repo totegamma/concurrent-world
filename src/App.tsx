@@ -1,5 +1,5 @@
 import { useEffect, useState, createContext, useRef, useMemo, useCallback } from 'react'
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, Link as RouterLink } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider, CssBaseline, Typography, useMediaQuery } from '@mui/material'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 
@@ -44,13 +44,11 @@ import { StorageProvider } from './context/StorageContext'
 import { MarkdownRendererLite } from './components/ui/MarkdownRendererLite'
 
 export const ApplicationContext = createContext<appData>({
-    displayingStream: [],
     acklist: [],
     updateAcklist: () => {}
 })
 
 export interface appData {
-    displayingStream: string[]
     acklist: User[]
     updateAcklist: () => void
 }
@@ -58,12 +56,13 @@ export interface appData {
 function App(): JSX.Element {
     const client = useApi()
     const [themeName] = usePreference('themeName')
-    const [lists] = usePreference('lists')
     const [sound] = usePreference('sound')
     const [customThemes] = usePreference('customThemes')
 
     const [theme, setTheme] = useState<ConcurrentTheme>(loadConcurrentTheme(themeName, customThemes))
     const isMobileSize = useMediaQuery(theme.breakpoints.down('sm'))
+
+    const mnemonic = JSON.parse(localStorage.getItem('Mnemonic') || 'null')
 
     const [acklist, setAcklist] = useState<User[]>([])
     const updateAcklist = useCallback(() => {
@@ -206,36 +205,6 @@ function App(): JSX.Element {
         })
     }, [client])
 
-    const path = useLocation()
-    const displayingStream: string[] = useMemo(() => {
-        switch (path.pathname) {
-            case '/': {
-                const rawid = path.hash.replace('#', '')
-                const list = lists[rawid] ?? Object.values(lists)[0]
-                if (!list) return []
-                console.log(list)
-                return [...list.streams, list.userStreams.map((e) => e.streamID)].flat()
-            }
-            case '/stream':
-            case '/stream/': {
-                return path.hash.replace('#', '').split(',')
-            }
-            case '/notifications': {
-                const notifications = client?.user?.userstreams?.payload.body.notificationStream
-                if (!notifications) return []
-                return [notifications]
-            }
-            case '/associations': {
-                const associations = client?.user?.userstreams?.payload.body.associationStream
-                if (!associations) return []
-                return [associations]
-            }
-            default: {
-                return []
-            }
-        }
-    }, [client, path])
-
     const [playNotification] = useSound(sound.notification, { volume: sound.volume / 100 })
     const playNotificationRef = useRef(playNotification)
     useEffect(() => {
@@ -256,11 +225,10 @@ function App(): JSX.Element {
 
     const applicationContext = useMemo(() => {
         return {
-            displayingStream,
             acklist,
             updateAcklist
         }
-    }, [displayingStream, acklist, updateAcklist])
+    }, [acklist, updateAcklist])
 
     if (!client) {
         return <>building api service...</>
@@ -293,7 +261,8 @@ function App(): JSX.Element {
             <Box
                 sx={{
                     display: 'flex',
-                    justifyContent: 'center',
+                    flexDirection: 'column',
+                    alignItems: 'center',
                     background: `${theme.palette.background.default}, 
                                  linear-gradient(${theme.palette.background.default}, ${darken(
                         theme.palette.background.default,
@@ -306,10 +275,35 @@ function App(): JSX.Element {
             >
                 <Box
                     sx={{
+                        backgroundColor: 'error.main',
+                        width: '100%',
+                        display: 'flex',
+                        justifyContent: 'center'
+                    }}
+                >
+                    {mnemonic && (
+                        <Typography
+                            sx={{
+                                textAlign: 'center',
+                                color: 'error.contrastText',
+                                fontSize: '0.8em',
+                                fontWeight: 'bold',
+                                padding: '10px'
+                            }}
+                            component={RouterLink}
+                            to="/settings/identity"
+                        >
+                            現在マスターキーを使ってログインしています。ここをクリックして、より安全なサブキーによるログインに今すぐ切り替えましょう。
+                        </Typography>
+                    )}
+                </Box>
+                <Box
+                    sx={{
                         display: 'flex',
                         flex: 1,
                         maxWidth: '1280px',
                         width: '100%',
+                        height: '100%',
                         marginLeft: 'env(safe-area-inset-left)',
                         marginRight: 'env(safe-area-inset-right)'
                     }}
@@ -362,7 +356,7 @@ function App(): JSX.Element {
                         >
                             <Routes>
                                 <Route index element={<ListPage />} />
-                                <Route path="/stream" element={<StreamPage />} />
+                                <Route path="/stream/:id" element={<StreamPage />} />
                                 <Route path="/associations" element={<Associations />} />
                                 <Route path="/contacts" element={<ContactsPage />} />
                                 <Route path="/explorer" element={<Explorer />} />
@@ -377,7 +371,8 @@ function App(): JSX.Element {
                             sx={{
                                 display: {
                                     xs: 'block',
-                                    sm: 'none'
+                                    sm: 'none',
+                                    md: 'none'
                                 }
                             }}
                         >

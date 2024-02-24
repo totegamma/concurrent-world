@@ -21,15 +21,16 @@ export interface PostedStreamsProps {
 
 export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
     const client = useApi()
-    const postedStreams = useMemo(
-        () =>
+    const postedStreams = useMemo(() => {
+        const streams =
             props.message.postedStreams?.filter(
                 (stream) =>
                     (stream.schema === Schemas.commonstream && (stream.author === client.ccid || stream.visible)) ||
                     stream.schema === Schemas.utilitystream
-            ) ?? [],
-        [props.message]
-    )
+            ) ?? []
+        const uniq = [...new Set(streams)]
+        return uniq
+    }, [props.message])
 
     return (
         <Box
@@ -57,7 +58,7 @@ export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
                             <Link
                                 key={e.id}
                                 component={RouterLink}
-                                to={'/stream#' + e.id}
+                                to={'/stream/' + e.id}
                                 underline="hover"
                                 sx={{
                                     fontweight: '400',
@@ -72,6 +73,7 @@ export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
                     case Schemas.utilitystream:
                         return props.useUserIcon ? (
                             <CCUserIcon
+                                key={e.id}
                                 sx={{
                                     height: '1rem',
                                     width: '1rem'
@@ -80,6 +82,7 @@ export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
                             />
                         ) : (
                             <Tooltip
+                                key={e.id}
                                 arrow
                                 placement="top"
                                 title={

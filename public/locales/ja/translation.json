@@ -105,6 +105,9 @@
             "secret": "シークレットコード",
             "secretCannotBeRestored": "このアカウントのインポートがシークレットコードではなく秘密鍵直接入力によるインポートであったため、シークレットコードを復元できません。"
         },
+        "identity": {
+            "title": "管理"
+        },
         "theme": {
             "title": "テーマ"
         },
@@ -152,6 +155,14 @@
             "helperText": "a-z, A-Z, 0-9, _が使用できます",
             "alreadyRegistered": "このユーザーは既に登録されています。",
             "tryAnotherID": "他のIDを試してください"
+        },
+        "qr": {
+            "title": "ログインQR",
+            "createNew": "新しく作成",
+            "showInstalled": "この端末のキーを表示",
+            "tip1": "ここで作成したサブキーの認証情報は、この画面を離れると再度表示されません。使わなかった場合作り直しになってしまう為、必要な時のみ生成して、必要に応じてメモを取るなどしてください。",
+            "tip2": "アカウントが持つキーのリストは設定のIdentityページから確認できます。",
+            "createNewSubKey": "サブキーを新しく生成する"
         }
     },
     "welcome": {
@@ -159,7 +170,7 @@
         "tagline2": "環境は無数。",
         "description": "Concurrentは1つのアカウントで無数のサーバーとつながれる、新しい分散型SNSです。",
         "createAccount": "アカウントを作成",
-        "import": "インポート",
+        "import": "ログイン",
         "gettingStarted": "さあ、始めよう",
         "feature1": {
             "title": "もうサーバーごとにアカウントを作る必要はありません",
@@ -235,7 +246,7 @@
             "next": "はじめる"
         },
         "alreadyHaveAccount": "すでにアカウントをお持ちですか？",
-        "importAccount": "アカウントのインポート"
+        "importAccount": "ログイン"
     },
     "import": {
         "searching": "検索中…",
@@ -243,11 +254,11 @@
         "invalidSecret": "シークレットコードが正しくありません。",
         "notFoundOnServer": "指定のサーバーにあなたのアカウントは見つかりませんでした。",
         "connectionError": "指定のサーバーに接続できませんでした。",
-        "input": "シークレットコードまたは秘密鍵を入力",
-        "secretPlaceholder": "12個の単語からなる呪文",
+        "input": "マスターキーでログイン",
+        "secretPlaceholder": "12個の単語からなる呪文または秘密鍵",
         "welcome": "ようこそ",
         "domain": "ドメイン",
-        "import": "インポート",
+        "import": "ログイン",
         "noAccount": "まだアカウントを作ってない？",
         "createAccount": "アカウントを作成"
     }

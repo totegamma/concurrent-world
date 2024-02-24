@@ -5,23 +5,19 @@ import {
     FormControlLabel,
     FormGroup,
     IconButton,
-    Link,
     MenuItem,
     Select,
     Switch,
     Typography
 } from '@mui/material'
 import { usePreference } from '../../context/PreferenceContext'
-import { Passport } from '../../components/theming/Passport'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
-import Tilt from 'react-parallax-tilt'
 import { useApi } from '../../context/api'
 import { useEffect, useState } from 'react'
 import { useSnackbar } from 'notistack'
 import { IssueJWT } from '@concurrent-world/client'
-import { useTranslation, Trans } from 'react-i18next'
-import { Link as NavLink } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 export const GeneralSettings = (): JSX.Element => {
     const client = useApi()
@@ -51,25 +47,6 @@ export const GeneralSettings = (): JSX.Element => {
                 gap: 1
             }}
         >
-            <Box
-                sx={{
-                    padding: { xs: '10px', sm: '10px 50px' }
-                }}
-            >
-                <Tilt glareEnable={true} glareBorderRadius="5%">
-                    <Passport />
-                </Tilt>
-            </Box>
-
-            <Typography>
-                <Trans
-                    i18nKey={t('checkSecret')}
-                    components={{ l: <Link component={NavLink} to="/settings/profile" /> }}
-                />
-            </Typography>
-
-            <Divider />
-
             <Box>
                 <Typography variant="h3">{t('language')}</Typography>
                 <Select
@@ -193,6 +170,7 @@ export const GeneralSettings = (): JSX.Element => {
                                 if (client.api.host === undefined) {
                                     return
                                 }
+                                if (!client?.keyPair?.privatekey) return
                                 const jwt = IssueJWT(client.keyPair.privatekey, {
                                     iss: client.ccid,
                                     aud: client.host,

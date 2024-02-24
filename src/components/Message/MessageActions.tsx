@@ -28,7 +28,7 @@ import { useInspector } from '../../context/Inspector'
 
 export interface MessageActionsProps {
     message: Message<SimpleNoteSchema | ReplyMessageSchema | RerouteMessageSchema>
-    userCCID: string
+    userCCID?: string
 }
 
 export const MessageActions = (props: MessageActionsProps): JSX.Element => {
