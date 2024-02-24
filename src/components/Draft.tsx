@@ -599,7 +599,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             color="primary"
                             disabled={sending}
                             onClick={(_) => {
-                                post()
+                                post(postHome)
                             }}
                             sx={{
                                 '&.Mui-disabled': {
