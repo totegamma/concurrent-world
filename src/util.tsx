@@ -4,6 +4,7 @@ import { LangJa } from './utils/lang-ja'
 import { useTranslation } from 'react-i18next'
 
 import { visit } from 'unist-util-visit'
+import { inspect } from 'unist-util-inspect'
 import { Sign } from '@concurrent-world/client'
 
 export const jumpToDomainRegistration = (ccid: string, privateKey: string, fqdn: string): void => {
@@ -138,6 +139,55 @@ export const fileToBase64 = (file: File): Promise<string | null> => {
     })
 }
 
+export const dumpRemarkPlugin = (): any => {
+    return (tree: Node) => {
+        console.log(inspect(tree))
+    }
+}
+
+export const literalLinkRemarkPlugin = (): any => {
+    return (tree: any) => {
+        visit(tree, 'text', (node: any, index?: number, parent?: any) => {
+            const parts = node.value.split(/(https?:\/\/[^\s]+)/)
+            if (parts.length !== 1) {
+                parent.children.splice(
+                    index,
+                    1,
+                    ...parts
+                        .map((part: string) => {
+                            if (part.length === 0) return undefined
+                            if (part.startsWith('http')) return { type: 'link', url: part, title: part }
+                            else return { type: 'text', value: part }
+                        })
+                        .filter((node: any) => node !== undefined)
+                )
+            }
+        })
+    }
+}
+
+export const strikeThroughRemarkPlugin = (): any => {
+    return (tree: any) => {
+        visit(tree, 'text', (node: any, index?: number, parent?: any) => {
+            const parts = node.value.split(/(~~[^~]+~~)/)
+            if (parts.length !== 1) {
+                parent.children.splice(
+                    index,
+                    1,
+                    ...parts
+                        .map((part: string) => {
+                            if (part.length === 0) return undefined
+                            if (part.startsWith('~~'))
+                                return { type: 'delete', children: [{ type: 'text', value: part.slice(2, -2) }] }
+                            else return { type: 'text', value: part }
+                        })
+                        .filter((node: any) => node !== undefined)
+                )
+            }
+        })
+    }
+}
+
 export const userMentionRemarkPlugin = (): any => {
     return (tree: any) => {
         visit(tree, 'text', (node: any, index?: number, parent?: any) => {
@@ -150,6 +200,27 @@ export const userMentionRemarkPlugin = (): any => {
                         .map((part: string) => {
                             if (part.length === 0) return undefined
                             if (part.startsWith('@')) return { type: 'userlink', ccid: part.slice(1) }
+                            else return { type: 'text', value: part }
+                        })
+                        .filter((node: any) => node !== undefined)
+                )
+            }
+        })
+    }
+}
+
+export const streamLinkRemarkPlugin = (): any => {
+    return (tree: any) => {
+        visit(tree, 'text', (node: any, index?: number, parent?: any) => {
+            const parts = node.value.split(/(%\w+@[^\s]+)/)
+            if (parts.length !== 1) {
+                parent.children.splice(
+                    index,
+                    1,
+                    ...parts
+                        .map((part: string) => {
+                            if (part.length === 0) return undefined
+                            if (part.startsWith('%')) return { type: 'streamlink', streamId: part.slice(1) }
                             else return { type: 'text', value: part }
                         })
                         .filter((node: any) => node !== undefined)

@@ -15,7 +15,11 @@ interface StreamCardProps {
 
 export function StreamCard(props: StreamCardProps): JSX.Element {
     return (
-        <Card>
+        <Card
+            sx={{
+                maxWidth: 345
+            }}
+        >
             <CardActionArea component={Link} to={'/stream/' + props.streamID}>
                 <CCWallpaper
                     sx={{

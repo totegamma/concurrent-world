@@ -3,6 +3,7 @@ import 'react-markdown'
 declare module 'react-markdown' {
     export interface Components {
         userlink?: React.FC<{ ccid: string }>
+        streamlink?: React.FC<{ streamId: string }>
         emoji?: React.FC<{ shortcode: string }>
         social?: React.FC<{ type: string; icon: string; service: string; children: string }>
         emojipack?: React.FC<{ src: string }>
@@ -13,6 +14,10 @@ declare global {
     namespace JSX {
         interface IntrinsicElements {
             userlink: { ccid: string } & React.DetailedHTMLProps<
+                React.AnchorHTMLAttributes<HTMLAnchorElement>,
+                HTMLAnchorElement
+            >
+            streamlink: { streamId: string } & React.DetailedHTMLProps<
                 React.AnchorHTMLAttributes<HTMLAnchorElement>,
                 HTMLAnchorElement
             >
