@@ -10,7 +10,6 @@ import {
     emojiRemarkPlugin,
     streamLinkRemarkPlugin,
     literalLinkRemarkPlugin,
-    dumpRemarkPlugin,
     strikeThroughRemarkPlugin
 } from '../../util'
 import { CCUserChip } from './CCUserChip'

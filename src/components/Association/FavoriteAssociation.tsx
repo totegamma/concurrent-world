@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { useApi } from '../../context/api'
+import { MarkdownRendererLite } from '../ui/MarkdownRendererLite'
 
 export interface FavoriteAssociationProps {
     association: Association<LikeSchema>
@@ -82,7 +83,10 @@ export const FavoriteAssociation = (props: FavoriteAssociationProps): JSX.Elemen
             </Box>
             {(!props.withoutContent && (
                 <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
-                    {target?.payload.body.body}
+                    <MarkdownRendererLite
+                        messagebody={target?.payload.body.body ?? 'no content'}
+                        emojiDict={target?.payload.body.emojis ?? {}}
+                    />
                 </blockquote>
             )) ||
                 undefined}
