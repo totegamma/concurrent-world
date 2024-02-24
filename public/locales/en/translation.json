@@ -6,7 +6,8 @@
         "unwatch": "Unwatch",
         "follow": "Follow",
         "following": "Following",
-        "unfollow": "Unfollow"
+        "unfollow": "Unfollow",
+        "followers": "Followers"
     },
     "pages": {
         "home": {
