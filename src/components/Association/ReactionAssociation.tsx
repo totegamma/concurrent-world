@@ -15,6 +15,7 @@ import { MarkdownRendererLite } from '../ui/MarkdownRendererLite'
 
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import { useApi } from '../../context/api'
 
 export interface ReactionAssociationProps {
     association: Association<EmojiAssociationSchema>
@@ -23,6 +24,7 @@ export interface ReactionAssociationProps {
 }
 
 export const ReactionAssociation = (props: ReactionAssociationProps): JSX.Element => {
+    const client = useApi()
     const [target, setTarget] = useState<Message<SimpleNoteSchema | ReplyMessageSchema> | null>(null)
     const isMeToOther = props.association?.authorUser?.ccid !== props.perspective
 
@@ -67,18 +69,20 @@ export const ReactionAssociation = (props: ReactionAssociationProps): JSX.Elemen
                     )}
                 </Typography>
                 <Box>
-                    <IconButton
-                        sx={{
-                            width: { xs: '12px', sm: '18px' },
-                            height: { xs: '12px', sm: '18px' },
-                            color: 'text.disabled'
-                        }}
-                        onClick={(e) => {
-                            setMenuAnchor(e.currentTarget)
-                        }}
-                    >
-                        <MoreHorizIcon sx={{ fontSize: '80%' }} />
-                    </IconButton>
+                    {(props.association.author === client?.ccid || props.association.owner === client?.ccid) && (
+                        <IconButton
+                            sx={{
+                                width: { xs: '12px', sm: '18px' },
+                                height: { xs: '12px', sm: '18px' },
+                                color: 'text.disabled'
+                            }}
+                            onClick={(e) => {
+                                setMenuAnchor(e.currentTarget)
+                            }}
+                        >
+                            <MoreHorizIcon sx={{ fontSize: '80%' }} />
+                        </IconButton>
+                    )}
                     <Link
                         component={RouterLink}
                         underline="hover"

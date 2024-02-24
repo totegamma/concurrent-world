@@ -247,18 +247,21 @@ export function MessagePage(): JSX.Element {
                                                 lastUpdated={lastUpdated}
                                                 userCCID={client.ccid}
                                                 additionalMenuItems={
-                                                    <MenuItem
-                                                        onClick={() => {
-                                                            reply.association?.delete().then(() => {
-                                                                setForceUpdate((prev) => prev + 1)
-                                                            })
-                                                        }}
-                                                    >
-                                                        <ListItemIcon>
-                                                            <DeleteForeverIcon sx={{ color: 'text.primary' }} />
-                                                        </ListItemIcon>
-                                                        <ListItemText>関連付けを削除</ListItemText>
-                                                    </MenuItem>
+                                                    reply.association.author === client.ccid ||
+                                                    reply.association.owner === client.ccid ? (
+                                                        <MenuItem
+                                                            onClick={() => {
+                                                                reply.association?.delete().then(() => {
+                                                                    setForceUpdate((prev) => prev + 1)
+                                                                })
+                                                            }}
+                                                        >
+                                                            <ListItemIcon>
+                                                                <DeleteForeverIcon sx={{ color: 'text.primary' }} />
+                                                            </ListItemIcon>
+                                                            <ListItemText>関連付けを削除</ListItemText>
+                                                        </MenuItem>
+                                                    ) : undefined
                                                 }
                                             />
                                         </Paper>
@@ -288,18 +291,21 @@ export function MessagePage(): JSX.Element {
                                             <RerouteMessageFrame
                                                 message={reroute.message}
                                                 additionalMenuItems={
-                                                    <MenuItem
-                                                        onClick={() => {
-                                                            reroute.association?.delete().then(() => {
-                                                                setForceUpdate((prev) => prev + 1)
-                                                            })
-                                                        }}
-                                                    >
-                                                        <ListItemIcon>
-                                                            <DeleteForeverIcon sx={{ color: 'text.primary' }} />
-                                                        </ListItemIcon>
-                                                        <ListItemText>関連付けを削除</ListItemText>
-                                                    </MenuItem>
+                                                    reroute.association.author === client.ccid ||
+                                                    reroute.association.owner === client.ccid ? (
+                                                        <MenuItem
+                                                            onClick={() => {
+                                                                reroute.association?.delete().then(() => {
+                                                                    setForceUpdate((prev) => prev + 1)
+                                                                })
+                                                            }}
+                                                        >
+                                                            <ListItemIcon>
+                                                                <DeleteForeverIcon sx={{ color: 'text.primary' }} />
+                                                            </ListItemIcon>
+                                                            <ListItemText>関連付けを削除</ListItemText>
+                                                        </MenuItem>
+                                                    ) : undefined
                                                 }
                                             />
                                         </Paper>

@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react'
 
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import { useApi } from '../../context/api'
 
 export interface FavoriteAssociationProps {
     association: Association<LikeSchema>
@@ -22,6 +23,7 @@ export interface FavoriteAssociationProps {
 }
 
 export const FavoriteAssociation = (props: FavoriteAssociationProps): JSX.Element => {
+    const client = useApi()
     const [target, setTarget] = useState<Message<SimpleNoteSchema | ReplyMessageSchema> | null>(null)
     const isMeToOther = props.association?.authorUser?.ccid !== props.perspective
 
@@ -53,18 +55,20 @@ export const FavoriteAssociation = (props: FavoriteAssociationProps): JSX.Elemen
                     )}
                 </Typography>
                 <Box>
-                    <IconButton
-                        sx={{
-                            width: { xs: '12px', sm: '18px' },
-                            height: { xs: '12px', sm: '18px' },
-                            color: 'text.disabled'
-                        }}
-                        onClick={(e) => {
-                            setMenuAnchor(e.currentTarget)
-                        }}
-                    >
-                        <MoreHorizIcon sx={{ fontSize: '80%' }} />
-                    </IconButton>
+                    {(props.association.author === client?.ccid || props.association.owner === client?.ccid) && (
+                        <IconButton
+                            sx={{
+                                width: { xs: '12px', sm: '18px' },
+                                height: { xs: '12px', sm: '18px' },
+                                color: 'text.disabled'
+                            }}
+                            onClick={(e) => {
+                                setMenuAnchor(e.currentTarget)
+                            }}
+                        >
+                            <MoreHorizIcon sx={{ fontSize: '80%' }} />
+                        </IconButton>
+                    )}
                     <Link
                         component={RouterLink}
                         underline="hover"
