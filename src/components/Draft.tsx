@@ -111,7 +111,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         setEmojiDict((prev) => ({ ...prev, [emoji.shortcode]: { imageURL: emoji.imageURL } }))
     }
 
-    const post = (): void => {
+    const post = (postHome: boolean): void => {
         if (!props.allowEmpty && (draft.length === 0 || draft.trim().length === 0)) {
             enqueueSnackbar('Message must not be empty!', { variant: 'error' })
             return
@@ -376,8 +376,12 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             }
                         }
                         if (draft.length === 0 || draft.trim().length === 0) return
-                        if (e.key === 'Enter' && (e.ctrlKey === true || e.metaKey === true)) {
-                            post()
+                        if (e.key === 'Enter' && (e.ctrlKey === true || e.metaKey === true) && !sending) {
+                            if (e.shiftKey) {
+                                post(false)
+                            } else {
+                                post(postHome)
+                            }
                         }
                     }}
                     onBlur={() => {
@@ -595,7 +599,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             color="primary"
                             disabled={sending}
                             onClick={(_) => {
-                                post()
+                                post(postHome)
                             }}
                             sx={{
                                 '&.Mui-disabled': {

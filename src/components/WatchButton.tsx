@@ -3,19 +3,24 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import { usePreference } from '../context/PreferenceContext'
 import { useState } from 'react'
 import { type StreamList } from '../model'
+import { useTranslation } from 'react-i18next'
 
-export interface FollowButtonProps {
+export interface WatchButtonProps {
     color?: string
     userCCID: string
     userStreamID: string
 }
 
-export const FollowButton = (props: FollowButtonProps): JSX.Element => {
+export const WatchButton = (props: WatchButtonProps): JSX.Element => {
     const [lists, setLists] = usePreference('lists')
     const theme = useTheme()
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
-    const followed = lists ? lists.home.userStreams.map((e) => e.userID).includes(props.userCCID) : []
+    const [isHovered, setIsHovered] = useState(false)
+
+    const { t } = useTranslation('', { keyPrefix: 'common' })
+
+    const watching = lists ? lists.home.userStreams.map((e) => e.userID).includes(props.userCCID) : []
 
     if (lists === undefined) {
         return <></>
@@ -29,10 +34,10 @@ export const FollowButton = (props: FollowButtonProps): JSX.Element => {
 
     return (
         <Box>
-            <ButtonGroup color="primary">
+            <ButtonGroup color="primary" variant="contained">
                 <Button
                     onClick={(_) => {
-                        if (followed) {
+                        if (watching) {
                             updateList('home', {
                                 ...lists.home,
                                 userStreams: lists.home.userStreams.filter((e) => e.userID !== props.userCCID)
@@ -50,8 +55,14 @@ export const FollowButton = (props: FollowButtonProps): JSX.Element => {
                             })
                         }
                     }}
+                    onMouseEnter={() => {
+                        setIsHovered(true)
+                    }}
+                    onMouseLeave={() => {
+                        setIsHovered(false)
+                    }}
                 >
-                    {followed ? 'Unfollow' : 'Follow'}
+                    {watching ? (isHovered ? t('unwatch') : t('watching')) : t('watch')}
                 </Button>
                 <Button
                     size="small"

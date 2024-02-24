@@ -1,5 +1,14 @@
 {
     "test": "テスト",
+    "common": {
+        "watch": "ウォッチ",
+        "watching": "ウォッチ中",
+        "unwatch": "ウォッチ解除",
+        "follow": "フォロー",
+        "following": "フォロー中",
+        "unfollow": "フォロー解除",
+        "followers": "フォロワー"
+    },
     "pages": {
         "home": {
             "title": "ホーム"

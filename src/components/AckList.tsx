@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { Box, Link, Tab, Tabs } from '@mui/material'
 import { CCAvatar } from './ui/CCAvatar'
 import { Link as RouterLink } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 export interface AckListProps {
     initmode?: 'acking' | 'acker'
@@ -14,6 +15,8 @@ export const AckList = (props: AckListProps): JSX.Element => {
 
     const [ackingUsers, setAckingUsers] = useState<User[]>([])
     const [ackerUsers, setAckerUsers] = useState<User[]>([])
+
+    const { t } = useTranslation('', { keyPrefix: 'common' })
 
     useEffect(() => {
         let unmounted = false
@@ -41,8 +44,8 @@ export const AckList = (props: AckListProps): JSX.Element => {
                 textColor="secondary"
                 indicatorColor="secondary"
             >
-                <Tab value="acking" label="追加済み" />
-                <Tab value="acker" label="ファンリスト" />
+                <Tab value="acking" label={t('follow')} />
+                <Tab value="acker" label={t('followers')} />
             </Tabs>
             <Box
                 sx={{

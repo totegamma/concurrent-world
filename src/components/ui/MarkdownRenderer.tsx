@@ -1,7 +1,6 @@
 import { type ImgHTMLAttributes, type DetailedHTMLProps, memo } from 'react'
 import { Box, Button, Divider, IconButton, Link, Tooltip, Typography } from '@mui/material'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
-import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 import { type ReactMarkdownProps } from 'react-markdown/lib/ast-to-react'
@@ -9,7 +8,13 @@ import breaks from 'remark-breaks'
 import { Codeblock } from './Codeblock'
 
 import type { EmojiLite } from '../../model'
-import { userMentionRemarkPlugin, emojiRemarkPlugin } from '../../util'
+import {
+    userMentionRemarkPlugin,
+    emojiRemarkPlugin,
+    streamLinkRemarkPlugin,
+    literalLinkRemarkPlugin,
+    strikeThroughRemarkPlugin
+} from '../../util'
 import { CCUserChip } from './CCUserChip'
 import { LinkChip } from './LinkChip'
 import { ThemeCard } from '../ThemeCard'
@@ -19,6 +24,7 @@ import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline'
 import { EmojipackCard } from '../EmojipackCard'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import { useGlobalActions } from '../../context/GlobalActions'
+import { StreamChip } from './StreamChip'
 
 export interface MarkdownRendererProps {
     messagebody: string
@@ -33,6 +39,7 @@ const sanitizeOption = {
         'video',
         'source',
         'userlink',
+        'streamlink',
         'emoji',
         'social',
         'emojipack'
@@ -43,6 +50,7 @@ const sanitizeOption = {
         video: [...(defaultSchema.attributes?.video ?? []), 'width', 'height', 'poster', 'loop'],
         source: [...(defaultSchema.attributes?.source ?? []), 'src', 'type'],
         userlink: ['ccid'],
+        streamlink: ['streamId'],
         emoji: ['shortcode'],
         social: ['href', 'service', 'icon'],
         emojipack: ['src']
@@ -117,8 +125,10 @@ export const MarkdownRenderer = memo<MarkdownRendererProps>((props: MarkdownRend
             <ReactMarkdown
                 remarkPlugins={[
                     breaks,
-                    [remarkGfm, { singleTilde: false }],
+                    literalLinkRemarkPlugin,
+                    strikeThroughRemarkPlugin,
                     userMentionRemarkPlugin,
+                    streamLinkRemarkPlugin,
                     emojiRemarkPlugin
                 ]}
                 rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeOption]]}
@@ -126,6 +136,9 @@ export const MarkdownRenderer = memo<MarkdownRendererProps>((props: MarkdownRend
                     handlers: {
                         userlink: (h, node) => {
                             return h(node, 'userlink', { ccid: node.ccid })
+                        },
+                        streamlink: (h, node) => {
+                            return h(node, 'streamlink', { streamId: node.streamId })
                         },
                         emoji: (h, node) => {
                             return h(node, 'emoji', { shortcode: node.shortcode })
@@ -135,6 +148,9 @@ export const MarkdownRenderer = memo<MarkdownRendererProps>((props: MarkdownRend
                 components={{
                     userlink: ({ ccid }) => {
                         return <CCUserChip ccid={ccid} />
+                    },
+                    streamlink: ({ streamId }) => {
+                        return <StreamChip streamID={streamId} />
                     },
                     social: ({ href, icon, service, children }) => {
                         return (

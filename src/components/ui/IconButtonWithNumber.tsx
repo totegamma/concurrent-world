@@ -25,7 +25,10 @@ const _IconButtonWithNumber: ForwardRefRenderFunction<HTMLDivElement, IconButton
                     color: theme.palette.text.secondary
                 }}
                 color="primary"
-                onClick={props.onClick}
+                onClick={(e) => {
+                    props.onClick(e)
+                    e.stopPropagation()
+                }}
             >
                 {props.icon}
             </IconButton>

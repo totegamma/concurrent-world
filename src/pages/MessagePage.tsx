@@ -1,4 +1,17 @@
-import { Box, Divider, List, Paper, Tab, Tabs, Typography, useMediaQuery, useTheme } from '@mui/material'
+import {
+    Box,
+    Divider,
+    List,
+    ListItemIcon,
+    ListItemText,
+    MenuItem,
+    Paper,
+    Tab,
+    Tabs,
+    Typography,
+    useMediaQuery,
+    useTheme
+} from '@mui/material'
 import { useParams } from 'react-router-dom'
 import { useApi } from '../context/api'
 import { useEffect, useState } from 'react'
@@ -10,7 +23,9 @@ import {
     type SimpleNoteSchema,
     type Association,
     type LikeSchema,
-    type EmojiAssociationSchema
+    type EmojiAssociationSchema,
+    type ReplyAssociationSchema,
+    type RerouteAssociationSchema
 } from '@concurrent-world/client'
 import { MessageView } from '../components/Message/MessageView'
 import { Draft } from '../components/Draft'
@@ -18,6 +33,8 @@ import { useGlobalActions } from '../context/GlobalActions'
 import { RerouteMessageFrame } from '../components/Message/RerouteMessageFrame'
 import { FavoriteAssociation } from '../components/Association/FavoriteAssociation'
 import { ReactionAssociation } from '../components/Association/ReactionAssociation'
+
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 
 export function MessagePage(): JSX.Element {
     const { id } = useParams()
@@ -33,8 +50,18 @@ export function MessagePage(): JSX.Element {
     > | null>()
     const [isFetching, setIsFetching] = useState<boolean>(true)
 
-    const [replies, setReplies] = useState<Array<Message<ReplyMessageSchema>>>([])
-    const [reroutes, setReroutes] = useState<Array<Message<RerouteMessageSchema>>>([])
+    const [replies, setReplies] = useState<
+        Array<{
+            association?: Association<ReplyAssociationSchema>
+            message?: Message<ReplyMessageSchema>
+        }>
+    >([])
+    const [reroutes, setReroutes] = useState<
+        Array<{
+            association?: Association<RerouteAssociationSchema>
+            message?: Message<RerouteMessageSchema>
+        }>
+    >([])
     const [favorites, setFavorites] = useState<Array<Association<LikeSchema>>>([])
     const [reactions, setReactions] = useState<Array<Association<EmojiAssociationSchema>>>([])
     const [replyTo, setReplyTo] = useState<Message<ReplyMessageSchema> | null>(null)
@@ -42,6 +69,8 @@ export function MessagePage(): JSX.Element {
     const tab = (location.hash.slice(1) as 'replies' | 'reroutes' | 'favorites' | 'reactions') || 'replies'
     const theme = useTheme()
     const isMobileSize = useMediaQuery(theme.breakpoints.down('sm'))
+
+    const [forceUpdate, setForceUpdate] = useState(0) // FIXME: use more elegant way to force update
 
     useEffect(() => {
         setMessage(null)
@@ -91,7 +120,7 @@ export function MessagePage(): JSX.Element {
         return () => {
             isMounted = false
         }
-    }, [messageID, authorID])
+    }, [messageID, authorID, forceUpdate])
 
     if (isFetching) {
         return (
@@ -203,16 +232,41 @@ export function MessagePage(): JSX.Element {
                             <Typography variant="h2" gutterBottom>
                                 Replies:
                             </Typography>
-                            {replies.map((reply) => (
-                                <Paper
-                                    key={reply.id}
-                                    sx={{
-                                        padding: '20px'
-                                    }}
-                                >
-                                    <MessageView message={reply} lastUpdated={lastUpdated} userCCID={client.ccid} />
-                                </Paper>
-                            ))}
+                            {replies.map(
+                                (reply) =>
+                                    reply.association &&
+                                    reply.message && (
+                                        <Paper
+                                            key={reply.message.id}
+                                            sx={{
+                                                padding: '20px'
+                                            }}
+                                        >
+                                            <MessageView
+                                                message={reply.message}
+                                                lastUpdated={lastUpdated}
+                                                userCCID={client.ccid}
+                                                additionalMenuItems={
+                                                    reply.association.author === client.ccid ||
+                                                    reply.association.owner === client.ccid ? (
+                                                        <MenuItem
+                                                            onClick={() => {
+                                                                reply.association?.delete().then(() => {
+                                                                    setForceUpdate((prev) => prev + 1)
+                                                                })
+                                                            }}
+                                                        >
+                                                            <ListItemIcon>
+                                                                <DeleteForeverIcon sx={{ color: 'text.primary' }} />
+                                                            </ListItemIcon>
+                                                            <ListItemText>関連付けを削除</ListItemText>
+                                                        </MenuItem>
+                                                    ) : undefined
+                                                }
+                                            />
+                                        </Paper>
+                                    )
+                            )}
                         </>
                     )}
                 </>
@@ -224,16 +278,39 @@ export function MessagePage(): JSX.Element {
                     </Typography>
                     {reroutes.length > 0 && (
                         <>
-                            {reroutes.map((reroute) => (
-                                <Paper
-                                    key={reroute.id}
-                                    sx={{
-                                        padding: '20px'
-                                    }}
-                                >
-                                    <RerouteMessageFrame message={reroute} />
-                                </Paper>
-                            ))}
+                            {reroutes.map(
+                                (reroute) =>
+                                    reroute.association &&
+                                    reroute.message && (
+                                        <Paper
+                                            key={reroute.message.id}
+                                            sx={{
+                                                padding: '20px'
+                                            }}
+                                        >
+                                            <RerouteMessageFrame
+                                                message={reroute.message}
+                                                additionalMenuItems={
+                                                    reroute.association.author === client.ccid ||
+                                                    reroute.association.owner === client.ccid ? (
+                                                        <MenuItem
+                                                            onClick={() => {
+                                                                reroute.association?.delete().then(() => {
+                                                                    setForceUpdate((prev) => prev + 1)
+                                                                })
+                                                            }}
+                                                        >
+                                                            <ListItemIcon>
+                                                                <DeleteForeverIcon sx={{ color: 'text.primary' }} />
+                                                            </ListItemIcon>
+                                                            <ListItemText>関連付けを削除</ListItemText>
+                                                        </MenuItem>
+                                                    ) : undefined
+                                                }
+                                            />
+                                        </Paper>
+                                    )
+                            )}
                         </>
                     )}
                 </>

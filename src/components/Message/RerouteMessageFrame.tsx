@@ -19,6 +19,7 @@ export interface RerouteMessageFrameProp {
     message: Message<RerouteMessageSchema>
     lastUpdated?: number
     simple?: boolean
+    additionalMenuItems?: JSX.Element | JSX.Element[]
 }
 
 export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element => {
@@ -110,6 +111,7 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
                     </ListItemIcon>
                     <ListItemText>詳細</ListItemText>
                 </MenuItem>
+                {props.additionalMenuItems}
                 {props.message.author === client?.user?.ccid && (
                     <MenuItem
                         onClick={() => {

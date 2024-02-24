@@ -1,7 +1,7 @@
 import { Box, Button, Typography, useTheme, Link } from '@mui/material'
 
 import { CCAvatar } from '../components/ui/CCAvatar'
-import { FollowButton } from '../components/FollowButton'
+import { WatchButton } from '../components/WatchButton'
 import { AckButton } from '../components/AckButton'
 import { MarkdownRenderer } from '../components/ui/MarkdownRenderer'
 
@@ -13,6 +13,7 @@ import { useApi } from '../context/api'
 import { CCDrawer } from './ui/CCDrawer'
 import { AckList } from '../components/AckList'
 import { CCWallpaper } from './ui/CCWallpaper'
+import { useTranslation } from 'react-i18next'
 
 export interface ProfileProps {
     user: User
@@ -32,6 +33,8 @@ export function Profile(props: ProfileProps): JSX.Element {
     const [ackingUsers, setAckingUsers] = useState<User[]>([])
     const [ackerUsers, setAckerUsers] = useState<User[]>([])
 
+    const { t } = useTranslation('', { keyPrefix: 'common' })
+
     useEffect(() => {
         let unmounted = false
         if (!props.user) return
@@ -50,25 +53,6 @@ export function Profile(props: ProfileProps): JSX.Element {
 
     return (
         <>
-            {/*
-            <Box
-                sx={{
-                    backgroundColor: theme.palette.primary.main,
-                    height: '150px',
-                }}
-            >
-                <Box
-                    sx={{
-                        backgroundImage: `url(${props.user.profile?.payload.body.banner || Wallpaper})`,
-                        backgroundPosition: 'center',
-                        backgroundSize: 'cover',
-                        mixBlendMode: props.user.profile?.payload.body.banner ? 'normal' : 'hard-light',
-                        width: '100%',
-                        height: '100%',
-                    }}
-                />
-            </Box>
-            */}
             <CCWallpaper
                 override={props.user.profile?.payload.body.banner}
                 sx={{
@@ -100,11 +84,12 @@ export function Profile(props: ProfileProps): JSX.Element {
                     alignItems="center"
                     justifyContent="flex-end"
                     visibility={props.guest ? 'hidden' : 'visible'}
+                    gap={1}
                 >
                     {!isSelf ? (
                         <>
                             <AckButton user={props.user} />
-                            <FollowButton
+                            <WatchButton
                                 color={theme.palette.secondary.main}
                                 userCCID={props.id!}
                                 userStreamID={props.user.userstreams?.payload.body.homeStream ?? ''}
@@ -149,7 +134,7 @@ export function Profile(props: ProfileProps): JSX.Element {
                             setDetailMode('ack')
                         }}
                     >
-                        {ackingUsers.length} Ack
+                        {ackingUsers.length} {t('follow')}
                     </Typography>
                     <Typography
                         component={Link}
@@ -158,7 +143,7 @@ export function Profile(props: ProfileProps): JSX.Element {
                             setDetailMode('acker')
                         }}
                     >
-                        {ackerUsers.length} Acker
+                        {ackerUsers.length} {t('followers')}
                     </Typography>
                 </Box>
             </Box>

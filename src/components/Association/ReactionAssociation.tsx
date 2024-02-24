@@ -7,11 +7,15 @@ import {
     type User
 } from '@concurrent-world/client'
 import { ContentWithCCAvatar } from '../ContentWithCCAvatar'
-import { Box, Link, Typography } from '@mui/material'
+import { Box, IconButton, Link, ListItemIcon, ListItemText, Menu, MenuItem, Typography } from '@mui/material'
 import { TimeDiff } from '../ui/TimeDiff'
 import { Link as RouterLink } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { MarkdownRendererLite } from '../ui/MarkdownRendererLite'
+
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import { useApi } from '../../context/api'
 
 export interface ReactionAssociationProps {
     association: Association<EmojiAssociationSchema>
@@ -20,6 +24,7 @@ export interface ReactionAssociationProps {
 }
 
 export const ReactionAssociation = (props: ReactionAssociationProps): JSX.Element => {
+    const client = useApi()
     const [target, setTarget] = useState<Message<SimpleNoteSchema | ReplyMessageSchema> | null>(null)
     const isMeToOther = props.association?.authorUser?.ccid !== props.perspective
 
@@ -30,6 +35,7 @@ export const ReactionAssociation = (props: ReactionAssociationProps): JSX.Elemen
             'anonymous') + "'s"
 
     const actionUser: User | undefined = isMeToOther ? props.association.authorUser : target?.authorUser
+    const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
     useEffect(() => {
         props.association.getTargetMessage().then(setTarget)
@@ -62,15 +68,31 @@ export const ReactionAssociation = (props: ReactionAssociationProps): JSX.Elemen
                         </>
                     )}
                 </Typography>
-                <Link
-                    component={RouterLink}
-                    underline="hover"
-                    color="inherit"
-                    fontSize="0.75rem"
-                    to={`/message/${target?.id ?? ''}@${target?.author ?? ''}`}
-                >
-                    <TimeDiff date={new Date(props.association.cdate)} />
-                </Link>
+                <Box>
+                    {(props.association.author === client?.ccid || props.association.owner === client?.ccid) && (
+                        <IconButton
+                            sx={{
+                                width: { xs: '12px', sm: '18px' },
+                                height: { xs: '12px', sm: '18px' },
+                                color: 'text.disabled'
+                            }}
+                            onClick={(e) => {
+                                setMenuAnchor(e.currentTarget)
+                            }}
+                        >
+                            <MoreHorizIcon sx={{ fontSize: '80%' }} />
+                        </IconButton>
+                    )}
+                    <Link
+                        component={RouterLink}
+                        underline="hover"
+                        color="inherit"
+                        fontSize="0.75rem"
+                        to={`/message/${target?.id ?? ''}@${target?.author ?? ''}`}
+                    >
+                        <TimeDiff date={new Date(props.association.cdate)} />
+                    </Link>
+                </Box>
             </Box>
             {(!props.withoutContent && (
                 <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
@@ -81,6 +103,25 @@ export const ReactionAssociation = (props: ReactionAssociationProps): JSX.Elemen
                 </blockquote>
             )) ||
                 undefined}
+            <Menu
+                anchorEl={menuAnchor}
+                open={Boolean(menuAnchor)}
+                onClose={() => {
+                    setMenuAnchor(null)
+                }}
+            >
+                <MenuItem
+                    onClick={() => {
+                        props.association.delete()
+                        setMenuAnchor(null)
+                    }}
+                >
+                    <ListItemIcon>
+                        <DeleteForeverIcon sx={{ color: 'text.primary' }} />
+                    </ListItemIcon>
+                    <ListItemText>関連付けを削除</ListItemText>
+                </MenuItem>
+            </Menu>
         </ContentWithCCAvatar>
     )
 }

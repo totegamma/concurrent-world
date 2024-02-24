@@ -1,5 +1,14 @@
 {
     "test": "Test",
+    "common": {
+        "watch": "Watch",
+        "watching": "Watching",
+        "unwatch": "Unwatch",
+        "follow": "Follow",
+        "following": "Following",
+        "unfollow": "Unfollow",
+        "followers": "Followers"
+    },
     "pages": {
         "home": {
             "title": "Home"

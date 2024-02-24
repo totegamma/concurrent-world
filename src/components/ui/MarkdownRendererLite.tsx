@@ -1,14 +1,20 @@
 import { type ImgHTMLAttributes, type DetailedHTMLProps } from 'react'
 import { Box, Link, Typography } from '@mui/material'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
-import remarkGfm from 'remark-gfm'
 import { type ReactMarkdownProps } from 'react-markdown/lib/ast-to-react'
 import breaks from 'remark-breaks'
 
 import type { EmojiLite } from '../../model'
-import { userMentionRemarkPlugin, emojiRemarkPlugin } from '../../util'
+import {
+    userMentionRemarkPlugin,
+    emojiRemarkPlugin,
+    streamLinkRemarkPlugin,
+    literalLinkRemarkPlugin,
+    strikeThroughRemarkPlugin
+} from '../../util'
 import { CCUserChip } from './CCUserChip'
 import { LinkChip } from './LinkChip'
+import { StreamChip } from './StreamChip'
 
 export interface MarkdownRendererProps {
     messagebody: string
@@ -83,14 +89,19 @@ export function MarkdownRendererLite(props: MarkdownRendererProps): JSX.Element 
             <ReactMarkdown
                 remarkPlugins={[
                     breaks,
-                    [remarkGfm, { singleTilde: false }],
+                    literalLinkRemarkPlugin,
+                    strikeThroughRemarkPlugin,
                     userMentionRemarkPlugin,
+                    streamLinkRemarkPlugin,
                     emojiRemarkPlugin
                 ]}
                 remarkRehypeOptions={{
                     handlers: {
                         userlink: (h, node) => {
                             return h(node, 'userlink', { ccid: node.ccid })
+                        },
+                        streamlink: (h, node) => {
+                            return h(node, 'streamlink', { streamId: node.streamId })
                         },
                         emoji: (h, node) => {
                             return h(node, 'emoji', { shortcode: node.shortcode })
@@ -100,6 +111,9 @@ export function MarkdownRendererLite(props: MarkdownRendererProps): JSX.Element 
                 components={{
                     userlink: ({ ccid }) => {
                         return <CCUserChip ccid={ccid} />
+                    },
+                    streamlink: ({ streamId }) => {
+                        return <StreamChip streamID={streamId} />
                     },
                     social: ({ href, icon, service, children }) => {
                         return (
