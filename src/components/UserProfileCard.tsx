@@ -3,7 +3,7 @@ import { Box, Chip, Typography } from '@mui/material'
 import { CCAvatar } from './ui/CCAvatar'
 import { useApi } from '../context/api'
 import { AckButton } from './AckButton'
-import { FollowButton } from './FollowButton'
+import { WatchButton } from './WatchButton'
 import { useSnackbar } from 'notistack'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import { MarkdownRenderer } from './ui/MarkdownRenderer'
@@ -60,7 +60,7 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
                 {!isSelf && (
                     <>
                         <AckButton user={props.user} />
-                        <FollowButton
+                        <WatchButton
                             userCCID={props.user.ccid}
                             userStreamID={props.user.userstreams?.payload.body.homeStream ?? ''}
                             color="primary.main"

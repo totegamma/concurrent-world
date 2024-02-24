@@ -1,7 +1,7 @@
 import { Box, Button, Typography, useTheme, Link } from '@mui/material'
 
 import { CCAvatar } from '../components/ui/CCAvatar'
-import { FollowButton } from '../components/FollowButton'
+import { WatchButton } from '../components/WatchButton'
 import { AckButton } from '../components/AckButton'
 import { MarkdownRenderer } from '../components/ui/MarkdownRenderer'
 
@@ -104,7 +104,7 @@ export function Profile(props: ProfileProps): JSX.Element {
                     {!isSelf ? (
                         <>
                             <AckButton user={props.user} />
-                            <FollowButton
+                            <WatchButton
                                 color={theme.palette.secondary.main}
                                 userCCID={props.id!}
                                 userStreamID={props.user.userstreams?.payload.body.homeStream ?? ''}
