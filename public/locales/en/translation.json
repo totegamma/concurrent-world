@@ -139,7 +139,7 @@
             "deleteCompletely": "Delete completely",
             "copyURL": "Copy URL",
             "copyID": "Copy ID",
-            "oauth2": "and create application with option \"OAuth 2 authorization without a callback URL\"",
+            "oauth2": " and create application with option \"OAuth 2 authorization without a callback URL\"",
             "descs": {
                 "domain": "Domain Storage refers to the storage provided by this domain. It can be used without any setup, but there is a maximum capacity set. Additionally, the list of files may be viewed by administrators and files that violate the terms may be deleted.",
                 "imgur": "Imgur is used for image uploads. It can be set up relatively easily. The content that can be uploaded is subject to Imgur's terms.",
