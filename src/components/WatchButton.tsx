@@ -34,7 +34,7 @@ export const WatchButton = (props: WatchButtonProps): JSX.Element => {
 
     return (
         <Box>
-            <ButtonGroup color="primary">
+            <ButtonGroup color="primary" variant="contained">
                 <Button
                     onClick={(_) => {
                         if (watching) {
