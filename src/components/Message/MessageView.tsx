@@ -26,6 +26,7 @@ export interface MessageViewProps {
     forceExpanded?: boolean
     clipHeight?: number
     simple?: boolean
+    additionalMenuItems?: JSX.Element | JSX.Element[]
 }
 
 const gradationHeight = 80
@@ -56,7 +57,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
             author={props.message.authorUser}
             profileOverride={props.message.payload.body.profileOverride}
         >
-            <MessageHeader message={props.message} />
+            <MessageHeader message={props.message} additionalMenuItems={props.additionalMenuItems} />
             {props.beforeMessage}
             <Box
                 sx={{
