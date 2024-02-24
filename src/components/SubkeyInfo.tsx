@@ -17,41 +17,60 @@ export default function SubkeyInfo(props: { subkey: string }): JSX.Element {
             }}
         >
             <Box
-                style={{
+                sx={{
                     width: '100%',
-                    height: '120px',
                     padding: '10px',
+                    paddingTop: {
+                        xs: '50px',
+                        sm: '50px',
+                        md: '10px'
+                    },
                     display: 'flex',
+                    flexDirection: {
+                        xs: 'column',
+                        sm: 'column',
+                        md: 'row'
+                    },
+                    flexFlow: {
+                        xs: 'column-reverse',
+                        sm: 'column-reverse',
+                        md: 'row'
+                    },
                     alignItems: 'center',
-                    justifyContent: 'space-between'
+                    justifyContent: 'space-between',
+                    gap: '10px'
                 }}
             >
                 <Typography
                     variant="h5"
                     style={{
-                        flex: '1'
+                        flex: '1',
+                        wordBreak: 'break-all'
                     }}
                 >
                     {props.subkey}
                 </Typography>
-                <Divider
-                    orientation="vertical"
-                    style={{
-                        flex: '1'
-                    }}
-                />
+                <Divider orientation="vertical" />
                 <Box
                     style={{
-                        flex: '1',
-                        width: '100px',
-                        height: '100px',
+                        width: '120px',
+                        height: '120px',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        backgroundColor: 'white',
+                        padding: '5px'
                     }}
                 >
-                    <QRCode value={props.subkey} size={100} />
+                    <QRCode
+                        value={props.subkey}
+                        size={100}
+                        style={{
+                            width: '100%',
+                            height: '100%'
+                        }}
+                    />
                 </Box>
             </Box>
 
