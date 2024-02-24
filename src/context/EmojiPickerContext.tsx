@@ -119,7 +119,9 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
     useEffect(() => {
         Promise.all(
             emojiPackageSource.map(async (url) => {
-                const rawpackage = await fetch(url).then((j) => j.json())
+                const rawpackage = await fetch(url, {
+                    cache: 'force-cache'
+                }).then((j) => j.json())
                 const packages: EmojiPackage = {
                     ...rawpackage,
                     packageURL: url
