@@ -156,7 +156,13 @@ export const literalLinkRemarkPlugin = (): any => {
                     ...parts
                         .map((part: string) => {
                             if (part.length === 0) return undefined
-                            if (part.startsWith('http')) return { type: 'link', url: part, title: part }
+                            if (part.startsWith('http'))
+                                return {
+                                    type: 'link',
+                                    url: part,
+                                    title: part,
+                                    children: [{ type: 'text', value: part }]
+                                }
                             else return { type: 'text', value: part }
                         })
                         .filter((node: any) => node !== undefined)
