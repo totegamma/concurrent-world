@@ -169,6 +169,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         const file = event.target.files[0]
         if (!file) return
         await uploadImage(file)
+        textInputRef.current?.focus()
     }
 
     const onFileUploadClick = (): void => {
@@ -535,6 +536,9 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                 emojiPicker.open(e.currentTarget, (emoji) => {
                                     insertEmoji(emoji)
                                     emojiPicker.close()
+                                    setTimeout(() => {
+                                        textInputRef.current?.focus()
+                                    }, 0)
                                 })
                             }}
                         >
