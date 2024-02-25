@@ -74,8 +74,6 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const [postHome, setPostHome] = useState<boolean>(true)
     const [sending, setSending] = useState<boolean>(false)
 
-    const postHomeOriginal = useRef(postHome)
-
     const [caretPos, setCaretPos] = useState<{ left: number; top: number }>({ left: 0, top: 0 })
 
     const [enableSuggestions, setEnableSuggestions] = useState<boolean>(false)
@@ -99,29 +97,6 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             setDraft(props.value)
         }
     }, [props.value])
-
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent): void => {
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && postHome) {
-                postHomeOriginal.current = true
-                setPostHome(false)
-            }
-        }
-
-        const handleKeyUp = (e: KeyboardEvent): void => {
-            if (e.key === 'Shift' || e.key === 'Control') {
-                setPostHome(postHomeOriginal.current)
-            }
-        }
-
-        window.addEventListener('keydown', handleKeyDown)
-        window.addEventListener('keyup', handleKeyUp)
-
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown)
-            window.removeEventListener('keyup', handleKeyUp)
-        }
-    })
 
     const [emojiDict, setEmojiDict] = useState<Record<string, EmojiLite>>({})
 
@@ -255,6 +230,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     }
 
     const { t } = useTranslation('', { keyPrefix: 'ui.draft' })
+    const postHomeOriginal = useRef(postHome)
 
     return (
         <Box
@@ -402,12 +378,21 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             }
                         }
                         if (draft.length === 0 || draft.trim().length === 0) return
+                        if ((e.ctrlKey || e.metaKey) && e.shiftKey && postHome) {
+                            postHomeOriginal.current = true
+                            setPostHome(false)
+                        }
                         if (e.key === 'Enter' && (e.ctrlKey === true || e.metaKey === true) && !sending) {
                             if (e.shiftKey) {
                                 post(false)
                             } else {
                                 post(postHome)
                             }
+                        }
+                    }}
+                    onKeyUp={(e: any) => {
+                        if (e.key === 'Shift' || e.key === 'Control') {
+                            setPostHome(postHomeOriginal.current)
                         }
                     }}
                     onBlur={() => {
