@@ -1,4 +1,4 @@
-import { Alert, Box, Paper, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material'
+import { Alert, Box, Paper, Typography } from '@mui/material'
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useApi } from './api'
@@ -29,20 +29,29 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
 
     useEffect(() => {
         if (!inspectingItem) return
+        let isMounted = true
 
         client.api.getMessageWithAuthor(inspectingItem.messageId, inspectingItem.author).then((msg) => {
             if (!msg) return
+            if (!isMounted) return
             setMessage(msg)
             if (msg.payload.keyID && msg.payload.keyID !== '') {
-                client.api.getKeychain(msg.payload.keyID).then((keys) => {
+                console.log('fetching keychain for', msg.payload.keyID, inspectingItem.author)
+                client.api.getKeyResolution(msg.payload.keyID, inspectingItem.author).then((keys) => {
+                    if (!isMounted) return
                     setKeyResolution(keys)
                 })
             }
         })
 
         client.api.getMessageAssociationsByTarget(inspectingItem.messageId, inspectingItem.author).then((assocs) => {
+            if (!isMounted) return
             setAssociations(assocs)
         })
+
+        return () => {
+            isMounted = false
+        }
     }, [inspectingItem])
 
     const signatureIsValid = useMemo(() => {
@@ -96,7 +105,7 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                 break
             }
 
-            if (previousKey && key.parent !== previousKey) {
+            if (previousKey && key.id !== previousKey) {
                 valid = false
                 reason = 'keychain is not linear'
                 break
@@ -126,7 +135,7 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                 }
             }
 
-            previousKey = keyResolution[i].id
+            previousKey = keyResolution[i].parent
         }
 
         if (valid === undefined) {
