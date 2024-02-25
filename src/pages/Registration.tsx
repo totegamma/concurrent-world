@@ -71,20 +71,17 @@ export function Registration(): JSX.Element {
 
         client?.api
             .getCharacter<DomainProfileSchema>(host.ccid, Schemas.domainProfile)
-            .then((profile: CoreCharacter<DomainProfileSchema> | null | undefined) => {
+            .then((profile: Array<CoreCharacter<DomainProfileSchema>> | null | undefined) => {
                 console.log('domainprofile:', profile)
+                const domainProfile = profile?.[0]?.payload.body
                 const list = {
                     home: {
                         label: 'Home',
                         pinned: true,
-                        streams: profile?.payload.body.defaultFollowingStreams
-                            ? profile.payload.body.defaultFollowingStreams
-                            : [],
+                        streams: domainProfile?.defaultFollowingStreams ? domainProfile?.defaultFollowingStreams : [],
                         userStreams: [],
                         expanded: false,
-                        defaultPostStreams: profile?.payload.body.defaultPostStreams
-                            ? profile.payload.body.defaultPostStreams
-                            : []
+                        defaultPostStreams: domainProfile?.defaultPostStreams ? domainProfile?.defaultPostStreams : []
                     }
                 }
 

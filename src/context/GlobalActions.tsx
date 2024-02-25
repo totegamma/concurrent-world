@@ -203,7 +203,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         const domain = await client.api.getDomain(client.api.host)
         if (!domain) throw new Error('Domain not found')
         try {
-            const domainProfile = await client.api.getCharacter<DomainProfileSchema>(domain.ccid, Schemas.domainProfile)
+            const domainProfile = ((await client.api.getCharacter<DomainProfileSchema>(
+                domain.ccid,
+                Schemas.domainProfile
+            )) ?? [null])[0]
             if (!domainProfile) throw new Error('Domain profile not found')
             if (domainProfile.payload.body.defaultBookmarkStreams)
                 localStorage.setItem(
