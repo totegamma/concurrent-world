@@ -6,7 +6,7 @@ import { Timeline } from '../components/Timeline'
 import { Draft } from '../components/Draft'
 import { useApi } from '../context/api'
 import { type CreateCurrentOptions, type CommonstreamSchema, type Stream } from '@concurrent-world/client'
-import InfoIcon from '@mui/icons-material/Info'
+import TuneIcon from '@mui/icons-material/Tune'
 import ExploreIcon from '@mui/icons-material/Explore'
 import { ListSettings } from '../components/ListSettings'
 import ListIcon from '@mui/icons-material/List'
@@ -99,7 +99,7 @@ export function ListPage(): JSX.Element {
                 <TimelineHeader
                     title={lists[id].label}
                     titleIcon={<ListIcon />}
-                    secondaryAction={<InfoIcon />}
+                    secondaryAction={<TuneIcon />}
                     onSecondaryActionClick={() => {
                         setListSettingsOpen(true)
                     }}
