@@ -10,7 +10,7 @@ import { ApplicationContext } from '../App'
 import { usePreference } from '../context/PreferenceContext'
 import { type CommonstreamSchema, type Stream } from '@concurrent-world/client'
 import PercentIcon from '@mui/icons-material/Percent'
-import InfoIcon from '@mui/icons-material/Info'
+import TuneIcon from '@mui/icons-material/Tune'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import WatchingStreamContextProvider from '../context/WatchingStreamContext'
 import { type VListHandle } from 'virtua'
@@ -78,7 +78,7 @@ export const StreamPage = memo((): JSX.Element => {
                 <TimelineHeader
                     title={targetStream?.payload.name ?? 'Not Found'}
                     titleIcon={<PercentIcon />}
-                    secondaryAction={<InfoIcon />}
+                    secondaryAction={<TuneIcon />}
                     onTitleClick={() => {
                         timelineRef.current?.scrollToIndex(0, { align: 'start', smooth: true })
                     }}
