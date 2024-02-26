@@ -1,9 +1,9 @@
 import { Box, Button, ListItemIcon, ListItemText, MenuItem, TextField, Typography } from '@mui/material'
 import { ProfileEditor } from '../ProfileEditor'
 import { useApi } from '../../context/api'
-import { closeSnackbar, useSnackbar } from 'notistack'
+import { useSnackbar } from 'notistack'
 import { useTranslation } from 'react-i18next'
-import { type CoreCharacter, type Schema } from '@concurrent-world/client'
+import { type ProfileSchema, type CoreCharacter, type Schema } from '@concurrent-world/client'
 import { useEffect, useState } from 'react'
 import { CCDrawer } from '../ui/CCDrawer'
 import { CCEditor } from '../ui/cceditor'
@@ -31,12 +31,13 @@ export const ProfileSettings = (): JSX.Element => {
     const [schemaURL, setSchemaURL] = useState<any>(null)
     const [editingCharacter, setEditingCharacter] = useState<CoreCharacter<any> | null>(null)
 
-    const [enabledSubprofilesDraft, setEnabledSubprofilesDraft] = useState<string[]>([])
-
-    const [modified, setModified] = useState(false)
+    const [latestProfile, setLatestProfile] = useState<CoreCharacter<ProfileSchema> | null | undefined>(
+        client.user?.profile
+    )
 
     const load = (): void => {
         if (!client) return
+        client.api.invalidateCharacter(client.ccid)
         client.api.getCharacter(client.ccid).then((characters) => {
             setAllCharacters(
                 (characters ?? []).filter(
@@ -44,12 +45,19 @@ export const ProfileSettings = (): JSX.Element => {
                 )
             )
         })
-        setEnabledSubprofilesDraft(client.user?.profile?.payload.body.subprofiles ?? [])
+
+        if (!client.user?.profile) return
+
+        client.api.getCharacterByID(client.user.profile?.id, client.user.ccid).then((profile) => {
+            setLatestProfile(profile as CoreCharacter<ProfileSchema>)
+        })
     }
 
     useEffect(() => {
         load()
     }, [client])
+
+    const enabledSubprofiles = latestProfile?.payload.body.subprofiles ?? []
 
     useEffect(() => {
         let isMounted = true
@@ -70,45 +78,6 @@ export const ProfileSettings = (): JSX.Element => {
             setOpenCharacterEditor(true)
         }
     }, [hash])
-
-    useEffect(() => {
-        if (modified) {
-            enqueueSnackbar('掲載サブプロフィール編集中', {
-                persist: true,
-                variant: 'info',
-                action: (key) => (
-                    <>
-                        <Button
-                            onClick={() => {
-                                setModified(false)
-                                setEnabledSubprofilesDraft([])
-                                load()
-                                closeSnackbar(key)
-                            }}
-                        >
-                            戻す
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                setModified(false)
-                                closeSnackbar(key)
-                                if (!client.user?.profile?.id) return
-                                client
-                                    .updateProfile(client.user?.profile?.id, {
-                                        subprofiles: enabledSubprofilesDraft
-                                    })
-                                    .then((_) => {
-                                        enqueueSnackbar('保存しました', { variant: 'success' })
-                                    })
-                            }}
-                        >
-                            保存
-                        </Button>
-                    </>
-                )
-            })
-        }
-    }, [modified])
 
     return (
         <Box
@@ -153,7 +122,7 @@ export const ProfileSettings = (): JSX.Element => {
                 </Button>
             </Box>
             {allCharacters.map((character) => {
-                const published = enabledSubprofilesDraft.includes(character.id)
+                const published = enabledSubprofiles.includes(character.id)
                 return (
                     <SubProfileCard
                         key={character.id}
@@ -162,12 +131,21 @@ export const ProfileSettings = (): JSX.Element => {
                             <MenuItem
                                 key="publish"
                                 onClick={() => {
+                                    let subprofiles
                                     if (published) {
-                                        setEnabledSubprofilesDraft((prev) => prev.filter((id) => id !== character.id))
+                                        subprofiles = enabledSubprofiles.filter((id) => id !== character.id)
                                     } else {
-                                        setEnabledSubprofilesDraft((prev) => [...prev, character.id])
+                                        subprofiles = [...enabledSubprofiles, character.id]
                                     }
-                                    setModified(true)
+
+                                    client.user?.profile?.id &&
+                                        client
+                                            .updateProfile(client.user?.profile?.id, {
+                                                subprofiles
+                                            })
+                                            .then((_) => {
+                                                load()
+                                            })
                                 }}
                             >
                                 <ListItemIcon>
@@ -192,16 +170,19 @@ export const ProfileSettings = (): JSX.Element => {
                             </MenuItem>,
                             <MenuItem
                                 key="delete"
+                                disabled={published}
                                 onClick={() => {
                                     client.api.deleteCharacter(character.id).then((_) => {
-                                        console.log('deleted')
+                                        load()
                                     })
                                 }}
                             >
                                 <ListItemIcon>
                                     <DeleteForeverIcon sx={{ color: 'error.main' }} />
                                 </ListItemIcon>
-                                <ListItemText>削除</ListItemText>
+                                <ListItemText>
+                                    {published ? <>削除するには非公開にしてください</> : <>削除</>}
+                                </ListItemText>
                             </MenuItem>
                         ]}
                     >
@@ -258,6 +239,7 @@ export const ProfileSettings = (): JSX.Element => {
                                         .upsertCharacter(editingCharacter.schema, e, editingCharacter.id)
                                         .then((_) => {
                                             setEditingCharacter(null)
+                                            client.api.invalidateCharacterByID(editingCharacter.id)
                                             load()
                                         })
                                 }}
