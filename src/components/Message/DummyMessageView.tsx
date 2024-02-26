@@ -10,6 +10,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import RepeatIcon from '@mui/icons-material/Repeat'
 import ReplyIcon from '@mui/icons-material/Reply'
 import { TimeDiff } from '../ui/TimeDiff'
+import { SubprofileBadge } from '../ui/SubprofileBadge'
 
 export interface DummyMessageViewProps {
     message?: SimpleNoteSchema | ReplyMessageSchema
@@ -17,6 +18,8 @@ export interface DummyMessageViewProps {
     userCCID?: string
     timestamp?: JSX.Element
     hideActions?: boolean
+    onAvatarClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
+    subprofileID?: string
 }
 
 export const DummyMessageView = (props: DummyMessageViewProps): JSX.Element => {
@@ -38,16 +41,31 @@ export const DummyMessageView = (props: DummyMessageViewProps): JSX.Element => {
                             height: { xs: '38px', sm: '48px' },
                             mt: { xs: '3px', sm: '5px' }
                         }}
+                        onClick={(e) => {
+                            props.onAvatarClick?.(e)
+                        }}
                     >
-                        <CCAvatar
-                            alt={props.user?.username ?? 'Unknown'}
-                            avatarURL={props.user?.avatar}
-                            identiconSource={props.userCCID ?? 'concurrent'}
-                            sx={{
-                                width: { xs: '38px', sm: '48px' },
-                                height: { xs: '38px', sm: '48px' }
-                            }}
-                        />
+                        {props.subprofileID ? (
+                            <SubprofileBadge
+                                characterID={props.subprofileID}
+                                authorCCID={props.userCCID ?? ''}
+                                sx={{
+                                    width: { xs: '38px', sm: '48px' },
+                                    height: { xs: '38px', sm: '48px' },
+                                    mt: { xs: '3px', sm: '5px' }
+                                }}
+                            />
+                        ) : (
+                            <CCAvatar
+                                alt={props.user?.username ?? 'Unknown'}
+                                avatarURL={props.user?.avatar}
+                                identiconSource={props.userCCID ?? 'concurrent'}
+                                sx={{
+                                    width: { xs: '38px', sm: '48px' },
+                                    height: { xs: '38px', sm: '48px' }
+                                }}
+                            />
+                        )}
                     </IconButton>
                     <Box
                         sx={{

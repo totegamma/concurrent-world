@@ -101,10 +101,11 @@ function App(): JSX.Element {
                             m &&
                                 client?.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                     playNotificationRef.current()
+                                    const profile = c?.[0].payload.body
                                     enqueueSnackbar(
                                         <Box display="flex" flexDirection="column">
                                             <Typography>
-                                                {c?.payload.body.username ?? 'anonymous'} replied to your message:{' '}
+                                                {profile?.username ?? 'anonymous'} replied to your message:{' '}
                                             </Typography>
                                             <MarkdownRendererLite
                                                 messagebody={m.payload.body.body as string}
@@ -123,10 +124,11 @@ function App(): JSX.Element {
                         m &&
                             client?.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                 playNotificationRef.current()
+                                const profile = c?.[0].payload.body
                                 enqueueSnackbar(
                                     <Box display="flex" flexDirection="column">
                                         <Typography>
-                                            {c?.payload.body.username ?? 'anonymous'} rerouted to your message:{' '}
+                                            {profile?.username ?? 'anonymous'} rerouted to your message:{' '}
                                         </Typography>
                                         <MarkdownRendererLite
                                             messagebody={m.payload.body.body as string}
@@ -145,9 +147,10 @@ function App(): JSX.Element {
                         m &&
                             client.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                 playNotificationRef.current()
+                                const profile = c?.[0].payload.body
                                 enqueueSnackbar(
                                     <Box display="flex" flexDirection="column">
-                                        <Typography>{c?.payload.body.username ?? 'anonymous'} favorited</Typography>
+                                        <Typography>{profile?.username ?? 'anonymous'} favorited</Typography>
                                         <MarkdownRendererLite
                                             messagebody={m.payload.body.body as string}
                                             emojiDict={m.payload.body.emojis ?? {}}
@@ -166,10 +169,11 @@ function App(): JSX.Element {
                         m &&
                             client.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                 playNotificationRef.current()
+                                const profile = c?.[0].payload.body
                                 enqueueSnackbar(
                                     <Box display="flex" flexDirection="column">
                                         <Typography>
-                                            {c?.payload.body.username ?? 'anonymous'} reacted{' '}
+                                            {profile?.username ?? 'anonymous'} reacted{' '}
                                             <img src={a.payload.body.imageUrl as string} style={{ height: '1em' }} />
                                         </Typography>
                                         <MarkdownRendererLite
@@ -188,9 +192,10 @@ function App(): JSX.Element {
                         m &&
                             client.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                 playNotificationRef.current()
+                                const profile = c?.[0].payload.body
                                 enqueueSnackbar(
                                     <Box display="flex" flexDirection="column">
-                                        {c?.payload.body.username ?? 'anonymous'} mentioned you:{' '}
+                                        {profile?.username ?? 'anonymous'} mentioned you:{' '}
                                         <MarkdownRendererLite
                                             messagebody={m.payload.body.body as string}
                                             emojiDict={m.payload.body.emojis ?? {}}
