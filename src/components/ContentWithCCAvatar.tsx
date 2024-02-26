@@ -3,15 +3,11 @@ import { Box, IconButton, ListItem, Paper, type SxProps, Tooltip } from '@mui/ma
 import { UserProfileCard } from './UserProfileCard'
 import { Link as routerLink } from 'react-router-dom'
 import { CCAvatar } from './ui/CCAvatar'
+import { type ProfileOverride } from '@concurrent-world/client/dist/types/model/core'
 
 export interface ContentWithCCAvatarProps {
     author?: User
-    profileOverride?: {
-        username?: string
-        avatar?: string
-        description?: string
-        link?: string
-    }
+    profileOverride?: ProfileOverride
     children?: JSX.Element | Array<JSX.Element | undefined>
     sx?: SxProps
 }
@@ -62,6 +58,7 @@ export const ContentWithCCAvatar = (props: ContentWithCCAvatarProps): JSX.Elemen
                         avatarURL={props.author?.profile?.payload.body.avatar}
                         avatarOverride={props.profileOverride?.avatar}
                         identiconSource={props.author?.ccid ?? ''}
+                        characterOverride={props.profileOverride?.characterID}
                         sx={{
                             width: { xs: '38px', sm: '48px' },
                             height: { xs: '38px', sm: '48px' }

@@ -328,9 +328,9 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                 }
                                                 onSubmit={async (text, streams, options): Promise<Error | null> => {
                                                     if (mode === 'reroute') {
-                                                        await targetMessage.reroute(streams, text, options?.emojis)
+                                                        await targetMessage.reroute(streams, text, options)
                                                     } else if (mode === 'reply') {
-                                                        await targetMessage.reply(streams, text, options?.emojis)
+                                                        await targetMessage.reply(streams, text, options)
                                                     }
                                                     setMode('none')
                                                     return null
@@ -406,9 +406,9 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                 }
                                                 onSubmit={async (text, streams, options): Promise<Error | null> => {
                                                     if (mode === 'reroute') {
-                                                        await targetMessage.reroute(streams, text, options?.emojis)
+                                                        await targetMessage.reroute(streams, text, options)
                                                     } else if (mode === 'reply') {
-                                                        await targetMessage.reply(streams, text, options?.emojis)
+                                                        await targetMessage.reply(streams, text, options)
                                                     }
                                                     setMode('none')
                                                     return null
