@@ -10,6 +10,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 export interface SubProfileCardProps {
     character: CoreCharacter<any>
     additionalMenuItems?: JSX.Element | JSX.Element[]
+    children?: JSX.Element | JSX.Element[]
 }
 
 const defaultProperties = ['username', 'avatar', 'description', 'banner', 'links']
@@ -108,7 +109,7 @@ export const SubProfileCard = (props: SubProfileCardProps): JSX.Element => {
                         px={1}
                         mb={1}
                     >
-                        未掲載
+                        {props.children}
                     </Box>
                     <Box
                         display="flex"

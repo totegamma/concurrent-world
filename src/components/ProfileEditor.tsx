@@ -34,7 +34,7 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
                 props.onSubmit?.(data)
             })
         } else {
-            client.updateProfile(props.id, username, description, avatar, banner).then((data) => {
+            client.updateProfile(props.id, { username, description, avatar, banner }).then((data) => {
                 console.log(data)
                 props.onSubmit?.(data)
             })
