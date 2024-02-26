@@ -18,7 +18,9 @@ import {
     Typography,
     Backdrop,
     type SxProps,
-    Popper
+    Popper,
+    Menu,
+    MenuItem
 } from '@mui/material'
 import { StreamPicker } from './ui/StreamPicker'
 import { closeSnackbar, useSnackbar } from 'notistack'
@@ -42,6 +44,8 @@ import { DummyMessageView } from './Message/DummyMessageView'
 
 import { ApplicationContext } from '../App'
 import { useStorage } from '../context/StorageContext'
+import { SubprofileBadge } from './ui/SubprofileBadge'
+import { CCAvatar } from './ui/CCAvatar'
 
 export interface DraftProps {
     submitButtonLabel?: string
@@ -84,9 +88,13 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
 
     const [selectedSuggestions, setSelectedSuggestions] = useState<number>(0)
 
+    const [profileSelectAnchorEl, setProfileSelectAnchorEl] = useState<null | HTMLElement>(null)
+
     const timerRef = useRef<any | null>(null)
 
     const { enqueueSnackbar } = useSnackbar()
+
+    const [selectedSubprofile, setSelectedSubprofile] = useState<string | undefined>(undefined)
 
     useEffect(() => {
         setDestStreams(props.streamPickerInitial)
@@ -129,7 +137,11 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
 
         setSending(true)
         props
-            .onSubmit(draft, dest, { emojis: emojiDict, mentions })
+            .onSubmit(draft, dest, {
+                emojis: emojiDict,
+                mentions,
+                profileOverride: { characterID: selectedSubprofile }
+            })
             .then((error) => {
                 if (error) {
                     enqueueSnackbar(`Failed to post message: ${error.message}`, { variant: 'error' })
@@ -629,6 +641,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     }}
                     user={client.user?.profile?.payload.body}
                     userCCID={client.user?.ccid}
+                    subprofileID={selectedSubprofile}
                     timestamp={
                         <Typography
                             sx={{
@@ -641,8 +654,51 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             {t('preview')}
                         </Typography>
                     }
+                    onAvatarClick={(e) => {
+                        setProfileSelectAnchorEl(e.currentTarget)
+                    }}
                 />
             </Collapse>
+            <Menu
+                anchorEl={profileSelectAnchorEl}
+                open={Boolean(profileSelectAnchorEl)}
+                onClose={() => {
+                    setProfileSelectAnchorEl(null)
+                }}
+            >
+                {selectedSubprofile && (
+                    <MenuItem
+                        onClick={() => {
+                            setSelectedSubprofile(undefined)
+                        }}
+                        selected
+                    >
+                        <ListItemIcon>
+                            <CCAvatar
+                                alt={client?.user?.profile?.payload.body.username ?? 'Unknown'}
+                                avatarURL={client?.user?.profile?.payload.body.avatar}
+                                identiconSource={client?.ccid ?? ''}
+                            />
+                        </ListItemIcon>
+                    </MenuItem>
+                )}
+
+                {client.user?.profile?.payload.body.subprofiles?.map((id) => {
+                    if (selectedSubprofile === id) return undefined
+                    return (
+                        <MenuItem
+                            key={id}
+                            onClick={() => {
+                                setSelectedSubprofile(id)
+                            }}
+                        >
+                            <ListItemIcon>
+                                <SubprofileBadge characterID={id} authorCCID={client.user?.ccid ?? ''} />
+                            </ListItemIcon>
+                        </MenuItem>
+                    )
+                })}
+            </Menu>
         </Box>
     )
 })
