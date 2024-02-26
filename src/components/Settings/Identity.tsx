@@ -84,26 +84,28 @@ export const IdentitySettings = (): JSX.Element => {
                     gap: 1
                 }}
             >
-                {keys.map((key) => (
-                    <KeyCard
-                        key={key.id}
-                        item={key}
-                        endItem={
-                            <IconButton
-                                sx={{
-                                    width: '40px',
-                                    height: '40px'
-                                }}
-                                onClick={(event) => {
-                                    setTarget(key.id)
-                                    setAnchorEl(event.currentTarget)
-                                }}
-                            >
-                                <MoreHorizIcon />
-                            </IconButton>
-                        }
-                    />
-                ))}
+                {keys
+                    .filter((key) => key.revokePayload === 'null')
+                    .map((key) => (
+                        <KeyCard
+                            key={key.id}
+                            item={key}
+                            endItem={
+                                <IconButton
+                                    sx={{
+                                        width: '40px',
+                                        height: '40px'
+                                    }}
+                                    onClick={(event) => {
+                                        setTarget(key.id)
+                                        setAnchorEl(event.currentTarget)
+                                    }}
+                                >
+                                    <MoreHorizIcon />
+                                </IconButton>
+                            }
+                        />
+                    ))}
                 <Menu
                     anchorEl={anchorEl}
                     open={Boolean(anchorEl)}
