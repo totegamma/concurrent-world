@@ -34,7 +34,9 @@ export const ProfileProperties = (props: ProfilePropertiesProps): JSX.Element =>
 
     useEffect(() => {
         let unmounted = false
-        fetch(props.character.schema)
+        fetch(props.character.schema, {
+            cache: 'force-cache'
+        })
             .then((res) => res.json())
             .then((data) => {
                 if (unmounted) return

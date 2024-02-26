@@ -1,5 +1,17 @@
-import { Box, Button, Checkbox, Divider, IconButton, Paper, TextField, Typography, useTheme } from '@mui/material'
-import { type CommonstreamSchema, Schemas } from '@concurrent-world/client'
+import {
+    Box,
+    Button,
+    Checkbox,
+    Divider,
+    IconButton,
+    Paper,
+    Tab,
+    Tabs,
+    TextField,
+    Typography,
+    useTheme
+} from '@mui/material'
+import { type CommonstreamSchema, Schemas, type CoreCharacter } from '@concurrent-world/client'
 import { useApi } from '../context/api'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
@@ -16,6 +28,8 @@ import DoneAllIcon from '@mui/icons-material/DoneAll'
 import RemoveDoneIcon from '@mui/icons-material/RemoveDone'
 import { type StreamWithDomain } from '../model'
 import { StreamCard } from '../components/Stream/Card'
+import { UserProfileCard } from '../components/UserProfileCard'
+import { SubProfileCard } from '../components/SubProfileCard'
 
 export function Explorer(): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'pages.explore' })
@@ -29,8 +43,11 @@ export function Explorer(): JSX.Element {
     const [streams, setStreams] = useState<StreamWithDomain[]>([])
     const [searchResult, setSearchResult] = useState<StreamWithDomain[]>([])
     const [search, setSearch] = useState<string>('')
-
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
+    const [tab, setTab] = useState<number>(0)
+    const [profileSchema, setProfileSchema] = useState<string>(Schemas.profile)
+
+    const [characters, setCharacters] = useState<Array<CoreCharacter<any>>>([])
 
     const { enqueueSnackbar } = useSnackbar()
 
@@ -43,11 +60,13 @@ export function Explorer(): JSX.Element {
     }
 
     useEffect(() => {
+        if (tab !== 0) return
         if (selectedDomains.length === 0) {
             setStreams([])
             setSearchResult([])
             return
         }
+        let unmounted = false
         Promise.all(
             selectedDomains.map(async (e) => {
                 const streams = await client.getStreamsBySchema<CommonstreamSchema>(e, Schemas.commonstream)
@@ -59,11 +78,40 @@ export function Explorer(): JSX.Element {
                 })
             })
         ).then((e) => {
+            if (unmounted) return
             const streams = e.flat()
             setStreams(streams)
             setSearchResult(streams)
         })
-    }, [selectedDomains])
+        return () => {
+            unmounted = true
+        }
+    }, [selectedDomains, tab])
+
+    useEffect(() => {
+        if (tab !== 1) return
+        if (profileSchema === '') return
+        let unmounted = false
+        const timer = setTimeout(() => {
+            Promise.all(
+                selectedDomains.map(async (e) => {
+                    return (
+                        ((await client.api.getCharacters({ schema: profileSchema, domain: e }))?.filter(
+                            (e) => e
+                        ) as Array<CoreCharacter<any>>) ?? []
+                    )
+                })
+            ).then((e) => {
+                if (unmounted) return
+                setCharacters(e.flat())
+            })
+        }, 500)
+
+        return () => {
+            unmounted = true
+            clearTimeout(timer)
+        }
+    }, [profileSchema, selectedDomains, tab])
 
     const createNewStream = (stream: any): void => {
         client.api
@@ -184,73 +232,119 @@ export function Explorer(): JSX.Element {
                 })}
             </Box>
             <Divider sx={{ mb: 2 }} />
-            <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between'
+            <Tabs
+                value={tab}
+                onChange={(e, v) => {
+                    setTab(v)
                 }}
             >
-                <Typography variant="h3" gutterBottom>
-                    {t('streams')}
-                </Typography>
-                <Button
-                    onClick={() => {
-                        setDrawerOpen(true)
-                    }}
-                >
-                    {t('createNew')}
-                </Button>
-            </Box>
-            <TextField
-                label="search"
-                variant="outlined"
-                value={search}
-                onChange={(e) => {
-                    setSearch(e.target.value)
-                }}
-            />
-            <Box
-                sx={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-                    gap: 2
-                }}
-            >
-                {searchResult.map((value) => {
-                    return (
-                        <StreamCard
-                            key={value.stream.id}
-                            streamID={value.stream.id}
-                            name={value.stream.payload.name}
-                            description={value.stream.payload.description}
-                            banner={value.stream.payload.banner ?? ''}
-                            domain={value.domain}
-                            isOwner={value.stream.author === client.ccid}
-                        />
-                    )
-                })}
-            </Box>
-            <CCDrawer
-                open={drawerOpen}
-                onClose={() => {
-                    setDrawerOpen(false)
-                }}
-            >
-                <Box p={1}>
+                <Tab value={0} label={t('streams')} />
+                <Tab value={1} label={'ユーザー'} />
+            </Tabs>
+            <Divider sx={{ mb: 2 }} />
+            {tab === 0 && (
+                <>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
+                        }}
+                    >
+                        <Typography variant="h3" gutterBottom>
+                            {t('streams')}
+                        </Typography>
+                        <Button
+                            onClick={() => {
+                                setDrawerOpen(true)
+                            }}
+                        >
+                            {t('createNew')}
+                        </Button>
+                    </Box>
+                    <TextField
+                        label="search"
+                        variant="outlined"
+                        value={search}
+                        onChange={(e) => {
+                            setSearch(e.target.value)
+                        }}
+                    />
+                    <Box
+                        sx={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                            gap: 2
+                        }}
+                    >
+                        {searchResult.map((value) => {
+                            return (
+                                <StreamCard
+                                    key={value.stream.id}
+                                    streamID={value.stream.id}
+                                    name={value.stream.payload.name}
+                                    description={value.stream.payload.description}
+                                    banner={value.stream.payload.banner ?? ''}
+                                    domain={value.domain}
+                                    isOwner={value.stream.author === client.ccid}
+                                />
+                            )
+                        })}
+                    </Box>
+                    <CCDrawer
+                        open={drawerOpen}
+                        onClose={() => {
+                            setDrawerOpen(false)
+                        }}
+                    >
+                        <Box p={1}>
+                            <Typography variant="h3" gutterBottom>
+                                {t('createNewStream.title')}
+                            </Typography>
+                            <Typography variant="body1" gutterBottom>
+                                {t('createNewStream.desc1')}
+                                {client.api.host}
+                                {t('createNewStream.desc2')}
+                            </Typography>
+                            <Divider />
+                            <CCEditor schemaURL={Schemas.commonstream} onSubmit={createNewStream} />
+                        </Box>
+                    </CCDrawer>
+                </>
+            )}
+            {tab === 1 && (
+                <>
                     <Typography variant="h3" gutterBottom>
-                        {t('createNewStream.title')}
+                        プロフィール
                     </Typography>
-                    <Typography variant="body1" gutterBottom>
-                        {t('createNewStream.desc1')}
-                        {client.api.host}
-                        {t('createNewStream.desc2')}
-                    </Typography>
-                    <Divider />
-                    <CCEditor schemaURL={Schemas.commonstream} onSubmit={createNewStream} />
-                </Box>
-            </CCDrawer>
+                    <TextField
+                        label="search"
+                        variant="outlined"
+                        value={profileSchema}
+                        onChange={(e) => {
+                            setProfileSchema(e.target.value)
+                        }}
+                    />
+                    <Box
+                        sx={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                            gap: 2
+                        }}
+                    >
+                        {characters.map((character) => (
+                            <Paper key={character.id} variant="outlined">
+                                {character.schema === Schemas.profile ? (
+                                    <UserProfileCard character={character} />
+                                ) : (
+                                    <SubProfileCard character={character} />
+                                )}
+                            </Paper>
+                        ))}
+                    </Box>
+                </>
+            )}
         </Box>
     )
 }
