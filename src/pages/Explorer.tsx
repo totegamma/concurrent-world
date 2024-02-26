@@ -1,7 +1,10 @@
 import {
+    Alert,
+    AlertTitle,
     Box,
     Button,
     Checkbox,
+    Collapse,
     Divider,
     IconButton,
     Paper,
@@ -30,6 +33,7 @@ import { type StreamWithDomain } from '../model'
 import { StreamCard } from '../components/Stream/Card'
 import { UserProfileCard } from '../components/UserProfileCard'
 import { SubProfileCard } from '../components/SubProfileCard'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 
 export function Explorer(): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'pages.explore' })
@@ -46,6 +50,8 @@ export function Explorer(): JSX.Element {
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
     const [tab, setTab] = useState<number>(0)
     const [profileSchema, setProfileSchema] = useState<string>(Schemas.profile)
+
+    const [openTips, setOpenTips] = useState<boolean>(false)
 
     const [characters, setCharacters] = useState<Array<CoreCharacter<any>>>([])
 
@@ -170,9 +176,16 @@ export function Explorer(): JSX.Element {
                     gap: 1
                 }}
             >
-                <Typography variant="h3" gutterBottom>
-                    {t('domains')}
-                </Typography>
+                <Box display="flex" alignItems="center" flexDirection="row">
+                    <Typography variant="h3">{t('domains')}</Typography>
+                    <IconButton
+                        onClick={() => {
+                            setOpenTips(!openTips)
+                        }}
+                    >
+                        <HelpOutlineIcon />
+                    </IconButton>
+                </Box>
                 <Box>
                     <IconButton
                         onClick={() => {
@@ -190,6 +203,13 @@ export function Explorer(): JSX.Element {
                     </IconButton>
                 </Box>
             </Box>
+            <Collapse in={openTips}>
+                <Alert severity="info">
+                    <AlertTitle>どうしてドメインごとに表示が分かれているの？</AlertTitle>
+                    コンカレントは本来ユーザーやデータがどこのサーバー(ドメイン)にあるかを意識しないでに使えるように設計されています。
+                    なのですが、現在はまだ十分な検索機能が実装されていないため、このような表示になっています。今後の進展にご期待ください。
+                </Alert>
+            </Collapse>
             <Box
                 sx={{
                     display: 'grid',
