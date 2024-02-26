@@ -161,7 +161,7 @@ export const literalLinkRemarkPlugin = (): any => {
                                     type: 'link',
                                     url: part,
                                     title: part,
-                                    children: [{ type: 'text', value: part }]
+                                    children: [{ type: 'text', value: decodeURI(part) }]
                                 }
                             else return { type: 'text', value: part }
                         })
