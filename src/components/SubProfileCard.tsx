@@ -3,9 +3,10 @@ import { Box, IconButton, Menu, Paper, Typography } from '@mui/material'
 import { CCWallpaper } from './ui/CCWallpaper'
 import { CCAvatar } from './ui/CCAvatar'
 import { MarkdownRendererLite } from './ui/MarkdownRendererLite'
-import { useEffect, useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
+import { ProfileProperties } from './ui/ProfileProperties'
 
 export interface SubProfileCardProps {
     character: CoreCharacter<any>
@@ -13,45 +14,10 @@ export interface SubProfileCardProps {
     children?: JSX.Element | JSX.Element[]
 }
 
-const defaultProperties = ['username', 'avatar', 'description', 'banner', 'links']
-
 export const SubProfileCard = (props: SubProfileCardProps): JSX.Element => {
     const isProfile = 'username' in props.character.payload.body && 'avatar' in props.character.payload.body
-    const [schema, setSchema] = useState<any>()
 
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
-
-    const properties = useMemo(() => {
-        if (!schema) return []
-        const specialProperties = schema.properties
-        for (const def of defaultProperties) {
-            delete specialProperties[def]
-        }
-
-        const properties = []
-        for (const key in specialProperties) {
-            if (specialProperties[key].type !== 'string') continue
-            properties.push({
-                key,
-                title: specialProperties[key].title,
-                description: specialProperties[key].description
-            })
-        }
-        return properties
-    }, [schema])
-
-    useEffect(() => {
-        let unmounted = false
-        fetch(props.character.schema)
-            .then((res) => res.json())
-            .then((data) => {
-                if (unmounted) return
-                setSchema(data)
-            })
-        return () => {
-            unmounted = true
-        }
-    }, [])
 
     return (
         <Paper variant="outlined">
@@ -137,19 +103,7 @@ export const SubProfileCard = (props: SubProfileCardProps): JSX.Element => {
                             emojiDict={{}}
                         />
                     </Box>
-                    <Box>
-                        {properties.map(
-                            (property, index) =>
-                                property.key in props.character.payload.body && (
-                                    <Box key={index} px={1} mb={1}>
-                                        {/* <Typography variant="h3">{property.title}</Typography> */}
-                                        <Typography variant="body1">
-                                            {property.description}: {props.character.payload.body[property.key]}
-                                        </Typography>
-                                    </Box>
-                                )
-                        )}
-                    </Box>
+                    <ProfileProperties character={props.character} />
                 </>
             ) : (
                 <>

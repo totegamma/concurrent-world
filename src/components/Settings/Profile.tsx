@@ -13,12 +13,16 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import PublishIcon from '@mui/icons-material/Publish'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import EditIcon from '@mui/icons-material/Edit'
+import { useLocation } from 'react-router-dom'
 
 export const ProfileSettings = (): JSX.Element => {
     const client = useApi()
     const { enqueueSnackbar } = useSnackbar()
 
     const { t } = useTranslation('', { keyPrefix: 'settings.profile' })
+
+    const path = useLocation()
+    const hash = path.hash.replace('#', '')
 
     const [allCharacters, setAllCharacters] = useState<Array<CoreCharacter<any>>>([])
     const [openCharacterEditor, setOpenCharacterEditor] = useState(false)
@@ -59,6 +63,13 @@ export const ProfileSettings = (): JSX.Element => {
             clearTimeout(timer)
         }
     }, [schemaURLDraft])
+
+    useEffect(() => {
+        if (hash) {
+            setSchemaURLDraft(hash)
+            setOpenCharacterEditor(true)
+        }
+    }, [hash])
 
     useEffect(() => {
         if (modified) {
@@ -229,6 +240,7 @@ export const ProfileSettings = (): JSX.Element => {
                                     console.log(e)
                                     client.api.upsertCharacter(schemaURL as Schema, e).then((_) => {
                                         setOpenCharacterEditor(false)
+                                        load()
                                     })
                                 }}
                             />
@@ -246,6 +258,7 @@ export const ProfileSettings = (): JSX.Element => {
                                         .upsertCharacter(editingCharacter.schema, e, editingCharacter.id)
                                         .then((_) => {
                                             setEditingCharacter(null)
+                                            load()
                                         })
                                 }}
                             />

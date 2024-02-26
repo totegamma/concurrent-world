@@ -7,6 +7,7 @@ export interface CCAvatarProps {
     avatarURL?: string
     avatarOverride?: string
     identiconSource?: string
+    onBadgeClick?: () => void
 }
 
 export const CCAvatar = (props: CCAvatarProps): JSX.Element => {
@@ -29,6 +30,7 @@ export const CCAvatar = (props: CCAvatarProps): JSX.Element => {
                     />
                 )
             }
+            onClick={() => props.onBadgeClick?.()}
         >
             <Avatar
                 alt={props.alt}
