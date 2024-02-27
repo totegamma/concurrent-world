@@ -23,6 +23,7 @@ export interface Preference {
         volume: number
     }
     customThemes: Record<string, DeepPartial<ConcurrentTheme>>
+    hideDisabledSubKey: boolean
 }
 
 export const defaultPreference: Preference = {
@@ -56,7 +57,8 @@ export const defaultPreference: Preference = {
         notification: NotificationSound,
         volume: 50
     },
-    customThemes: {}
+    customThemes: {},
+    hideDisabledSubKey: false
 }
 
 interface PreferenceState {
