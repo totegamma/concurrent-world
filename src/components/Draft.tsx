@@ -79,7 +79,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const [holdCtrlShift, setHoldCtrlShift] = useState<boolean>(false)
     const postHome = postHomeButton && !holdCtrlShift
 
-    const [sending, setSending] = useState<boolean>(false)
+    let [sending, setSending] = useState<boolean>(false)
 
     const [caretPos, setCaretPos] = useState<{ left: number; top: number }>({ left: 0, top: 0 })
 
@@ -138,7 +138,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
 
         const mentions = draft.match(/@([^\s@]+)/g)?.map((e) => e.slice(1)) ?? []
 
-        setSending(true)
+        setSending((sending = true))
         props
             .onSubmit(draft, dest, {
                 emojis: emojiDict,
@@ -396,11 +396,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         }
                         if (draft.length === 0 || draft.trim().length === 0) return
                         if (e.key === 'Enter' && (e.ctrlKey === true || e.metaKey === true) && !sending) {
-                            if (e.shiftKey) {
-                                post(false)
-                            } else {
-                                post(postHome)
-                            }
+                            post(postHome)
                         }
                     }}
                     onKeyUp={(e: any) => {
