@@ -75,7 +75,10 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const textInputRef = useRef<HTMLInputElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
-    const [postHome, setPostHome] = useState<boolean>(true)
+    const [postHomeButton, setPostHomeButton] = useState<boolean>(true)
+    const [holdCtrlShift, setHoldCtrlShift] = useState<boolean>(false)
+    const postHome = postHomeButton && !holdCtrlShift
+
     const [sending, setSending] = useState<boolean>(false)
 
     const [caretPos, setCaretPos] = useState<{ left: number; top: number }>({ left: 0, top: 0 })
@@ -181,6 +184,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         const file = event.target.files[0]
         if (!file) return
         await uploadImage(file)
+        textInputRef.current?.focus()
     }
 
     const onFileUploadClick = (): void => {
@@ -287,7 +291,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 <Tooltip title={postHome ? t('postToHome') : t('noPostToHome')} arrow placement="top">
                     <IconButton
                         onClick={() => {
-                            setPostHome(!postHome)
+                            setPostHomeButton(!postHomeButton)
                         }}
                     >
                         <HomeIcon color={postHome ? 'primary' : 'disabled'} />
@@ -387,6 +391,9 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                 onSuggestConfirm(0)
                             }
                         }
+                        if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
+                            setHoldCtrlShift(true)
+                        }
                         if (draft.length === 0 || draft.trim().length === 0) return
                         if (e.key === 'Enter' && (e.ctrlKey === true || e.metaKey === true) && !sending) {
                             if (e.shiftKey) {
@@ -394,6 +401,11 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             } else {
                                 post(postHome)
                             }
+                        }
+                    }}
+                    onKeyUp={(e: any) => {
+                        if (e.key === 'Shift' || e.key === 'Control') {
+                            setHoldCtrlShift(false)
                         }
                     }}
                     onBlur={() => {
@@ -536,6 +548,9 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                 emojiPicker.open(e.currentTarget, (emoji) => {
                                     insertEmoji(emoji)
                                     emojiPicker.close()
+                                    setTimeout(() => {
+                                        textInputRef.current?.focus()
+                                    }, 0)
                                 })
                             }}
                         >
