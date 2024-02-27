@@ -119,14 +119,14 @@ export function Profile(props: ProfileProps): JSX.Element {
                         ))}
                     </Box>
                     {!isSelf ? (
-                        <>
+                        <Box display="flex" gap={1}>
                             <AckButton user={props.user} />
                             <WatchButton
                                 color={theme.palette.secondary.main}
                                 userCCID={props.id!}
                                 userStreamID={props.user.userstreams?.payload.body.homeStream ?? ''}
                             />
-                        </>
+                        </Box>
                     ) : (
                         <Button variant="outlined" component={NavLink} to="/settings/profile">
                             Edit Profile
