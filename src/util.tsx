@@ -148,6 +148,7 @@ export const dumpRemarkPlugin = (): any => {
 export const literalLinkRemarkPlugin = (): any => {
     return (tree: any) => {
         visit(tree, 'text', (node: any, index?: number, parent?: any) => {
+            if (node.skip) return
             const parts = node.value.split(/(https?:\/\/[^\s]+)/)
             if (parts.length !== 1) {
                 parent.children.splice(
@@ -165,7 +166,7 @@ export const literalLinkRemarkPlugin = (): any => {
                                     type: 'link',
                                     url: part,
                                     title: part,
-                                    children: [{ type: 'text', value: uri }]
+                                    children: [{ type: 'text', value: uri, skip: true }]
                                 }
                             else return { type: 'text', value: part }
                         })
