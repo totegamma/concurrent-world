@@ -46,6 +46,9 @@ import { ApplicationContext } from '../App'
 import { useStorage } from '../context/StorageContext'
 import { SubprofileBadge } from './ui/SubprofileBadge'
 import { CCAvatar } from './ui/CCAvatar'
+import { ErrorBoundary } from 'react-error-boundary'
+
+import HeartBrokenIcon from '@mui/icons-material/HeartBroken'
 
 export interface DraftProps {
     submitButtonLabel?: string
@@ -645,30 +648,55 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     }}
                 />
 
-                <DummyMessageView
-                    message={{
-                        body: draft,
-                        emojis: emojiDict
-                    }}
-                    user={client.user?.profile?.payload.body}
-                    userCCID={client.user?.ccid}
-                    subprofileID={selectedSubprofile}
-                    timestamp={
-                        <Typography
+                <ErrorBoundary
+                    FallbackComponent={({ error }) => (
+                        <Box
                             sx={{
-                                backgroundColor: 'divider',
-                                color: 'primary.contrastText',
-                                px: 1,
-                                fontSize: '0.75rem'
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                py: 2
                             }}
                         >
-                            {t('preview')}
-                        </Typography>
-                    }
-                    onAvatarClick={(e) => {
-                        setProfileSelectAnchorEl(e.currentTarget)
-                    }}
-                />
+                            <Typography
+                                color="error"
+                                variant="body2"
+                                align="center"
+                                display="flex"
+                                alignItems="center"
+                                gap={1}
+                            >
+                                <HeartBrokenIcon />
+                                {error.message}
+                            </Typography>
+                        </Box>
+                    )}
+                >
+                    <DummyMessageView
+                        message={{
+                            body: draft,
+                            emojis: emojiDict
+                        }}
+                        user={client.user?.profile?.payload.body}
+                        userCCID={client.user?.ccid}
+                        subprofileID={selectedSubprofile}
+                        timestamp={
+                            <Typography
+                                sx={{
+                                    backgroundColor: 'divider',
+                                    color: 'primary.contrastText',
+                                    px: 1,
+                                    fontSize: '0.75rem'
+                                }}
+                            >
+                                {t('preview')}
+                            </Typography>
+                        }
+                        onAvatarClick={(e) => {
+                            setProfileSelectAnchorEl(e.currentTarget)
+                        }}
+                    />
+                </ErrorBoundary>
             </Collapse>
             <Menu
                 anchorEl={profileSelectAnchorEl}
