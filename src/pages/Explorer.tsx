@@ -16,7 +16,7 @@ import {
 } from '@mui/material'
 import { type CommonstreamSchema, Schemas, type CoreCharacter } from '@concurrent-world/client'
 import { useApi } from '../context/api'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -35,11 +35,17 @@ import { UserProfileCard } from '../components/UserProfileCard'
 import { SubProfileCard } from '../components/SubProfileCard'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 
+// type explorerTab = 'streams' | 'users'
+
 export function Explorer(): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'pages.explore' })
     const client = useApi()
     const theme = useTheme()
     const navigate = useNavigate()
+
+    const { tab } = useParams()
+    const path = useLocation()
+    const hash = path.hash.replace('#', '')
 
     const [domains, setDomains] = useState<string[]>([])
     const [selectedDomains, setSelectedDomains] = useState<string[]>([client.api.host])
@@ -48,7 +54,6 @@ export function Explorer(): JSX.Element {
     const [searchResult, setSearchResult] = useState<StreamWithDomain[]>([])
     const [search, setSearch] = useState<string>('')
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
-    const [tab, setTab] = useState<number>(0)
     const [profileSchema, setProfileSchema] = useState<string>(Schemas.profile)
 
     const [openTips, setOpenTips] = useState<boolean>(false)
@@ -66,7 +71,19 @@ export function Explorer(): JSX.Element {
     }
 
     useEffect(() => {
-        if (tab !== 0) return
+        if (!hash) return
+        switch (tab) {
+            case 'streams':
+                setSearch(hash)
+                break
+            case 'users':
+                setProfileSchema(hash)
+                break
+        }
+    }, [hash])
+
+    useEffect(() => {
+        if (tab !== 'streams') return
         if (selectedDomains.length === 0) {
             setStreams([])
             setSearchResult([])
@@ -95,7 +112,7 @@ export function Explorer(): JSX.Element {
     }, [selectedDomains, tab])
 
     useEffect(() => {
-        if (tab !== 1) return
+        if (tab !== 'users') return
         if (profileSchema === '') return
         let unmounted = false
         const timer = setTimeout(() => {
@@ -254,15 +271,15 @@ export function Explorer(): JSX.Element {
             <Divider sx={{ mb: 2 }} />
             <Tabs
                 value={tab}
-                onChange={(e, v) => {
-                    setTab(v)
+                onChange={(_, v) => {
+                    navigate(`/explorer/${v}`)
                 }}
             >
-                <Tab value={0} label={t('streams')} />
-                <Tab value={1} label={'ユーザー'} />
+                <Tab value={'streams'} label={t('streams')} />
+                <Tab value={'users'} label={'ユーザー'} />
             </Tabs>
             <Divider sx={{ mb: 2 }} />
-            {tab === 0 && (
+            {tab === 'streams' && (
                 <>
                     <Box
                         sx={{
@@ -333,7 +350,7 @@ export function Explorer(): JSX.Element {
                     </CCDrawer>
                 </>
             )}
-            {tab === 1 && (
+            {tab === 'users' && (
                 <>
                     <Typography variant="h3" gutterBottom>
                         プロフィール

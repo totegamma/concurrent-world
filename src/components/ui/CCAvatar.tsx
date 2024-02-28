@@ -1,8 +1,5 @@
 import { Avatar, Badge, type SxProps } from '@mui/material'
 import BoringAvatar from 'boring-avatars'
-import { useApi } from '../../context/api'
-import { useEffect, useState } from 'react'
-import { type CoreCharacter } from '@concurrent-world/client'
 
 export interface CCAvatarProps {
     sx?: SxProps
@@ -10,21 +7,10 @@ export interface CCAvatarProps {
     avatarURL?: string
     avatarOverride?: string
     identiconSource?: string
-    characterOverride?: string
     onBadgeClick?: () => void
 }
 
 export const CCAvatar = (props: CCAvatarProps): JSX.Element => {
-    const client = useApi()
-    const [characterOverride, setCharacterOverride] = useState<CoreCharacter<any> | undefined>(undefined)
-
-    useEffect(() => {
-        if (!(client && props.characterOverride && props.identiconSource)) return
-        client.api.getCharacterByID(props.characterOverride, props.identiconSource).then((character) => {
-            setCharacterOverride(character ?? undefined)
-        })
-    }, [props.characterOverride])
-
     return (
         <Badge
             overlap="circular"
@@ -33,7 +19,7 @@ export const CCAvatar = (props: CCAvatarProps): JSX.Element => {
                 horizontal: 'right'
             }}
             badgeContent={
-                (characterOverride?.payload.body.avatar || props.avatarOverride) && (
+                props.avatarOverride && (
                     <CCAvatar
                         sx={{
                             width: 24,
@@ -48,7 +34,7 @@ export const CCAvatar = (props: CCAvatarProps): JSX.Element => {
         >
             <Avatar
                 alt={props.alt}
-                src={characterOverride?.payload.body.avatar ?? props.avatarOverride ?? props.avatarURL}
+                src={props.avatarOverride ?? props.avatarURL}
                 sx={{
                     ...props.sx,
                     borderRadius: 1

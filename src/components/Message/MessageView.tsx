@@ -9,13 +9,15 @@ import {
     type Message,
     type ReplyMessageSchema,
     type SimpleNoteSchema,
-    Schemas
+    Schemas,
+    type CoreCharacter
 } from '@concurrent-world/client'
 import { PostedStreams } from './PostedStreams'
 import { ContentWithCCAvatar } from '../ContentWithCCAvatar'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import ReplayIcon from '@mui/icons-material/Replay'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useApi } from '../../context/api'
 
 export interface MessageViewProps {
     message: Message<SimpleNoteSchema | ReplyMessageSchema>
@@ -35,6 +37,19 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
     const theme = useTheme()
     const clipHeight = props.clipHeight ?? 450
     const [expanded, setExpanded] = useState(props.forceExpanded ?? false)
+
+    const client = useApi()
+
+    const [characterOverride, setCharacterOverride] = useState<CoreCharacter<any> | undefined>(undefined)
+
+    useEffect(() => {
+        if (!(client && props.message.payload.body.profileOverride?.characterID)) return
+        client.api
+            .getCharacterByID(props.message.payload.body.profileOverride?.characterID, props.message.author)
+            .then((character) => {
+                setCharacterOverride(character ?? undefined)
+            })
+    }, [client, props.message])
 
     const reroutedsame = useMemo(() => {
         if (!props.rerouted) return false
@@ -56,8 +71,13 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
         <ContentWithCCAvatar
             author={props.message.authorUser}
             profileOverride={props.message.payload.body.profileOverride}
+            avatarOverride={characterOverride?.payload.body.avatar}
         >
-            <MessageHeader message={props.message} additionalMenuItems={props.additionalMenuItems} />
+            <MessageHeader
+                usernameOverride={characterOverride?.payload.body.username}
+                message={props.message}
+                additionalMenuItems={props.additionalMenuItems}
+            />
             {props.beforeMessage}
             <Box
                 sx={{

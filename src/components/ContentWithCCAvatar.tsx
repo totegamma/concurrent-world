@@ -8,6 +8,7 @@ import { type ProfileOverride } from '@concurrent-world/client/dist/types/model/
 export interface ContentWithCCAvatarProps {
     author?: User
     profileOverride?: ProfileOverride
+    avatarOverride?: string
     children?: JSX.Element | Array<JSX.Element | undefined>
     sx?: SxProps
 }
@@ -56,9 +57,8 @@ export const ContentWithCCAvatar = (props: ContentWithCCAvatarProps): JSX.Elemen
                 >
                     <CCAvatar
                         avatarURL={props.author?.profile?.payload.body.avatar}
-                        avatarOverride={props.profileOverride?.avatar}
+                        avatarOverride={props.avatarOverride || props.profileOverride?.avatar}
                         identiconSource={props.author?.ccid ?? ''}
-                        characterOverride={props.profileOverride?.characterID}
                         sx={{
                             width: { xs: '38px', sm: '48px' },
                             height: { xs: '38px', sm: '48px' }

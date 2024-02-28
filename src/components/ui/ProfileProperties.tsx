@@ -1,7 +1,9 @@
 import { type CoreCharacter } from '@concurrent-world/client'
-import { Box, Link, Typography } from '@mui/material'
+import { Box, Button, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
+import { CCDrawer } from './CCDrawer'
+import { CCEditor } from './cceditor'
 
 export interface ProfilePropertiesProps {
     character: CoreCharacter<any>
@@ -12,6 +14,7 @@ const defaultProperties = ['username', 'avatar', 'description', 'banner', 'links
 
 export const ProfileProperties = (props: ProfilePropertiesProps): JSX.Element => {
     const [schema, setSchema] = useState<any>()
+    const [inspecting, setInspecting] = useState(false)
 
     const properties = useMemo(() => {
         if (!schema) return []
@@ -48,28 +51,62 @@ export const ProfileProperties = (props: ProfilePropertiesProps): JSX.Element =>
     }, [])
 
     return (
-        <Box>
-            {properties.map(
-                (property, index) =>
-                    property.key in props.character.payload.body && (
-                        <Box key={index} px={1} mb={1}>
-                            {/* <Typography variant="h3">{property.title}</Typography> */}
-                            <Typography variant="body1">
-                                {property.description}: {props.character.payload.body[property.key]}
-                            </Typography>
-                        </Box>
-                    )
-            )}
-            {props.showCreateLink && (
-                <Box display="flex" width="100%" justifyContent="flex-end" px={1}>
-                    <Typography variant="caption">
-                        これはテンプレート「{schema?.title || '無名'}」で作成されました。
-                    </Typography>
-                    <Link variant="caption" component={RouterLink} to={`/settings/profile#${props.character.schema}`}>
-                        自分も作成する
-                    </Link>
+        <>
+            <Box>
+                {properties.map(
+                    (property, index) =>
+                        property.key in props.character.payload.body && (
+                            <Box key={index} px={1} mb={1}>
+                                <Typography variant="body1">
+                                    {property.title}: {props.character.payload.body[property.key]}
+                                </Typography>
+                            </Box>
+                        )
+                )}
+                {props.showCreateLink && (
+                    <Box
+                        display="flex"
+                        width="100%"
+                        justifyContent="flex-end"
+                        px={1}
+                        onClick={() => {
+                            setInspecting(true)
+                        }}
+                    >
+                        <Typography variant="caption" sx={{ textDecoration: 'underline', cursor: 'pointer' }}>
+                            テンプレートを見る
+                        </Typography>
+                    </Box>
+                )}
+            </Box>
+            <CCDrawer
+                open={inspecting}
+                onClose={() => {
+                    setInspecting(false)
+                }}
+            >
+                <Box p={2}>
+                    <Typography variant="h3">テンプレート: {schema?.title}</Typography>
+                    <Box>{schema?.description}</Box>
+                    <Box mt={2} gap={1} display="flex" flexDirection="column">
+                        <Button component={RouterLink} to={`/explorer/users#${props.character.schema}`}>
+                            このテンプレートのキャラクターを検索
+                        </Button>
+                        <Button component={RouterLink} to={`/settings/profile#${props.character.schema}`}>
+                            このテンプレートで自分も作成する
+                        </Button>
+                        <Button
+                            component={RouterLink}
+                            to={props.character.schema}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            ソースを見る
+                        </Button>
+                    </Box>
+                    {schema && <CCEditor disabled schema={schema} init={props.character.payload.body} />}
                 </Box>
-            )}
-        </Box>
+            </CCDrawer>
+        </>
     )
 }

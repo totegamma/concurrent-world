@@ -21,31 +21,35 @@ export const SubProfileCard = (props: SubProfileCardProps): JSX.Element => {
 
     return (
         <Paper variant="outlined">
+            <CCWallpaper
+                sx={{
+                    height: '80px',
+                    position: 'relative'
+                }}
+                override={props.character.payload.body.banner}
+            >
+                {props.additionalMenuItems && (
+                    <IconButton
+                        sx={{
+                            position: 'absolute',
+                            right: '8px',
+                            top: '8px',
+                            padding: 0.5,
+                            backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                            '&:hover': {
+                                backgroundColor: 'rgba(255, 255, 255, 0.7)'
+                            }
+                        }}
+                        onClick={(e) => {
+                            setMenuAnchor(e.currentTarget)
+                        }}
+                    >
+                        <MoreHorizIcon sx={{ fontSize: '80%' }} />
+                    </IconButton>
+                )}
+            </CCWallpaper>
             {isProfile ? (
                 <>
-                    <CCWallpaper
-                        sx={{
-                            height: '80px',
-                            position: 'relative'
-                        }}
-                        override={props.character.payload.body.banner}
-                    >
-                        {props.additionalMenuItems && (
-                            <IconButton
-                                sx={{
-                                    color: 'text.disabled',
-                                    position: 'absolute',
-                                    right: 2,
-                                    top: 2
-                                }}
-                                onClick={(e) => {
-                                    setMenuAnchor(e.currentTarget)
-                                }}
-                            >
-                                <MoreHorizIcon sx={{ fontSize: '80%' }} />
-                            </IconButton>
-                        )}
-                    </CCWallpaper>
                     <Box position="relative" height={0}>
                         <Box
                             position="relative"
@@ -106,9 +110,10 @@ export const SubProfileCard = (props: SubProfileCardProps): JSX.Element => {
                     <ProfileProperties character={props.character} />
                 </>
             ) : (
-                <>
+                <Box overflow="auto">
                     <Typography variant="h2">Not a profile</Typography>
-                </>
+                    <pre>{JSON.stringify(props.character, null, 2)}</pre>
+                </Box>
             )}
             <Menu
                 anchorEl={menuAnchor}
