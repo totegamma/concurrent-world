@@ -156,12 +156,16 @@ export const literalLinkRemarkPlugin = (): any => {
                     ...parts
                         .map((part: string) => {
                             if (part.length === 0) return undefined
+                            let uri = part
+                            try {
+                                uri = decodeURI(part)
+                            } catch (_) {}
                             if (part.startsWith('http'))
                                 return {
                                     type: 'link',
                                     url: part,
                                     title: part,
-                                    children: [{ type: 'text', value: decodeURI(part) }]
+                                    children: [{ type: 'text', value: uri }]
                                 }
                             else return { type: 'text', value: part }
                         })
