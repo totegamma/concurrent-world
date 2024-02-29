@@ -18,7 +18,9 @@ import {
     Typography,
     Backdrop,
     type SxProps,
-    Popper
+    Popper,
+    Menu,
+    MenuItem
 } from '@mui/material'
 import { StreamPicker } from './ui/StreamPicker'
 import { closeSnackbar, useSnackbar } from 'notistack'
@@ -42,6 +44,11 @@ import { DummyMessageView } from './Message/DummyMessageView'
 
 import { ApplicationContext } from '../App'
 import { useStorage } from '../context/StorageContext'
+import { SubprofileBadge } from './ui/SubprofileBadge'
+import { CCAvatar } from './ui/CCAvatar'
+import { ErrorBoundary } from 'react-error-boundary'
+
+import HeartBrokenIcon from '@mui/icons-material/HeartBroken'
 
 export interface DraftProps {
     submitButtonLabel?: string
@@ -71,8 +78,11 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const textInputRef = useRef<HTMLInputElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
-    const [postHome, setPostHome] = useState<boolean>(true)
-    const [sending, setSending] = useState<boolean>(false)
+    const [postHomeButton, setPostHomeButton] = useState<boolean>(true)
+    const [holdCtrlShift, setHoldCtrlShift] = useState<boolean>(false)
+    const postHome = postHomeButton && !holdCtrlShift
+
+    let [sending, setSending] = useState<boolean>(false)
 
     const [caretPos, setCaretPos] = useState<{ left: number; top: number }>({ left: 0, top: 0 })
 
@@ -84,9 +94,13 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
 
     const [selectedSuggestions, setSelectedSuggestions] = useState<number>(0)
 
+    const [profileSelectAnchorEl, setProfileSelectAnchorEl] = useState<null | HTMLElement>(null)
+
     const timerRef = useRef<any | null>(null)
 
     const { enqueueSnackbar } = useSnackbar()
+
+    const [selectedSubprofile, setSelectedSubprofile] = useState<string | undefined>(undefined)
 
     useEffect(() => {
         setDestStreams(props.streamPickerInitial)
@@ -127,9 +141,13 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
 
         const mentions = draft.match(/@([^\s@]+)/g)?.map((e) => e.slice(1)) ?? []
 
-        setSending(true)
+        setSending((sending = true))
         props
-            .onSubmit(draft, dest, { emojis: emojiDict, mentions })
+            .onSubmit(draft, dest, {
+                emojis: emojiDict,
+                mentions,
+                profileOverride: { characterID: selectedSubprofile }
+            })
             .then((error) => {
                 if (error) {
                     enqueueSnackbar(`Failed to post message: ${error.message}`, { variant: 'error' })
@@ -169,6 +187,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         const file = event.target.files[0]
         if (!file) return
         await uploadImage(file)
+        textInputRef.current?.focus()
     }
 
     const onFileUploadClick = (): void => {
@@ -275,7 +294,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 <Tooltip title={postHome ? t('postToHome') : t('noPostToHome')} arrow placement="top">
                     <IconButton
                         onClick={() => {
-                            setPostHome(!postHome)
+                            setPostHomeButton(!postHomeButton)
                         }}
                     >
                         <HomeIcon color={postHome ? 'primary' : 'disabled'} />
@@ -375,13 +394,17 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                 onSuggestConfirm(0)
                             }
                         }
+                        if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
+                            setHoldCtrlShift(true)
+                        }
                         if (draft.length === 0 || draft.trim().length === 0) return
                         if (e.key === 'Enter' && (e.ctrlKey === true || e.metaKey === true) && !sending) {
-                            if (e.shiftKey) {
-                                post(false)
-                            } else {
-                                post(postHome)
-                            }
+                            post(postHome)
+                        }
+                    }}
+                    onKeyUp={(e: any) => {
+                        if (e.key === 'Shift' || e.key === 'Control') {
+                            setHoldCtrlShift(false)
                         }
                     }}
                     onBlur={() => {
@@ -524,6 +547,9 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                 emojiPicker.open(e.currentTarget, (emoji) => {
                                     insertEmoji(emoji)
                                     emojiPicker.close()
+                                    setTimeout(() => {
+                                        textInputRef.current?.focus()
+                                    }, 0)
                                 })
                             }}
                         >
@@ -622,27 +648,96 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     }}
                 />
 
-                <DummyMessageView
-                    message={{
-                        body: draft,
-                        emojis: emojiDict
-                    }}
-                    user={client.user?.profile?.payload.body}
-                    userCCID={client.user?.ccid}
-                    timestamp={
-                        <Typography
+                <ErrorBoundary
+                    FallbackComponent={({ error }) => (
+                        <Box
                             sx={{
-                                backgroundColor: 'divider',
-                                color: 'primary.contrastText',
-                                px: 1,
-                                fontSize: '0.75rem'
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                py: 2
                             }}
                         >
-                            {t('preview')}
-                        </Typography>
-                    }
-                />
+                            <Typography
+                                color="error"
+                                variant="body2"
+                                align="center"
+                                display="flex"
+                                alignItems="center"
+                                gap={1}
+                            >
+                                <HeartBrokenIcon />
+                                {error.message}
+                            </Typography>
+                        </Box>
+                    )}
+                >
+                    <DummyMessageView
+                        message={{
+                            body: draft,
+                            emojis: emojiDict
+                        }}
+                        user={client.user?.profile?.payload.body}
+                        userCCID={client.user?.ccid}
+                        subprofileID={selectedSubprofile}
+                        timestamp={
+                            <Typography
+                                sx={{
+                                    backgroundColor: 'divider',
+                                    color: 'primary.contrastText',
+                                    px: 1,
+                                    fontSize: '0.75rem'
+                                }}
+                            >
+                                {t('preview')}
+                            </Typography>
+                        }
+                        onAvatarClick={(e) => {
+                            setProfileSelectAnchorEl(e.currentTarget)
+                        }}
+                    />
+                </ErrorBoundary>
             </Collapse>
+            <Menu
+                anchorEl={profileSelectAnchorEl}
+                open={Boolean(profileSelectAnchorEl)}
+                onClose={() => {
+                    setProfileSelectAnchorEl(null)
+                }}
+            >
+                {selectedSubprofile && (
+                    <MenuItem
+                        onClick={() => {
+                            setSelectedSubprofile(undefined)
+                        }}
+                        selected
+                    >
+                        <ListItemIcon>
+                            <CCAvatar
+                                alt={client?.user?.profile?.payload.body.username ?? 'Unknown'}
+                                avatarURL={client?.user?.profile?.payload.body.avatar}
+                                identiconSource={client?.ccid ?? ''}
+                            />
+                        </ListItemIcon>
+                    </MenuItem>
+                )}
+
+                {client.user?.profile?.payload.body.subprofiles?.map((id) => {
+                    if (selectedSubprofile === id) return undefined
+                    return (
+                        <MenuItem
+                            key={id}
+                            onClick={() => {
+                                setSelectedSubprofile(id)
+                            }}
+                        >
+                            <ListItemIcon>
+                                <SubprofileBadge characterID={id} authorCCID={client.user?.ccid ?? ''} />
+                            </ListItemIcon>
+                        </MenuItem>
+                    )
+                })}
+            </Menu>
         </Box>
     )
 })

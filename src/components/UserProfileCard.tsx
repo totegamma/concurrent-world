@@ -1,4 +1,4 @@
-import { type User } from '@concurrent-world/client'
+import { type CoreCharacter, type ProfileSchema, type User } from '@concurrent-world/client'
 import { Box, Chip, Typography } from '@mui/material'
 import { CCAvatar } from './ui/CCAvatar'
 import { useApi } from '../context/api'
@@ -9,7 +9,8 @@ import { MarkdownRenderer } from './ui/MarkdownRenderer'
 import { CCWallpaper } from './ui/CCWallpaper'
 
 export interface UserProfileCardProps {
-    user: User | undefined
+    user?: User
+    character?: CoreCharacter<ProfileSchema>
 }
 
 export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
@@ -17,7 +18,9 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
     const isSelf = props.user?.ccid === client?.ccid
     const { enqueueSnackbar } = useSnackbar()
 
-    if (!props.user) return <></>
+    const character = props.user?.profile ?? props.character
+
+    if (!character) return <></>
 
     return (
         <Box display="flex" flexDirection="column" maxWidth="500px">
@@ -25,7 +28,7 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
                 sx={{
                     height: '80px'
                 }}
-                override={props.user.profile?.payload.body.banner}
+                override={character.payload.body.banner}
             />
             <Box position="relative" height={0}>
                 <Box
@@ -36,9 +39,9 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
                     }}
                 >
                     <CCAvatar
-                        alt={props.user.profile?.payload.body.username}
-                        avatarURL={props.user.profile?.payload.body.avatar}
-                        identiconSource={props.user.ccid ?? ''}
+                        alt={character.payload.body.username}
+                        avatarURL={character.payload.body.avatar}
+                        identiconSource={character.author}
                         sx={{
                             width: '60px',
                             height: '60px'
@@ -56,7 +59,7 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
                 px={1}
                 mb={1}
             >
-                {!isSelf && (
+                {!isSelf && props.user && (
                     <>
                         <AckButton user={props.user} />
                     </>
@@ -71,10 +74,10 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
                 px={1}
                 mb={1}
             >
-                <Typography variant="h2">{props.user.profile?.payload.body.username}</Typography>
+                <Typography variant="h2">{character.payload.body.username}</Typography>
                 <Chip
                     size="small"
-                    label={`${props.user.ccid.slice(0, 9)}...`}
+                    label={`${character.author.slice(0, 9)}...`}
                     deleteIcon={<ContentPasteIcon />}
                     onDelete={() => {
                         navigator.clipboard.writeText(props.user?.ccid ?? '')
@@ -91,7 +94,7 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
                     mb: 1
                 }}
             >
-                <MarkdownRenderer messagebody={props.user.profile?.payload.body.description ?? ''} emojiDict={{}} />
+                <MarkdownRenderer messagebody={character.payload.body.description ?? ''} emojiDict={{}} />
             </Box>
         </Box>
     )

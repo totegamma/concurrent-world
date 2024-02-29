@@ -59,6 +59,7 @@ export const GeneralSettings = (): JSX.Element => {
                     <MenuItem value={'en'}>English</MenuItem>
                     <MenuItem value={'ja'}>日本語</MenuItem>
                     <MenuItem value={'kr'}>한국어 (translated by @Alternative)</MenuItem>
+                    <MenuItem value={'th'}>ภาษาไทย</MenuItem>
                 </Select>
             </Box>
             <Box>

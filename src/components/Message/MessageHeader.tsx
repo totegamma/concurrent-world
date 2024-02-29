@@ -10,6 +10,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 
 export interface MessageHeaderProps {
     message: Message<SimpleNoteSchema | ReplyMessageSchema>
+    usernameOverride?: string
     additionalMenuItems?: JSX.Element | JSX.Element[]
 }
 
@@ -43,7 +44,8 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                         fontSize: { xs: '0.9rem', sm: '0.95rem' }
                     }}
                 >
-                    {props.message.payload.body.profileOverride?.username ||
+                    {props.usernameOverride ||
+                        props.message.payload.body.profileOverride?.username ||
                         props.message.authorUser?.profile?.payload.body.username ||
                         'anonymous'}
                 </Typography>

@@ -126,7 +126,8 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
                         if (cctype === 'character') {
                             if (!client.ccid) return
                             client.api.getCharacter(client.ccid, schemaURLDraft).then((e) => {
-                                setCharacter(e)
+                                if (!e || e.length === 0) return
+                                setCharacter(e[0])
                                 setSchemaURL(schemaURLDraft)
                             })
                         } else {

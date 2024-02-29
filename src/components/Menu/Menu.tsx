@@ -139,7 +139,12 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
-                            <ListItemButton sx={{ gap: 1 }} component={Link} to="/explorer" onClick={props.onClick}>
+                            <ListItemButton
+                                sx={{ gap: 1 }}
+                                component={Link}
+                                to="/explorer/streams"
+                                onClick={props.onClick}
+                            >
                                 <ExploreIcon
                                     sx={{
                                         color: 'background.contrastText'

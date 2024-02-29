@@ -5,13 +5,15 @@ import { memo, useEffect, useState } from 'react'
 import { fetchWithTimeout } from '../../util'
 
 export interface CCEditorProps {
-    schemaURL: string
-    onSubmit: (_: any) => void
+    schemaURL?: string
+    schema?: any
+    onSubmit?: (_: any) => void
     init?: any
+    disabled?: boolean
 }
 
 export const CCEditor = memo<CCEditorProps>((props: CCEditorProps): JSX.Element => {
-    const [schema, setSchema] = useState<any>()
+    const [schema, setSchema] = useState<any>(props.schema)
     const [formData, setFormData] = useState<any>()
 
     useEffect(() => {
@@ -19,7 +21,7 @@ export const CCEditor = memo<CCEditorProps>((props: CCEditorProps): JSX.Element 
     }, [props.init])
 
     useEffect(() => {
-        if (!props.schemaURL) return
+        if (props.schema || !props.schemaURL) return
         fetchWithTimeout(props.schemaURL, { method: 'GET' })
             .then((e) => e.json())
             .then((e) => {
@@ -34,10 +36,15 @@ export const CCEditor = memo<CCEditorProps>((props: CCEditorProps): JSX.Element 
             })
     }, [props.schemaURL])
 
+    if (!props.schemaURL && !props.schema) {
+        return <Box>Bad Input</Box>
+    }
+
     return (
         <Box>
             {schema && (
                 <Form
+                    disabled={props.disabled}
                     schema={schema}
                     validator={validator}
                     formData={formData}
@@ -46,7 +53,7 @@ export const CCEditor = memo<CCEditorProps>((props: CCEditorProps): JSX.Element 
                     }}
                     onSubmit={(e) => {
                         console.log(e.formData)
-                        props.onSubmit(e.formData)
+                        props.onSubmit?.(e.formData)
                     }}
                 />
             )}

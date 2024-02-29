@@ -1,0 +1,274 @@
+{
+    "test": "ทดสอบ",
+    "common": {
+        "watch": "ดู",
+        "watching": "กำลังดู",
+        "unwatch": "เลิกดู",
+        "follow": "ติดตาม",
+        "following": "กำลังติดตาม",
+        "unfollow": "เลิกติดตาม",
+        "followers": "ผู้ติดตาม"
+    },
+    "pages": {
+        "home": {
+            "title": "หน้าหลัก"
+        },
+        "notifications": {
+            "title": "การแจ้งเตือน"
+        },
+        "associations": {
+            "title": "การเชื่อมโยง"
+        },
+        "contacts": {
+            "title": "รายชื่อ"
+        },
+        "explore": {
+            "title": "สำรวจ",
+            "domains": "โดเมน",
+            "streams": "สตรีม",
+            "createNew": "สร้างใหม่",
+            "createNewStream": {
+                "title": "สร้างสตรีมใหม่",
+                "desc1": "สร้างสตรีมใหม่เกี่ยวกับ ",
+                "desc2": " ด้วยการตั้งค่าเหล่านี้"
+            }
+        },
+        "devtool": {
+            "title": "เครื่องมือนักพัฒนา"
+        },
+        "settings": {
+            "title": "การตั้งค่า",
+            "actions": {
+                "title": "การดำเนินการ",
+                "clearCache": "ล้างแคช",
+                "forceReload": "โหลดใหม่ทันที",
+                "logout": "ออกจากระบบ",
+                "areYouSure": "แน่ใจหรือว่าต้องการที่จะออกจากระบบ?",
+                "logoutWarn": "คุณจะไม่สามารถเข้าสูระบบใหม่ได้หากไม่มีรหัสลับ(Secret Key)ของคุณ"
+            }
+        },
+        "lists": {
+            "title": "รายการ"
+        }
+    },
+    "time": {
+        "secondsBefore": "วินาทีที่แล้ว",
+        "minutesBefore": "นาทีที่แล้ว",
+        "hoursBefore": "ชั่วโมงที่แล้ว"
+    },
+    "ui": {
+        "profileEditor": {
+            "update": "อัพเดท",
+            "updateSuccess": "อัพเดทสำเร็จ",
+            "updateFailed": "อัพเดทล้มเหลว",
+            "createNew": "สร้างใหม่"
+        },
+        "draft": {
+            "placeholder": "กำลังทำอะไรอยู่?",
+            "attachImage": "แนบรูปภาพ",
+            "cantAttachImage": "กรุณาตั้งค่า Imgur ID ก่อน",
+            "preview": "ดูตัวอย่าง",
+            "openPreview": "เปิดดูตัวอย่าง",
+            "closePreview": "ปิดดูตัวอย่าง",
+            "emoji": "อีโมจิ",
+            "clearDraft": "ล้างแบบร่าง",
+            "postToHome": "โพสต์ไปที่หน้าหลักด้วย",
+            "noPostToHome": "ไม่โพสต์ไปที่หน้าหลักด้วย",
+            "current": "เคอร์เร้นท์"
+        },
+        "secret": {
+            "clickToReveal": "คลิกเพื่อเปิดเผย",
+            "warn": "กรุณาอย่าเปิดเผยรหัสลับของคุณให้ผู้อื่นเห็น",
+            "copy": "คัดลอก"
+        },
+        "listSettings": {
+            "title": "การตั้งค่ารายการ",
+            "name": "ชื่อรายการ",
+            "update": "อัพเดท",
+            "defaultDest": "ปลายทางเริ่มต้น",
+            "stream": "สตรีม",
+            "user": "ผู้ใช้",
+            "pin": "ปักหมุด",
+            "delete": "ลบ"
+        }
+    },
+    "settings": {
+        "title": "การตั้งค่า",
+        "general": {
+            "title": "ทั่วไป",
+            "checkSecret": "รหัสลับของคุณสามารถดูได้จาก <l>profile</l>.",
+            "basic": "พื้นฐาน",
+            "showEditorOnTop": "แสดงตัวแก้ไขด้านบน",
+            "showEditorOnTopMobile": "แสดงตัวแก้ไขด้านบน (มือถือ)",
+            "developerMode": "โหมดนักพัฒนา",
+            "generateInviteCode": "สร้างรหัสเชิญ",
+            "inviteCode": "รหัสเชิญ (ใช้ได้ภายใน 24 ชั่วโมง)",
+            "copyInviteCode": "คัดลอกรหัสเชิญ",
+            "copied": "คัดลอกแล้ว",
+            "language": "ภาษา"
+        },
+        "profile": {
+            "title": "โปรไฟล์",
+            "update": "อัพเดท",
+            "updated": "อัพเดทแล้ว",
+            "secret": "รหัสลับ",
+            "secretCannotBeRestored": "ไม่สามารถกู้คืนรหัสลับได้เนื่องจากบัญชีนี้นำเข้าโดยใช้คีย์ส่วนตัว(secret key)แทนรหัสลับ(secret code)"
+        },
+        "identity": {
+            "title": "ข้อมูลระบุตัวตน"
+        },
+        "theme": {
+            "title": "ธีม"
+        },
+        "sound": {
+            "title": "เสียง",
+            "sound": "เสียง",
+            "volume": "ระดับเสียง",
+            "override": {
+                "title": "แทนที่เสียง",
+                "postSound": "เสียงโพสต์",
+                "notificationSound": "เสียงการแจ้งเตือน"
+            }
+        },
+        "emoji": {
+            "title": "อีโมจิ",
+            "emojiPackage": "ชุดอีโมจิ",
+            "emojiPackageURL": "URL ของชุดอีโมจิ",
+            "packageNotFound": "ไม่พบชุดอีโมจิ",
+            "copied": "คัดลอกแล้ว",
+            "alreadyAdded": "ชุดอีโมจินี้ถูกเพิ่มแล้ว"
+        },
+        "media": {
+            "title": "มีเดีย",
+            "storageProviderLabel": "ผู้ให้บริการพื้นที่จัดเก็บ",
+            "corsSettings": "การตั้งค่า CORS",
+            "imagePostSettings": "การตั้งค่าโพสต์รูปภาพ",
+            "afterRegisteringImgur": "หลังจากลงทะเบียนที่ Imgur, ไปยัง",
+            "thisPage": "หน้านี้",
+            "deleteCompletely": "ลบทั้งหมด",
+            "copyURL": "คัดลอก URL",
+            "copyID": "คัดลอก ID",
+            "oauth2": "และสร้างแอปพลิเคชันที่มีตัวเลือก \"การอนุญาต OAuth 2 โดยไม่มี Callback URL\"",
+            "descs": {
+                "domain": "พื้นที่เก็บข้อมูลโดเมนหมายถึงพื้นที่เก็บข้อมูลที่โดเมนนี้มอบให้ สามารถใช้งานได้โดยไม่ต้องตั้งค่าใดๆ แต่มีการตั้งค่าความจุสูงสุดไว้ นอกจากนี้ ผู้ดูแลระบบอาจดูรายการไฟล์และไฟล์ที่ละเมิดข้อกำหนดอาจถูกลบ",
+                "imgur": "Imgur ใช้สำหรับการอัพโหลดรูปภาพ สามารถตั้งค่าได้ค่อนข้างง่าย เนื้อหาที่สามารถอัปโหลดได้นั้นอยู่ภายใต้เงื่อนไขของ Imgur",
+                "s3": "S3 ใช้สำหรับการอัพโหลดรูปภาพ นอกจากนี้ยังสามารถใช้บริการที่เข้ากันได้กับ S3 เช่น CloudFlare R2 อีกด้วย ต้องใช้ความพยายามมากขึ้นในการตั้งค่า แต่ช่วยให้คุณเก็บไฟล์ไว้ภายใต้การควบคุมของคุณเอง อาจมีค่าธรรมเนียมขึ้นอยู่กับบริการ แต่ในกรณีส่วนใหญ่ จะพอดีกับ Free Tier"
+            }
+        },
+        "ap": {
+            "title": "ActivityPub",
+            "setup": "การตั้งค่า ActivityPub ID",
+            "cantBeChangedOnceRegistered": "**ไม่สามารถเปลี่ยนแปลงได้หลังจากที่ลงทะเบียนแล้ว",
+            "confirming": "กำลังยืนยัน…",
+            "register": "ลงทะเบียน",
+            "helperText": "สามารถใช้อักขระต่อไปนี้: a-z, A-Z, 0-9",
+            "alreadyRegistered": "ลงทะเบียนแล้ว",
+            "tryAnotherID": "ลองใช้ ID อื่น"
+        },
+        "qr": {
+            "title": "รหัสเข้าสู่ระบบ",
+            "createNew": "สร้างใหม่",
+            "showInstalled": "แสดงรหัสที่ติดตั้งแล้ว",
+            "tip1": "คุณสามารถดูรหัสที่สร้างขึ้นได้เพียงครั้งเดียว สร้างรหัสใหม่เมื่อคุณต้องการเท่านั้น",
+            "tip2": "คุณสามารถตรวจสอบคีย์ที่สร้างขึ้นได้ในหน้าการตั้งค่า > ข้อมูลระบุตัวตน",
+            "createNewSubKey": "สร้างคีย์ย่อยใหม่"
+        }
+    },
+    "welcome": {
+        "tagline1": "One World,",
+        "tagline2": "Infinite Environments.",
+        "description": "Concurrent is a new type of decentralized social networking service that connects you to countless servers with just one account.",
+        "createAccount": "Create an Account",
+        "import": "Sign in",
+        "gettingStarted": "Let's get started",
+        "feature1": {
+            "title": "No need to create an account for each server anymore",
+            "description": "Traditional decentralized SNS required you to create an account for each server. Concurrent uses a secret key to prove your identity across countless servers with just one account."
+        },
+        "feature2": {
+            "title": "Timelines for different topics",
+            "description": "Concurrent allows you to freely create community timelines called 'Streams'. Say goodbye to the hassle of switching between multiple accounts on traditional social networks because you feel a bit hesitant to discuss certain topics with all of your followers. Gather and enjoy conversations about your favorite topics in casual streams with like-minded people."
+        },
+        "wip": {
+            "title": "Concurrent is currently under development.",
+            "description": "We are in the middle of adding exciting features and many functionalities are not available yet. We would be delighted if you could play around with it as a form of sightseeing!",
+            "contribute": "If you find any bugs or have great ideas, raise an issue on Github and join the development now!",
+            "milestones": {
+                "title": "Planned features",
+                "item1": "- Private Timelines",
+                "item2": "- Media-specific Posts & Media Lists for Users",
+                "item3": "- Various Filtering Options such as Muting",
+                "item4": "- Timelines of Other Users' Activities",
+                "item5": "- etc..."
+            }
+        }
+    },
+    "registration": {
+        "welcome": {
+            "title": "Let's create your Concurrent account!",
+            "noticeTitle": "Concurrent is currently under development.",
+            "notice": "We are still adding features and the explanations are brief. We would be happy if you could play with it as a form of sightseeing!",
+            "next": "Create an ID Card"
+        },
+        "yourID": {
+            "title": "Your ID",
+            "desc1": "This is the string that identifies you in the world of Concurrent.",
+            "desc2": "It is a random string so that you can be equally identified from any server.",
+            "desc3": "Next, we will create a secret code to prove that you are the owner of this ID.",
+            "next": "Next: Creating your ID's Secret Code"
+        },
+        "saveSecret": {
+            "title": "Secret Code",
+            "desc1": "The secret code is a spell you need when you want to log in again or log in from a different device.",
+            "desc2": "Make sure you never lose it and that nobody else ever finds out about it.",
+            "desc3": "If you lose it, you will never be able to access your account again. If someone else finds out, your account will become a shared account with a hacker.",
+            "didyousave": "Have you taken a note of it?",
+            "next": "Next: Confirming the Secret Code"
+        },
+        "verifyCode": {
+            "title": "Confirming the Secret Code",
+            "match": "OK!",
+            "notMatch": "The secret code does not match",
+            "next": "Next: Choosing a Domain"
+        },
+        "chooseDomain": {
+            "title": "Choosing a Domain",
+            "desc1": "Let's find a domain that will store and deliver your messages.",
+            "desc2": "No matter which domain you choose, you can connect with anyone.",
+            "desc3": "Also, (if the server manager works hard) you can always move to a different domain.",
+            "notice": "You will now move from concurrent.world to a domain jurisdiction site",
+            "chooseFromList": "Choose from the list",
+            "or": "or",
+            "directInput": "Enter URL directly",
+            "tips": "Tips: If you're setting up your own server, click here",
+            "jump": "Go to the registration page",
+            "notRegistered": "Registration at the domain is not confirmed. Please register at the domain you jump to.",
+            "nextDisabled": "You can proceed to the next step once registration at the domain is complete",
+            "next": "Next: Creating a Profile"
+        },
+        "createProfile": {
+            "title": "Creating a Profile",
+            "desc": "Here you set your name, icon, and self-introduction."
+        },
+        "ready": {
+            "title": "Ready to go!",
+            "next": "Start"
+        },
+        "alreadyHaveAccount": "Already have an account?",
+        "importAccount": "Sign in"
+    },
+    "import": {
+        "searching": "Searching…",
+        "notFound": "Your server could not be found. You can continue by entering it manually.",
+        "invalidSecret": "The secret code is not correct.",
+        "notFoundOnServer": "Your account could not be found on the specified server.",
+        "connectionError": "Could not connect to the specified server.",
+        "input": "Enter the secret code or private key",
+        "secretPlaceholder": "A spell made of 12 words",
+        "welcome": "Welcome",
+        "domain": "Domain",
+        "import": "Sign in",
+        "noAccount": "Don’t have an account yet?",
+        "createAccount": "Create an Account"
+    }
+}
