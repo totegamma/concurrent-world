@@ -1,5 +1,5 @@
 import { Box, Button, Divider, FormControlLabel, FormGroup, Paper, Switch, TextField, Typography } from '@mui/material'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useClient } from '../context/ClientContext'
 import { type User, type CommonstreamSchema, type CoreStream } from '@concurrent-world/client'
 import { CCEditor } from './ui/cceditor'
@@ -26,6 +26,13 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
 
     const [writers, setWriters] = useState<User[]>([])
     const [readers, setReaders] = useState<User[]>([])
+
+    const readable = useMemo(
+        () =>
+            stream &&
+            (stream.author === client.ccid || stream.reader.length === 0 || stream.reader.includes(client.ccid ?? '')),
+        [client, stream]
+    )
 
     useEffect(() => {
         if (!props.id) return
@@ -160,7 +167,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                             </Button>
                         </Box>
                     ) : (
-                        <StreamUserList writers={writers} readers={readers} />
+                        readable && <StreamUserList writers={writers} readers={readers} />
                     )}
                 </>
             )}
