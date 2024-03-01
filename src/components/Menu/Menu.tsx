@@ -18,8 +18,7 @@ import ExploreIcon from '@mui/icons-material/Explore'
 import SettingsIcon from '@mui/icons-material/Settings'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import ContactsIcon from '@mui/icons-material/Contacts'
-import { memo, useContext } from 'react'
-import { ApplicationContext } from '../../App'
+import { memo } from 'react'
 // @ts-expect-error vite dynamic import
 import buildTime from '~build/time'
 // @ts-expect-error vite dynamic import
@@ -39,15 +38,10 @@ export interface MenuProps {
 
 export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
     const client = useApi()
-    const appData = useContext(ApplicationContext)
     const actions = useGlobalActions()
     const { t } = useTranslation('', { keyPrefix: 'pages' })
     const [devMode] = usePreference('devMode')
     const [showEditorOnTop] = usePreference('showEditorOnTop')
-
-    if (!appData) {
-        return <>loading...</>
-    }
 
     return (
         <Box

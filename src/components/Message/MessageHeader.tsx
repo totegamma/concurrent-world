@@ -1,12 +1,12 @@
 import { Box, Typography, Link, Tooltip, Menu, IconButton } from '@mui/material'
 import { TimeDiff } from '../ui/TimeDiff'
 import { Link as RouterLink } from 'react-router-dom'
-import { useContext, useMemo, useState } from 'react'
-import { ApplicationContext } from '../../App'
+import { useMemo, useState } from 'react'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { type Message, type ReplyMessageSchema, type SimpleNoteSchema } from '@concurrent-world/client'
 
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
+import { useApi } from '../../context/api'
 
 export interface MessageHeaderProps {
     message: Message<SimpleNoteSchema | ReplyMessageSchema>
@@ -15,13 +15,12 @@ export interface MessageHeaderProps {
 }
 
 export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
-    const appData = useContext(ApplicationContext)
-
+    const client = useApi()
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
     const myAck = useMemo(() => {
-        return appData.acklist.find((ack) => ack.ccid === props.message.author)
-    }, [props.message, appData.acklist])
+        return client.ackings?.find((ack) => ack.ccid === props.message.author)
+    }, [props.message, client])
 
     return (
         <Box

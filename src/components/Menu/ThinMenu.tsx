@@ -7,8 +7,7 @@ import ExploreIcon from '@mui/icons-material/Explore'
 import SettingsIcon from '@mui/icons-material/Settings'
 import ContactsIcon from '@mui/icons-material/Contacts'
 import NotificationsIcon from '@mui/icons-material/Notifications'
-import { memo, useContext } from 'react'
-import { ApplicationContext } from '../../App'
+import { memo } from 'react'
 import { CCAvatar } from '../ui/CCAvatar'
 import { useApi } from '../../context/api'
 import { usePreference } from '../../context/PreferenceContext'
@@ -23,14 +22,9 @@ export interface MenuProps {
 
 export const ThinMenu = memo<MenuProps>((props: MenuProps): JSX.Element => {
     const client = useApi()
-    const appData = useContext(ApplicationContext)
     const actions = useGlobalActions()
     const [devMode] = usePreference('devMode')
     const [showEditorOnTop] = usePreference('showEditorOnTop')
-
-    if (!appData) {
-        return <>loading...</>
-    }
 
     return (
         <Box

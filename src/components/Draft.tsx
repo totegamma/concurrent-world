@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo, useContext } from 'react'
+import { useState, useEffect, useRef, memo } from 'react'
 import {
     InputBase,
     Box,
@@ -42,7 +42,6 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { DummyMessageView } from './Message/DummyMessageView'
 
-import { ApplicationContext } from '../App'
 import { useStorage } from '../context/StorageContext'
 import { SubprofileBadge } from './ui/SubprofileBadge'
 import { CCAvatar } from './ui/CCAvatar'
@@ -65,7 +64,6 @@ export interface DraftProps {
 export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const client = useApi()
     const theme = useTheme()
-    const { acklist } = useContext(ApplicationContext)
     const emojiPicker = useEmojiPicker()
     const navigate = useNavigate()
     const { uploadFile, isUploadReady } = useStorage()
@@ -340,11 +338,10 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         }
 
                         if (userQuery) {
-                            console.log(acklist, userQuery)
                             setUserSuggestions(
-                                acklist.filter((q) =>
+                                client.ackings?.filter((q) =>
                                     q.profile?.payload.body.username?.toLowerCase()?.includes(userQuery)
-                                )
+                                ) ?? []
                             )
                             setEnableUserPicker(true)
                         }

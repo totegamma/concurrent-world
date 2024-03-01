@@ -29,7 +29,6 @@ import { useNavigate } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
 
-import { ApplicationContext } from '../App'
 import { useStorage } from '../context/StorageContext'
 import { DummyMessageView } from './Message/DummyMessageView'
 
@@ -48,7 +47,6 @@ export interface MobileDraftProps {
 export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX.Element => {
     const client = useApi()
     const theme = useTheme()
-    const { acklist } = useContext(ApplicationContext)
     const emojiPicker = useEmojiPicker()
     const navigate = useNavigate()
     const { uploadFile, isUploadReady } = useStorage()
@@ -337,11 +335,10 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
                         }
 
                         if (userQuery) {
-                            console.log(acklist, userQuery)
                             setUserSuggestions(
-                                acklist.filter((q) =>
+                                client.ackings?.filter((q) =>
                                     q.profile?.payload.body.username?.toLowerCase()?.includes(userQuery)
-                                )
+                                ) ?? []
                             )
                             setEnableUserPicker(true)
                         }
