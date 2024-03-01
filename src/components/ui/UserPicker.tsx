@@ -3,6 +3,7 @@ import { type User } from '@concurrent-world/client'
 import { useClient } from '../../context/ClientContext'
 import { CCUserChip } from './CCUserChip'
 import { CCAvatar } from './CCAvatar'
+import { useMemo } from 'react'
 
 export interface UserPickerProps {
     selected: User[]
@@ -12,6 +13,19 @@ export interface UserPickerProps {
 
 export const UserPicker = (props: UserPickerProps): JSX.Element => {
     const { client } = useClient()
+
+    const selected = useMemo(
+        () =>
+            JSON.parse(
+                JSON.stringify(props.selected ?? [], (key, value) => {
+                    if (key === 'client' || key === 'api') {
+                        return undefined
+                    }
+                    return value
+                })
+            ),
+        [props.selected]
+    )
 
     return (
         <Box
@@ -27,7 +41,7 @@ export const UserPicker = (props: UserPickerProps): JSX.Element => {
                 filterSelectedOptions
                 sx={{ width: 1 }}
                 multiple
-                value={props.selected}
+                value={selected}
                 options={client.ackings ?? []}
                 getOptionKey={(option: User) => option.ccid}
                 getOptionLabel={(option: User) => option.profile?.payload.body.username ?? ''}
@@ -48,10 +62,20 @@ export const UserPicker = (props: UserPickerProps): JSX.Element => {
                 }}
                 renderTags={(value, getTagProps) =>
                     value.map((option, index) => (
-                        <CCUserChip user={option} {...getTagProps({ index })} key={option.ccid} />
+                        <CCUserChip
+                            avatar
+                            user={option}
+                            {...getTagProps({ index })}
+                            key={option.ccid}
+                            onDelete={() => {
+                                const newValue = [...value]
+                                newValue.splice(index, 1)
+                                props.setSelected(newValue)
+                            }}
+                        />
                     ))
                 }
-                renderOption={(props, option, state) => (
+                renderOption={(props, option) => (
                     <ListItem {...props}>
                         <ListItemIcon>
                             <CCAvatar avatarURL={option.profile?.payload.body.avatar} identiconSource={option.ccid} />

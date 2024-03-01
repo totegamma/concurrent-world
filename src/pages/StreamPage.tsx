@@ -165,7 +165,7 @@ export const StreamPage = memo((): JSX.Element => {
                     setStreamInfoOpen(false)
                 }}
             >
-                <StreamInfo id={targetStreamID} />
+                <StreamInfo detailed id={targetStreamID} />
             </CCDrawer>
         </>
     )
