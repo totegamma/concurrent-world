@@ -1,10 +1,10 @@
 import { Box, Button, Typography } from '@mui/material'
 import { forwardRef } from 'react'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import { useSnackbar } from 'notistack'
 
 export const Debugger = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const { enqueueSnackbar } = useSnackbar()
 
     return (

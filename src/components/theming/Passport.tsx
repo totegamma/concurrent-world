@@ -1,10 +1,10 @@
 import { useTheme } from '@mui/material'
 import { type ConcurrentTheme } from '../../model'
 import { useId } from 'react'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 
 export function Passport(): JSX.Element {
-    const client = useApi()
+    const { client } = useClient()
 
     return (
         <PassportRenderer

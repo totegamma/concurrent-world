@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useMemo } from 'react'
 import { usePreference } from './PreferenceContext'
-import { useApi } from './api'
+import { useClient } from './ClientContext'
 
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import { fileToBase64 } from '../util'
@@ -14,7 +14,7 @@ export interface StorageState {
 const StorageContext = createContext<StorageState | undefined>(undefined)
 
 export const StorageProvider = ({ children }: { children: JSX.Element | JSX.Element[] }): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const [storageProvider] = usePreference('storageProvider')
     const [s3Config] = usePreference('s3Config')
     const [imgurClientID] = usePreference('imgurClientID')

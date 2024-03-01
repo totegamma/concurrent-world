@@ -3,7 +3,7 @@ import TextField from '@mui/material/TextField'
 import { useEffect, useState } from 'react'
 import { type CoreCharacter, type ProfileSchema } from '@concurrent-world/client'
 import Button from '@mui/material/Button'
-import { useApi } from '../context/api'
+import { useClient } from '../context/ClientContext'
 import { CCAvatar } from './ui/CCAvatar'
 import { alpha, useTheme } from '@mui/material'
 
@@ -18,7 +18,7 @@ interface ProfileEditorProps {
 }
 
 export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
-    const client = useApi()
+    const { client } = useClient()
     const theme = useTheme()
     const [username, setUsername] = useState<string>(props.initial?.username ?? '')
     const [avatar, setAvatar] = useState<string>(props.initial?.avatar ?? '')

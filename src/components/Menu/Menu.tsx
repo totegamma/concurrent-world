@@ -25,7 +25,7 @@ import buildTime from '~build/time'
 import { branch, sha } from '~build/info'
 import { StreamList } from '../StreamList/main'
 import { CCAvatar } from '../ui/CCAvatar'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import { usePreference } from '../../context/PreferenceContext'
 import { useGlobalActions } from '../../context/GlobalActions'
 import { useTranslation } from 'react-i18next'
@@ -37,7 +37,7 @@ export interface MenuProps {
 }
 
 export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const actions = useGlobalActions()
     const { t } = useTranslation('', { keyPrefix: 'pages' })
     const [devMode] = usePreference('devMode')

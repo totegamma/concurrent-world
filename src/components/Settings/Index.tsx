@@ -1,7 +1,7 @@
 import { Typography, Box, ButtonBase, Button, Paper } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
 import { CCAvatar } from '../ui/CCAvatar'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import SettingsIcon from '@mui/icons-material/Settings'
 import PaletteIcon from '@mui/icons-material/Palette'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
@@ -17,7 +17,7 @@ import { IconButtonWithLabel } from '../ui/IconButtonWithLabel'
 import { useTranslation } from 'react-i18next'
 
 export function SettingsIndex(): JSX.Element {
-    const client = useApi()
+    const { client } = useClient()
     const { enqueueSnackbar } = useSnackbar()
 
     const { t } = useTranslation('', { keyPrefix: '' })

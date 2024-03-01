@@ -8,7 +8,7 @@ import { FullScreenLoading } from './components/ui/FullScreenLoading'
 import { Registration } from './pages/Registration'
 import { AccountImport } from './pages/AccountImport'
 import { GuestTimelinePage } from './pages/GuestTimeline'
-import ApiProvider from './context/api'
+import ApiProvider from './context/ClientContext'
 import { PreferenceProvider } from './context/PreferenceContext'
 import './i18n'
 

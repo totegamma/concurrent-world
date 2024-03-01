@@ -17,7 +17,7 @@ import { ContentWithCCAvatar } from '../ContentWithCCAvatar'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import ReplayIcon from '@mui/icons-material/Replay'
 import { useEffect, useMemo, useState } from 'react'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 
 export interface MessageViewProps {
     message: Message<SimpleNoteSchema | ReplyMessageSchema>
@@ -38,7 +38,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
     const clipHeight = props.clipHeight ?? 450
     const [expanded, setExpanded] = useState(props.forceExpanded ?? false)
 
-    const client = useApi()
+    const { client } = useClient()
 
     const [characterOverride, setCharacterOverride] = useState<CoreCharacter<any> | undefined>(undefined)
 

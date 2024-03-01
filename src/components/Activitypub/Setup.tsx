@@ -1,6 +1,6 @@
 import { Box, Button, TextField, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import { useSnackbar } from 'notistack'
 import { Schemas } from '@concurrent-world/client'
 import { usePreference } from '../../context/PreferenceContext'
@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { type StreamList } from '../../model'
 
 export const ApSetup = (): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const [lists, setLists] = usePreference('lists')
     const [userID, setUserID] = useState('')
     const { enqueueSnackbar } = useSnackbar()

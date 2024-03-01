@@ -3,7 +3,7 @@ import { Box, Divider, Typography } from '@mui/material'
 import { Draft } from '../components/Draft'
 import { useLocation, useParams } from 'react-router-dom'
 import { TimelineHeader } from '../components/TimelineHeader'
-import { useApi } from '../context/api'
+import { useClient } from '../context/ClientContext'
 import { Timeline } from '../components/Timeline/main'
 import { StreamInfo } from '../components/StreamInfo'
 import { usePreference } from '../context/PreferenceContext'
@@ -19,7 +19,7 @@ import InfoIcon from '@mui/icons-material/Info'
 import LockIcon from '@mui/icons-material/Lock'
 
 export const StreamPage = memo((): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const actions = useGlobalActions()
 
     const { id } = useParams()

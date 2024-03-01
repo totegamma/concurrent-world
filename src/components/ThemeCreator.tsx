@@ -20,7 +20,7 @@ import { type ConcurrentTheme } from '../model'
 import { Themes, createConcurrentThemeFromObject } from '../themes'
 import { ConcurrentLogo } from './theming/ConcurrentLogo'
 import { usePreference } from '../context/PreferenceContext'
-import { useApi } from '../context/api'
+import { useClient } from '../context/ClientContext'
 import { HexColorPicker } from 'react-colorful'
 import ColorizeIcon from '@mui/icons-material/Colorize'
 import { useGlobalActions } from '../context/GlobalActions'
@@ -106,7 +106,7 @@ export const ColorPicker = (props: ColorPickerProps): JSX.Element => {
 }
 
 export const ThemeCreator = (): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const actions = useGlobalActions()
     const theme = useTheme<ConcurrentTheme>()
     const [currentTheme, setCurrentTheme] = usePreference('themeName')

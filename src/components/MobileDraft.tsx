@@ -23,7 +23,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 import { useEmojiPicker } from '../context/EmojiPickerContext'
 import { type CommonstreamSchema, type Stream, type User, type CreateCurrentOptions } from '@concurrent-world/client'
-import { useApi } from '../context/api'
+import { useClient } from '../context/ClientContext'
 import { type Emoji, type EmojiLite } from '../model'
 import { useNavigate } from 'react-router-dom'
 
@@ -45,7 +45,7 @@ export interface MobileDraftProps {
 }
 
 export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const theme = useTheme()
     const emojiPicker = useEmojiPicker()
     const navigate = useNavigate()

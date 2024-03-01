@@ -14,7 +14,7 @@ import { ThemeCreator } from '../ThemeCreator'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { type User } from '@concurrent-world/client'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import { usePreference } from '../../context/PreferenceContext'
 import { type ConcurrentTheme } from '../../model'
 import { Themes, loadConcurrentTheme } from '../../themes'
@@ -24,7 +24,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { ThemeCard } from '../ThemeCard'
 
 export const ThemeSettings = (): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const [themeName, setThemeName] = usePreference('themeName')
     const [customThemes, setCustomTheme] = usePreference('customThemes')
     const theme = useTheme<ConcurrentTheme>()

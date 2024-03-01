@@ -1,7 +1,7 @@
 import { type CoreCharacter, type ProfileSchema, type User } from '@concurrent-world/client'
 import { Box, Chip, Typography } from '@mui/material'
 import { CCAvatar } from './ui/CCAvatar'
-import { useApi } from '../context/api'
+import { useClient } from '../context/ClientContext'
 import { AckButton } from './AckButton'
 import { useSnackbar } from 'notistack'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
@@ -14,7 +14,7 @@ export interface UserProfileCardProps {
 }
 
 export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const isSelf = props.user?.ccid === client?.ccid
     const { enqueueSnackbar } = useSnackbar()
 

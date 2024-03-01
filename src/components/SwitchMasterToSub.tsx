@@ -12,7 +12,7 @@ import {
     TextField,
     Typography
 } from '@mui/material'
-import { useApi } from '../context/api'
+import { useClient } from '../context/ClientContext'
 import { useMemo, useRef, useState } from 'react'
 import EmailIcon from '@mui/icons-material/Email'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
@@ -29,7 +29,7 @@ export interface SwitchMasterToSubProps {
 }
 
 export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.Element {
-    const client = useApi()
+    const { client } = useClient()
     const [mnemonicTest, setMnemonicTest] = useState<string>('')
     const [activeStep, setActiveStep] = useState(0)
     const [processing, setProcessing] = useState(false)

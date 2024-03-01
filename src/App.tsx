@@ -20,7 +20,7 @@ import {
 
 import useSound from 'use-sound'
 import { MobileMenu } from './components/Menu/MobileMenu'
-import { useApi } from './context/api'
+import { useClient } from './context/ClientContext'
 import { GlobalActionsProvider } from './context/GlobalActions'
 import { EmojiPickerProvider } from './context/EmojiPickerContext'
 
@@ -43,7 +43,7 @@ import { StorageProvider } from './context/StorageContext'
 import { MarkdownRendererLite } from './components/ui/MarkdownRendererLite'
 
 function App(): JSX.Element {
-    const client = useApi()
+    const { client } = useClient()
     const [themeName] = usePreference('themeName')
     const [sound] = usePreference('sound')
     const [customThemes] = usePreference('customThemes')

@@ -1,6 +1,6 @@
 import { Box, Button, ListItemIcon, ListItemText, MenuItem, TextField, Typography } from '@mui/material'
 import { ProfileEditor } from '../ProfileEditor'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import { useSnackbar } from 'notistack'
 import { useTranslation } from 'react-i18next'
 import { type ProfileSchema, type CoreCharacter, type Schema } from '@concurrent-world/client'
@@ -16,7 +16,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import { useLocation } from 'react-router-dom'
 
 export const ProfileSettings = (): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const { enqueueSnackbar } = useSnackbar()
 
     const { t } = useTranslation('', { keyPrefix: 'settings.profile' })

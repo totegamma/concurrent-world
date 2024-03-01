@@ -4,7 +4,7 @@ import { useLocation, useNavigate, Link as RouterLink } from 'react-router-dom'
 import { usePreference } from '../context/PreferenceContext'
 import { Timeline } from '../components/Timeline'
 import { Draft } from '../components/Draft'
-import { useApi } from '../context/api'
+import { useClient } from '../context/ClientContext'
 import { type CreateCurrentOptions, type CommonstreamSchema, type Stream } from '@concurrent-world/client'
 import TuneIcon from '@mui/icons-material/Tune'
 import ExploreIcon from '@mui/icons-material/Explore'
@@ -16,7 +16,7 @@ import { type VListHandle } from 'virtua'
 import { useGlobalActions } from '../context/GlobalActions'
 
 export function ListPage(): JSX.Element {
-    const client = useApi()
+    const { client } = useClient()
     const path = useLocation()
     const navigate = useNavigate()
     const actions = useGlobalActions()

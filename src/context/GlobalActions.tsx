@@ -1,7 +1,7 @@
 import { Box, Paper, Modal, Typography, Divider, Button, Drawer, useTheme, useMediaQuery, Tooltip } from '@mui/material'
 import { InspectorProvider } from '../context/Inspector'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { useApi } from './api'
+import { useClient } from './ClientContext'
 import {
     Schemas,
     type Message,
@@ -53,7 +53,7 @@ const style = {
 const RowEmojiCount = 6
 
 export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const [lists] = usePreference('lists')
     const [emojiPackages, setEmojiPackages] = usePreference('emojiPackages')
     const { enqueueSnackbar } = useSnackbar()

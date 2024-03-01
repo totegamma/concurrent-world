@@ -15,7 +15,7 @@ import {
     useTheme
 } from '@mui/material'
 import { type CommonstreamSchema, Schemas, type CoreCharacter } from '@concurrent-world/client'
-import { useApi } from '../context/api'
+import { useClient } from '../context/ClientContext'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -39,7 +39,7 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 
 export function Explorer(): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'pages.explore' })
-    const client = useApi()
+    const { client } = useClient()
     const theme = useTheme()
     const navigate = useNavigate()
 

@@ -6,7 +6,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { type Message, type ReplyMessageSchema, type SimpleNoteSchema } from '@concurrent-world/client'
 
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 
 export interface MessageHeaderProps {
     message: Message<SimpleNoteSchema | ReplyMessageSchema>
@@ -15,7 +15,7 @@ export interface MessageHeaderProps {
 }
 
 export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
     const myAck = useMemo(() => {

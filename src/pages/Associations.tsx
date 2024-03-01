@@ -1,10 +1,10 @@
 import { Box, Divider, Typography } from '@mui/material'
 import { useMemo } from 'react'
 import { Timeline } from '../components/Timeline'
-import { useApi } from '../context/api'
+import { useClient } from '../context/ClientContext'
 
 export function Associations(): JSX.Element {
-    const client = useApi()
+    const { client } = useClient()
 
     const streams = useMemo(() => {
         const target = client.user?.userstreams?.payload.body.notificationStream
