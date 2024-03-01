@@ -1,25 +1,26 @@
-import { memo, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { Box, Divider } from '@mui/material'
+import { memo, useEffect, useMemo, useRef, useState } from 'react'
+import { Box, Divider, Typography } from '@mui/material'
 import { Draft } from '../components/Draft'
 import { useLocation, useParams } from 'react-router-dom'
 import { TimelineHeader } from '../components/TimelineHeader'
 import { useApi } from '../context/api'
 import { Timeline } from '../components/Timeline/main'
 import { StreamInfo } from '../components/StreamInfo'
-import { ApplicationContext } from '../App'
 import { usePreference } from '../context/PreferenceContext'
 import { type CommonstreamSchema, type Stream } from '@concurrent-world/client'
-import PercentIcon from '@mui/icons-material/Percent'
-import TuneIcon from '@mui/icons-material/Tune'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import WatchingStreamContextProvider from '../context/WatchingStreamContext'
 import { type VListHandle } from 'virtua'
 import { useGlobalActions } from '../context/GlobalActions'
 
+import PercentIcon from '@mui/icons-material/Percent'
+import TuneIcon from '@mui/icons-material/Tune'
+import InfoIcon from '@mui/icons-material/Info'
+import LockIcon from '@mui/icons-material/Lock'
+
 export const StreamPage = memo((): JSX.Element => {
     const client = useApi()
     const actions = useGlobalActions()
-    const appData = useContext(ApplicationContext)
 
     const { id } = useParams()
 
@@ -28,33 +29,25 @@ export const StreamPage = memo((): JSX.Element => {
 
     const reactlocation = useLocation()
     const timelineRef = useRef<VListHandle>(null)
-    const [writeable, setWriteable] = useState<boolean>(true)
 
     const targetStreamID = id ?? ''
     const [targetStream, setTargetStream] = useState<Stream<CommonstreamSchema> | null | undefined>(null)
 
     const [streamInfoOpen, setStreamInfoOpen] = useState<boolean>(false)
 
-    useEffect(() => {
-        client.getStream<CommonstreamSchema>(targetStreamID).then((stream) => {
-            setTargetStream(stream)
-        })
+    const isOwner = useMemo(() => {
+        return targetStream?.author === client.ccid
+    }, [targetStream])
 
-        client.api
-            .getStream(targetStreamID)
-            .then((stream) => {
-                if (!stream) {
-                    setWriteable(false)
-                } else if (stream.author === client.ccid) {
-                    setWriteable(true)
-                } else if (stream.writer.length === 0) {
-                    setWriteable(true)
-                } else if (stream.writer.includes(client.ccid ?? '')) {
-                    setWriteable(true)
-                }
-            })
-            .finally(() => {})
-    }, [reactlocation.hash])
+    const writeable = useMemo(
+        () => isOwner || targetStream?.writer.length === 0 || targetStream?.writer.includes(client.ccid ?? ''),
+        [targetStream]
+    )
+
+    const readable = useMemo(
+        () => isOwner || targetStream?.reader.length === 0 || targetStream?.reader.includes(client.ccid ?? ''),
+        [targetStream]
+    )
 
     const streams = useMemo(() => {
         return targetStream ? [targetStream] : []
@@ -63,6 +56,12 @@ export const StreamPage = memo((): JSX.Element => {
     const streamIDs = useMemo(() => {
         return targetStream ? [targetStream.id] : []
     }, [targetStream])
+
+    useEffect(() => {
+        client.getStream<CommonstreamSchema>(targetStreamID).then((stream) => {
+            setTargetStream(stream)
+        })
+    }, [reactlocation.hash])
 
     return (
         <>
@@ -78,7 +77,7 @@ export const StreamPage = memo((): JSX.Element => {
                 <TimelineHeader
                     title={targetStream?.payload.name ?? 'Not Found'}
                     titleIcon={<PercentIcon />}
-                    secondaryAction={<TuneIcon />}
+                    secondaryAction={isOwner ? <TuneIcon /> : <InfoIcon />}
                     onTitleClick={() => {
                         timelineRef.current?.scrollToIndex(0, { align: 'start', smooth: true })
                     }}
@@ -86,53 +85,79 @@ export const StreamPage = memo((): JSX.Element => {
                         setStreamInfoOpen(true)
                     }}
                 />
-                <WatchingStreamContextProvider watchingStreams={streamIDs}>
-                    <Timeline
-                        streams={streamIDs}
-                        ref={timelineRef}
-                        header={
-                            (writeable && (
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        flexDirection: 'column'
-                                    }}
-                                >
+                {readable ? (
+                    <WatchingStreamContextProvider watchingStreams={streamIDs}>
+                        <Timeline
+                            streams={streamIDs}
+                            ref={timelineRef}
+                            header={
+                                (writeable && (
                                     <Box
                                         sx={{
-                                            display: {
-                                                xs: showEditorOnTopMobile ? 'block' : 'none',
-                                                sm: showEditorOnTop ? 'block' : 'none'
-                                            }
+                                            display: 'flex',
+                                            flexDirection: 'column'
                                         }}
                                     >
-                                        <Draft
-                                            streamPickerInitial={streams}
-                                            streamPickerOptions={[...new Set([...actions.allKnownStreams, ...streams])]}
-                                            onSubmit={async (
-                                                text: string,
-                                                destinations: string[],
-                                                options
-                                            ): Promise<Error | null> => {
-                                                await client.createCurrent(text, destinations, options).catch((e) => e)
-                                                return null
-                                            }}
+                                        <Box
                                             sx={{
-                                                p: 1
+                                                display: {
+                                                    xs: showEditorOnTopMobile ? 'block' : 'none',
+                                                    sm: showEditorOnTop ? 'block' : 'none'
+                                                }
                                             }}
-                                        />
-                                        <Divider
-                                            sx={{
-                                                mb: 1
-                                            }}
-                                        />
+                                        >
+                                            <Draft
+                                                streamPickerInitial={streams}
+                                                streamPickerOptions={[
+                                                    ...new Set([...actions.allKnownStreams, ...streams])
+                                                ]}
+                                                onSubmit={async (
+                                                    text: string,
+                                                    destinations: string[],
+                                                    options
+                                                ): Promise<Error | null> => {
+                                                    await client
+                                                        .createCurrent(text, destinations, options)
+                                                        .catch((e) => e)
+                                                    return null
+                                                }}
+                                                sx={{
+                                                    p: 1
+                                                }}
+                                            />
+                                            <Divider
+                                                sx={{
+                                                    mb: 1
+                                                }}
+                                            />
+                                        </Box>
                                     </Box>
-                                </Box>
-                            )) ||
-                            undefined
-                        }
-                    />
-                </WatchingStreamContextProvider>
+                                )) ||
+                                undefined
+                            }
+                        />
+                    </WatchingStreamContextProvider>
+                ) : (
+                    <Box>
+                        <StreamInfo id={targetStreamID} />
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                height: '100%'
+                            }}
+                        >
+                            <LockIcon
+                                sx={{
+                                    fontSize: '10rem'
+                                }}
+                            />
+                            <Typography variant="h5">このストリームは鍵がかかっています。</Typography>
+                        </Box>
+                    </Box>
+                )}
             </Box>
             <CCDrawer
                 open={streamInfoOpen}
