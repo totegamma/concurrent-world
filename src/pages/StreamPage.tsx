@@ -7,7 +7,7 @@ import { useClient } from '../context/ClientContext'
 import { Timeline } from '../components/Timeline/main'
 import { StreamInfo } from '../components/StreamInfo'
 import { usePreference } from '../context/PreferenceContext'
-import { type CommonstreamSchema, type Stream } from '@concurrent-world/client'
+import { type CommonstreamSchema } from '@concurrent-world/client'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import WatchingStreamContextProvider from '../context/WatchingStreamContext'
 import { type VListHandle } from 'virtua'
@@ -20,7 +20,7 @@ import LockIcon from '@mui/icons-material/Lock'
 
 export const StreamPage = memo((): JSX.Element => {
     const { client } = useClient()
-    const actions = useGlobalActions()
+    const { allKnownStreams, postStreams, setPostStreams } = useGlobalActions()
 
     const { id } = useParams()
 
@@ -30,7 +30,7 @@ export const StreamPage = memo((): JSX.Element => {
     const timelineRef = useRef<VListHandle>(null)
 
     const targetStreamID = id ?? ''
-    const [targetStream, setTargetStream] = useState<Stream<CommonstreamSchema> | null | undefined>(null)
+    const targetStream = postStreams[0]
 
     const [streamInfoOpen, setStreamInfoOpen] = useState<boolean>(false)
 
@@ -60,7 +60,7 @@ export const StreamPage = memo((): JSX.Element => {
 
     useEffect(() => {
         client.getStream<CommonstreamSchema>(targetStreamID).then((stream) => {
-            setTargetStream(stream)
+            if (stream) setPostStreams([stream])
         })
     }, [id])
 
@@ -110,9 +110,7 @@ export const StreamPage = memo((): JSX.Element => {
                                             <Draft
                                                 defaultPostHome={!nonPublic}
                                                 streamPickerInitial={streams}
-                                                streamPickerOptions={[
-                                                    ...new Set([...actions.allKnownStreams, ...streams])
-                                                ]}
+                                                streamPickerOptions={[...new Set([...allKnownStreams, ...streams])]}
                                                 onSubmit={async (
                                                     text: string,
                                                     destinations: string[],

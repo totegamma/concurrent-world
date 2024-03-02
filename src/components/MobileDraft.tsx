@@ -42,6 +42,7 @@ export interface MobileDraftProps {
     placeholder?: string
     value?: string
     context?: JSX.Element
+    defaultPostHome?: boolean
 }
 
 export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX.Element => {
@@ -58,7 +59,7 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
     const textInputRef = useRef<HTMLInputElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
-    const [postHome, setPostHome] = useState<boolean>(true)
+    const [postHome, setPostHome] = useState<boolean>(props.defaultPostHome ?? true)
     const [sending, setSending] = useState<boolean>(false)
 
     const [enableSuggestions, setEnableSuggestions] = useState<boolean>(false)

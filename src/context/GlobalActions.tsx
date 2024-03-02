@@ -11,7 +11,6 @@ import {
 } from '@concurrent-world/client'
 import { Draft } from '../components/Draft'
 import { MobileDraft } from '../components/MobileDraft'
-import { useLocation } from 'react-router-dom'
 import { usePreference } from './PreferenceContext'
 import { ProfileEditor } from '../components/ProfileEditor'
 import { MessageContainer } from '../components/Message/MessageContainer'
@@ -21,7 +20,6 @@ import { CCDrawer } from '../components/ui/CCDrawer'
 import { type EmojiPackage } from '../model'
 import { experimental_VGrid as VGrid } from 'virtua'
 import { useSnackbar } from 'notistack'
-import { useTranslation } from 'react-i18next'
 import { ImagePreviewModal } from '../components/ui/ImagePreviewModal'
 
 export interface GlobalActionsState {
@@ -33,6 +31,8 @@ export interface GlobalActionsState {
     draft: string
     openEmojipack: (url: EmojiPackage) => void
     openImageViewer: (url: string) => void
+    postStreams: Array<Stream<CommonstreamSchema>>
+    setPostStreams: (streams: Array<Stream<CommonstreamSchema>>) => void
 }
 
 const GlobalActionsContext = createContext<GlobalActionsState | undefined>(undefined)
@@ -57,13 +57,18 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const [lists] = usePreference('lists')
     const [emojiPackages, setEmojiPackages] = usePreference('emojiPackages')
     const { enqueueSnackbar } = useSnackbar()
-    const path = useLocation()
     const theme = useTheme()
     const [draft, setDraft] = useState<string>('')
     const [mode, setMode] = useState<'compose' | 'reply' | 'reroute' | 'none'>('none')
     const [targetMessage, setTargetMessage] = useState<Message<any> | null>(null)
 
-    const [queriedStreams, setQueriedStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
+    const [postStreams, setPostStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
+
+    const isPostStreamsPublic = useMemo(
+        () => postStreams.every((stream) => stream.reader.length === 0 && stream.visible),
+        [postStreams]
+    )
+
     const [allKnownStreams, setAllKnownStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
     const [domainIsOffline, setDomainIsOffline] = useState<boolean>(false)
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
@@ -75,8 +80,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     }, [emojiPack, emojiPackages])
 
     const isMobileSize = useMediaQuery(theme.breakpoints.down('sm'))
-
-    const { t } = useTranslation('')
 
     const [viewportHeight, setViewportHeight] = useState<number>(visualViewport?.height ?? 0)
     useEffect(() => {
@@ -123,34 +126,12 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         })
     }, [client.user])
 
-    const updateQueriedStreams = useCallback(() => {
-        let streamIDs: string[] = []
-        switch (path.pathname) {
-            case '/stream': {
-                streamIDs = path.hash.replace('#', '').split(',')
-                break
-            }
-            default: {
-                const rawid = path.hash.replace('#', '')
-                const list = lists[rawid] ?? Object.values(lists)[0]
-                if (!list) break
-                streamIDs = list.defaultPostStreams
-                break
-            }
-        }
-
-        Promise.all(streamIDs.map((id) => client.getStream(id))).then((streams) => {
-            setQueriedStreams(streams.filter((e) => e !== null) as Array<Stream<CommonstreamSchema>>)
-        })
-    }, [path.pathname, path.hash, lists])
-
     const openDraft = useCallback(
         (draft?: string) => {
             setDraft(draft ?? '')
-            updateQueriedStreams()
             setMode('compose')
         },
-        [updateQueriedStreams]
+        [setDraft, setMode]
     )
 
     const openReply = useCallback((target: Message<any>) => {
@@ -160,11 +141,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
 
     const openReroute = useCallback(
         (target: Message<any>) => {
-            updateQueriedStreams()
             setTargetMessage(target)
             setMode('reroute')
         },
-        [setTargetMessage, setMode, updateQueriedStreams]
+        [setTargetMessage, setMode]
     )
 
     const openMobileMenu = useCallback((open?: boolean) => {
@@ -257,9 +237,22 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     allKnownStreams,
                     draft,
                     openEmojipack,
-                    openImageViewer
+                    openImageViewer,
+                    postStreams,
+                    setPostStreams
                 }
-            }, [openDraft, openReply, openReroute, openMobileMenu, allKnownStreams])}
+            }, [
+                openDraft,
+                openReply,
+                openReroute,
+                openMobileMenu,
+                allKnownStreams,
+                draft,
+                openEmojipack,
+                openImageViewer,
+                postStreams,
+                setPostStreams
+            ])}
         >
             <InspectorProvider>
                 <>{props.children}</>
@@ -294,7 +287,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                     >
                                         {mode === 'compose' && (
                                             <MobileDraft
-                                                streamPickerInitial={queriedStreams}
+                                                streamPickerInitial={postStreams}
+                                                defaultPostHome={isPostStreamsPublic}
                                                 streamPickerOptions={allKnownStreams}
                                                 onSubmit={async (text: string, destinations: string[], options) => {
                                                     await client
@@ -315,11 +309,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                         {targetMessage && (mode === 'reply' || mode === 'reroute') && (
                                             <MobileDraft
                                                 allowEmpty={mode === 'reroute'}
+                                                defaultPostHome={isPostStreamsPublic}
                                                 submitButtonLabel={mode === 'reply' ? 'Reply' : 'Reroute'}
                                                 streamPickerInitial={
-                                                    mode === 'reroute'
-                                                        ? queriedStreams
-                                                        : targetMessage.postedStreams ?? []
+                                                    mode === 'reroute' ? postStreams : targetMessage.postedStreams ?? []
                                                 }
                                                 streamPickerOptions={
                                                     mode === 'reroute'
@@ -359,8 +352,9 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                         <Box sx={{ display: 'flex' }}>
                                             <Draft
                                                 autoFocus
+                                                defaultPostHome={isPostStreamsPublic}
                                                 value={draft}
-                                                streamPickerInitial={queriedStreams}
+                                                streamPickerInitial={postStreams}
                                                 streamPickerOptions={allKnownStreams}
                                                 onSubmit={async (text: string, destinations: string[], options) => {
                                                     await client
@@ -392,12 +386,11 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                         <Box sx={{ display: 'flex' }}>
                                             <Draft
                                                 autoFocus
+                                                defaultPostHome={isPostStreamsPublic}
                                                 allowEmpty={mode === 'reroute'}
                                                 submitButtonLabel={mode === 'reply' ? 'Reply' : 'Reroute'}
                                                 streamPickerInitial={
-                                                    mode === 'reroute'
-                                                        ? queriedStreams
-                                                        : targetMessage.postedStreams ?? []
+                                                    mode === 'reroute' ? postStreams : targetMessage.postedStreams ?? []
                                                 }
                                                 streamPickerOptions={
                                                     mode === 'reroute'

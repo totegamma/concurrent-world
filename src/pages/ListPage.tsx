@@ -19,7 +19,7 @@ export function ListPage(): JSX.Element {
     const { client } = useClient()
     const path = useLocation()
     const navigate = useNavigate()
-    const actions = useGlobalActions()
+    const { allKnownStreams, postStreams, setPostStreams } = useGlobalActions()
     const [lists, setLists] = usePreference('lists')
     const [showEditorOnTop] = usePreference('showEditorOnTop')
     const [showEditorOnTopMobile] = usePreference('showEditorOnTopMobile')
@@ -27,7 +27,6 @@ export function ListPage(): JSX.Element {
     const id = lists[rawid] ? rawid : Object.keys(lists)[0]
     const [tab, setTab] = useState<string>(id)
 
-    const [postStreams, setPostStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
     const [listSettingsOpen, setListSettingsOpen] = useState<boolean>(false)
 
     const timelineRef = useRef<VListHandle>(null)
@@ -43,14 +42,16 @@ export function ListPage(): JSX.Element {
     }, [id, lists])
 
     useEffect(() => {
-        if (id) {
-            setTab(id)
-        }
+        if (id) setTab(id)
     }, [id])
 
     useEffect(() => {
         navigate(`#${tab}`)
     }, [tab])
+
+    useEffect(() => {
+        console.log('poststreams changed!!!!!', postStreams)
+    }, [postStreams])
 
     const streamIDs = useMemo(() => {
         return [
@@ -58,7 +59,7 @@ export function ListPage(): JSX.Element {
             ...(lists[id]?.streams ?? []),
             lists[id]?.userStreams.map((e) => e.streamID) ?? []
         ].flat()
-    }, [id, lists, client?.user?.userstreams?.payload.body.homeStream])
+    }, [id, lists, client])
 
     if (!lists[id]) {
         return (
@@ -148,7 +149,7 @@ export function ListPage(): JSX.Element {
                                     }}
                                 >
                                     <Draft
-                                        streamPickerOptions={actions.allKnownStreams}
+                                        streamPickerOptions={allKnownStreams}
                                         streamPickerInitial={postStreams}
                                         onSubmit={async (
                                             text: string,
