@@ -1,6 +1,6 @@
 import { type User } from '@concurrent-world/client'
 import { CCAvatar } from './CCAvatar'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import { useEffect, useState } from 'react'
 import { type SxProps } from '@mui/material'
 
@@ -11,13 +11,13 @@ export interface CCUserIconProps {
 }
 
 export const CCUserIcon = (props: CCUserIconProps): JSX.Element => {
-    const api = useApi()
+    const { client } = useClient()
     const [user, setUser] = useState<User | null | undefined>(props.user)
 
     useEffect(() => {
         if (user !== undefined) return
         if (!props.ccid) return
-        api.getUser(props.ccid).then((user) => {
+        client.getUser(props.ccid).then((user) => {
             setUser(user)
         })
     }, [props.ccid])

@@ -2,7 +2,7 @@ import { Tooltip, Paper, Chip } from '@mui/material'
 import { type Stream } from '@concurrent-world/client'
 import { Link as NavLink } from 'react-router-dom'
 import PercentIcon from '@mui/icons-material/Percent'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import { useEffect, useState } from 'react'
 import { StreamCard } from '../Stream/Card'
 
@@ -11,7 +11,7 @@ export interface StreamChipProps {
 }
 
 export const StreamChip = (props: StreamChipProps): JSX.Element => {
-    const api = useApi()
+    const { client } = useClient()
     const [stream, setStream] = useState<Stream<any> | null | undefined>(undefined)
 
     const domain = props.streamID?.split('@')?.[1]
@@ -19,7 +19,7 @@ export const StreamChip = (props: StreamChipProps): JSX.Element => {
     useEffect(() => {
         if (stream !== undefined) return
         if (!props.streamID) return
-        api.getStream<any>(props.streamID).then(setStream)
+        client.getStream<any>(props.streamID).then(setStream)
     }, [])
 
     return (

@@ -1,6 +1,6 @@
 import { type CoreCharacter } from '@concurrent-world/client'
 import { useEffect, useState } from 'react'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import { Avatar, type SxProps, Tooltip } from '@mui/material'
 import BoringAvatar from 'boring-avatars'
 
@@ -12,7 +12,7 @@ export interface SubprofileBadgeProps {
 }
 
 export function SubprofileBadge(props: SubprofileBadgeProps): JSX.Element {
-    const client = useApi()
+    const { client } = useClient()
 
     const [character, setCharacter] = useState<CoreCharacter<any> | null>(null)
 

@@ -10,7 +10,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { useState } from 'react'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import { useInspector } from '../../context/Inspector'
 import { MarkdownRendererLite } from '../ui/MarkdownRendererLite'
 import { MarkdownRenderer } from '../ui/MarkdownRenderer'
@@ -23,7 +23,7 @@ export interface RerouteMessageFrameProp {
 }
 
 export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const inspector = useInspector()
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 

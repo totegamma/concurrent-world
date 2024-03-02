@@ -1,7 +1,7 @@
 import { Box, Collapse, Divider, Tab, Tabs } from '@mui/material'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
-import { useApi } from '../context/api'
+import { useClient } from '../context/ClientContext'
 import { Timeline } from '../components/Timeline'
 import { type User } from '@concurrent-world/client'
 import { type VListHandle } from 'virtua'
@@ -10,7 +10,7 @@ import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import { Profile } from '../components/Profile'
 
 export function EntityPage(): JSX.Element {
-    const client = useApi()
+    const { client } = useClient()
     const { id } = useParams()
 
     const [user, setUser] = useState<User | null | undefined>(null)

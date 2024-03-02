@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import { type ApEntity } from '../../model'
 import { Box, Button, TextField, Typography, alpha, useTheme } from '@mui/material'
 import { CCAvatar } from '../ui/CCAvatar'
@@ -7,7 +7,7 @@ import { useSnackbar } from 'notistack'
 import { CCWallpaper } from '../ui/CCWallpaper'
 
 export const ApProfileEditor = (props: { entity: ApEntity }): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const theme = useTheme()
     const { enqueueSnackbar } = useSnackbar()
 

@@ -3,7 +3,7 @@ import { StreamPicker } from './ui/StreamPicker'
 import { useEffect, useState } from 'react'
 import { usePreference } from '../context/PreferenceContext'
 import { type CommonstreamSchema, type Stream } from '@concurrent-world/client'
-import { useApi } from '../context/api'
+import { useClient } from '../context/ClientContext'
 import { StreamLink, UserStreamLink } from './StreamList/StreamLink'
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove'
 import { useTranslation } from 'react-i18next'
@@ -14,7 +14,7 @@ export interface ListSettingsProps {
 }
 
 export function ListSettings(props: ListSettingsProps): JSX.Element {
-    const client = useApi()
+    const { client } = useClient()
     const [lists, setLists] = usePreference('lists')
     const [listName, setListName] = useState<string>('')
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo, useContext } from 'react'
+import { useState, useEffect, useRef, memo } from 'react'
 import {
     InputBase,
     Box,
@@ -35,14 +35,13 @@ import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 import { useEmojiPicker } from '../context/EmojiPickerContext'
 import caretPosition from 'textarea-caret'
 import { type CommonstreamSchema, type Stream, type User, type CreateCurrentOptions } from '@concurrent-world/client'
-import { useApi } from '../context/api'
+import { useClient } from '../context/ClientContext'
 import { type Emoji, type EmojiLite } from '../model'
 import { useNavigate } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
 import { DummyMessageView } from './Message/DummyMessageView'
 
-import { ApplicationContext } from '../App'
 import { useStorage } from '../context/StorageContext'
 import { SubprofileBadge } from './ui/SubprofileBadge'
 import { CCAvatar } from './ui/CCAvatar'
@@ -60,12 +59,12 @@ export interface DraftProps {
     placeholder?: string
     sx?: SxProps
     value?: string
+    defaultPostHome?: boolean
 }
 
 export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const theme = useTheme()
-    const { acklist } = useContext(ApplicationContext)
     const emojiPicker = useEmojiPicker()
     const navigate = useNavigate()
     const { uploadFile, isUploadReady } = useStorage()
@@ -78,7 +77,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const textInputRef = useRef<HTMLInputElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
-    const [postHomeButton, setPostHomeButton] = useState<boolean>(true)
+    const [postHomeButton, setPostHomeButton] = useState<boolean>(props.defaultPostHome ?? true)
     const [holdCtrlShift, setHoldCtrlShift] = useState<boolean>(false)
     const postHome = postHomeButton && !holdCtrlShift
 
@@ -340,11 +339,10 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         }
 
                         if (userQuery) {
-                            console.log(acklist, userQuery)
                             setUserSuggestions(
-                                acklist.filter((q) =>
+                                client.ackings?.filter((q) =>
                                     q.profile?.payload.body.username?.toLowerCase()?.includes(userQuery)
-                                )
+                                ) ?? []
                             )
                             setEnableUserPicker(true)
                         }

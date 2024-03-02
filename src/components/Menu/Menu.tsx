@@ -18,15 +18,14 @@ import ExploreIcon from '@mui/icons-material/Explore'
 import SettingsIcon from '@mui/icons-material/Settings'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import ContactsIcon from '@mui/icons-material/Contacts'
-import { memo, useContext } from 'react'
-import { ApplicationContext } from '../../App'
+import { memo } from 'react'
 // @ts-expect-error vite dynamic import
 import buildTime from '~build/time'
 // @ts-expect-error vite dynamic import
 import { branch, sha } from '~build/info'
 import { StreamList } from '../StreamList/main'
 import { CCAvatar } from '../ui/CCAvatar'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import { usePreference } from '../../context/PreferenceContext'
 import { useGlobalActions } from '../../context/GlobalActions'
 import { useTranslation } from 'react-i18next'
@@ -38,16 +37,11 @@ export interface MenuProps {
 }
 
 export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
-    const client = useApi()
-    const appData = useContext(ApplicationContext)
+    const { client } = useClient()
     const actions = useGlobalActions()
     const { t } = useTranslation('', { keyPrefix: 'pages' })
     const [devMode] = usePreference('devMode')
     const [showEditorOnTop] = usePreference('showEditorOnTop')
-
-    if (!appData) {
-        return <>loading...</>
-    }
 
     return (
         <Box

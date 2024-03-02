@@ -1,7 +1,7 @@
 import { Alert, Box, Paper, Typography } from '@mui/material'
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import { useApi } from './api'
+import { useClient } from './ClientContext'
 import { validateSignature, type CoreMessage, type CoreAssociation } from '@concurrent-world/client'
 import { Codeblock } from '../components/ui/Codeblock'
 import { MessageContainer } from '../components/Message/MessageContainer'
@@ -21,7 +21,7 @@ interface InspectorProps {
 }
 
 export const InspectorProvider = (props: InspectorProps): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const [inspectingItem, inspectItem] = useState<{ messageId: string; author: string } | null>(null)
     const [message, setMessage] = useState<CoreMessage<any> | undefined>()
     const [associations, setAssociations] = useState<Array<CoreAssociation<any>>>([])

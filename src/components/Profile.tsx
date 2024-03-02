@@ -9,7 +9,7 @@ import { Link as NavLink } from 'react-router-dom'
 
 import { useEffect, useState } from 'react'
 import { type CoreCharacter, type User } from '@concurrent-world/client'
-import { useApi } from '../context/api'
+import { useClient } from '../context/ClientContext'
 import { CCDrawer } from './ui/CCDrawer'
 import { AckList } from '../components/AckList'
 import { CCWallpaper } from './ui/CCWallpaper'
@@ -28,7 +28,7 @@ export interface ProfileProps {
 type detail = 'none' | 'ack' | 'acker'
 
 export function Profile(props: ProfileProps): JSX.Element {
-    const client = useApi()
+    const { client } = useClient()
     const theme = useTheme()
 
     const isSelf = props.id === client.ccid

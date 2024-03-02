@@ -7,7 +7,7 @@ import {
     type RerouteAssociationSchema,
     Schemas
 } from '@concurrent-world/client'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import { Box, ListItem, type SxProps, Typography } from '@mui/material'
 import { MessageSkeleton } from '../MessageSkeleton'
 import { MessageContainer } from '../Message/MessageContainer'
@@ -26,7 +26,7 @@ export interface AssociationFrameProp {
 }
 
 export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFrameProp): JSX.Element | null => {
-    const client = useApi()
+    const { client } = useClient()
     const [isDevMode] = usePreference('devMode')
     const [association, setAssociation] = useState<Association<
         LikeSchema | EmojiAssociationSchema | ReplyAssociationSchema | RerouteAssociationSchema

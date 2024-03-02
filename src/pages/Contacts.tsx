@@ -1,11 +1,11 @@
 import { Box, Divider, Typography } from '@mui/material'
 import { AckList } from '../components/AckList'
-import { useApi } from '../context/api'
+import { useClient } from '../context/ClientContext'
 import { useTranslation } from 'react-i18next'
 
 export function ContactsPage(): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'pages.contacts' })
-    const client = useApi()
+    const { client } = useClient()
 
     return (
         <Box

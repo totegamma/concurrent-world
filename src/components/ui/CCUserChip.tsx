@@ -1,28 +1,45 @@
-import { Tooltip, Paper, Chip } from '@mui/material'
+import { Tooltip, Paper, Chip, Avatar } from '@mui/material'
 import { UserProfileCard } from '../UserProfileCard'
 import { type User } from '@concurrent-world/client'
 import { Link as NavLink } from 'react-router-dom'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import { useEffect, useState } from 'react'
+import { CCAvatar } from './CCAvatar'
 
 export interface CCUserChipProps {
     user?: User
     ccid?: string
     iconOverride?: JSX.Element
+    onDelete?: () => void
+    avatar?: boolean
 }
 
 export const CCUserChip = (props: CCUserChipProps): JSX.Element => {
-    const api = useApi()
+    const { client } = useClient()
     const [user, setUser] = useState<User | null | undefined>(props.user)
 
     useEffect(() => {
         if (user !== undefined) return
         if (!props.ccid) return
-        api.getUser(props.ccid).then((user) => {
+        client.getUser(props.ccid).then((user) => {
             setUser(user)
         })
     }, [])
+
+    const icon = props.avatar
+        ? (
+              <CCAvatar
+                  sx={{
+                      width: 20,
+                      height: 20
+                  }}
+                  circle
+                  identiconSource={user?.ccid ?? ''}
+                  avatarURL={user?.profile?.payload.body.avatar}
+              />
+          ) ?? <AlternateEmailIcon fontSize="small" />
+        : props.iconOverride ?? <AlternateEmailIcon fontSize="small" />
 
     return (
         <Tooltip
@@ -45,13 +62,22 @@ export const CCUserChip = (props: CCUserChipProps): JSX.Element => {
             }}
             title={<UserProfileCard user={user ?? undefined} />}
         >
-            <Chip
-                component={NavLink}
-                to={'/entity/' + (user?.ccid ?? '')}
-                size={'small'}
-                label={user?.profile?.payload.body.username ?? 'anonymous'}
-                icon={props.iconOverride ?? <AlternateEmailIcon fontSize="small" />}
-            />
+            {props.onDelete ? (
+                <Chip
+                    size={'small'}
+                    label={user?.profile?.payload.body.username ?? 'anonymous'}
+                    icon={icon}
+                    onDelete={props.onDelete}
+                />
+            ) : (
+                <Chip
+                    component={NavLink}
+                    to={'/entity/' + (user?.ccid ?? '')}
+                    size={'small'}
+                    label={user?.profile?.payload.body.username ?? 'anonymous'}
+                    icon={icon}
+                />
+            )}
         </Tooltip>
     )
 }

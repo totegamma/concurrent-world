@@ -9,7 +9,7 @@ import { Box, Link, Tooltip } from '@mui/material'
 import { useMemo } from 'react'
 
 import { Link as RouterLink } from 'react-router-dom'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import { CCUserIcon } from '../ui/CCUserIcon'
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
@@ -20,7 +20,7 @@ export interface PostedStreamsProps {
 }
 
 export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const postedStreams = useMemo(() => {
         const streams =
             props.message.postedStreams?.filter(

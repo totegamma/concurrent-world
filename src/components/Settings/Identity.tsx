@@ -2,7 +2,7 @@ import { Alert, Box, IconButton, Menu, MenuItem, Switch, FormGroup, FormControlL
 import Tilt from 'react-parallax-tilt'
 import { Passport } from '../theming/Passport'
 import { Suspense, lazy, useEffect, useState } from 'react'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import { type Key } from '@concurrent-world/client/dist/types/model/core'
 import { usePreference } from '../../context/PreferenceContext'
 
@@ -12,7 +12,7 @@ import { KeyCard } from '../ui/KeyCard'
 const SwitchMasterToSub = lazy(() => import('../SwitchMasterToSub'))
 
 export const IdentitySettings = (): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const mnemonic = JSON.parse(localStorage.getItem('Mnemonic') || 'null')
     const subkey = JSON.parse(localStorage.getItem('SubKey') || 'null')
 

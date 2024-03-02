@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { usePersistent } from '../hooks/usePersistent'
-import { useApi } from './api'
+import { useClient } from './ClientContext'
 import { type s3Config, type StreamList, type ConcurrentTheme } from '../model'
 import { type DeepPartial } from '../util'
 
@@ -73,7 +73,7 @@ interface PreferenceProviderProps {
 }
 
 export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const [pref, setPref] = usePersistent<Preference>('preference', defaultPreference)
     const [initialized, setInitialized] = useState<boolean>(false)
 
@@ -113,7 +113,7 @@ export function usePreference<K extends keyof Preference>(
     key: K,
     silent: boolean = false
 ): [value: Preference[K], set: (value: Preference[K]) => void] {
-    const client = useApi()
+    const { client } = useClient()
     const ctx = useContext(PreferenceContext)
     if (!ctx) return [defaultPreference[key], () => {}]
     const { preference, setPreference } = ctx

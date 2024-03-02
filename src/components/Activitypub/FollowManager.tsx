@@ -1,5 +1,5 @@
 import { memo, useEffect, useState } from 'react'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import { Avatar, Box, Button, Divider, IconButton, Link, Paper, TextField, Typography } from '@mui/material'
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1'
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove'
@@ -11,7 +11,7 @@ interface Stats {
 }
 
 export const ApFollowManager = (): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const [stats, setStats] = useState<Stats | null>(null)
     const [userID, setUserID] = useState('')
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
@@ -136,7 +136,7 @@ export const ApFollowManager = (): JSX.Element => {
 
 export const APUserCard = memo<{ url: string; remove?: (_: string) => void }>(
     (props: { url: string; remove?: (_: string) => void }): JSX.Element => {
-        const client = useApi()
+        const { client } = useClient()
         const [person, setPerson] = useState<any>(null)
         const host = props.url.split('/')[2]
         const shortID = `@${person?.preferredUsername}@${host}`

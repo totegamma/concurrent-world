@@ -26,11 +26,11 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { useTranslation } from 'react-i18next'
 import { Codeblock } from '../ui/Codeblock'
 import { type s3Config } from '../../model'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 
 export const MediaSettings = (): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const [s3Config, setS3Config] = usePreference('s3Config')
     const [storageProvider, setStorageProvider] = usePreference('storageProvider')
     const [imgurClientID, setImgurClientID] = usePreference('imgurClientID')

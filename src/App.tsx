@@ -1,4 +1,4 @@
-import { useEffect, useState, createContext, useRef, useMemo, useCallback } from 'react'
+import { useEffect, useState, useRef, useMemo } from 'react'
 import { Routes, Route, Link as RouterLink } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider, CssBaseline, Typography, useMediaQuery } from '@mui/material'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
@@ -20,7 +20,7 @@ import {
 
 import useSound from 'use-sound'
 import { MobileMenu } from './components/Menu/MobileMenu'
-import { useApi } from './context/api'
+import { useClient } from './context/ClientContext'
 import { GlobalActionsProvider } from './context/GlobalActions'
 import { EmojiPickerProvider } from './context/EmojiPickerContext'
 
@@ -35,7 +35,6 @@ import {
     Schemas,
     type Subscription,
     type ProfileSchema,
-    type User,
     type Association,
     type ReplyAssociationSchema
 } from '@concurrent-world/client'
@@ -43,18 +42,8 @@ import { UrlSummaryProvider } from './context/urlSummaryContext'
 import { StorageProvider } from './context/StorageContext'
 import { MarkdownRendererLite } from './components/ui/MarkdownRendererLite'
 
-export const ApplicationContext = createContext<appData>({
-    acklist: [],
-    updateAcklist: () => {}
-})
-
-export interface appData {
-    acklist: User[]
-    updateAcklist: () => void
-}
-
 function App(): JSX.Element {
-    const client = useApi()
+    const { client } = useClient()
     const [themeName] = usePreference('themeName')
     const [sound] = usePreference('sound')
     const [customThemes] = usePreference('customThemes')
@@ -63,17 +52,6 @@ function App(): JSX.Element {
     const isMobileSize = useMediaQuery(theme.breakpoints.down('sm'))
 
     const mnemonic = JSON.parse(localStorage.getItem('Mnemonic') || 'null')
-
-    const [acklist, setAcklist] = useState<User[]>([])
-    const updateAcklist = useCallback(() => {
-        client.user?.getAcking().then((acklist) => {
-            setAcklist(acklist)
-        })
-    }, [client, client?.user])
-
-    useEffect(() => {
-        updateAcklist()
-    }, [client, client?.user])
 
     const subscription = useRef<Subscription>()
 
@@ -228,13 +206,6 @@ function App(): JSX.Element {
         themeColorMetaTag.content = newtheme.palette.background.default
     }, [themeName, customThemes])
 
-    const applicationContext = useMemo(() => {
-        return {
-            acklist,
-            updateAcklist
-        }
-    }, [acklist, updateAcklist])
-
     if (!client) {
         return <>building api service...</>
     }
@@ -247,15 +218,13 @@ function App(): JSX.Element {
             <ThemeProvider theme={theme}>
                 <CssBaseline />
                 <TickerProvider>
-                    <ApplicationContext.Provider value={applicationContext}>
-                        <UrlSummaryProvider host={client.host}>
-                            <EmojiPickerProvider>
-                                <StorageProvider>
-                                    <GlobalActionsProvider>{childs}</GlobalActionsProvider>
-                                </StorageProvider>
-                            </EmojiPickerProvider>
-                        </UrlSummaryProvider>
-                    </ApplicationContext.Provider>
+                    <UrlSummaryProvider host={client.host}>
+                        <EmojiPickerProvider>
+                            <StorageProvider>
+                                <GlobalActionsProvider>{childs}</GlobalActionsProvider>
+                            </StorageProvider>
+                        </EmojiPickerProvider>
+                    </UrlSummaryProvider>
                 </TickerProvider>
             </ThemeProvider>
         </SnackbarProvider>

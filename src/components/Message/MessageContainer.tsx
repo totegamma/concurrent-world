@@ -5,7 +5,7 @@ import {
     Schemas,
     type SimpleNoteSchema
 } from '@concurrent-world/client'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import { memo, useEffect, useState } from 'react'
 import { ReplyMessageFrame } from './ReplyMessageFrame'
 import { RerouteMessageFrame } from './RerouteMessageFrame'
@@ -27,7 +27,7 @@ interface MessageContainerProps {
 }
 
 export const MessageContainer = memo<MessageContainerProps>((props: MessageContainerProps): JSX.Element | null => {
-    const client = useApi()
+    const { client } = useClient()
     const [message, setMessage] = useState<Message<
         SimpleNoteSchema | ReplyMessageSchema | RerouteMessageSchema
     > | null>()

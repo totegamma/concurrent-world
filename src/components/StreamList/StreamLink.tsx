@@ -2,7 +2,7 @@ import { ListItemButton, type SxProps } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 import { type User, type Stream, type CommonstreamSchema } from '@concurrent-world/client'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import PercentIcon from '@mui/icons-material/Percent'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import { type userHomeStream } from '../../model'
@@ -14,7 +14,7 @@ export interface StreamLinkProps {
 }
 
 export const StreamLink = (props: StreamLinkProps): JSX.Element | null => {
-    const client = useApi()
+    const { client } = useClient()
     const [stream, SetStream] = useState<Stream<CommonstreamSchema> | null | undefined>(null)
 
     useEffect(() => {
@@ -53,7 +53,7 @@ export interface UserStreamLinkProps {
 }
 
 export const UserStreamLink = (props: UserStreamLinkProps): JSX.Element | null => {
-    const client = useApi()
+    const { client } = useClient()
     const [user, SetUser] = useState<User | null | undefined>(null)
 
     useEffect(() => {

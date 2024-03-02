@@ -1,6 +1,6 @@
 import { Box, Button, Divider, IconButton, TextField, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import { type ApEntity } from '../../model'
 import { ApSetup } from '../Activitypub/Setup'
 import { ApProfileEditor } from '../Activitypub/ProfileEditor'
@@ -11,7 +11,7 @@ import { CCDrawer } from '../ui/CCDrawer'
 import { useNavigate } from 'react-router-dom'
 
 export const APSettings = (): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const [entity, setEntity] = useState<ApEntity | null | undefined>(undefined)
     const [openInquiry, setOpenInquiry] = useState(false)
     const [url, setUrl] = useState('')

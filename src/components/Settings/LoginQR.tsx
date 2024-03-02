@@ -2,11 +2,11 @@ import { Alert, Button, Tab, Tabs, Typography } from '@mui/material'
 import SubkeyInfo from '../SubkeyInfo'
 import { useState } from 'react'
 import { ComputeCKID, generateIdentity } from '@concurrent-world/client'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import { useTranslation } from 'react-i18next'
 
 export function LoginQR(): JSX.Element {
-    const client = useApi()
+    const { client } = useClient()
     const subkey = JSON.parse(localStorage.getItem('SubKey') || 'null')
     const [tab, setTab] = useState(0)
 

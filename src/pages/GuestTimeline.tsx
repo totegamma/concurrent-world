@@ -4,7 +4,7 @@ import { useLocation, useParams } from 'react-router-dom'
 import { Timeline } from '../components/Timeline/main'
 import { Client, type User } from '@concurrent-world/client'
 import { FullScreenLoading } from '../components/ui/FullScreenLoading'
-import ApiProvider from '../context/api'
+import ApiProvider from '../context/ClientContext'
 import TickerProvider from '../context/Ticker'
 
 import { type VListHandle } from 'virtua'

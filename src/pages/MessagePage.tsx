@@ -13,7 +13,7 @@ import {
     useTheme
 } from '@mui/material'
 import { useParams } from 'react-router-dom'
-import { useApi } from '../context/api'
+import { useClient } from '../context/ClientContext'
 import { useEffect, useState } from 'react'
 import {
     type Message,
@@ -38,7 +38,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 
 export function MessagePage(): JSX.Element {
     const { id } = useParams()
-    const client = useApi()
+    const { client } = useClient()
     const messageID = id?.split('@')[0]
     const authorID = id?.split('@')[1]
     const lastUpdated = 0

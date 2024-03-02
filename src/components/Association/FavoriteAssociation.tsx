@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react'
 
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 import { MarkdownRendererLite } from '../ui/MarkdownRendererLite'
 
 export interface FavoriteAssociationProps {
@@ -24,7 +24,7 @@ export interface FavoriteAssociationProps {
 }
 
 export const FavoriteAssociation = (props: FavoriteAssociationProps): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const [target, setTarget] = useState<Message<SimpleNoteSchema | ReplyMessageSchema> | null>(null)
     const isMeToOther = props.association?.authorUser?.ccid !== props.perspective
 

@@ -15,7 +15,7 @@ import { MarkdownRendererLite } from '../ui/MarkdownRendererLite'
 
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-import { useApi } from '../../context/api'
+import { useClient } from '../../context/ClientContext'
 
 export interface ReactionAssociationProps {
     association: Association<EmojiAssociationSchema>
@@ -24,7 +24,7 @@ export interface ReactionAssociationProps {
 }
 
 export const ReactionAssociation = (props: ReactionAssociationProps): JSX.Element => {
-    const client = useApi()
+    const { client } = useClient()
     const [target, setTarget] = useState<Message<SimpleNoteSchema | ReplyMessageSchema> | null>(null)
     const isMeToOther = props.association?.authorUser?.ccid !== props.perspective
 

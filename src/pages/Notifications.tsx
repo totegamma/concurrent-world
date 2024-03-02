@@ -2,11 +2,11 @@ import { Box, Divider, Typography } from '@mui/material'
 import { useMemo } from 'react'
 import { Timeline } from '../components/Timeline'
 import { useTranslation } from 'react-i18next'
-import { useApi } from '../context/api'
+import { useClient } from '../context/ClientContext'
 
 export function Notifications(): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'pages.notifications' })
-    const client = useApi()
+    const { client } = useClient()
 
     const streams = useMemo(() => {
         const target = client.user?.userstreams?.payload.body.notificationStream
