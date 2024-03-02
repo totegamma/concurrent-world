@@ -59,6 +59,7 @@ export interface DraftProps {
     placeholder?: string
     sx?: SxProps
     value?: string
+    defaultPostHome?: boolean
 }
 
 export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
@@ -76,7 +77,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const textInputRef = useRef<HTMLInputElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
-    const [postHomeButton, setPostHomeButton] = useState<boolean>(true)
+    const [postHomeButton, setPostHomeButton] = useState<boolean>(props.defaultPostHome ?? true)
     const [holdCtrlShift, setHoldCtrlShift] = useState<boolean>(false)
     const postHome = postHomeButton && !holdCtrlShift
 

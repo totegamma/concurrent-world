@@ -1,7 +1,7 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { Box, Divider, Typography } from '@mui/material'
 import { Draft } from '../components/Draft'
-import { useLocation, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { TimelineHeader } from '../components/TimelineHeader'
 import { useClient } from '../context/ClientContext'
 import { Timeline } from '../components/Timeline/main'
@@ -27,7 +27,6 @@ export const StreamPage = memo((): JSX.Element => {
     const [showEditorOnTop] = usePreference('showEditorOnTop')
     const [showEditorOnTopMobile] = usePreference('showEditorOnTopMobile')
 
-    const reactlocation = useLocation()
     const timelineRef = useRef<VListHandle>(null)
 
     const targetStreamID = id ?? ''
@@ -49,6 +48,8 @@ export const StreamPage = memo((): JSX.Element => {
         [targetStream]
     )
 
+    const nonPublic = useMemo(() => targetStream?.reader.length !== 0 || !targetStream?.visible, [targetStream])
+
     const streams = useMemo(() => {
         return targetStream ? [targetStream] : []
     }, [targetStream])
@@ -61,7 +62,7 @@ export const StreamPage = memo((): JSX.Element => {
         client.getStream<CommonstreamSchema>(targetStreamID).then((stream) => {
             setTargetStream(stream)
         })
-    }, [reactlocation.hash])
+    }, [id])
 
     return (
         <>
@@ -107,6 +108,7 @@ export const StreamPage = memo((): JSX.Element => {
                                             }}
                                         >
                                             <Draft
+                                                defaultPostHome={!nonPublic}
                                                 streamPickerInitial={streams}
                                                 streamPickerOptions={[
                                                     ...new Set([...actions.allKnownStreams, ...streams])
