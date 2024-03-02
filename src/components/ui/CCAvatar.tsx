@@ -38,7 +38,7 @@ export const CCAvatar = (props: CCAvatarProps): JSX.Element => {
                 src={props.avatarOverride ?? props.avatarURL}
                 sx={{
                     ...props.sx,
-                    borderRadius: props.circle ? undefined : '0'
+                    borderRadius: props.circle ? undefined : 1
                 }}
                 variant={props.circle ? 'circular' : 'square'}
             >
