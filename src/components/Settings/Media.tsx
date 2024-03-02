@@ -27,7 +27,18 @@ import { useTranslation } from 'react-i18next'
 import { Codeblock } from '../ui/Codeblock'
 import { type s3Config } from '../../model'
 import { useClient } from '../../context/ClientContext'
+import ContentPasteIcon from '@mui/icons-material/ContentPaste'
+import CodeIcon from '@mui/icons-material/Code'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import { useGlobalActions } from '../../context/GlobalActions'
+
+interface File {
+    id: string
+    url: string
+    ownerId: string
+    size: number
+    cdate: string
+}
 
 export const MediaSettings = (): JSX.Element => {
     const { client } = useClient()
@@ -35,7 +46,10 @@ export const MediaSettings = (): JSX.Element => {
     const [storageProvider, setStorageProvider] = usePreference('storageProvider')
     const [imgurClientID, setImgurClientID] = usePreference('imgurClientID')
     const clientIdRef = useRef<HTMLInputElement>(null)
-    const [selectedImageID, setSelectedImageID] = useState<string | null>(null)
+
+    const { openImageViewer } = useGlobalActions()
+
+    const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
     const [buttonText, setButtonText] = useState<string>('Save')
 
@@ -129,8 +143,22 @@ export const MediaSettings = (): JSX.Element => {
                     </Alert>
                     <ImageList cols={3} gap={8}>
                         {myFiles.map((file) => (
-                            <ImageListItem key={file.id}>
-                                <img src={file.url} alt={file.id} />
+                            <ImageListItem
+                                key={file.id}
+                                sx={{ cursor: 'pointer' }}
+                                onClick={() => {
+                                    openImageViewer(file.url)
+                                }}
+                            >
+                                <Box
+                                    sx={{
+                                        width: '100%',
+                                        height: '300px',
+                                        backgroundImage: `url(${file.url})`,
+                                        backgroundSize: 'cover',
+                                        backgroundPosition: 'center'
+                                    }}
+                                />
                                 <ImageListItemBar
                                     title={file.id}
                                     subtitle={file.cdate}
@@ -138,8 +166,9 @@ export const MediaSettings = (): JSX.Element => {
                                         <IconButton
                                             sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
                                             onClick={(e) => {
-                                                setSelectedImageID(file.id)
+                                                setSelectedFile(file)
                                                 setDeleteMenu(e.currentTarget)
+                                                e.stopPropagation()
                                             }}
                                         >
                                             <MoreHorizIcon />
@@ -158,7 +187,29 @@ export const MediaSettings = (): JSX.Element => {
                     >
                         <MenuItem
                             onClick={() => {
-                                selectedImageID && deleteFile(selectedImageID)
+                                navigator.clipboard.writeText(selectedFile?.url || '')
+                                setDeleteMenu(null)
+                            }}
+                        >
+                            <ListItemIcon>
+                                <ContentPasteIcon />
+                            </ListItemIcon>
+                            <ListItemText>画像URLをコピー</ListItemText>
+                        </MenuItem>
+                        <MenuItem
+                            onClick={() => {
+                                navigator.clipboard.writeText(`![${selectedFile?.id}](${selectedFile?.url})`)
+                                setDeleteMenu(null)
+                            }}
+                        >
+                            <ListItemIcon>
+                                <CodeIcon />
+                            </ListItemIcon>
+                            <ListItemText>Markdownコードをコピー</ListItemText>
+                        </MenuItem>
+                        <MenuItem
+                            onClick={() => {
+                                selectedFile && deleteFile(selectedFile.id)
                                 setDeleteMenu(null)
                             }}
                         >
