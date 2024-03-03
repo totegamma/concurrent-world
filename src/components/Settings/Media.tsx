@@ -27,7 +27,24 @@ import { useTranslation } from 'react-i18next'
 import { Codeblock } from '../ui/Codeblock'
 import { type s3Config } from '../../model'
 import { useClient } from '../../context/ClientContext'
+import ContentPasteIcon from '@mui/icons-material/ContentPaste'
+import CodeIcon from '@mui/icons-material/Code'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import { useGlobalActions } from '../../context/GlobalActions'
+
+interface File {
+    id: string
+    url: string
+    ownerId: string
+    size: number
+    cdate: string
+}
+
+interface FileResponse {
+    content: File[]
+    next: string | undefined
+    prev: string | undefined
+}
 
 export const MediaSettings = (): JSX.Element => {
     const { client } = useClient()
@@ -35,7 +52,10 @@ export const MediaSettings = (): JSX.Element => {
     const [storageProvider, setStorageProvider] = usePreference('storageProvider')
     const [imgurClientID, setImgurClientID] = usePreference('imgurClientID')
     const clientIdRef = useRef<HTMLInputElement>(null)
-    const [selectedImageID, setSelectedImageID] = useState<string | null>(null)
+
+    const { openImageViewer } = useGlobalActions()
+
+    const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
     const [buttonText, setButtonText] = useState<string>('Save')
 
@@ -45,25 +65,29 @@ export const MediaSettings = (): JSX.Element => {
         _setS3Config({ ..._s3Config, [key]: value })
     }
 
-    const [myFiles, setMyFiles] = useState<any[]>([])
-
     const domainProfileAvailable = useMemo(() => {
         return 'mediaserver' in client.domainServices
     }, [client.domainServices])
 
     const [deleteMenu, setDeleteMenu] = useState<null | HTMLElement>(null)
 
+    const [itr, setItr] = useState<{ mode: 'before' | 'after'; cursor: string | null }>({
+        mode: 'before',
+        cursor: null
+    })
+    const [fileResponse, setFileResponse] = useState<FileResponse | null>(null)
+
     useEffect(() => {
         if (storageProvider !== 'domain') return
-        client.api.fetchWithCredential(client.host, '/storage/files', {}).then((res) => {
+        const url = itr.cursor ? `/storage/files?limit=9&${itr.mode}=${itr.cursor}` : '/storage/files?limit=9'
+        client.api.fetchWithCredential(client.host, url, {}).then((res) => {
             if (res.ok) {
-                res.json().then((content) => {
-                    console.log(content)
-                    setMyFiles(content.reverse())
+                res.json().then((resp) => {
+                    setFileResponse(resp)
                 })
             }
         })
-    }, [storageProvider])
+    }, [storageProvider, itr])
 
     const deleteFile = (id: string): void => {
         client.api
@@ -72,7 +96,11 @@ export const MediaSettings = (): JSX.Element => {
             })
             .then((res) => {
                 if (res.ok) {
-                    setMyFiles(myFiles.filter((e) => e.id !== id))
+                    setFileResponse({
+                        content: fileResponse?.content.filter((e) => e.id !== id) ?? [],
+                        next: fileResponse?.next,
+                        prev: fileResponse?.prev
+                    })
                 }
             })
     }
@@ -128,9 +156,23 @@ export const MediaSettings = (): JSX.Element => {
                         {t('descs.domain')}
                     </Alert>
                     <ImageList cols={3} gap={8}>
-                        {myFiles.map((file) => (
-                            <ImageListItem key={file.id}>
-                                <img src={file.url} alt={file.id} />
+                        {(fileResponse?.content ?? []).map((file) => (
+                            <ImageListItem
+                                key={file.id}
+                                sx={{ cursor: 'pointer' }}
+                                onClick={() => {
+                                    openImageViewer(file.url)
+                                }}
+                            >
+                                <Box
+                                    sx={{
+                                        width: '100%',
+                                        height: '300px',
+                                        backgroundImage: `url(${file.url})`,
+                                        backgroundSize: 'cover',
+                                        backgroundPosition: 'center'
+                                    }}
+                                />
                                 <ImageListItemBar
                                     title={file.id}
                                     subtitle={file.cdate}
@@ -138,8 +180,9 @@ export const MediaSettings = (): JSX.Element => {
                                         <IconButton
                                             sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
                                             onClick={(e) => {
-                                                setSelectedImageID(file.id)
+                                                setSelectedFile(file)
                                                 setDeleteMenu(e.currentTarget)
+                                                e.stopPropagation()
                                             }}
                                         >
                                             <MoreHorizIcon />
@@ -149,6 +192,30 @@ export const MediaSettings = (): JSX.Element => {
                             </ImageListItem>
                         ))}
                     </ImageList>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            gap: '1em'
+                        }}
+                    >
+                        <Button
+                            onClick={() => {
+                                setItr({ mode: 'after', cursor: fileResponse?.prev ?? null })
+                            }}
+                            disabled={!fileResponse?.prev}
+                        >
+                            prev
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                setItr({ mode: 'before', cursor: fileResponse?.next ?? null })
+                            }}
+                            disabled={!fileResponse?.next}
+                        >
+                            next
+                        </Button>
+                    </Box>
                     <Menu
                         anchorEl={deleteMenu}
                         open={Boolean(deleteMenu)}
@@ -158,7 +225,29 @@ export const MediaSettings = (): JSX.Element => {
                     >
                         <MenuItem
                             onClick={() => {
-                                selectedImageID && deleteFile(selectedImageID)
+                                navigator.clipboard.writeText(selectedFile?.url || '')
+                                setDeleteMenu(null)
+                            }}
+                        >
+                            <ListItemIcon>
+                                <ContentPasteIcon />
+                            </ListItemIcon>
+                            <ListItemText>画像URLをコピー</ListItemText>
+                        </MenuItem>
+                        <MenuItem
+                            onClick={() => {
+                                navigator.clipboard.writeText(`![${selectedFile?.id}](${selectedFile?.url})`)
+                                setDeleteMenu(null)
+                            }}
+                        >
+                            <ListItemIcon>
+                                <CodeIcon />
+                            </ListItemIcon>
+                            <ListItemText>Markdownコードをコピー</ListItemText>
+                        </MenuItem>
+                        <MenuItem
+                            onClick={() => {
+                                selectedFile && deleteFile(selectedFile.id)
                                 setDeleteMenu(null)
                             }}
                         >
