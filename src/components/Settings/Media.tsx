@@ -40,6 +40,12 @@ interface File {
     cdate: string
 }
 
+interface FileResponse {
+    content: File[]
+    next: string | undefined
+    prev: string | undefined
+}
+
 export const MediaSettings = (): JSX.Element => {
     const { client } = useClient()
     const [s3Config, setS3Config] = usePreference('s3Config')
@@ -59,25 +65,29 @@ export const MediaSettings = (): JSX.Element => {
         _setS3Config({ ..._s3Config, [key]: value })
     }
 
-    const [myFiles, setMyFiles] = useState<any[]>([])
-
     const domainProfileAvailable = useMemo(() => {
         return 'mediaserver' in client.domainServices
     }, [client.domainServices])
 
     const [deleteMenu, setDeleteMenu] = useState<null | HTMLElement>(null)
 
+    const [itr, setItr] = useState<{ mode: 'before' | 'after'; cursor: string | null }>({
+        mode: 'before',
+        cursor: null
+    })
+    const [fileResponse, setFileResponse] = useState<FileResponse | null>(null)
+
     useEffect(() => {
         if (storageProvider !== 'domain') return
-        client.api.fetchWithCredential(client.host, '/storage/files', {}).then((res) => {
+        const url = itr.cursor ? `/storage/files?limit=9&${itr.mode}=${itr.cursor}` : '/storage/files?limit=9'
+        client.api.fetchWithCredential(client.host, url, {}).then((res) => {
             if (res.ok) {
-                res.json().then((content) => {
-                    console.log(content)
-                    setMyFiles(content.reverse())
+                res.json().then((resp) => {
+                    setFileResponse(resp)
                 })
             }
         })
-    }, [storageProvider])
+    }, [storageProvider, itr])
 
     const deleteFile = (id: string): void => {
         client.api
@@ -86,7 +96,11 @@ export const MediaSettings = (): JSX.Element => {
             })
             .then((res) => {
                 if (res.ok) {
-                    setMyFiles(myFiles.filter((e) => e.id !== id))
+                    setFileResponse({
+                        content: fileResponse?.content.filter((e) => e.id !== id) ?? [],
+                        next: fileResponse?.next,
+                        prev: fileResponse?.prev
+                    })
                 }
             })
     }
@@ -142,7 +156,7 @@ export const MediaSettings = (): JSX.Element => {
                         {t('descs.domain')}
                     </Alert>
                     <ImageList cols={3} gap={8}>
-                        {myFiles.map((file) => (
+                        {(fileResponse?.content ?? []).map((file) => (
                             <ImageListItem
                                 key={file.id}
                                 sx={{ cursor: 'pointer' }}
@@ -178,6 +192,30 @@ export const MediaSettings = (): JSX.Element => {
                             </ImageListItem>
                         ))}
                     </ImageList>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            gap: '1em'
+                        }}
+                    >
+                        <Button
+                            onClick={() => {
+                                setItr({ mode: 'after', cursor: fileResponse?.prev ?? null })
+                            }}
+                            disabled={!fileResponse?.prev}
+                        >
+                            prev
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                setItr({ mode: 'before', cursor: fileResponse?.next ?? null })
+                            }}
+                            disabled={!fileResponse?.next}
+                        >
+                            next
+                        </Button>
+                    </Box>
                     <Menu
                         anchorEl={deleteMenu}
                         open={Boolean(deleteMenu)}
