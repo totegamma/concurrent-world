@@ -535,7 +535,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                     onChange={(e) => {
                                         onFileInputChange(e)
                                     }}
-                                    accept={'.png, .jpg, .jpeg, .gif, .webp, video/*'}
+                                    accept={'image/*, video/*'}
                                 />
                             </IconButton>
                         </span>

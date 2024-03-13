@@ -539,7 +539,7 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
                                     onChange={(e) => {
                                         onFileInputChange(e)
                                     }}
-                                    accept={'.png, .jpg, .jpeg, .gif, .webp, video/*'}
+                                    accept={'image/*, video/*'}
                                 />
                             </IconButton>
                         </span>
