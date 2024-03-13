@@ -95,25 +95,27 @@ export const StorageProvider = ({ children }: { children: JSX.Element | JSX.Elem
                 })
                 return (await result.json()).data.link
             } else {
-                const isImage = file.type.includes('image')
-                if (!isImage) return null
+                try {
+                    const result = await client.api.fetchWithCredential(client.host, '/storage/files', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': file.type
+                        },
+                        body: file
+                    })
 
-                const result = await client.api.fetchWithCredential(client.host, '/storage/files', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': file.type
-                    },
-                    body: file
-                })
+                    if (!result.ok) {
+                        console.error('upload failed:', result)
+                        return null
+                    }
 
-                if (!result.ok) {
-                    console.error('upload failed:', result)
+                    const json = await result.json()
+
+                    return json.content.url
+                } catch (e) {
+                    console.error('upload failed:', e)
                     return null
                 }
-
-                const json = await result.json()
-
-                return json.content.url
             }
         },
         [storageProvider, imgurClientID, s3Config]
