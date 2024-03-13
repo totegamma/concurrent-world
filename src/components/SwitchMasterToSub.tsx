@@ -34,7 +34,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
     const [activeStep, setActiveStep] = useState(0)
     const [processing, setProcessing] = useState(false)
 
-    const { t, i18n } = useTranslation('', { keyPrefix: 'settings.identity.switchToSubKey' })
+    const { t, i18n } = useTranslation('', { keyPrefix: 'settings.identity.switchMasterToSub' })
     const [keyFormat, setKeyFormat] = useState<'ja' | 'en'>(i18n.language === 'ja' ? 'ja' : 'en')
 
     const mnemonicToPrivateKey = (mnemonic: string): string => {
@@ -125,7 +125,9 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
             content: (
                 <Box display="flex" flexDirection="column" gap={1}>
                     <Typography>{t('descSaveMasterKey')}</Typography>
-                    <Alert severity="error">{t('alertMasterKey')}</Alert>
+                    <Alert severity="error">
+                        <Trans i18nKey={'settings.identity.switchMasterToSub.alertMasterKey'} />
+                    </Alert>
                     <Box display="flex" alignItems="center" flexDirection="row" gap={1}>
                         <Typography>{t('masterKeyFormat')}</Typography>
                         <Select
@@ -425,7 +427,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                             width: '90%'
                         }}
                     >
-                        <Trans i18nKey={'settings.identity.switchToSubKey.aboutMasterKey'} />
+                        <Trans i18nKey={'settings.identity.switchMasterToSub.aboutMasterKey'} />
                     </div>
 
                     <div
