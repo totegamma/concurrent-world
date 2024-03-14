@@ -143,8 +143,9 @@ export function ImportMasterKey(): JSX.Element {
     const accountImport = (): void => {
         localStorage.setItem('Domain', JSON.stringify(domain))
         localStorage.setItem('PrivateKey', JSON.stringify(properKey))
-        if (secretInput.split(' ').length === 12) {
-            localStorage.setItem('Mnemonic', JSON.stringify(secretInput))
+        const normalized = secretInput.trim().normalize('NFKD')
+        if (normalized.split(' ').length === 12) {
+            localStorage.setItem('Mnemonic', JSON.stringify(normalized))
         }
         window.location.href = '/'
     }
