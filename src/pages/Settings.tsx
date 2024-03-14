@@ -12,6 +12,19 @@ import { APSettings } from '../components/Settings/APSettings'
 import { IdentitySettings } from '../components/Settings/Identity'
 import { BreadcrumbList } from '../components/ui/BreadcrumbList'
 
+const pathTitles: Record<string, string> = {
+    '/settings': 'settings.title',
+    '/settings/general': 'settings.general.title',
+    '/settings/profile': 'settings.profile.title',
+    '/settings/identity': 'settings.identity.title',
+    '/settings/theme': 'settings.theme.title',
+    '/settings/sound': 'settings.sound.title',
+    '/settings/emoji': 'settings.emoji.title',
+    '/settings/media': 'settings.media.title',
+    '/settings/activitypub': 'settings.ap.title',
+    '/settings/loginqr': 'settings.qr.title'
+}
+
 export function Settings(): JSX.Element {
     return (
         <Box
@@ -25,7 +38,7 @@ export function Settings(): JSX.Element {
                 overflowY: 'scroll'
             }}
         >
-            <BreadcrumbList />
+            <BreadcrumbList pathTitles={pathTitles} />
             <Divider />
             <Routes>
                 <Route path="/" element={<SettingsIndex />} />

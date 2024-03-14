@@ -3,25 +3,16 @@ import { Link as RouterLink, useLocation } from 'react-router-dom'
 import { Breadcrumbs, Link } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
+export interface BreadcrumbListProps {
+    // K: path, T: Translation key
+    pathTitles: Record<string, string>
+}
 interface BreadcrumbItem {
     path: string
     title: string
 }
 
-const pathTitles: Record<string, string> = {
-    '/settings': 'settings.title',
-    '/settings/general': 'settings.general.title',
-    '/settings/profile': 'settings.profile.title',
-    '/settings/identity': 'settings.identity.title',
-    '/settings/theme': 'settings.theme.title',
-    '/settings/sound': 'settings.sound.title',
-    '/settings/emoji': 'settings.emoji.title',
-    '/settings/media': 'settings.media.title',
-    '/settings/activitypub': 'settings.ap.title',
-    '/settings/loginqr': 'settings.qr.title'
-}
-
-export const BreadcrumbList = (): JSX.Element => {
+export const BreadcrumbList = (props: BreadcrumbListProps): JSX.Element => {
     const { t } = useTranslation()
     const currentPath = useLocation()
 
@@ -29,7 +20,7 @@ export const BreadcrumbList = (): JSX.Element => {
         .split('/')
         .reduce<BreadcrumbItem[]>((acc, path, index, paths) => {
             const currentPath = `/${paths.slice(1, index + 1).join('/')}`
-            const title = pathTitles[currentPath]
+            const title = props.pathTitles[currentPath]
             if (title) {
                 acc.push({ path: currentPath, title: t(title) })
             }
