@@ -1,5 +1,5 @@
-import { Divider, Box, Breadcrumbs, Link } from '@mui/material'
-import { Route, Routes, useLocation, Link as RouterLink } from 'react-router-dom'
+import { Divider, Box } from '@mui/material'
+import { Route, Routes } from 'react-router-dom'
 import { SettingsIndex } from '../components/Settings/Index'
 import { GeneralSettings } from '../components/Settings/General'
 import { ProfileSettings } from '../components/Settings/Profile'
@@ -9,14 +9,10 @@ import { EmojiSettings } from '../components/Settings/Emoji'
 import { MediaSettings } from '../components/Settings/Media'
 import { LoginQR } from '../components/Settings/LoginQR'
 import { APSettings } from '../components/Settings/APSettings'
-import { useTranslation } from 'react-i18next'
 import { IdentitySettings } from '../components/Settings/Identity'
+import { BreadcrumbList } from '../components/ui/BreadcrumbList'
 
 export function Settings(): JSX.Element {
-    const path = useLocation()
-
-    const { t } = useTranslation('', { keyPrefix: 'pages.settings' })
-
     return (
         <Box
             sx={{
@@ -29,26 +25,7 @@ export function Settings(): JSX.Element {
                 overflowY: 'scroll'
             }}
         >
-            <Breadcrumbs>
-                <Link variant="h2" component={RouterLink} underline="hover" color="text.primary" to="/settings">
-                    {t('title')}
-                </Link>
-                {path.pathname !== '/settings' && (
-                    <Link
-                        variant="h2"
-                        underline="hover"
-                        color="inherit"
-                        to={path.pathname}
-                        component={RouterLink}
-                        sx={{
-                            textTransform: 'capitalize',
-                            color: 'text.primary'
-                        }}
-                    >
-                        {path.pathname.split('/')[2]}
-                    </Link>
-                )}
-            </Breadcrumbs>
+            <BreadcrumbList />
             <Divider />
             <Routes>
                 <Route path="/" element={<SettingsIndex />} />
