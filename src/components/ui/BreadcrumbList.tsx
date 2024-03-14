@@ -37,7 +37,7 @@ export const BreadcrumbList = (): JSX.Element => {
         }, [])
 
     return (
-        <Breadcrumbs aria-label="breadcrumb">
+        <Breadcrumbs>
             {breadcrumbTitles.map(({ path, title }) => (
                 <Link
                     key={path}
