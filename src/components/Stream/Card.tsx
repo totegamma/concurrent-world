@@ -1,4 +1,4 @@
-import { Card, CardActionArea, CardActions, CardContent, Typography } from '@mui/material'
+import { Card, CardActionArea, CardActions, CardContent, type SxProps, Typography } from '@mui/material'
 import { AddListButton } from '../AddListButton'
 import { Link } from 'react-router-dom'
 
@@ -11,13 +11,15 @@ interface StreamCardProps {
     banner: string
     domain: string
     isOwner?: boolean
+    sx?: SxProps
 }
 
 export function StreamCard(props: StreamCardProps): JSX.Element {
     return (
         <Card
             sx={{
-                maxWidth: 345
+                maxWidth: 345,
+                ...props.sx
             }}
         >
             <CardActionArea component={Link} to={'/stream/' + props.streamID}>
