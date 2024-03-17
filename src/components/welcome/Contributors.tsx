@@ -5,64 +5,70 @@ import Tilt from 'react-parallax-tilt'
 
 const contributers = [
     {
-        ccid: 'CCE919C85E695AdA4acE5d3ae56310435EE0b522a3',
+        ccid: 'CC707E9Aa446961E6e6C33e5d69d827e5420B69E1f',
         name: 'totegamma',
         avatar: 'https://github.com/totegamma.png',
         host: 'dev.concurrent.world'
     },
     {
-        ccid: 'CCE919C85E695AdA4acE5d3ae56310435EE0b522a3',
-        name: 'rassi0429',
+        ccid: 'CC0a77dB95EA8A6150Ca7b54fcD400aB882E709737',
+        name: 'kokoa',
         avatar: 'https://github.com/rassi0429.png',
         host: 'dev.concurrent.world'
     },
     {
-        ccid: 'CCE919C85E695AdA4acE5d3ae56310435EE0b522a3',
+        ccid: 'CC9e5D3D77Cc07BFf90a8c5AD96902fD7e9ce4a3DC',
         name: 'fono09',
         avatar: 'https://github.com/fono09.png',
         host: 'con.fono.jp'
     },
     {
-        ccid: 'CCE919C85E695AdA4acE5d3ae56310435EE0b522a3',
-        name: 'waonme',
+        ccid: 'CC061509279837Ee2231c5C9079d1290A65E8e836F',
+        name: 'わおん',
         avatar: 'https://github.com/waonme.png',
         host: 'dev.concurrent.world'
     },
     {
-        ccid: 'CCE919C85E695AdA4acE5d3ae56310435EE0b522a3',
-        name: 'naborisk',
+        ccid: 'CC26a9C14888b558862252E185257331D2e48b3e6b',
+        name: 'Naborisk',
         avatar: 'https://github.com/naborisk.png',
-        host: 'cc.naborisk.com'
+        host: 'dev.concurrent.world'
     },
     {
-        ccid: 'CCE919C85E695AdA4acE5d3ae56310435EE0b522a3',
+        ccid: 'CC4Ccce3e4B200018D9a784F35ec219e24A34E73c2',
         name: 'oinarisummer',
         avatar: 'https://github.com/oinarisummer.png',
         host: 'dev.concurrent.world'
     },
     {
-        ccid: 'CCE919C85E695AdA4acE5d3ae56310435EE0b522a3',
+        ccid: 'CC0DF7bf34A68B2B77Eac609b2609e2f619B2fe12a',
         name: 'Zozokasu',
         avatar: 'https://github.com/Zozokasu.png',
         host: 'hub.concurrent.world'
     },
     {
-        ccid: 'CCE919C85E695AdA4acE5d3ae56310435EE0b522a3',
+        ccid: 'CCCb018771C38F0A06c1A5Dd8587887f0DF9a004Fa',
         name: 'ouroboros723',
         avatar: 'https://github.com/ouroboros723.png',
         host: 'cc.draboros.net'
     },
     {
-        ccid: 'CCE919C85E695AdA4acE5d3ae56310435EE0b522a3',
+        ccid: 'CC5bc66E91a30E5de7DD781a4f92FD3ed7fcF7c157',
         name: 'ryotn',
         avatar: 'https://github.com/ryotn.png',
         host: 'hub.concurrent.world'
     },
     {
-        ccid: 'CCE919C85E695AdA4acE5d3ae56310435EE0b522a3',
-        name: 'tigerwall',
+        ccid: 'CC29C846bec48a549A1db2c5218C7e9294d1100773',
+        name: 'Tigerwall',
         avatar: 'https://github.com/tigerwall.png',
         host: 'hub.concurrent.world'
+    },
+    {
+        ccid: 'CC260FdC5eFAC5b1C2a5569aCA792Cbef34E784397',
+        name: 'jiftechnify',
+        avatar: 'https://github.com/jiftechnify.png',
+        host: 'c.c-stellar.net'
     }
 ]
 
