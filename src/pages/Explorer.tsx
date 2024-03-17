@@ -220,13 +220,15 @@ export function Explorer(): JSX.Element {
                     </IconButton>
                 </Box>
             </Box>
-            <Collapse in={openTips}>
-                <Alert severity="info">
-                    <AlertTitle>どうしてドメインごとに表示が分かれているの？</AlertTitle>
-                    コンカレントは本来ユーザーやデータがどこのサーバー(ドメイン)にあるかを意識しないでに使えるように設計されています。
-                    なのですが、現在はまだ十分な検索機能が実装されていないため、このような表示になっています。今後の進展にご期待ください。
-                </Alert>
-            </Collapse>
+            <Box>
+                <Collapse in={openTips}>
+                    <Alert severity="info">
+                        <AlertTitle>どうしてドメインごとに表示が分かれているの？</AlertTitle>
+                        コンカレントは本来ユーザーやデータがどこのサーバー(ドメイン)にあるかを意識しないでに使えることを目指しています。
+                        なのですが、現在はまだ十分な検索機能が実装されていないため、このような表示になっています。今後の進展にご期待ください。
+                    </Alert>
+                </Collapse>
+            </Box>
             <Box
                 sx={{
                     display: 'grid',
