@@ -1,4 +1,4 @@
-import { Box, Paper, Typography } from '@mui/material'
+import { Alert, AlertTitle, Box, Paper, Typography } from '@mui/material'
 import Tilt from 'react-parallax-tilt'
 import { PassportRenderer } from '../theming/Passport'
 import { type Identity } from '../../util'
@@ -16,10 +16,16 @@ export function RegistrationWelcome(props: {
     const { t } = useTranslation('', { keyPrefix: 'registration.welcome' })
     return (
         <>
+            <Alert severity="info" sx={{ margin: '20px' }}>
+                <AlertTitle>Concurrentは現在開発中のSNSです</AlertTitle>
+                5月中にはベータ版を公開する予定ですが、その際にデータの移行が困難になる変更が入ることが予定されています。
+                <br />
+                今は観光程度にお楽しみいただけると嬉しいです！
+            </Alert>
             <Box
                 sx={{
-                    padding: '30px',
-                    maxWidth: '600px',
+                    padding: '20px',
+                    maxWidth: '500px',
                     margin: 'auto'
                 }}
             >
