@@ -96,7 +96,6 @@
         "title": "Settings",
         "general": {
             "title": "General",
-            "checkSecret": "Your secret code can be confirmed from the <l>profile</l>.",
             "basic": "Basic",
             "showEditorOnTop": "Show editor on top",
             "showEditorOnTopMobile": "Show editor on top (mobile)",
@@ -115,7 +114,45 @@
             "secretCannotBeRestored": "Since this account was imported using the private key instead of the secret code, the secret code cannot be restored."
         },
         "identity": {
-                "title": "Identity"
+            "title": "Identity",
+            "loginType": {
+                "masterKey": "You are currently logged in using the master-key. Switch to a more secure sub-key login immediately.",
+                "subKey": "You are currently logged in using a sub-key.",
+                "secret": "You are currently logged in using the master-key by directly entering the secret key."
+            },
+            "hideSubKey": "Hide deactivated sub-keys",
+            "deacvtivate": "Deactivate",
+            "switchMasterToSub": {
+                "saveMasterKey": "Securely save the master-key",
+                "descSaveMasterKey": "You will need this key to migrate or recover your account. If it becomes known to others, your account could be accessed illegally, so it must be kept absolutely confidential.",
+                "alertMasterKey": "This is the last opportunity to download your master-key! If you fail to back it up here, this account can never be recovered.<br/>We recommend storing it in a secure and reliable way, such as printing it and keeping it in a safe.",
+                "masterKeyFormat": "Master-key format:",
+                "sendEmail": "Send to my email",
+                "mailHerf": "mailto:?subject=concurrent secret&body=**Set the recipient of this email to yourself and send it.**%0D%0A%0D%0A=== Identification Info ===%0D%0AIdentifier: {{ ccid }}%0D%0AMaster Key: {{ mnemonic }}%0D%0A================%0D%0A%0D%0A%0D%0AThe master key is the only passphrase that proves you own the account identified by this identifier.%0D%0AIf this key becomes known to a malicious third party, the security of this account will be compromised, and you will need to take steps to freeze the account yourself.%0D%0A%0D%0AThe master key will be used for important operations such as migrating your account or recovering lost sub-keys.%0D%0AUntil then, store it securely, such as by printing it and keeping it in a safe deposit box.%0D%0A",
+                "downloadPDF": "Download as PDF",
+                "next": "Next",
+                "verifyBackup": "Verify backup",
+                "descVerifyBackup": "Are you ready? Let's confirm that you have stored the master-key correctly.",
+                "masterKeyPlaceholder": "A spell made of 12 words",
+                "back": "Back",
+                "testNG": "Mismatch",
+                "removeMasterKey": "Remove the master-key from this device",
+                "descRemoveMasterKey": "Since the master-key is highly confidential information, we will generate a 'proxy' sub-key from the master-key, and replace the master-key with the sub-key on this device.",
+                "processing": "Processing...",
+                "ready": "Remove the master-key completely from this device and switch to the sub-key",
+                "identification": "Identification",
+                "confidential": "CONFIDENTIAL",
+                "identifier": "Identifier",
+                "undifined": "Undefined",
+                "masterKey": "master-key",
+                "aboutMasterKey": "The master-key is the only passphrase that proves you are the owner of the account identified by this identifier.<br/>If this key becomes known to a malicious third party, the security of this account will be compromised, and you will need to take steps to freeze the account yourself.<br/>The master-key will be used for important operations such as migrating your account or recovering lost sub-keys. Until then, keep it stored in a secure and reliable way, such as printing it and keeping it in a safe.",
+                "reference": "Reference Information",
+                "name": "Name",
+                "unset": "Unset",
+                "domain": "Governing Domain",
+                "addition": "The reference information is from when this certificate was issued and may have changed since then.",
+                "date": "Issued on:"
+            }
         },
         "theme": {
             "title": "Theme"
@@ -177,17 +214,27 @@
     "welcome": {
         "tagline1": "One World,",
         "tagline2": "Infinite Environments.",
-        "description": "Concurrent is a new type of decentralized social networking service that connects you to countless servers with just one account.",
+        "description": "Concurrent is a new decentralized social networking service that allows you to connect with many communities with just one account.",
         "createAccount": "Create an Account",
         "import": "Sign in",
         "gettingStarted": "Let's get started",
+        "mission": {
+            "title1": "Establish your social media accounts",
+            "title2": " as your \"Internet persona.\"",
+            "body1": "In modern society, the role of social media accounts is extremely important.",
+            "body2": "It's only natural, considering they encapsulate interactions with friends, fans, and idols, as well as records of one's activities.",
+            "body3": "However, in today's world, these precious SNS accounts, existing as 'personas' on the internet, can be easily frozen at the whim of a corporation. This should be unacceptable.",
+            "body4": "Concurrent uses cryptographic technology to prove that your account belongs to you, not to the operating organization. Servers merely 'help' in distributing your data.",
+            "body5": "With Concurrent, let's birth your internet persona by your own hands."
+        },
         "feature1": {
-            "title": "No need to create an account for each server anymore",
-            "description": "Traditional decentralized SNS required you to create an account for each server. Concurrent uses a secret key to prove your identity across countless servers with just one account."
+            "title": "Returning to the Origins of Social Media",
+            "body1": "Are you exhausted by the endless stream of world problems, anger, and sadness flooding Social Media every day? While confronting such issues is sometimes necessary, for many, the original reason to start using Social Media was to know what the people they are interested in are 'doing now'."
         },
         "feature2": {
-            "title": "Timelines for different topics",
-            "description": "Concurrent allows you to freely create community timelines called 'Streams'. Say goodbye to the hassle of switching between multiple accounts on traditional social networks because you feel a bit hesitant to discuss certain topics with all of your followers. Gather and enjoy conversations about your favorite topics in casual streams with like-minded people."
+            "title": "From Community to the World",
+            "body1": "In addition to a home timeline, Concurrent allows you to use numerous community timelines. When posting, you can adopt a model that allows for simultaneous posting to multiple communities, naturally facilitating the social behavior of 'loosely connecting with multiple communities', which is important for humans.",
+            "body2": "Concurrent aims to be an Social Media that connects moderately with other communities and the world, not being overly connected like X, nor too closed off like Discord."
         },
         "wip": {
             "title": "Concurrent is currently under development.",
@@ -209,27 +256,6 @@
             "noticeTitle": "Concurrent is currently under development.",
             "notice": "We are still adding features and the explanations are brief. We would be happy if you could play with it as a form of sightseeing!",
             "next": "Create an ID Card"
-        },
-        "yourID": {
-            "title": "Your ID",
-            "desc1": "This is the string that identifies you in the world of Concurrent.",
-            "desc2": "It is a random string so that you can be equally identified from any server.",
-            "desc3": "Next, we will create a secret code to prove that you are the owner of this ID.",
-            "next": "Next: Creating your ID's Secret Code"
-        },
-        "saveSecret": {
-            "title": "Secret Code",
-            "desc1": "The secret code is a spell you need when you want to log in again or log in from a different device.",
-            "desc2": "Make sure you never lose it and that nobody else ever finds out about it.",
-            "desc3": "If you lose it, you will never be able to access your account again. If someone else finds out, your account will become a shared account with a hacker.",
-            "didyousave": "Have you taken a note of it?",
-            "next": "Next: Confirming the Secret Code"
-        },
-        "verifyCode": {
-            "title": "Confirming the Secret Code",
-            "match": "OK!",
-            "notMatch": "The secret code does not match",
-            "next": "Next: Choosing a Domain"
         },
         "chooseDomain": {
             "title": "Choosing a Domain",
@@ -268,7 +294,7 @@
         "welcome": "Welcome",
         "domain": "Domain",
         "import": "Sign in",
-        "noAccount": "Don’t have an account yet?",
+        "noAccount": "Don't have an account yet?",
         "createAccount": "Create an Account"
     }
 }

@@ -31,13 +31,7 @@ export const GuestBase = (props: GuestBaseProps): JSX.Element => {
                 sx={{
                     display: 'flex',
                     justifyContent: 'center',
-                    background: [
-                        theme.palette.background.default,
-                        `linear-gradient(${theme.palette.background.default}, ${darken(
-                            theme.palette.background.default,
-                            0.1
-                        )})`
-                    ],
+                    background: theme.palette.background.default,
                     minWidth: '100vw',
                     minHeight: '100dvh'
                 }}

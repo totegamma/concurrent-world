@@ -22,7 +22,7 @@ import html2canvas from 'html2canvas'
 import JsPDF from 'jspdf'
 import ccPaper from '../resources/cc-paper.svg'
 import { ComputeCKID, LoadKey, generateIdentity } from '@concurrent-world/client'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 
 export interface SwitchMasterToSubProps {
     mnemonic: string
@@ -34,7 +34,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
     const [activeStep, setActiveStep] = useState(0)
     const [processing, setProcessing] = useState(false)
 
-    const { t, i18n } = useTranslation('', { keyPrefix: 'registration' })
+    const { t, i18n } = useTranslation('', { keyPrefix: 'settings.identity.switchMasterToSub' })
     const [keyFormat, setKeyFormat] = useState<'ja' | 'en'>(i18n.language === 'ja' ? 'ja' : 'en')
 
     const mnemonicToPrivateKey = (mnemonic: string): string => {
@@ -121,18 +121,15 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
 
     const steps = [
         {
-            label: 'マスターキーを安全に保存',
+            label: t('saveMasterKey'),
             content: (
                 <Box display="flex" flexDirection="column" gap={1}>
-                    <Typography>
-                        アカウントの引っ越しや、復旧にこのキーが必要になります。また、他人に知られた場合アカウントに不正にアクセスされることになるので、絶対に秘密です。
-                    </Typography>
+                    <Typography>{t('descSaveMasterKey')}</Typography>
                     <Alert severity="error">
-                        このステップがマスターキーをダウンロードできる最後の機会です！ここで保管を怠ると、このアカウントは絶対に復旧できません。
-                        印刷して金庫に保管するなど、安全で確実な方法で保管することをお勧めします。
+                        <Trans i18nKey={'settings.identity.switchMasterToSub.alertMasterKey'} />
                     </Alert>
                     <Box display="flex" alignItems="center" flexDirection="row" gap={1}>
-                        <Typography>マスターキーのフォーマット:</Typography>
+                        <Typography>{t('masterKeyFormat')}</Typography>
                         <Select
                             value={keyFormat}
                             onChange={(e) => {
@@ -147,23 +144,10 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                         <Button
                             component="a"
                             target="_blank"
-                            href={`mailto:?subject=concurrent secret&body=
-** このメールの宛先を自分自身に設定し、送信してください。**%0D%0A
-%0D%0A
-=== 識別情報 ===%0D%0A
-識別子: ${client?.ccid}%0D%0A
-マスターキー: ${mnemonic}%0D%0A
-================%0D%0A
-%0D%0A
-%0D%0A
-マスターキーは、あなたがこの識別子で識別されるアカウントの所有者であることを証明する唯一の合言葉です。%0D%0A
-このキーが悪意のある第三者に知られた場合、このアカウントの安全性は失われるため自身の手でアカウントを凍結する手続きを行う必要が生じます。%0D%0A
-%0D%0A
-マスターキーは、アカウントの引っ越しや、サブキーを失った際の復旧など、重要な操作を行う際に使用することになります。%0D%0A
-それまで、印刷して金庫に保管するなどして、安全で確実な方法で保管してください。%0D%0A`}
+                            href={t('mailHerf', { ccid: client?.ccid, mnemonic })}
                             startIcon={<EmailIcon />}
                         >
-                            自分宛にメールで送信
+                            {t('sendEmail')}
                         </Button>
                         <Button
                             onClick={() => {
@@ -176,7 +160,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                             }}
                             startIcon={<FileDownloadIcon />}
                         >
-                            PDFでダウンロード
+                            {t('downloadPDF')}
                         </Button>
                         <Box flexGrow={1} />
                         <Button
@@ -184,20 +168,20 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                                 setActiveStep(1)
                             }}
                         >
-                            次へ
+                            {t('next')}
                         </Button>
                     </Box>
                 </Box>
             )
         },
         {
-            label: 'バックアップの確認',
+            label: t('verifyBackup'),
             content: (
                 <Box display="flex" flexDirection="column" gap={1}>
-                    <Typography>準備はできましたか？正しくマスターキーを保管できたか確認します。</Typography>
+                    <Typography>{t('descVerifyBackup')}</Typography>
                     <TextField
                         fullWidth
-                        placeholder="12個の単語からなる呪文を入力"
+                        placeholder={t('masterKeyPlaceholder')}
                         value={mnemonicTest}
                         onChange={(e) => {
                             setMnemonicTest(e.target.value)
@@ -212,7 +196,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                                 setActiveStep(0)
                             }}
                         >
-                            戻る
+                            {t('back')}
                         </Button>
                         <Button
                             disabled={!testOK}
@@ -220,20 +204,17 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                                 setActiveStep(2)
                             }}
                         >
-                            {testOK ? '次へ' : '一致しません'}
+                            {testOK ? t('next') : t('testNG')}
                         </Button>
                     </Box>
                 </Box>
             )
         },
         {
-            label: '端末からマスターキーを抹消',
+            label: t('removeMasterKey'),
             content: (
                 <Box display="flex" flexDirection="column" gap={1}>
-                    <Typography>
-                        マスターキーは秘密度の高い情報なので、マスターキーから「身代わり」となるサブキーを生成し、
-                        この端末ではマスターキーとの入れ替えを行います。
-                    </Typography>
+                    <Typography>{t('descRemoveMasterKey')}</Typography>
                     <Button
                         fullWidth
                         color="error"
@@ -261,7 +242,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                                 })
                         }}
                     >
-                        {processing ? '切り替え中...' : 'マスターキーを端末から完全に削除してサブキーへ切り替える'}
+                        {processing ? t('processing') : t('ready')}
                     </Button>
                 </Box>
             )
@@ -311,7 +292,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                             transform: 'translate(-50%, 0%)'
                         }}
                     >
-                        識別情報
+                        {t('identification')}
                     </div>
 
                     <div
@@ -328,7 +309,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                             borderRadius: '5px'
                         }}
                     >
-                        極秘
+                        {t('confidential')}
                     </div>
 
                     <Box
@@ -362,7 +343,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                                         textAlign: 'center'
                                     }}
                                 >
-                                    識別子
+                                    {t('identifier')}
                                 </td>
                                 <td
                                     style={{
@@ -371,7 +352,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                                         textAlign: 'left'
                                     }}
                                 >
-                                    {client?.ccid ?? '不明'}
+                                    {client?.ccid ?? t('undifined')}
                                 </td>
                             </tr>
                             <tr>
@@ -383,7 +364,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                                         wordBreak: 'keep-all'
                                     }}
                                 >
-                                    マスターキー
+                                    {t('masterKey')}
                                 </td>
                                 <td
                                     style={{
@@ -446,12 +427,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                             width: '90%'
                         }}
                     >
-                        マスターキーは、あなたがこの識別子で識別されるアカウントの所有者であることを証明する唯一の合言葉です。
-                        <br />
-                        このキーが悪意のある第三者に知られた場合、このアカウントの安全性は失われるため自身の手でアカウントを凍結する手続きを行う必要が生じます。
-                        <br />
-                        マスターキーは、アカウントの引っ越しや、サブキーを失った際の復旧など、重要な操作を行う際に使用することになります。
-                        それまで、印刷して金庫に保管するなどして、安全で確実な方法で保管してください。
+                        <Trans i18nKey={'settings.identity.switchMasterToSub.aboutMasterKey'} />
                     </div>
 
                     <div
@@ -477,7 +453,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                                 fontFamily: 'serif'
                             }}
                         >
-                            参考情報
+                            {t('reference')}
                         </div>
                         <table
                             style={{
@@ -495,7 +471,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                                         textAlign: 'center'
                                     }}
                                 >
-                                    名称
+                                    {t('name')}
                                 </td>
                                 <td
                                     style={{
@@ -504,7 +480,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                                         textAlign: 'left'
                                     }}
                                 >
-                                    {client?.user?.profile?.payload.body.username ?? '未設定'}
+                                    {client?.user?.profile?.payload.body.username ?? t('unset')}
                                 </td>
                             </tr>
                             <tr>
@@ -515,7 +491,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                                         textAlign: 'center'
                                     }}
                                 >
-                                    管轄ドメイン
+                                    {t('domain')}
                                 </td>
                                 <td
                                     style={{
@@ -528,7 +504,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                                 </td>
                             </tr>
                         </table>
-                        <div>参考情報はこの証書を発行した当時の情報であり、現在は変更されている可能性があります。</div>
+                        <div>{t('addition')}</div>
                     </div>
 
                     <div
@@ -542,7 +518,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                             textAlign: 'center'
                         }}
                     >
-                        発行日: {new Date().toLocaleDateString()}
+                        {t('date')} {new Date().toLocaleDateString()}
                     </div>
                 </div>
             </Box>

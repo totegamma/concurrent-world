@@ -131,16 +131,17 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
     }
 
     const uploadImage = async (imageFile: File): Promise<void> => {
-        const isImage = imageFile.type.includes('image')
-        if (isImage) {
-            const uploadingText = ' ![uploading...]()'
-            setDraft(draft + uploadingText)
-            const result = await uploadFile(imageFile)
-            if (!result) {
-                setDraft(draft.replace(uploadingText, ''))
-                setDraft(draft + `![upload failed]()`)
+        const uploadingText = ' ![uploading...]()'
+        setDraft(draft + uploadingText)
+        const result = await uploadFile(imageFile)
+        if (!result) {
+            setDraft(draft.replace(uploadingText, ''))
+            setDraft(draft + `![upload failed]()`)
+        } else {
+            setDraft(draft.replace(uploadingText, ''))
+            if (imageFile.type.startsWith('video')) {
+                setDraft(draft + `<video controls><source src="${result}" type="${imageFile.type}"></video>`)
             } else {
-                setDraft(draft.replace(uploadingText, ''))
                 setDraft(draft + `![image](${result})`)
             }
         }
@@ -538,7 +539,7 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
                                     onChange={(e) => {
                                         onFileInputChange(e)
                                     }}
-                                    accept={'.png, .jpg, .jpeg, .gif'}
+                                    accept={'image/*, video/*'}
                                 />
                             </IconButton>
                         </span>

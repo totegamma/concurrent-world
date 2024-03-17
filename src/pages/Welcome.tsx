@@ -3,11 +3,10 @@ import { Button, IconButton, Typography } from '@mui/material'
 import { Link, NavLink } from 'react-router-dom'
 import GitHubIcon from '@mui/icons-material/GitHub'
 import AppMock from '../components/welcome/AppMock'
-import { PassportRenderer } from '../components/theming/Passport'
-import Tilt from 'react-parallax-tilt'
 import { StreamCard } from '../components/Stream/Card'
 import { useTranslation } from 'react-i18next'
 import { GuestBase } from '../components/GuestBase'
+import Contributors from '../components/welcome/Contributors'
 
 export default function Welcome(): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'welcome' })
@@ -18,7 +17,7 @@ export default function Welcome(): JSX.Element {
                 display: 'flex',
                 gap: 4,
                 width: '100vw',
-                maxWidth: '1024px',
+                maxWidth: '1280px',
                 margin: 'auto',
                 minHeight: '100dvh',
                 flexDirection: 'column',
@@ -31,7 +30,13 @@ export default function Welcome(): JSX.Element {
                 </Button>
             }
         >
-            <Box /* top */ display="flex" flexDirection={{ xs: 'column', sm: 'column', md: 'row' }} gap={2}>
+            <Box /* top */
+                display="flex"
+                minHeight="50vh"
+                flexDirection={{ xs: 'column', sm: 'column', md: 'row' }}
+                gap={2}
+                alignItems="center"
+            >
                 <Box flex={1}>
                     <Typography variant="h1" fontSize="50px">
                         {t('tagline1')}
@@ -72,60 +77,91 @@ export default function Welcome(): JSX.Element {
                     <AppMock />
                 </Box>
             </Box>
-            <Box /* column */
+            <Box
                 display="flex"
-                flexDirection={{ xs: 'column-reverse', sm: 'column-reverse', md: 'row' }}
+                flexDirection="column"
                 gap={2}
+                alignItems="center"
+                minHeight="50vh"
+                justifyContent="center"
+                mb="5vh"
             >
-                <Box
-                    sx={{
-                        flex: 1,
-                        width: '300px',
-                        margin: 'auto'
-                    }}
-                >
-                    <Tilt glareEnable={true} glareBorderRadius="5%">
-                        <PassportRenderer
-                            ccid={'CCE919C85E695AdA4acE5d3ae56310435EE0b522a3'}
-                            name={'Anonymous'}
-                            avatar={''}
-                            host={'dev.concurrent.world'}
-                            cdate={'2023/02/04'}
-                            trust={255}
-                        />
-                    </Tilt>
-                </Box>
+                <Typography variant="h1" fontSize="40px" sx={{ textAlign: 'center' }}>
+                    {t('mission.title1')}
+                    <br />
+                    {t('mission.title2')}
+                </Typography>
 
-                <Box flex={1}>
-                    <Typography gutterBottom variant="h1">
-                        {t('feature1.title')}
+                <Box display="flex" flexDirection="column" gap={2}>
+                    <Typography sx={{ textAlign: 'center' }}>
+                        {t('mission.body1')}
+                        <br />
+                        {t('mission.body2')}
                     </Typography>
-                    <Typography>{t('feature1.description')}</Typography>
+
+                    <Typography sx={{ textAlign: 'center' }}>{t('mission.body3')}</Typography>
+
+                    <Typography sx={{ textAlign: 'center' }}>{t('mission.body4')}</Typography>
+
+                    <Typography sx={{ textAlign: 'center' }}>{t('mission.body5')}</Typography>
                 </Box>
+                <Contributors />
             </Box>
 
-            <Box /* column */ display="flex" flexDirection={{ xs: 'column', sm: 'column', md: 'row' }} gap={2}>
-                <Box flex={1}>
-                    <Typography gutterBottom variant="h1">
+            <Box /* column */
+                display="flex"
+                flexDirection={{ xs: 'column', sm: 'column', md: 'row' }}
+                gap={2}
+                width="100%"
+                minHeight="50vh"
+            >
+                <Box flex={1} display="flex" flexDirection="column" gap={2}>
+                    <Typography variant="h1" fontSize="40px">
+                        {t('feature1.title')}
+                    </Typography>
+                    <Typography>{t('feature1.body1')}</Typography>
+
+                    <Typography gutterBottom variant="h1" fontSize="40px">
                         {t('feature2.title')}
                     </Typography>
-                    <Typography>{t('feature2.description')}</Typography>
+                    <Typography>{t('feature2.body1')}</Typography>
+                    <Typography>{t('feature2.body2')}</Typography>
                 </Box>
-                <Box display="flex" flexDirection="column" flex={1} gap={1}>
+                <Box display="flex" gap={1} overflow="auto" flexDirection={{ xs: 'row', sm: 'row', md: 'column' }}>
                     <StreamCard
+                        sx={{ minWidth: '300px' }}
                         streamID="ci8qvhep9dcpltmfq3fg@hub.concurrent.world"
                         name="Arrival Lounge"
                         description="hub.concurrent.worldサーバーへようこそ！わからない事があれば、ここで呟いてみましょう。"
-                        banner="https://cdn.discordapp.com/attachments/812107435833294868/1138120758493708348/image.png"
+                        banner="https://worldfile.cc/CC2d97694D850Df2089F48E639B4795dD95D2DCE2E/f696009d-f1f0-44f8-83fe-6387946f1b86"
                         domain="hub.concurrent.world"
                     />
                     <StreamCard
+                        sx={{ minWidth: '300px' }}
                         streamID="chrmsgep9dcl7anfkgcg@dev.concurrent.world"
                         name="Dev Central"
                         description="開発者の憩い場"
-                        banner="https://cdn.discordapp.com/attachments/812107435833294868/1138082112646418463/IMG_1983.jpg"
+                        banner="https://worldfile.cc/CC2d97694D850Df2089F48E639B4795dD95D2DCE2E/16e8e34f-460f-4a01-b0d1-6d0661a18ca4"
                         domain="dev.concurrent.world"
                     />
+                    {/*
+                    <StreamCard
+                        sx={{minWidth: '300px'}}
+                        streamID="chrmskup9dcl7anfkge0@hub.concurrent.world"
+                        name="ガジェット探索"
+                        description="My New Gear......"
+                        banner="https://worldfile.cc/CC2d97694D850Df2089F48E639B4795dD95D2DCE2E/077ff86b-99d6-4a96-9bc9-4ec1b59fd22e"
+                        domain="dev.concurrent.world"
+                    />
+                    <StreamCard
+                        sx={{minWidth: '300px'}}
+                        streamID="ck4hekep9dcsa69ohmlg@hub.concurrent.world"
+                        name="Nostr民"
+                        description="Nostr民のたまり場"
+                        banner=""
+                        domain="hub.concurrent.world"
+                    />
+                    */}
                 </Box>
             </Box>
 

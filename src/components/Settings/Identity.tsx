@@ -5,6 +5,7 @@ import { Suspense, lazy, useEffect, useState } from 'react'
 import { useClient } from '../../context/ClientContext'
 import { type Key } from '@concurrent-world/client/dist/types/model/core'
 import { usePreference } from '../../context/PreferenceContext'
+import { useTranslation } from 'react-i18next'
 
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { KeyCard } from '../ui/KeyCard'
@@ -20,6 +21,8 @@ export const IdentitySettings = (): JSX.Element => {
     const [target, setTarget] = useState<string | null>(null)
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
     const [hideDisabledSubKey, setHideDisabledSubKey] = usePreference('hideDisabledSubKey')
+
+    const { t } = useTranslation('', { keyPrefix: 'settings.identity' })
 
     useEffect(() => {
         client.api.getKeyList().then((res) => {
@@ -57,9 +60,7 @@ export const IdentitySettings = (): JSX.Element => {
                         gap: 1
                     }}
                 >
-                    <Alert severity="warning">
-                        現在マスターキーを使ってログインしています。より安全なサブキーによるログインに今すぐ切り替えましょう。
-                    </Alert>
+                    <Alert severity="warning">{t('loginType.masterKey')}</Alert>
 
                     <Suspense fallback={<>loading...</>}>
                         <SwitchMasterToSub mnemonic={mnemonic} />
@@ -75,13 +76,11 @@ export const IdentitySettings = (): JSX.Element => {
                         gap: 1
                     }}
                 >
-                    <Alert severity="info">現在サブキーでログインしています。</Alert>
+                    <Alert severity="info">{t('loginType.subKey')}</Alert>
                 </Box>
             )}
 
-            {!subkey && !mnemonic && (
-                <Alert severity="error">現在秘密鍵直接入力によるマスターキーでログインしています。</Alert>
-            )}
+            {!subkey && !mnemonic && <Alert severity="error">{t('loginType.secret')}</Alert>}
 
             <Box
                 sx={{
@@ -93,7 +92,7 @@ export const IdentitySettings = (): JSX.Element => {
                         control={
                             <Switch size="small" checked={hideDisabledSubKey} onChange={toggleHideDisabledSubKey} />
                         }
-                        label="無効化したサブキーを非表示にする"
+                        label={t('hideSubKey')}
                     />
                 </FormGroup>
             </Box>
@@ -146,7 +145,7 @@ export const IdentitySettings = (): JSX.Element => {
                             })
                         }}
                     >
-                        無効化
+                        {t('deactivate')}
                     </MenuItem>
                 </Menu>
             </Box>

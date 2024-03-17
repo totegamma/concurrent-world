@@ -167,16 +167,17 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     }
 
     const uploadImage = async (imageFile: File): Promise<void> => {
-        const isImage = imageFile.type.includes('image')
-        if (isImage) {
-            const uploadingText = ' ![uploading...]()'
-            setDraft(draft + uploadingText)
-            const result = await uploadFile(imageFile)
-            if (!result) {
-                setDraft(draft.replace(uploadingText, ''))
-                setDraft(draft + `![upload failed]()`)
+        const uploadingText = ' ![uploading...]()'
+        setDraft(draft + uploadingText)
+        const result = await uploadFile(imageFile)
+        if (!result) {
+            setDraft(draft.replace(uploadingText, ''))
+            setDraft(draft + `![upload failed]()`)
+        } else {
+            setDraft(draft.replace(uploadingText, ''))
+            if (imageFile.type.startsWith('video')) {
+                setDraft(draft + `<video controls><source src="${result}" type="${imageFile.type}"></video>`)
             } else {
-                setDraft(draft.replace(uploadingText, ''))
                 setDraft(draft + `![image](${result})`)
             }
         }
@@ -184,7 +185,10 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
 
     const onFileInputChange = async (event: any): Promise<void> => {
         const file = event.target.files[0]
-        if (!file) return
+        if (!file) {
+            console.log('no file')
+            return
+        }
         await uploadImage(file)
         textInputRef.current?.focus()
     }
@@ -531,7 +535,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                     onChange={(e) => {
                                         onFileInputChange(e)
                                     }}
-                                    accept={'.png, .jpg, .jpeg, .gif, .webp'}
+                                    accept={'image/*, video/*'}
                                 />
                             </IconButton>
                         </span>

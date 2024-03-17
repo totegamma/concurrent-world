@@ -41,6 +41,7 @@ import {
 import { UrlSummaryProvider } from './context/urlSummaryContext'
 import { StorageProvider } from './context/StorageContext'
 import { MarkdownRendererLite } from './components/ui/MarkdownRendererLite'
+import { useTranslation } from 'react-i18next'
 
 function App(): JSX.Element {
     const { client } = useClient()
@@ -54,6 +55,8 @@ function App(): JSX.Element {
     const mnemonic = JSON.parse(localStorage.getItem('Mnemonic') || 'null')
 
     const subscription = useRef<Subscription>()
+
+    const { t } = useTranslation()
 
     useEffect(() => {
         if (!client) return
@@ -267,7 +270,7 @@ function App(): JSX.Element {
                             component={RouterLink}
                             to="/settings/identity"
                         >
-                            現在マスターキーを使ってログインしています。ここをクリックして、より安全なサブキーによるログインに今すぐ切り替えましょう。
+                            {t('settings.identity.loginType.masterKey')}
                         </Typography>
                     )}
                 </Box>
