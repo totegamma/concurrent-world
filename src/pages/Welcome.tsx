@@ -84,48 +84,28 @@ export default function Welcome(): JSX.Element {
                 alignItems="center"
                 minHeight="50vh"
                 justifyContent="center"
-                mb="10vh"
+                mb="5vh"
             >
                 <Typography variant="h1" fontSize="40px" sx={{ textAlign: 'center' }}>
-                    SNSアカウントをあなたの
+                    {t('mission.title1')}
                     <br />
-                    「インターネット人格」として確立しましょう。
+                    {t('mission.title2')}
                 </Typography>
 
                 <Box display="flex" flexDirection="column" gap={2}>
                     <Typography sx={{ textAlign: 'center' }}>
-                        現代社会において、SNSアカウントの立ち位置は非常に重要です。
+                        {t('mission.body1')}
                         <br />
-                        友達やファン・憧れの人との交流も、自分の活動の記録も、すべてがそこに詰まっているわけですから当たり前ですよね。
+                        {t('mission.body2')}
                     </Typography>
 
-                    <Typography sx={{ textAlign: 'center' }}>
-                        しかし、現代社会ではこのようにインターネット上の「人格」として存在している貴重なSNSアカウントは、一企業の気分次第で簡単に凍結されています。これは、到底許せることではないはずです。
-                    </Typography>
+                    <Typography sx={{ textAlign: 'center' }}>{t('mission.body3')}</Typography>
 
-                    <Typography sx={{ textAlign: 'center' }}>
-                        Concurrentは暗号技術を用いて、あなたのアカウントの権利を運営団体ではなく「あなた自身で」責任を持って管理することができます。サーバーは、あなたのデータを配信する「お手伝い」をするだけです。
-                    </Typography>
+                    <Typography sx={{ textAlign: 'center' }}>{t('mission.body4')}</Typography>
 
-                    <Typography sx={{ textAlign: 'center' }}>
-                        Concurrentで、あなたのインターネット人格を、自分の手で、誕生させましょう。
-                    </Typography>
+                    <Typography sx={{ textAlign: 'center' }}>{t('mission.body5')}</Typography>
                 </Box>
                 <Contributors />
-                {/*
-                <Box display="flex" flexDirection="column" alignItems="center">
-                    <Button
-                        component={NavLink}
-                        to="/register"
-                        sx={{
-                            marginTop: '20px',
-                            width: '100%'
-                        }}
-                    >
-                        {t('createAccount')}
-                    </Button>
-                </Box>
-                */}
             </Box>
 
             <Box /* column */
