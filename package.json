@@ -13,7 +13,7 @@
     "dependencies": {
         "@aws-sdk/client-s3": "^3.445.0",
         "@aws-sdk/s3-request-presigner": "^3.445.0",
-        "@concurrent-world/client": "^4.2.17",
+        "@concurrent-world/client": "^4.2.19",
         "@emotion/react": "^11.10.5",
         "@emotion/styled": "^11.10.5",
         "@fortawesome/free-brands-svg-icons": "^6.4.2",
