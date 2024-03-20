@@ -10,6 +10,7 @@ import { useSnackbar } from 'notistack'
 import { useLocation } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
+import { fetchWithTimeout } from '../../util'
 
 export const EmojiSettings = (): JSX.Element => {
     const [emojiPackages, setEmojiPackages] = usePreference('emojiPackages')
@@ -31,13 +32,23 @@ export const EmojiSettings = (): JSX.Element => {
 
     useEffect(() => {
         Promise.all(
-            emojiPackages.map((url) =>
-                fetch(url)
-                    .then((j) => j.json())
-                    .then((p: RawEmojiPackage) => ({ ...p, packageURL: url }))
-            )
-        ).then((packages: EmojiPackage[]) => {
-            setPackages(packages)
+            emojiPackages.map(async (url) => {
+                console.log(url)
+                try {
+                    const rawpackage = await fetchWithTimeout(url, {}, 3000).then((j) => j.json())
+                    const packages: EmojiPackage = {
+                        ...rawpackage,
+                        packageURL: url
+                    }
+                    return packages
+                } catch (e) {
+                    console.error(e)
+                    return undefined
+                }
+            })
+        ).then((packages: Array<EmojiPackage | undefined>) => {
+            console.log(packages)
+            setPackages(packages.filter((e) => e) as EmojiPackage[])
         })
     }, [emojiPackages])
 
