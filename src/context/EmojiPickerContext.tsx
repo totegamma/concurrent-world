@@ -21,6 +21,7 @@ import { Link as RouterLink } from 'react-router-dom'
 
 import Fuzzysort from 'fuzzysort'
 import { experimental_VGrid as VGrid, type VGridHandle } from 'virtua'
+import { fetchWithTimeout } from '../util'
 
 export interface EmojiPickerState {
     open: (anchor: HTMLElement, onSelected: (selected: Emoji) => void) => void
@@ -119,16 +120,22 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
     useEffect(() => {
         Promise.all(
             emojiPackageSource.map(async (url) => {
-                const rawpackage = await fetch(url).then((j) => j.json())
-                const packages: EmojiPackage = {
-                    ...rawpackage,
-                    packageURL: url
+                try {
+                    const rawpackage = await fetchWithTimeout(url, {}, 3000).then((j) => j.json())
+                    const packages: EmojiPackage = {
+                        ...rawpackage,
+                        packageURL: url
+                    }
+                    return packages
+                } catch (e) {
+                    console.error('Failed to fetch emoji package', url, e)
+                    return undefined
                 }
-                return packages
             })
-        ).then((packages: EmojiPackage[]) => {
-            setEmojiPackages(packages)
-            setAllEmojis(packages.flatMap((p) => p.emojis))
+        ).then((packages: Array<EmojiPackage | undefined>) => {
+            const filtered = packages.filter((p) => p !== undefined) as EmojiPackage[]
+            setEmojiPackages(filtered)
+            setAllEmojis(filtered.flatMap((p) => p.emojis))
         })
     }, [emojiPackageSource])
 
