@@ -1,4 +1,5 @@
 import { type FallbackProps } from 'react-error-boundary'
+import { type Preference, defaultPreference } from '../context/PreferenceContext'
 
 export function EmergencyKit({ error }: FallbackProps): JSX.Element {
     const gracefulResetLocalStorage = (): void => {
@@ -12,6 +13,21 @@ export function EmergencyKit({ error }: FallbackProps): JSX.Element {
         for (const key in localStorage) {
             localStorage.removeItem(key)
         }
+
+        window.location.reload()
+    }
+
+    const resetThemeAndEnterSafemode = (): void => {
+        const preference = localStorage.getItem('preference')
+        if (preference) {
+            const parsed: Preference = JSON.parse(preference)
+            parsed.themeName = defaultPreference.themeName
+            localStorage.setItem('preference', JSON.stringify(parsed))
+        }
+
+        localStorage.setItem('noloadsettings', 'true')
+
+        window.location.reload()
     }
 
     return (
@@ -30,6 +46,9 @@ export function EmergencyKit({ error }: FallbackProps): JSX.Element {
             </button>
             <h2>Medical Kit</h2>
             <div>3回くらいリロードしても解決しないなら↓</div>
+            <div>
+                <button onClick={resetThemeAndEnterSafemode}>テーマをリセットして初回設定同期オフで起動する</button>
+            </div>
             <div>
                 <button onClick={gracefulResetLocalStorage}>
                     アカウント情報以外のlocalstorageをすべてリセットする
