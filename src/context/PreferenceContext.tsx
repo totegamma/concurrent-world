@@ -80,6 +80,11 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
     useEffect(() => {
         if (!client) return
         if (initialized) return
+        const isNoloadSettings = localStorage.getItem('noloadsettings')
+        if (isNoloadSettings) {
+            localStorage.removeItem('noloadsettings')
+            return
+        }
         client.api
             .getKV('world.concurrent.preference')
             .then((storage: string | null | undefined) => {
