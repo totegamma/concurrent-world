@@ -30,7 +30,7 @@ export interface PassportRendererProps {
 export function PassportRenderer(props: PassportRendererProps): JSX.Element {
     const theme = useTheme<ConcurrentTheme>()
 
-    const line1 = 'P<' + props.ccid
+    const line1 = 'P<' + props.ccid.toUpperCase()
     let line2 = props.host.toUpperCase().replace(/(\.|-)/g, '<') ?? 'UNKNOWN'
     line2 += '<'.repeat(40 - line2.length) + '0xFF'
 

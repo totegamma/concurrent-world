@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import ApiProvider from '../context/ClientContext'
 import { Fade, Paper } from '@mui/material'
 import { usePersistent } from '../hooks/usePersistent'
-import { type Identity, generateIdentity, jumpToDomainRegistration } from '../util'
+import { jumpToDomainRegistration } from '../util'
 import {
     Client,
     Schemas,
@@ -13,7 +13,9 @@ import {
     type CoreDomain,
     type ProfileSchema,
     type DomainProfileSchema,
-    LoadKey
+    LoadKey,
+    generateIdentity,
+    type Identity
 } from '@concurrent-world/client'
 import { RegistrationWelcome } from '../components/Registration/Welcome'
 import { ChooseDomain } from '../components/Registration/ChooseDomain'
@@ -65,7 +67,7 @@ export function Registration(): JSX.Element {
         if (!host) return
         localStorage.setItem('Domain', JSON.stringify(host.fqdn))
         localStorage.setItem('PrivateKey', JSON.stringify(identity.privateKey))
-        localStorage.setItem('Mnemonic', JSON.stringify(identity.mnemonic_en))
+        localStorage.setItem('Mnemonic', JSON.stringify(identity.mnemonic))
 
         console.log('hostAddr', host.ccid)
 
