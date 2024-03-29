@@ -1,8 +1,7 @@
 import { Box, Button } from '@mui/material'
 import Tilt from 'react-parallax-tilt'
 import { PassportRenderer } from '../theming/Passport'
-import { type Identity } from '../../util'
-import { type CoreCharacter, type CoreDomain, type ProfileSchema } from '@concurrent-world/client'
+import { type Identity, type CoreCharacter, type CoreDomain, type ProfileSchema } from '@concurrent-world/client'
 import { useTranslation } from 'react-i18next'
 
 export function RegistrationReady(props: {

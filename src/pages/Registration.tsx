@@ -164,7 +164,6 @@ export function Registration(): JSX.Element {
                         setActiveStep(3)
                     }}
                     client={client}
-                    setProfile={setProfile}
                 />
             )
         },

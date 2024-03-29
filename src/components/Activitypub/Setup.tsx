@@ -59,7 +59,7 @@ export const ApSetup = (): JSX.Element => {
             return
         }
 
-        const followstream = await client.api.createStream(
+        const followstream = await client.api.createTimeline(
             Schemas.commonstream,
             {
                 name: 'ActivityPub',
@@ -67,8 +67,8 @@ export const ApSetup = (): JSX.Element => {
                 description: 'ActivityPub home stream'
             },
             {
-                reader: client?.user?.ccid ? [client?.user?.ccid] : [],
-                visible: false
+                indexable: false,
+                domainOwned: false
             }
         )
 
