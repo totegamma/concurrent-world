@@ -79,7 +79,7 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                                     <CCAvatar
                                         avatarURL={
                                             reaction.payload.body.profileOverride?.avatar ??
-                                            reaction.authorUser?.profile?.payload.body.avatar
+                                            reaction.authorUser?.profile?.avatar
                                         }
                                         identiconSource={reaction.author}
                                         sx={{
@@ -94,7 +94,7 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                                         }}
                                     >
                                         {reaction.payload.body.profileOverride?.username ||
-                                            reaction.authorUser?.profile?.payload.body.username ||
+                                            reaction.authorUser?.profile?.username ||
                                             'anonymous'}
                                     </Typography>
                                 </Box>

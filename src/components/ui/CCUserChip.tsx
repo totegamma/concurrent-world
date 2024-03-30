@@ -36,7 +36,7 @@ export const CCUserChip = (props: CCUserChipProps): JSX.Element => {
                   }}
                   circle
                   identiconSource={user?.ccid ?? ''}
-                  avatarURL={user?.profile?.payload.body.avatar}
+                  avatarURL={user?.profile?.avatar}
               />
           ) ?? <AlternateEmailIcon fontSize="small" />
         : props.iconOverride ?? <AlternateEmailIcon fontSize="small" />
@@ -65,7 +65,7 @@ export const CCUserChip = (props: CCUserChipProps): JSX.Element => {
             {props.onDelete ? (
                 <Chip
                     size={'small'}
-                    label={user?.profile?.payload.body.username ?? 'anonymous'}
+                    label={user?.profile?.username ?? 'anonymous'}
                     icon={icon}
                     onDelete={props.onDelete}
                 />
@@ -74,7 +74,7 @@ export const CCUserChip = (props: CCUserChipProps): JSX.Element => {
                     component={NavLink}
                     to={'/entity/' + (user?.ccid ?? '')}
                     size={'small'}
-                    label={user?.profile?.payload.body.username ?? 'anonymous'}
+                    label={user?.profile?.username ?? 'anonymous'}
                     icon={icon}
                 />
             )}

@@ -93,11 +93,9 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const setupAccountRequired =
         client?.user !== null &&
         (client?.user.profile === undefined ||
-            client?.user.userstreams === undefined ||
-            !client?.user.userstreams.payload.body.homeStream ||
-            !client?.user.userstreams.payload.body.notificationStream ||
-            !client?.user.userstreams.payload.body.associationStream ||
-            !client?.user.userstreams.payload.body.ackCollection)
+            !client?.user.profile?.homeStream ||
+            !client?.user.profile?.notificationStream ||
+            !client?.user.profile?.associationStream)
 
     useEffect(() => {
         let unmounted = false
@@ -455,22 +453,16 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                             見つかった問題:
                             <ul>
                                 {!client?.user?.profile && <li>プロフィールが存在していません</li>}
-                                {!client?.user?.userstreams?.payload.body.homeStream && (
-                                    <li>ホームストリームが存在していません</li>
-                                )}
-                                {!client?.user?.userstreams?.payload.body.notificationStream && (
+                                {!client?.user?.profile?.homeStream && <li>ホームストリームが存在していません</li>}
+                                {!client?.user?.profile?.notificationStream && (
                                     <li>通知ストリームが存在していません</li>
                                 )}
-                                {!client?.user?.userstreams?.payload.body.associationStream && (
+                                {!client?.user?.profile?.associationStream && (
                                     <li>アクティビティストリームが存在していません</li>
-                                )}
-                                {!client?.user?.userstreams?.payload.body.ackCollection && (
-                                    <li>Ackコレクションが存在していません</li>
                                 )}
                             </ul>
                             <ProfileEditor
-                                id={client?.user?.profile?.id}
-                                initial={client?.user?.profile?.payload.body}
+                                initial={client?.user?.profile}
                                 onSubmit={() => {
                                     fixAccount()
                                 }}

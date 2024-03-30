@@ -70,7 +70,7 @@ export function Profile(props: ProfileProps): JSX.Element {
     return (
         <>
             <CCWallpaper
-                override={props.user.profile?.payload.body.banner}
+                override={props.user.profile?.banner}
                 sx={{
                     height: '150px'
                 }}
@@ -86,8 +86,8 @@ export function Profile(props: ProfileProps): JSX.Element {
             >
                 <Box position="absolute" top="-50px" left="10px">
                     <CCAvatar
-                        alt={props.user.profile?.payload.body.username}
-                        avatarURL={props.user.profile?.payload.body.avatar}
+                        alt={props.user.profile?.username}
+                        avatarURL={props.user.profile?.avatar}
                         avatarOverride={subCharacter ? subCharacter.payload.body.avatar : undefined}
                         identiconSource={props.user.ccid}
                         sx={{
@@ -107,7 +107,7 @@ export function Profile(props: ProfileProps): JSX.Element {
                     gap={1}
                 >
                     <Box ml="110px" display="flex" gap={1}>
-                        {props.user.profile?.payload.body.subprofiles?.map((id, _) => (
+                        {props.user.profile?.subprofiles?.map((id, _) => (
                             <SubprofileBadge
                                 key={id}
                                 characterID={id}
@@ -124,7 +124,7 @@ export function Profile(props: ProfileProps): JSX.Element {
                             <WatchButton
                                 color={theme.palette.secondary.main}
                                 userCCID={props.id!}
-                                userStreamID={props.user.userstreams?.payload.body.homeStream ?? ''}
+                                userStreamID={props.user.profile?.homeStream ?? ''}
                             />
                         </Box>
                     ) : (
@@ -141,9 +141,7 @@ export function Profile(props: ProfileProps): JSX.Element {
                             fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.5rem' }
                         }}
                     >
-                        {subCharacter?.payload.body.username ??
-                            props.user.profile?.payload.body.username ??
-                            'anonymous'}
+                        {subCharacter?.payload.body.username ?? props.user.profile?.username ?? 'anonymous'}
                     </Typography>
                     <Typography variant="caption">{props.user.ccid}</Typography>
                 </Box>
@@ -154,9 +152,7 @@ export function Profile(props: ProfileProps): JSX.Element {
                     }}
                 >
                     <MarkdownRenderer
-                        messagebody={
-                            subCharacter?.payload.body.description ?? props.user.profile?.payload.body.description ?? ''
-                        }
+                        messagebody={subCharacter?.payload.body.description ?? props.user.profile?.description ?? ''}
                         emojiDict={{}}
                     />
                 </Box>

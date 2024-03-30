@@ -86,8 +86,8 @@ export const ApSetup = (): JSX.Element => {
                 },
                 body: JSON.stringify({
                     id: userID,
-                    homestream: client?.user?.userstreams?.payload.body.homeStream,
-                    notificationstream: client?.user?.userstreams?.payload.body.notificationStream,
+                    homestream: client?.user?.profile?.homeStream,
+                    notificationstream: client?.user?.profile?.notificationStream,
                     followstream: followstream.id
                 })
             })
@@ -106,9 +106,9 @@ export const ApSetup = (): JSX.Element => {
                 },
                 body: JSON.stringify({
                     id: userID,
-                    name: client?.user?.profile?.payload.body.username,
-                    summary: client?.user?.profile?.payload.body.description,
-                    icon_url: client?.user?.profile?.payload.body.avatar
+                    name: client?.user?.profile?.username,
+                    summary: client?.user?.profile?.description,
+                    icon_url: client?.user?.profile?.avatar
                 })
             })
             .then(async (res) => await res.json())

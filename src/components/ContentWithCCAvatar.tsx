@@ -56,7 +56,7 @@ export const ContentWithCCAvatar = (props: ContentWithCCAvatarProps): JSX.Elemen
                     rel={props.profileOverride?.link ? 'noopener noreferrer' : undefined}
                 >
                     <CCAvatar
-                        avatarURL={props.author?.profile?.payload.body.avatar}
+                        avatarURL={props.author?.profile?.avatar}
                         avatarOverride={props.avatarOverride || props.profileOverride?.avatar}
                         identiconSource={props.author?.ccid ?? ''}
                         sx={{

@@ -46,7 +46,7 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
                         to={'/entity/' + props.message.author}
                     >
                         <CCAvatar
-                            avatarURL={props.message.authorUser?.profile?.payload.body.avatar}
+                            avatarURL={props.message.authorUser?.profile?.avatar}
                             identiconSource={props.message.author}
                             sx={{
                                 width: { xs: '12px', sm: '18px' },
@@ -66,7 +66,7 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
                         flex: 1
                     }}
                 >
-                    {props.message.authorUser?.profile?.payload.body.username || 'Anonymous'} rerouted{' '}
+                    {props.message.authorUser?.profile?.username || 'Anonymous'} rerouted{' '}
                     {props.message.payload.body.body && 'with comment:'}
                 </Typography>
                 <Box>

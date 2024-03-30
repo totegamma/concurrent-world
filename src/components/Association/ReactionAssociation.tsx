@@ -28,11 +28,9 @@ export const ReactionAssociation = (props: ReactionAssociationProps): JSX.Elemen
     const [target, setTarget] = useState<Message<SimpleNoteSchema | ReplyMessageSchema> | null>(null)
     const isMeToOther = props.association?.authorUser?.ccid !== props.perspective
 
-    const Nominative = props.association?.authorUser?.profile?.payload.body.username ?? 'anonymous'
+    const Nominative = props.association?.authorUser?.profile?.username ?? 'anonymous'
     const Possessive =
-        (target?.payload.body.profileOverride?.username ??
-            target?.authorUser?.profile?.payload.body.username ??
-            'anonymous') + "'s"
+        (target?.payload.body.profileOverride?.username ?? target?.authorUser?.profile?.username ?? 'anonymous') + "'s"
 
     const actionUser: User | undefined = isMeToOther ? props.association.authorUser : target?.authorUser
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)

@@ -31,7 +31,6 @@ import DoneAllIcon from '@mui/icons-material/DoneAll'
 import RemoveDoneIcon from '@mui/icons-material/RemoveDone'
 import { type StreamWithDomain } from '../model'
 import { StreamCard } from '../components/Stream/Card'
-import { UserProfileCard } from '../components/UserProfileCard'
 import { SubProfileCard } from '../components/SubProfileCard'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 
@@ -374,11 +373,7 @@ export function Explorer(): JSX.Element {
                     >
                         {characters.map((character) => (
                             <Paper key={character.id} variant="outlined">
-                                {character.schema === Schemas.profile ? (
-                                    <UserProfileCard character={character} />
-                                ) : (
-                                    <SubProfileCard character={character} />
-                                )}
+                                <SubProfileCard character={character} />
                             </Paper>
                         ))}
                     </Box>

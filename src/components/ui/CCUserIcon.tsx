@@ -22,5 +22,5 @@ export const CCUserIcon = (props: CCUserIconProps): JSX.Element => {
         })
     }, [props.ccid])
 
-    return <CCAvatar sx={props.sx} avatarURL={user?.profile?.payload.body.avatar} identiconSource={user?.ccid ?? ''} />
+    return <CCAvatar sx={props.sx} avatarURL={user?.profile?.avatar} identiconSource={user?.ccid ?? ''} />
 }

@@ -3,7 +3,7 @@ import { ProfileEditor } from '../ProfileEditor'
 import { useClient } from '../../context/ClientContext'
 import { useSnackbar } from 'notistack'
 import { useTranslation } from 'react-i18next'
-import { type ProfileSchema, type CoreCharacter, type Schema } from '@concurrent-world/client'
+import { type ProfileSchema, type CoreCharacter, type Schema, Schemas } from '@concurrent-world/client'
 import { useEffect, useState } from 'react'
 import { CCDrawer } from '../ui/CCDrawer'
 import { CCEditor } from '../ui/cceditor'
@@ -31,25 +31,20 @@ export const ProfileSettings = (): JSX.Element => {
     const [schemaURL, setSchemaURL] = useState<any>(null)
     const [editingCharacter, setEditingCharacter] = useState<CoreCharacter<any> | null>(null)
 
-    const [latestProfile, setLatestProfile] = useState<CoreCharacter<ProfileSchema> | null | undefined>(
-        client.user?.profile
-    )
+    const [latestProfile, setLatestProfile] = useState<ProfileSchema | null | undefined>(client.user?.profile)
 
     const load = (): void => {
         if (!client) return
         client.api.invalidateCharacter(client.ccid)
-        client.api.getCharacter(client.ccid).then((characters) => {
-            setAllCharacters(
-                (characters ?? []).filter(
-                    (c) => c.id !== client.user?.profile?.id && c.id !== client.user?.userstreams?.id
-                )
-            )
+
+        client.api.getCharacters({ author: client.ccid }).then((characters) => {
+            setAllCharacters(characters ?? [])
         })
 
         if (!client.user?.profile) return
 
-        client.api.getCharacterByID(client.user.profile?.id, client.user.ccid).then((profile) => {
-            setLatestProfile(profile as CoreCharacter<ProfileSchema>)
+        client.api.getEntity<ProfileSchema>(client.user.ccid, Schemas.profile).then((entity) => {
+            setLatestProfile(entity?.extension?.document.body)
         })
     }
 
@@ -57,7 +52,7 @@ export const ProfileSettings = (): JSX.Element => {
         load()
     }, [client])
 
-    const enabledSubprofiles = latestProfile?.payload.body.subprofiles ?? []
+    const enabledSubprofiles = latestProfile?.subprofiles ?? []
 
     useEffect(() => {
         let isMounted = true
@@ -97,8 +92,7 @@ export const ProfileSettings = (): JSX.Element => {
                 }}
             >
                 <ProfileEditor
-                    id={client?.user?.profile?.id}
-                    initial={client?.user?.profile?.payload.body}
+                    initial={client?.user?.profile}
                     onSubmit={() => {
                         enqueueSnackbar(t('updated'), { variant: 'success' })
                     }}
@@ -138,14 +132,13 @@ export const ProfileSettings = (): JSX.Element => {
                                         subprofiles = [...enabledSubprofiles, character.id]
                                     }
 
-                                    client.user?.profile?.id &&
-                                        client
-                                            .updateProfile(client.user?.profile?.id, {
-                                                subprofiles
-                                            })
-                                            .then((_) => {
-                                                load()
-                                            })
+                                    client
+                                        .setProfile({
+                                            subprofiles
+                                        })
+                                        .then((_) => {
+                                            load()
+                                        })
                                 }}
                             >
                                 <ListItemIcon>

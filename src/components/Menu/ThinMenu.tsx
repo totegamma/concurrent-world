@@ -60,7 +60,7 @@ export const ThinMenu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         onClick={props.onClick}
                     >
                         <CCAvatar
-                            avatarURL={client.user?.profile?.payload.body.avatar}
+                            avatarURL={client.user?.profile?.avatar}
                             identiconSource={client.ccid}
                             sx={{
                                 width: '40px',

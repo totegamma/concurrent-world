@@ -9,8 +9,8 @@ export function Passport(): JSX.Element {
     return (
         <PassportRenderer
             ccid={client.ccid || ''}
-            name={client?.user?.profile?.payload.body.username || ''}
-            avatar={client?.user?.profile?.payload.body.avatar || ''}
+            name={client?.user?.profile?.username || ''}
+            avatar={client?.user?.profile?.avatar || ''}
             host={client.api.host || ''}
             cdate={'N/A'}
             trust={100}

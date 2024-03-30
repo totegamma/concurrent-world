@@ -87,7 +87,7 @@ export const UserStreamLink = (props: UserStreamLinkProps): JSX.Element | null =
             onClick={props.onClick}
         >
             <AlternateEmailIcon />
-            {user?.profile?.payload.body.username}
+            {user?.profile?.username}
         </ListItemButton>
     )
 }

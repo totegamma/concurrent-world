@@ -134,9 +134,9 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             return
         }
         const destStreamIDs = destStreams.map((s) => s.id)
-        const dest = [
-            ...new Set([...destStreamIDs, ...(postHome ? [client?.user?.userstreams?.payload.body.homeStream] : [])])
-        ].filter((e) => e) as string[]
+        const dest = [...new Set([...destStreamIDs, ...(postHome ? [client?.user?.profile?.homeStream] : [])])].filter(
+            (e) => e
+        ) as string[]
 
         const mentions = draft.match(/@([^\s@]+)/g)?.map((e) => e.slice(1)) ?? []
 
@@ -345,7 +345,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         if (userQuery) {
                             setUserSuggestions(
                                 client.ackings?.filter((q) =>
-                                    q.profile?.payload.body.username?.toLowerCase()?.includes(userQuery)
+                                    q.profile?.username?.toLowerCase()?.includes(userQuery)
                                 ) ?? []
                             )
                             setEnableUserPicker(true)
@@ -480,7 +480,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             {userSuggestions.map((user, index) => (
                                 <ListItemButton
                                     dense
-                                    key={user.profile?.payload.body.avatar}
+                                    key={user.profile?.avatar}
                                     selected={index === selectedSuggestions}
                                     onClick={() => {
                                         onUserSuggestConfirm(index)
@@ -489,11 +489,11 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                     <ListItemIcon>
                                         <Box
                                             component="img"
-                                            src={user.profile?.payload.body.avatar}
+                                            src={user.profile?.avatar}
                                             sx={{ width: '1em', height: '1em' }}
                                         />
                                     </ListItemIcon>
-                                    <ListItemText>{user.profile?.payload.body.username}</ListItemText>
+                                    <ListItemText>{user.profile?.username}</ListItemText>
                                 </ListItemButton>
                             ))}
                         </List>
@@ -679,7 +679,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             body: draft,
                             emojis: emojiDict
                         }}
-                        user={client.user?.profile?.payload.body}
+                        user={client.user?.profile}
                         userCCID={client.user?.ccid}
                         subprofileID={selectedSubprofile}
                         timestamp={
@@ -716,15 +716,15 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     >
                         <ListItemIcon>
                             <CCAvatar
-                                alt={client?.user?.profile?.payload.body.username ?? 'Unknown'}
-                                avatarURL={client?.user?.profile?.payload.body.avatar}
+                                alt={client?.user?.profile?.username ?? 'Unknown'}
+                                avatarURL={client?.user?.profile?.avatar}
                                 identiconSource={client?.ccid ?? ''}
                             />
                         </ListItemIcon>
                     </MenuItem>
                 )}
 
-                {client.user?.profile?.payload.body.subprofiles?.map((id) => {
+                {client.user?.profile?.subprofiles?.map((id) => {
                     if (selectedSubprofile === id) return undefined
                     return (
                         <MenuItem

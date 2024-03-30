@@ -21,7 +21,7 @@ import { LangJa } from '../utils/lang-ja'
 import html2canvas from 'html2canvas'
 import JsPDF from 'jspdf'
 import ccPaper from '../resources/cc-paper.svg'
-import { ComputeCKID, LoadKey, generateIdentity } from '@concurrent-world/client'
+import { ComputeCKID, generateIdentity } from '@concurrent-world/client'
 import { Trans, useTranslation } from 'react-i18next'
 
 export interface SwitchMasterToSubProps {
@@ -231,7 +231,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                                 .enactSubkey(ckid)
                                 .then(() => {
                                     console.log('subkey enacted')
-                                    const subkey = `concurrent-subkey ${newIdentity.privateKey} ${client.ccid}@${client.host} ${client.user?.profile?.payload.body.username}`
+                                    const subkey = `concurrent-subkey ${newIdentity.privateKey} ${client.ccid}@${client.host} ${client.user?.profile?.username}`
                                     localStorage.setItem('SubKey', JSON.stringify(subkey))
                                     localStorage.removeItem('Mnemonic')
                                     localStorage.removeItem('PrivateKey')
@@ -480,7 +480,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                                         textAlign: 'left'
                                     }}
                                 >
-                                    {client?.user?.profile?.payload.body.username ?? t('unset')}
+                                    {client?.user?.profile?.username ?? t('unset')}
                                 </td>
                             </tr>
                             <tr>

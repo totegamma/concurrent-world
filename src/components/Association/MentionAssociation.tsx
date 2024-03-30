@@ -10,7 +10,7 @@ import { ContentWithCCAvatar } from '../ContentWithCCAvatar'
 import { Box, Link, Typography } from '@mui/material'
 import { TimeDiff } from '../ui/TimeDiff'
 import { Link as RouterLink } from 'react-router-dom'
-import { type ReactElement, type ReactNode, useEffect, useState } from 'react'
+import { type ReactElement, useEffect, useState } from 'react'
 
 export interface MentionAssociationProps {
     association: Association<EmojiAssociationSchema>
@@ -22,11 +22,9 @@ export const MentionAssociation = (props: MentionAssociationProps): ReactElement
     const [target, setTarget] = useState<Message<SimpleNoteSchema | ReplyMessageSchema> | null>(null)
     const isMeToOther = props.association?.authorUser?.ccid !== props.perspective
 
-    const Nominative = props.association?.authorUser?.profile?.payload.body.username ?? 'anonymous'
+    const Nominative = props.association?.authorUser?.profile?.username ?? 'anonymous'
     const Possessive =
-        (target?.payload.body.profileOverride?.username ??
-            target?.authorUser?.profile?.payload.body.username ??
-            'anonymous') + "'s"
+        (target?.payload.body.profileOverride?.username ?? target?.authorUser?.profile?.username ?? 'anonymous') + "'s"
 
     const actionUser: User | undefined = isMeToOther ? props.association.authorUser : target?.authorUser
 

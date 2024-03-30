@@ -112,8 +112,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                             width: '20px'
                                         }}
                                         avatarURL={
-                                            fav.payload.body.profileOverride?.avatar ??
-                                            fav.authorUser?.profile?.payload.body.avatar
+                                            fav.payload.body.profileOverride?.avatar ?? fav.authorUser?.profile?.avatar
                                         }
                                         identiconSource={fav.author}
                                     />
@@ -124,7 +123,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                         }}
                                     >
                                         {fav.payload.body.profileOverride?.username ||
-                                            fav.authorUser?.profile?.payload.body.username ||
+                                            fav.authorUser?.profile?.username ||
                                             'anonymous'}
                                     </Typography>
                                 </Box>
