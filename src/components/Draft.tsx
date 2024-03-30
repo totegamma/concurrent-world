@@ -34,7 +34,7 @@ import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 import { useEmojiPicker } from '../context/EmojiPickerContext'
 import caretPosition from 'textarea-caret'
-import { type CommonstreamSchema, type Stream, type User, type CreateCurrentOptions } from '@concurrent-world/client'
+import { type CommonstreamSchema, type Timeline, type User, type CreateCurrentOptions } from '@concurrent-world/client'
 import { useClient } from '../context/ClientContext'
 import { type Emoji, type EmojiLite } from '../model'
 import { useNavigate } from 'react-router-dom'
@@ -51,8 +51,8 @@ import HeartBrokenIcon from '@mui/icons-material/HeartBroken'
 
 export interface DraftProps {
     submitButtonLabel?: string
-    streamPickerInitial: Array<Stream<CommonstreamSchema>>
-    streamPickerOptions: Array<Stream<CommonstreamSchema>>
+    streamPickerInitial: Array<Timeline<CommonstreamSchema>>
+    streamPickerOptions: Array<Timeline<CommonstreamSchema>>
     onSubmit: (text: string, destinations: string[], options?: CreateCurrentOptions) => Promise<Error | null>
     allowEmpty?: boolean
     autoFocus?: boolean
@@ -69,7 +69,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const navigate = useNavigate()
     const { uploadFile, isUploadReady } = useStorage()
 
-    const [destStreams, setDestStreams] = useState<Array<Stream<CommonstreamSchema>>>(props.streamPickerInitial)
+    const [destTimelines, setDestTimelines] = useState<Array<Timeline<CommonstreamSchema>>>(props.streamPickerInitial)
 
     const [draft, setDraft] = usePersistent<string>('draft', '')
     const [openPreview, setOpenPreview] = useState<boolean>(true)
@@ -102,7 +102,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const [selectedSubprofile, setSelectedSubprofile] = useState<string | undefined>(undefined)
 
     useEffect(() => {
-        setDestStreams(props.streamPickerInitial)
+        setDestTimelines(props.streamPickerInitial)
     }, [props.streamPickerInitial])
 
     useEffect(() => {
@@ -129,14 +129,14 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             enqueueSnackbar('Message must not be empty!', { variant: 'error' })
             return
         }
-        if (destStreams.length === 0 && !postHome) {
+        if (destTimelines.length === 0 && !postHome) {
             enqueueSnackbar('set destination required', { variant: 'error' })
             return
         }
-        const destStreamIDs = destStreams.map((s) => s.id)
-        const dest = [...new Set([...destStreamIDs, ...(postHome ? [client?.user?.profile?.homeStream] : [])])].filter(
-            (e) => e
-        ) as string[]
+        const destTimelineIDs = destTimelines.map((s) => s.id)
+        const dest = [
+            ...new Set([...destTimelineIDs, ...(postHome ? [client?.user?.profile?.homeStream] : [])])
+        ].filter((e) => e) as string[]
 
         const mentions = draft.match(/@([^\s@]+)/g)?.map((e) => e.slice(1)) ?? []
 
@@ -290,8 +290,8 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 >
                     <StreamPicker
                         options={props.streamPickerOptions}
-                        selected={destStreams}
-                        setSelected={setDestStreams}
+                        selected={destTimelines}
+                        setSelected={setDestTimelines}
                     />
                 </Box>
                 <Tooltip title={postHome ? t('postToHome') : t('noPostToHome')} arrow placement="top">

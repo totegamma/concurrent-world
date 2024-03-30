@@ -91,7 +91,7 @@ export function Explorer(): JSX.Element {
         let unmounted = false
         Promise.all(
             selectedDomains.map(async (e) => {
-                const streams = await client.getStreamsBySchema<CommonstreamSchema>(e, Schemas.commonstream)
+                const streams = await client.getTimelinesBySchema<CommonstreamSchema>(e, Schemas.commonstream)
                 return streams.map((stream) => {
                     return {
                         domain: e,
@@ -321,9 +321,9 @@ export function Explorer(): JSX.Element {
                                 <StreamCard
                                     key={value.stream.id}
                                     streamID={value.stream.id}
-                                    name={value.stream.document.name}
-                                    description={value.stream.document.description}
-                                    banner={value.stream.document.banner ?? ''}
+                                    name={value.stream.document.body.name}
+                                    description={value.stream.document.body.description}
+                                    banner={value.stream.document.body.banner ?? ''}
                                     domain={value.domain}
                                     isOwner={value.stream.author === client.ccid}
                                 />

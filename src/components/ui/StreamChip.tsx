@@ -1,5 +1,5 @@
 import { Tooltip, Paper, Chip } from '@mui/material'
-import { type Stream } from '@concurrent-world/client'
+import { type Timeline } from '@concurrent-world/client'
 import { Link as NavLink } from 'react-router-dom'
 import PercentIcon from '@mui/icons-material/Percent'
 import { useClient } from '../../context/ClientContext'
@@ -12,14 +12,14 @@ export interface StreamChipProps {
 
 export const StreamChip = (props: StreamChipProps): JSX.Element => {
     const { client } = useClient()
-    const [stream, setStream] = useState<Stream<any> | null | undefined>(undefined)
+    const [stream, setStream] = useState<Timeline<any> | null | undefined>(undefined)
 
     const domain = props.streamID?.split('@')?.[1]
 
     useEffect(() => {
         if (stream !== undefined) return
         if (!props.streamID) return
-        client.getStream<any>(props.streamID).then(setStream)
+        client.getTimeline<any>(props.streamID).then(setStream)
     }, [])
 
     return (
@@ -47,9 +47,9 @@ export const StreamChip = (props: StreamChipProps): JSX.Element => {
                 domain && (
                     <StreamCard
                         streamID={props.streamID}
-                        name={stream.document.name}
-                        description={stream.document.description}
-                        banner={stream.document.banner ?? ''}
+                        name={stream.document.body.name}
+                        description={stream.document.body.description}
+                        banner={stream.document.body.banner ?? ''}
                         domain={domain}
                     />
                 )
@@ -59,7 +59,7 @@ export const StreamChip = (props: StreamChipProps): JSX.Element => {
                 component={NavLink}
                 to={'/stream/' + (props.streamID ?? '')}
                 size={'small'}
-                label={stream?.document.name ?? props.streamID}
+                label={stream?.document.body.name ?? props.streamID}
                 icon={<PercentIcon />}
             />
         </Tooltip>

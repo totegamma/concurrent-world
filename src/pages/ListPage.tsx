@@ -5,7 +5,11 @@ import { usePreference } from '../context/PreferenceContext'
 import { Timeline } from '../components/Timeline'
 import { Draft } from '../components/Draft'
 import { useClient } from '../context/ClientContext'
-import { type CreateCurrentOptions, type CommonstreamSchema, type Stream } from '@concurrent-world/client'
+import {
+    type CreateCurrentOptions,
+    type CommonstreamSchema,
+    type Timeline as CoreTimeline
+} from '@concurrent-world/client'
 import TuneIcon from '@mui/icons-material/Tune'
 import ExploreIcon from '@mui/icons-material/Explore'
 import { ListSettings } from '../components/ListSettings'
@@ -36,8 +40,8 @@ export function ListPage(): JSX.Element {
         const list = lists[id]
         if (!list) return
 
-        Promise.all(list.defaultPostStreams.map((streamID) => client.getStream(streamID))).then((streams) => {
-            setPostStreams(streams.filter((e) => e !== null) as Array<Stream<CommonstreamSchema>>)
+        Promise.all(list.defaultPostStreams.map((streamID) => client.getTimeline(streamID))).then((streams) => {
+            setPostStreams(streams.filter((e) => e !== null) as Array<CoreTimeline<CommonstreamSchema>>)
         })
     }, [id, lists])
 

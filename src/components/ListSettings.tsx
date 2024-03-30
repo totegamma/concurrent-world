@@ -2,7 +2,7 @@ import { Box, Button, IconButton, List, ListItem, Switch, Tab, Tabs, TextField, 
 import { StreamPicker } from './ui/StreamPicker'
 import { useEffect, useState } from 'react'
 import { usePreference } from '../context/PreferenceContext'
-import { type CommonstreamSchema, type Stream } from '@concurrent-world/client'
+import { type CommonstreamSchema, type Timeline } from '@concurrent-world/client'
 import { useClient } from '../context/ClientContext'
 import { StreamLink, UserStreamLink } from './StreamList/StreamLink'
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove'
@@ -22,8 +22,8 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
 
     const list = lists[props.id]
 
-    const [options, setOptions] = useState<Array<Stream<CommonstreamSchema>>>([])
-    const [postStreams, setPostStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
+    const [options, setOptions] = useState<Array<Timeline<CommonstreamSchema>>>([])
+    const [postStreams, setPostStreams] = useState<Array<Timeline<CommonstreamSchema>>>([])
 
     const [tab, setTab] = useState<'stream' | 'user'>('stream')
 
@@ -37,12 +37,12 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
     }, [props.id])
 
     useEffect(() => {
-        Promise.all(list.streams.map((streamID) => client.getStream(streamID))).then((streams) => {
-            setOptions(streams.filter((e) => e !== null) as Array<Stream<CommonstreamSchema>>)
+        Promise.all(list.streams.map((streamID) => client.getTimeline(streamID))).then((streams) => {
+            setOptions(streams.filter((e) => e !== null) as Array<Timeline<CommonstreamSchema>>)
         })
 
-        Promise.all(list.defaultPostStreams.map((streamID) => client.getStream(streamID))).then((streams) => {
-            setPostStreams(streams.filter((stream) => stream !== null) as Array<Stream<CommonstreamSchema>>)
+        Promise.all(list.defaultPostStreams.map((streamID) => client.getTimeline(streamID))).then((streams) => {
+            setPostStreams(streams.filter((stream) => stream !== null) as Array<Timeline<CommonstreamSchema>>)
         })
     }, [props.id])
 

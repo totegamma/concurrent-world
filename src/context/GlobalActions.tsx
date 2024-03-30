@@ -5,7 +5,7 @@ import { useClient } from './ClientContext'
 import {
     Schemas,
     type Message,
-    type Stream,
+    type Timeline,
     type CommonstreamSchema,
     type DomainProfileSchema
 } from '@concurrent-world/client'
@@ -27,12 +27,12 @@ export interface GlobalActionsState {
     openReply: (target: Message<any>) => void
     openReroute: (target: Message<any>) => void
     openMobileMenu: (open?: boolean) => void
-    allKnownStreams: Array<Stream<CommonstreamSchema>>
+    allKnownStreams: Array<Timeline<CommonstreamSchema>>
     draft: string
     openEmojipack: (url: EmojiPackage) => void
     openImageViewer: (url: string) => void
-    postStreams: Array<Stream<CommonstreamSchema>>
-    setPostStreams: (streams: Array<Stream<CommonstreamSchema>>) => void
+    postStreams: Array<Timeline<CommonstreamSchema>>
+    setPostStreams: (streams: Array<Timeline<CommonstreamSchema>>) => void
 }
 
 const GlobalActionsContext = createContext<GlobalActionsState | undefined>(undefined)
@@ -62,14 +62,11 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const [mode, setMode] = useState<'compose' | 'reply' | 'reroute' | 'none'>('none')
     const [targetMessage, setTargetMessage] = useState<Message<any> | null>(null)
 
-    const [postStreams, setPostStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
+    const [postStreams, setPostStreams] = useState<Array<Timeline<CommonstreamSchema>>>([])
 
-    const isPostStreamsPublic = useMemo(
-        () => postStreams.every((stream) => stream.reader.length === 0 && stream.visible),
-        [postStreams]
-    )
+    const isPostStreamsPublic = useMemo(() => postStreams.every((stream) => stream.indexable), [postStreams])
 
-    const [allKnownStreams, setAllKnownStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
+    const [allKnownStreams, setAllKnownStreams] = useState<Array<Timeline<CommonstreamSchema>>>([])
     const [domainIsOffline, setDomainIsOffline] = useState<boolean>(false)
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
     const [previewImage, setPreviewImage] = useState<string | undefined>()
@@ -105,7 +102,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
             .flat()
         const uniq = [...new Set(allStreams)]
         uniq.forEach((id) => {
-            client.getStream<CommonstreamSchema>(id).then((stream) => {
+            client.getTimeline<CommonstreamSchema>(id).then((stream) => {
                 if (stream && !unmounted) {
                     setAllKnownStreams((prev) => [...prev, stream])
                 }

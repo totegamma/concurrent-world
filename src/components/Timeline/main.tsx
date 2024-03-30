@@ -7,7 +7,7 @@ import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import HeartBrokenIcon from '@mui/icons-material/HeartBroken'
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
 import SyncIcon from '@mui/icons-material/Sync'
-import { type Timeline as CoreTimeline } from '@concurrent-world/client'
+import { type TimelineReader } from '@concurrent-world/client'
 import { useRefWithForceUpdate } from '../../hooks/useRefWithForceUpdate'
 import useSound from 'use-sound'
 import { usePreference } from '../../context/PreferenceContext'
@@ -30,7 +30,7 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
     const theme = useTheme()
     const [sound] = usePreference('sound')
 
-    const [timeline, timelineChanged] = useRefWithForceUpdate<CoreTimeline | null>(null)
+    const [timeline, timelineChanged] = useRefWithForceUpdate<TimelineReader | null>(null)
 
     const [hasMoreData, setHasMoreData] = useState<boolean>(false)
     const [isFetching, setIsFetching] = useState<boolean>(false)
@@ -53,7 +53,7 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
         let isCancelled = false
         if (props.streams.length === 0) return
         setTimelineLoading(true)
-        const mt = client.newTimeline().then((t) => {
+        const mt = client.newTimelineReader().then((t) => {
             if (isCancelled) return
             timeline.current = t
             t.onUpdate = () => {

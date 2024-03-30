@@ -1,7 +1,7 @@
 import { Box, Button, Divider, FormControlLabel, FormGroup, Paper, Switch, TextField, Typography } from '@mui/material'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useClient } from '../context/ClientContext'
-import { type User, type CommonstreamSchema, type CoreStream } from '@concurrent-world/client'
+import { type User, type CommonstreamSchema, type CoreTimeline } from '@concurrent-world/client'
 import { CCEditor } from './ui/cceditor'
 import { useSnackbar } from 'notistack'
 import { AddListButton } from './AddListButton'
@@ -17,43 +17,32 @@ export interface StreamInfoProps {
 export function StreamInfo(props: StreamInfoProps): JSX.Element {
     const { client } = useClient()
     const { enqueueSnackbar } = useSnackbar()
-    const [stream, setStream] = useState<CoreStream<CommonstreamSchema>>()
+    const [stream, setStream] = useState<CoreTimeline<CommonstreamSchema>>()
     const isAuthor = stream?.author === client.ccid
 
     const [visible, setVisible] = useState(false)
 
     const [schemaDraft, setSchemaDraft] = useState('')
 
-    const [writers, setWriters] = useState<User[]>([])
-    const [readers, setReaders] = useState<User[]>([])
-
     const readable = useMemo(
-        () =>
-            stream &&
-            (stream.author === client.ccid || stream.reader.length === 0 || stream.reader.includes(client.ccid ?? '')),
+        () => stream /* &&
+            (stream.author === client.ccid || stream.reader.length === 0 || stream.reader.includes(client.ccid ?? '')) */,
         [client, stream]
     )
 
     useEffect(() => {
         if (!props.id) return
-        client.api.getStream(props.id).then((e) => {
+        client.api.getTimeline(props.id).then((e) => {
             if (!e) return
             setStream(e)
-            setVisible(e.visible)
+            setVisible(e.indexable)
             setSchemaDraft(e.schema)
-
-            Promise.all(e.writer.map((e) => client.getUser(e))).then((e) => {
-                setWriters(e.filter((e) => e) as User[])
-            })
-
-            Promise.all(e.reader.map((e) => client.getUser(e))).then((e) => {
-                setReaders(e.filter((e) => e) as User[])
-            })
         })
     }, [props.id])
 
     const updateStream = useCallback(
         (document: CommonstreamSchema) => {
+            /* TODO
             if (!stream) return
             client.api
                 .updateStream({
@@ -70,8 +59,9 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                 .catch((_) => {
                     enqueueSnackbar('更新に失敗しました', { variant: 'error' })
                 })
+                */
         },
-        [client.api, stream, writers, readers, schemaDraft, props.id, visible, enqueueSnackbar]
+        [client.api, stream, schemaDraft, props.id, visible, enqueueSnackbar]
     )
 
     if (!stream) {
@@ -81,7 +71,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
     return (
         <>
             <CCWallpaper
-                override={stream.document.banner}
+                override={stream.document.body.banner}
                 sx={{
                     height: '150px'
                 }}
@@ -102,12 +92,12 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                             gap: '10px'
                         }}
                     >
-                        <Typography variant="h1">{stream.document.name}</Typography>
+                        <Typography variant="h1">{stream.document.body.name}</Typography>
                         <AddListButton stream={props.id} />
                     </Box>
                     <Typography variant="caption">{props.id}</Typography>
                     <Divider />
-                    <Typography>{stream.document.description || 'まだ説明はありません'}</Typography>
+                    <Typography>{stream.document.body.description || 'まだ説明はありません'}</Typography>
                 </Paper>
             </CCWallpaper>
             {props.detailed && (
@@ -138,10 +128,6 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                             <Box>
                                 <Typography>空の場合パブリックになります。</Typography>
                             </Box>
-                            <Typography>writer</Typography>
-                            <UserPicker selected={writers} setSelected={setWriters} />
-                            <Typography>reader</Typography>
-                            <UserPicker selected={readers} setSelected={setReaders} />
                             <Typography variant="h3">スキーマ</Typography>
                             ※基本的に変更する必要はありません。
                             <TextField
@@ -167,7 +153,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                             </Button>
                         </Box>
                     ) : (
-                        readable && <StreamUserList writers={writers} readers={readers} />
+                        readable
                     )}
                 </>
             )}
