@@ -1,12 +1,12 @@
 import { Alert, AlertTitle, Box, Paper, Typography } from '@mui/material'
 import Tilt from 'react-parallax-tilt'
 import { PassportRenderer } from '../theming/Passport'
-import { type Identity } from '../../util'
 import { useTranslation } from 'react-i18next'
 import { IconButtonWithLabel } from '../ui/IconButtonWithLabel'
 
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh'
 import BuildIcon from '@mui/icons-material/Build'
+import { type Identity } from '@concurrent-world/client'
 
 export function RegistrationWelcome(props: {
     customSetup: () => void

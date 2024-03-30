@@ -178,7 +178,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
 
     const fixAccount = useCallback(async () => {
         console.log('starting account fix')
-        await client.setupUserstreams()
+        // await client.setupUserstreams()
         console.log('userstream setup complete')
         const domain = await client.api.getDomain(client.api.host)
         if (!domain) throw new Error('Domain not found')
@@ -471,7 +471,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                             <ProfileEditor
                                 id={client?.user?.profile?.id}
                                 initial={client?.user?.profile?.payload.body}
-                                onSubmit={(_) => {
+                                onSubmit={() => {
                                     fixAccount()
                                 }}
                             />

@@ -138,7 +138,7 @@ export function Explorer(): JSX.Element {
 
     const createNewStream = (stream: any): void => {
         client.api
-            .createStream(Schemas.commonstream, stream)
+            .createTimeline(Schemas.commonstream, stream)
             .then((e: any) => {
                 const id: string = e.id
                 if (id) navigate('/stream/' + id)
