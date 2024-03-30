@@ -265,21 +265,22 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                         ) : (
                             timeline.current?.body.map((e) => {
                                 let element
-                                switch (e.type) {
-                                    case 'message':
+                                const type = e.objectID[0]
+                                switch (type) {
+                                    case 'm':
                                         element = (
                                             <MessageContainer
                                                 sx={timelineElemSx}
                                                 messageID={e.objectID}
                                                 messageOwner={e.owner}
-                                                resolveHint={e.streamID.split('@')[1]}
+                                                resolveHint={e.timelineID.split('@')[1]}
                                                 lastUpdated={e.lastUpdate?.getTime() ?? 0}
                                                 after={divider}
                                                 timestamp={e.cdate}
                                             />
                                         )
                                         break
-                                    case 'association':
+                                    case 'a':
                                         element = (
                                             <AssociationFrame
                                                 sx={timelineElemSx}
@@ -292,7 +293,7 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                                         )
                                         break
                                     default:
-                                        element = <Typography>Unknown message type: {e.type}</Typography>
+                                        element = <Typography>Unknown message type: {type}</Typography>
                                         break
                                 }
 
