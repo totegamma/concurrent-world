@@ -25,7 +25,7 @@ import { GlobalActionsProvider } from './context/GlobalActions'
 import { EmojiPickerProvider } from './context/EmojiPickerContext'
 
 import { ThinMenu } from './components/Menu/ThinMenu'
-import { type StreamEvent } from '@concurrent-world/client/dist/types/model/core'
+import { type TimelineEvent } from '@concurrent-world/client/dist/types/model/core'
 import { ConcurrentLogo } from './components/theming/ConcurrentLogo'
 import { usePreference } from './context/PreferenceContext'
 import TickerProvider from './context/Ticker'
@@ -65,7 +65,7 @@ function App(): JSX.Element {
             subscription.current.listen([
                 ...(client?.user?.profile?.notificationStream ? [client?.user?.profile?.notificationStream] : [])
             ])
-            sub.on('AssociationCreated', (event: StreamEvent) => {
+            sub.on('AssociationCreated', (event: TimelineEvent) => {
                 const a = event.body as CoreAssociation<any>
                 if (!a) return
                 if (a.schema === Schemas.replyAssociation) {

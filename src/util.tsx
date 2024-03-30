@@ -17,9 +17,7 @@ export const jumpToDomainRegistration = (ccid: string, privateKey: string, fqdn:
     const affiliation: CCDocument.Affiliation = {
         signer: ccid,
         type: 'affiliation',
-        body: {
-            domain: 'con1.kokopi.me'
-        },
+        domain: 'con1.kokopi.me',
         signedAt: new Date()
     }
 

@@ -15,7 +15,6 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
 
     const [associationTarget, setAssociationTarget] = useState<string>('')
     const [associationTargetAuthor, setAssociationTargetAuthor] = useState<string>('')
-    const [associationTargetType, setAssociationTargetType] = useState<string>('message')
 
     const [character, setCharacter] = useState<CoreCharacter<any> | null | undefined>()
 
@@ -29,7 +28,6 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
             e,
             associationTarget,
             associationTargetAuthor,
-            associationTargetType,
             streams.split(',')
         )
     }
@@ -91,17 +89,6 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
                                 setAssociationTargetAuthor(e.target.value)
                             }}
                         />
-                        <Select
-                            value={associationTargetType}
-                            label="Target Type"
-                            onChange={(e) => {
-                                setAssociationTargetType(e.target.value as any)
-                            }}
-                        >
-                            <MenuItem value={'message'}>Message</MenuItem>
-                            <MenuItem value={'character'}>Character</MenuItem>
-                        </Select>
-
                         <TextField
                             label="Streams"
                             value={streams}
