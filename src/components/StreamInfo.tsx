@@ -153,7 +153,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                             </Button>
                         </Box>
                     ) : (
-                        readable
+                        <></>
                     )}
                 </>
             )}

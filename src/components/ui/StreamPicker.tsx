@@ -25,8 +25,6 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
         [props.selected]
     )
 
-    console.log('!!!!!!!!!!! selected !!!!!!!!!!!!!!', props.selected)
-
     return (
         <Box
             sx={{

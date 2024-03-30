@@ -53,10 +53,6 @@ export function ListPage(): JSX.Element {
         navigate(`#${tab}`)
     }, [tab])
 
-    useEffect(() => {
-        console.log('poststreams changed!!!!!', postStreams)
-    }, [postStreams])
-
     const streamIDs = useMemo(() => {
         return [
             id === 'home' ? client?.user?.profile?.homeStream ?? [] : [],
