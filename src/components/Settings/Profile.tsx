@@ -225,7 +225,7 @@ export const ProfileSettings = (): JSX.Element => {
                             <Typography variant="h3">サブプロフィールの編集</Typography>
                             <CCEditor
                                 schemaURL={editingCharacter.schema}
-                                init={editingCharacter.payload.body}
+                                init={editingCharacter.document.body}
                                 onSubmit={(e) => {
                                     console.log(e)
                                     client.api

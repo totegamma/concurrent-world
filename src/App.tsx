@@ -73,22 +73,22 @@ function App(): JSX.Element {
                     console.log(replyassociation)
                     client?.api
                         .getMessageWithAuthor(
-                            replyassociation.payload.body.messageId,
-                            replyassociation.payload.body.messageAuthor
+                            replyassociation.document.body.messageId,
+                            replyassociation.document.body.messageAuthor
                         )
                         .then((m) => {
                             m &&
                                 client?.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                     playNotificationRef.current()
-                                    const profile = c?.[0].payload.body
+                                    const profile = c?.[0].document.body
                                     enqueueSnackbar(
                                         <Box display="flex" flexDirection="column">
                                             <Typography>
                                                 {profile?.username ?? 'anonymous'} replied to your message:{' '}
                                             </Typography>
                                             <MarkdownRendererLite
-                                                messagebody={m.payload.body.body as string}
-                                                emojiDict={m.payload.body.emojis ?? {}}
+                                                messagebody={m.document.body.body as string}
+                                                emojiDict={m.document.body.emojis ?? {}}
                                                 limit={128}
                                             />
                                         </Box>
@@ -103,15 +103,15 @@ function App(): JSX.Element {
                         m &&
                             client?.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                 playNotificationRef.current()
-                                const profile = c?.[0].payload.body
+                                const profile = c?.[0].document.body
                                 enqueueSnackbar(
                                     <Box display="flex" flexDirection="column">
                                         <Typography>
                                             {profile?.username ?? 'anonymous'} rerouted to your message:{' '}
                                         </Typography>
                                         <MarkdownRendererLite
-                                            messagebody={m.payload.body.body as string}
-                                            emojiDict={m.payload.body.emojis ?? {}}
+                                            messagebody={m.document.body.body as string}
+                                            emojiDict={m.document.body.emojis ?? {}}
                                             limit={128}
                                         />
                                     </Box>
@@ -126,13 +126,13 @@ function App(): JSX.Element {
                         m &&
                             client.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                 playNotificationRef.current()
-                                const profile = c?.[0].payload.body
+                                const profile = c?.[0].document.body
                                 enqueueSnackbar(
                                     <Box display="flex" flexDirection="column">
                                         <Typography>{profile?.username ?? 'anonymous'} favorited</Typography>
                                         <MarkdownRendererLite
-                                            messagebody={m.payload.body.body as string}
-                                            emojiDict={m.payload.body.emojis ?? {}}
+                                            messagebody={m.document.body.body as string}
+                                            emojiDict={m.document.body.emojis ?? {}}
                                             limit={128}
                                         />
                                     </Box>
@@ -148,16 +148,16 @@ function App(): JSX.Element {
                         m &&
                             client.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                 playNotificationRef.current()
-                                const profile = c?.[0].payload.body
+                                const profile = c?.[0].document.body
                                 enqueueSnackbar(
                                     <Box display="flex" flexDirection="column">
                                         <Typography>
                                             {profile?.username ?? 'anonymous'} reacted{' '}
-                                            <img src={a.payload.body.imageUrl as string} style={{ height: '1em' }} />
+                                            <img src={a.document.body.imageUrl as string} style={{ height: '1em' }} />
                                         </Typography>
                                         <MarkdownRendererLite
-                                            messagebody={m.payload.body.body as string}
-                                            emojiDict={m.payload.body.emojis ?? {}}
+                                            messagebody={m.document.body.body as string}
+                                            emojiDict={m.document.body.emojis ?? {}}
                                             limit={128}
                                         />
                                     </Box>
@@ -171,13 +171,13 @@ function App(): JSX.Element {
                         m &&
                             client.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
                                 playNotificationRef.current()
-                                const profile = c?.[0].payload.body
+                                const profile = c?.[0].document.body
                                 enqueueSnackbar(
                                     <Box display="flex" flexDirection="column">
                                         {profile?.username ?? 'anonymous'} mentioned you:{' '}
                                         <MarkdownRendererLite
-                                            messagebody={m.payload.body.body as string}
-                                            emojiDict={m.payload.body.emojis ?? {}}
+                                            messagebody={m.document.body.body as string}
+                                            emojiDict={m.document.body.emojis ?? {}}
                                             limit={128}
                                         />
                                     </Box>

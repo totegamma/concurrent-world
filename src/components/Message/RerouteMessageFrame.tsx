@@ -67,7 +67,7 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
                     }}
                 >
                     {props.message.authorUser?.profile?.username || 'Anonymous'} rerouted{' '}
-                    {props.message.payload.body.body && 'with comment:'}
+                    {props.message.document.body.body && 'with comment:'}
                 </Typography>
                 <Box>
                     <IconButton
@@ -125,7 +125,7 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
                     </MenuItem>
                 )}
             </Menu>
-            {props.message.payload.body.body && (
+            {props.message.document.body.body && (
                 <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 2 }}>
                     <Box display="flex" flexDirection="row-reverse" width={{ xs: '38px', sm: '48px' }} flexShrink={0} />
                     <Typography
@@ -140,15 +140,15 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
                             placement="top"
                             title={
                                 <MarkdownRenderer
-                                    messagebody={props.message.payload.body.body}
-                                    emojiDict={props.message.payload.body.emojis ?? {}}
+                                    messagebody={props.message.document.body.body}
+                                    emojiDict={props.message.document.body.emojis ?? {}}
                                 />
                             }
                         >
                             <Box>
                                 <MarkdownRendererLite
-                                    messagebody={props.message.payload.body.body}
-                                    emojiDict={props.message.payload.body.emojis ?? {}}
+                                    messagebody={props.message.document.body.body}
+                                    emojiDict={props.message.document.body.emojis ?? {}}
                                     forceOneline={true}
                                 />
                             </Box>
@@ -158,8 +158,8 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
             )}
             <MessageContainer
                 simple={props.simple}
-                messageID={props.message.payload.body.rerouteMessageId}
-                messageOwner={props.message.payload.body.rerouteMessageAuthor}
+                messageID={props.message.document.body.rerouteMessageId}
+                messageOwner={props.message.document.body.rerouteMessageAuthor}
                 rerouted={props.message}
             />
             <Box

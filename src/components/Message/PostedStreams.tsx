@@ -67,7 +67,7 @@ export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
                                     borderColor: 'divider'
                                 }}
                             >
-                                %{e.payload.shortname}
+                                %{e.document.shortname}
                             </Link>
                         )
                     case Schemas.utilitystream:

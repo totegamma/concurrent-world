@@ -1,4 +1,4 @@
-import { Message, ReplyMessageSchema, SimpleNoteSchema } from '@concurrent-world/client'
+import { type Message, type ReplyMessageSchema, type SimpleNoteSchema } from '@concurrent-world/client'
 import { MarkdownRenderer } from '../ui/MarkdownRenderer'
 
 interface SimpleNoteProps {
@@ -6,5 +6,10 @@ interface SimpleNoteProps {
 }
 
 export const SimpleNote = (props: SimpleNoteProps): JSX.Element => {
-    return <MarkdownRenderer messagebody={props.message.payload.body.body ?? 'no content'} emojiDict={props.message.payload.body.emojis ?? {}} />
+    return (
+        <MarkdownRenderer
+            messagebody={props.message.document.body.body ?? 'no content'}
+            emojiDict={props.message.document.body.emojis ?? {}}
+        />
+    )
 }

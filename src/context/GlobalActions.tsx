@@ -186,18 +186,18 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                 Schemas.domainProfile
             )) ?? [null])[0]
             if (!domainProfile) throw new Error('Domain profile not found')
-            if (domainProfile.payload.body.defaultBookmarkStreams)
+            if (domainProfile.document.body.defaultBookmarkStreams)
                 localStorage.setItem(
                     'bookmarkingStreams',
-                    JSON.stringify(domainProfile.payload.body.defaultBookmarkStreams)
+                    JSON.stringify(domainProfile.document.body.defaultBookmarkStreams)
                 )
-            if (domainProfile.payload.body.defaultFollowingStreams)
+            if (domainProfile.document.body.defaultFollowingStreams)
                 localStorage.setItem(
                     'followingStreams',
-                    JSON.stringify(domainProfile.payload.body.defaultFollowingStreams)
+                    JSON.stringify(domainProfile.document.body.defaultFollowingStreams)
                 )
-            if (domainProfile.payload.body.defaultPostStreams)
-                localStorage.setItem('postingStreams', JSON.stringify(domainProfile.payload.body.defaultPostStreams))
+            if (domainProfile.document.body.defaultPostStreams)
+                localStorage.setItem('postingStreams', JSON.stringify(domainProfile.document.body.defaultPostStreams))
         } catch (e) {
             console.info(e)
         }

@@ -24,7 +24,7 @@ export const MentionAssociation = (props: MentionAssociationProps): ReactElement
 
     const Nominative = props.association?.authorUser?.profile?.username ?? 'anonymous'
     const Possessive =
-        (target?.payload.body.profileOverride?.username ?? target?.authorUser?.profile?.username ?? 'anonymous') + "'s"
+        (target?.document.body.profileOverride?.username ?? target?.authorUser?.profile?.username ?? 'anonymous') + "'s"
 
     const actionUser: User | undefined = isMeToOther ? props.association.authorUser : target?.authorUser
 
@@ -35,7 +35,7 @@ export const MentionAssociation = (props: MentionAssociationProps): ReactElement
     return (
         <ContentWithCCAvatar
             author={actionUser}
-            profileOverride={!isMeToOther ? target?.payload.body.profileOverride : undefined}
+            profileOverride={!isMeToOther ? target?.document.body.profileOverride : undefined}
         >
             <Box display="flex" justifyContent="space-between">
                 <Typography>
@@ -44,8 +44,8 @@ export const MentionAssociation = (props: MentionAssociationProps): ReactElement
                             <b>{Nominative}</b> mentioned You in message with{' '}
                             <img
                                 height="13px"
-                                src={props.association.payload.body.imageUrl}
-                                alt={props.association.payload.body.shortcode}
+                                src={props.association.document.body.imageUrl}
+                                alt={props.association.document.body.shortcode}
                             />
                         </>
                     ) : (
@@ -53,8 +53,8 @@ export const MentionAssociation = (props: MentionAssociationProps): ReactElement
                             {Nominative} mentioned You in message with{' '}
                             <img
                                 height="13px"
-                                src={props.association.payload.body.imageUrl}
-                                alt={props.association.payload.body.shortcode}
+                                src={props.association.document.body.imageUrl}
+                                alt={props.association.document.body.shortcode}
                             />
                         </>
                     )}
@@ -71,7 +71,7 @@ export const MentionAssociation = (props: MentionAssociationProps): ReactElement
             </Box>
             {(!props.withoutContent && (
                 <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
-                    {target?.payload.body.body}
+                    {target?.document.body.body}
                 </blockquote>
             )) ||
                 undefined}

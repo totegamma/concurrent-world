@@ -88,7 +88,7 @@ export function Profile(props: ProfileProps): JSX.Element {
                     <CCAvatar
                         alt={props.user.profile?.username}
                         avatarURL={props.user.profile?.avatar}
-                        avatarOverride={subCharacter ? subCharacter.payload.body.avatar : undefined}
+                        avatarOverride={subCharacter ? subCharacter.document.body.avatar : undefined}
                         identiconSource={props.user.ccid}
                         sx={{
                             width: '100px',
@@ -141,7 +141,7 @@ export function Profile(props: ProfileProps): JSX.Element {
                             fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.5rem' }
                         }}
                     >
-                        {subCharacter?.payload.body.username ?? props.user.profile?.username ?? 'anonymous'}
+                        {subCharacter?.document.body.username ?? props.user.profile?.username ?? 'anonymous'}
                     </Typography>
                     <Typography variant="caption">{props.user.ccid}</Typography>
                 </Box>
@@ -152,7 +152,7 @@ export function Profile(props: ProfileProps): JSX.Element {
                     }}
                 >
                     <MarkdownRenderer
-                        messagebody={subCharacter?.payload.body.description ?? props.user.profile?.description ?? ''}
+                        messagebody={subCharacter?.document.body.description ?? props.user.profile?.description ?? ''}
                         emojiDict={{}}
                     />
                 </Box>

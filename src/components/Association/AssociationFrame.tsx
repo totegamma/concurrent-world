@@ -89,8 +89,8 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
             return (
                 <Box sx={props.sx}>
                     <MessageContainer
-                        messageID={(association as Association<ReplyAssociationSchema>).payload.body.messageId}
-                        messageOwner={(association as Association<ReplyAssociationSchema>).payload.body.messageAuthor}
+                        messageID={(association as Association<ReplyAssociationSchema>).document.body.messageId}
+                        messageOwner={(association as Association<ReplyAssociationSchema>).document.body.messageAuthor}
                         after={props.after}
                     />
                 </Box>
@@ -99,8 +99,8 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
             return (
                 <Box sx={props.sx}>
                     <MessageContainer
-                        messageID={(association as Association<RerouteAssociationSchema>).payload.body.messageId}
-                        messageOwner={(association as Association<ReplyAssociationSchema>).payload.body.messageAuthor}
+                        messageID={(association as Association<RerouteAssociationSchema>).document.body.messageId}
+                        messageOwner={(association as Association<ReplyAssociationSchema>).document.body.messageAuthor}
                         after={props.after}
                     />
                 </Box>

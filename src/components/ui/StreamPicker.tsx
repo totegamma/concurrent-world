@@ -42,7 +42,7 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
                 value={selected}
                 options={props.options}
                 getOptionKey={(option: Stream<CommonstreamSchema>) => option.id ?? ''}
-                getOptionLabel={(option: Stream<CommonstreamSchema>) => option.payload.name}
+                getOptionLabel={(option: Stream<CommonstreamSchema>) => option.document.name}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 onChange={(_, value) => {
                     props.setSelected(value)
@@ -62,7 +62,7 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
                 renderTags={(value, getTagProps) =>
                     value.map((option, index) => (
                         <Chip
-                            label={option.payload.name}
+                            label={option.document.name}
                             sx={{ color: 'text.default' }}
                             {...getTagProps({ index })}
                             key={option.id}

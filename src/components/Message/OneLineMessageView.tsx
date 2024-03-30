@@ -53,15 +53,15 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                         placement="top"
                         title={
                             <MarkdownRenderer
-                                messagebody={props.message.payload.body.body}
-                                emojiDict={props.message.payload.body.emojis ?? {}}
+                                messagebody={props.message.document.body.body}
+                                emojiDict={props.message.document.body.emojis ?? {}}
                             />
                         }
                     >
                         <Box>
                             <MarkdownRendererLite
-                                messagebody={props.message.payload.body.body}
-                                emojiDict={props.message.payload.body.emojis ?? {}}
+                                messagebody={props.message.document.body.body}
+                                emojiDict={props.message.document.body.emojis ?? {}}
                                 forceOneline={true}
                             />
                         </Box>

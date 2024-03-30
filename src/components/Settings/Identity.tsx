@@ -105,7 +105,7 @@ export const IdentitySettings = (): JSX.Element => {
                 }}
             >
                 {keys
-                    .filter((key) => key.revokePayload === 'null' || !hideDisabledSubKey)
+                    .filter((key) => key.revokeDocument === 'null' || !hideDisabledSubKey)
                     .map((key) => (
                         <KeyCard
                             key={key.id}

@@ -76,7 +76,7 @@ export const StreamPage = memo((): JSX.Element => {
                 }}
             >
                 <TimelineHeader
-                    title={targetStream?.payload.name ?? 'Not Found'}
+                    title={targetStream?.document.name ?? 'Not Found'}
                     titleIcon={<PercentIcon />}
                     secondaryAction={isOwner ? <TuneIcon /> : <InfoIcon />}
                     onTitleClick={() => {

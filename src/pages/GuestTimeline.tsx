@@ -43,7 +43,7 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
 
                     client.api.getStream(id).then((e) => {
                         console.log(e)
-                        setTitle(e?.payload.name ?? '')
+                        setTitle(e?.document.name ?? '')
                     })
                     setUser(undefined)
 

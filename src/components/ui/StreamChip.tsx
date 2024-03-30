@@ -47,9 +47,9 @@ export const StreamChip = (props: StreamChipProps): JSX.Element => {
                 domain && (
                     <StreamCard
                         streamID={props.streamID}
-                        name={stream.payload.name}
-                        description={stream.payload.description}
-                        banner={stream.payload.banner ?? ''}
+                        name={stream.document.name}
+                        description={stream.document.description}
+                        banner={stream.document.banner ?? ''}
                         domain={domain}
                     />
                 )
@@ -59,7 +59,7 @@ export const StreamChip = (props: StreamChipProps): JSX.Element => {
                 component={NavLink}
                 to={'/stream/' + (props.streamID ?? '')}
                 size={'small'}
-                label={stream?.payload.name ?? props.streamID}
+                label={stream?.document.name ?? props.streamID}
                 icon={<PercentIcon />}
             />
         </Tooltip>

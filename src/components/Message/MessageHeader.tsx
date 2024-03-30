@@ -44,7 +44,7 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                     }}
                 >
                     {props.usernameOverride ||
-                        props.message.payload.body.profileOverride?.username ||
+                        props.message.document.body.profileOverride?.username ||
                         props.message.authorUser?.profile?.username ||
                         'anonymous'}
                 </Typography>
@@ -59,6 +59,7 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                         />
                     </Tooltip>
                 )}
+                {/*
                 {props.message.authorUser?.certs?.map((cert, i) => (
                     <Tooltip arrow key={i} title={cert.description} placement="top">
                         <Box
@@ -71,6 +72,7 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                         />
                     </Tooltip>
                 ))}
+                */}
             </Box>
             <Box>
                 {props.additionalMenuItems && (

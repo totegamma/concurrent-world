@@ -154,7 +154,7 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
                                 break
                         }
                     }}
-                    init={character?.payload.body}
+                    init={character?.document.body}
                 />
             </Box>
         </div>

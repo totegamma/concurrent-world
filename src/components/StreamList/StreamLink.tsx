@@ -41,7 +41,7 @@ export const StreamLink = (props: StreamLinkProps): JSX.Element | null => {
             onClick={props.onClick}
         >
             <PercentIcon />
-            {stream?.payload.name}
+            {stream?.document.name}
         </ListItemButton>
     )
 }

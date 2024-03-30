@@ -53,13 +53,13 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
     }, [props.id])
 
     const updateStream = useCallback(
-        (payload: CommonstreamSchema) => {
+        (document: CommonstreamSchema) => {
             if (!stream) return
             client.api
                 .updateStream({
                     ...stream,
                     schema: schemaDraft,
-                    payload,
+                    document,
                     writer: writers.map((e) => e.ccid),
                     reader: readers.map((e) => e.ccid),
                     visible
@@ -81,7 +81,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
     return (
         <>
             <CCWallpaper
-                override={stream.payload.banner}
+                override={stream.document.banner}
                 sx={{
                     height: '150px'
                 }}
@@ -102,12 +102,12 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                             gap: '10px'
                         }}
                     >
-                        <Typography variant="h1">{stream.payload.name}</Typography>
+                        <Typography variant="h1">{stream.document.name}</Typography>
                         <AddListButton stream={props.id} />
                     </Box>
                     <Typography variant="caption">{props.id}</Typography>
                     <Divider />
-                    <Typography>{stream.payload.description || 'まだ説明はありません'}</Typography>
+                    <Typography>{stream.document.description || 'まだ説明はありません'}</Typography>
                 </Paper>
             </CCWallpaper>
             {props.detailed && (
@@ -153,7 +153,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                             />
                             <Box>
                                 <Typography variant="h3">属性</Typography>
-                                <CCEditor schemaURL={schemaDraft} init={stream.payload} onSubmit={updateStream} />
+                                <CCEditor schemaURL={schemaDraft} init={stream.document} onSubmit={updateStream} />
                             </Box>
                             <Button
                                 color="error"
