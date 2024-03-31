@@ -108,7 +108,8 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                 >
                     <Button
                         sx={{
-                            p: 0,
+                            py: 0,
+                            px: 1,
                             gap: 1,
                             display: 'flex',
                             backgroundColor: ownReactions[imageUrl]
