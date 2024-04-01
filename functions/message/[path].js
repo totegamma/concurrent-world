@@ -6,6 +6,7 @@ export function onRequest(context) {
         .then((response) => response.json())
         .then((data) => {
             console.log(data)
-            return new Response(`Message ID: ${messageId}, CCID: ${ccid}, data: ${data}`)
         })
+
+    return new Response(`Message ID: ${messageId}, CCID: ${ccid}`)
 }
