@@ -6,5 +6,22 @@ export async function onRequest(context) {
         .then((response) => response.json())
         .then((data) => data)
 
-    return new Response(`Message ID: ${messageId}, CCID: ${ccid}, Content: ${content}`)
+    const message = await fetch(`https://dev.concurrent.world/api/v1/message/${messageId}`)
+        .then((response) => response.json())
+        .then((data) => data)
+
+    console.log(message)
+
+    // return new Response(`Message ID: ${messageId}, CCID: ${ccid}, Content: ${content}`)
+    return new Response(
+        `
+      <meta property="og:title" content="${ccid}">
+      <meta property="og:description" content="${JSON.parse(message.content.payload).body.body}">
+      `,
+        {
+            headers: {
+                'Content-Type': 'text/html'
+            }
+        }
+    )
 }
