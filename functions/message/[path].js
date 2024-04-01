@@ -6,18 +6,24 @@ export async function onRequest(context) {
         .then((response) => response.json())
         .then((data) => data)
 
-    const message = await fetch(`https://dev.concurrent.world/api/v1/message/${messageId}`)
+    const message = await fetch(`https://${content}/api/v1/message/${messageId}`)
         .then((response) => response.json())
         .then((data) => data)
 
-    console.log(message)
+    const characters = await fetch(
+        `https://${content}/api/v1/characters?author=${ccid}&schema=https%3A%2F%2Fraw.githubusercontent.com%2Ftotegamma%2Fconcurrent-schemas%2Fmaster%2Fcharacters%2Fprofile%2F0.0.2.json`
+    )
+        .then((res) => res.json())
+        .then((data) => data)
 
-    // return new Response(`Message ID: ${messageId}, CCID: ${ccid}, Content: ${content}`)
+    const username = JSON.parse(characters.content[0].payload).body.username
+    const avatar = JSON.parse(characters.content[0].payload).body.avatar
+
     return new Response(
-        `
-      <meta property="og:title" content="${ccid}">
-      <meta property="og:description" content="${JSON.parse(message.content.payload).body.body}">
-      `,
+        `<meta property="og:title" content="${username}">
+<meta property="og:description" content="${JSON.parse(message.content.payload).body.body}">
+<meta property="og:image" content="${avatar}">
+<meta property="twitter:card" content="summary">`,
         {
             headers: {
                 'Content-Type': 'text/html'
