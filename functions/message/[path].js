@@ -1,12 +1,10 @@
-export function onRequest(context) {
+export async function onRequest(context) {
     const { path } = context.params
     const [messageId, ccid] = path.split('@')
 
-    fetch(`https://hub.concurrent.world/api/v1/address/${ccid}`)
+    const { content } = await fetch(`https://hub.concurrent.world/api/v1/address/${ccid}`)
         .then((response) => response.json())
-        .then((data) => {
-            console.log(data)
-        })
+        .then((data) => data)
 
-    return new Response(`Message ID: ${messageId}, CCID: ${ccid}`)
+    return new Response(`Message ID: ${messageId}, CCID: ${ccid}, Content: ${content}`)
 }
