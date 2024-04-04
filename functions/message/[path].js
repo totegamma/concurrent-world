@@ -1,3 +1,12 @@
+const escapeHtml = (unsafe) => {
+    return unsafe
+        .replaceAll(/&/g, '&amp;')
+        .replaceAll(/</g, '&lt;')
+        .replaceAll(/>/g, '&gt;')
+        .replaceAll(/"/g, '&quot;')
+        .replaceAll(/'/g, '&#039;')
+}
+
 export async function onRequest(context) {
     const { path } = context.params
     const [messageId, ccid] = path.split('@')
@@ -16,10 +25,10 @@ export async function onRequest(context) {
         .then((res) => res.json())
         .then((data) => data)
 
-    const username = JSON.parse(characters.content[0].payload).body.username
-    const avatar = JSON.parse(characters.content[0].payload).body.avatar
+    const username = escapeHtml(JSON.parse(characters.content[0].payload).body.username)
+    const avatar = escapeHtml(JSON.parse(characters.content[0].payload).body.avatar)
 
-    const description = JSON.parse(message.content.payload).body.body
+    const description = escapeHtml(JSON.parse(message.content.payload).body.body)
 
     let responseBody = ''
 
