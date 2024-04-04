@@ -23,14 +23,16 @@ export async function onRequest(context) {
 
     let responseBody = ''
 
-    if (description.match(/!\[[^\]]*\]\(([^\)]*)\)/)) {
-        const imageUrl = description.match(/!\[[^\]]*\]\(([^\)]*)\)/)[1]
-        responseBody = `<meta property="og:title" content="${username}">
-<meta property="og:description" content="${description.slice(0, description.search(/!\[[^\]]*\]\(([^\)]*)\)/))}">
+    const imageRegex = /!\[[^\]]*\]\(([^\)]*)\)/
+
+    if (description.match(imageRegex)) {
+        const imageUrl = description.match(imageRegex)[1]
+        responseBody = `<meta property="og:title" content="${username} on Concurrent">
+<meta property="og:description" content="${description.slice(0, description.search(imageRegex))}">
 <meta property="og:image" content="${imageUrl}">
 <meta property="twitter:card" content="summary_large_image">`
     } else {
-        responseBody = `<meta property="og:title" content="${username}">
+        responseBody = `<meta property="og:title" content="${username} on Concurrent">
 <meta property="og:description" content="${description}">
 <meta property="og:image" content="${avatar}">
 <meta property="twitter:card" content="summary">`
