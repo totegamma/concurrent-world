@@ -159,9 +159,10 @@ export function Explorer(): JSX.Element {
             setSearchResult(streams)
             return
         }
+        console.log(streams)
         setSearchResult(
             Fuzzysort.go(search, streams, {
-                keys: ['stream.name', 'stream.description']
+                keys: ['stream.payload.name', 'stream.payload.description']
             }).map((e) => e.obj)
         )
     }, [search])
