@@ -19,15 +19,26 @@ export async function onRequest(context) {
     const username = JSON.parse(characters.content[0].payload).body.username
     const avatar = JSON.parse(characters.content[0].payload).body.avatar
 
-    return new Response(
-        `<meta property="og:title" content="${username}">
-<meta property="og:description" content="${JSON.parse(message.content.payload).body.body}">
+    const description = JSON.parse(message.content.payload).body.body
+
+    let responseBody = ''
+
+    if (description.match(/!\[.*\]\((.*)\)/)) {
+        const imageUrl = description.match(/!\[.*\]\((.*)\)/)[1]
+        responseBody = `<meta property="og:title" content="${username}">
+<meta property="og:description" content="${description.slice(0, description.search(/!\[.*\]\((.*)\)/))}">
+<meta property="og:image" content="${imageUrl}">
+<meta property="twitter:card" content="summary_large_image">`
+    } else {
+        responseBody = `<meta property="og:title" content="${username}">
+<meta property="og:description" content="${description}">
 <meta property="og:image" content="${avatar}">
-<meta property="twitter:card" content="summary">`,
-        {
-            headers: {
-                'Content-Type': 'text/html'
-            }
+<meta property="twitter:card" content="summary">`
+    }
+
+    return new Response(responseBody, {
+        headers: {
+            'Content-Type': 'text/html'
         }
-    )
+    })
 }
