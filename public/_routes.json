@@ -1,5 +1,5 @@
 {
     "version": 1,
-    "include": ["/message/*"],
+    "include": ["/message/*", "/entity/*"],
     "exclude": []
 }
