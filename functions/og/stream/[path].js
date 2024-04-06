@@ -16,6 +16,8 @@ export async function onRequest(context) {
         .then((response) => response.json())
         .then((data) => data)
 
+    console.log('stream content: ' + JSON.stringify(content))
+
     const payload = JSON.parse(content.payload)
 
     const name = escapeHtml(payload.name)
