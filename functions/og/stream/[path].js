@@ -11,6 +11,7 @@ export async function onRequest(context) {
     const { path } = context.params
     const streamId = path.split('@')[0]
 
+    console.log('fetching stream: ' + streamId)
     const { content } = await fetch(`https://hub.concurrent.world/api/v1/stream/${streamId}`)
         .then((response) => response.json())
         .then((data) => data)
