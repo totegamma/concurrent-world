@@ -28,7 +28,7 @@ export async function onRequest(context) {
     <meta property="og:title" content="${name} on Concurrent">
     <meta property="og:description" content="${description}">
     <meta property="og:image" content="${imageUrl}">
-    <meta property="twitter:card" content="summary">
+    <meta property="twitter:card" content="summary_large_image">
   </head>
 </html>`
 
