@@ -11,12 +11,9 @@ export async function onRequest(context) {
     const { path } = context.params
     const [streamId, host] = path.split('@')
 
-    console.log('fetching stream: ' + streamId)
     const { content } = await fetch(`https://${host}/api/v1/stream/${streamId}`)
         .then((response) => response.json())
         .then((data) => data)
-
-    console.log('stream content: ' + JSON.stringify(content))
 
     const payload = JSON.parse(content.payload)
 
