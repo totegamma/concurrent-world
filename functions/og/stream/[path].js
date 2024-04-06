@@ -1,0 +1,40 @@
+const escapeHtml = (unsafe) => {
+    return unsafe
+        .replaceAll(/&/g, '&amp;')
+        .replaceAll(/</g, '&lt;')
+        .replaceAll(/>/g, '&gt;')
+        .replaceAll(/"/g, '&quot;')
+        .replaceAll(/'/g, '&#039;')
+}
+
+export async function onRequest(context) {
+    const { path } = context.params
+    const streamId = path.split('@')[0]
+
+    const { content } = await fetch(`https://hub.concurrent.world/api/v1/stream/${streamId}`)
+        .then((response) => response.json())
+        .then((data) => data)
+
+    const payload = JSON.parse(content.payload)
+
+    const name = escapeHtml(payload.name)
+    const description = escapeHtml(payload.description)
+    const imageUrl = escapeHtml(payload.banner)
+
+    const responseBody = `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta property="og:title" content="${name} on Concurrent">
+    <meta property="og:description" content="${description}">
+    <meta property="og:image" content="${imageUrl}">
+    <meta property="twitter:card" content="summary">
+  </head>
+</html>`
+
+    return new Response(responseBody, {
+        headers: {
+            'Content-Type': 'text/html'
+        }
+    })
+}
