@@ -9,10 +9,10 @@ const escapeHtml = (unsafe) => {
 
 export async function onRequest(context) {
     const { path } = context.params
-    const streamId = path.split('@')[0]
+    const [streamId, host] = path.split('@')
 
     console.log('fetching stream: ' + streamId)
-    const { content } = await fetch(`https://hub.concurrent.world/api/v1/stream/${streamId}`)
+    const { content } = await fetch(`https://${host}/api/v1/stream/${streamId}`)
         .then((response) => response.json())
         .then((data) => data)
 
