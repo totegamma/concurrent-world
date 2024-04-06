@@ -36,15 +36,27 @@ export async function onRequest(context) {
 
     if (description.match(imageRegex)) {
         const imageUrl = description.match(imageRegex)[1]
-        responseBody = `<meta property="og:title" content="${username} on Concurrent">
-<meta property="og:description" content="${description.slice(0, description.search(imageRegex))}">
-<meta property="og:image" content="${imageUrl}">
-<meta property="twitter:card" content="summary_large_image">`
+        responseBody = `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta property="og:title" content="${username} on Concurrent">
+    <meta property="og:description" content="${description.slice(0, description.search(imageRegex))}">
+    <meta property="og:image" content="${imageUrl}">
+    <meta property="twitter:card" content="summary_large_image">
+  </head>
+</html>`
     } else {
-        responseBody = `<meta property="og:title" content="${username} on Concurrent">
-<meta property="og:description" content="${description}">
-<meta property="og:image" content="${avatar}">
-<meta property="twitter:card" content="summary">`
+        responseBody = `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta property="og:title" content="${username} on Concurrent">
+    <meta property="og:description" content="${description}">
+    <meta property="og:image" content="${avatar}">
+    <meta property="twitter:card" content="summary">
+  </head>
+</html>`
     }
 
     return new Response(responseBody, {

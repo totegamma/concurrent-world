@@ -26,10 +26,16 @@ export async function onRequest(context) {
 
     const description = escapeHtml(JSON.parse(characters.content[0].payload).body.description)
 
-    const responseBody = `<meta property="og:title" content="${username} on Concurrent">
-<meta property="og:description" content="${description}">
-<meta property="og:image" content="${avatar}">
-<meta property="twitter:card" content="summary">`
+    const responseBody = `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta property="og:title" content="${username} on Concurrent">
+    <meta property="og:description" content="${description}">
+    <meta property="og:image" content="${avatar}">
+    <meta property="twitter:card" content="summary">
+  </head>
+</html>`
 
     return new Response(responseBody, {
         headers: {
