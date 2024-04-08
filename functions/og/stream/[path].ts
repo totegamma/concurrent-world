@@ -1,4 +1,4 @@
-const escapeHtml = (unsafe) => {
+const escapeHtml = (unsafe: string) => {
     return unsafe
         .replaceAll(/&/g, '&amp;')
         .replaceAll(/</g, '&lt;')
@@ -7,15 +7,28 @@ const escapeHtml = (unsafe) => {
         .replaceAll(/'/g, '&#039;')
 }
 
-export async function onRequest(context) {
+interface Content {
+    content: {
+        payload: string
+    }
+}
+
+interface Stream {
+    name: string
+    shortname: string
+    description: string
+    banner: string
+}
+
+export const onRequest: PagesFunction = async (context) => {
     const { path } = context.params
-    const [streamId, host] = path.split('@')
+    const [streamId, host] = (<string>path).split('@')
 
     const { content } = await fetch(`https://${host}/api/v1/stream/${streamId}`)
-        .then((response) => response.json())
+        .then((response) => response.json<Content>())
         .then((data) => data)
 
-    const payload = JSON.parse(content.payload)
+    const payload: Stream = JSON.parse(content.payload)
 
     const name = escapeHtml(payload.name)
     const description = escapeHtml(payload.description)

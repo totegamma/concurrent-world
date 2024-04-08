@@ -62,6 +62,7 @@
         "virtua": "^0.23.2"
     },
     "devDependencies": {
+        "@cloudflare/workers-types": "^4.20240405.0",
         "@storybook/addon-essentials": "7.0.18",
         "@storybook/addon-interactions": "7.0.18",
         "@storybook/addon-links": "7.0.18",

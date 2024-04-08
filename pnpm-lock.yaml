@@ -154,6 +154,9 @@ dependencies:
     version: 0.23.2(react-dom@18.2.0)(react@18.2.0)
 
 devDependencies:
+  '@cloudflare/workers-types':
+    specifier: ^4.20240405.0
+    version: 4.20240405.0
   '@storybook/addon-essentials':
     specifier: 7.0.18
     version: 7.0.18(react-dom@18.2.0)(react@18.2.0)
@@ -2290,6 +2293,10 @@ packages:
 
   /@bcoe/v8-coverage@0.2.3:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
+    dev: true
+
+  /@cloudflare/workers-types@4.20240405.0:
+    resolution: {integrity: sha512-sEVOhyOgXUwfLkgHqbLZa/sfkSYrh7/zLmI6EZNibPaVPvAnAcItbNNl3SAlLyLKuwf8m4wAIAgu9meKWCvXjg==}
     dev: true
 
   /@colors/colors@1.5.0:
