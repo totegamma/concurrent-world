@@ -26,12 +26,11 @@ export async function onRequest(context) {
         .then((data) => data)
 
     const { body } = JSON.parse(characters.content[0].payload)
-    console.log(body)
 
     const username = escapeHtml(body.username)
     const avatar = escapeHtml(body.avatar)
 
-    const description = escapeHtml(body.description)
+    const description = escapeHtml(JSON.parse(message.content.payload).body.body)
 
     let responseBody = ''
 
