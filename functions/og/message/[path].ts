@@ -1,6 +1,6 @@
 import { sanitizeHtml } from '../../lib/sanitize'
 
-interface Content {
+interface AddressResponse {
     content: {
         payload: string
     }
@@ -38,7 +38,7 @@ export const onRequest: PagesFunction = async (context) => {
     const [messageId, ccid] = (<string>path).split('@')
 
     const host = await fetch(`https://hub.concurrent.world/api/v1/address/${ccid}`)
-        .then((response) => response.json<Content>())
+        .then((response) => response.json<AddressResponse>())
         .then((data) => data.content)
 
     const message = await fetch(`https://${host}/api/v1/message/${messageId}`)

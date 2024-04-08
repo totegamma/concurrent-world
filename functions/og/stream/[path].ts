@@ -1,6 +1,6 @@
 import { sanitizeHtml } from '../../lib/sanitize'
 
-interface Content {
+interface AddressResponse {
     content: {
         payload: string
     }
@@ -18,7 +18,7 @@ export const onRequest: PagesFunction = async (context) => {
     const [streamId, host] = (<string>path).split('@')
 
     const { content } = await fetch(`https://${host}/api/v1/stream/${streamId}`)
-        .then((response) => response.json<Content>())
+        .then((response) => response.json<AddressResponse>())
         .then((data) => data)
 
     const payload: Stream = JSON.parse(content.payload)
