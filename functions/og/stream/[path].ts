@@ -1,11 +1,4 @@
-const escapeHtml = (unsafe: string) => {
-    return unsafe
-        .replaceAll(/&/g, '&amp;')
-        .replaceAll(/</g, '&lt;')
-        .replaceAll(/>/g, '&gt;')
-        .replaceAll(/"/g, '&quot;')
-        .replaceAll(/'/g, '&#039;')
-}
+import { sanitizeHtml } from '../../lib/sanitize'
 
 interface Content {
     content: {
@@ -30,12 +23,11 @@ export const onRequest: PagesFunction = async (context) => {
 
     const payload: Stream = JSON.parse(content.payload)
 
-    const name = escapeHtml(payload.name)
-    const description = escapeHtml(payload.description)
-    const imageUrl = escapeHtml(payload.banner)
+    const name = sanitizeHtml(payload.name)
+    const description = sanitizeHtml(payload.description)
+    const imageUrl = sanitizeHtml(payload.banner)
 
-    const responseBody = `
-<!DOCTYPE html>
+    const responseBody = `<!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8">

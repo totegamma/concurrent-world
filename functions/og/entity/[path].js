@@ -1,11 +1,4 @@
-const escapeHtml = (unsafe) => {
-    return unsafe
-        .replaceAll(/&/g, '&amp;')
-        .replaceAll(/</g, '&lt;')
-        .replaceAll(/>/g, '&gt;')
-        .replaceAll(/"/g, '&quot;')
-        .replaceAll(/'/g, '&#039;')
-}
+import { sanitizeHtml } from '../../lib/sanitize'
 
 export async function onRequest(context) {
     const { path } = context.params
@@ -23,10 +16,10 @@ export async function onRequest(context) {
 
     const { body } = JSON.parse(characters.content[0].payload)
 
-    const username = escapeHtml(body.username)
-    const avatar = escapeHtml(body.avatar)
+    const username = sanitizeHtml(body.username)
+    const avatar = sanitizeHtml(body.avatar)
 
-    const description = escapeHtml(body.description)
+    const description = sanitizeHtml(body.description)
 
     const responseBody = `
 <!DOCTYPE html>
