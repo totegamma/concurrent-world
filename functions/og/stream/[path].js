@@ -25,7 +25,7 @@ export async function onRequest(context) {
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
     <meta property="og:title" content="${name} on Concurrent">
     <meta property="og:description" content="${description}">
     <meta property="og:image" content="${imageUrl}">

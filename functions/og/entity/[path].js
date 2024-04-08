@@ -21,16 +21,18 @@ export async function onRequest(context) {
         .then((res) => res.json())
         .then((data) => data)
 
-    const username = escapeHtml(JSON.parse(characters.content[0].payload).body.username)
-    const avatar = escapeHtml(JSON.parse(characters.content[0].payload).body.avatar)
+    const { body } = JSON.parse(characters.content[0].payload)
 
-    const description = escapeHtml(JSON.parse(characters.content[0].payload).body.description)
+    const username = escapeHtml(body.username)
+    const avatar = escapeHtml(body.avatar)
+
+    const description = escapeHtml(body.description)
 
     const responseBody = `
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
     <meta property="og:title" content="${username} on Concurrent">
     <meta property="og:description" content="${description}">
     <meta property="og:image" content="${avatar}">
