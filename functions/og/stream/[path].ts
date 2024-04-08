@@ -1,17 +1,5 @@
+import type { AddressResponse, Stream } from '../../types/concurrent'
 import { sanitizeHtml } from '../../lib/sanitize'
-
-interface AddressResponse {
-    content: {
-        payload: string
-    }
-}
-
-interface Stream {
-    name: string
-    shortname: string
-    description: string
-    banner: string
-}
 
 export const onRequest: PagesFunction = async (context) => {
     const { path } = context.params

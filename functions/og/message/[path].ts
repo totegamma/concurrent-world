@@ -1,37 +1,11 @@
+import type {
+    AddressResponse,
+    MessageResponse,
+    Message as CCMessage,
+    Characters,
+    CharactersResponse
+} from '../../types/concurrent'
 import { sanitizeHtml } from '../../lib/sanitize'
-
-interface AddressResponse {
-    content: {
-        payload: string
-    }
-}
-
-interface MessageResponse {
-    content: {
-        payload: string
-    }
-}
-
-interface Message {
-    body: string
-    emojis: {}
-    mentions: []
-    profileOverride: {}
-}
-
-interface CharactersResponse {
-    content: {
-        payload: string
-    }[]
-}
-
-interface Characters {
-    username: string
-    description: string
-    avatar: string
-    banner: string
-    subprofiles: string
-}
 
 export const onRequest: PagesFunction = async (context) => {
     const { path } = context.params
@@ -43,7 +17,7 @@ export const onRequest: PagesFunction = async (context) => {
 
     const message = await fetch(`https://${host}/api/v1/message/${messageId}`)
         .then((response) => response.json<MessageResponse>())
-        .then((data) => JSON.parse(data.content.payload).body as Message)
+        .then((data) => JSON.parse(data.content.payload).body as CCMessage)
 
     const characters = await fetch(
         `https://${host}/api/v1/characters?author=${ccid}&schema=https%3A%2F%2Fraw.githubusercontent.com%2Ftotegamma%2Fconcurrent-schemas%2Fmaster%2Fcharacters%2Fprofile%2F0.0.2.json`

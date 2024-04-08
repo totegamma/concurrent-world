@@ -1,24 +1,5 @@
+import type { AddressResponse, CharactersResponse, Characters } from '../../types/concurrent'
 import { sanitizeHtml } from '../../lib/sanitize'
-
-interface AddressResponse {
-    content: {
-        payload: string
-    }
-}
-
-interface CharactersResponse {
-    content: {
-        payload: string
-    }[]
-}
-
-interface Characters {
-    username: string
-    description: string
-    avatar: string
-    banner: string
-    subprofiles: string
-}
 
 export const onRequest: PagesFunction = async (context) => {
     const { path } = context.params
@@ -28,7 +9,7 @@ export const onRequest: PagesFunction = async (context) => {
         .then((response) => response.json<AddressResponse>())
         .then((data) => data.content)
 
-    const characters = await fetch(
+    const characters: Characters = await fetch(
         `https://${host}/api/v1/characters?author=${ccid}&schema=https%3A%2F%2Fraw.githubusercontent.com%2Ftotegamma%2Fconcurrent-schemas%2Fmaster%2Fcharacters%2Fprofile%2F0.0.2.json`
     )
         .then((res) => res.json<CharactersResponse>())
