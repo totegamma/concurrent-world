@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Routes, Route, Link as RouterLink } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider, CssBaseline, Typography, useMediaQuery } from '@mui/material'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
@@ -78,22 +78,24 @@ function App(): JSX.Element {
                         )
                         .then((m) => {
                             m &&
-                                client?.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
-                                    playNotificationRef.current()
-                                    const profile = c?.[0].document.body
-                                    enqueueSnackbar(
-                                        <Box display="flex" flexDirection="column">
-                                            <Typography>
-                                                {profile?.username ?? 'anonymous'} replied to your message:{' '}
-                                            </Typography>
-                                            <MarkdownRendererLite
-                                                messagebody={m.document.body.body as string}
-                                                emojiDict={m.document.body.emojis ?? {}}
-                                                limit={128}
-                                            />
-                                        </Box>
-                                    )
-                                })
+                                client?.api
+                                    .getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.author)
+                                    .then((c) => {
+                                        playNotificationRef.current()
+                                        const profile = c?.document.body
+                                        enqueueSnackbar(
+                                            <Box display="flex" flexDirection="column">
+                                                <Typography>
+                                                    {profile?.username ?? 'anonymous'} replied to your message:{' '}
+                                                </Typography>
+                                                <MarkdownRendererLite
+                                                    messagebody={m.document.body.body as string}
+                                                    emojiDict={m.document.body.emojis ?? {}}
+                                                    limit={128}
+                                                />
+                                            </Box>
+                                        )
+                                    })
                         })
                     return
                 }
@@ -101,9 +103,9 @@ function App(): JSX.Element {
                 if (a.schema === Schemas.rerouteAssociation) {
                     client?.api.getMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
                         m &&
-                            client?.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
+                            client?.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.author).then((c) => {
                                 playNotificationRef.current()
-                                const profile = c?.[0].document.body
+                                const profile = c?.document.body
                                 enqueueSnackbar(
                                     <Box display="flex" flexDirection="column">
                                         <Typography>
@@ -124,9 +126,9 @@ function App(): JSX.Element {
                 if (a.schema === Schemas.like) {
                     client?.api.getMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
                         m &&
-                            client.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
+                            client.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.author).then((c) => {
                                 playNotificationRef.current()
-                                const profile = c?.[0].document.body
+                                const profile = c?.document.body
                                 enqueueSnackbar(
                                     <Box display="flex" flexDirection="column">
                                         <Typography>{profile?.username ?? 'anonymous'} favorited</Typography>
@@ -146,9 +148,9 @@ function App(): JSX.Element {
                     client.api.getMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
                         console.log(m)
                         m &&
-                            client.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
+                            client.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.author).then((c) => {
                                 playNotificationRef.current()
-                                const profile = c?.[0].document.body
+                                const profile = c?.document.body
                                 enqueueSnackbar(
                                     <Box display="flex" flexDirection="column">
                                         <Typography>
@@ -169,9 +171,9 @@ function App(): JSX.Element {
                 if (a.schema === Schemas.mention) {
                     client?.api.getMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
                         m &&
-                            client.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
+                            client.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.author).then((c) => {
                                 playNotificationRef.current()
-                                const profile = c?.[0].document.body
+                                const profile = c?.document.body
                                 enqueueSnackbar(
                                     <Box display="flex" flexDirection="column">
                                         {profile?.username ?? 'anonymous'} mentioned you:{' '}
