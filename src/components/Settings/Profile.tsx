@@ -3,7 +3,7 @@ import { ProfileEditor } from '../ProfileEditor'
 import { useClient } from '../../context/ClientContext'
 import { useSnackbar } from 'notistack'
 import { useTranslation } from 'react-i18next'
-import { type ProfileSchema, type CoreCharacter, type Schema, Schemas } from '@concurrent-world/client'
+import { type ProfileSchema, type CoreCharacter, type Schema } from '@concurrent-world/client'
 import { useEffect, useState } from 'react'
 import { CCDrawer } from '../ui/CCDrawer'
 import { CCEditor } from '../ui/cceditor'
@@ -44,7 +44,7 @@ export const ProfileSettings = (): JSX.Element => {
         if (!client.user?.profile) return
 
         client.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', client.ccid).then((profile) => {
-            setLatestProfile(profile?.body)
+            setLatestProfile(profile?.document.body)
         })
     }
 

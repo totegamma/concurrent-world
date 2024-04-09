@@ -72,7 +72,7 @@ export function Registration(): JSX.Element {
         console.log('hostAddr', host.ccid)
 
         client?.api
-            .getCharacter<DomainProfileSchema>(host.ccid, Schemas.domainProfile)
+            .getCharacters<DomainProfileSchema>({ author: host.ccid, schema: Schemas.domainProfile })
             .then((profile: Array<CoreCharacter<DomainProfileSchema>> | null | undefined) => {
                 console.log('domainprofile:', profile)
                 const domainProfile = profile?.[0]?.document.body
