@@ -59,7 +59,7 @@ export const ApSetup = (): JSX.Element => {
             return
         }
 
-        const followstream = await client.api.createTimeline(
+        const followstream = await client.api.upsertTimeline(
             Schemas.commonstream,
             {
                 name: 'ActivityPub',
@@ -67,6 +67,7 @@ export const ApSetup = (): JSX.Element => {
                 description: 'ActivityPub home stream'
             },
             {
+                semanticID: 'world.concrnt.p-aphome',
                 indexable: false,
                 domainOwned: false
             }
