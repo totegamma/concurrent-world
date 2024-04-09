@@ -41,25 +41,17 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
     }, [props.id])
 
     const updateStream = useCallback(
-        (document: CommonstreamSchema) => {
-            /* TODO
+        // const res2 = await this.api.upsertTimeline(Schemas.utilitystream, {}, { semanticID: 'world.concrnt.t-assoc', indexable: false, domainOwned: false })
+        (body: CommonstreamSchema) => {
             if (!stream) return
             client.api
-                .updateStream({
-                    ...stream,
-                    schema: schemaDraft,
-                    document,
-                    writer: writers.map((e) => e.ccid),
-                    reader: readers.map((e) => e.ccid),
-                    visible
-                })
+                .upsertTimeline(schemaDraft, body, { id: props.id, indexable: visible, domainOwned: false })
                 .then((_) => {
                     enqueueSnackbar('更新しました', { variant: 'success' })
                 })
                 .catch((_) => {
                     enqueueSnackbar('更新に失敗しました', { variant: 'error' })
                 })
-                */
         },
         [client.api, stream, schemaDraft, props.id, visible, enqueueSnackbar]
     )
@@ -139,12 +131,12 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                             />
                             <Box>
                                 <Typography variant="h3">属性</Typography>
-                                <CCEditor schemaURL={schemaDraft} init={stream.document} onSubmit={updateStream} />
+                                <CCEditor schemaURL={schemaDraft} init={stream.document.body} onSubmit={updateStream} />
                             </Box>
                             <Button
                                 color="error"
                                 onClick={() => {
-                                    client.api.deleteStream(props.id).then((_) => {
+                                    client.api.deleteTimeline(props.id.split('@')[0]).then((_) => {
                                         enqueueSnackbar('削除しました', { variant: 'success' })
                                     })
                                 }}
