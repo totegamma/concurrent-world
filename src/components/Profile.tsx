@@ -124,7 +124,7 @@ export function Profile(props: ProfileProps): JSX.Element {
                             <WatchButton
                                 color={theme.palette.secondary.main}
                                 userCCID={props.id!}
-                                userStreamID={props.user.profile?.homeStream ?? ''}
+                                userStreamID={props.user.homeTimeline ?? ''}
                             />
                         </Box>
                     ) : (

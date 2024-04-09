@@ -34,7 +34,7 @@ export const ProfileSettings = (): JSX.Element => {
     const [latestProfile, setLatestProfile] = useState<ProfileSchema | null | undefined>(client.user?.profile)
 
     const load = (): void => {
-        if (!client) return
+        if (!client?.ccid) return
         client.api.invalidateCharacter(client.ccid)
 
         client.api.getCharacters({ author: client.ccid }).then((characters) => {
@@ -43,8 +43,8 @@ export const ProfileSettings = (): JSX.Element => {
 
         if (!client.user?.profile) return
 
-        client.api.getEntity<ProfileSchema>(client.user.ccid, Schemas.profile).then((entity) => {
-            setLatestProfile(entity?.extension?.document.body)
+        client.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', client.ccid).then((profile) => {
+            setLatestProfile(profile?.body)
         })
     }
 

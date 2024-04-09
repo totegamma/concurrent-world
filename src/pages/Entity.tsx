@@ -35,10 +35,10 @@ export function EntityPage(): JSX.Element {
         let target
         switch (tab) {
             case 0:
-                target = user?.profile?.homeStream
+                target = user?.homeTimeline
                 break
             case 1:
-                target = user?.profile?.associationStream
+                target = user?.associationTimeline
                 break
         }
         return target ? [target] : []

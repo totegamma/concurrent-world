@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo, useContext } from 'react'
+import { useState, useEffect, useRef, memo } from 'react'
 import {
     InputBase,
     Box,
@@ -108,7 +108,7 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
             return
         }
         const destStreamIDs = destStreams.map((s) => s.id)
-        const dest = [...new Set([...destStreamIDs, ...(postHome ? [client?.user?.profile?.homeStream] : [])])].filter(
+        const dest = [...new Set([...destStreamIDs, ...(postHome ? [client?.user?.homeTimeline] : [])])].filter(
             (e) => e
         ) as string[]
 

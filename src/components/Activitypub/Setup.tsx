@@ -86,8 +86,8 @@ export const ApSetup = (): JSX.Element => {
                 },
                 body: JSON.stringify({
                     id: userID,
-                    homestream: client?.user?.profile?.homeStream,
-                    notificationstream: client?.user?.profile?.notificationStream,
+                    homestream: client?.user?.homeTimeline,
+                    notificationstream: client?.user?.notificationTimeline,
                     followstream: followstream.id
                 })
             })

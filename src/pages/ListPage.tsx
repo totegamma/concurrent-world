@@ -55,7 +55,7 @@ export function ListPage(): JSX.Element {
 
     const streamIDs = useMemo(() => {
         return [
-            id === 'home' ? client?.user?.profile?.homeStream ?? [] : [],
+            id === 'home' ? client?.user?.homeTimeline ?? [] : [],
             ...(lists[id]?.streams ?? []),
             lists[id]?.userStreams.map((e) => e.streamID) ?? []
         ].flat()

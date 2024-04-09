@@ -56,7 +56,7 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
                     client.getUser(id).then((e) => {
                         setUser(e)
                         setTitle(e?.profile?.username ?? '')
-                        setTargetStream([e?.profile?.homeStream ?? ''])
+                        setTargetStream([e?.homeTimeline ?? ''])
                     })
 
                     initializeClient(client)
@@ -72,7 +72,7 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
                     client.getUser(authorID).then((e) => {
                         setUser(e)
                         setTitle(e?.profile?.username ?? '')
-                        setTargetStream([e?.profile?.homeStream ?? ''])
+                        setTargetStream([e?.homeTimeline ?? ''])
                     })
                 }
                 break

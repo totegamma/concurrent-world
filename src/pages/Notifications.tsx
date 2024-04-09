@@ -9,7 +9,7 @@ export function Notifications(): JSX.Element {
     const { client } = useClient()
 
     const streams = useMemo(() => {
-        const target = client.user?.profile?.notificationStream
+        const target = client.user?.notificationTimeline
         return target ? [target] : []
     }, [client])
 

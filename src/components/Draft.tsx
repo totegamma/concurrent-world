@@ -134,9 +134,9 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             return
         }
         const destTimelineIDs = destTimelines.map((s) => s.id)
-        const dest = [
-            ...new Set([...destTimelineIDs, ...(postHome ? [client?.user?.profile?.homeStream] : [])])
-        ].filter((e) => e) as string[]
+        const dest = [...new Set([...destTimelineIDs, ...(postHome ? [client?.user?.homeTimeline] : [])])].filter(
+            (e) => e
+        ) as string[]
 
         const mentions = draft.match(/@([^\s@]+)/g)?.map((e) => e.slice(1)) ?? []
 

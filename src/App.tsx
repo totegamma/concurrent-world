@@ -63,7 +63,7 @@ function App(): JSX.Element {
         client.newSubscription().then((sub) => {
             subscription.current = sub
             subscription.current.listen([
-                ...(client?.user?.profile?.notificationStream ? [client?.user?.profile?.notificationStream] : [])
+                ...(client?.user?.notificationTimeline ? [client?.user?.notificationTimeline] : [])
             ])
             sub.on('AssociationCreated', (event: TimelineEvent) => {
                 const a = event.body as CoreAssociation<any>

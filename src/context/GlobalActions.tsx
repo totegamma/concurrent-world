@@ -87,12 +87,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         return () => visualViewport?.removeEventListener('resize', handleResize)
     }, [])
 
-    const setupAccountRequired =
-        client?.user !== null &&
-        (client?.user.profile === undefined ||
-            !client?.user.profile?.homeStream ||
-            !client?.user.profile?.notificationStream ||
-            !client?.user.profile?.associationStream)
+    const setupAccountRequired = client?.user !== null && client?.user.profile === undefined
 
     useEffect(() => {
         let unmounted = false
@@ -448,16 +443,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                 アカウント設定を完了させましょう！
                             </Typography>
                             見つかった問題:
-                            <ul>
-                                {!client?.user?.profile && <li>プロフィールが存在していません</li>}
-                                {!client?.user?.profile?.homeStream && <li>ホームストリームが存在していません</li>}
-                                {!client?.user?.profile?.notificationStream && (
-                                    <li>通知ストリームが存在していません</li>
-                                )}
-                                {!client?.user?.profile?.associationStream && (
-                                    <li>アクティビティストリームが存在していません</li>
-                                )}
-                            </ul>
+                            <ul>{!client?.user?.profile && <li>プロフィールが存在していません</li>}</ul>
                             <ProfileEditor
                                 initial={client?.user?.profile}
                                 onSubmit={() => {
