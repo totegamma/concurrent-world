@@ -2,25 +2,39 @@ import type { AddressResponse, CharactersResponse, Characters } from '../../type
 import { sanitizeHtml } from '../../lib/sanitize'
 
 export const onRequest: PagesFunction = async (context) => {
-    const { path } = context.params
-    const ccid = path
+    console.log(context.request.url)
+    const cacheUrl = new URL(context.request.url)
 
-    const host = await fetch(`https://hub.concurrent.world/api/v1/address/${ccid}`)
-        .then((response) => response.json<AddressResponse>())
-        .then((data) => data.content)
+    const cacheKey = new Request(cacheUrl.toString(), context.request)
 
-    const characters: Characters = await fetch(
-        `https://${host}/api/v1/characters?author=${ccid}&schema=https%3A%2F%2Fraw.githubusercontent.com%2Ftotegamma%2Fconcurrent-schemas%2Fmaster%2Fcharacters%2Fprofile%2F0.0.2.json`
-    )
-        .then((res) => res.json<CharactersResponse>())
-        .then((data) => JSON.parse(data.content[0].payload).body as Characters)
+    // Cloudflare Workersの@CacheStorageタイプはcaches.defaultがあるが、ブラウザのCacheStorageはcaches.defaultがないのでエラーが出る
+    // @ts-ignore
+    const cache = caches.default
 
-    const username = sanitizeHtml(characters.username)
-    const avatar = sanitizeHtml(characters.avatar)
+    let response = await cache.match(cacheKey)
 
-    const description = sanitizeHtml(characters.description)
+    if (!response) {
+        console.log(`Response for ${context.request.url} not found in cache. Fetching from origin.`)
 
-    const responseBody = `
+        const { path } = context.params
+        const ccid = path
+
+        const host = await fetch(`https://hub.concurrent.world/api/v1/address/${ccid}`)
+            .then((response) => response.json<AddressResponse>())
+            .then((data) => data.content)
+
+        const characters: Characters = await fetch(
+            `https://${host}/api/v1/characters?author=${ccid}&schema=https%3A%2F%2Fraw.githubusercontent.com%2Ftotegamma%2Fconcurrent-schemas%2Fmaster%2Fcharacters%2Fprofile%2F0.0.2.json`
+        )
+            .then((res) => res.json<CharactersResponse>())
+            .then((data) => JSON.parse(data.content[0].payload).body as Characters)
+
+        const username = sanitizeHtml(characters.username)
+        const avatar = sanitizeHtml(characters.avatar)
+
+        const description = sanitizeHtml(characters.description)
+
+        const responseBody = `
 <!DOCTYPE html>
 <html>
   <head>
@@ -32,9 +46,17 @@ export const onRequest: PagesFunction = async (context) => {
   </head>
 </html>`
 
-    return new Response(responseBody, {
-        headers: {
-            'Content-Type': 'text/html'
-        }
-    })
+        response = new Response(responseBody, {
+            headers: {
+                'Content-Type': 'text/html',
+                'Cache-Control': 's-maxage=10'
+            }
+        })
+
+        context.waitUntil(cache.put(cacheKey, response.clone()))
+    } else {
+        console.log(`Response for ${context.request.url} found in cache.`)
+    }
+
+    return response
 }

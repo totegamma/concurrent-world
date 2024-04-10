@@ -8,35 +8,48 @@ import type {
 import { sanitizeHtml } from '../../lib/sanitize'
 
 export const onRequest: PagesFunction = async (context) => {
-    const { path } = context.params
-    const [messageId, ccid] = (<string>path).split('@')
+    const cacheUrl = new URL(context.request.url)
 
-    const host = await fetch(`https://hub.concurrent.world/api/v1/address/${ccid}`)
-        .then((response) => response.json<AddressResponse>())
-        .then((data) => data.content)
+    const cacheKey = new Request(cacheUrl.toString(), context.request)
 
-    const message = await fetch(`https://${host}/api/v1/message/${messageId}`)
-        .then((response) => response.json<MessageResponse>())
-        .then((data) => JSON.parse(data.content.payload).body as CCMessage)
+    // Cloudflare Workersの@CacheStorageタイプはcaches.defaultがあるが、ブラウザのCacheStorageはcaches.defaultがないのでエラーが出る
+    // @ts-ignore
+    const cache = caches.default
 
-    const characters = await fetch(
-        `https://${host}/api/v1/characters?author=${ccid}&schema=https%3A%2F%2Fraw.githubusercontent.com%2Ftotegamma%2Fconcurrent-schemas%2Fmaster%2Fcharacters%2Fprofile%2F0.0.2.json`
-    )
-        .then((res) => res.json<CharactersResponse>())
-        .then((data) => JSON.parse(data.content[0].payload).body as Characters)
+    let response = await cache.match(cacheKey)
 
-    const username = sanitizeHtml(characters.username)
-    const avatar = sanitizeHtml(characters.avatar)
+    if (!response) {
+        console.log(`Response for ${context.request.url} not found in cache. Fetching from origin.`)
 
-    const description = sanitizeHtml(message.body)
+        const { path } = context.params
+        const [messageId, ccid] = (<string>path).split('@')
 
-    let responseBody = ''
+        const host = await fetch(`https://hub.concurrent.world/api/v1/address/${ccid}`)
+            .then((response) => response.json<AddressResponse>())
+            .then((data) => data.content)
 
-    const imageRegex = /!\[[^\]]*\]\(([^\)]*)\)/
+        const message = await fetch(`https://${host}/api/v1/message/${messageId}`)
+            .then((response) => response.json<MessageResponse>())
+            .then((data) => JSON.parse(data.content.payload).body as CCMessage)
 
-    if (description.match(imageRegex)) {
-        const imageUrl = description.match(imageRegex)[1]
-        responseBody = `
+        const characters = await fetch(
+            `https://${host}/api/v1/characters?author=${ccid}&schema=https%3A%2F%2Fraw.githubusercontent.com%2Ftotegamma%2Fconcurrent-schemas%2Fmaster%2Fcharacters%2Fprofile%2F0.0.2.json`
+        )
+            .then((res) => res.json<CharactersResponse>())
+            .then((data) => JSON.parse(data.content[0].payload).body as Characters)
+
+        const username = sanitizeHtml(characters.username)
+        const avatar = sanitizeHtml(characters.avatar)
+
+        const description = sanitizeHtml(message.body)
+
+        let responseBody = ''
+
+        const imageRegex = /!\[[^\]]*\]\(([^\)]*)\)/
+
+        if (description.match(imageRegex)) {
+            const imageUrl = description.match(imageRegex)[1]
+            responseBody = `
 <!DOCTYPE html>
 <html>
   <head>
@@ -47,8 +60,8 @@ export const onRequest: PagesFunction = async (context) => {
     <meta property="twitter:card" content="summary_large_image">
   </head>
 </html>`
-    } else {
-        responseBody = `
+        } else {
+            responseBody = `
 <!DOCTYPE html>
 <html>
   <head>
@@ -59,11 +72,19 @@ export const onRequest: PagesFunction = async (context) => {
     <meta property="twitter:card" content="summary">
   </head>
 </html>`
+        }
+
+        response = new Response(responseBody, {
+            headers: {
+                'Content-Type': 'text/html',
+                'Cache-Control': 's-maxage=10'
+            }
+        })
+
+        context.waitUntil(cache.put(cacheKey, response.clone()))
+    } else {
+        console.log(`Response for ${context.request.url} found in cache.`)
     }
 
-    return new Response(responseBody, {
-        headers: {
-            'Content-Type': 'text/html'
-        }
-    })
+    return response
 }

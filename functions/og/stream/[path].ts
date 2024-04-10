@@ -2,20 +2,34 @@ import type { AddressResponse, Stream } from '../../types/concurrent'
 import { sanitizeHtml } from '../../lib/sanitize'
 
 export const onRequest: PagesFunction = async (context) => {
-    const { path } = context.params
-    const [streamId, host] = (<string>path).split('@')
+    console.log(context.request.url)
+    const cacheUrl = new URL(context.request.url)
 
-    const { content } = await fetch(`https://${host}/api/v1/stream/${streamId}`)
-        .then((response) => response.json<AddressResponse>())
-        .then((data) => data)
+    const cacheKey = new Request(cacheUrl.toString(), context.request)
 
-    const payload: Stream = JSON.parse(content.payload)
+    // Cloudflare Workersの@CacheStorageタイプはcaches.defaultがあるが、ブラウザのCacheStorageはcaches.defaultがないのでエラーが出る
+    // @ts-ignore
+    const cache = caches.default
 
-    const name = sanitizeHtml(payload.name)
-    const description = sanitizeHtml(payload.description)
-    const imageUrl = sanitizeHtml(payload.banner)
+    let response = await cache.match(cacheKey)
 
-    const responseBody = `<!DOCTYPE html>
+    if (!response) {
+        console.log(`Response for ${context.request.url} not found in cache. Fetching from origin.`)
+
+        const { path } = context.params
+        const [streamId, host] = (<string>path).split('@')
+
+        const { content } = await fetch(`https://${host}/api/v1/stream/${streamId}`)
+            .then((response) => response.json<AddressResponse>())
+            .then((data) => data)
+
+        const payload: Stream = JSON.parse(content.payload)
+
+        const name = sanitizeHtml(payload.name)
+        const description = sanitizeHtml(payload.description)
+        const imageUrl = sanitizeHtml(payload.banner)
+
+        const responseBody = `<!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8">
@@ -26,9 +40,17 @@ export const onRequest: PagesFunction = async (context) => {
   </head>
 </html>`
 
-    return new Response(responseBody, {
-        headers: {
-            'Content-Type': 'text/html'
-        }
-    })
+        response = new Response(responseBody, {
+            headers: {
+                'Content-Type': 'text/html',
+                'Cache-Control': 's-maxage=10'
+            }
+        })
+
+        context.waitUntil(cache.put(cacheKey, response.clone()))
+    } else {
+        console.log(`Response for ${context.request.url} found in cache.`)
+    }
+
+    return response
 }
