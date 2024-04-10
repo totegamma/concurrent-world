@@ -1,8 +1,9 @@
 import type { AddressResponse, CharactersResponse, Characters } from '../../types/concurrent'
 import { sanitizeHtml } from '../../lib/sanitize'
 
+const CACHE_TTL_SECONDS = 10
+
 export const onRequest: PagesFunction = async (context) => {
-    console.log(context.request.url)
     const cacheUrl = new URL(context.request.url)
 
     const cacheKey = new Request(cacheUrl.toString(), context.request)
@@ -14,7 +15,7 @@ export const onRequest: PagesFunction = async (context) => {
     let response = await cache.match(cacheKey)
 
     if (!response) {
-        console.log(`Response for ${context.request.url} not found in cache. Fetching from origin.`)
+        console.log(`[entity, cache not found]`)
 
         const { path } = context.params
         const ccid = path
@@ -49,13 +50,13 @@ export const onRequest: PagesFunction = async (context) => {
         response = new Response(responseBody, {
             headers: {
                 'Content-Type': 'text/html',
-                'Cache-Control': 's-maxage=10'
+                'Cache-Control': `s-maxage=${CACHE_TTL_SECONDS}`
             }
         })
 
         context.waitUntil(cache.put(cacheKey, response.clone()))
     } else {
-        console.log(`Response for ${context.request.url} found in cache.`)
+        console.log(`[entity, cache found]`)
     }
 
     return response
