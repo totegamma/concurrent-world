@@ -1,7 +1,7 @@
 import type { AddressResponse, Stream } from '../../types/concurrent'
 import { sanitizeHtml } from '../../lib/sanitize'
 
-const CACHE_TTL_SECONDS = 10
+const CACHE_TTL_SECONDS = 21600
 
 export const onRequest: PagesFunction = async (context) => {
     const cacheUrl = new URL(context.request.url)
