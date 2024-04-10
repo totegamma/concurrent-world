@@ -7,7 +7,8 @@ import {
     type Message,
     type Timeline,
     type CommonstreamSchema,
-    type DomainProfileSchema
+    type DomainProfileSchema,
+    type CoreSubscription
 } from '@concurrent-world/client'
 import { Draft } from '../components/Draft'
 import { MobileDraft } from '../components/MobileDraft'
@@ -28,6 +29,7 @@ export interface GlobalActionsState {
     openReroute: (target: Message<any>) => void
     openMobileMenu: (open?: boolean) => void
     allKnownStreams: Array<Timeline<CommonstreamSchema>>
+    ownSubscriptions: Array<CoreSubscription<any>>
     draft: string
     openEmojipack: (url: EmojiPackage) => void
     openImageViewer: (url: string) => void
@@ -67,6 +69,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const isPostStreamsPublic = useMemo(() => postStreams.every((stream) => stream.indexable), [postStreams])
 
     const [allKnownStreams, setAllKnownStreams] = useState<Array<Timeline<CommonstreamSchema>>>([])
+    const [ownSubscriptions, setOwnSubscriptions] = useState<Array<CoreSubscription<any>>>([])
     const [domainIsOffline, setDomainIsOffline] = useState<boolean>(false)
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
     const [previewImage, setPreviewImage] = useState<string | undefined>()
@@ -107,6 +110,15 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
             unmounted = true
         }
     }, [lists])
+
+    useEffect(() => {
+        if (!client.api) return
+
+        client.api.getOwnSubscriptions().then((subs) => {
+            console.log('subs', subs)
+            if (subs) setOwnSubscriptions(subs)
+        })
+    }, [client])
 
     useEffect(() => {
         client.api.getDomain(client.api.host).then((domain) => {
@@ -229,7 +241,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     openEmojipack,
                     openImageViewer,
                     postStreams,
-                    setPostStreams
+                    setPostStreams,
+                    ownSubscriptions
                 }
             }, [
                 openDraft,
@@ -241,7 +254,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                 openEmojipack,
                 openImageViewer,
                 postStreams,
-                setPostStreams
+                setPostStreams,
+                ownSubscriptions
             ])}
         >
             <InspectorProvider>
