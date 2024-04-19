@@ -80,8 +80,12 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
                     label={`${character.author.slice(0, 9)}...`}
                     deleteIcon={<ContentPasteIcon />}
                     onDelete={() => {
-                        navigator.clipboard.writeText(props.user?.ccid ?? '')
-                        enqueueSnackbar('Copied', { variant: 'info' })
+                        if (character.author) {
+                            navigator.clipboard.writeText(character.author)
+                            enqueueSnackbar('Copied', { variant: 'info' })
+                        } else {
+                            enqueueSnackbar('No CCID found', { variant: 'error' })
+                        }
                     }}
                 />
             </Box>
