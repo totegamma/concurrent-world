@@ -1,6 +1,7 @@
-# Concurrent-world
+![wordmark](https://github.com/totegamma/concurrent/assets/7270849/44864682-ca2d-427a-b1fb-552ca50bcfce)
+### Concurrent: SNSのアカウントをあなたのインターネット人格として確立します。
+
 Concurrent-worldは分散マイクロブログ基盤である[Concurrent](https://github.com/totegamma/concurrent)のwebクライアント実装の1つです。
-現在は絶賛開発中で、最低限の機能しかありません。
 
 現在は [concurrent.world](https://concurrent.world)で公開されています。
 
@@ -36,16 +37,6 @@ pnpm dev
 ```
 pnpm build
 ```
-
-### schemaファイルの生成
-concurrentはサーバー間でやりとりするオブジェクトのIDと内容をjsonSchemaで担保しています。
-利用するjsonSchemaを`src/schemas.ts`で定義し、以下のコマンドを実行すると外部からjsonSchemaをダウンロードし、typescriptの型定義に変換した上で`src/schemas/`へ格納してくれます。
-
-```
-deno run -A collectSchemas.ts
-```
-
-`dist/`下に成果物が出力されます。
 
 ## Contributing
 現在は絶賛開発中な為、PR前にissueの起票をお願いします。

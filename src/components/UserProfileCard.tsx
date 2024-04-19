@@ -7,6 +7,7 @@ import { useSnackbar } from 'notistack'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import { MarkdownRenderer } from './ui/MarkdownRenderer'
 import { CCWallpaper } from './ui/CCWallpaper'
+import { Link as routerLink } from 'react-router-dom'
 
 export interface UserProfileCardProps {
     user?: User
@@ -33,6 +34,8 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
             <Box position="relative" height={0}>
                 <Box
                     position="relative"
+                    component={routerLink}
+                    to={'/entity/' + (character.author ?? '')}
                     sx={{
                         top: '-30px',
                         left: '10px'
@@ -80,8 +83,12 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
                     label={`${character.author.slice(0, 9)}...`}
                     deleteIcon={<ContentPasteIcon />}
                     onDelete={() => {
-                        navigator.clipboard.writeText(props.user?.ccid ?? '')
-                        enqueueSnackbar('Copied', { variant: 'info' })
+                        if (character.author) {
+                            navigator.clipboard.writeText(character.author)
+                            enqueueSnackbar('Copied', { variant: 'info' })
+                        } else {
+                            enqueueSnackbar('No CCID found', { variant: 'error' })
+                        }
                     }}
                 />
             </Box>

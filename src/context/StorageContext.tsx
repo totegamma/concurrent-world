@@ -96,13 +96,18 @@ export const StorageProvider = ({ children }: { children: JSX.Element | JSX.Elem
                 return (await result.json()).data.link
             } else {
                 try {
-                    const result = await client.api.fetchWithCredential(client.host, '/storage/files', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': file.type
+                    const result = await client.api.fetchWithCredential(
+                        client.host,
+                        '/storage/files',
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': file.type
+                            },
+                            body: file
                         },
-                        body: file
-                    })
+                        1000 * 60 // 1 minute
+                    )
 
                     if (!result.ok) {
                         console.error('upload failed:', result)

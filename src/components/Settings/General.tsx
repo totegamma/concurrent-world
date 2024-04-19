@@ -36,7 +36,7 @@ export const GeneralSettings = (): JSX.Element => {
     const { t, i18n } = useTranslation('', { keyPrefix: 'settings.general' })
 
     useEffect(() => {
-        setCurrentLanguage(i18n.language)
+        setCurrentLanguage(i18n.resolvedLanguage || 'en')
     }, [])
 
     return (
