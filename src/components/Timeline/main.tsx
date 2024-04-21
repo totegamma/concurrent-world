@@ -60,7 +60,7 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                 timelineChanged()
             }
             t.onRealtimeEvent = (event) => {
-                if (event.type === 'message' && event.action === 'create') {
+                if (event.document?.type === 'message') {
                     playBubbleRef.current()
                 }
             }
@@ -265,13 +265,13 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                         ) : (
                             timeline.current?.body.map((e) => {
                                 let element
-                                const type = e.objectID[0]
+                                const type = e.resourceID[0]
                                 switch (type) {
                                     case 'm':
                                         element = (
                                             <MessageContainer
                                                 sx={timelineElemSx}
-                                                messageID={e.objectID}
+                                                messageID={e.resourceID}
                                                 messageOwner={e.owner}
                                                 resolveHint={e.timelineID.split('@')[1]}
                                                 lastUpdated={e.lastUpdate?.getTime() ?? 0}
@@ -284,7 +284,7 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                                         element = (
                                             <AssociationFrame
                                                 sx={timelineElemSx}
-                                                associationID={e.objectID}
+                                                associationID={e.resourceID}
                                                 associationOwner={e.owner}
                                                 lastUpdated={e.lastUpdate?.getTime() ?? 0}
                                                 after={divider}
@@ -298,7 +298,7 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                                 }
 
                                 return (
-                                    <React.Fragment key={e.objectID}>
+                                    <React.Fragment key={e.resourceID}>
                                         <ErrorBoundary FallbackComponent={renderError}>{element}</ErrorBoundary>
                                     </React.Fragment>
                                 )

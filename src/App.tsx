@@ -25,7 +25,6 @@ import { GlobalActionsProvider } from './context/GlobalActions'
 import { EmojiPickerProvider } from './context/EmojiPickerContext'
 
 import { ThinMenu } from './components/Menu/ThinMenu'
-import { type TimelineEvent } from '@concurrent-world/client/dist/types/model/core'
 import { ConcurrentLogo } from './components/theming/ConcurrentLogo'
 import { usePreference } from './context/PreferenceContext'
 import TickerProvider from './context/Ticker'
@@ -36,7 +35,9 @@ import {
     type Subscription,
     type ProfileSchema,
     type Association,
-    type ReplyAssociationSchema
+    type ReplyAssociationSchema,
+    type TimelineEvent,
+    type CCDocument
 } from '@concurrent-world/client'
 import { UrlSummaryProvider } from './context/urlSummaryContext'
 import { StorageProvider } from './context/StorageContext'
@@ -67,20 +68,18 @@ function App(): JSX.Element {
                 ...(client?.user?.notificationTimeline ? [client?.user?.notificationTimeline] : [])
             ])
             sub.on('AssociationCreated', (event: TimelineEvent) => {
-                const a = event.body as CoreAssociation<any>
+                const a = event.document as CCDocument.Association<any>
+
                 if (!a) return
                 if (a.schema === Schemas.replyAssociation) {
-                    const replyassociation = a as Association<ReplyAssociationSchema>
+                    const replyassociation = a as CCDocument.Association<ReplyAssociationSchema>
                     console.log(replyassociation)
                     client?.api
-                        .getMessageWithAuthor(
-                            replyassociation.document.body.messageId,
-                            replyassociation.document.body.messageAuthor
-                        )
+                        .getMessageWithAuthor(replyassociation.body.messageId, replyassociation.body.messageAuthor)
                         .then((m) => {
                             m &&
                                 client?.api
-                                    .getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.author)
+                                    .getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.signer)
                                     .then((c) => {
                                         playNotificationRef.current()
                                         const profile = c?.document.body
@@ -102,9 +101,9 @@ function App(): JSX.Element {
                 }
 
                 if (a.schema === Schemas.rerouteAssociation) {
-                    client?.api.getMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
+                    client?.api.getMessageWithAuthor(a.target, event.item.owner).then((m) => {
                         m &&
-                            client?.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.author).then((c) => {
+                            client?.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.signer).then((c) => {
                                 playNotificationRef.current()
                                 const profile = c?.document.body
                                 enqueueSnackbar(
@@ -125,9 +124,9 @@ function App(): JSX.Element {
                 }
 
                 if (a.schema === Schemas.like) {
-                    client?.api.getMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
+                    client?.api.getMessageWithAuthor(a.target, event.item.owner).then((m) => {
                         m &&
-                            client.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.author).then((c) => {
+                            client.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.signer).then((c) => {
                                 playNotificationRef.current()
                                 const profile = c?.document.body
                                 enqueueSnackbar(
@@ -146,17 +145,17 @@ function App(): JSX.Element {
                 }
 
                 if (a.schema === Schemas.emojiAssociation) {
-                    client.api.getMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
+                    client.api.getMessageWithAuthor(a.target, event.item.owner).then((m) => {
                         console.log(m)
                         m &&
-                            client.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.author).then((c) => {
+                            client.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.signer).then((c) => {
                                 playNotificationRef.current()
                                 const profile = c?.document.body
                                 enqueueSnackbar(
                                     <Box display="flex" flexDirection="column">
                                         <Typography>
                                             {profile?.username ?? 'anonymous'} reacted{' '}
-                                            <img src={a.document.body.imageUrl as string} style={{ height: '1em' }} />
+                                            <img src={a.body.imageUrl as string} style={{ height: '1em' }} />
                                         </Typography>
                                         <MarkdownRendererLite
                                             messagebody={m.document.body.body as string}
@@ -170,9 +169,9 @@ function App(): JSX.Element {
                 }
 
                 if (a.schema === Schemas.mention) {
-                    client?.api.getMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
+                    client?.api.getMessageWithAuthor(a.target, event.item.owner).then((m) => {
                         m &&
-                            client.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.author).then((c) => {
+                            client.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.signer).then((c) => {
                                 playNotificationRef.current()
                                 const profile = c?.document.body
                                 enqueueSnackbar(
