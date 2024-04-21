@@ -1,15 +1,17 @@
-import { IconButton, List, ListItem, ListItemText } from '@mui/material'
+import { List, ListItem, ListItemText } from '@mui/material'
 import { StreamListItem } from './StreamListItem'
-import AddIcon from '@mui/icons-material/Add'
 import ListIcon from '@mui/icons-material/List'
 import { useGlobalActions } from '../../context/GlobalActions'
 import { useTranslation } from 'react-i18next'
 import { useClient } from '../../context/ClientContext'
+import { usePreference } from '../../context/PreferenceContext'
+import { useNavigate } from 'react-router-dom'
 
 export const StreamList = (): JSX.Element => {
     const { t } = useTranslation('', { keyPrefix: 'pages' })
-    const { openMobileMenu, ownSubscriptions } = useGlobalActions()
-    const { client } = useClient()
+    const { openMobileMenu } = useGlobalActions()
+    const [lists] = usePreference('lists')
+    const navigate = useNavigate()
     return (
         <List
             dense
@@ -19,31 +21,9 @@ export const StreamList = (): JSX.Element => {
             }}
         >
             <ListItem
-                onClick={() => {}}
-                secondaryAction={
-                    <IconButton
-                        sx={{
-                            p: 0,
-                            color: 'background.contrastText'
-                        }}
-                        onClick={() => {
-                            client.api
-                                .upsertSubscription(
-                                    'https://schema.concrnt.world/s/common.json',
-                                    {},
-                                    { indexable: false, domainOwned: false }
-                                )
-                                .then((subscription) => {
-                                    console.log(subscription)
-                                })
-                                .catch((error) => {
-                                    console.error(error)
-                                })
-                        }}
-                    >
-                        <AddIcon />
-                    </IconButton>
-                }
+                onClick={() => {
+                    navigate('/subscriptions')
+                }}
                 sx={{
                     gap: '8px'
                 }}
@@ -55,18 +35,11 @@ export const StreamList = (): JSX.Element => {
                 />
                 <ListItemText primary={t('lists.title')} />
             </ListItem>
-            {ownSubscriptions.map((sub) => (
+            {Object.keys(lists).map((key) => (
                 <StreamListItem
-                    key={sub.id}
-                    id={sub.id}
-                    body={{
-                        label: sub.id,
-                        pinned: false,
-                        expanded: true,
-                        streams: [],
-                        userStreams: [],
-                        defaultPostStreams: []
-                    }}
+                    key={key}
+                    id={key}
+                    body={lists[key]}
                     onClick={() => {
                         openMobileMenu(false)
                     }}

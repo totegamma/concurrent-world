@@ -42,6 +42,7 @@ import { UrlSummaryProvider } from './context/urlSummaryContext'
 import { StorageProvider } from './context/StorageContext'
 import { MarkdownRendererLite } from './components/ui/MarkdownRendererLite'
 import { useTranslation } from 'react-i18next'
+import { ManageSubsPage } from './pages/ManageSubs'
 
 function App(): JSX.Element {
     const { client } = useClient()
@@ -342,6 +343,7 @@ function App(): JSX.Element {
                                 <Route path="/message/:id" element={<MessagePage />} />
                                 <Route path="/entity/:id" element={<EntityPage />} />
                                 <Route path="/devtool" element={<Devtool />} />
+                                <Route path="/subscriptions" element={<ManageSubsPage />} />
                             </Routes>
                         </Paper>
                         <Box

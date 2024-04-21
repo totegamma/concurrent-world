@@ -28,8 +28,8 @@ export interface GlobalActionsState {
     openReply: (target: Message<any>) => void
     openReroute: (target: Message<any>) => void
     openMobileMenu: (open?: boolean) => void
-    allKnownStreams: Array<Timeline<CommonstreamSchema>>
-    ownSubscriptions: Array<CoreSubscription<any>>
+    allKnownTimelines: Array<Timeline<CommonstreamSchema>>
+    listedSubscriptions: Record<string, CoreSubscription<any>>
     draft: string
     openEmojipack: (url: EmojiPackage) => void
     openImageViewer: (url: string) => void
@@ -68,8 +68,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
 
     const isPostStreamsPublic = useMemo(() => postStreams.every((stream) => stream.indexable), [postStreams])
 
-    const [allKnownStreams, setAllKnownStreams] = useState<Array<Timeline<CommonstreamSchema>>>([])
-    const [ownSubscriptions, setOwnSubscriptions] = useState<Array<CoreSubscription<any>>>([])
+    const [allKnownTimelines, setAllKnownTimelines] = useState<Array<Timeline<CommonstreamSchema>>>([])
+    const [listedSubscriptions, setListedSubscriptions] = useState<Record<string, CoreSubscription<any>>>({})
     const [domainIsOffline, setDomainIsOffline] = useState<boolean>(false)
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
     const [previewImage, setPreviewImage] = useState<string | undefined>()
@@ -94,31 +94,42 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
 
     useEffect(() => {
         let unmounted = false
-        setAllKnownStreams([])
-        const allStreams = Object.values(lists)
-            .map((list) => list.streams)
-            .flat()
-        const uniq = [...new Set(allStreams)]
-        uniq.forEach((id) => {
-            client.getTimeline<CommonstreamSchema>(id).then((stream) => {
-                if (stream && !unmounted) {
-                    setAllKnownStreams((prev) => [...prev, stream])
-                }
+        setAllKnownTimelines([])
+        Promise.all(
+            Object.keys(lists).map((id) =>
+                client.api
+                    .getSubscription(id)
+                    .then((sub) => {
+                        return [id, sub]
+                    })
+                    .catch((e) => {
+                        console.log(e)
+                        return [id, null]
+                    })
+            )
+        ).then((subs) => {
+            if (unmounted) return
+            const validsubsarr = subs.filter((e) => e[1]) as Array<[string, CoreSubscription<any>]>
+            const listedSubs = Object.fromEntries(validsubsarr)
+            setListedSubscriptions(listedSubs)
+
+            const validsubs = validsubsarr.map((e) => e[1])
+
+            const allTimelins = validsubs.flatMap((sub) => sub.items.map((e) => e.id))
+            const uniq = [...new Set(allTimelins)]
+            uniq.forEach((id) => {
+                client.getTimeline<CommonstreamSchema>(id).then((stream) => {
+                    if (stream && !unmounted) {
+                        setAllKnownTimelines((prev) => [...prev, stream])
+                    }
+                })
             })
         })
+
         return () => {
             unmounted = true
         }
     }, [lists])
-
-    useEffect(() => {
-        if (!client.api) return
-
-        client.api.getOwnSubscriptions().then((subs) => {
-            console.log('subs', subs)
-            if (subs) setOwnSubscriptions(subs)
-        })
-    }, [client])
 
     useEffect(() => {
         client.api.getDomain(client.api.host).then((domain) => {
@@ -236,26 +247,26 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     openReply,
                     openReroute,
                     openMobileMenu,
-                    allKnownStreams,
+                    allKnownTimelines,
                     draft,
                     openEmojipack,
                     openImageViewer,
                     postStreams,
                     setPostStreams,
-                    ownSubscriptions
+                    listedSubscriptions
                 }
             }, [
                 openDraft,
                 openReply,
                 openReroute,
                 openMobileMenu,
-                allKnownStreams,
+                allKnownTimelines,
                 draft,
                 openEmojipack,
                 openImageViewer,
                 postStreams,
                 setPostStreams,
-                ownSubscriptions
+                listedSubscriptions
             ])}
         >
             <InspectorProvider>
@@ -293,7 +304,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                             <MobileDraft
                                                 streamPickerInitial={postStreams}
                                                 defaultPostHome={isPostStreamsPublic}
-                                                streamPickerOptions={allKnownStreams}
+                                                streamPickerOptions={allKnownTimelines}
                                                 onSubmit={async (text: string, destinations: string[], options) => {
                                                     await client
                                                         .createCurrent(text, destinations, options)
@@ -320,7 +331,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                 }
                                                 streamPickerOptions={
                                                     mode === 'reroute'
-                                                        ? allKnownStreams
+                                                        ? allKnownTimelines
                                                         : targetMessage.postedStreams ?? []
                                                 }
                                                 onSubmit={async (text, streams, options): Promise<Error | null> => {
@@ -359,7 +370,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                 defaultPostHome={isPostStreamsPublic}
                                                 value={draft}
                                                 streamPickerInitial={postStreams}
-                                                streamPickerOptions={allKnownStreams}
+                                                streamPickerOptions={allKnownTimelines}
                                                 onSubmit={async (text: string, destinations: string[], options) => {
                                                     await client
                                                         .createCurrent(text, destinations, options)
@@ -398,7 +409,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                 }
                                                 streamPickerOptions={
                                                     mode === 'reroute'
-                                                        ? allKnownStreams
+                                                        ? allKnownTimelines
                                                         : targetMessage.postedStreams ?? []
                                                 }
                                                 onSubmit={async (text, streams, options): Promise<Error | null> => {

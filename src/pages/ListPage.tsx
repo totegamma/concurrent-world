@@ -8,7 +8,8 @@ import { useClient } from '../context/ClientContext'
 import {
     type CreateCurrentOptions,
     type CommonstreamSchema,
-    type Timeline as CoreTimeline
+    type Timeline as CoreTimeline,
+    type CoreSubscription
 } from '@concurrent-world/client'
 import TuneIcon from '@mui/icons-material/Tune'
 import ExploreIcon from '@mui/icons-material/Explore'
@@ -23,17 +24,20 @@ export function ListPage(): JSX.Element {
     const { client } = useClient()
     const path = useLocation()
     const navigate = useNavigate()
-    const { allKnownStreams, postStreams, setPostStreams } = useGlobalActions()
-    const [lists, setLists] = usePreference('lists')
+    const { allKnownTimelines, postStreams, setPostStreams } = useGlobalActions()
+    const [lists, _setLists] = usePreference('lists')
     const [showEditorOnTop] = usePreference('showEditorOnTop')
     const [showEditorOnTopMobile] = usePreference('showEditorOnTopMobile')
     const rawid = path.hash.replace('#', '')
     const id = lists[rawid] ? rawid : Object.keys(lists)[0]
     const [tab, setTab] = useState<string>(id)
+    const [subscription, setSubscription] = useState<CoreSubscription<any> | null>(null)
 
     const [listSettingsOpen, setListSettingsOpen] = useState<boolean>(false)
 
     const timelineRef = useRef<VListHandle>(null)
+
+    const timelines = useMemo(() => subscription?.items.map((e) => e.id) ?? [], [subscription])
 
     useEffect(() => {
         if (!id) return
@@ -53,38 +57,12 @@ export function ListPage(): JSX.Element {
         navigate(`#${tab}`)
     }, [tab])
 
-    const streamIDs = useMemo(() => {
-        return [
-            id === 'home' ? client?.user?.homeTimeline ?? [] : [],
-            ...(lists[id]?.streams ?? []),
-            lists[id]?.userStreams.map((e) => e.streamID) ?? []
-        ].flat()
-    }, [id, lists, client])
-
-    if (!lists[id]) {
-        return (
-            <Box>
-                <div>list not found</div>
-                <Button
-                    onClick={() => {
-                        setLists({
-                            home: {
-                                label: 'Home',
-                                pinned: true,
-                                streams: [],
-                                userStreams: [],
-                                expanded: false,
-                                defaultPostStreams: []
-                            }
-                        })
-                        window.location.reload()
-                    }}
-                >
-                    治す
-                </Button>
-            </Box>
-        )
-    }
+    useEffect(() => {
+        client.api.getSubscription(id).then((sub) => {
+            if (!sub) return
+            setSubscription(sub)
+        })
+    }, [id, client])
 
     return (
         <>
@@ -98,7 +76,7 @@ export function ListPage(): JSX.Element {
                 }}
             >
                 <TimelineHeader
-                    title={lists[id].label}
+                    title={id}
                     titleIcon={<ListIcon />}
                     secondaryAction={<TuneIcon />}
                     onSecondaryActionClick={() => {
@@ -124,7 +102,7 @@ export function ListPage(): JSX.Element {
                             <Tab
                                 key={e}
                                 value={e}
-                                label={lists[e].label}
+                                label={e}
                                 onClick={() => {
                                     console.log('click', e, tab)
                                     if (e === tab) {
@@ -136,7 +114,7 @@ export function ListPage(): JSX.Element {
                         ))}
                 </Tabs>
 
-                {streamIDs.length > 0 ? (
+                {timelines.length > 0 ? (
                     <Timeline
                         header={
                             <>
@@ -149,7 +127,7 @@ export function ListPage(): JSX.Element {
                                     }}
                                 >
                                     <Draft
-                                        streamPickerOptions={allKnownStreams}
+                                        streamPickerOptions={allKnownTimelines}
                                         streamPickerInitial={postStreams}
                                         onSubmit={async (
                                             text: string,
@@ -171,7 +149,7 @@ export function ListPage(): JSX.Element {
                                 </Box>
                             </>
                         }
-                        streams={streamIDs}
+                        streams={timelines}
                         ref={timelineRef}
                     />
                 ) : (
@@ -211,7 +189,7 @@ export function ListPage(): JSX.Element {
                     setListSettingsOpen(false)
                 }}
             >
-                <ListSettings id={id} />
+                {subscription ? <ListSettings subscription={subscription} /> : <>Loading...</>}
             </CCDrawer>
         </>
     )

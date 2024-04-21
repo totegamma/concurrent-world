@@ -20,7 +20,7 @@ import LockIcon from '@mui/icons-material/Lock'
 
 export const StreamPage = memo((): JSX.Element => {
     const { client } = useClient()
-    const { allKnownStreams, postStreams, setPostStreams } = useGlobalActions()
+    const { allKnownTimelines, postStreams, setPostStreams } = useGlobalActions()
 
     const { id } = useParams()
 
@@ -113,7 +113,7 @@ export const StreamPage = memo((): JSX.Element => {
                                             <Draft
                                                 defaultPostHome={!nonPublic}
                                                 streamPickerInitial={streams}
-                                                streamPickerOptions={[...new Set([...allKnownStreams, ...streams])]}
+                                                streamPickerOptions={[...new Set([...allKnownTimelines, ...streams])]}
                                                 onSubmit={async (
                                                     text: string,
                                                     destinations: string[],

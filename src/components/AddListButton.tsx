@@ -1,17 +1,21 @@
 import { Checkbox, IconButton, Menu, MenuItem, Tooltip } from '@mui/material'
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
 import { useState } from 'react'
-import { usePreference } from '../context/PreferenceContext'
+import { useClient } from '../context/ClientContext'
+import { useGlobalActions } from '../context/GlobalActions'
 
 export interface AddListButtonProps {
     stream: string
 }
 
 export const AddListButton = (props: AddListButtonProps): JSX.Element => {
-    const [lists, setLists] = usePreference('lists')
+    const { client } = useClient()
+    const actions = useGlobalActions()
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
-    if (!lists) return <></>
+    if (!actions) {
+        return <></>
+    }
 
     return (
         <>
@@ -36,19 +40,22 @@ export const AddListButton = (props: AddListButtonProps): JSX.Element => {
                     setMenuAnchor(null)
                 }}
             >
-                {Object.keys(lists).map((e) => (
-                    <MenuItem key={e} onClick={() => {}}>
-                        {lists[e].label}
+                {Object.keys(actions.listedSubscriptions).map((key) => (
+                    <MenuItem key={key} onClick={() => {}}>
+                        {key}
                         <Checkbox
-                            checked={lists[e].streams.includes(props.stream)}
+                            checked={
+                                actions.listedSubscriptions[key].items.find((e) => e.id === props.stream) !== undefined
+                            }
                             onChange={(check) => {
-                                const old = lists
                                 if (check.target.checked) {
-                                    old[e].streams.push(props.stream)
-                                    setLists(JSON.parse(JSON.stringify(old)))
+                                    client.api.subscribe(props.stream, key).then((subscription) => {
+                                        console.log(subscription)
+                                    })
                                 } else {
-                                    old[e].streams = old[e].streams.filter((e) => e !== props.stream)
-                                    setLists(JSON.parse(JSON.stringify(old)))
+                                    client.api.unsubscribe(props.stream, key).then((subscription) => {
+                                        console.log(subscription)
+                                    })
                                 }
                             }}
                         />

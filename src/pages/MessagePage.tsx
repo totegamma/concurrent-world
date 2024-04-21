@@ -216,7 +216,7 @@ export function MessagePage(): JSX.Element {
                     <Paper variant="outlined">
                         <Draft
                             streamPickerInitial={message.postedStreams ?? []}
-                            streamPickerOptions={actions.allKnownStreams}
+                            streamPickerOptions={actions.allKnownTimelines}
                             placeholder="Write a reply..."
                             onSubmit={async (text: string, streams: string[], options) => {
                                 await message.reply(streams, text, options?.emojis)
