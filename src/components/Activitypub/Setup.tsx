@@ -75,8 +75,8 @@ export const ApSetup = (): JSX.Element => {
 
         const oldhome = lists.home
         if (oldhome) {
-            oldhome.streams.push(followstream.id)
-            updateList('home', oldhome)
+            // oldhome.streams.push(followstream.id) // TODO
+            // updateList('home', oldhome)
         }
 
         await client.api

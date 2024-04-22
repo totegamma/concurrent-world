@@ -25,7 +25,7 @@ export const MinimalStreamList = (): JSX.Element => {
                         textDecoration: 'none'
                     }}
                 >
-                    {lists[key].label}
+                    {key}
                 </Avatar>
             ))}
         </Box>

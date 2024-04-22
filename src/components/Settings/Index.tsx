@@ -70,6 +70,7 @@ export function SettingsIndex(): JSX.Element {
                         </Typography>
                     </Box>
                 </ButtonBase>
+                {/*
                 <Button
                     onClick={(_) => {
                         if (client.api.host === undefined) {
@@ -84,6 +85,7 @@ export function SettingsIndex(): JSX.Element {
                 >
                     Goto Domain Home
                 </Button>
+                */}
             </Box>
             <Paper /* menu */
                 variant="outlined"
