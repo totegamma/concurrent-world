@@ -31,25 +31,20 @@ export const ProfileSettings = (): JSX.Element => {
     const [schemaURL, setSchemaURL] = useState<any>(null)
     const [editingCharacter, setEditingCharacter] = useState<CoreCharacter<any> | null>(null)
 
-    const [latestProfile, setLatestProfile] = useState<CoreCharacter<ProfileSchema> | null | undefined>(
-        client.user?.profile
-    )
+    const [latestProfile, setLatestProfile] = useState<ProfileSchema | null | undefined>(client.user?.profile)
 
     const load = (): void => {
-        if (!client) return
+        if (!client?.ccid) return
         client.api.invalidateCharacter(client.ccid)
-        client.api.getCharacter(client.ccid).then((characters) => {
-            setAllCharacters(
-                (characters ?? []).filter(
-                    (c) => c.id !== client.user?.profile?.id && c.id !== client.user?.userstreams?.id
-                )
-            )
+
+        client.api.getCharacters({ author: client.ccid }).then((characters) => {
+            setAllCharacters(characters ?? [])
         })
 
         if (!client.user?.profile) return
 
-        client.api.getCharacterByID(client.user.profile?.id, client.user.ccid).then((profile) => {
-            setLatestProfile(profile as CoreCharacter<ProfileSchema>)
+        client.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', client.ccid).then((profile) => {
+            setLatestProfile(profile?.document.body)
         })
     }
 
@@ -57,7 +52,7 @@ export const ProfileSettings = (): JSX.Element => {
         load()
     }, [client])
 
-    const enabledSubprofiles = latestProfile?.payload.body.subprofiles ?? []
+    const enabledSubprofiles = latestProfile?.subprofiles ?? []
 
     useEffect(() => {
         let isMounted = true
@@ -97,9 +92,8 @@ export const ProfileSettings = (): JSX.Element => {
                 }}
             >
                 <ProfileEditor
-                    id={client?.user?.profile?.id}
-                    initial={client?.user?.profile?.payload.body}
-                    onSubmit={(_profile) => {
+                    initial={client?.user?.profile}
+                    onSubmit={() => {
                         enqueueSnackbar(t('updated'), { variant: 'success' })
                     }}
                 />
@@ -138,14 +132,13 @@ export const ProfileSettings = (): JSX.Element => {
                                         subprofiles = [...enabledSubprofiles, character.id]
                                     }
 
-                                    client.user?.profile?.id &&
-                                        client
-                                            .updateProfile(client.user?.profile?.id, {
-                                                subprofiles
-                                            })
-                                            .then((_) => {
-                                                load()
-                                            })
+                                    client
+                                        .setProfile({
+                                            subprofiles
+                                        })
+                                        .then((_) => {
+                                            load()
+                                        })
                                 }}
                             >
                                 <ListItemIcon>
@@ -232,7 +225,7 @@ export const ProfileSettings = (): JSX.Element => {
                             <Typography variant="h3">サブプロフィールの編集</Typography>
                             <CCEditor
                                 schemaURL={editingCharacter.schema}
-                                init={editingCharacter.payload.body}
+                                init={editingCharacter.document.body}
                                 onSubmit={(e) => {
                                     console.log(e)
                                     client.api

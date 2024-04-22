@@ -31,8 +31,8 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                 to={'/entity/' + props.message.author}
             >
                 <CCAvatar
-                    alt={props.message.authorUser?.profile?.payload.body.username}
-                    avatarURL={props.message.authorUser?.profile?.payload.body.avatar}
+                    alt={props.message.authorUser?.profile?.username}
+                    avatarURL={props.message.authorUser?.profile?.avatar}
                     identiconSource={props.message.author}
                     sx={{
                         width: { xs: '38px', sm: '48px' },
@@ -53,15 +53,15 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                         placement="top"
                         title={
                             <MarkdownRenderer
-                                messagebody={props.message.payload.body.body}
-                                emojiDict={props.message.payload.body.emojis ?? {}}
+                                messagebody={props.message.document.body.body}
+                                emojiDict={props.message.document.body.emojis ?? {}}
                             />
                         }
                     >
                         <Box>
                             <MarkdownRendererLite
-                                messagebody={props.message.payload.body.body}
-                                emojiDict={props.message.payload.body.emojis ?? {}}
+                                messagebody={props.message.document.body.body}
+                                emojiDict={props.message.document.body.emojis ?? {}}
                                 forceOneline={true}
                             />
                         </Box>

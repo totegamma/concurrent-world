@@ -43,9 +43,9 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
     const [characterOverride, setCharacterOverride] = useState<CoreCharacter<any> | undefined>(undefined)
 
     useEffect(() => {
-        if (!(client && props.message.payload.body.profileOverride?.characterID)) return
+        if (!(client && props.message.document.body.profileOverride?.characterID)) return
         client.api
-            .getCharacterByID(props.message.payload.body.profileOverride?.characterID, props.message.author)
+            .getCharacterByID(props.message.document.body.profileOverride?.characterID, props.message.author)
             .then((character) => {
                 setCharacterOverride(character ?? undefined)
             })
@@ -70,11 +70,11 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
     return (
         <ContentWithCCAvatar
             author={props.message.authorUser}
-            profileOverride={props.message.payload.body.profileOverride}
-            avatarOverride={characterOverride?.payload.body.avatar}
+            profileOverride={props.message.document.body.profileOverride}
+            avatarOverride={characterOverride?.document.body.avatar}
         >
             <MessageHeader
-                usernameOverride={characterOverride?.payload.body.username}
+                usernameOverride={characterOverride?.document.body.username}
                 message={props.message}
                 additionalMenuItems={props.additionalMenuItems}
             />
@@ -113,7 +113,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                     </Button>
                 </Box>
                 <SimpleNote message={props.message} />
-                {!props.simple && <MessageUrlPreview messageBody={props.message.payload.body.body} />}
+                {!props.simple && <MessageUrlPreview messageBody={props.message.document.body.body} />}
             </Box>
             {(!props.simple && (
                 <>

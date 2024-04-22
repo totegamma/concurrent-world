@@ -35,9 +35,9 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
             if (!msg) return
             if (!isMounted) return
             setMessage(msg)
-            if (msg.payload.keyID && msg.payload.keyID !== '') {
-                console.log('fetching keychain for', msg.payload.keyID, inspectingItem.author)
-                client.api.getKeyResolution(msg.payload.keyID, inspectingItem.author).then((keys) => {
+            if (msg.document.keyID && msg.document.keyID !== '') {
+                console.log('fetching keychain for', msg.document.keyID, inspectingItem.author)
+                client.api.getKeyResolution(msg.document.keyID, inspectingItem.author).then((keys) => {
                     if (!isMounted) return
                     setKeyResolution(keys)
                 })
@@ -57,9 +57,9 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
     const signatureIsValid = useMemo(() => {
         if (message) {
             return validateSignature(
-                message.rawpayload,
+                message._document,
                 message.signature,
-                message.payload.keyID ?? message.payload.signer
+                message.document.keyID ?? message.document.signer
             )
         }
         return false
@@ -76,7 +76,7 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
 
     const isSignedBySubkey = useMemo(() => {
         if (message) {
-            return message.payload.keyID && message.payload.keyID !== ''
+            return message.document.keyID && message.document.keyID !== ''
         }
         return false
     }, [message])
@@ -111,7 +111,7 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                 break
             }
 
-            if (!validateSignature(key.enactPayload, key.enactSignature, key.parent)) {
+            if (!validateSignature(key.enactDocument, key.enactSignature, key.parent)) {
                 valid = false
                 reason = 'failed to validate enact signature of key ' + key.id
                 break
@@ -120,17 +120,17 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                 since = new Date(keyResolution[i].validSince)
             }
 
-            if (key.revokePayload?.startsWith('{') && key.revokeSignature) {
+            if (key.revokeDocument?.startsWith('{') && key.revokeSignature) {
                 try {
-                    const obj = JSON.parse(key.revokePayload)
-                    if (validateSignature(key.revokePayload, key.revokeSignature, obj.keyID ?? obj.signer)) {
+                    const obj = JSON.parse(key.revokeDocument)
+                    if (validateSignature(key.revokeDocument, key.revokeSignature, obj.keyID ?? obj.signer)) {
                         if (!until || new Date(keyResolution[i].validUntil) > until) {
                             until = new Date(keyResolution[i].validUntil)
                         }
                     }
                 } catch (e) {
                     valid = false
-                    reason = 'failed to parse revoke payload of key ' + key.id
+                    reason = 'failed to parse revoke document of key ' + key.id
                     break
                 }
             }
@@ -139,10 +139,10 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
         }
 
         if (valid === undefined) {
-            if (since && message && since > new Date(message.payload.signedAt)) {
+            if (since && message && since > new Date(message.document.signedAt)) {
                 valid = false
                 reason = 'keychain is not valid at the time of signing'
-            } else if (until && message && until < new Date(message.payload.signedAt)) {
+            } else if (until && message && until < new Date(message.document.signedAt)) {
                 valid = false
                 reason = 'keychain is not valid at the time of signing'
             } else {
@@ -197,7 +197,7 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                                     <br />
                                     With subkey:
                                     <br />
-                                    {message.payload.keyID}
+                                    {message.document.keyID}
                                 </Alert>
                             ) : (
                                 <Alert severity="success">Signature is valid!</Alert>

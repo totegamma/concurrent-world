@@ -7,7 +7,7 @@ import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import HeartBrokenIcon from '@mui/icons-material/HeartBroken'
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
 import SyncIcon from '@mui/icons-material/Sync'
-import { type Timeline as CoreTimeline } from '@concurrent-world/client'
+import { type TimelineReader } from '@concurrent-world/client'
 import { useRefWithForceUpdate } from '../../hooks/useRefWithForceUpdate'
 import useSound from 'use-sound'
 import { usePreference } from '../../context/PreferenceContext'
@@ -30,7 +30,7 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
     const theme = useTheme()
     const [sound] = usePreference('sound')
 
-    const [timeline, timelineChanged] = useRefWithForceUpdate<CoreTimeline | null>(null)
+    const [timeline, timelineChanged] = useRefWithForceUpdate<TimelineReader | null>(null)
 
     const [hasMoreData, setHasMoreData] = useState<boolean>(false)
     const [isFetching, setIsFetching] = useState<boolean>(false)
@@ -53,14 +53,14 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
         let isCancelled = false
         if (props.streams.length === 0) return
         setTimelineLoading(true)
-        const mt = client.newTimeline().then((t) => {
+        const mt = client.newTimelineReader().then((t) => {
             if (isCancelled) return
             timeline.current = t
             t.onUpdate = () => {
                 timelineChanged()
             }
             t.onRealtimeEvent = (event) => {
-                if (event.type === 'message' && event.action === 'create') {
+                if (event.document?.type === 'message') {
                     playBubbleRef.current()
                 }
             }
@@ -265,25 +265,26 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                         ) : (
                             timeline.current?.body.map((e) => {
                                 let element
-                                switch (e.type) {
-                                    case 'message':
+                                const type = e.resourceID[0]
+                                switch (type) {
+                                    case 'm':
                                         element = (
                                             <MessageContainer
                                                 sx={timelineElemSx}
-                                                messageID={e.objectID}
+                                                messageID={e.resourceID}
                                                 messageOwner={e.owner}
-                                                resolveHint={e.streamID.split('@')[1]}
+                                                resolveHint={e.timelineID.split('@')[1]}
                                                 lastUpdated={e.lastUpdate?.getTime() ?? 0}
                                                 after={divider}
                                                 timestamp={e.cdate}
                                             />
                                         )
                                         break
-                                    case 'association':
+                                    case 'a':
                                         element = (
                                             <AssociationFrame
                                                 sx={timelineElemSx}
-                                                associationID={e.objectID}
+                                                associationID={e.resourceID}
                                                 associationOwner={e.owner}
                                                 lastUpdated={e.lastUpdate?.getTime() ?? 0}
                                                 after={divider}
@@ -292,12 +293,12 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                                         )
                                         break
                                     default:
-                                        element = <Typography>Unknown message type: {e.type}</Typography>
+                                        element = <Typography>Unknown message type: {type}</Typography>
                                         break
                                 }
 
                                 return (
-                                    <React.Fragment key={e.objectID}>
+                                    <React.Fragment key={e.resourceID}>
                                         <ErrorBoundary FallbackComponent={renderError}>{element}</ErrorBoundary>
                                     </React.Fragment>
                                 )

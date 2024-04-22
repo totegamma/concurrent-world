@@ -41,9 +41,9 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
                     const resolver = id.split('@')[1]
                     const client = new Client(resolver)
 
-                    client.api.getStream(id).then((e) => {
+                    client.api.getTimeline(id).then((e) => {
                         console.log(e)
-                        setTitle(e?.payload.name ?? '')
+                        setTitle(e?.document.body.name ?? '')
                     })
                     setUser(undefined)
 
@@ -55,8 +55,8 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
                     const client = new Client('hub.concurrent.world')
                     client.getUser(id).then((e) => {
                         setUser(e)
-                        setTitle(e?.profile?.payload.body.username ?? '')
-                        setTargetStream([e?.userstreams?.payload.body.homeStream ?? ''])
+                        setTitle(e?.profile?.username ?? '')
+                        setTargetStream([e?.homeTimeline ?? ''])
                     })
 
                     initializeClient(client)
@@ -71,8 +71,8 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
 
                     client.getUser(authorID).then((e) => {
                         setUser(e)
-                        setTitle(e?.profile?.payload.body.username ?? '')
-                        setTargetStream([e?.userstreams?.payload.body.homeStream ?? ''])
+                        setTitle(e?.profile?.username ?? '')
+                        setTargetStream([e?.homeTimeline ?? ''])
                     })
                 }
                 break

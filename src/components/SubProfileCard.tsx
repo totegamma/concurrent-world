@@ -15,7 +15,7 @@ export interface SubProfileCardProps {
 }
 
 export const SubProfileCard = (props: SubProfileCardProps): JSX.Element => {
-    const isProfile = 'username' in props.character.payload.body && 'avatar' in props.character.payload.body
+    const isProfile = 'username' in props.character.document.body && 'avatar' in props.character.document.body
 
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
@@ -26,7 +26,7 @@ export const SubProfileCard = (props: SubProfileCardProps): JSX.Element => {
                     height: '80px',
                     position: 'relative'
                 }}
-                override={props.character.payload.body.banner}
+                override={props.character.document.body.banner}
             >
                 {props.additionalMenuItems && (
                     <IconButton
@@ -59,9 +59,9 @@ export const SubProfileCard = (props: SubProfileCardProps): JSX.Element => {
                             }}
                         >
                             <CCAvatar
-                                alt={props.character.payload.body.username}
-                                avatarURL={props.character.payload.body.avatar}
-                                identiconSource={props.character.payload.body.username}
+                                alt={props.character.document.body.username}
+                                avatarURL={props.character.document.body.avatar}
+                                identiconSource={props.character.document.body.username}
                                 sx={{
                                     width: '60px',
                                     height: '60px'
@@ -90,7 +90,7 @@ export const SubProfileCard = (props: SubProfileCardProps): JSX.Element => {
                         px={1}
                         mb={1}
                     >
-                        <Typography variant="h2">{props.character.payload.body.username}</Typography>
+                        <Typography variant="h2">{props.character.document.body.username}</Typography>
                         <Box />
                     </Box>
                     <Box
@@ -103,7 +103,7 @@ export const SubProfileCard = (props: SubProfileCardProps): JSX.Element => {
                         }}
                     >
                         <MarkdownRendererLite
-                            messagebody={props.character.payload.body.description ?? ''}
+                            messagebody={props.character.document.body.description ?? ''}
                             emojiDict={{}}
                         />
                     </Box>

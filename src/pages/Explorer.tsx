@@ -31,7 +31,6 @@ import DoneAllIcon from '@mui/icons-material/DoneAll'
 import RemoveDoneIcon from '@mui/icons-material/RemoveDone'
 import { type StreamWithDomain } from '../model'
 import { StreamCard } from '../components/Stream/Card'
-import { UserProfileCard } from '../components/UserProfileCard'
 import { SubProfileCard } from '../components/SubProfileCard'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 
@@ -92,7 +91,7 @@ export function Explorer(): JSX.Element {
         let unmounted = false
         Promise.all(
             selectedDomains.map(async (e) => {
-                const streams = await client.getStreamsBySchema<CommonstreamSchema>(e, Schemas.commonstream)
+                const streams = await client.getTimelinesBySchema<CommonstreamSchema>(e, Schemas.commonstream)
                 return streams.map((stream) => {
                     return {
                         domain: e,
@@ -138,7 +137,7 @@ export function Explorer(): JSX.Element {
 
     const createNewStream = (stream: any): void => {
         client.api
-            .createStream(Schemas.commonstream, stream)
+            .upsertTimeline(Schemas.commonstream, stream)
             .then((e: any) => {
                 const id: string = e.id
                 if (id) navigate('/stream/' + id)
@@ -322,9 +321,9 @@ export function Explorer(): JSX.Element {
                                 <StreamCard
                                     key={value.stream.id}
                                     streamID={value.stream.id}
-                                    name={value.stream.payload.name}
-                                    description={value.stream.payload.description}
-                                    banner={value.stream.payload.banner ?? ''}
+                                    name={value.stream.document.body.name}
+                                    description={value.stream.document.body.description}
+                                    banner={value.stream.document.body.banner ?? ''}
                                     domain={value.domain}
                                     isOwner={value.stream.author === client.ccid}
                                 />
@@ -374,11 +373,7 @@ export function Explorer(): JSX.Element {
                     >
                         {characters.map((character) => (
                             <Paper key={character.id} variant="outlined">
-                                {character.schema === Schemas.profile ? (
-                                    <UserProfileCard character={character} />
-                                ) : (
-                                    <SubProfileCard character={character} />
-                                )}
+                                <SubProfileCard character={character} />
                             </Paper>
                         ))}
                     </Box>

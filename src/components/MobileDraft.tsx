@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo, useContext } from 'react'
+import { useState, useEffect, useRef, memo } from 'react'
 import {
     InputBase,
     Box,
@@ -22,7 +22,7 @@ import ImageIcon from '@mui/icons-material/Image'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 import { useEmojiPicker } from '../context/EmojiPickerContext'
-import { type CommonstreamSchema, type Stream, type User, type CreateCurrentOptions } from '@concurrent-world/client'
+import { type CommonstreamSchema, type Timeline, type User, type CreateCurrentOptions } from '@concurrent-world/client'
 import { useClient } from '../context/ClientContext'
 import { type Emoji, type EmojiLite } from '../model'
 import { useNavigate } from 'react-router-dom'
@@ -33,8 +33,8 @@ import { useStorage } from '../context/StorageContext'
 import { DummyMessageView } from './Message/DummyMessageView'
 
 export interface MobileDraftProps {
-    streamPickerInitial: Array<Stream<CommonstreamSchema>>
-    streamPickerOptions: Array<Stream<CommonstreamSchema>>
+    streamPickerInitial: Array<Timeline<CommonstreamSchema>>
+    streamPickerOptions: Array<Timeline<CommonstreamSchema>>
     onSubmit: (text: string, destinations: string[], options?: CreateCurrentOptions) => Promise<Error | null>
     onCancel?: () => void
     submitButtonLabel?: string
@@ -52,7 +52,7 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
     const navigate = useNavigate()
     const { uploadFile, isUploadReady } = useStorage()
 
-    const [destStreams, setDestStreams] = useState<Array<Stream<CommonstreamSchema>>>(props.streamPickerInitial)
+    const [destStreams, setDestStreams] = useState<Array<Timeline<CommonstreamSchema>>>(props.streamPickerInitial)
 
     const [draft, setDraft] = usePersistent<string>('draft', '')
 
@@ -108,9 +108,9 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
             return
         }
         const destStreamIDs = destStreams.map((s) => s.id)
-        const dest = [
-            ...new Set([...destStreamIDs, ...(postHome ? [client?.user?.userstreams?.payload.body.homeStream] : [])])
-        ].filter((e) => e) as string[]
+        const dest = [...new Set([...destStreamIDs, ...(postHome ? [client?.user?.homeTimeline] : [])])].filter(
+            (e) => e
+        ) as string[]
 
         const mentions = draft.match(/@([^\s@]+)/g)?.map((e) => e.slice(1)) ?? []
 
@@ -339,7 +339,7 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
                         if (userQuery) {
                             setUserSuggestions(
                                 client.ackings?.filter((q) =>
-                                    q.profile?.payload.body.username?.toLowerCase()?.includes(userQuery)
+                                    q.profile?.username?.toLowerCase()?.includes(userQuery)
                                 ) ?? []
                             )
                             setEnableUserPicker(true)
@@ -407,7 +407,7 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
                             body: draft,
                             emojis: emojiDict
                         }}
-                        user={client.user?.profile?.payload.body}
+                        user={client.user?.profile}
                         userCCID={client.user?.ccid}
                         timestamp={
                             <Typography
@@ -473,7 +473,7 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
                     >
                         {userSuggestions.map((user, index) => (
                             <ListItemButton
-                                key={user.profile?.payload.body.avatar}
+                                key={user.profile?.avatar}
                                 selected={index === selectedSuggestions}
                                 onClick={() => {
                                     onUserSuggestConfirm(index)
@@ -488,7 +488,7 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
                             >
                                 <Box
                                     component="img"
-                                    src={user.profile?.payload.body.avatar}
+                                    src={user.profile?.avatar}
                                     sx={{
                                         width: '100%',
                                         height: '100%'

@@ -15,7 +15,6 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
 
     const [associationTarget, setAssociationTarget] = useState<string>('')
     const [associationTargetAuthor, setAssociationTargetAuthor] = useState<string>('')
-    const [associationTargetType, setAssociationTargetType] = useState<string>('message')
 
     const [character, setCharacter] = useState<CoreCharacter<any> | null | undefined>()
 
@@ -29,7 +28,6 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
             e,
             associationTarget,
             associationTargetAuthor,
-            associationTargetType,
             streams.split(',')
         )
     }
@@ -91,17 +89,6 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
                                 setAssociationTargetAuthor(e.target.value)
                             }}
                         />
-                        <Select
-                            value={associationTargetType}
-                            label="Target Type"
-                            onChange={(e) => {
-                                setAssociationTargetType(e.target.value as any)
-                            }}
-                        >
-                            <MenuItem value={'message'}>Message</MenuItem>
-                            <MenuItem value={'character'}>Character</MenuItem>
-                        </Select>
-
                         <TextField
                             label="Streams"
                             value={streams}
@@ -125,7 +112,7 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
                     onClick={() => {
                         if (cctype === 'character') {
                             if (!client.ccid) return
-                            client.api.getCharacter(client.ccid, schemaURLDraft).then((e) => {
+                            client.api.getCharacters({ author: client.ccid, schema: schemaURLDraft }).then((e) => {
                                 if (!e || e.length === 0) return
                                 setCharacter(e[0])
                                 setSchemaURL(schemaURLDraft)
@@ -154,7 +141,7 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
                                 break
                         }
                     }}
-                    init={character?.payload.body}
+                    init={character?.document.body}
                 />
             </Box>
         </div>

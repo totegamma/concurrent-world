@@ -1,16 +1,17 @@
-import { IconButton, List, ListItem, ListItemText } from '@mui/material'
-import { usePreference } from '../../context/PreferenceContext'
-import { v4 as uuidv4 } from 'uuid'
+import { List, ListItem, ListItemText } from '@mui/material'
 import { StreamListItem } from './StreamListItem'
-import AddIcon from '@mui/icons-material/Add'
 import ListIcon from '@mui/icons-material/List'
 import { useGlobalActions } from '../../context/GlobalActions'
 import { useTranslation } from 'react-i18next'
+import { useClient } from '../../context/ClientContext'
+import { usePreference } from '../../context/PreferenceContext'
+import { useNavigate } from 'react-router-dom'
 
 export const StreamList = (): JSX.Element => {
     const { t } = useTranslation('', { keyPrefix: 'pages' })
-    const [lists, setLists] = usePreference('lists')
-    const actions = useGlobalActions()
+    const { openMobileMenu } = useGlobalActions()
+    const [lists] = usePreference('lists')
+    const navigate = useNavigate()
     return (
         <List
             dense
@@ -20,29 +21,9 @@ export const StreamList = (): JSX.Element => {
             }}
         >
             <ListItem
-                onClick={() => {}}
-                secondaryAction={
-                    <IconButton
-                        sx={{
-                            p: 0,
-                            color: 'background.contrastText'
-                        }}
-                        onClick={() => {
-                            const old = lists
-                            old[uuidv4()] = {
-                                label: 'new list',
-                                pinned: false,
-                                expanded: false,
-                                streams: [],
-                                userStreams: [],
-                                defaultPostStreams: []
-                            }
-                            setLists(old)
-                        }}
-                    >
-                        <AddIcon />
-                    </IconButton>
-                }
+                onClick={() => {
+                    navigate('/subscriptions')
+                }}
                 sx={{
                     gap: '8px'
                 }}
@@ -60,7 +41,7 @@ export const StreamList = (): JSX.Element => {
                     id={key}
                     body={lists[key]}
                     onClick={() => {
-                        actions.openMobileMenu(false)
+                        openMobileMenu(false)
                     }}
                 />
             ))}

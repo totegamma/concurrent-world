@@ -2,15 +2,15 @@ import { Box, Button, IconButton, List, ListItem, Switch, Tab, Tabs, TextField, 
 import { StreamPicker } from './ui/StreamPicker'
 import { useEffect, useState } from 'react'
 import { usePreference } from '../context/PreferenceContext'
-import { type CommonstreamSchema, type Stream } from '@concurrent-world/client'
+import { type CoreSubscription, type CommonstreamSchema, type Timeline } from '@concurrent-world/client'
 import { useClient } from '../context/ClientContext'
-import { StreamLink, UserStreamLink } from './StreamList/StreamLink'
+import { StreamLink } from './StreamList/StreamLink'
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove'
 import { useTranslation } from 'react-i18next'
 import { type StreamList } from '../model'
 
 export interface ListSettingsProps {
-    id: string
+    subscription: CoreSubscription<any>
 }
 
 export function ListSettings(props: ListSettingsProps): JSX.Element {
@@ -20,31 +20,23 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
 
     const { t } = useTranslation('', { keyPrefix: 'ui.listSettings' })
 
-    const list = lists[props.id]
-
-    const [options, setOptions] = useState<Array<Stream<CommonstreamSchema>>>([])
-    const [postStreams, setPostStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
+    const [options, setOptions] = useState<Array<Timeline<CommonstreamSchema>>>([])
+    const [postStreams, setPostStreams] = useState<Array<Timeline<CommonstreamSchema>>>([])
 
     const [tab, setTab] = useState<'stream' | 'user'>('stream')
 
-    useEffect(() => {
-        if (props.id) {
-            const list = lists[props.id]
-            if (list) {
-                setListName(list.label)
-            }
-        }
-    }, [props.id])
+    const list = lists[props.subscription.id]
 
     useEffect(() => {
-        Promise.all(list.streams.map((streamID) => client.getStream(streamID))).then((streams) => {
-            setOptions(streams.filter((e) => e !== null) as Array<Stream<CommonstreamSchema>>)
+        if (!list) return
+        Promise.all(props.subscription.items.map((sub) => client.getTimeline(sub.id))).then((streams) => {
+            setOptions(streams.filter((e) => e !== null) as Array<Timeline<CommonstreamSchema>>)
         })
 
-        Promise.all(list.defaultPostStreams.map((streamID) => client.getStream(streamID))).then((streams) => {
-            setPostStreams(streams.filter((stream) => stream !== null) as Array<Stream<CommonstreamSchema>>)
+        Promise.all(list.defaultPostStreams.map((streamID) => client.getTimeline(streamID))).then((streams) => {
+            setPostStreams(streams.filter((stream) => stream !== null) as Array<Timeline<CommonstreamSchema>>)
         })
-    }, [props.id])
+    }, [props.subscription])
 
     const updateList = (id: string, list: StreamList): void => {
         const old = lists
@@ -77,10 +69,7 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                 />
                 <Button
                     onClick={(_) => {
-                        updateList(props.id, {
-                            ...list,
-                            label: listName
-                        })
+                        // TODO
                     }}
                 >
                     {t('update')}
@@ -98,7 +87,7 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                     options={options}
                     selected={postStreams}
                     setSelected={(value) => {
-                        updateList(props.id, {
+                        updateList(props.subscription.id, {
                             ...list,
                             defaultPostStreams: value.map((e) => e.id)
                         })
@@ -106,30 +95,26 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                     }}
                 />
             </Box>
-            {props.id !== 'home' && (
-                <>
-                    <Typography variant="h3">{t('pin')}</Typography>
-                    <Switch
-                        checked={list.pinned}
-                        onChange={(_) => {
-                            updateList(props.id, {
-                                ...list,
-                                pinned: !list.pinned
-                            })
-                        }}
-                    />
-                    <Button
-                        color="error"
-                        onClick={(_) => {
-                            const old = lists
-                            delete old[props.id]
-                            setLists(JSON.parse(JSON.stringify(old)))
-                        }}
-                    >
-                        {t('delete')}
-                    </Button>
-                </>
-            )}
+            <Typography variant="h3">{t('pin')}</Typography>
+            <Switch
+                checked={list.pinned}
+                onChange={(_) => {
+                    updateList(props.subscription.id, {
+                        ...list,
+                        pinned: !list.pinned
+                    })
+                }}
+            />
+            <Button
+                color="error"
+                onClick={(_) => {
+                    const old = lists
+                    delete old[props.subscription.id]
+                    setLists(JSON.parse(JSON.stringify(old)))
+                }}
+            >
+                {t('delete')}
+            </Button>
             <Tabs
                 value={tab}
                 onChange={(_, value) => {
@@ -142,50 +127,23 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                 <Tab label={t('user')} value="user" />
             </Tabs>
             <List>
-                {tab === 'stream' &&
-                    list.streams.map((streamID) => (
-                        <ListItem
-                            key={streamID}
-                            disablePadding
-                            secondaryAction={
-                                <IconButton
-                                    onClick={(_) => {
-                                        updateList(props.id, {
-                                            ...list,
-                                            streams: list.streams.filter((e) => e !== streamID)
-                                        })
-                                    }}
-                                >
-                                    <PlaylistRemoveIcon />
-                                </IconButton>
-                            }
-                        >
-                            <StreamLink streamID={streamID} />
-                        </ListItem>
-                    ))}
-                {tab === 'user' &&
-                    list.userStreams.map((userstream) => (
-                        <ListItem
-                            key={userstream.streamID}
-                            disablePadding
-                            secondaryAction={
-                                <IconButton
-                                    onClick={(_) => {
-                                        updateList(props.id, {
-                                            ...list,
-                                            userStreams: list.userStreams.filter(
-                                                (e) => e.streamID !== userstream.streamID
-                                            )
-                                        })
-                                    }}
-                                >
-                                    <PlaylistRemoveIcon />
-                                </IconButton>
-                            }
-                        >
-                            <UserStreamLink userHomeStream={userstream} />
-                        </ListItem>
-                    ))}
+                {props.subscription.items.map((sub) => (
+                    <ListItem
+                        key={sub.id}
+                        disablePadding
+                        secondaryAction={
+                            <IconButton
+                                onClick={(_) => {
+                                    // TODO: unsubscribe
+                                }}
+                            >
+                                <PlaylistRemoveIcon />
+                            </IconButton>
+                        }
+                    >
+                        <StreamLink streamID={sub.id} />
+                    </ListItem>
+                ))}
             </List>
         </Box>
     )

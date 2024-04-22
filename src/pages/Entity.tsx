@@ -35,10 +35,10 @@ export function EntityPage(): JSX.Element {
         let target
         switch (tab) {
             case 0:
-                target = user?.userstreams?.payload.body.homeStream
+                target = user?.homeTimeline
                 break
             case 1:
-                target = user?.userstreams?.payload.body.associationStream
+                target = user?.associationTimeline
                 break
         }
         return target ? [target] : []
@@ -61,7 +61,7 @@ export function EntityPage(): JSX.Element {
             <Box position="absolute" top="0" left="0" width="100%" zIndex="1">
                 <Collapse in={showHeader}>
                     <TimelineHeader
-                        title={user.profile?.payload.body.username || 'anonymous'}
+                        title={user.profile?.username || 'anonymous'}
                         titleIcon={<AlternateEmailIcon />}
                         onTitleClick={() => {
                             timelineRef.current?.scrollToIndex(0, { align: 'start', smooth: true })

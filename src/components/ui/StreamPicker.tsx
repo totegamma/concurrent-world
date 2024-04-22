@@ -1,12 +1,12 @@
 import { Autocomplete, Box, Chip, InputBase, type SxProps } from '@mui/material'
-import { type CommonstreamSchema, Schemas, type Stream } from '@concurrent-world/client'
+import { type CommonstreamSchema, Schemas, type Timeline } from '@concurrent-world/client'
 import { useMemo } from 'react'
 
 export interface StreamPickerProps {
-    selected: Array<Stream<CommonstreamSchema>>
-    setSelected: (selected: Array<Stream<CommonstreamSchema>>) => void
+    selected: Array<Timeline<CommonstreamSchema>>
+    setSelected: (selected: Array<Timeline<CommonstreamSchema>>) => void
     sx?: SxProps
-    options: Array<Stream<CommonstreamSchema>>
+    options: Array<Timeline<CommonstreamSchema>>
 }
 
 export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
@@ -19,8 +19,8 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
                     }
                     return value
                 })
-            ).filter((stream: Stream<any>) => stream.schema === Schemas.commonstream) as Array<
-                Stream<CommonstreamSchema>
+            ).filter((stream: Timeline<any>) => stream.schema === Schemas.commonstream) as Array<
+                Timeline<CommonstreamSchema>
             >,
         [props.selected]
     )
@@ -41,8 +41,8 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
                 multiple
                 value={selected}
                 options={props.options}
-                getOptionKey={(option: Stream<CommonstreamSchema>) => option.id ?? ''}
-                getOptionLabel={(option: Stream<CommonstreamSchema>) => option.payload.name}
+                getOptionKey={(option: Timeline<CommonstreamSchema>) => option.id ?? ''}
+                getOptionLabel={(option: Timeline<CommonstreamSchema>) => option.document.body.name}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 onChange={(_, value) => {
                     props.setSelected(value)
@@ -62,7 +62,7 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
                 renderTags={(value, getTagProps) =>
                     value.map((option, index) => (
                         <Chip
-                            label={option.payload.name}
+                            label={option.document.body.name}
                             sx={{ color: 'text.default' }}
                             {...getTagProps({ index })}
                             key={option.id}

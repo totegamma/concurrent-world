@@ -59,7 +59,7 @@ export const ApSetup = (): JSX.Element => {
             return
         }
 
-        const followstream = await client.api.createStream(
+        const followstream = await client.api.upsertTimeline(
             Schemas.commonstream,
             {
                 name: 'ActivityPub',
@@ -67,8 +67,9 @@ export const ApSetup = (): JSX.Element => {
                 description: 'ActivityPub home stream'
             },
             {
-                reader: client?.user?.ccid ? [client?.user?.ccid] : [],
-                visible: false
+                semanticID: 'world.concrnt.p-aphome',
+                indexable: false,
+                domainOwned: false
             }
         )
 
@@ -86,8 +87,8 @@ export const ApSetup = (): JSX.Element => {
                 },
                 body: JSON.stringify({
                     id: userID,
-                    homestream: client?.user?.userstreams?.payload.body.homeStream,
-                    notificationstream: client?.user?.userstreams?.payload.body.notificationStream,
+                    homestream: client?.user?.homeTimeline,
+                    notificationstream: client?.user?.notificationTimeline,
                     followstream: followstream.id
                 })
             })
@@ -106,9 +107,9 @@ export const ApSetup = (): JSX.Element => {
                 },
                 body: JSON.stringify({
                     id: userID,
-                    name: client?.user?.profile?.payload.body.username,
-                    summary: client?.user?.profile?.payload.body.description,
-                    icon_url: client?.user?.profile?.payload.body.avatar
+                    name: client?.user?.profile?.username,
+                    summary: client?.user?.profile?.description,
+                    icon_url: client?.user?.profile?.avatar
                 })
             })
             .then(async (res) => await res.json())

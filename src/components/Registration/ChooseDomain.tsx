@@ -1,4 +1,4 @@
-import { type Client, type CoreDomain } from '@concurrent-world/client'
+import { type Identity, type Client, type CoreDomain } from '@concurrent-world/client'
 import {
     Alert,
     AlertTitle,
@@ -17,7 +17,7 @@ import {
 } from '@mui/material'
 import { useEffect, useState } from 'react'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
-import { jumpToDomainRegistration, type Identity } from '../../util'
+import { jumpToDomainRegistration } from '../../util'
 import { useTranslation } from 'react-i18next'
 
 interface ChooseDomainProps {

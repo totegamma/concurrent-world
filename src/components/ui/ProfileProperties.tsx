@@ -55,10 +55,10 @@ export const ProfileProperties = (props: ProfilePropertiesProps): JSX.Element =>
             <Box>
                 {properties.map(
                     (property, index) =>
-                        property.key in props.character.payload.body && (
+                        property.key in props.character.document.body && (
                             <Box key={index} px={1} mb={1}>
                                 <Typography variant="body1">
-                                    {property.title}: {props.character.payload.body[property.key]}
+                                    {property.title}: {props.character.document.body[property.key]}
                                 </Typography>
                             </Box>
                         )
@@ -104,7 +104,7 @@ export const ProfileProperties = (props: ProfilePropertiesProps): JSX.Element =>
                             ソースを見る
                         </Button>
                     </Box>
-                    {schema && <CCEditor disabled schema={schema} init={props.character.payload.body} />}
+                    {schema && <CCEditor disabled schema={schema} init={props.character.document.body} />}
                 </Box>
             </CCDrawer>
         </>

@@ -1,11 +1,8 @@
-import { Mnemonic, randomBytes, HDNodeWallet } from 'ethers'
-import { LangJa } from './utils/lang-ja'
-
 import { useTranslation } from 'react-i18next'
 
 import { visit } from 'unist-util-visit'
 import { inspect } from 'unist-util-inspect'
-import { Sign } from '@concurrent-world/client'
+import { Sign, type CCDocument } from '@concurrent-world/client'
 
 export const jumpToDomainRegistration = (ccid: string, privateKey: string, fqdn: string): void => {
     let next = window.location.href
@@ -17,51 +14,23 @@ export const jumpToDomainRegistration = (ccid: string, privateKey: string, fqdn:
     // add next hash
     next = `${next}#2`
 
-    const signObject = {
+    const affiliation: CCDocument.Affiliation = {
         signer: ccid,
-        type: 'Entity',
-        body: {
-            domain: fqdn
-        },
-        signedAt: new Date().toISOString()
+        type: 'affiliation',
+        domain: fqdn,
+        signedAt: new Date()
     }
 
-    const signedObject = JSON.stringify(signObject)
-    const signature = Sign(privateKey, signedObject)
+    const signedDoc = JSON.stringify(affiliation)
+    const signature = Sign(privateKey, signedDoc)
 
-    const encodedObject = btoa(signedObject).replace('+', '-').replace('/', '_').replace('==', '')
+    const encodedObject = btoa(signedDoc).replace('+', '-').replace('/', '_').replace('==', '')
 
     const link = `http://${fqdn}/web/register?registration=${encodedObject}&signature=${signature}&callback=${encodeURIComponent(
         next
     )}`
 
     window.location.href = link
-}
-
-export interface Identity {
-    mnemonic_ja: string
-    mnemonic_en: string
-    privateKey: string
-    publicKey: string
-    CCID: string
-}
-
-export const generateIdentity = (): Identity => {
-    const entrophy = randomBytes(16)
-    const mnemonicJa = Mnemonic.fromEntropy(entrophy, null, LangJa.wordlist())
-    const mnemonicEn = Mnemonic.fromEntropy(entrophy, null)
-    const wallet = HDNodeWallet.fromPhrase(mnemonicEn.phrase)
-    const CCID = 'CC' + wallet.address.slice(2)
-    const privateKey = wallet.privateKey.slice(2)
-    const publicKey = wallet.publicKey.slice(2)
-
-    return {
-        mnemonic_ja: mnemonicJa.phrase.normalize().replaceAll('　', ' '),
-        mnemonic_en: mnemonicEn.phrase,
-        privateKey,
-        publicKey,
-        CCID
-    }
 }
 
 export const fetchWithTimeout = async (

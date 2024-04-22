@@ -46,7 +46,7 @@ export const ReplyMessageFrame = (props: ReplyMessageFrameProp): JSX.Element => 
                         <Box>
                             <CCUserChip
                                 iconOverride={<ReplyIcon fontSize="small" />}
-                                ccid={props.message.payload.body.replyToMessageAuthor}
+                                ccid={props.message.document.body.replyToMessageAuthor}
                             />
                         </Box>
                     }

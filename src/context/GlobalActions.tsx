@@ -5,9 +5,10 @@ import { useClient } from './ClientContext'
 import {
     Schemas,
     type Message,
-    type Stream,
+    type Timeline,
     type CommonstreamSchema,
-    type DomainProfileSchema
+    type DomainProfileSchema,
+    type CoreSubscription
 } from '@concurrent-world/client'
 import { Draft } from '../components/Draft'
 import { MobileDraft } from '../components/MobileDraft'
@@ -27,12 +28,13 @@ export interface GlobalActionsState {
     openReply: (target: Message<any>) => void
     openReroute: (target: Message<any>) => void
     openMobileMenu: (open?: boolean) => void
-    allKnownStreams: Array<Stream<CommonstreamSchema>>
+    allKnownTimelines: Array<Timeline<CommonstreamSchema>>
+    listedSubscriptions: Record<string, CoreSubscription<any>>
     draft: string
     openEmojipack: (url: EmojiPackage) => void
     openImageViewer: (url: string) => void
-    postStreams: Array<Stream<CommonstreamSchema>>
-    setPostStreams: (streams: Array<Stream<CommonstreamSchema>>) => void
+    postStreams: Array<Timeline<CommonstreamSchema>>
+    setPostStreams: (streams: Array<Timeline<CommonstreamSchema>>) => void
 }
 
 const GlobalActionsContext = createContext<GlobalActionsState | undefined>(undefined)
@@ -62,14 +64,12 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const [mode, setMode] = useState<'compose' | 'reply' | 'reroute' | 'none'>('none')
     const [targetMessage, setTargetMessage] = useState<Message<any> | null>(null)
 
-    const [postStreams, setPostStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
+    const [postStreams, setPostStreams] = useState<Array<Timeline<CommonstreamSchema>>>([])
 
-    const isPostStreamsPublic = useMemo(
-        () => postStreams.every((stream) => stream.reader.length === 0 && stream.visible),
-        [postStreams]
-    )
+    const isPostStreamsPublic = useMemo(() => postStreams.every((stream) => stream.indexable), [postStreams])
 
-    const [allKnownStreams, setAllKnownStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
+    const [allKnownTimelines, setAllKnownTimelines] = useState<Array<Timeline<CommonstreamSchema>>>([])
+    const [listedSubscriptions, setListedSubscriptions] = useState<Record<string, CoreSubscription<any>>>({})
     const [domainIsOffline, setDomainIsOffline] = useState<boolean>(false)
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
     const [previewImage, setPreviewImage] = useState<string | undefined>()
@@ -90,29 +90,42 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         return () => visualViewport?.removeEventListener('resize', handleResize)
     }, [])
 
-    const setupAccountRequired =
-        client?.user !== null &&
-        (client?.user.profile === undefined ||
-            client?.user.userstreams === undefined ||
-            !client?.user.userstreams.payload.body.homeStream ||
-            !client?.user.userstreams.payload.body.notificationStream ||
-            !client?.user.userstreams.payload.body.associationStream ||
-            !client?.user.userstreams.payload.body.ackCollection)
+    const setupAccountRequired = client?.user !== null && client?.user.profile === undefined
 
     useEffect(() => {
         let unmounted = false
-        setAllKnownStreams([])
-        const allStreams = Object.values(lists)
-            .map((list) => list.streams)
-            .flat()
-        const uniq = [...new Set(allStreams)]
-        uniq.forEach((id) => {
-            client.getStream<CommonstreamSchema>(id).then((stream) => {
-                if (stream && !unmounted) {
-                    setAllKnownStreams((prev) => [...prev, stream])
-                }
+        setAllKnownTimelines([])
+        Promise.all(
+            Object.keys(lists).map((id) =>
+                client.api
+                    .getSubscription(id)
+                    .then((sub) => {
+                        return [id, sub]
+                    })
+                    .catch((e) => {
+                        console.log(e)
+                        return [id, null]
+                    })
+            )
+        ).then((subs) => {
+            if (unmounted) return
+            const validsubsarr = subs.filter((e) => e[1]) as Array<[string, CoreSubscription<any>]>
+            const listedSubs = Object.fromEntries(validsubsarr)
+            setListedSubscriptions(listedSubs)
+
+            const validsubs = validsubsarr.map((e) => e[1])
+
+            const allTimelins = validsubs.flatMap((sub) => sub.items.map((e) => e.id))
+            const uniq = [...new Set(allTimelins)]
+            uniq.forEach((id) => {
+                client.getTimeline<CommonstreamSchema>(id).then((stream) => {
+                    if (stream && !unmounted) {
+                        setAllKnownTimelines((prev) => [...prev, stream])
+                    }
+                })
             })
         })
+
         return () => {
             unmounted = true
         }
@@ -178,28 +191,28 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
 
     const fixAccount = useCallback(async () => {
         console.log('starting account fix')
-        await client.setupUserstreams()
+        // await client.setupUserstreams()
         console.log('userstream setup complete')
         const domain = await client.api.getDomain(client.api.host)
         if (!domain) throw new Error('Domain not found')
         try {
-            const domainProfile = ((await client.api.getCharacter<DomainProfileSchema>(
-                domain.ccid,
-                Schemas.domainProfile
-            )) ?? [null])[0]
+            const domainProfile = ((await client.api.getCharacters<DomainProfileSchema>({
+                author: domain.ccid,
+                schema: Schemas.domainProfile
+            })) ?? [null])[0]
             if (!domainProfile) throw new Error('Domain profile not found')
-            if (domainProfile.payload.body.defaultBookmarkStreams)
+            if (domainProfile.document.body.defaultBookmarkStreams)
                 localStorage.setItem(
                     'bookmarkingStreams',
-                    JSON.stringify(domainProfile.payload.body.defaultBookmarkStreams)
+                    JSON.stringify(domainProfile.document.body.defaultBookmarkStreams)
                 )
-            if (domainProfile.payload.body.defaultFollowingStreams)
+            if (domainProfile.document.body.defaultFollowingStreams)
                 localStorage.setItem(
                     'followingStreams',
-                    JSON.stringify(domainProfile.payload.body.defaultFollowingStreams)
+                    JSON.stringify(domainProfile.document.body.defaultFollowingStreams)
                 )
-            if (domainProfile.payload.body.defaultPostStreams)
-                localStorage.setItem('postingStreams', JSON.stringify(domainProfile.payload.body.defaultPostStreams))
+            if (domainProfile.document.body.defaultPostStreams)
+                localStorage.setItem('postingStreams', JSON.stringify(domainProfile.document.body.defaultPostStreams))
         } catch (e) {
             console.info(e)
         }
@@ -234,24 +247,26 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     openReply,
                     openReroute,
                     openMobileMenu,
-                    allKnownStreams,
+                    allKnownTimelines,
                     draft,
                     openEmojipack,
                     openImageViewer,
                     postStreams,
-                    setPostStreams
+                    setPostStreams,
+                    listedSubscriptions
                 }
             }, [
                 openDraft,
                 openReply,
                 openReroute,
                 openMobileMenu,
-                allKnownStreams,
+                allKnownTimelines,
                 draft,
                 openEmojipack,
                 openImageViewer,
                 postStreams,
-                setPostStreams
+                setPostStreams,
+                listedSubscriptions
             ])}
         >
             <InspectorProvider>
@@ -289,7 +304,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                             <MobileDraft
                                                 streamPickerInitial={postStreams}
                                                 defaultPostHome={isPostStreamsPublic}
-                                                streamPickerOptions={allKnownStreams}
+                                                streamPickerOptions={allKnownTimelines}
                                                 onSubmit={async (text: string, destinations: string[], options) => {
                                                     await client
                                                         .createCurrent(text, destinations, options)
@@ -316,7 +331,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                 }
                                                 streamPickerOptions={
                                                     mode === 'reroute'
-                                                        ? allKnownStreams
+                                                        ? allKnownTimelines
                                                         : targetMessage.postedStreams ?? []
                                                 }
                                                 onSubmit={async (text, streams, options): Promise<Error | null> => {
@@ -355,7 +370,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                 defaultPostHome={isPostStreamsPublic}
                                                 value={draft}
                                                 streamPickerInitial={postStreams}
-                                                streamPickerOptions={allKnownStreams}
+                                                streamPickerOptions={allKnownTimelines}
                                                 onSubmit={async (text: string, destinations: string[], options) => {
                                                     await client
                                                         .createCurrent(text, destinations, options)
@@ -394,7 +409,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                 }
                                                 streamPickerOptions={
                                                     mode === 'reroute'
-                                                        ? allKnownStreams
+                                                        ? allKnownTimelines
                                                         : targetMessage.postedStreams ?? []
                                                 }
                                                 onSubmit={async (text, streams, options): Promise<Error | null> => {
@@ -453,25 +468,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                 アカウント設定を完了させましょう！
                             </Typography>
                             見つかった問題:
-                            <ul>
-                                {!client?.user?.profile && <li>プロフィールが存在していません</li>}
-                                {!client?.user?.userstreams?.payload.body.homeStream && (
-                                    <li>ホームストリームが存在していません</li>
-                                )}
-                                {!client?.user?.userstreams?.payload.body.notificationStream && (
-                                    <li>通知ストリームが存在していません</li>
-                                )}
-                                {!client?.user?.userstreams?.payload.body.associationStream && (
-                                    <li>アクティビティストリームが存在していません</li>
-                                )}
-                                {!client?.user?.userstreams?.payload.body.ackCollection && (
-                                    <li>Ackコレクションが存在していません</li>
-                                )}
-                            </ul>
+                            <ul>{!client?.user?.profile && <li>プロフィールが存在していません</li>}</ul>
                             <ProfileEditor
-                                id={client?.user?.profile?.id}
-                                initial={client?.user?.profile?.payload.body}
-                                onSubmit={(_) => {
+                                initial={client?.user?.profile}
+                                onSubmit={() => {
                                     fixAccount()
                                 }}
                             />

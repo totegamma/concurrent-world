@@ -1,9 +1,9 @@
 import { Box, Button, ButtonGroup, Checkbox, Menu, MenuItem, useTheme } from '@mui/material'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
-import { usePreference } from '../context/PreferenceContext'
 import { useState } from 'react'
-import { type StreamList } from '../model'
 import { useTranslation } from 'react-i18next'
+import { useGlobalActions } from '../context/GlobalActions'
+import { useClient } from '../context/ClientContext'
 
 export interface WatchButtonProps {
     color?: string
@@ -12,47 +12,34 @@ export interface WatchButtonProps {
 }
 
 export const WatchButton = (props: WatchButtonProps): JSX.Element => {
-    const [lists, setLists] = usePreference('lists')
     const theme = useTheme()
+    const { client } = useClient()
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
     const [isHovered, setIsHovered] = useState(false)
+    const actions = useGlobalActions()
 
-    const { t } = useTranslation('', { keyPrefix: 'common' })
-
-    const watching = lists ? lists.home.userStreams.map((e) => e.userID).includes(props.userCCID) : []
-
-    if (lists === undefined) {
+    if (!actions) {
         return <></>
     }
 
-    const updateList = (id: string, list: StreamList): void => {
-        const old = lists
-        old[id] = list
-        setLists(JSON.parse(JSON.stringify(old)))
-    }
+    const { t } = useTranslation('', { keyPrefix: 'common' })
+
+    const watching = actions.allKnownTimelines.find((e) => e.id === props.userStreamID) !== undefined
 
     return (
         <Box>
             <ButtonGroup color="primary" variant="contained">
                 <Button
-                    onClick={(_) => {
+                    onClick={(e) => {
                         if (watching) {
-                            updateList('home', {
-                                ...lists.home,
-                                userStreams: lists.home.userStreams.filter((e) => e.userID !== props.userCCID)
-                            })
+                            setMenuAnchor(e.currentTarget)
                         } else {
-                            updateList('home', {
-                                ...lists.home,
-                                userStreams: [
-                                    ...lists.home.userStreams,
-                                    {
-                                        streamID: props.userStreamID,
-                                        userID: props.userCCID
-                                    }
-                                ]
-                            })
+                            client.api
+                                .subscribe(props.userStreamID, Object.keys(actions.listedSubscriptions)[0])
+                                .then((subscription) => {
+                                    console.log(subscription)
+                                })
                         }
                     }}
                     onMouseEnter={() => {
@@ -86,27 +73,22 @@ export const WatchButton = (props: WatchButtonProps): JSX.Element => {
                     zIndex: theme.zIndex.tooltip + 1
                 }}
             >
-                {Object.keys(lists).map((id) => (
-                    <MenuItem key={id} onClick={() => {}}>
-                        {lists[id].label}
+                {Object.keys(actions.listedSubscriptions).map((key) => (
+                    <MenuItem key={key} onClick={() => {}}>
+                        {key}
                         <Checkbox
-                            checked={lists[id].userStreams.map((e) => e.userID).includes(props.userCCID)}
+                            checked={
+                                actions.listedSubscriptions[key].items.find((e) => e.id === props.userStreamID) !==
+                                undefined
+                            }
                             onChange={(check) => {
                                 if (check.target.checked) {
-                                    updateList(id, {
-                                        ...lists[id],
-                                        userStreams: [
-                                            ...lists[id].userStreams,
-                                            {
-                                                streamID: props.userStreamID,
-                                                userID: props.userCCID
-                                            }
-                                        ]
+                                    client.api.subscribe(props.userStreamID, key).then((subscription) => {
+                                        console.log(subscription)
                                     })
                                 } else {
-                                    updateList(id, {
-                                        ...lists[id],
-                                        userStreams: lists[id].userStreams.filter((e) => e.userID !== props.userCCID)
+                                    client.api.unsubscribe(props.userStreamID, key).then((subscription) => {
+                                        console.log(subscription)
                                     })
                                 }
                             }}

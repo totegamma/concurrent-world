@@ -20,7 +20,7 @@ import LockIcon from '@mui/icons-material/Lock'
 
 export const StreamPage = memo((): JSX.Element => {
     const { client } = useClient()
-    const { allKnownStreams, postStreams, setPostStreams } = useGlobalActions()
+    const { allKnownTimelines, postStreams, setPostStreams } = useGlobalActions()
 
     const { id } = useParams()
 
@@ -39,16 +39,19 @@ export const StreamPage = memo((): JSX.Element => {
     }, [targetStream])
 
     const writeable = useMemo(
-        () => isOwner || targetStream?.writer.length === 0 || targetStream?.writer.includes(client.ccid ?? ''),
+        // () => isOwner || targetStream?.writer.length === 0 || targetStream?.writer.includes(client.ccid ?? ''),
+        () => true,
         [targetStream]
     )
 
     const readable = useMemo(
-        () => isOwner || targetStream?.reader.length === 0 || targetStream?.reader.includes(client.ccid ?? ''),
+        // () => isOwner || targetStream?.reader.length === 0 || targetStream?.reader.includes(client.ccid ?? ''),
+        () => true,
         [targetStream]
     )
 
-    const nonPublic = useMemo(() => targetStream?.reader.length !== 0 || !targetStream?.visible, [targetStream])
+    // const nonPublic = useMemo(() => targetStream?.reader.length !== 0 || !targetStream?.visible, [targetStream])
+    const nonPublic = useMemo(() => false, [targetStream])
 
     const streams = useMemo(() => {
         return targetStream ? [targetStream] : []
@@ -59,7 +62,7 @@ export const StreamPage = memo((): JSX.Element => {
     }, [targetStream])
 
     useEffect(() => {
-        client.getStream<CommonstreamSchema>(targetStreamID).then((stream) => {
+        client.getTimeline<CommonstreamSchema>(targetStreamID).then((stream) => {
             if (stream) setPostStreams([stream])
         })
     }, [id])
@@ -76,7 +79,7 @@ export const StreamPage = memo((): JSX.Element => {
                 }}
             >
                 <TimelineHeader
-                    title={targetStream?.payload.name ?? 'Not Found'}
+                    title={targetStream?.document.body.name ?? 'Not Found'}
                     titleIcon={<PercentIcon />}
                     secondaryAction={isOwner ? <TuneIcon /> : <InfoIcon />}
                     onTitleClick={() => {
@@ -110,7 +113,7 @@ export const StreamPage = memo((): JSX.Element => {
                                             <Draft
                                                 defaultPostHome={!nonPublic}
                                                 streamPickerInitial={streams}
-                                                streamPickerOptions={[...new Set([...allKnownStreams, ...streams])]}
+                                                streamPickerOptions={[...new Set([...allKnownTimelines, ...streams])]}
                                                 onSubmit={async (
                                                     text: string,
                                                     destinations: string[],

@@ -5,7 +5,7 @@ import KeyOffIcon from '@mui/icons-material/KeyOff'
 import { Box, Paper, Typography } from '@mui/material'
 
 export const KeyCard = (props: { item: Key; endItem?: JSX.Element; short?: boolean }): JSX.Element => {
-    const valid = props.item.revokePayload === 'null'
+    const valid = props.item.revokeDocument === 'null'
 
     return (
         <Paper

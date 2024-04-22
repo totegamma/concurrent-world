@@ -102,9 +102,9 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                         textDecoration: 'none'
                                     }}
                                     component={RouterLink}
-                                    to={fav.payload.body.profileOverride?.link ?? '/entity/' + fav.author}
-                                    target={fav.payload.body.profileOverride?.link ? '_blank' : undefined}
-                                    rel={fav.payload.body.profileOverride?.link ? 'noopener noreferrer' : undefined}
+                                    to={fav.document.body.profileOverride?.link ?? '/entity/' + fav.author}
+                                    target={fav.document.body.profileOverride?.link ? '_blank' : undefined}
+                                    rel={fav.document.body.profileOverride?.link ? 'noopener noreferrer' : undefined}
                                 >
                                     <CCAvatar
                                         sx={{
@@ -112,8 +112,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                             width: '20px'
                                         }}
                                         avatarURL={
-                                            fav.payload.body.profileOverride?.avatar ??
-                                            fav.authorUser?.profile?.payload.body.avatar
+                                            fav.document.body.profileOverride?.avatar ?? fav.authorUser?.profile?.avatar
                                         }
                                         identiconSource={fav.author}
                                     />
@@ -123,8 +122,8 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                             color: '#fff'
                                         }}
                                     >
-                                        {fav.payload.body.profileOverride?.username ||
-                                            fav.authorUser?.profile?.payload.body.username ||
+                                        {fav.document.body.profileOverride?.username ||
+                                            fav.authorUser?.profile?.username ||
                                             'anonymous'}
                                     </Typography>
                                 </Box>
@@ -182,8 +181,8 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
             >
                 <MenuItem
                     onClick={() => {
-                        props.message.payload.body.body &&
-                            navigator.clipboard.writeText(props.message.payload.body.body)
+                        props.message.document.body.body &&
+                            navigator.clipboard.writeText(props.message.document.body.body)
                         setMenuAnchor(null)
                     }}
                 >

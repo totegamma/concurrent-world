@@ -25,7 +25,7 @@ export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
         const streams =
             props.message.postedStreams?.filter(
                 (stream) =>
-                    (stream.schema === Schemas.commonstream && (stream.author === client.ccid || stream.visible)) ||
+                    (stream.schema === Schemas.commonstream && (stream.author === client.ccid || stream.indexable)) ||
                     stream.schema === Schemas.utilitystream
             ) ?? []
         const uniq = [...new Set(streams)]
@@ -67,7 +67,7 @@ export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
                                     borderColor: 'divider'
                                 }}
                             >
-                                %{e.payload.shortname}
+                                %{e.document.body.shortname}
                             </Link>
                         )
                     case Schemas.utilitystream:

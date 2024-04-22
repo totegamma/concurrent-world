@@ -27,7 +27,7 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
             Object.fromEntries(
                 props.message.ownAssociations
                     .filter((association) => association.schema === Schemas.emojiAssociation)
-                    .map((association) => [association.payload.body.imageUrl, association])
+                    .map((association) => [association.document.body.imageUrl, association])
             ),
         [props.message]
     )
@@ -57,7 +57,7 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                         <Box display="flex" flexDirection="column" alignItems="right" gap={1}>
                             <Box display="flex" alignItems="center" gap={1}>
                                 <Box component="img" height="20px" src={imageUrl}></Box>
-                                {reactionMembers[imageUrl]?.[0].payload.body.shortcode ?? 'Loading...'}
+                                {reactionMembers[imageUrl]?.[0].document.body.shortcode ?? 'Loading...'}
                             </Box>
                             <Divider flexItem></Divider>
                             {reactionMembers[imageUrl]?.map((reaction) => (
@@ -70,16 +70,16 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                                         textDecoration: 'none'
                                     }}
                                     component={routerLink}
-                                    to={reaction.payload.body.profileOverride?.link ?? '/entity/' + reaction.author}
-                                    target={reaction.payload.body.profileOverride?.link ? '_blank' : undefined}
+                                    to={reaction.document.body.profileOverride?.link ?? '/entity/' + reaction.author}
+                                    target={reaction.document.body.profileOverride?.link ? '_blank' : undefined}
                                     rel={
-                                        reaction.payload.body.profileOverride?.link ? 'noopener noreferrer' : undefined
+                                        reaction.document.body.profileOverride?.link ? 'noopener noreferrer' : undefined
                                     }
                                 >
                                     <CCAvatar
                                         avatarURL={
-                                            reaction.payload.body.profileOverride?.avatar ??
-                                            reaction.authorUser?.profile?.payload.body.avatar
+                                            reaction.document.body.profileOverride?.avatar ??
+                                            reaction.authorUser?.profile?.avatar
                                         }
                                         identiconSource={reaction.author}
                                         sx={{
@@ -93,8 +93,8 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                                             color: '#fff'
                                         }}
                                     >
-                                        {reaction.payload.body.profileOverride?.username ||
-                                            reaction.authorUser?.profile?.payload.body.username ||
+                                        {reaction.document.body.profileOverride?.username ||
+                                            reaction.authorUser?.profile?.username ||
                                             'anonymous'}
                                     </Typography>
                                 </Box>
@@ -123,11 +123,11 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                                 props.message.deleteAssociation(ownReactions[imageUrl].id)
                             } else {
                                 if (reactionMembers[imageUrl]) {
-                                    const shortcode = reactionMembers[imageUrl]?.[0].payload.body.shortcode
+                                    const shortcode = reactionMembers[imageUrl]?.[0].document.body.shortcode
                                     props.message.reaction(shortcode, imageUrl)
                                 } else {
                                     props.message.getReactions(imageUrl).then((reactions) => {
-                                        const shortcode = reactions[0].payload.body.shortcode
+                                        const shortcode = reactions[0].document.body.shortcode
                                         props.message.reaction(shortcode, imageUrl)
                                     })
                                 }
