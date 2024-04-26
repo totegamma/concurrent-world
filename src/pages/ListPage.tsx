@@ -194,7 +194,7 @@ export function ListPage(): JSX.Element {
                                 alignItems: 'center'
                             }}
                         >
-                            <Button component={RouterLink} to="/explorer">
+                            <Button component={RouterLink} to="/explorer/streams">
                                 <Typography variant="h1" sx={{ fontWeight: 600, mx: 1 }}>
                                     Go Explore
                                 </Typography>
