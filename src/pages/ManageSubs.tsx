@@ -160,6 +160,7 @@ export function ManageSubsPage(): JSX.Element {
                                             <ArrowDownwardIcon />
                                         </IconButton>
                                         <IconButton
+                                            disabled={listedSubs.length === 1}
                                             onClick={() => {
                                                 const old = lists
                                                 delete old[sub.id]

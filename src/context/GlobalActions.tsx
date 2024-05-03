@@ -6,7 +6,8 @@ import {
     type Message,
     type Timeline,
     type CommunityTimelineSchema,
-    type CoreSubscription
+    type CoreSubscription,
+    Schemas
 } from '@concurrent-world/client'
 import { Draft } from '../components/Draft'
 import { MobileDraft } from '../components/MobileDraft'
@@ -20,6 +21,9 @@ import { type EmojiPackage } from '../model'
 import { experimental_VGrid as VGrid } from 'virtua'
 import { useSnackbar } from 'notistack'
 import { ImagePreviewModal } from '../components/ui/ImagePreviewModal'
+
+import HikingIcon from '@mui/icons-material/Hiking'
+import GroupIcon from '@mui/icons-material/Group'
 
 export interface GlobalActionsState {
     openDraft: (text?: string) => void
@@ -55,7 +59,7 @@ const RowEmojiCount = 6
 
 export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element => {
     const { client } = useClient()
-    const [lists] = usePreference('lists')
+    const [lists, setLists] = usePreference('lists')
     const [emojiPackages, setEmojiPackages] = usePreference('emojiPackages')
     const { enqueueSnackbar } = useSnackbar()
     const theme = useTheme()
@@ -90,6 +94,35 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     }, [])
 
     const setupAccountRequired = client?.user !== null && client?.user.profile === undefined
+    const noListDetected = Object.keys(lists).length === 0
+
+    const setupList = useCallback(
+        (timeline?: string) => {
+            client.api
+                .upsertSubscription(
+                    Schemas.listSubscription,
+                    {
+                        name: 'Home'
+                    },
+                    { indexable: false, domainOwned: false }
+                )
+                .then(async (sub) => {
+                    if (timeline) {
+                        await client.api.subscribe(timeline, sub.id)
+                    }
+
+                    const list = {
+                        [sub.id]: {
+                            pinned: true,
+                            expanded: false,
+                            defaultPostStreams: timeline ? [timeline] : []
+                        }
+                    }
+                    setLists(list)
+                })
+        },
+        [client]
+    )
 
     useEffect(() => {
         let unmounted = false
@@ -114,8 +147,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
 
             const validsubs = validsubsarr.map((e) => e[1])
 
-            const allTimelins = validsubs.flatMap((sub) => sub.items.map((e) => e.id))
-            const uniq = [...new Set(allTimelins)]
+            const allTimelines = validsubs.flatMap((sub) => sub.items.map((e) => e.id))
+            const uniq = [...new Set(allTimelines)]
             uniq.forEach((id) => {
                 client.getTimeline<CommunityTimelineSchema>(id).then((stream) => {
                     if (stream && !unmounted) {
@@ -477,6 +510,100 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                         </Box>
                     </Paper>
                 </Modal>
+
+                <Modal open={noListDetected} onClose={() => {}}>
+                    <Paper sx={style}>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                padding: 1
+                            }}
+                        >
+                            <Typography variant="h2" component="div">
+                                コンカレントへようこそ！
+                                <Box>
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: 2,
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}
+                                    >
+                                        <Paper
+                                            variant="outlined"
+                                            sx={{
+                                                width: '90%',
+                                                maxWidth: '800px',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                gap: 2,
+                                                padding: 1
+                                            }}
+                                        >
+                                            <Box
+                                                sx={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 1
+                                                }}
+                                            >
+                                                <GroupIcon
+                                                    color="primary"
+                                                    sx={{
+                                                        fontSize: '3rem'
+                                                    }}
+                                                />
+                                                <Typography
+                                                    sx={{
+                                                        flex: 1,
+                                                        textAlign: 'center'
+                                                    }}
+                                                >
+                                                    コミュニティーを始点にする
+                                                </Typography>
+                                            </Box>
+                                            <Typography>未実装</Typography>
+                                        </Paper>
+                                        <Paper
+                                            variant="outlined"
+                                            sx={{
+                                                width: '90%',
+                                                maxWidth: '800px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 2,
+                                                cursor: 'pointer',
+                                                padding: 1
+                                            }}
+                                            onClick={() => {
+                                                setupList()
+                                            }}
+                                        >
+                                            <HikingIcon
+                                                color="primary"
+                                                sx={{
+                                                    fontSize: '3rem'
+                                                }}
+                                            />
+                                            <Typography
+                                                sx={{
+                                                    flex: 1,
+                                                    textAlign: 'center'
+                                                }}
+                                            >
+                                                自力で始める
+                                            </Typography>
+                                        </Paper>
+                                    </Box>
+                                </Box>
+                            </Typography>
+                        </Box>
+                    </Paper>
+                </Modal>
+
                 <ImagePreviewModal
                     src={previewImage}
                     onClose={() => {
