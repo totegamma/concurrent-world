@@ -13,13 +13,21 @@ export function ManageSubsPage(): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'pages.contacts' })
     const { client } = useClient()
     const [lists, setLists] = usePreference('lists')
-    const listedSubs = Object.keys(lists)
 
     const [ownSubscriptions, setOwnSubscriptions] = useState<Array<CoreSubscription<any>>>([])
-    const unlistedSubs = ownSubscriptions.filter((sub) => !listedSubs.includes(sub.id))
+    const listedSubs: Array<CoreSubscription<any>> = Object.keys(lists)
+        .map((id) => ownSubscriptions.find((sub) => sub.id === id))
+        .filter((sub) => sub !== undefined) as Array<CoreSubscription<any>>
+    const unlistedSubs: Array<CoreSubscription<any>> = ownSubscriptions.filter(
+        (sub) => !Object.keys(lists).includes(sub.id)
+    )
+
+    console.log('listedSubs', listedSubs)
+    console.log('unlistedSubs', unlistedSubs)
 
     useEffect(() => {
-        client.api.getOwnSubscriptions().then((subs) => {
+        client.api.getOwnSubscriptions<any>().then((subs) => {
+            console.log('subs', subs)
             setOwnSubscriptions(subs)
         })
     }, [])
@@ -104,7 +112,7 @@ export function ManageSubsPage(): JSX.Element {
                                         </IconButton>
                                     }
                                 >
-                                    <ListItemText primary={sub.id} />
+                                    <ListItemText primary={sub.document.body?.name ?? sub.id} />
                                 </ListItem>
                             ))}
                         </List>
@@ -120,15 +128,15 @@ export function ManageSubsPage(): JSX.Element {
                             Listed Subscriptions
                         </Typography>
                         <List>
-                            {listedSubs.map((subId) => (
+                            {listedSubs.map((sub) => (
                                 <ListItem
-                                    key={subId}
+                                    key={sub.id}
                                     secondaryAction={
                                         <IconButton
                                             edge="end"
                                             onClick={() => {
                                                 const old = lists
-                                                delete old[subId]
+                                                delete old[sub.id]
                                                 setLists(old)
                                             }}
                                         >
@@ -136,7 +144,7 @@ export function ManageSubsPage(): JSX.Element {
                                         </IconButton>
                                     }
                                 >
-                                    <ListItemText primary={subId} />
+                                    <ListItemText primary={sub.document.body?.name ?? sub.id} />
                                 </ListItem>
                             ))}
                         </List>

@@ -55,7 +55,7 @@ export function ListPage(): JSX.Element {
     useEffect(() => {
         Promise.all(
             Object.keys(lists)
-                .filter((e) => lists[e])
+                .filter((e) => lists[e].pinned)
                 .map((e) => client.api.getSubscription(e))
         ).then((subs) => {
             setPinnedSubscriptions(subs.filter((e) => e !== null) as Array<CoreSubscription<ListSubscriptionSchema>>)
@@ -71,7 +71,7 @@ export function ListPage(): JSX.Element {
     }, [tab])
 
     useEffect(() => {
-        client.api.getSubscription(id).then((sub) => {
+        client.api.getSubscription<ListSubscriptionSchema>(id).then((sub) => {
             if (!sub) return
             setSubscription(sub)
         })
