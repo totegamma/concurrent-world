@@ -10,7 +10,7 @@ import {
     Schemas
 } from '@concurrent-world/client'
 import { useClient } from '../context/ClientContext'
-import { StreamLink } from './StreamList/StreamLink'
+import { ListItemTimeline } from './ui/ListItemTimeline'
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove'
 import { useTranslation } from 'react-i18next'
 import { type StreamList } from '../model'
@@ -22,6 +22,7 @@ export interface ListSettingsProps {
 
 export function ListSettings(props: ListSettingsProps): JSX.Element {
     const { client } = useClient()
+
     const [lists, setLists] = usePreference('lists')
 
     const listSubscription =
@@ -162,23 +163,27 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                 <Tab label={t('user')} value="user" />
             </Tabs>
             <List>
-                {props.subscription.items.map((sub) => (
-                    <ListItem
-                        key={sub.id}
-                        disablePadding
-                        secondaryAction={
-                            <IconButton
-                                onClick={(_) => {
-                                    // TODO: unsubscribe
-                                }}
-                            >
-                                <PlaylistRemoveIcon />
-                            </IconButton>
-                        }
-                    >
-                        <StreamLink streamID={sub.id} />
-                    </ListItem>
-                ))}
+                {props.subscription.items
+                    .filter((sub) => sub.resolverType === (tab === 'user' ? 0 : 1))
+                    .map((sub) => (
+                        <ListItem
+                            key={sub.id}
+                            disablePadding
+                            secondaryAction={
+                                <IconButton
+                                    onClick={(_) => {
+                                        client.api.unsubscribe(sub.id, sub.subscription).then((_) => {
+                                            props.onModified?.()
+                                        })
+                                    }}
+                                >
+                                    <PlaylistRemoveIcon />
+                                </IconButton>
+                            }
+                        >
+                            <ListItemTimeline timelineID={sub.id} />
+                        </ListItem>
+                    ))}
             </List>
         </Box>
     )

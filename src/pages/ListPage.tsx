@@ -42,6 +42,8 @@ export function ListPage(): JSX.Element {
 
     const [pinnedSubscriptions, setPinnedSubscriptions] = useState<Array<CoreSubscription<ListSubscriptionSchema>>>([])
 
+    const [updater, setUpdater] = useState<number>(0)
+
     useEffect(() => {
         if (!id) return
         const list = lists[id]
@@ -75,7 +77,7 @@ export function ListPage(): JSX.Element {
             if (!sub) return
             setSubscription(sub)
         })
-    }, [id, client])
+    }, [id, client, updater])
 
     return (
         <>
@@ -199,7 +201,17 @@ export function ListPage(): JSX.Element {
                     setListSettingsOpen(false)
                 }}
             >
-                {subscription ? <ListSettings subscription={subscription} /> : <>Loading...</>}
+                {subscription ? (
+                    <ListSettings
+                        subscription={subscription}
+                        onModified={() => {
+                            setUpdater((e) => e + 1)
+                            actions.reloadList()
+                        }}
+                    />
+                ) : (
+                    <>Loading...</>
+                )}
             </CCDrawer>
         </>
     )

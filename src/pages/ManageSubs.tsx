@@ -25,11 +25,14 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import { ListSettings } from '../components/ListSettings'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import { type StreamList } from '../model'
+import { useGlobalActions } from '../context/GlobalActions'
 
 export function ManageSubsPage(): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'pages.contacts' })
     const { client } = useClient()
     const [lists, setLists] = usePreference('lists')
+
+    const actions = useGlobalActions()
 
     const [ownSubscriptions, setOwnSubscriptions] = useState<Array<CoreSubscription<any>>>([])
     const listedSubs: Array<CoreSubscription<any>> = Object.keys(lists)
@@ -238,6 +241,7 @@ export function ManageSubsPage(): JSX.Element {
                         subscription={inspectedSub}
                         onModified={() => {
                             setReloader((prev) => prev + 1)
+                            actions.reloadList()
                             setInspectedSub(null)
                         }}
                     />

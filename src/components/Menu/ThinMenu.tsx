@@ -13,7 +13,7 @@ import { useClient } from '../../context/ClientContext'
 import { usePreference } from '../../context/PreferenceContext'
 import { useGlobalActions } from '../../context/GlobalActions'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
-import { MinimalStreamList } from '../StreamList/MinimalStreamList'
+import { MinimalListsMenu } from '../ListsMenu/minimal'
 import TerminalIcon from '@mui/icons-material/Terminal'
 
 export interface MenuProps {
@@ -128,7 +128,7 @@ export const ThinMenu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         }
                     }}
                 >
-                    <MinimalStreamList />
+                    <MinimalListsMenu />
                 </Box>
                 <Divider />
                 <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center">

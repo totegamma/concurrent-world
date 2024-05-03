@@ -1,12 +1,12 @@
 import { List, ListItem, ListItemButton, ListItemText } from '@mui/material'
-import { StreamListItem } from './StreamListItem'
+import { ListItemSubscription } from '../ui/ListItemSubscription'
 import ListIcon from '@mui/icons-material/List'
 import { useGlobalActions } from '../../context/GlobalActions'
 import { useTranslation } from 'react-i18next'
 import { usePreference } from '../../context/PreferenceContext'
 import { Link as RouterLink } from 'react-router-dom'
 
-export const StreamList = (): JSX.Element => {
+export const ListsMenu = (): JSX.Element => {
     const { t } = useTranslation('', { keyPrefix: 'pages' })
     const { openMobileMenu } = useGlobalActions()
     const [lists] = usePreference('lists')
@@ -29,7 +29,7 @@ export const StreamList = (): JSX.Element => {
                 </ListItemButton>
             </ListItem>
             {Object.keys(lists).map((key) => (
-                <StreamListItem
+                <ListItemSubscription
                     key={key}
                     id={key}
                     body={lists[key]}

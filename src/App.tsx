@@ -331,7 +331,8 @@ function App(): JSX.Element {
                         >
                             <Routes>
                                 <Route index element={<ListPage />} />
-                                <Route path="/stream/:id" element={<StreamPage />} />
+                                <Route path="/stream/:id" element={<StreamPage />} /> {/* for legacy */}
+                                <Route path="/timeline/:id" element={<StreamPage />} />
                                 <Route path="/associations" element={<Associations />} />
                                 <Route path="/contacts" element={<ContactsPage />} />
                                 <Route path="/explorer/:tab" element={<Explorer />} />

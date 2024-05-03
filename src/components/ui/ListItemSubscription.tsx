@@ -3,18 +3,18 @@ import { type StreamList } from '../../model'
 import { Link as RouterLink } from 'react-router-dom'
 
 import ExpandMore from '@mui/icons-material/ExpandMore'
-import { StreamLink, UserStreamLink } from './StreamLink'
+import { ListItemTimeline } from './ListItemTimeline'
 import { usePreference } from '../../context/PreferenceContext'
 import { type ListSubscriptionSchema, type CoreSubscription } from '@concurrent-world/client'
 import { useGlobalActions } from '../../context/GlobalActions'
 
-export interface StreamListItemProps {
+export interface ListItemSubscriptionProps {
     id: string
     body: StreamList
     onClick?: () => void
 }
 
-export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
+export const ListItemSubscription = (props: ListItemSubscriptionProps): JSX.Element => {
     const [lists, updateLists] = usePreference('lists')
     const open = props.body.expanded
     const setOpen = (newOpen: boolean): void => {
@@ -72,9 +72,9 @@ export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
             <Collapse in={open} timeout="auto">
                 <List dense component="div" disablePadding>
                     {subscription?.items.map((sub) => (
-                        <StreamLink
+                        <ListItemTimeline
                             key={sub.id}
-                            streamID={sub.id}
+                            timelineID={sub.id}
                             sx={{
                                 pl: 2,
                                 gap: 1

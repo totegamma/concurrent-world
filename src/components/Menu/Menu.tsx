@@ -23,7 +23,7 @@ import { memo } from 'react'
 import buildTime from '~build/time'
 // @ts-expect-error vite dynamic import
 import { branch, sha } from '~build/info'
-import { StreamList } from '../StreamList/main'
+import { ListsMenu } from '../ListsMenu/main'
 import { CCAvatar } from '../ui/CCAvatar'
 import { useClient } from '../../context/ClientContext'
 import { usePreference } from '../../context/PreferenceContext'
@@ -185,7 +185,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         }
                     }}
                 >
-                    <StreamList />
+                    <ListsMenu />
                 </Box>
                 {!showEditorOnTop && (
                     <Button
