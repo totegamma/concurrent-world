@@ -1,14 +1,15 @@
-import { Box, Button, ButtonGroup, Checkbox, Menu, MenuItem, useTheme } from '@mui/material'
+import { Box, Button, ButtonGroup, Checkbox, IconButton, Menu, MenuItem, Tooltip, useTheme } from '@mui/material'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useGlobalActions } from '../context/GlobalActions'
 import { useClient } from '../context/ClientContext'
 
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
+
 export interface WatchButtonProps {
-    color?: string
-    userCCID: string
-    userStreamID: string
+    timelineID: string
+    minimal?: boolean
 }
 
 export const WatchButton = (props: WatchButtonProps): JSX.Element => {
@@ -25,44 +26,62 @@ export const WatchButton = (props: WatchButtonProps): JSX.Element => {
 
     const { t } = useTranslation('', { keyPrefix: 'common' })
 
-    const watching = actions.allKnownTimelines.find((e) => e.id === props.userStreamID) !== undefined
+    const watching = actions.allKnownTimelines.find((e) => e.id === props.timelineID) !== undefined
 
     return (
         <Box>
-            <ButtonGroup color="primary" variant="contained">
-                <Button
-                    onClick={(e) => {
-                        if (watching) {
+            {props.minimal ? (
+                <Tooltip title="リストに追加" placement="top" arrow>
+                    <IconButton
+                        sx={{ flexGrow: 0 }}
+                        onClick={(e) => {
                             setMenuAnchor(e.currentTarget)
-                        } else {
-                            client.api
-                                .subscribe(props.userStreamID, Object.keys(actions.listedSubscriptions)[0])
-                                .then((subscription) => {
-                                    console.log(subscription)
-                                })
-                        }
-                    }}
-                    onMouseEnter={() => {
-                        setIsHovered(true)
-                    }}
-                    onMouseLeave={() => {
-                        setIsHovered(false)
-                    }}
-                >
-                    {watching ? (isHovered ? t('unwatch') : t('watching')) : t('watch')}
-                </Button>
-                <Button
-                    size="small"
-                    onClick={(e) => {
-                        setMenuAnchor(e.currentTarget)
-                    }}
-                    sx={{
-                        padding: 0
-                    }}
-                >
-                    <ArrowDropDownIcon />
-                </Button>
-            </ButtonGroup>
+                        }}
+                    >
+                        <PlaylistAddIcon
+                            sx={{
+                                color: 'text.primary'
+                            }}
+                        />
+                    </IconButton>
+                </Tooltip>
+            ) : (
+                <ButtonGroup color="primary" variant="contained">
+                    <Button
+                        onClick={(e) => {
+                            if (watching) {
+                                setMenuAnchor(e.currentTarget)
+                            } else {
+                                client.api
+                                    .subscribe(props.timelineID, Object.keys(actions.listedSubscriptions)[0])
+                                    .then((subscription) => {
+                                        console.log(subscription)
+                                    })
+                            }
+                        }}
+                        onMouseEnter={() => {
+                            setIsHovered(true)
+                        }}
+                        onMouseLeave={() => {
+                            setIsHovered(false)
+                        }}
+                    >
+                        {watching ? (isHovered ? t('unwatch') : t('watching')) : t('watch')}
+                    </Button>
+                    <Button
+                        size="small"
+                        onClick={(e) => {
+                            setMenuAnchor(e.currentTarget)
+                        }}
+                        sx={{
+                            padding: 0
+                        }}
+                    >
+                        <ArrowDropDownIcon />
+                    </Button>
+                </ButtonGroup>
+            )}
+
             <Menu
                 anchorEl={menuAnchor}
                 open={Boolean(menuAnchor)}
@@ -75,20 +94,20 @@ export const WatchButton = (props: WatchButtonProps): JSX.Element => {
             >
                 {Object.keys(actions.listedSubscriptions).map((key) => (
                     <MenuItem key={key} onClick={() => {}}>
-                        {key}
+                        {actions.listedSubscriptions[key].document.body.name}
                         <Checkbox
                             checked={
-                                actions.listedSubscriptions[key].items.find((e) => e.id === props.userStreamID) !==
+                                actions.listedSubscriptions[key].items.find((e) => e.id === props.timelineID) !==
                                 undefined
                             }
                             onChange={(check) => {
                                 if (check.target.checked) {
-                                    client.api.subscribe(props.userStreamID, key).then((subscription) => {
-                                        console.log(subscription)
+                                    client.api.subscribe(props.timelineID, key).then((_) => {
+                                        actions.reloadList()
                                     })
                                 } else {
-                                    client.api.unsubscribe(props.userStreamID, key).then((subscription) => {
-                                        console.log(subscription)
+                                    client.api.unsubscribe(props.timelineID, key).then((_) => {
+                                        actions.reloadList()
                                     })
                                 }
                             }}

@@ -1,8 +1,8 @@
 import { Card, CardActionArea, CardActions, CardContent, type SxProps, Typography } from '@mui/material'
-import { AddListButton } from '../AddListButton'
 import { Link } from 'react-router-dom'
 
 import { CCWallpaper } from '../ui/CCWallpaper'
+import { WatchButton } from '../WatchButton'
 
 interface StreamCardProps {
     streamID: string
@@ -43,7 +43,7 @@ export function StreamCard(props: StreamCardProps): JSX.Element {
                 </CardContent>
             </CardActionArea>
             <CardActions>
-                <AddListButton stream={props.streamID} />
+                <WatchButton minimal timelineID={props.streamID} />
             </CardActions>
         </Card>
     )

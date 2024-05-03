@@ -118,16 +118,12 @@ export function Profile(props: ProfileProps): JSX.Element {
                             />
                         ))}
                     </Box>
-                    {!isSelf ? (
-                        <Box display="flex" gap={1}>
-                            <AckButton user={props.user} />
-                            <WatchButton
-                                color={theme.palette.secondary.main}
-                                userCCID={props.id!}
-                                userStreamID={props.user.homeTimeline ?? ''}
-                            />
-                        </Box>
-                    ) : (
+                    <Box display="flex" gap={1}>
+                        {!isSelf && <AckButton user={props.user} />}
+
+                        <WatchButton timelineID={props.user.homeTimeline ?? ''} />
+                    </Box>
+                    {isSelf && (
                         <Button variant="outlined" component={NavLink} to="/settings/profile">
                             Edit Profile
                         </Button>

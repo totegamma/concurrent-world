@@ -4,10 +4,10 @@ import { useClient } from '../context/ClientContext'
 import { type User, type CommunityTimelineSchema, type CoreTimeline } from '@concurrent-world/client'
 import { CCEditor } from './ui/cceditor'
 import { useSnackbar } from 'notistack'
-import { AddListButton } from './AddListButton'
 import { CCWallpaper } from './ui/CCWallpaper'
 import { UserPicker } from './ui/UserPicker'
 import { StreamUserList } from './StreamUserList'
+import { WatchButton } from './WatchButton'
 
 export interface StreamInfoProps {
     id: string
@@ -85,7 +85,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                         }}
                     >
                         <Typography variant="h1">{stream.document.body.name}</Typography>
-                        <AddListButton stream={props.id} />
+                        <WatchButton minimal timelineID={props.id} />
                     </Box>
                     <Typography variant="caption">{props.id}</Typography>
                     <Divider />
