@@ -5,9 +5,8 @@ import { Link as RouterLink } from 'react-router-dom'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import { StreamLink, UserStreamLink } from './StreamLink'
 import { usePreference } from '../../context/PreferenceContext'
-import { useClient } from '../../context/ClientContext'
-import { useEffect, useState } from 'react'
 import { type ListSubscriptionSchema, type CoreSubscription } from '@concurrent-world/client'
+import { useGlobalActions } from '../../context/GlobalActions'
 
 export interface StreamListItemProps {
     id: string
@@ -16,7 +15,6 @@ export interface StreamListItemProps {
 }
 
 export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
-    const { client } = useClient()
     const [lists, updateLists] = usePreference('lists')
     const open = props.body.expanded
     const setOpen = (newOpen: boolean): void => {
@@ -28,21 +26,8 @@ export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
         updateLists(old)
     }
 
-    const [subscription, setSubscription] = useState<CoreSubscription<ListSubscriptionSchema> | null>(null)
-
-    useEffect(() => {
-        if (!client) return
-        if (subscription) return
-        client.api
-            .getSubscription(props.id)
-            .then((sub) => {
-                console.log(sub)
-                if (sub) setSubscription(sub)
-            })
-            .catch((e) => {
-                console.error(e)
-            })
-    }, [])
+    const action = useGlobalActions()
+    const subscription = action.listedSubscriptions[props.id] as CoreSubscription<ListSubscriptionSchema> | undefined
 
     return (
         <>

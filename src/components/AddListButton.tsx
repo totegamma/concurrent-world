@@ -42,19 +42,19 @@ export const AddListButton = (props: AddListButtonProps): JSX.Element => {
             >
                 {Object.keys(actions.listedSubscriptions).map((key) => (
                     <MenuItem key={key} onClick={() => {}}>
-                        {key}
+                        {actions.listedSubscriptions[key].document.body.name}
                         <Checkbox
                             checked={
                                 actions.listedSubscriptions[key].items.find((e) => e.id === props.stream) !== undefined
                             }
                             onChange={(check) => {
                                 if (check.target.checked) {
-                                    client.api.subscribe(props.stream, key).then((subscription) => {
-                                        console.log(subscription)
+                                    client.api.subscribe(props.stream, key).then((_) => {
+                                        actions.reloadList()
                                     })
                                 } else {
-                                    client.api.unsubscribe(props.stream, key).then((subscription) => {
-                                        console.log(subscription)
+                                    client.api.unsubscribe(props.stream, key).then((_) => {
+                                        actions.reloadList()
                                     })
                                 }
                             }}

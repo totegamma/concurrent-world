@@ -25,7 +25,7 @@ export function ListPage(): JSX.Element {
     const { client } = useClient()
     const path = useLocation()
     const navigate = useNavigate()
-    const { allKnownTimelines, postStreams, setPostStreams } = useGlobalActions()
+    const actions = useGlobalActions()
     const [lists, _setLists] = usePreference('lists')
     const [showEditorOnTop] = usePreference('showEditorOnTop')
     const [showEditorOnTopMobile] = usePreference('showEditorOnTopMobile')
@@ -48,7 +48,7 @@ export function ListPage(): JSX.Element {
         if (!list) return
 
         Promise.all(list.defaultPostStreams.map((streamID) => client.getTimeline(streamID))).then((streams) => {
-            setPostStreams(streams.filter((e) => e !== null) as Array<CoreTimeline<CommunityTimelineSchema>>)
+            actions.setPostStreams(streams.filter((e) => e !== null) as Array<CoreTimeline<CommunityTimelineSchema>>)
         })
     }, [id, lists])
 
@@ -137,8 +137,8 @@ export function ListPage(): JSX.Element {
                                     }}
                                 >
                                     <Draft
-                                        streamPickerOptions={allKnownTimelines}
-                                        streamPickerInitial={postStreams}
+                                        streamPickerOptions={actions.allKnownTimelines}
+                                        streamPickerInitial={actions.postStreams}
                                         onSubmit={async (
                                             text: string,
                                             destinations: string[],

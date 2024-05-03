@@ -28,6 +28,7 @@ export interface GlobalActionsState {
     openMobileMenu: (open?: boolean) => void
     allKnownTimelines: Array<Timeline<CommunityTimelineSchema>>
     listedSubscriptions: Record<string, CoreSubscription<any>>
+    reloadList: () => void
     draft: string
     openEmojipack: (url: EmojiPackage) => void
     openImageViewer: (url: string) => void
@@ -129,6 +130,39 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         }
     }, [lists])
 
+    const reloadList = useCallback(() => {
+        setAllKnownTimelines([])
+        Promise.all(
+            Object.keys(lists).map((id) =>
+                client.api
+                    .getSubscription(id)
+                    .then((sub) => {
+                        return [id, sub]
+                    })
+                    .catch((e) => {
+                        console.log(e)
+                        return [id, null]
+                    })
+            )
+        ).then((subs) => {
+            const validsubsarr = subs.filter((e) => e[1]) as Array<[string, CoreSubscription<any>]>
+            const listedSubs = Object.fromEntries(validsubsarr)
+            setListedSubscriptions(listedSubs)
+
+            const validsubs = validsubsarr.map((e) => e[1])
+
+            const allTimelins = validsubs.flatMap((sub) => sub.items.map((e) => e.id))
+            const uniq = [...new Set(allTimelins)]
+            uniq.forEach((id) => {
+                client.getTimeline<CommunityTimelineSchema>(id).then((stream) => {
+                    if (stream) {
+                        setAllKnownTimelines((prev) => [...prev, stream])
+                    }
+                })
+            })
+        })
+    }, [client, lists])
+
     useEffect(() => {
         client.api.getDomain(client.api.host).then((domain) => {
             if (domain === null) {
@@ -221,7 +255,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     openImageViewer,
                     postStreams,
                     setPostStreams,
-                    listedSubscriptions
+                    listedSubscriptions,
+                    reloadList
                 }
             }, [
                 openDraft,
@@ -234,7 +269,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                 openImageViewer,
                 postStreams,
                 setPostStreams,
-                listedSubscriptions
+                listedSubscriptions,
+                reloadList
             ])}
         >
             <InspectorProvider>
