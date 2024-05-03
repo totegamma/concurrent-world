@@ -8,7 +8,7 @@ import {
     type RerouteMessageSchema,
     type Message,
     type ReplyMessageSchema,
-    type SimpleNoteSchema,
+    type MarkdownMessageSchema,
     Schemas,
     type CoreCharacter
 } from '@concurrent-world/client'
@@ -20,7 +20,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useClient } from '../../context/ClientContext'
 
 export interface MessageViewProps {
-    message: Message<SimpleNoteSchema | ReplyMessageSchema>
+    message: Message<MarkdownMessageSchema | ReplyMessageSchema>
     rerouted?: Message<RerouteMessageSchema>
     userCCID?: string
     beforeMessage?: JSX.Element
@@ -55,11 +55,11 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
         if (!props.rerouted) return false
         const A =
             props.rerouted.postedStreams?.filter(
-                (stream) => stream.schema === Schemas.commonstream || stream.schema === Schemas.utilitystream
+                (stream) => stream.schema === Schemas.communityTimeline || stream.schema === Schemas.emptyTimeline
             ) ?? []
         const B =
             props.message.postedStreams?.filter(
-                (stream) => stream.schema === Schemas.commonstream || stream.schema === Schemas.utilitystream
+                (stream) => stream.schema === Schemas.communityTimeline || stream.schema === Schemas.emptyTimeline
             ) ?? []
         if (A.length !== B.length) return false
         const Aids = A.map((e) => e.id).sort()

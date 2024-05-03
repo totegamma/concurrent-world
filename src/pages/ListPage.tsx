@@ -7,7 +7,7 @@ import { Draft } from '../components/Draft'
 import { useClient } from '../context/ClientContext'
 import {
     type CreateCurrentOptions,
-    type CommonstreamSchema,
+    type CommunityTimelineSchema,
     type Timeline as CoreTimeline,
     type CoreSubscription
 } from '@concurrent-world/client'
@@ -45,7 +45,7 @@ export function ListPage(): JSX.Element {
         if (!list) return
 
         Promise.all(list.defaultPostStreams.map((streamID) => client.getTimeline(streamID))).then((streams) => {
-            setPostStreams(streams.filter((e) => e !== null) as Array<CoreTimeline<CommonstreamSchema>>)
+            setPostStreams(streams.filter((e) => e !== null) as Array<CoreTimeline<CommunityTimelineSchema>>)
         })
     }, [id, lists])
 
@@ -134,7 +134,7 @@ export function ListPage(): JSX.Element {
                                             destinations: string[],
                                             options?: CreateCurrentOptions
                                         ): Promise<Error | null> => {
-                                            await client.createCurrent(text, destinations, options).catch((e) => e)
+                                            await client.createMarkdownCrnt(text, destinations, options).catch((e) => e)
                                             return null
                                         }}
                                         sx={{

@@ -60,7 +60,7 @@ export const ApSetup = (): JSX.Element => {
         }
 
         const followstream = await client.api.upsertTimeline(
-            Schemas.commonstream,
+            Schemas.communityTimeline,
             {
                 name: 'ActivityPub',
                 shortname: 'activitypub',

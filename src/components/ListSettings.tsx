@@ -2,7 +2,7 @@ import { Box, Button, IconButton, List, ListItem, Switch, Tab, Tabs, TextField, 
 import { StreamPicker } from './ui/StreamPicker'
 import { useEffect, useState } from 'react'
 import { usePreference } from '../context/PreferenceContext'
-import { type CoreSubscription, type CommonstreamSchema, type Timeline } from '@concurrent-world/client'
+import { type CoreSubscription, type Timeline, type CommunityTimelineSchema } from '@concurrent-world/client'
 import { useClient } from '../context/ClientContext'
 import { StreamLink } from './StreamList/StreamLink'
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove'
@@ -20,8 +20,8 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
 
     const { t } = useTranslation('', { keyPrefix: 'ui.listSettings' })
 
-    const [options, setOptions] = useState<Array<Timeline<CommonstreamSchema>>>([])
-    const [postStreams, setPostStreams] = useState<Array<Timeline<CommonstreamSchema>>>([])
+    const [options, setOptions] = useState<Array<Timeline<CommunityTimelineSchema>>>([])
+    const [postStreams, setPostStreams] = useState<Array<Timeline<CommunityTimelineSchema>>>([])
 
     const [tab, setTab] = useState<'stream' | 'user'>('stream')
 
@@ -30,11 +30,11 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
     useEffect(() => {
         if (!list) return
         Promise.all(props.subscription.items.map((sub) => client.getTimeline(sub.id))).then((streams) => {
-            setOptions(streams.filter((e) => e !== null) as Array<Timeline<CommonstreamSchema>>)
+            setOptions(streams.filter((e) => e !== null) as Array<Timeline<CommunityTimelineSchema>>)
         })
 
         Promise.all(list.defaultPostStreams.map((streamID) => client.getTimeline(streamID))).then((streams) => {
-            setPostStreams(streams.filter((stream) => stream !== null) as Array<Timeline<CommonstreamSchema>>)
+            setPostStreams(streams.filter((stream) => stream !== null) as Array<Timeline<CommunityTimelineSchema>>)
         })
     }, [props.subscription])
 

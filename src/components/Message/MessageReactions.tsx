@@ -9,12 +9,12 @@ import {
     type ReplyMessageSchema,
     type RerouteMessageSchema,
     Schemas,
-    type SimpleNoteSchema
+    type MarkdownMessageSchema
 } from '@concurrent-world/client'
 import { type EmojiAssociation } from '@concurrent-world/client/dist/types/schemas/emojiAssociation'
 
 export interface MessageReactionsProps {
-    message: Message<SimpleNoteSchema | ReplyMessageSchema | RerouteMessageSchema>
+    message: Message<MarkdownMessageSchema | ReplyMessageSchema | RerouteMessageSchema>
 }
 
 export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
@@ -26,7 +26,7 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
         () =>
             Object.fromEntries(
                 props.message.ownAssociations
-                    .filter((association) => association.schema === Schemas.emojiAssociation)
+                    .filter((association) => association.schema === Schemas.reactionAssociation)
                     .map((association) => [association.document.body.imageUrl, association])
             ),
         [props.message]

@@ -3,13 +3,13 @@ import { TimeDiff } from '../ui/TimeDiff'
 import { Link as RouterLink } from 'react-router-dom'
 import { useMemo, useState } from 'react'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import { type Message, type ReplyMessageSchema, type SimpleNoteSchema } from '@concurrent-world/client'
+import { type Message, type ReplyMessageSchema, type MarkdownMessageSchema } from '@concurrent-world/client'
 
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { useClient } from '../../context/ClientContext'
 
 export interface MessageHeaderProps {
-    message: Message<SimpleNoteSchema | ReplyMessageSchema>
+    message: Message<MarkdownMessageSchema | ReplyMessageSchema>
     usernameOverride?: string
     additionalMenuItems?: JSX.Element | JSX.Element[]
 }

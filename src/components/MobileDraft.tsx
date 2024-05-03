@@ -22,7 +22,12 @@ import ImageIcon from '@mui/icons-material/Image'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 import { useEmojiPicker } from '../context/EmojiPickerContext'
-import { type CommonstreamSchema, type Timeline, type User, type CreateCurrentOptions } from '@concurrent-world/client'
+import {
+    type CommunityTimelineSchema,
+    type Timeline,
+    type User,
+    type CreateCurrentOptions
+} from '@concurrent-world/client'
 import { useClient } from '../context/ClientContext'
 import { type Emoji, type EmojiLite } from '../model'
 import { useNavigate } from 'react-router-dom'
@@ -33,8 +38,8 @@ import { useStorage } from '../context/StorageContext'
 import { DummyMessageView } from './Message/DummyMessageView'
 
 export interface MobileDraftProps {
-    streamPickerInitial: Array<Timeline<CommonstreamSchema>>
-    streamPickerOptions: Array<Timeline<CommonstreamSchema>>
+    streamPickerInitial: Array<Timeline<CommunityTimelineSchema>>
+    streamPickerOptions: Array<Timeline<CommunityTimelineSchema>>
     onSubmit: (text: string, destinations: string[], options?: CreateCurrentOptions) => Promise<Error | null>
     onCancel?: () => void
     submitButtonLabel?: string
@@ -52,7 +57,7 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
     const navigate = useNavigate()
     const { uploadFile, isUploadReady } = useStorage()
 
-    const [destStreams, setDestStreams] = useState<Array<Timeline<CommonstreamSchema>>>(props.streamPickerInitial)
+    const [destStreams, setDestStreams] = useState<Array<Timeline<CommunityTimelineSchema>>>(props.streamPickerInitial)
 
     const [draft, setDraft] = usePersistent<string>('draft', '')
 

@@ -8,11 +8,8 @@ import { usePersistent } from '../hooks/usePersistent'
 import { jumpToDomainRegistration } from '../util'
 import {
     Client,
-    Schemas,
-    type CoreCharacter,
     type CoreDomain,
     type ProfileSchema,
-    type DomainProfileSchema,
     LoadKey,
     generateIdentity,
     type Identity
@@ -71,54 +68,10 @@ export function Registration(): JSX.Element {
 
         console.log('hostAddr', host.ccid)
 
-        client?.api
-            .getCharacters<DomainProfileSchema>({ author: host.ccid, schema: Schemas.domainProfile })
-            .then((profile: Array<CoreCharacter<DomainProfileSchema>> | null | undefined) => {
-                console.log('domainprofile:', profile)
-                const domainProfile = profile?.[0]?.document.body
-                const list = {
-                    home: {
-                        label: 'Home',
-                        pinned: true,
-                        streams: domainProfile?.defaultFollowingStreams ? domainProfile?.defaultFollowingStreams : [],
-                        userStreams: [],
-                        expanded: false,
-                        defaultPostStreams: domainProfile?.defaultPostStreams ? domainProfile?.defaultPostStreams : []
-                    }
-                }
+        const storage = JSON.stringify(defaultPreference)
+        client.api.writeKV('world.concurrent.preference', storage)
 
-                const pref = {
-                    ...defaultPreference,
-                    lists: list
-                }
-
-                const storage = JSON.stringify(pref)
-                client.api.writeKV('world.concurrent.preference', storage)
-
-                window.location.href = '/'
-            })
-            .catch((_) => {
-                const list = {
-                    home: {
-                        label: 'Home',
-                        pinned: true,
-                        streams: [],
-                        userStreams: [],
-                        expanded: false,
-                        defaultPostStreams: []
-                    }
-                }
-
-                const pref = {
-                    ...defaultPreference,
-                    lists: list
-                }
-
-                const storage = JSON.stringify(pref)
-                client.api.writeKV('world.concurrent.preference', storage)
-
-                window.location.href = '/'
-            })
+        window.location.href = '/'
     }
 
     const steps = [

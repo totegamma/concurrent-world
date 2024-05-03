@@ -1,9 +1,9 @@
 import {
     type Association,
-    type EmojiAssociationSchema,
+    type ReactionAssociationSchema,
     type Message,
     type ReplyMessageSchema,
-    type SimpleNoteSchema,
+    type MarkdownMessageSchema,
     type User
 } from '@concurrent-world/client'
 import { ContentWithCCAvatar } from '../ContentWithCCAvatar'
@@ -13,13 +13,13 @@ import { Link as RouterLink } from 'react-router-dom'
 import { type ReactElement, useEffect, useState } from 'react'
 
 export interface MentionAssociationProps {
-    association: Association<EmojiAssociationSchema>
+    association: Association<ReactionAssociationSchema>
     perspective: string
     withoutContent?: boolean
 }
 
 export const MentionAssociation = (props: MentionAssociationProps): ReactElement => {
-    const [target, setTarget] = useState<Message<SimpleNoteSchema | ReplyMessageSchema> | null>(null)
+    const [target, setTarget] = useState<Message<MarkdownMessageSchema | ReplyMessageSchema> | null>(null)
     const isMeToOther = props.association?.authorUser?.ccid !== props.perspective
 
     const Nominative = props.association?.authorUser?.profile?.username ?? 'anonymous'

@@ -2,12 +2,12 @@ import { Box, Link, IconButton, Typography, Tooltip } from '@mui/material'
 import { Link as routerLink, Link as RouterLink } from 'react-router-dom'
 import { CCAvatar } from '../ui/CCAvatar'
 import { TimeDiff } from '../ui/TimeDiff'
-import { type Message, type ReplyMessageSchema, type SimpleNoteSchema } from '@concurrent-world/client'
+import { type Message, type ReplyMessageSchema, type MarkdownMessageSchema } from '@concurrent-world/client'
 import { MarkdownRendererLite } from '../ui/MarkdownRendererLite'
 import { MarkdownRenderer } from '../ui/MarkdownRenderer'
 
 export interface OneLineMessageViewProps {
-    message: Message<SimpleNoteSchema | ReplyMessageSchema>
+    message: Message<MarkdownMessageSchema | ReplyMessageSchema>
 }
 
 export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element => {

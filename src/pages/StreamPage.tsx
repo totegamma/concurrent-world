@@ -7,7 +7,7 @@ import { useClient } from '../context/ClientContext'
 import { Timeline } from '../components/Timeline/main'
 import { StreamInfo } from '../components/StreamInfo'
 import { usePreference } from '../context/PreferenceContext'
-import { type CommonstreamSchema } from '@concurrent-world/client'
+import { type CommunityTimelineSchema } from '@concurrent-world/client'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import WatchingStreamContextProvider from '../context/WatchingStreamContext'
 import { type VListHandle } from 'virtua'
@@ -62,7 +62,7 @@ export const StreamPage = memo((): JSX.Element => {
     }, [targetStream])
 
     useEffect(() => {
-        client.getTimeline<CommonstreamSchema>(targetStreamID).then((stream) => {
+        client.getTimeline<CommunityTimelineSchema>(targetStreamID).then((stream) => {
             if (stream) setPostStreams([stream])
         })
     }, [id])
@@ -120,7 +120,7 @@ export const StreamPage = memo((): JSX.Element => {
                                                     options
                                                 ): Promise<Error | null> => {
                                                     await client
-                                                        .createCurrent(text, destinations, options)
+                                                        .createMarkdownCrnt(text, destinations, options)
                                                         .catch((e) => e)
                                                     return null
                                                 }}

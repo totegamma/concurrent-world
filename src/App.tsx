@@ -30,11 +30,9 @@ import { usePreference } from './context/PreferenceContext'
 import TickerProvider from './context/Ticker'
 import { ContactsPage } from './pages/Contacts'
 import {
-    type CoreAssociation,
     Schemas,
     type Subscription,
     type ProfileSchema,
-    type Association,
     type ReplyAssociationSchema,
     type TimelineEvent,
     type CCDocument
@@ -123,7 +121,7 @@ function App(): JSX.Element {
                     return
                 }
 
-                if (a.schema === Schemas.like) {
+                if (a.schema === Schemas.likeAssociation) {
                     client?.api.getMessageWithAuthor(a.target, event.item.owner).then((m) => {
                         m &&
                             client.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.signer).then((c) => {
@@ -144,7 +142,7 @@ function App(): JSX.Element {
                     return
                 }
 
-                if (a.schema === Schemas.emojiAssociation) {
+                if (a.schema === Schemas.reactionAssociation) {
                     client.api.getMessageWithAuthor(a.target, event.item.owner).then((m) => {
                         console.log(m)
                         m &&
@@ -168,7 +166,7 @@ function App(): JSX.Element {
                     })
                 }
 
-                if (a.schema === Schemas.mention) {
+                if (a.schema === Schemas.mentionAssociation) {
                     client?.api.getMessageWithAuthor(a.target, event.item.owner).then((m) => {
                         m &&
                             client.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.signer).then((c) => {

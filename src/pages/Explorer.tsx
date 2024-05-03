@@ -14,7 +14,7 @@ import {
     Typography,
     useTheme
 } from '@mui/material'
-import { type CommonstreamSchema, Schemas, type CoreCharacter } from '@concurrent-world/client'
+import { type CommunityTimelineSchema, Schemas, type CoreCharacter } from '@concurrent-world/client'
 import { useClient } from '../context/ClientContext'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
@@ -91,7 +91,7 @@ export function Explorer(): JSX.Element {
         let unmounted = false
         Promise.all(
             selectedDomains.map(async (e) => {
-                const streams = await client.getTimelinesBySchema<CommonstreamSchema>(e, Schemas.commonstream)
+                const streams = await client.getTimelinesBySchema<CommunityTimelineSchema>(e, Schemas.communityTimeline)
                 return streams.map((stream) => {
                     return {
                         domain: e,
@@ -137,7 +137,7 @@ export function Explorer(): JSX.Element {
 
     const createNewStream = (stream: any): void => {
         client.api
-            .upsertTimeline(Schemas.commonstream, stream)
+            .upsertTimeline(Schemas.communityTimeline, stream)
             .then((e: any) => {
                 const id: string = e.id
                 if (id) navigate('/stream/' + id)
@@ -322,7 +322,7 @@ export function Explorer(): JSX.Element {
                                     key={value.stream.id}
                                     streamID={value.stream.id}
                                     name={value.stream.document.body.name}
-                                    description={value.stream.document.body.description}
+                                    description={value.stream.document.body.description ?? 'no description'}
                                     banner={value.stream.document.body.banner ?? ''}
                                     domain={value.domain}
                                     isOwner={value.stream.author === client.ccid}
@@ -346,7 +346,7 @@ export function Explorer(): JSX.Element {
                                 {t('createNewStream.desc2')}
                             </Typography>
                             <Divider />
-                            <CCEditor schemaURL={Schemas.commonstream} onSubmit={createNewStream} />
+                            <CCEditor schemaURL={Schemas.communityTimeline} onSubmit={createNewStream} />
                         </Box>
                     </CCDrawer>
                 </>

@@ -1,7 +1,7 @@
 import { Box, Button, Divider, FormControlLabel, FormGroup, Paper, Switch, TextField, Typography } from '@mui/material'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useClient } from '../context/ClientContext'
-import { type User, type CommonstreamSchema, type CoreTimeline } from '@concurrent-world/client'
+import { type User, type CommunityTimelineSchema, type CoreTimeline } from '@concurrent-world/client'
 import { CCEditor } from './ui/cceditor'
 import { useSnackbar } from 'notistack'
 import { AddListButton } from './AddListButton'
@@ -17,7 +17,7 @@ export interface StreamInfoProps {
 export function StreamInfo(props: StreamInfoProps): JSX.Element {
     const { client } = useClient()
     const { enqueueSnackbar } = useSnackbar()
-    const [stream, setStream] = useState<CoreTimeline<CommonstreamSchema>>()
+    const [stream, setStream] = useState<CoreTimeline<CommunityTimelineSchema>>()
     const isAuthor = stream?.author === client.ccid
 
     const [visible, setVisible] = useState(false)
@@ -42,7 +42,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
 
     const updateStream = useCallback(
         // const res2 = await this.api.upsertTimeline(Schemas.utilitystream, {}, { semanticID: 'world.concrnt.t-assoc', indexable: false, domainOwned: false })
-        (body: CommonstreamSchema) => {
+        (body: CommunityTimelineSchema) => {
             if (!stream) return
             client.api
                 .upsertTimeline(schemaDraft, body, { id: props.id, indexable: visible, domainOwned: false })

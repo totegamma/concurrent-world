@@ -1,7 +1,7 @@
 import { ListItemButton, type SxProps } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
-import { type User, type Timeline, type CommonstreamSchema } from '@concurrent-world/client'
+import { type User, type Timeline, type CommunityTimelineSchema } from '@concurrent-world/client'
 import { useClient } from '../../context/ClientContext'
 import PercentIcon from '@mui/icons-material/Percent'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
@@ -15,10 +15,10 @@ export interface StreamLinkProps {
 
 export const StreamLink = (props: StreamLinkProps): JSX.Element | null => {
     const { client } = useClient()
-    const [stream, SetStream] = useState<Timeline<CommonstreamSchema> | null | undefined>(null)
+    const [stream, SetStream] = useState<Timeline<CommunityTimelineSchema> | null | undefined>(null)
 
     useEffect(() => {
-        client.getTimeline<CommonstreamSchema>(props.streamID).then((e) => {
+        client.getTimeline<CommunityTimelineSchema>(props.streamID).then((e) => {
             SetStream(e)
         })
     }, [props.streamID])

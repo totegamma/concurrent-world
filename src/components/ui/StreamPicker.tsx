@@ -1,12 +1,12 @@
 import { Autocomplete, Box, Chip, InputBase, type SxProps } from '@mui/material'
-import { type CommonstreamSchema, Schemas, type Timeline } from '@concurrent-world/client'
+import { type CommunityTimelineSchema, Schemas, type Timeline } from '@concurrent-world/client'
 import { useMemo } from 'react'
 
 export interface StreamPickerProps {
-    selected: Array<Timeline<CommonstreamSchema>>
-    setSelected: (selected: Array<Timeline<CommonstreamSchema>>) => void
+    selected: Array<Timeline<CommunityTimelineSchema>>
+    setSelected: (selected: Array<Timeline<CommunityTimelineSchema>>) => void
     sx?: SxProps
-    options: Array<Timeline<CommonstreamSchema>>
+    options: Array<Timeline<CommunityTimelineSchema>>
 }
 
 export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
@@ -19,8 +19,8 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
                     }
                     return value
                 })
-            ).filter((stream: Timeline<any>) => stream.schema === Schemas.commonstream) as Array<
-                Timeline<CommonstreamSchema>
+            ).filter((stream: Timeline<any>) => stream.schema === Schemas.communityTimeline) as Array<
+                Timeline<CommunityTimelineSchema>
             >,
         [props.selected]
     )
@@ -41,8 +41,8 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
                 multiple
                 value={selected}
                 options={props.options}
-                getOptionKey={(option: Timeline<CommonstreamSchema>) => option.id ?? ''}
-                getOptionLabel={(option: Timeline<CommonstreamSchema>) => option.document.body.name}
+                getOptionKey={(option: Timeline<CommunityTimelineSchema>) => option.id ?? ''}
+                getOptionLabel={(option: Timeline<CommunityTimelineSchema>) => option.document.body.name}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 onChange={(_, value) => {
                     props.setSelected(value)

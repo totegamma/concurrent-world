@@ -12,8 +12,8 @@ dependencies:
     specifier: ^3.445.0
     version: 3.445.0
   '@concurrent-world/client':
-    specifier: ^5.0.3
-    version: 5.0.3
+    specifier: ^6.0.0
+    version: 6.0.0
   '@emotion/react':
     specifier: ^11.10.5
     version: 11.10.5(@babel/core@7.21.8)(@types/react@18.0.26)(react@18.2.0)
@@ -2391,14 +2391,14 @@ packages:
     dev: true
     optional: true
 
-  /@concurrent-world/client@5.0.3:
-    resolution: {integrity: sha512-qTJOH17zRHbaN094x3HlROH/01T9LwGw2ylODp0S7SYGWKnJtXFHpMXwAZOBL3qFiE6TvuL+Nf3UozZur01aHA==}
+  /@concurrent-world/client@6.0.0:
+    resolution: {integrity: sha512-aTsZOLUxNY5i9k7iosNjfx6EbpVVschS7hMkaI9CPK2YD1iohRp2FJCU1QlxPqM1J4mHI03glwgATtcAEU9JvA==}
     dependencies:
       '@cosmjs/amino': 0.32.3
       '@cosmjs/crypto': 0.32.3
       '@cosmjs/encoding': 0.32.3
       elliptic: 6.5.4
-      ethers: 6.12.0
+      ethers: 6.12.1
       uuid: 9.0.0
     transitivePeerDependencies:
       - bufferutil
@@ -8164,8 +8164,8 @@ packages:
     engines: {node: '>= 0.6'}
     dev: true
 
-  /ethers@6.12.0:
-    resolution: {integrity: sha512-zL5NlOTjML239gIvtVJuaSk0N9GQLi1Hom3ZWUszE5lDTQE/IVB62mrPkQ2W1bGcZwVGSLaetQbWNQSvI4rGDQ==}
+  /ethers@6.12.1:
+    resolution: {integrity: sha512-j6wcVoZf06nqEcBbDWkKg8Fp895SS96dSnTCjiXT+8vt2o02raTn4Lo9ERUuIVU5bAjoPYeA+7ytQFexFmLuVw==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@adraffy/ens-normalize': 1.10.1
