@@ -7,7 +7,7 @@ import AddIcon from '@mui/icons-material/Add'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import { useEffect, useState } from 'react'
-import { type CoreSubscription } from '@concurrent-world/client'
+import { Schemas, type CoreSubscription } from '@concurrent-world/client'
 
 export function ManageSubsPage(): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'pages.contacts' })
@@ -53,11 +53,7 @@ export function ManageSubsPage(): JSX.Element {
                     }}
                     onClick={() => {
                         client.api
-                            .upsertSubscription(
-                                'https://schema.concrnt.world/s/common.json',
-                                {},
-                                { indexable: false, domainOwned: false }
-                            )
+                            .upsertSubscription(Schemas.listSubscription, {}, { indexable: false, domainOwned: false })
                             .then((subscription) => {
                                 console.log(subscription)
                             })

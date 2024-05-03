@@ -9,7 +9,8 @@ import {
     type CreateCurrentOptions,
     type CommunityTimelineSchema,
     type Timeline as CoreTimeline,
-    type CoreSubscription
+    type CoreSubscription,
+    type ListSubscriptionSchema
 } from '@concurrent-world/client'
 import TuneIcon from '@mui/icons-material/Tune'
 import ExploreIcon from '@mui/icons-material/Explore'
@@ -31,13 +32,15 @@ export function ListPage(): JSX.Element {
     const rawid = path.hash.replace('#', '')
     const id = lists[rawid] ? rawid : Object.keys(lists)[0]
     const [tab, setTab] = useState<string>(id)
-    const [subscription, setSubscription] = useState<CoreSubscription<any> | null>(null)
+    const [subscription, setSubscription] = useState<CoreSubscription<ListSubscriptionSchema> | null>(null)
 
     const [listSettingsOpen, setListSettingsOpen] = useState<boolean>(false)
 
     const timelineRef = useRef<VListHandle>(null)
 
     const timelines = useMemo(() => subscription?.items.map((e) => e.id) ?? [], [subscription])
+
+    const [pinnedSubscriptions, setPinnedSubscriptions] = useState<Array<CoreSubscription<ListSubscriptionSchema>>>([])
 
     useEffect(() => {
         if (!id) return
@@ -48,6 +51,16 @@ export function ListPage(): JSX.Element {
             setPostStreams(streams.filter((e) => e !== null) as Array<CoreTimeline<CommunityTimelineSchema>>)
         })
     }, [id, lists])
+
+    useEffect(() => {
+        Promise.all(
+            Object.keys(lists)
+                .filter((e) => lists[e])
+                .map((e) => client.api.getSubscription(e))
+        ).then((subs) => {
+            setPinnedSubscriptions(subs.filter((e) => e !== null) as Array<CoreSubscription<ListSubscriptionSchema>>)
+        })
+    }, [lists, client])
 
     useEffect(() => {
         if (id) setTab(id)
@@ -76,7 +89,7 @@ export function ListPage(): JSX.Element {
                 }}
             >
                 <TimelineHeader
-                    title={id}
+                    title={subscription?.document.body.name ?? 'No Name'}
                     titleIcon={<ListIcon />}
                     secondaryAction={<TuneIcon />}
                     onSecondaryActionClick={() => {
@@ -96,22 +109,19 @@ export function ListPage(): JSX.Element {
                     variant="scrollable"
                     scrollButtons={false}
                 >
-                    {Object.keys(lists)
-                        .filter((e) => lists[e].pinned)
-                        .map((e) => (
-                            <Tab
-                                key={e}
-                                value={e}
-                                label={e}
-                                onClick={() => {
-                                    console.log('click', e, tab)
-                                    if (e === tab) {
-                                        timelineRef.current?.scrollToIndex(0, { align: 'start', smooth: true })
-                                    }
-                                }}
-                                sx={{ fontSize: '0.9rem', padding: '0', textTransform: 'none' }}
-                            />
-                        ))}
+                    {pinnedSubscriptions.map((sub) => (
+                        <Tab
+                            key={sub.id}
+                            value={sub.id}
+                            label={sub.document.body.name}
+                            onClick={() => {
+                                if (sub.id === tab) {
+                                    timelineRef.current?.scrollToIndex(0, { align: 'start', smooth: true })
+                                }
+                            }}
+                            sx={{ fontSize: '0.9rem', padding: '0', textTransform: 'none' }}
+                        />
+                    ))}
                 </Tabs>
 
                 {timelines.length > 0 ? (

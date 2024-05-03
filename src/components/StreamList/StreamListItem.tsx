@@ -7,7 +7,7 @@ import { StreamLink, UserStreamLink } from './StreamLink'
 import { usePreference } from '../../context/PreferenceContext'
 import { useClient } from '../../context/ClientContext'
 import { useEffect, useState } from 'react'
-import { type CoreSubscription } from '@concurrent-world/client'
+import { type ListSubscriptionSchema, type CoreSubscription } from '@concurrent-world/client'
 
 export interface StreamListItemProps {
     id: string
@@ -28,7 +28,7 @@ export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
         updateLists(old)
     }
 
-    const [subscription, setSubscription] = useState<CoreSubscription<any> | null>(null)
+    const [subscription, setSubscription] = useState<CoreSubscription<ListSubscriptionSchema> | null>(null)
 
     useEffect(() => {
         if (!client) return
@@ -81,7 +81,7 @@ export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
                     component={RouterLink}
                     to={`/#${props.id}`}
                 >
-                    <ListItemText primary={props.id} />
+                    <ListItemText primary={subscription?.document.body.name} />
                 </ListItemButton>
             </ListItem>
             <Collapse in={open} timeout="auto">

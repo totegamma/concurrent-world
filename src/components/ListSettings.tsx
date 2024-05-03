@@ -2,7 +2,13 @@ import { Box, Button, IconButton, List, ListItem, Switch, Tab, Tabs, TextField, 
 import { StreamPicker } from './ui/StreamPicker'
 import { useEffect, useState } from 'react'
 import { usePreference } from '../context/PreferenceContext'
-import { type CoreSubscription, type Timeline, type CommunityTimelineSchema } from '@concurrent-world/client'
+import {
+    type CoreSubscription,
+    type Timeline,
+    type CommunityTimelineSchema,
+    type ListSubscriptionSchema,
+    Schemas
+} from '@concurrent-world/client'
 import { useClient } from '../context/ClientContext'
 import { StreamLink } from './StreamList/StreamLink'
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove'
@@ -16,7 +22,13 @@ export interface ListSettingsProps {
 export function ListSettings(props: ListSettingsProps): JSX.Element {
     const { client } = useClient()
     const [lists, setLists] = usePreference('lists')
-    const [listName, setListName] = useState<string>('')
+
+    const listSubscription =
+        props.subscription.schema === Schemas.listSubscription
+            ? (props.subscription as CoreSubscription<ListSubscriptionSchema>)
+            : null
+
+    const [listName, setListName] = useState<string>(listSubscription ? listSubscription.document.body.name : '')
 
     const { t } = useTranslation('', { keyPrefix: 'ui.listSettings' })
 
@@ -54,27 +66,40 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
             }}
         >
             <Typography variant="h2">{t('title')}</Typography>
-            <Typography variant="h3">{t('name')}</Typography>
-            <Box display="flex" flexDirection="row">
-                <TextField
-                    label="list name"
-                    variant="outlined"
-                    value={listName}
-                    sx={{
-                        flexGrow: 1
-                    }}
-                    onChange={(e) => {
-                        setListName(e.target.value)
-                    }}
-                />
-                <Button
-                    onClick={(_) => {
-                        // TODO
-                    }}
-                >
-                    {t('update')}
-                </Button>
-            </Box>
+            {props.subscription.schema === Schemas.listSubscription && (
+                <>
+                    <Typography variant="h3">{t('name')}</Typography>
+                    <Box display="flex" flexDirection="row">
+                        <TextField
+                            label="list name"
+                            variant="outlined"
+                            value={listName}
+                            sx={{
+                                flexGrow: 1
+                            }}
+                            onChange={(e) => {
+                                setListName(e.target.value)
+                            }}
+                        />
+                        <Button
+                            onClick={(_) => {
+                                client.api.upsertSubscription<ListSubscriptionSchema>(
+                                    props.subscription.schema,
+                                    {
+                                        name: listName
+                                    },
+                                    {
+                                        id: props.subscription.id,
+                                        indexable: props.subscription.indexable
+                                    }
+                                )
+                            }}
+                        >
+                            {t('update')}
+                        </Button>
+                    </Box>
+                </>
+            )}
             <Typography variant="h3">{t('defaultDest')}</Typography>
             <Box
                 sx={{
