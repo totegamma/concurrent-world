@@ -17,6 +17,7 @@ import { type StreamList } from '../model'
 
 export interface ListSettingsProps {
     subscription: CoreSubscription<any>
+    onModified?: () => void
 }
 
 export function ListSettings(props: ListSettingsProps): JSX.Element {
@@ -100,42 +101,51 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                     </Box>
                 </>
             )}
-            <Typography variant="h3">{t('defaultDest')}</Typography>
-            <Box
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    flex: 1
-                }}
-            >
-                <StreamPicker
-                    options={options}
-                    selected={postStreams}
-                    setSelected={(value) => {
-                        updateList(props.subscription.id, {
-                            ...list,
-                            defaultPostStreams: value.map((e) => e.id)
-                        })
-                        setPostStreams(value)
-                    }}
-                />
-            </Box>
-            <Typography variant="h3">{t('pin')}</Typography>
-            <Switch
-                checked={list.pinned}
-                onChange={(_) => {
-                    updateList(props.subscription.id, {
-                        ...list,
-                        pinned: !list.pinned
-                    })
-                }}
-            />
+            {list && (
+                <>
+                    <Typography variant="h3">{t('defaultDest')}</Typography>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            flex: 1
+                        }}
+                    >
+                        <StreamPicker
+                            options={options}
+                            selected={postStreams}
+                            setSelected={(value) => {
+                                updateList(props.subscription.id, {
+                                    ...list,
+                                    defaultPostStreams: value.map((e) => e.id)
+                                })
+                                setPostStreams(value)
+                            }}
+                        />
+                    </Box>
+                    <Typography variant="h3">{t('pin')}</Typography>
+                    <Switch
+                        checked={list.pinned}
+                        onChange={(_) => {
+                            updateList(props.subscription.id, {
+                                ...list,
+                                pinned: !list.pinned
+                            })
+                        }}
+                    />
+                </>
+            )}
             <Button
                 color="error"
                 onClick={(_) => {
-                    const old = lists
-                    delete old[props.subscription.id]
-                    setLists(JSON.parse(JSON.stringify(old)))
+                    if (lists[props.subscription.id]) {
+                        const old = lists
+                        delete old[props.subscription.id]
+                        setLists(JSON.parse(JSON.stringify(old)))
+                    }
+                    client.api.deleteSubscription(props.subscription.id).then((_) => {
+                        props.onModified?.()
+                    })
                 }}
             >
                 {t('delete')}

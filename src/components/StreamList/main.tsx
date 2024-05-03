@@ -1,17 +1,15 @@
-import { List, ListItem, ListItemText } from '@mui/material'
+import { List, ListItem, ListItemButton, ListItemText } from '@mui/material'
 import { StreamListItem } from './StreamListItem'
 import ListIcon from '@mui/icons-material/List'
 import { useGlobalActions } from '../../context/GlobalActions'
 import { useTranslation } from 'react-i18next'
-import { useClient } from '../../context/ClientContext'
 import { usePreference } from '../../context/PreferenceContext'
-import { useNavigate } from 'react-router-dom'
+import { Link as RouterLink } from 'react-router-dom'
 
 export const StreamList = (): JSX.Element => {
     const { t } = useTranslation('', { keyPrefix: 'pages' })
     const { openMobileMenu } = useGlobalActions()
     const [lists] = usePreference('lists')
-    const navigate = useNavigate()
     return (
         <List
             dense
@@ -20,20 +18,15 @@ export const StreamList = (): JSX.Element => {
                 width: '100%'
             }}
         >
-            <ListItem
-                onClick={() => {
-                    navigate('/subscriptions')
-                }}
-                sx={{
-                    gap: '8px'
-                }}
-            >
-                <ListIcon
-                    sx={{
-                        color: 'background.contrastText'
-                    }}
-                />
-                <ListItemText primary={t('lists.title')} />
+            <ListItem disablePadding>
+                <ListItemButton sx={{ gap: 1 }} component={RouterLink} to="/subscriptions">
+                    <ListIcon
+                        sx={{
+                            color: 'background.contrastText'
+                        }}
+                    />
+                    <ListItemText primary={t('lists.title')} />
+                </ListItemButton>
             </ListItem>
             {Object.keys(lists).map((key) => (
                 <StreamListItem

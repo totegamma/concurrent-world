@@ -1,13 +1,30 @@
-import { Box, Divider, IconButton, List, ListItem, ListItemText, Typography } from '@mui/material'
+import {
+    Box,
+    Button,
+    Divider,
+    IconButton,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemText,
+    Typography
+} from '@mui/material'
 import { useClient } from '../context/ClientContext'
 import { useTranslation } from 'react-i18next'
 import { usePreference } from '../context/PreferenceContext'
 
+import { useEffect, useState } from 'react'
+import { Schemas, type CoreSubscription } from '@concurrent-world/client'
+
 import AddIcon from '@mui/icons-material/Add'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
-import { useEffect, useState } from 'react'
-import { Schemas, type CoreSubscription } from '@concurrent-world/client'
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
+
+import { ListSettings } from '../components/ListSettings'
+import { CCDrawer } from '../components/ui/CCDrawer'
+import { type StreamList } from '../model'
 
 export function ManageSubsPage(): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'pages.contacts' })
@@ -21,16 +38,15 @@ export function ManageSubsPage(): JSX.Element {
     const unlistedSubs: Array<CoreSubscription<any>> = ownSubscriptions.filter(
         (sub) => !Object.keys(lists).includes(sub.id)
     )
+    const [inspectedSub, setInspectedSub] = useState<CoreSubscription<any> | null>(null)
 
-    console.log('listedSubs', listedSubs)
-    console.log('unlistedSubs', unlistedSubs)
+    const [reloader, setReloader] = useState<number>(0)
 
     useEffect(() => {
         client.api.getOwnSubscriptions<any>().then((subs) => {
-            console.log('subs', subs)
             setOwnSubscriptions(subs)
         })
-    }, [])
+    }, [reloader])
 
     return (
         <Box
@@ -50,54 +66,139 @@ export function ManageSubsPage(): JSX.Element {
                     overflow: 'hidden'
                 }}
             >
-                <Typography variant="h2" gutterBottom>
-                    ManageSubscriptions
-                </Typography>
-                <Divider />
-                <IconButton
+                <Typography variant="h2">リストの管理</Typography>
+
+                <Divider
                     sx={{
-                        p: 0,
-                        color: 'background.contrastText'
+                        margin: '10px 0'
                     }}
-                    onClick={() => {
-                        client.api
-                            .upsertSubscription(Schemas.listSubscription, {}, { indexable: false, domainOwned: false })
-                            .then((subscription) => {
-                                console.log(subscription)
-                            })
-                            .catch((error) => {
-                                console.error(error)
-                            })
-                    }}
-                >
-                    <AddIcon />
-                </IconButton>
+                />
                 <Box
                     sx={{
                         display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        gap: '20px',
-                        marginTop: '20px'
+                        flexDirection: 'column',
+                        flex: '1'
                     }}
                 >
                     <Box
                         sx={{
                             display: 'flex',
-                            flexDirection: 'column',
-                            flex: '1'
+                            gap: 1,
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
                         }}
                     >
-                        <Typography variant="h3" gutterBottom>
-                            Unlisted Subscriptions
-                        </Typography>
-                        <List>
-                            {unlistedSubs.map((sub) => (
-                                <ListItem
-                                    key={sub.id}
-                                    secondaryAction={
+                        <Typography variant="h3">表示中のリスト</Typography>
+                        <Button
+                            onClick={() => {
+                                client.api
+                                    .upsertSubscription(
+                                        Schemas.listSubscription,
+                                        {
+                                            name: '新しいリスト'
+                                        },
+                                        { indexable: false, domainOwned: false }
+                                    )
+                                    .then((subscription) => {
+                                        console.log(subscription)
+                                        setReloader((prev) => prev + 1)
+                                    })
+                                    .catch((error) => {
+                                        console.error(error)
+                                    })
+                            }}
+                            endIcon={<AddIcon />}
+                        >
+                            新規作成
+                        </Button>
+                    </Box>
+
+                    <List dense>
+                        {listedSubs.map((sub, i) => (
+                            <ListItem
+                                dense
+                                key={sub.id}
+                                secondaryAction={
+                                    <Box>
                                         <IconButton
-                                            edge="end"
+                                            disabled={i === 0}
+                                            onClick={() => {
+                                                const keys = Object.keys(lists)
+                                                const tmp = keys[i]
+                                                keys[i] = keys[i - 1]
+                                                keys[i - 1] = tmp
+
+                                                const newLists = new Map<string, StreamList>()
+                                                for (const key of keys) {
+                                                    newLists.set(key, lists[key])
+                                                }
+
+                                                setLists(Object.fromEntries(newLists))
+                                            }}
+                                        >
+                                            <ArrowUpwardIcon />
+                                        </IconButton>
+                                        <IconButton
+                                            disabled={i === listedSubs.length - 1}
+                                            onClick={() => {
+                                                const keys = Object.keys(lists)
+                                                const tmp = keys[i]
+                                                keys[i] = keys[i + 1]
+                                                keys[i + 1] = tmp
+
+                                                const newLists = new Map<string, StreamList>()
+                                                for (const key of keys) {
+                                                    newLists.set(key, lists[key])
+                                                }
+
+                                                setLists(Object.fromEntries(newLists))
+                                            }}
+                                        >
+                                            <ArrowDownwardIcon />
+                                        </IconButton>
+                                        <IconButton
+                                            onClick={() => {
+                                                const old = lists
+                                                delete old[sub.id]
+                                                setLists(old)
+                                            }}
+                                        >
+                                            <RemoveCircleOutlineIcon />
+                                        </IconButton>
+                                    </Box>
+                                }
+                            >
+                                <ListItemButton
+                                    dense
+                                    onClick={() => {
+                                        setInspectedSub(sub)
+                                    }}
+                                >
+                                    <ListItemText primary={sub.document.body?.name ?? sub.id} />
+                                </ListItemButton>
+                            </ListItem>
+                        ))}
+                    </List>
+                </Box>
+
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        flex: '1'
+                    }}
+                >
+                    <Typography variant="h3" gutterBottom>
+                        非表示のリスト
+                    </Typography>
+                    <List dense>
+                        {unlistedSubs.map((sub) => (
+                            <ListItem
+                                dense
+                                key={sub.id}
+                                secondaryAction={
+                                    <Box>
+                                        <IconButton
                                             onClick={() => {
                                                 const old = lists
                                                 old[sub.id] = {
@@ -110,47 +211,40 @@ export function ManageSubsPage(): JSX.Element {
                                         >
                                             <AddCircleOutlineIcon />
                                         </IconButton>
-                                    }
+                                    </Box>
+                                }
+                            >
+                                <ListItemButton
+                                    dense
+                                    onClick={() => {
+                                        setInspectedSub(sub)
+                                    }}
                                 >
                                     <ListItemText primary={sub.document.body?.name ?? sub.id} />
-                                </ListItem>
-                            ))}
-                        </List>
-                    </Box>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            flex: '1'
-                        }}
-                    >
-                        <Typography variant="h3" gutterBottom>
-                            Listed Subscriptions
-                        </Typography>
-                        <List>
-                            {listedSubs.map((sub) => (
-                                <ListItem
-                                    key={sub.id}
-                                    secondaryAction={
-                                        <IconButton
-                                            edge="end"
-                                            onClick={() => {
-                                                const old = lists
-                                                delete old[sub.id]
-                                                setLists(old)
-                                            }}
-                                        >
-                                            <RemoveCircleOutlineIcon />
-                                        </IconButton>
-                                    }
-                                >
-                                    <ListItemText primary={sub.document.body?.name ?? sub.id} />
-                                </ListItem>
-                            ))}
-                        </List>
-                    </Box>
+                                </ListItemButton>
+                            </ListItem>
+                        ))}
+                    </List>
                 </Box>
             </Box>
+            <CCDrawer
+                open={!!inspectedSub}
+                onClose={() => {
+                    setInspectedSub(null)
+                }}
+            >
+                {inspectedSub ? (
+                    <ListSettings
+                        subscription={inspectedSub}
+                        onModified={() => {
+                            setReloader((prev) => prev + 1)
+                            setInspectedSub(null)
+                        }}
+                    />
+                ) : (
+                    <>Loading...</>
+                )}
+            </CCDrawer>
         </Box>
     )
 }
