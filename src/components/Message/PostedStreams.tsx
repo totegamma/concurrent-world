@@ -68,7 +68,7 @@ export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
                                     borderColor: 'divider'
                                 }}
                             >
-                                #{e.document.body.shortname}
+                                #{e.document.body.shortname || e.document.body.name}
                             </Link>
                         )
                     case Schemas.emptyTimeline:
