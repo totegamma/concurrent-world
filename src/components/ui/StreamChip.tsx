@@ -1,7 +1,7 @@
 import { Tooltip, Paper, Chip } from '@mui/material'
 import { type Timeline } from '@concurrent-world/client'
 import { Link as NavLink } from 'react-router-dom'
-import PercentIcon from '@mui/icons-material/Percent'
+import TagIcon from '@mui/icons-material/Tag'
 import { useClient } from '../../context/ClientContext'
 import { useEffect, useState } from 'react'
 import { StreamCard } from '../Stream/Card'
@@ -60,7 +60,7 @@ export const StreamChip = (props: StreamChipProps): JSX.Element => {
                 to={'/stream/' + (props.streamID ?? '')}
                 size={'small'}
                 label={stream?.document.body.name ?? props.streamID}
-                icon={<PercentIcon />}
+                icon={<TagIcon />}
             />
         </Tooltip>
     )

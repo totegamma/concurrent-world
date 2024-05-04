@@ -13,7 +13,7 @@ import WatchingStreamContextProvider from '../context/WatchingStreamContext'
 import { type VListHandle } from 'virtua'
 import { useGlobalActions } from '../context/GlobalActions'
 
-import PercentIcon from '@mui/icons-material/Percent'
+import TagIcon from '@mui/icons-material/Tag'
 import TuneIcon from '@mui/icons-material/Tune'
 import InfoIcon from '@mui/icons-material/Info'
 import LockIcon from '@mui/icons-material/Lock'
@@ -80,7 +80,7 @@ export const StreamPage = memo((): JSX.Element => {
             >
                 <TimelineHeader
                     title={targetStream?.document.body.name ?? 'Not Found'}
-                    titleIcon={<PercentIcon />}
+                    titleIcon={<TagIcon />}
                     secondaryAction={isOwner ? <TuneIcon /> : <InfoIcon />}
                     onTitleClick={() => {
                         timelineRef.current?.scrollToIndex(0, { align: 'start', smooth: true })

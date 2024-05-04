@@ -192,7 +192,7 @@ export const userMentionRemarkPlugin = (): any => {
 export const streamLinkRemarkPlugin = (): any => {
     return (tree: any) => {
         visit(tree, 'text', (node: any, index?: number, parent?: any) => {
-            const parts = node.value.split(/(%\w+@[^\s]+)/)
+            const parts = node.value.split(/(#\w+@[^\s]+)/)
             if (parts.length !== 1) {
                 parent.children.splice(
                     index,
@@ -200,7 +200,7 @@ export const streamLinkRemarkPlugin = (): any => {
                     ...parts
                         .map((part: string) => {
                             if (part.length === 0) return undefined
-                            if (part.startsWith('%')) return { type: 'streamlink', streamId: part.slice(1) }
+                            if (part.startsWith('#')) return { type: 'streamlink', streamId: part.slice(1) }
                             else return { type: 'text', value: part }
                         })
                         .filter((node: any) => node !== undefined)
