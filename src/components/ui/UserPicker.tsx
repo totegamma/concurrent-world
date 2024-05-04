@@ -42,7 +42,7 @@ export const UserPicker = (props: UserPickerProps): JSX.Element => {
                 sx={{ width: 1 }}
                 multiple
                 value={selected}
-                options={client.ackings ?? []}
+                options={[...(client.ackings ?? []), ...(client.user ? [client.user] : [])]}
                 getOptionKey={(option: User) => option.ccid}
                 getOptionLabel={(option: User) => option.profile?.username ?? ''}
                 isOptionEqualToValue={(option, value) => option.ccid === value.ccid}
