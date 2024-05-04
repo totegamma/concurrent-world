@@ -10,7 +10,7 @@ import {
     type ReplyMessageSchema,
     type MarkdownMessageSchema,
     Schemas,
-    type CoreCharacter
+    type CoreProfile
 } from '@concurrent-world/client'
 import { PostedStreams } from './PostedStreams'
 import { ContentWithCCAvatar } from '../ContentWithCCAvatar'
@@ -40,14 +40,14 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
 
     const { client } = useClient()
 
-    const [characterOverride, setCharacterOverride] = useState<CoreCharacter<any> | undefined>(undefined)
+    const [characterOverride, setProfileOverride] = useState<CoreProfile<any> | undefined>(undefined)
 
     useEffect(() => {
         if (!(client && props.message.document.body.profileOverride?.characterID)) return
         client.api
-            .getCharacterByID(props.message.document.body.profileOverride?.characterID, props.message.author)
-            .then((character) => {
-                setCharacterOverride(character ?? undefined)
+            .getProfileByID(props.message.document.body.profileOverride?.characterID, props.message.author)
+            .then((profile) => {
+                setProfileOverride(profile ?? undefined)
             })
     }, [client, props.message])
 

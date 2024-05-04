@@ -20,7 +20,7 @@ import LockIcon from '@mui/icons-material/Lock'
 
 export const StreamPage = memo((): JSX.Element => {
     const { client } = useClient()
-    const { allKnownTimelines, postStreams, setPostStreams } = useGlobalActions()
+    const actions = useGlobalActions()
 
     const { id } = useParams()
 
@@ -30,7 +30,7 @@ export const StreamPage = memo((): JSX.Element => {
     const timelineRef = useRef<VListHandle>(null)
 
     const targetStreamID = id ?? ''
-    const targetStream = postStreams[0]
+    const targetStream = actions.postStreams[0]
 
     const [streamInfoOpen, setStreamInfoOpen] = useState<boolean>(false)
 
@@ -63,7 +63,7 @@ export const StreamPage = memo((): JSX.Element => {
 
     useEffect(() => {
         client.getTimeline<CommunityTimelineSchema>(targetStreamID).then((stream) => {
-            if (stream) setPostStreams([stream])
+            if (stream) actions.setPostStreams([stream])
         })
     }, [id])
 
@@ -113,7 +113,9 @@ export const StreamPage = memo((): JSX.Element => {
                                             <Draft
                                                 defaultPostHome={!nonPublic}
                                                 streamPickerInitial={streams}
-                                                streamPickerOptions={[...new Set([...allKnownTimelines, ...streams])]}
+                                                streamPickerOptions={[
+                                                    ...new Set([...actions.allKnownTimelines, ...streams])
+                                                ]}
                                                 onSubmit={async (
                                                     text: string,
                                                     destinations: string[],

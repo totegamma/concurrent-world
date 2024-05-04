@@ -1,4 +1,4 @@
-import { type CoreCharacter } from '@concurrent-world/client'
+import { type CoreProfile } from '@concurrent-world/client'
 import { Box, IconButton, Menu, Paper, Typography } from '@mui/material'
 import { CCWallpaper } from './ui/CCWallpaper'
 import { CCAvatar } from './ui/CCAvatar'
@@ -9,7 +9,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { ProfileProperties } from './ui/ProfileProperties'
 
 export interface SubProfileCardProps {
-    character: CoreCharacter<any>
+    character: CoreProfile<any>
     additionalMenuItems?: JSX.Element | JSX.Element[]
     children?: JSX.Element | JSX.Element[]
 }

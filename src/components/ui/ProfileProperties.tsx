@@ -1,4 +1,4 @@
-import { type CoreCharacter } from '@concurrent-world/client'
+import { type CoreProfile } from '@concurrent-world/client'
 import { Box, Button, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
@@ -6,7 +6,7 @@ import { CCDrawer } from './CCDrawer'
 import { CCEditor } from './cceditor'
 
 export interface ProfilePropertiesProps {
-    character: CoreCharacter<any>
+    character: CoreProfile<any>
     showCreateLink?: boolean
 }
 
@@ -104,7 +104,9 @@ export const ProfileProperties = (props: ProfilePropertiesProps): JSX.Element =>
                             ソースを見る
                         </Button>
                     </Box>
-                    {schema && <CCEditor disabled schema={schema} init={props.character.document.body} />}
+                    {schema && (
+                        <CCEditor disabled schema={schema} value={props.character.document.body} setValue={() => {}} />
+                    )}
                 </Box>
             </CCDrawer>
         </>

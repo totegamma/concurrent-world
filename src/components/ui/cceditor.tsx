@@ -1,24 +1,56 @@
-import { Box } from '@mui/material'
+import { Box, Button, Typography } from '@mui/material'
 import Form from '@rjsf/mui'
 import validator from '@rjsf/validator-ajv8'
 import { memo, useEffect, useState } from 'react'
 import { fetchWithTimeout } from '../../util'
+import { useClient } from '../../context/ClientContext'
+import { type User } from '@concurrent-world/client'
+import { UserPicker } from '../ui/UserPicker'
+import { type RegistryWidgetsType, type UiSchema, type WidgetProps } from '@rjsf/utils'
 
 export interface CCEditorProps {
     schemaURL?: string
     schema?: any
-    onSubmit?: (_: any) => void
-    init?: any
+    value: any
+    setValue: (_: any) => void
     disabled?: boolean
+    showSubmit?: boolean
+}
+
+const UserPickerWidget = (props: WidgetProps): JSX.Element => {
+    const { client } = useClient()
+
+    const [selected, setSelected] = useState<User[]>([])
+    useEffect(() => {
+        if (!props.value || !client) return
+        Promise.all(props.value.map((e: string) => client.getUser(e))).then((e) => {
+            setSelected(e.filter((e) => e) as User[])
+        })
+    }, [props])
+
+    return (
+        <>
+            <Typography>{props.label}</Typography>
+            <UserPicker
+                selected={selected}
+                setSelected={(value) => {
+                    console.log(value)
+                    setSelected(value)
+                    props.onChange(value.map((e) => e.ccid))
+                }}
+            />
+        </>
+    )
+}
+
+const widgets: RegistryWidgetsType = {
+    userPicker: UserPickerWidget
 }
 
 export const CCEditor = memo<CCEditorProps>((props: CCEditorProps): JSX.Element => {
     const [schema, setSchema] = useState<any>(props.schema)
-    const [formData, setFormData] = useState<any>()
 
-    useEffect(() => {
-        setFormData(props.init)
-    }, [props.init])
+    const uiSchema: UiSchema = schema?.ui || {}
 
     useEffect(() => {
         if (props.schema || !props.schemaURL) return
@@ -27,10 +59,10 @@ export const CCEditor = memo<CCEditorProps>((props: CCEditorProps): JSX.Element 
             .then((e) => {
                 setSchema(e)
                 // if not compatible, reset form data
-                if (formData) {
-                    const errors = validator.rawValidation(schema, formData)
+                if (props.value) {
+                    const errors = validator.rawValidation(schema, props.value)
                     if (errors.errors && errors.errors.length > 0) {
-                        setFormData({})
+                        props.setValue({})
                     }
                 }
             })
@@ -47,15 +79,23 @@ export const CCEditor = memo<CCEditorProps>((props: CCEditorProps): JSX.Element 
                     disabled={props.disabled}
                     schema={schema}
                     validator={validator}
-                    formData={formData}
+                    formData={props.value}
+                    uiSchema={uiSchema}
+                    widgets={widgets}
                     onChange={(e) => {
-                        setFormData(e.formData)
+                        props.setValue(e.formData)
                     }}
-                    onSubmit={(e) => {
-                        console.log(e.formData)
-                        props.onSubmit?.(e.formData)
-                    }}
-                />
+                >
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        sx={{
+                            display: props.showSubmit ? 'block' : 'none'
+                        }}
+                    >
+                        Submit
+                    </Button>
+                </Form>
             )}
         </Box>
     )

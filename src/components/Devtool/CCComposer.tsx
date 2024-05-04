@@ -1,13 +1,13 @@
 import { Box, Button, Divider, MenuItem, Select, TextField, Typography } from '@mui/material'
 import { forwardRef, useState } from 'react'
 import { useClient } from '../../context/ClientContext'
-import { type Schema, type CoreCharacter } from '@concurrent-world/client'
+import { type Schema } from '@concurrent-world/client'
 import { CCEditor } from '../ui/cceditor'
 
 export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
     const { client } = useClient()
 
-    const [cctype, setcctype] = useState<'message' | 'association' | 'character'>('message')
+    const [cctype, setcctype] = useState<'message' | 'association' | 'profile'>('message')
     const [schemaURL, setSchemaURL] = useState<string>('')
     const [schemaURLDraft, setSchemaURLDraft] = useState<string>('')
 
@@ -16,28 +16,24 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
     const [associationTarget, setAssociationTarget] = useState<string>('')
     const [associationTargetAuthor, setAssociationTargetAuthor] = useState<string>('')
 
-    const [character, setCharacter] = useState<CoreCharacter<any> | null | undefined>()
+    const [data, setData] = useState<any>({})
 
-    const createMessage = async (e: any): Promise<void> => {
-        client.api.createMessage(schemaURL as Schema, e, streams.split(','))
+    const createMessage = async (): Promise<void> => {
+        client.api.createMessage(schemaURL as Schema, data, streams.split(','))
     }
 
-    const createAssociation = async (e: any): Promise<void> => {
+    const createAssociation = async (): Promise<void> => {
         client.api.createAssociation(
             schemaURL as Schema,
-            e,
+            data,
             associationTarget,
             associationTargetAuthor,
             streams.split(',')
         )
     }
 
-    const createCharacter = async (e: any): Promise<void> => {
-        if (character) {
-            client.api.upsertCharacter(schemaURL as Schema, e, character.id)
-        } else {
-            client.api.upsertCharacter(schemaURL as Schema, e)
-        }
+    const createProfile = async (): Promise<void> => {
+        client.api.upsertProfile(schemaURL as Schema, data, {})
     }
 
     return (
@@ -60,7 +56,7 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
                 >
                     <MenuItem value={'message'}>Message</MenuItem>
                     <MenuItem value={'association'}>Association</MenuItem>
-                    <MenuItem value={'character'}>Character</MenuItem>
+                    <MenuItem value={'profile'}>Profile</MenuItem>
                 </Select>
                 {cctype === 'message' && (
                     <>
@@ -110,39 +106,30 @@ export const CCComposer = forwardRef<HTMLDivElement>((props, ref): JSX.Element =
                 />
                 <Button
                     onClick={() => {
-                        if (cctype === 'character') {
-                            if (!client.ccid) return
-                            client.api.getCharacters({ author: client.ccid, schema: schemaURLDraft }).then((e) => {
-                                if (!e || e.length === 0) return
-                                setCharacter(e[0])
-                                setSchemaURL(schemaURLDraft)
-                            })
-                        } else {
-                            setSchemaURL(schemaURLDraft)
-                        }
+                        setSchemaURL(schemaURLDraft)
                     }}
                 >
                     Load
                 </Button>
 
-                <CCEditor
-                    schemaURL={schemaURL}
-                    onSubmit={(e) => {
-                        console.log(e)
+                <CCEditor schemaURL={schemaURL} value={data} setValue={setData} />
+                <Button
+                    onClick={() => {
                         switch (cctype) {
                             case 'message':
-                                createMessage(e)
+                                createMessage()
                                 break
                             case 'association':
-                                createAssociation(e)
+                                createAssociation()
                                 break
-                            case 'character':
-                                createCharacter(e)
+                            case 'profile':
+                                createProfile()
                                 break
                         }
                     }}
-                    init={character?.document.body}
-                />
+                >
+                    Create
+                </Button>
             </Box>
         </div>
     )

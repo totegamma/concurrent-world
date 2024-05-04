@@ -81,8 +81,8 @@ export function EntityPage(): JSX.Element {
                         <Profile
                             user={user}
                             id={id}
-                            overrideSubCharacterID={subCharacterID}
-                            onSubCharacterClicked={(id) => {
+                            overrideSubProfileID={subCharacterID}
+                            onSubProfileClicked={(id) => {
                                 window.location.hash = id
                             }}
                         />
