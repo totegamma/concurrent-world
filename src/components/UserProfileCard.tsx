@@ -37,7 +37,7 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
                 <Box
                     position="relative"
                     component={routerLink}
-                    to={'/entity/' + (character.author ?? '')}
+                    to={'/entity/' + (props.ccid ?? '')}
                     sx={{
                         top: '-30px',
                         left: '10px'
@@ -85,8 +85,8 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
                     label={`${ccid.slice(0, 9)}...`}
                     deleteIcon={<ContentPasteIcon />}
                     onDelete={() => {
-                        if (character.author) {
-                            navigator.clipboard.writeText(character.author)
+                        if (props.ccid) {
+                            navigator.clipboard.writeText(props.ccid)
                             enqueueSnackbar('Copied', { variant: 'info' })
                         } else {
                             enqueueSnackbar('No CCID found', { variant: 'error' })
