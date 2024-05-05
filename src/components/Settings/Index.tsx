@@ -15,6 +15,8 @@ import { useSnackbar } from 'notistack'
 import { LogoutButton } from './LogoutButton'
 import { IconButtonWithLabel } from '../ui/IconButtonWithLabel'
 import { useTranslation } from 'react-i18next'
+import HailIcon from '@mui/icons-material/Hail'
+import ImportExportIcon from '@mui/icons-material/ImportExport'
 
 export function SettingsIndex(): JSX.Element {
     const { client } = useClient()
@@ -130,6 +132,20 @@ export function SettingsIndex(): JSX.Element {
                     to="/settings/activitypub"
                 />
                 <IconButtonWithLabel link icon={QrCodeIcon} label={t('settings.qr.title')} to="/settings/loginqr" />
+                {/*
+                <IconButtonWithLabel
+                    link
+                    icon={HailIcon}
+                    label={t('settings.transit.title')}
+                    to="/settings/transit"
+                />
+                */}
+                <IconButtonWithLabel
+                    link
+                    icon={ImportExportIcon}
+                    label={t('settings.importexport.title')}
+                    to="/settings/importexport"
+                />
             </Paper>
             <Paper
                 variant="outlined"

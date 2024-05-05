@@ -209,6 +209,9 @@
             "tip1": "You can only see generated codes once. Generate a new code only when you need it.",
             "tip2": "You can check created keys in the Settings > Identity page.",
             "createNewSubKey": "Create New Sub Key"
+        },
+        "transit": {
+            "title": "Transit"
         }
     },
     "welcome": {
