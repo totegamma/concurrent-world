@@ -14,7 +14,7 @@ import {
     Typography,
     useTheme
 } from '@mui/material'
-import { type CommonstreamSchema, Schemas, type CoreCharacter } from '@concurrent-world/client'
+import { type CommunityTimelineSchema, Schemas, type CoreProfile } from '@concurrent-world/client'
 import { useClient } from '../context/ClientContext'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
@@ -31,7 +31,6 @@ import DoneAllIcon from '@mui/icons-material/DoneAll'
 import RemoveDoneIcon from '@mui/icons-material/RemoveDone'
 import { type StreamWithDomain } from '../model'
 import { StreamCard } from '../components/Stream/Card'
-import { UserProfileCard } from '../components/UserProfileCard'
 import { SubProfileCard } from '../components/SubProfileCard'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 
@@ -58,7 +57,8 @@ export function Explorer(): JSX.Element {
 
     const [openTips, setOpenTips] = useState<boolean>(false)
 
-    const [characters, setCharacters] = useState<Array<CoreCharacter<any>>>([])
+    const [characters, setProfiles] = useState<Array<CoreProfile<any>>>([])
+    const [timelineDraft, setTimelineDraft] = useState<CommunityTimelineSchema>()
 
     const { enqueueSnackbar } = useSnackbar()
 
@@ -92,7 +92,7 @@ export function Explorer(): JSX.Element {
         let unmounted = false
         Promise.all(
             selectedDomains.map(async (e) => {
-                const streams = await client.getStreamsBySchema<CommonstreamSchema>(e, Schemas.commonstream)
+                const streams = await client.getTimelinesBySchema<CommunityTimelineSchema>(e, Schemas.communityTimeline)
                 return streams.map((stream) => {
                     return {
                         domain: e,
@@ -119,14 +119,14 @@ export function Explorer(): JSX.Element {
             Promise.all(
                 selectedDomains.map(async (e) => {
                     return (
-                        ((await client.api.getCharacters({ schema: profileSchema, domain: e }))?.filter(
+                        ((await client.api.getProfiles({ schema: profileSchema, domain: e }))?.filter(
                             (e) => e
-                        ) as Array<CoreCharacter<any>>) ?? []
+                        ) as Array<CoreProfile<any>>) ?? []
                     )
                 })
             ).then((e) => {
                 if (unmounted) return
-                setCharacters(e.flat())
+                setProfiles(e.flat())
             })
         }, 500)
 
@@ -138,7 +138,7 @@ export function Explorer(): JSX.Element {
 
     const createNewStream = (stream: any): void => {
         client.api
-            .createStream(Schemas.commonstream, stream)
+            .upsertTimeline(Schemas.communityTimeline, stream)
             .then((e: any) => {
                 const id: string = e.id
                 if (id) navigate('/stream/' + id)
@@ -322,9 +322,9 @@ export function Explorer(): JSX.Element {
                                 <StreamCard
                                     key={value.stream.id}
                                     streamID={value.stream.id}
-                                    name={value.stream.payload.name}
-                                    description={value.stream.payload.description}
-                                    banner={value.stream.payload.banner ?? ''}
+                                    name={value.stream.document.body.name}
+                                    description={value.stream.document.body.description ?? 'no description'}
+                                    banner={value.stream.document.body.banner ?? ''}
                                     domain={value.domain}
                                     isOwner={value.stream.author === client.ccid}
                                 />
@@ -347,7 +347,18 @@ export function Explorer(): JSX.Element {
                                 {t('createNewStream.desc2')}
                             </Typography>
                             <Divider />
-                            <CCEditor schemaURL={Schemas.commonstream} onSubmit={createNewStream} />
+                            <CCEditor
+                                schemaURL={Schemas.communityTimeline}
+                                value={timelineDraft}
+                                setValue={setTimelineDraft}
+                            />
+                            <Button
+                                onClick={() => {
+                                    createNewStream(timelineDraft)
+                                }}
+                            >
+                                作成
+                            </Button>
                         </Box>
                     </CCDrawer>
                 </>
@@ -374,11 +385,7 @@ export function Explorer(): JSX.Element {
                     >
                         {characters.map((character) => (
                             <Paper key={character.id} variant="outlined">
-                                {character.schema === Schemas.profile ? (
-                                    <UserProfileCard character={character} />
-                                ) : (
-                                    <SubProfileCard character={character} />
-                                )}
+                                <SubProfileCard character={character} />
                             </Paper>
                         ))}
                     </Box>

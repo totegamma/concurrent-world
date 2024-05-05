@@ -1,13 +1,12 @@
 import { Box, Button, Divider, FormControlLabel, FormGroup, Paper, Switch, TextField, Typography } from '@mui/material'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useClient } from '../context/ClientContext'
-import { type User, type CommonstreamSchema, type CoreStream } from '@concurrent-world/client'
+import { type CommunityTimelineSchema, type CoreTimeline } from '@concurrent-world/client'
 import { CCEditor } from './ui/cceditor'
 import { useSnackbar } from 'notistack'
-import { AddListButton } from './AddListButton'
 import { CCWallpaper } from './ui/CCWallpaper'
-import { UserPicker } from './ui/UserPicker'
-import { StreamUserList } from './StreamUserList'
+import { WatchButton } from './WatchButton'
+import { PolicyEditor } from './ui/PolicyEditor'
 
 export interface StreamInfoProps {
     id: string
@@ -17,62 +16,48 @@ export interface StreamInfoProps {
 export function StreamInfo(props: StreamInfoProps): JSX.Element {
     const { client } = useClient()
     const { enqueueSnackbar } = useSnackbar()
-    const [stream, setStream] = useState<CoreStream<CommonstreamSchema>>()
+    const [stream, setStream] = useState<CoreTimeline<CommunityTimelineSchema>>()
     const isAuthor = stream?.author === client.ccid
 
     const [visible, setVisible] = useState(false)
-
     const [schemaDraft, setSchemaDraft] = useState('')
+    const [policyDraft, setPolicyDraft] = useState<string | undefined>(undefined)
 
-    const [writers, setWriters] = useState<User[]>([])
-    const [readers, setReaders] = useState<User[]>([])
-
-    const readable = useMemo(
-        () =>
-            stream &&
-            (stream.author === client.ccid || stream.reader.length === 0 || stream.reader.includes(client.ccid ?? '')),
-        [client, stream]
-    )
+    const [documentBody, setDocumentBody] = useState<CommunityTimelineSchema | undefined>(stream?.document.body)
+    const [policyParams, setPolicyParams] = useState<string | undefined>()
 
     useEffect(() => {
         if (!props.id) return
-        client.api.getStream(props.id).then((e) => {
+        client.api.getTimeline(props.id).then((e) => {
             if (!e) return
             setStream(e)
-            setVisible(e.visible)
+            setDocumentBody(e.document.body)
+            setPolicyParams(e.policyParams)
+            setVisible(e.indexable)
             setSchemaDraft(e.schema)
-
-            Promise.all(e.writer.map((e) => client.getUser(e))).then((e) => {
-                setWriters(e.filter((e) => e) as User[])
-            })
-
-            Promise.all(e.reader.map((e) => client.getUser(e))).then((e) => {
-                setReaders(e.filter((e) => e) as User[])
-            })
+            setPolicyDraft(e.policy || '')
         })
     }, [props.id])
 
-    const updateStream = useCallback(
-        (payload: CommonstreamSchema) => {
-            if (!stream) return
-            client.api
-                .updateStream({
-                    ...stream,
-                    schema: schemaDraft,
-                    payload,
-                    writer: writers.map((e) => e.ccid),
-                    reader: readers.map((e) => e.ccid),
-                    visible
-                })
-                .then((_) => {
-                    enqueueSnackbar('更新しました', { variant: 'success' })
-                })
-                .catch((_) => {
-                    enqueueSnackbar('更新に失敗しました', { variant: 'error' })
-                })
-        },
-        [client.api, stream, writers, readers, schemaDraft, props.id, visible, enqueueSnackbar]
-    )
+    const updateStream = useCallback(() => {
+        console.log('policyDraft', policyDraft)
+        console.log('policyParams', policyParams)
+        if (!stream) return
+        client.api
+            .upsertTimeline(schemaDraft, documentBody, {
+                id: props.id,
+                indexable: visible,
+                domainOwned: false,
+                policy: policyDraft,
+                policyParams
+            })
+            .then((_) => {
+                enqueueSnackbar('更新しました', { variant: 'success' })
+            })
+            .catch((_) => {
+                enqueueSnackbar('更新に失敗しました', { variant: 'error' })
+            })
+    }, [client.api, stream, schemaDraft, props.id, visible, enqueueSnackbar, documentBody, policyDraft, policyParams])
 
     if (!stream) {
         return <>stream information not found</>
@@ -81,7 +66,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
     return (
         <>
             <CCWallpaper
-                override={stream.payload.banner}
+                override={stream.document.body.banner}
                 sx={{
                     height: '150px'
                 }}
@@ -102,12 +87,12 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                             gap: '10px'
                         }}
                     >
-                        <Typography variant="h1">{stream.payload.name}</Typography>
-                        <AddListButton stream={props.id} />
+                        <Typography variant="h1">{stream.document.body.name}</Typography>
+                        <WatchButton minimal timelineID={props.id} />
                     </Box>
                     <Typography variant="caption">{props.id}</Typography>
                     <Divider />
-                    <Typography>{stream.payload.description || 'まだ説明はありません'}</Typography>
+                    <Typography>{stream.document.body.description || 'まだ説明はありません'}</Typography>
                 </Paper>
             </CCWallpaper>
             {props.detailed && (
@@ -138,10 +123,6 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                             <Box>
                                 <Typography>空の場合パブリックになります。</Typography>
                             </Box>
-                            <Typography>writer</Typography>
-                            <UserPicker selected={writers} setSelected={setWriters} />
-                            <Typography>reader</Typography>
-                            <UserPicker selected={readers} setSelected={setReaders} />
                             <Typography variant="h3">スキーマ</Typography>
                             ※基本的に変更する必要はありません。
                             <TextField
@@ -153,12 +134,45 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                             />
                             <Box>
                                 <Typography variant="h3">属性</Typography>
-                                <CCEditor schemaURL={schemaDraft} init={stream.payload} onSubmit={updateStream} />
+                                <CCEditor
+                                    schemaURL={schemaDraft}
+                                    value={stream.document.body}
+                                    setValue={(e) => {
+                                        setDocumentBody(e)
+                                    }}
+                                />
                             </Box>
+                            <Typography variant="h3">ポリシー</Typography>
+                            <TextField
+                                label="Policy"
+                                value={policyDraft}
+                                onChange={(e) => {
+                                    setPolicyDraft(e.target.value)
+                                }}
+                            />
+                            {policyDraft && (
+                                <Box>
+                                    <Typography variant="h3">ポリシーパラメーター</Typography>
+                                    <PolicyEditor
+                                        policyURL={policyDraft}
+                                        value={policyParams}
+                                        setValue={(e) => {
+                                            setPolicyParams(e)
+                                        }}
+                                    />
+                                </Box>
+                            )}
+                            <Button
+                                onClick={() => {
+                                    updateStream()
+                                }}
+                            >
+                                保存
+                            </Button>
                             <Button
                                 color="error"
                                 onClick={() => {
-                                    client.api.deleteStream(props.id).then((_) => {
+                                    client.api.deleteTimeline(props.id.split('@')[0]).then((_) => {
                                         enqueueSnackbar('削除しました', { variant: 'success' })
                                     })
                                 }}
@@ -167,7 +181,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                             </Button>
                         </Box>
                     ) : (
-                        readable && <StreamUserList writers={writers} readers={readers} />
+                        <></>
                     )}
                 </>
             )}

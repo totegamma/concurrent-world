@@ -2,12 +2,12 @@ import { Box, Link, IconButton, Typography, Tooltip } from '@mui/material'
 import { Link as routerLink, Link as RouterLink } from 'react-router-dom'
 import { CCAvatar } from '../ui/CCAvatar'
 import { TimeDiff } from '../ui/TimeDiff'
-import { type Message, type ReplyMessageSchema, type SimpleNoteSchema } from '@concurrent-world/client'
+import { type Message, type ReplyMessageSchema, type MarkdownMessageSchema } from '@concurrent-world/client'
 import { MarkdownRendererLite } from '../ui/MarkdownRendererLite'
 import { MarkdownRenderer } from '../ui/MarkdownRenderer'
 
 export interface OneLineMessageViewProps {
-    message: Message<SimpleNoteSchema | ReplyMessageSchema>
+    message: Message<MarkdownMessageSchema | ReplyMessageSchema>
 }
 
 export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element => {
@@ -31,8 +31,8 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                 to={'/entity/' + props.message.author}
             >
                 <CCAvatar
-                    alt={props.message.authorUser?.profile?.payload.body.username}
-                    avatarURL={props.message.authorUser?.profile?.payload.body.avatar}
+                    alt={props.message.authorUser?.profile?.username}
+                    avatarURL={props.message.authorUser?.profile?.avatar}
                     identiconSource={props.message.author}
                     sx={{
                         width: { xs: '38px', sm: '48px' },
@@ -53,15 +53,15 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                         placement="top"
                         title={
                             <MarkdownRenderer
-                                messagebody={props.message.payload.body.body}
-                                emojiDict={props.message.payload.body.emojis ?? {}}
+                                messagebody={props.message.document.body.body}
+                                emojiDict={props.message.document.body.emojis ?? {}}
                             />
                         }
                     >
                         <Box>
                             <MarkdownRendererLite
-                                messagebody={props.message.payload.body.body}
-                                emojiDict={props.message.payload.body.emojis ?? {}}
+                                messagebody={props.message.document.body.body}
+                                emojiDict={props.message.document.body.emojis ?? {}}
                                 forceOneline={true}
                             />
                         </Box>

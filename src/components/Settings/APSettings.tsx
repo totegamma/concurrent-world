@@ -5,10 +5,10 @@ import { type ApEntity } from '../../model'
 import { ApSetup } from '../Activitypub/Setup'
 import { ApProfileEditor } from '../Activitypub/ProfileEditor'
 import { ApFollowManager } from '../Activitypub/FollowManager'
-import { AddListButton } from '../AddListButton'
 import TravelExploreIcon from '@mui/icons-material/TravelExplore'
 import { CCDrawer } from '../ui/CCDrawer'
 import { useNavigate } from 'react-router-dom'
+import { WatchButton } from '../WatchButton'
 
 export const APSettings = (): JSX.Element => {
     const { client } = useClient()
@@ -76,7 +76,7 @@ export const APSettings = (): JSX.Element => {
                                 }}
                             />
                         </IconButton>
-                        <AddListButton stream={entity.followstream} />
+                        <WatchButton minimal timelineID={entity.followstream} />
                     </Box>
                     <ApProfileEditor entity={entity} />
                     <ApFollowManager />

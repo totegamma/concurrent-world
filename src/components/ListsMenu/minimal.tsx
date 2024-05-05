@@ -3,7 +3,7 @@ import { usePreference } from '../../context/PreferenceContext'
 
 import { Link as RouterLink } from 'react-router-dom'
 
-export const MinimalStreamList = (): JSX.Element => {
+export const MinimalListsMenu = (): JSX.Element => {
     const [lists] = usePreference('lists')
     return (
         <Box
@@ -25,7 +25,7 @@ export const MinimalStreamList = (): JSX.Element => {
                         textDecoration: 'none'
                     }}
                 >
-                    {lists[key].label}
+                    {key}
                 </Avatar>
             ))}
         </Box>

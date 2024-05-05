@@ -1,6 +1,6 @@
 import { Box, IconButton, ListItem, Typography } from '@mui/material'
 import { CCAvatar } from '../ui/CCAvatar'
-import { type ProfileSchema, type ReplyMessageSchema, type SimpleNoteSchema } from '@concurrent-world/client'
+import { type ProfileSchema, type ReplyMessageSchema, type MarkdownMessageSchema } from '@concurrent-world/client'
 import { MarkdownRenderer } from '../ui/MarkdownRenderer'
 import { IconButtonWithNumber } from '../ui/IconButtonWithNumber'
 
@@ -13,7 +13,7 @@ import { TimeDiff } from '../ui/TimeDiff'
 import { SubprofileBadge } from '../ui/SubprofileBadge'
 
 export interface DummyMessageViewProps {
-    message?: SimpleNoteSchema | ReplyMessageSchema
+    message?: MarkdownMessageSchema | ReplyMessageSchema
     user?: ProfileSchema
     userCCID?: string
     timestamp?: JSX.Element

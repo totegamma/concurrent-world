@@ -8,9 +8,9 @@ import {
     type RerouteMessageSchema,
     type Message,
     type ReplyMessageSchema,
-    type SimpleNoteSchema,
+    type MarkdownMessageSchema,
     Schemas,
-    type CoreCharacter
+    type CoreProfile
 } from '@concurrent-world/client'
 import { PostedStreams } from './PostedStreams'
 import { ContentWithCCAvatar } from '../ContentWithCCAvatar'
@@ -20,7 +20,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useClient } from '../../context/ClientContext'
 
 export interface MessageViewProps {
-    message: Message<SimpleNoteSchema | ReplyMessageSchema>
+    message: Message<MarkdownMessageSchema | ReplyMessageSchema>
     rerouted?: Message<RerouteMessageSchema>
     userCCID?: string
     beforeMessage?: JSX.Element
@@ -40,14 +40,14 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
 
     const { client } = useClient()
 
-    const [characterOverride, setCharacterOverride] = useState<CoreCharacter<any> | undefined>(undefined)
+    const [characterOverride, setProfileOverride] = useState<CoreProfile<any> | undefined>(undefined)
 
     useEffect(() => {
-        if (!(client && props.message.payload.body.profileOverride?.characterID)) return
+        if (!(client && props.message.document.body.profileOverride?.characterID)) return
         client.api
-            .getCharacterByID(props.message.payload.body.profileOverride?.characterID, props.message.author)
-            .then((character) => {
-                setCharacterOverride(character ?? undefined)
+            .getProfileByID(props.message.document.body.profileOverride?.characterID, props.message.author)
+            .then((profile) => {
+                setProfileOverride(profile ?? undefined)
             })
     }, [client, props.message])
 
@@ -55,11 +55,11 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
         if (!props.rerouted) return false
         const A =
             props.rerouted.postedStreams?.filter(
-                (stream) => stream.schema === Schemas.commonstream || stream.schema === Schemas.utilitystream
+                (stream) => stream.schema === Schemas.communityTimeline || stream.schema === Schemas.emptyTimeline
             ) ?? []
         const B =
             props.message.postedStreams?.filter(
-                (stream) => stream.schema === Schemas.commonstream || stream.schema === Schemas.utilitystream
+                (stream) => stream.schema === Schemas.communityTimeline || stream.schema === Schemas.emptyTimeline
             ) ?? []
         if (A.length !== B.length) return false
         const Aids = A.map((e) => e.id).sort()
@@ -70,11 +70,11 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
     return (
         <ContentWithCCAvatar
             author={props.message.authorUser}
-            profileOverride={props.message.payload.body.profileOverride}
-            avatarOverride={characterOverride?.payload.body.avatar}
+            profileOverride={props.message.document.body.profileOverride}
+            avatarOverride={characterOverride?.document.body.avatar}
         >
             <MessageHeader
-                usernameOverride={characterOverride?.payload.body.username}
+                usernameOverride={characterOverride?.document.body.username}
                 message={props.message}
                 additionalMenuItems={props.additionalMenuItems}
             />
@@ -113,7 +113,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                     </Button>
                 </Box>
                 <SimpleNote message={props.message} />
-                {!props.simple && <MessageUrlPreview messageBody={props.message.payload.body.body} />}
+                {!props.simple && <MessageUrlPreview messageBody={props.message.document.body.body} />}
             </Box>
             {(!props.simple && (
                 <>

@@ -1,8 +1,8 @@
 import { memo, useEffect, useState } from 'react'
 import {
     type Association,
-    type EmojiAssociationSchema,
-    type LikeSchema,
+    type ReactionAssociationSchema,
+    type LikeAssociationSchema,
     type ReplyAssociationSchema,
     type RerouteAssociationSchema,
     Schemas
@@ -29,16 +29,15 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     const { client } = useClient()
     const [isDevMode] = usePreference('devMode')
     const [association, setAssociation] = useState<Association<
-        LikeSchema | EmojiAssociationSchema | ReplyAssociationSchema | RerouteAssociationSchema
+        LikeAssociationSchema | ReactionAssociationSchema | ReplyAssociationSchema | RerouteAssociationSchema
     > | null>(null)
     const [fetching, setFetching] = useState<boolean>(true)
 
     useEffect(() => {
         client
-            .getAssociation<LikeSchema | EmojiAssociationSchema | ReplyAssociationSchema | RerouteAssociationSchema>(
-                props.associationID,
-                props.associationOwner
-            )
+            .getAssociation<
+                LikeAssociationSchema | ReactionAssociationSchema | ReplyAssociationSchema | RerouteAssociationSchema
+            >(props.associationID, props.associationOwner)
             .then((a) => {
                 setAssociation(a ?? null)
             })
@@ -65,21 +64,21 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     }
 
     switch (association.schema) {
-        case Schemas.like:
+        case Schemas.likeAssociation:
             return (
                 <Box sx={props.sx}>
                     <FavoriteAssociation
-                        association={association as Association<LikeSchema>}
+                        association={association as Association<LikeAssociationSchema>}
                         perspective={props.perspective ?? client.ccid ?? ''}
                     />
                     {props.after}
                 </Box>
             )
-        case Schemas.emojiAssociation:
+        case Schemas.reactionAssociation:
             return (
                 <Box sx={props.sx}>
                     <ReactionAssociation
-                        association={association as Association<EmojiAssociationSchema>}
+                        association={association as Association<ReactionAssociationSchema>}
                         perspective={props.perspective ?? client.ccid ?? ''}
                     />
                     {props.after}
@@ -89,8 +88,8 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
             return (
                 <Box sx={props.sx}>
                     <MessageContainer
-                        messageID={(association as Association<ReplyAssociationSchema>).payload.body.messageId}
-                        messageOwner={(association as Association<ReplyAssociationSchema>).payload.body.messageAuthor}
+                        messageID={(association as Association<ReplyAssociationSchema>).document.body.messageId}
+                        messageOwner={(association as Association<ReplyAssociationSchema>).document.body.messageAuthor}
                         after={props.after}
                     />
                 </Box>
@@ -99,17 +98,17 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
             return (
                 <Box sx={props.sx}>
                     <MessageContainer
-                        messageID={(association as Association<RerouteAssociationSchema>).payload.body.messageId}
-                        messageOwner={(association as Association<ReplyAssociationSchema>).payload.body.messageAuthor}
+                        messageID={(association as Association<RerouteAssociationSchema>).document.body.messageId}
+                        messageOwner={(association as Association<ReplyAssociationSchema>).document.body.messageAuthor}
                         after={props.after}
                     />
                 </Box>
             )
-        case Schemas.mention:
+        case Schemas.mentionAssociation:
             return (
                 <Box sx={props.sx}>
                     <MentionAssociation
-                        association={association as Association<EmojiAssociationSchema>}
+                        association={association as Association<ReactionAssociationSchema>}
                         perspective={props.perspective ?? client.ccid ?? ''}
                     />
                     {props.after}

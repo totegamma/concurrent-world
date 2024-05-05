@@ -28,7 +28,8 @@ export const GeneralSettings = (): JSX.Element => {
     const [showEditorOnTopMobile, setShowEditorOnTopMobile] = usePreference('showEditorOnTopMobile')
     const [devMode, setDevMode] = usePreference('devMode')
 
-    const tags = client?.api?.getTokenClaims()?.tag?.split(',') ?? []
+    // const tags = client?.api?.getTokenClaims()?.tag?.split(',') ?? []
+    const tags: string[] = [] // TODO
     const { enqueueSnackbar } = useSnackbar()
 
     const [currentLanguage, setCurrentLanguage] = useState<string>('')
@@ -142,17 +143,17 @@ export const GeneralSettings = (): JSX.Element => {
                     <Typography variant="h3" gutterBottom>
                         HomeStream
                     </Typography>
-                    <Typography gutterBottom>{client.user?.userstreams?.payload.body.homeStream}</Typography>
+                    <Typography gutterBottom>{client.user?.homeTimeline}</Typography>
 
                     <Typography variant="h3" gutterBottom>
                         NotificationStream
                     </Typography>
-                    <Typography gutterBottom>{client.user?.userstreams?.payload.body.notificationStream}</Typography>
+                    <Typography gutterBottom>{client.user?.notificationTimeline}</Typography>
 
                     <Typography variant="h3" gutterBottom>
                         AssociationStream
                     </Typography>
-                    <Typography gutterBottom>{client.user?.userstreams?.payload.body.associationStream}</Typography>
+                    <Typography gutterBottom>{client.user?.associationTimeline}</Typography>
 
                     <Divider />
                     <Typography variant="h3" gutterBottom>

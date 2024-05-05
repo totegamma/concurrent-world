@@ -3,11 +3,11 @@ import { InspectorProvider } from '../context/Inspector'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useClient } from './ClientContext'
 import {
-    Schemas,
     type Message,
-    type Stream,
-    type CommonstreamSchema,
-    type DomainProfileSchema
+    type Timeline,
+    type CommunityTimelineSchema,
+    type CoreSubscription,
+    Schemas
 } from '@concurrent-world/client'
 import { Draft } from '../components/Draft'
 import { MobileDraft } from '../components/MobileDraft'
@@ -22,17 +22,22 @@ import { experimental_VGrid as VGrid } from 'virtua'
 import { useSnackbar } from 'notistack'
 import { ImagePreviewModal } from '../components/ui/ImagePreviewModal'
 
+import HikingIcon from '@mui/icons-material/Hiking'
+import GroupIcon from '@mui/icons-material/Group'
+
 export interface GlobalActionsState {
     openDraft: (text?: string) => void
     openReply: (target: Message<any>) => void
     openReroute: (target: Message<any>) => void
     openMobileMenu: (open?: boolean) => void
-    allKnownStreams: Array<Stream<CommonstreamSchema>>
+    allKnownTimelines: Array<Timeline<CommunityTimelineSchema>>
+    listedSubscriptions: Record<string, CoreSubscription<any>>
+    reloadList: () => void
     draft: string
     openEmojipack: (url: EmojiPackage) => void
     openImageViewer: (url: string) => void
-    postStreams: Array<Stream<CommonstreamSchema>>
-    setPostStreams: (streams: Array<Stream<CommonstreamSchema>>) => void
+    postStreams: Array<Timeline<CommunityTimelineSchema>>
+    setPostStreams: (streams: Array<Timeline<CommunityTimelineSchema>>) => void
 }
 
 const GlobalActionsContext = createContext<GlobalActionsState | undefined>(undefined)
@@ -54,7 +59,7 @@ const RowEmojiCount = 6
 
 export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element => {
     const { client } = useClient()
-    const [lists] = usePreference('lists')
+    const [lists, setLists] = usePreference('lists')
     const [emojiPackages, setEmojiPackages] = usePreference('emojiPackages')
     const { enqueueSnackbar } = useSnackbar()
     const theme = useTheme()
@@ -62,14 +67,12 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const [mode, setMode] = useState<'compose' | 'reply' | 'reroute' | 'none'>('none')
     const [targetMessage, setTargetMessage] = useState<Message<any> | null>(null)
 
-    const [postStreams, setPostStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
+    const [postStreams, setPostStreams] = useState<Array<Timeline<CommunityTimelineSchema>>>([])
 
-    const isPostStreamsPublic = useMemo(
-        () => postStreams.every((stream) => stream.reader.length === 0 && stream.visible),
-        [postStreams]
-    )
+    const isPostStreamsPublic = useMemo(() => postStreams.every((stream) => stream.indexable), [postStreams])
 
-    const [allKnownStreams, setAllKnownStreams] = useState<Array<Stream<CommonstreamSchema>>>([])
+    const [allKnownTimelines, setAllKnownTimelines] = useState<Array<Timeline<CommunityTimelineSchema>>>([])
+    const [listedSubscriptions, setListedSubscriptions] = useState<Record<string, CoreSubscription<any>>>({})
     const [domainIsOffline, setDomainIsOffline] = useState<boolean>(false)
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
     const [previewImage, setPreviewImage] = useState<string | undefined>()
@@ -90,33 +93,108 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         return () => visualViewport?.removeEventListener('resize', handleResize)
     }, [])
 
-    const setupAccountRequired =
-        client?.user !== null &&
-        (client?.user.profile === undefined ||
-            client?.user.userstreams === undefined ||
-            !client?.user.userstreams.payload.body.homeStream ||
-            !client?.user.userstreams.payload.body.notificationStream ||
-            !client?.user.userstreams.payload.body.associationStream ||
-            !client?.user.userstreams.payload.body.ackCollection)
+    const setupAccountRequired = client?.user !== null && client?.user.profile === undefined
+    const noListDetected = Object.keys(lists).length === 0
+
+    const setupList = useCallback(
+        (timeline?: string) => {
+            client.api
+                .upsertSubscription(
+                    Schemas.listSubscription,
+                    {
+                        name: 'Home'
+                    },
+                    { indexable: false, domainOwned: false }
+                )
+                .then(async (sub) => {
+                    if (timeline) {
+                        await client.api.subscribe(timeline, sub.id)
+                    }
+
+                    const list = {
+                        [sub.id]: {
+                            pinned: true,
+                            expanded: false,
+                            defaultPostStreams: timeline ? [timeline] : []
+                        }
+                    }
+                    setLists(list)
+                })
+        },
+        [client]
+    )
 
     useEffect(() => {
         let unmounted = false
-        setAllKnownStreams([])
-        const allStreams = Object.values(lists)
-            .map((list) => list.streams)
-            .flat()
-        const uniq = [...new Set(allStreams)]
-        uniq.forEach((id) => {
-            client.getStream<CommonstreamSchema>(id).then((stream) => {
-                if (stream && !unmounted) {
-                    setAllKnownStreams((prev) => [...prev, stream])
-                }
+        setAllKnownTimelines([])
+        Promise.all(
+            Object.keys(lists).map((id) =>
+                client.api
+                    .getSubscription(id)
+                    .then((sub) => {
+                        return [id, sub]
+                    })
+                    .catch((e) => {
+                        console.log(e)
+                        return [id, null]
+                    })
+            )
+        ).then((subs) => {
+            if (unmounted) return
+            const validsubsarr = subs.filter((e) => e[1]) as Array<[string, CoreSubscription<any>]>
+            const listedSubs = Object.fromEntries(validsubsarr)
+            setListedSubscriptions(listedSubs)
+
+            const validsubs = validsubsarr.map((e) => e[1])
+
+            const allTimelines = validsubs.flatMap((sub) => sub.items.map((e) => e.id))
+            const uniq = [...new Set(allTimelines)]
+            uniq.forEach((id) => {
+                client.getTimeline<CommunityTimelineSchema>(id).then((stream) => {
+                    if (stream && !unmounted) {
+                        setAllKnownTimelines((prev) => [...prev, stream])
+                    }
+                })
             })
         })
+
         return () => {
             unmounted = true
         }
     }, [lists])
+
+    const reloadList = useCallback(() => {
+        setAllKnownTimelines([])
+        Promise.all(
+            Object.keys(lists).map((id) =>
+                client.api
+                    .getSubscription(id)
+                    .then((sub) => {
+                        return [id, sub]
+                    })
+                    .catch((e) => {
+                        console.log(e)
+                        return [id, null]
+                    })
+            )
+        ).then((subs) => {
+            const validsubsarr = subs.filter((e) => e[1]) as Array<[string, CoreSubscription<any>]>
+            const listedSubs = Object.fromEntries(validsubsarr)
+            setListedSubscriptions(listedSubs)
+
+            const validsubs = validsubsarr.map((e) => e[1])
+
+            const allTimelins = validsubs.flatMap((sub) => sub.items.map((e) => e.id))
+            const uniq = [...new Set(allTimelins)]
+            uniq.forEach((id) => {
+                client.getTimeline<CommunityTimelineSchema>(id).then((stream) => {
+                    if (stream) {
+                        setAllKnownTimelines((prev) => [...prev, stream])
+                    }
+                })
+            })
+        })
+    }, [client, lists])
 
     useEffect(() => {
         client.api.getDomain(client.api.host).then((domain) => {
@@ -176,36 +254,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         setPreviewImage(url)
     }, [])
 
-    const fixAccount = useCallback(async () => {
-        console.log('starting account fix')
-        await client.setupUserstreams()
-        console.log('userstream setup complete')
-        const domain = await client.api.getDomain(client.api.host)
-        if (!domain) throw new Error('Domain not found')
-        try {
-            const domainProfile = ((await client.api.getCharacter<DomainProfileSchema>(
-                domain.ccid,
-                Schemas.domainProfile
-            )) ?? [null])[0]
-            if (!domainProfile) throw new Error('Domain profile not found')
-            if (domainProfile.payload.body.defaultBookmarkStreams)
-                localStorage.setItem(
-                    'bookmarkingStreams',
-                    JSON.stringify(domainProfile.payload.body.defaultBookmarkStreams)
-                )
-            if (domainProfile.payload.body.defaultFollowingStreams)
-                localStorage.setItem(
-                    'followingStreams',
-                    JSON.stringify(domainProfile.payload.body.defaultFollowingStreams)
-                )
-            if (domainProfile.payload.body.defaultPostStreams)
-                localStorage.setItem('postingStreams', JSON.stringify(domainProfile.payload.body.defaultPostStreams))
-        } catch (e) {
-            console.info(e)
-        }
-        window.location.reload()
-    }, [client])
-
     useEffect(() => {
         // attach the event listener
         document.addEventListener('keydown', handleKeyPress)
@@ -234,24 +282,28 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     openReply,
                     openReroute,
                     openMobileMenu,
-                    allKnownStreams,
+                    allKnownTimelines,
                     draft,
                     openEmojipack,
                     openImageViewer,
                     postStreams,
-                    setPostStreams
+                    setPostStreams,
+                    listedSubscriptions,
+                    reloadList
                 }
             }, [
                 openDraft,
                 openReply,
                 openReroute,
                 openMobileMenu,
-                allKnownStreams,
+                allKnownTimelines,
                 draft,
                 openEmojipack,
                 openImageViewer,
                 postStreams,
-                setPostStreams
+                setPostStreams,
+                listedSubscriptions,
+                reloadList
             ])}
         >
             <InspectorProvider>
@@ -289,10 +341,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                             <MobileDraft
                                                 streamPickerInitial={postStreams}
                                                 defaultPostHome={isPostStreamsPublic}
-                                                streamPickerOptions={allKnownStreams}
+                                                streamPickerOptions={allKnownTimelines}
                                                 onSubmit={async (text: string, destinations: string[], options) => {
                                                     await client
-                                                        .createCurrent(text, destinations, options)
+                                                        .createMarkdownCrnt(text, destinations, options)
                                                         .catch((e) => {
                                                             return e
                                                         })
@@ -316,7 +368,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                 }
                                                 streamPickerOptions={
                                                     mode === 'reroute'
-                                                        ? allKnownStreams
+                                                        ? allKnownTimelines
                                                         : targetMessage.postedStreams ?? []
                                                 }
                                                 onSubmit={async (text, streams, options): Promise<Error | null> => {
@@ -355,10 +407,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                 defaultPostHome={isPostStreamsPublic}
                                                 value={draft}
                                                 streamPickerInitial={postStreams}
-                                                streamPickerOptions={allKnownStreams}
+                                                streamPickerOptions={allKnownTimelines}
                                                 onSubmit={async (text: string, destinations: string[], options) => {
                                                     await client
-                                                        .createCurrent(text, destinations, options)
+                                                        .createMarkdownCrnt(text, destinations, options)
                                                         .catch((e) => {
                                                             return e
                                                         })
@@ -394,7 +446,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                 }
                                                 streamPickerOptions={
                                                     mode === 'reroute'
-                                                        ? allKnownStreams
+                                                        ? allKnownTimelines
                                                         : targetMessage.postedStreams ?? []
                                                 }
                                                 onSubmit={async (text, streams, options): Promise<Error | null> => {
@@ -453,31 +505,105 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                 アカウント設定を完了させましょう！
                             </Typography>
                             見つかった問題:
-                            <ul>
-                                {!client?.user?.profile && <li>プロフィールが存在していません</li>}
-                                {!client?.user?.userstreams?.payload.body.homeStream && (
-                                    <li>ホームストリームが存在していません</li>
-                                )}
-                                {!client?.user?.userstreams?.payload.body.notificationStream && (
-                                    <li>通知ストリームが存在していません</li>
-                                )}
-                                {!client?.user?.userstreams?.payload.body.associationStream && (
-                                    <li>アクティビティストリームが存在していません</li>
-                                )}
-                                {!client?.user?.userstreams?.payload.body.ackCollection && (
-                                    <li>Ackコレクションが存在していません</li>
-                                )}
-                            </ul>
-                            <ProfileEditor
-                                id={client?.user?.profile?.id}
-                                initial={client?.user?.profile?.payload.body}
-                                onSubmit={(_) => {
-                                    fixAccount()
-                                }}
-                            />
+                            <ul>{!client?.user?.profile && <li>プロフィールが存在していません</li>}</ul>
+                            <ProfileEditor initial={client?.user?.profile} />
                         </Box>
                     </Paper>
                 </Modal>
+
+                <Modal open={noListDetected} onClose={() => {}}>
+                    <Paper sx={style}>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                padding: 1
+                            }}
+                        >
+                            <Typography variant="h2" component="div">
+                                コンカレントへようこそ！
+                                <Box>
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: 2,
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}
+                                    >
+                                        <Paper
+                                            variant="outlined"
+                                            sx={{
+                                                width: '90%',
+                                                maxWidth: '800px',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                gap: 2,
+                                                padding: 1
+                                            }}
+                                        >
+                                            <Box
+                                                sx={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 1
+                                                }}
+                                            >
+                                                <GroupIcon
+                                                    color="primary"
+                                                    sx={{
+                                                        fontSize: '3rem'
+                                                    }}
+                                                />
+                                                <Typography
+                                                    sx={{
+                                                        flex: 1,
+                                                        textAlign: 'center'
+                                                    }}
+                                                >
+                                                    コミュニティーを始点にする
+                                                </Typography>
+                                            </Box>
+                                            <Typography>未実装</Typography>
+                                        </Paper>
+                                        <Paper
+                                            variant="outlined"
+                                            sx={{
+                                                width: '90%',
+                                                maxWidth: '800px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 2,
+                                                cursor: 'pointer',
+                                                padding: 1
+                                            }}
+                                            onClick={() => {
+                                                setupList()
+                                            }}
+                                        >
+                                            <HikingIcon
+                                                color="primary"
+                                                sx={{
+                                                    fontSize: '3rem'
+                                                }}
+                                            />
+                                            <Typography
+                                                sx={{
+                                                    flex: 1,
+                                                    textAlign: 'center'
+                                                }}
+                                            >
+                                                自力で始める
+                                            </Typography>
+                                        </Paper>
+                                    </Box>
+                                </Box>
+                            </Typography>
+                        </Box>
+                    </Paper>
+                </Modal>
+
                 <ImagePreviewModal
                     src={previewImage}
                     onClose={() => {

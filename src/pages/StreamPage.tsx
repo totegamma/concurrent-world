@@ -7,20 +7,20 @@ import { useClient } from '../context/ClientContext'
 import { Timeline } from '../components/Timeline/main'
 import { StreamInfo } from '../components/StreamInfo'
 import { usePreference } from '../context/PreferenceContext'
-import { type CommonstreamSchema } from '@concurrent-world/client'
+import { type CommunityTimelineSchema } from '@concurrent-world/client'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import WatchingStreamContextProvider from '../context/WatchingStreamContext'
 import { type VListHandle } from 'virtua'
 import { useGlobalActions } from '../context/GlobalActions'
 
-import PercentIcon from '@mui/icons-material/Percent'
+import TagIcon from '@mui/icons-material/Tag'
 import TuneIcon from '@mui/icons-material/Tune'
 import InfoIcon from '@mui/icons-material/Info'
 import LockIcon from '@mui/icons-material/Lock'
 
 export const StreamPage = memo((): JSX.Element => {
     const { client } = useClient()
-    const { allKnownStreams, postStreams, setPostStreams } = useGlobalActions()
+    const actions = useGlobalActions()
 
     const { id } = useParams()
 
@@ -30,7 +30,7 @@ export const StreamPage = memo((): JSX.Element => {
     const timelineRef = useRef<VListHandle>(null)
 
     const targetStreamID = id ?? ''
-    const targetStream = postStreams[0]
+    const targetStream = actions.postStreams[0]
 
     const [streamInfoOpen, setStreamInfoOpen] = useState<boolean>(false)
 
@@ -39,16 +39,19 @@ export const StreamPage = memo((): JSX.Element => {
     }, [targetStream])
 
     const writeable = useMemo(
-        () => isOwner || targetStream?.writer.length === 0 || targetStream?.writer.includes(client.ccid ?? ''),
+        // () => isOwner || targetStream?.writer.length === 0 || targetStream?.writer.includes(client.ccid ?? ''),
+        () => true,
         [targetStream]
     )
 
     const readable = useMemo(
-        () => isOwner || targetStream?.reader.length === 0 || targetStream?.reader.includes(client.ccid ?? ''),
+        // () => isOwner || targetStream?.reader.length === 0 || targetStream?.reader.includes(client.ccid ?? ''),
+        () => true,
         [targetStream]
     )
 
-    const nonPublic = useMemo(() => targetStream?.reader.length !== 0 || !targetStream?.visible, [targetStream])
+    // const nonPublic = useMemo(() => targetStream?.reader.length !== 0 || !targetStream?.visible, [targetStream])
+    const nonPublic = useMemo(() => false, [targetStream])
 
     const streams = useMemo(() => {
         return targetStream ? [targetStream] : []
@@ -59,8 +62,8 @@ export const StreamPage = memo((): JSX.Element => {
     }, [targetStream])
 
     useEffect(() => {
-        client.getStream<CommonstreamSchema>(targetStreamID).then((stream) => {
-            if (stream) setPostStreams([stream])
+        client.getTimeline<CommunityTimelineSchema>(targetStreamID).then((stream) => {
+            if (stream) actions.setPostStreams([stream])
         })
     }, [id])
 
@@ -76,8 +79,8 @@ export const StreamPage = memo((): JSX.Element => {
                 }}
             >
                 <TimelineHeader
-                    title={targetStream?.payload.name ?? 'Not Found'}
-                    titleIcon={<PercentIcon />}
+                    title={targetStream?.document.body.name ?? 'Not Found'}
+                    titleIcon={<TagIcon />}
                     secondaryAction={isOwner ? <TuneIcon /> : <InfoIcon />}
                     onTitleClick={() => {
                         timelineRef.current?.scrollToIndex(0, { align: 'start', smooth: true })
@@ -110,14 +113,16 @@ export const StreamPage = memo((): JSX.Element => {
                                             <Draft
                                                 defaultPostHome={!nonPublic}
                                                 streamPickerInitial={streams}
-                                                streamPickerOptions={[...new Set([...allKnownStreams, ...streams])]}
+                                                streamPickerOptions={[
+                                                    ...new Set([...actions.allKnownTimelines, ...streams])
+                                                ]}
                                                 onSubmit={async (
                                                     text: string,
                                                     destinations: string[],
                                                     options
                                                 ): Promise<Error | null> => {
                                                     await client
-                                                        .createCurrent(text, destinations, options)
+                                                        .createMarkdownCrnt(text, destinations, options)
                                                         .catch((e) => e)
                                                     return null
                                                 }}

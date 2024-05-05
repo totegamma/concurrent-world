@@ -74,7 +74,7 @@ export const ThemeSettings = (): JSX.Element => {
                         message={{
                             body: theme.meta?.comment ?? 'I made this theme!'
                         }}
-                        user={themeAuthor?.profile?.payload.body}
+                        user={themeAuthor?.profile}
                         timestamp={
                             <Typography
                                 sx={{

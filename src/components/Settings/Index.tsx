@@ -56,7 +56,7 @@ export function SettingsIndex(): JSX.Element {
                     to={'/settings/profile'}
                 >
                     <CCAvatar
-                        avatarURL={client?.user?.profile?.payload.body.avatar}
+                        avatarURL={client?.user?.profile?.avatar}
                         identiconSource={client.ccid}
                         sx={{
                             width: '40px',
@@ -64,12 +64,13 @@ export function SettingsIndex(): JSX.Element {
                         }}
                     />
                     <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', flexFlow: 'column' }}>
-                        <Typography color="contrastText">{client?.user?.profile?.payload.body.username}</Typography>
+                        <Typography color="contrastText">{client?.user?.profile?.username}</Typography>
                         <Typography variant="caption" color="background.contrastText">
                             {client.api.host}
                         </Typography>
                     </Box>
                 </ButtonBase>
+                {/*
                 <Button
                     onClick={(_) => {
                         if (client.api.host === undefined) {
@@ -84,6 +85,7 @@ export function SettingsIndex(): JSX.Element {
                 >
                     Goto Domain Home
                 </Button>
+                */}
             </Box>
             <Paper /* menu */
                 variant="outlined"

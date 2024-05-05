@@ -3,7 +3,7 @@ import { ProfileEditor } from '../ProfileEditor'
 import { useClient } from '../../context/ClientContext'
 import { useSnackbar } from 'notistack'
 import { useTranslation } from 'react-i18next'
-import { type ProfileSchema, type CoreCharacter, type Schema } from '@concurrent-world/client'
+import { type ProfileSchema, type CoreProfile, type Schema } from '@concurrent-world/client'
 import { useEffect, useState } from 'react'
 import { CCDrawer } from '../ui/CCDrawer'
 import { CCEditor } from '../ui/cceditor'
@@ -24,32 +24,29 @@ export const ProfileSettings = (): JSX.Element => {
     const path = useLocation()
     const hash = path.hash.replace('#', '')
 
-    const [allCharacters, setAllCharacters] = useState<Array<CoreCharacter<any>>>([])
-    const [openCharacterEditor, setOpenCharacterEditor] = useState(false)
+    const [allProfiles, setAllProfiles] = useState<Array<CoreProfile<any>>>([])
+    const [openProfileEditor, setOpenProfileEditor] = useState(false)
 
     const [schemaURLDraft, setSchemaURLDraft] = useState<string>('')
     const [schemaURL, setSchemaURL] = useState<any>(null)
-    const [editingCharacter, setEditingCharacter] = useState<CoreCharacter<any> | null>(null)
+    const [editingProfile, setEditingProfile] = useState<CoreProfile<any> | null>(null)
 
-    const [latestProfile, setLatestProfile] = useState<CoreCharacter<ProfileSchema> | null | undefined>(
-        client.user?.profile
-    )
+    const [latestProfile, setLatestProfile] = useState<ProfileSchema | null | undefined>(client.user?.profile)
+
+    const [subprofileDraft, setSubprofileDraft] = useState<any>(null)
 
     const load = (): void => {
-        if (!client) return
-        client.api.invalidateCharacter(client.ccid)
-        client.api.getCharacter(client.ccid).then((characters) => {
-            setAllCharacters(
-                (characters ?? []).filter(
-                    (c) => c.id !== client.user?.profile?.id && c.id !== client.user?.userstreams?.id
-                )
-            )
+        if (!client?.ccid) return
+        // client.api.invalidateProfile(client.ccid)
+
+        client.api.getProfiles({ author: client.ccid }).then((characters) => {
+            setAllProfiles(characters ?? [])
         })
 
         if (!client.user?.profile) return
 
-        client.api.getCharacterByID(client.user.profile?.id, client.user.ccid).then((profile) => {
-            setLatestProfile(profile as CoreCharacter<ProfileSchema>)
+        client.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', client.ccid).then((profile) => {
+            setLatestProfile(profile?.document.body)
         })
     }
 
@@ -57,7 +54,7 @@ export const ProfileSettings = (): JSX.Element => {
         load()
     }, [client])
 
-    const enabledSubprofiles = latestProfile?.payload.body.subprofiles ?? []
+    const enabledSubprofiles = latestProfile?.subprofiles ?? []
 
     useEffect(() => {
         let isMounted = true
@@ -75,7 +72,7 @@ export const ProfileSettings = (): JSX.Element => {
     useEffect(() => {
         if (hash) {
             setSchemaURLDraft(hash)
-            setOpenCharacterEditor(true)
+            setOpenProfileEditor(true)
         }
     }, [hash])
 
@@ -97,9 +94,8 @@ export const ProfileSettings = (): JSX.Element => {
                 }}
             >
                 <ProfileEditor
-                    id={client?.user?.profile?.id}
-                    initial={client?.user?.profile?.payload.body}
-                    onSubmit={(_profile) => {
+                    initial={client?.user?.profile}
+                    onSubmit={() => {
                         enqueueSnackbar(t('updated'), { variant: 'success' })
                     }}
                 />
@@ -115,13 +111,14 @@ export const ProfileSettings = (): JSX.Element => {
                 <Typography variant="h3">サブプロフィール</Typography>
                 <Button
                     onClick={() => {
-                        setOpenCharacterEditor(true)
+                        setSubprofileDraft({})
+                        setOpenProfileEditor(true)
                     }}
                 >
                     新規
                 </Button>
             </Box>
-            {allCharacters.map((character) => {
+            {allProfiles.map((character) => {
                 const published = enabledSubprofiles.includes(character.id)
                 return (
                     <SubProfileCard
@@ -138,14 +135,13 @@ export const ProfileSettings = (): JSX.Element => {
                                         subprofiles = [...enabledSubprofiles, character.id]
                                     }
 
-                                    client.user?.profile?.id &&
-                                        client
-                                            .updateProfile(client.user?.profile?.id, {
-                                                subprofiles
-                                            })
-                                            .then((_) => {
-                                                load()
-                                            })
+                                    client
+                                        .setProfile({
+                                            subprofiles
+                                        })
+                                        .then((_) => {
+                                            load()
+                                        })
                                 }}
                             >
                                 <ListItemIcon>
@@ -160,7 +156,8 @@ export const ProfileSettings = (): JSX.Element => {
                             <MenuItem
                                 key="edit"
                                 onClick={() => {
-                                    setEditingCharacter(character)
+                                    setSubprofileDraft(character.document.body)
+                                    setEditingProfile(character)
                                 }}
                             >
                                 <ListItemIcon>
@@ -172,7 +169,7 @@ export const ProfileSettings = (): JSX.Element => {
                                 key="delete"
                                 disabled={published}
                                 onClick={() => {
-                                    client.api.deleteCharacter(character.id).then((_) => {
+                                    client.api.deleteProfile(character.id).then((_) => {
                                         load()
                                     })
                                 }}
@@ -191,10 +188,10 @@ export const ProfileSettings = (): JSX.Element => {
                 )
             })}
             <CCDrawer
-                open={openCharacterEditor || editingCharacter !== null}
+                open={openProfileEditor || editingProfile !== null}
                 onClose={() => {
-                    setOpenCharacterEditor(false)
-                    setEditingCharacter(null)
+                    setOpenProfileEditor(false)
+                    setEditingProfile(null)
                 }}
             >
                 <Box
@@ -205,7 +202,7 @@ export const ProfileSettings = (): JSX.Element => {
                         p: 3
                     }}
                 >
-                    {openCharacterEditor && (
+                    {openProfileEditor && (
                         <>
                             <Typography variant="h3">新規サブプロフィール</Typography>
                             <TextField
@@ -215,35 +212,42 @@ export const ProfileSettings = (): JSX.Element => {
                                     setSchemaURLDraft(e.target.value)
                                 }}
                             />
-                            <CCEditor
-                                schemaURL={schemaURL}
-                                onSubmit={(e) => {
-                                    console.log(e)
-                                    client.api.upsertCharacter(schemaURL as Schema, e).then((_) => {
-                                        setOpenCharacterEditor(false)
+                            <CCEditor schemaURL={schemaURL} value={subprofileDraft} setValue={setSubprofileDraft} />
+                            <Button
+                                onClick={() => {
+                                    client.api.upsertProfile(schemaURL as Schema, subprofileDraft, {}).then((_) => {
+                                        setOpenProfileEditor(false)
                                         load()
                                     })
                                 }}
-                            />
+                            >
+                                作成
+                            </Button>
                         </>
                     )}
-                    {editingCharacter && (
+                    {editingProfile && (
                         <>
                             <Typography variant="h3">サブプロフィールの編集</Typography>
                             <CCEditor
-                                schemaURL={editingCharacter.schema}
-                                init={editingCharacter.payload.body}
-                                onSubmit={(e) => {
-                                    console.log(e)
+                                schemaURL={editingProfile.schema}
+                                value={subprofileDraft}
+                                setValue={setSubprofileDraft}
+                            />
+                            <Button
+                                onClick={() => {
                                     client.api
-                                        .upsertCharacter(editingCharacter.schema, e, editingCharacter.id)
+                                        .upsertProfile(editingProfile.schema, subprofileDraft, {
+                                            id: editingProfile.id
+                                        })
                                         .then((_) => {
-                                            setEditingCharacter(null)
-                                            client.api.invalidateCharacterByID(editingCharacter.id)
+                                            setEditingProfile(null)
+                                            // client.api.invalidateProfileByID(editingProfile.id)
                                             load()
                                         })
                                 }}
-                            />
+                            >
+                                更新
+                            </Button>
                         </>
                     )}
                 </Box>

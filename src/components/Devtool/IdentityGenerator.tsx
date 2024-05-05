@@ -1,6 +1,6 @@
+import { generateIdentity } from '@concurrent-world/client'
 import { Box, Button, Typography } from '@mui/material'
 import { forwardRef, useState } from 'react'
-import { generateIdentity } from '../../util'
 
 export const IdentityGenerator = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
     const [mnemonic, setMnemonic] = useState<string>('')
@@ -11,7 +11,7 @@ export const IdentityGenerator = forwardRef<HTMLDivElement>((props, ref): JSX.El
     const generate = (): void => {
         const identity = generateIdentity()
 
-        setMnemonic(`${identity.mnemonic_ja}\n${identity.mnemonic_en}\n}`)
+        setMnemonic(`${identity.mnemonic}}`)
         setCCID(identity.CCID)
         setPrivateKey(identity.privateKey)
         setPublicKey(identity.publicKey)

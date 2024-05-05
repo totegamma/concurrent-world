@@ -2,7 +2,7 @@ import {
     type Message,
     type ReplyMessageSchema,
     Schemas,
-    type SimpleNoteSchema,
+    type MarkdownMessageSchema,
     type RerouteMessageSchema
 } from '@concurrent-world/client'
 import { Box, Link, Tooltip } from '@mui/material'
@@ -16,7 +16,7 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 
 export interface PostedStreamsProps {
     useUserIcon?: boolean
-    message: Message<SimpleNoteSchema | ReplyMessageSchema | RerouteMessageSchema>
+    message: Message<MarkdownMessageSchema | ReplyMessageSchema | RerouteMessageSchema>
 }
 
 export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
@@ -25,8 +25,9 @@ export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
         const streams =
             props.message.postedStreams?.filter(
                 (stream) =>
-                    (stream.schema === Schemas.commonstream && (stream.author === client.ccid || stream.visible)) ||
-                    stream.schema === Schemas.utilitystream
+                    (stream.schema === Schemas.communityTimeline &&
+                        (stream.author === client.ccid || stream.indexable)) ||
+                    stream.schema === Schemas.emptyTimeline
             ) ?? []
         const uniq = [...new Set(streams)]
         return uniq
@@ -53,7 +54,7 @@ export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
             )}
             {postedStreams.map((e) => {
                 switch (e.schema) {
-                    case Schemas.commonstream:
+                    case Schemas.communityTimeline:
                         return (
                             <Link
                                 key={e.id}
@@ -67,10 +68,10 @@ export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
                                     borderColor: 'divider'
                                 }}
                             >
-                                %{e.payload.shortname}
+                                #{e.document.body.shortname || e.document.body.name}
                             </Link>
                         )
-                    case Schemas.utilitystream:
+                    case Schemas.emptyTimeline:
                         return props.useUserIcon ? (
                             <CCUserIcon
                                 key={e.id}

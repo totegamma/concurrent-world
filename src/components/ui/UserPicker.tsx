@@ -42,9 +42,9 @@ export const UserPicker = (props: UserPickerProps): JSX.Element => {
                 sx={{ width: 1 }}
                 multiple
                 value={selected}
-                options={client.ackings ?? []}
+                options={[...(client.ackings ?? []), ...(client.user ? [client.user] : [])]}
                 getOptionKey={(option: User) => option.ccid}
-                getOptionLabel={(option: User) => option.profile?.payload.body.username ?? ''}
+                getOptionLabel={(option: User) => option.profile?.username ?? ''}
                 isOptionEqualToValue={(option, value) => option.ccid === value.ccid}
                 onChange={(_, value) => {
                     props.setSelected(value)
@@ -78,9 +78,9 @@ export const UserPicker = (props: UserPickerProps): JSX.Element => {
                 renderOption={(props, option) => (
                     <ListItem {...props}>
                         <ListItemIcon>
-                            <CCAvatar avatarURL={option.profile?.payload.body.avatar} identiconSource={option.ccid} />
+                            <CCAvatar avatarURL={option.profile?.avatar} identiconSource={option.ccid} />
                         </ListItemIcon>
-                        <ListItemText primary={option.profile?.payload.body.username} secondary={option.ccid} />
+                        <ListItemText primary={option.profile?.username} secondary={option.ccid} />
                     </ListItem>
                 )}
             />

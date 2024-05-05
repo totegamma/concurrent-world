@@ -3,7 +3,7 @@ import {
     type ReplyMessageSchema,
     type RerouteMessageSchema,
     Schemas,
-    type SimpleNoteSchema
+    type MarkdownMessageSchema
 } from '@concurrent-world/client'
 import { useClient } from '../../context/ClientContext'
 import { memo, useEffect, useState } from 'react'
@@ -29,7 +29,7 @@ interface MessageContainerProps {
 export const MessageContainer = memo<MessageContainerProps>((props: MessageContainerProps): JSX.Element | null => {
     const { client } = useClient()
     const [message, setMessage] = useState<Message<
-        SimpleNoteSchema | ReplyMessageSchema | RerouteMessageSchema
+        MarkdownMessageSchema | ReplyMessageSchema | RerouteMessageSchema
     > | null>()
     const [isFetching, setIsFetching] = useState<boolean>(true)
     const [devMode] = usePreference('devMode')
@@ -69,12 +69,12 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
 
     let body
     switch (message?.schema) {
-        case Schemas.simpleNote:
+        case Schemas.markdownMessage:
             body = (
                 <Box sx={props.sx}>
                     <MessageView
                         simple={props.simple}
-                        message={message as Message<SimpleNoteSchema>}
+                        message={message as Message<MarkdownMessageSchema>}
                         lastUpdated={props.lastUpdated}
                         userCCID={client.ccid}
                         rerouted={props.rerouted}

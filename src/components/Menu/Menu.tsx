@@ -23,7 +23,7 @@ import { memo } from 'react'
 import buildTime from '~build/time'
 // @ts-expect-error vite dynamic import
 import { branch, sha } from '~build/info'
-import { StreamList } from '../StreamList/main'
+import { ListsMenu } from '../ListsMenu/main'
 import { CCAvatar } from '../ui/CCAvatar'
 import { useClient } from '../../context/ClientContext'
 import { usePreference } from '../../context/PreferenceContext'
@@ -71,7 +71,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         onClick={props.onClick}
                     >
                         <CCAvatar
-                            avatarURL={client?.user?.profile?.payload.body.avatar}
+                            avatarURL={client?.user?.profile?.avatar}
                             identiconSource={client.ccid}
                             sx={{
                                 width: '40px',
@@ -79,7 +79,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                             }}
                         />
                         <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', flexFlow: 'column' }}>
-                            <Typography color="contrastText">{client?.user?.profile?.payload.body.username}</Typography>
+                            <Typography color="contrastText">{client?.user?.profile?.username}</Typography>
                             <Typography variant="caption" color="background.contrastText">
                                 {client.api.host}
                             </Typography>
@@ -185,7 +185,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         }
                     }}
                 >
-                    <StreamList />
+                    <ListsMenu />
                 </Box>
                 {!showEditorOnTop && (
                     <Button

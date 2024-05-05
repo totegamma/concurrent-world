@@ -8,7 +8,7 @@ import { MarkdownRenderer } from '../components/ui/MarkdownRenderer'
 import { Link as NavLink } from 'react-router-dom'
 
 import { useEffect, useState } from 'react'
-import { type CoreCharacter, type User } from '@concurrent-world/client'
+import { type CoreProfile, type User } from '@concurrent-world/client'
 import { useClient } from '../context/ClientContext'
 import { CCDrawer } from './ui/CCDrawer'
 import { AckList } from '../components/AckList'
@@ -21,8 +21,8 @@ export interface ProfileProps {
     user: User
     id?: string
     guest?: boolean
-    onSubCharacterClicked?: (characterID: string) => void
-    overrideSubCharacterID?: string
+    onSubProfileClicked?: (characterID: string) => void
+    overrideSubProfileID?: string
 }
 
 type detail = 'none' | 'ack' | 'acker'
@@ -37,7 +37,7 @@ export function Profile(props: ProfileProps): JSX.Element {
     const [ackingUsers, setAckingUsers] = useState<User[]>([])
     const [ackerUsers, setAckerUsers] = useState<User[]>([])
 
-    const [subCharacter, setSubCharacter] = useState<CoreCharacter<any> | null>(null)
+    const [subProfile, setSubProfile] = useState<CoreProfile<any> | null>(null)
 
     const { t } = useTranslation('', { keyPrefix: 'common' })
 
@@ -58,19 +58,19 @@ export function Profile(props: ProfileProps): JSX.Element {
     }, [props.user])
 
     useEffect(() => {
-        if (!client || !props.overrideSubCharacterID) {
-            setSubCharacter(null)
+        if (!client || !props.overrideSubProfileID) {
+            setSubProfile(null)
             return
         }
-        client.api.getCharacterByID(props.overrideSubCharacterID, props.user.ccid).then((character) => {
-            setSubCharacter(character ?? null)
+        client.api.getProfileByID(props.overrideSubProfileID, props.user.ccid).then((character) => {
+            setSubProfile(character ?? null)
         })
-    }, [client, props.overrideSubCharacterID, props.user.ccid])
+    }, [client, props.overrideSubProfileID, props.user.ccid])
 
     return (
         <>
             <CCWallpaper
-                override={props.user.profile?.payload.body.banner}
+                override={props.user.profile?.banner}
                 sx={{
                     height: '150px'
                 }}
@@ -86,16 +86,16 @@ export function Profile(props: ProfileProps): JSX.Element {
             >
                 <Box position="absolute" top="-50px" left="10px">
                     <CCAvatar
-                        alt={props.user.profile?.payload.body.username}
-                        avatarURL={props.user.profile?.payload.body.avatar}
-                        avatarOverride={subCharacter ? subCharacter.payload.body.avatar : undefined}
+                        alt={props.user.profile?.username}
+                        avatarURL={props.user.profile?.avatar}
+                        avatarOverride={subProfile ? subProfile.document.body.avatar : undefined}
                         identiconSource={props.user.ccid}
                         sx={{
                             width: '100px',
                             height: '100px'
                         }}
                         onBadgeClick={() => {
-                            props.onSubCharacterClicked?.('')
+                            props.onSubProfileClicked?.('')
                         }}
                     />
                 </Box>
@@ -107,27 +107,23 @@ export function Profile(props: ProfileProps): JSX.Element {
                     gap={1}
                 >
                     <Box ml="110px" display="flex" gap={1}>
-                        {props.user.profile?.payload.body.subprofiles?.map((id, _) => (
+                        {props.user.profile?.subprofiles?.map((id, _) => (
                             <SubprofileBadge
                                 key={id}
                                 characterID={id}
                                 authorCCID={props.user.ccid}
                                 onClick={() => {
-                                    props.onSubCharacterClicked?.(id)
+                                    props.onSubProfileClicked?.(id)
                                 }}
                             />
                         ))}
                     </Box>
-                    {!isSelf ? (
-                        <Box display="flex" gap={1}>
-                            <AckButton user={props.user} />
-                            <WatchButton
-                                color={theme.palette.secondary.main}
-                                userCCID={props.id!}
-                                userStreamID={props.user.userstreams?.payload.body.homeStream ?? ''}
-                            />
-                        </Box>
-                    ) : (
+                    <Box display="flex" gap={1}>
+                        {!isSelf && <AckButton user={props.user} />}
+
+                        <WatchButton timelineID={props.user.homeTimeline ?? ''} />
+                    </Box>
+                    {isSelf && (
                         <Button variant="outlined" component={NavLink} to="/settings/profile">
                             Edit Profile
                         </Button>
@@ -141,9 +137,7 @@ export function Profile(props: ProfileProps): JSX.Element {
                             fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.5rem' }
                         }}
                     >
-                        {subCharacter?.payload.body.username ??
-                            props.user.profile?.payload.body.username ??
-                            'anonymous'}
+                        {subProfile?.document.body.username ?? props.user.profile?.username ?? 'anonymous'}
                     </Typography>
                     <Typography variant="caption">{props.user.ccid}</Typography>
                 </Box>
@@ -154,9 +148,7 @@ export function Profile(props: ProfileProps): JSX.Element {
                     }}
                 >
                     <MarkdownRenderer
-                        messagebody={
-                            subCharacter?.payload.body.description ?? props.user.profile?.payload.body.description ?? ''
-                        }
+                        messagebody={subProfile?.document.body.description ?? props.user.profile?.description ?? ''}
                         emojiDict={{}}
                     />
                 </Box>
@@ -186,10 +178,10 @@ export function Profile(props: ProfileProps): JSX.Element {
                     </Typography>
                 </Box>
             </Box>
-            {subCharacter && (
+            {subProfile && (
                 <>
                     <Divider sx={{ mb: 1 }} />
-                    <ProfileProperties showCreateLink character={subCharacter} />
+                    <ProfileProperties showCreateLink character={subProfile} />
                     <Divider />
                 </>
             )}

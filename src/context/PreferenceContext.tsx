@@ -41,16 +41,7 @@ export const defaultPreference: Preference = {
     devMode: false,
     showEditorOnTop: true,
     showEditorOnTopMobile: false,
-    lists: {
-        home: {
-            label: 'Home',
-            pinned: true,
-            streams: [],
-            userStreams: [],
-            expanded: false,
-            defaultPostStreams: []
-        }
-    },
+    lists: {},
     emojiPackages: ['https://gist.githubusercontent.com/totegamma/6e1a047f54960f6bb7b946064664d793/raw/twemoji.json'],
     sound: {
         post: BubbleSound,

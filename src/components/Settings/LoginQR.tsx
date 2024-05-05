@@ -45,7 +45,7 @@ export function LoginQR(): JSX.Element {
                                     .enactSubkey(ckid)
                                     .then(() => {
                                         console.log('subkey enacted')
-                                        const subkey = `concurrent-subkey ${newIdentity.privateKey} ${client.ccid}@${client.host} ${client.user?.profile?.payload.body.username}`
+                                        const subkey = `concurrent-subkey ${newIdentity.privateKey} ${client.ccid}@${client.host} ${client.user?.profile?.username}`
                                         setGenerated(subkey)
                                     })
                                     .catch((e) => {

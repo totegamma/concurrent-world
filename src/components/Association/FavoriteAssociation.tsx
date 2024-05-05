@@ -1,9 +1,9 @@
 import {
     type Association,
-    type LikeSchema,
+    type LikeAssociationSchema,
     type Message,
     type ReplyMessageSchema,
-    type SimpleNoteSchema,
+    type MarkdownMessageSchema,
     type User
 } from '@concurrent-world/client'
 import { ContentWithCCAvatar } from '../ContentWithCCAvatar'
@@ -18,21 +18,19 @@ import { useClient } from '../../context/ClientContext'
 import { MarkdownRendererLite } from '../ui/MarkdownRendererLite'
 
 export interface FavoriteAssociationProps {
-    association: Association<LikeSchema>
+    association: Association<LikeAssociationSchema>
     perspective?: string
     withoutContent?: boolean
 }
 
 export const FavoriteAssociation = (props: FavoriteAssociationProps): JSX.Element => {
     const { client } = useClient()
-    const [target, setTarget] = useState<Message<SimpleNoteSchema | ReplyMessageSchema> | null>(null)
+    const [target, setTarget] = useState<Message<MarkdownMessageSchema | ReplyMessageSchema> | null>(null)
     const isMeToOther = props.association?.authorUser?.ccid !== props.perspective
 
-    const Nominative = props.association?.authorUser?.profile?.payload.body.username ?? 'anonymous'
+    const Nominative = props.association?.authorUser?.profile?.username ?? 'anonymous'
     const Possessive =
-        (target?.payload.body.profileOverride?.username ??
-            target?.authorUser?.profile?.payload.body.username ??
-            'anonymous') + "'s"
+        (target?.document.body.profileOverride?.username ?? target?.authorUser?.profile?.username ?? 'anonymous') + "'s"
 
     const actionUser: User | undefined = isMeToOther ? props.association.authorUser : target?.authorUser
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
@@ -42,7 +40,7 @@ export const FavoriteAssociation = (props: FavoriteAssociationProps): JSX.Elemen
     }, [props.association])
 
     return (
-        <ContentWithCCAvatar author={actionUser} profileOverride={target?.payload.body.profileOverride}>
+        <ContentWithCCAvatar author={actionUser} profileOverride={target?.document.body.profileOverride}>
             <Box display="flex" justifyContent="space-between">
                 <Typography>
                     {isMeToOther ? (
@@ -84,8 +82,8 @@ export const FavoriteAssociation = (props: FavoriteAssociationProps): JSX.Elemen
             {(!props.withoutContent && (
                 <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
                     <MarkdownRendererLite
-                        messagebody={target?.payload.body.body ?? 'no content'}
-                        emojiDict={target?.payload.body.emojis ?? {}}
+                        messagebody={target?.document.body.body ?? 'no content'}
+                        emojiDict={target?.document.body.emojis ?? {}}
                     />
                 </blockquote>
             )) ||

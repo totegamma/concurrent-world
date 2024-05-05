@@ -5,7 +5,7 @@ import {
     type RerouteMessageSchema,
     type Message,
     type ReplyMessageSchema,
-    type SimpleNoteSchema
+    type MarkdownMessageSchema
 } from '@concurrent-world/client'
 import { useClient } from '../../context/ClientContext'
 import { MessageView } from './MessageView'
@@ -24,7 +24,7 @@ export interface ReplyMessageFrameProp {
 export const ReplyMessageFrame = (props: ReplyMessageFrameProp): JSX.Element => {
     const { client } = useClient()
 
-    const [replyTo, setReplyTo] = useState<Message<SimpleNoteSchema | ReplyMessageSchema> | null>()
+    const [replyTo, setReplyTo] = useState<Message<MarkdownMessageSchema | ReplyMessageSchema> | null>()
 
     useEffect(() => {
         if (props.message) {
@@ -46,7 +46,7 @@ export const ReplyMessageFrame = (props: ReplyMessageFrameProp): JSX.Element => 
                         <Box>
                             <CCUserChip
                                 iconOverride={<ReplyIcon fontSize="small" />}
-                                ccid={props.message.payload.body.replyToMessageAuthor}
+                                ccid={props.message.document.body.replyToMessageAuthor}
                             />
                         </Box>
                     }

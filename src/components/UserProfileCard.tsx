@@ -1,4 +1,4 @@
-import { type CoreCharacter, type ProfileSchema, type User } from '@concurrent-world/client'
+import { type ProfileSchema, type User } from '@concurrent-world/client'
 import { Box, Chip, Typography } from '@mui/material'
 import { CCAvatar } from './ui/CCAvatar'
 import { useClient } from '../context/ClientContext'
@@ -11,7 +11,8 @@ import { Link as routerLink } from 'react-router-dom'
 
 export interface UserProfileCardProps {
     user?: User
-    character?: CoreCharacter<ProfileSchema>
+    profile?: ProfileSchema
+    ccid?: string
 }
 
 export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
@@ -19,9 +20,10 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
     const isSelf = props.user?.ccid === client?.ccid
     const { enqueueSnackbar } = useSnackbar()
 
-    const character = props.user?.profile ?? props.character
+    const ccid = props.user?.ccid ?? props.ccid ?? '???????????????????'
+    const profile = props.user?.profile ?? props.profile
 
-    if (!character) return <></>
+    if (!profile) return <></>
 
     return (
         <Box display="flex" flexDirection="column" maxWidth="500px">
@@ -29,7 +31,7 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
                 sx={{
                     height: '80px'
                 }}
-                override={character.payload.body.banner}
+                override={profile.banner}
             />
             <Box position="relative" height={0}>
                 <Box
@@ -42,9 +44,9 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
                     }}
                 >
                     <CCAvatar
-                        alt={character.payload.body.username}
-                        avatarURL={character.payload.body.avatar}
-                        identiconSource={character.author}
+                        alt={profile.username}
+                        avatarURL={profile.avatar}
+                        identiconSource={ccid}
                         sx={{
                             width: '60px',
                             height: '60px'
@@ -77,10 +79,10 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
                 px={1}
                 mb={1}
             >
-                <Typography variant="h2">{character.payload.body.username}</Typography>
+                <Typography variant="h2">{profile.username}</Typography>
                 <Chip
                     size="small"
-                    label={`${character.author.slice(0, 9)}...`}
+                    label={`${ccid.slice(0, 9)}...`}
                     deleteIcon={<ContentPasteIcon />}
                     onDelete={() => {
                         if (character.author) {
@@ -101,7 +103,7 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
                     mb: 1
                 }}
             >
-                <MarkdownRenderer messagebody={character.payload.body.description ?? ''} emojiDict={{}} />
+                <MarkdownRenderer messagebody={profile.description ?? ''} emojiDict={{}} />
             </Box>
         </Box>
     )

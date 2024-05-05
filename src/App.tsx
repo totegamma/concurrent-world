@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Routes, Route, Link as RouterLink } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider, CssBaseline, Typography, useMediaQuery } from '@mui/material'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
@@ -25,23 +25,23 @@ import { GlobalActionsProvider } from './context/GlobalActions'
 import { EmojiPickerProvider } from './context/EmojiPickerContext'
 
 import { ThinMenu } from './components/Menu/ThinMenu'
-import { type StreamEvent } from '@concurrent-world/client/dist/types/model/core'
 import { ConcurrentLogo } from './components/theming/ConcurrentLogo'
 import { usePreference } from './context/PreferenceContext'
 import TickerProvider from './context/Ticker'
 import { ContactsPage } from './pages/Contacts'
 import {
-    type CoreAssociation,
     Schemas,
     type Subscription,
     type ProfileSchema,
-    type Association,
-    type ReplyAssociationSchema
+    type ReplyAssociationSchema,
+    type TimelineEvent,
+    type CCDocument
 } from '@concurrent-world/client'
 import { UrlSummaryProvider } from './context/urlSummaryContext'
 import { StorageProvider } from './context/StorageContext'
 import { MarkdownRendererLite } from './components/ui/MarkdownRendererLite'
 import { useTranslation } from 'react-i18next'
+import { ManageSubsPage } from './pages/ManageSubs'
 
 function App(): JSX.Element {
     const { client } = useClient()
@@ -63,57 +63,55 @@ function App(): JSX.Element {
         client.newSubscription().then((sub) => {
             subscription.current = sub
             subscription.current.listen([
-                ...(client?.user?.userstreams?.payload.body.notificationStream
-                    ? [client?.user?.userstreams.payload.body.notificationStream]
-                    : [])
+                ...(client?.user?.notificationTimeline ? [client?.user?.notificationTimeline] : [])
             ])
-            sub.on('AssociationCreated', (event: StreamEvent) => {
-                const a = event.body as CoreAssociation<any>
+            sub.on('AssociationCreated', (event: TimelineEvent) => {
+                const a = event.document as CCDocument.Association<any>
+
                 if (!a) return
                 if (a.schema === Schemas.replyAssociation) {
-                    const replyassociation = a as Association<ReplyAssociationSchema>
+                    const replyassociation = a as CCDocument.Association<ReplyAssociationSchema>
                     console.log(replyassociation)
                     client?.api
-                        .getMessageWithAuthor(
-                            replyassociation.payload.body.messageId,
-                            replyassociation.payload.body.messageAuthor
-                        )
+                        .getMessageWithAuthor(replyassociation.body.messageId, replyassociation.body.messageAuthor)
                         .then((m) => {
                             m &&
-                                client?.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
-                                    playNotificationRef.current()
-                                    const profile = c?.[0].payload.body
-                                    enqueueSnackbar(
-                                        <Box display="flex" flexDirection="column">
-                                            <Typography>
-                                                {profile?.username ?? 'anonymous'} replied to your message:{' '}
-                                            </Typography>
-                                            <MarkdownRendererLite
-                                                messagebody={m.payload.body.body as string}
-                                                emojiDict={m.payload.body.emojis ?? {}}
-                                                limit={128}
-                                            />
-                                        </Box>
-                                    )
-                                })
+                                client?.api
+                                    .getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.signer)
+                                    .then((c) => {
+                                        playNotificationRef.current()
+                                        const profile = c?.document.body
+                                        enqueueSnackbar(
+                                            <Box display="flex" flexDirection="column">
+                                                <Typography>
+                                                    {profile?.username ?? 'anonymous'} replied to your message:{' '}
+                                                </Typography>
+                                                <MarkdownRendererLite
+                                                    messagebody={m.document.body.body as string}
+                                                    emojiDict={m.document.body.emojis ?? {}}
+                                                    limit={128}
+                                                />
+                                            </Box>
+                                        )
+                                    })
                         })
                     return
                 }
 
                 if (a.schema === Schemas.rerouteAssociation) {
-                    client?.api.getMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
+                    client?.api.getMessageWithAuthor(a.target, event.item.owner).then((m) => {
                         m &&
-                            client?.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
+                            client?.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.signer).then((c) => {
                                 playNotificationRef.current()
-                                const profile = c?.[0].payload.body
+                                const profile = c?.document.body
                                 enqueueSnackbar(
                                     <Box display="flex" flexDirection="column">
                                         <Typography>
                                             {profile?.username ?? 'anonymous'} rerouted to your message:{' '}
                                         </Typography>
                                         <MarkdownRendererLite
-                                            messagebody={m.payload.body.body as string}
-                                            emojiDict={m.payload.body.emojis ?? {}}
+                                            messagebody={m.document.body.body as string}
+                                            emojiDict={m.document.body.emojis ?? {}}
                                             limit={128}
                                         />
                                     </Box>
@@ -123,18 +121,18 @@ function App(): JSX.Element {
                     return
                 }
 
-                if (a.schema === Schemas.like) {
-                    client?.api.getMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
+                if (a.schema === Schemas.likeAssociation) {
+                    client?.api.getMessageWithAuthor(a.target, event.item.owner).then((m) => {
                         m &&
-                            client.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
+                            client.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.signer).then((c) => {
                                 playNotificationRef.current()
-                                const profile = c?.[0].payload.body
+                                const profile = c?.document.body
                                 enqueueSnackbar(
                                     <Box display="flex" flexDirection="column">
                                         <Typography>{profile?.username ?? 'anonymous'} favorited</Typography>
                                         <MarkdownRendererLite
-                                            messagebody={m.payload.body.body as string}
-                                            emojiDict={m.payload.body.emojis ?? {}}
+                                            messagebody={m.document.body.body as string}
+                                            emojiDict={m.document.body.emojis ?? {}}
                                             limit={128}
                                         />
                                     </Box>
@@ -144,22 +142,22 @@ function App(): JSX.Element {
                     return
                 }
 
-                if (a.schema === Schemas.emojiAssociation) {
-                    client.api.getMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
+                if (a.schema === Schemas.reactionAssociation) {
+                    client.api.getMessageWithAuthor(a.target, event.item.owner).then((m) => {
                         console.log(m)
                         m &&
-                            client.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
+                            client.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.signer).then((c) => {
                                 playNotificationRef.current()
-                                const profile = c?.[0].payload.body
+                                const profile = c?.document.body
                                 enqueueSnackbar(
                                     <Box display="flex" flexDirection="column">
                                         <Typography>
                                             {profile?.username ?? 'anonymous'} reacted{' '}
-                                            <img src={a.payload.body.imageUrl as string} style={{ height: '1em' }} />
+                                            <img src={a.body.imageUrl as string} style={{ height: '1em' }} />
                                         </Typography>
                                         <MarkdownRendererLite
-                                            messagebody={m.payload.body.body as string}
-                                            emojiDict={m.payload.body.emojis ?? {}}
+                                            messagebody={m.document.body.body as string}
+                                            emojiDict={m.document.body.emojis ?? {}}
                                             limit={128}
                                         />
                                     </Box>
@@ -168,18 +166,18 @@ function App(): JSX.Element {
                     })
                 }
 
-                if (a.schema === Schemas.mention) {
-                    client?.api.getMessageWithAuthor(a.targetID, event.item.owner).then((m) => {
+                if (a.schema === Schemas.mentionAssociation) {
+                    client?.api.getMessageWithAuthor(a.target, event.item.owner).then((m) => {
                         m &&
-                            client.api.getCharacter<ProfileSchema>(a.author, Schemas.profile).then((c) => {
+                            client.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.signer).then((c) => {
                                 playNotificationRef.current()
-                                const profile = c?.[0].payload.body
+                                const profile = c?.document.body
                                 enqueueSnackbar(
                                     <Box display="flex" flexDirection="column">
                                         {profile?.username ?? 'anonymous'} mentioned you:{' '}
                                         <MarkdownRendererLite
-                                            messagebody={m.payload.body.body as string}
-                                            emojiDict={m.payload.body.emojis ?? {}}
+                                            messagebody={m.document.body.body as string}
+                                            emojiDict={m.document.body.emojis ?? {}}
                                             limit={128}
                                         />
                                     </Box>
@@ -333,7 +331,8 @@ function App(): JSX.Element {
                         >
                             <Routes>
                                 <Route index element={<ListPage />} />
-                                <Route path="/stream/:id" element={<StreamPage />} />
+                                <Route path="/stream/:id" element={<StreamPage />} /> {/* for legacy */}
+                                <Route path="/timeline/:id" element={<StreamPage />} />
                                 <Route path="/associations" element={<Associations />} />
                                 <Route path="/contacts" element={<ContactsPage />} />
                                 <Route path="/explorer/:tab" element={<Explorer />} />
@@ -342,6 +341,7 @@ function App(): JSX.Element {
                                 <Route path="/message/:id" element={<MessagePage />} />
                                 <Route path="/entity/:id" element={<EntityPage />} />
                                 <Route path="/devtool" element={<Devtool />} />
+                                <Route path="/subscriptions" element={<ManageSubsPage />} />
                             </Routes>
                         </Paper>
                         <Box

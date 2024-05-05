@@ -3,18 +3,19 @@ import { type StreamList } from '../../model'
 import { Link as RouterLink } from 'react-router-dom'
 
 import ExpandMore from '@mui/icons-material/ExpandMore'
-import { StreamLink, UserStreamLink } from './StreamLink'
+import { ListItemTimeline } from './ListItemTimeline'
 import { usePreference } from '../../context/PreferenceContext'
+import { type ListSubscriptionSchema, type CoreSubscription } from '@concurrent-world/client'
+import { useGlobalActions } from '../../context/GlobalActions'
 
-export interface StreamListItemProps {
+export interface ListItemSubscriptionProps {
     id: string
     body: StreamList
     onClick?: () => void
 }
 
-export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
+export const ListItemSubscription = (props: ListItemSubscriptionProps): JSX.Element => {
     const [lists, updateLists] = usePreference('lists')
-
     const open = props.body.expanded
     const setOpen = (newOpen: boolean): void => {
         const old = lists
@@ -24,6 +25,9 @@ export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
         }
         updateLists(old)
     }
+
+    const action = useGlobalActions()
+    const subscription = action.listedSubscriptions[props.id] as CoreSubscription<ListSubscriptionSchema> | undefined
 
     return (
         <>
@@ -62,26 +66,15 @@ export const StreamListItem = (props: StreamListItemProps): JSX.Element => {
                     component={RouterLink}
                     to={`/#${props.id}`}
                 >
-                    <ListItemText primary={props.body.label} />
+                    <ListItemText primary={subscription?.document.body.name} />
                 </ListItemButton>
             </ListItem>
             <Collapse in={open} timeout="auto">
                 <List dense component="div" disablePadding>
-                    {props.body.streams.map((stream) => (
-                        <StreamLink
-                            key={stream}
-                            streamID={stream}
-                            sx={{
-                                pl: 2,
-                                gap: 1
-                            }}
-                            onClick={props.onClick}
-                        />
-                    ))}
-                    {props.body.userStreams.map((stream) => (
-                        <UserStreamLink
-                            key={stream.userID}
-                            userHomeStream={stream}
+                    {subscription?.items.map((sub) => (
+                        <ListItemTimeline
+                            key={sub.id}
+                            timelineID={sub.id}
                             sx={{
                                 pl: 2,
                                 gap: 1

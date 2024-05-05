@@ -1,9 +1,9 @@
 import {
     type Association,
-    type EmojiAssociationSchema,
+    type ReactionAssociationSchema,
     type Message,
     type ReplyMessageSchema,
-    type SimpleNoteSchema,
+    type MarkdownMessageSchema,
     type User
 } from '@concurrent-world/client'
 import { ContentWithCCAvatar } from '../ContentWithCCAvatar'
@@ -18,21 +18,19 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { useClient } from '../../context/ClientContext'
 
 export interface ReactionAssociationProps {
-    association: Association<EmojiAssociationSchema>
+    association: Association<ReactionAssociationSchema>
     perspective?: string
     withoutContent?: boolean
 }
 
 export const ReactionAssociation = (props: ReactionAssociationProps): JSX.Element => {
     const { client } = useClient()
-    const [target, setTarget] = useState<Message<SimpleNoteSchema | ReplyMessageSchema> | null>(null)
+    const [target, setTarget] = useState<Message<MarkdownMessageSchema | ReplyMessageSchema> | null>(null)
     const isMeToOther = props.association?.authorUser?.ccid !== props.perspective
 
-    const Nominative = props.association?.authorUser?.profile?.payload.body.username ?? 'anonymous'
+    const Nominative = props.association?.authorUser?.profile?.username ?? 'anonymous'
     const Possessive =
-        (target?.payload.body.profileOverride?.username ??
-            target?.authorUser?.profile?.payload.body.username ??
-            'anonymous') + "'s"
+        (target?.document.body.profileOverride?.username ?? target?.authorUser?.profile?.username ?? 'anonymous') + "'s"
 
     const actionUser: User | undefined = isMeToOther ? props.association.authorUser : target?.authorUser
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
@@ -44,7 +42,7 @@ export const ReactionAssociation = (props: ReactionAssociationProps): JSX.Elemen
     return (
         <ContentWithCCAvatar
             author={actionUser}
-            profileOverride={!isMeToOther ? target?.payload.body.profileOverride : undefined}
+            profileOverride={!isMeToOther ? target?.document.body.profileOverride : undefined}
         >
             <Box display="flex" justifyContent="space-between">
                 <Typography>
@@ -53,8 +51,8 @@ export const ReactionAssociation = (props: ReactionAssociationProps): JSX.Elemen
                             <b>{Nominative}</b> reacted {Possessive} message with{' '}
                             <img
                                 height="13px"
-                                src={props.association.payload.body.imageUrl}
-                                alt={props.association.payload.body.shortcode}
+                                src={props.association.document.body.imageUrl}
+                                alt={props.association.document.body.shortcode}
                             />
                         </>
                     ) : (
@@ -62,8 +60,8 @@ export const ReactionAssociation = (props: ReactionAssociationProps): JSX.Elemen
                             {Nominative} reacted <b>{Possessive}</b> message with{' '}
                             <img
                                 height="13px"
-                                src={props.association.payload.body.imageUrl}
-                                alt={props.association.payload.body.shortcode}
+                                src={props.association.document.body.imageUrl}
+                                alt={props.association.document.body.shortcode}
                             />
                         </>
                     )}
@@ -97,8 +95,8 @@ export const ReactionAssociation = (props: ReactionAssociationProps): JSX.Elemen
             {(!props.withoutContent && (
                 <blockquote style={{ margin: 0, paddingLeft: '1rem', borderLeft: '4px solid #ccc' }}>
                     <MarkdownRendererLite
-                        messagebody={target?.payload.body.body ?? 'no content'}
-                        emojiDict={target?.payload.body.emojis ?? {}}
+                        messagebody={target?.document.body.body ?? 'no content'}
+                        emojiDict={target?.document.body.emojis ?? {}}
                     />
                 </blockquote>
             )) ||

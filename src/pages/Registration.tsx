@@ -5,15 +5,14 @@ import { useEffect, useState } from 'react'
 import ApiProvider from '../context/ClientContext'
 import { Fade, Paper } from '@mui/material'
 import { usePersistent } from '../hooks/usePersistent'
-import { type Identity, generateIdentity, jumpToDomainRegistration } from '../util'
+import { jumpToDomainRegistration } from '../util'
 import {
     Client,
-    Schemas,
-    type CoreCharacter,
     type CoreDomain,
     type ProfileSchema,
-    type DomainProfileSchema,
-    LoadKey
+    LoadKey,
+    generateIdentity,
+    type Identity
 } from '@concurrent-world/client'
 import { RegistrationWelcome } from '../components/Registration/Welcome'
 import { ChooseDomain } from '../components/Registration/ChooseDomain'
@@ -32,7 +31,7 @@ export function Registration(): JSX.Element {
     const [client, initializeClient] = useState<Client>()
     const [host, setHost] = useState<CoreDomain | null | undefined>()
     const [identity, setIdentity] = usePersistent<Identity>('CreatedIdentity', generateIdentity())
-    const [profile, setProfile] = useState<CoreCharacter<ProfileSchema> | null>(null)
+    const [profile, setProfile] = useState<ProfileSchema | null>(null)
 
     const activeStep = parseInt(location.hash.replace('#', '')) || 0
     const setActiveStep = (step: number): void => {
@@ -65,58 +64,14 @@ export function Registration(): JSX.Element {
         if (!host) return
         localStorage.setItem('Domain', JSON.stringify(host.fqdn))
         localStorage.setItem('PrivateKey', JSON.stringify(identity.privateKey))
-        localStorage.setItem('Mnemonic', JSON.stringify(identity.mnemonic_en))
+        localStorage.setItem('Mnemonic', JSON.stringify(identity.mnemonic))
 
         console.log('hostAddr', host.ccid)
 
-        client?.api
-            .getCharacter<DomainProfileSchema>(host.ccid, Schemas.domainProfile)
-            .then((profile: Array<CoreCharacter<DomainProfileSchema>> | null | undefined) => {
-                console.log('domainprofile:', profile)
-                const domainProfile = profile?.[0]?.payload.body
-                const list = {
-                    home: {
-                        label: 'Home',
-                        pinned: true,
-                        streams: domainProfile?.defaultFollowingStreams ? domainProfile?.defaultFollowingStreams : [],
-                        userStreams: [],
-                        expanded: false,
-                        defaultPostStreams: domainProfile?.defaultPostStreams ? domainProfile?.defaultPostStreams : []
-                    }
-                }
+        const storage = JSON.stringify(defaultPreference)
+        client.api.writeKV('world.concurrent.preference', storage)
 
-                const pref = {
-                    ...defaultPreference,
-                    lists: list
-                }
-
-                const storage = JSON.stringify(pref)
-                client.api.writeKV('world.concurrent.preference', storage)
-
-                window.location.href = '/'
-            })
-            .catch((_) => {
-                const list = {
-                    home: {
-                        label: 'Home',
-                        pinned: true,
-                        streams: [],
-                        userStreams: [],
-                        expanded: false,
-                        defaultPostStreams: []
-                    }
-                }
-
-                const pref = {
-                    ...defaultPreference,
-                    lists: list
-                }
-
-                const storage = JSON.stringify(pref)
-                client.api.writeKV('world.concurrent.preference', storage)
-
-                window.location.href = '/'
-            })
+        window.location.href = '/'
     }
 
     const steps = [
@@ -162,7 +117,6 @@ export function Registration(): JSX.Element {
                         setActiveStep(3)
                     }}
                     client={client}
-                    setProfile={setProfile}
                 />
             )
         },

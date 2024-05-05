@@ -8,12 +8,12 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import RepeatIcon from '@mui/icons-material/Repeat'
 import {
     type Association,
-    type LikeSchema,
+    type LikeAssociationSchema,
     type Message,
     type ReplyMessageSchema,
     type RerouteMessageSchema,
     Schemas,
-    type SimpleNoteSchema
+    type MarkdownMessageSchema
 } from '@concurrent-world/client'
 import { useMemo, useState } from 'react'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
@@ -27,7 +27,7 @@ import { useGlobalActions } from '../../context/GlobalActions'
 import { useInspector } from '../../context/Inspector'
 
 export interface MessageActionsProps {
-    message: Message<SimpleNoteSchema | ReplyMessageSchema | RerouteMessageSchema>
+    message: Message<MarkdownMessageSchema | ReplyMessageSchema | RerouteMessageSchema>
     userCCID?: string
 }
 
@@ -38,13 +38,13 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
     const ownFavorite = useMemo(
-        () => props.message.ownAssociations.find((association) => association.schema === Schemas.like),
+        () => props.message.ownAssociations.find((association) => association.schema === Schemas.likeAssociation),
         [props.message]
     )
-    const [favoriteMembers, setFavoriteMembers] = useState<Array<Association<LikeSchema>>>([])
+    const [favoriteMembers, setFavoriteMembers] = useState<Array<Association<LikeAssociationSchema>>>([])
 
     const replyCount = props.message.associationCounts?.[Schemas.replyAssociation] ?? 0
-    const likeCount = props.message.associationCounts?.[Schemas.like] ?? 0
+    const likeCount = props.message.associationCounts?.[Schemas.likeAssociation] ?? 0
     const rerouteCount = props.message.associationCounts?.[Schemas.rerouteAssociation] ?? 0
 
     const emojiPicker = useEmojiPicker()
@@ -102,9 +102,9 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                         textDecoration: 'none'
                                     }}
                                     component={RouterLink}
-                                    to={fav.payload.body.profileOverride?.link ?? '/entity/' + fav.author}
-                                    target={fav.payload.body.profileOverride?.link ? '_blank' : undefined}
-                                    rel={fav.payload.body.profileOverride?.link ? 'noopener noreferrer' : undefined}
+                                    to={fav.document.body.profileOverride?.link ?? '/entity/' + fav.author}
+                                    target={fav.document.body.profileOverride?.link ? '_blank' : undefined}
+                                    rel={fav.document.body.profileOverride?.link ? 'noopener noreferrer' : undefined}
                                 >
                                     <CCAvatar
                                         sx={{
@@ -112,8 +112,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                             width: '20px'
                                         }}
                                         avatarURL={
-                                            fav.payload.body.profileOverride?.avatar ??
-                                            fav.authorUser?.profile?.payload.body.avatar
+                                            fav.document.body.profileOverride?.avatar ?? fav.authorUser?.profile?.avatar
                                         }
                                         identiconSource={fav.author}
                                     />
@@ -123,8 +122,8 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                             color: '#fff'
                                         }}
                                     >
-                                        {fav.payload.body.profileOverride?.username ||
-                                            fav.authorUser?.profile?.payload.body.username ||
+                                        {fav.document.body.profileOverride?.username ||
+                                            fav.authorUser?.profile?.username ||
                                             'anonymous'}
                                     </Typography>
                                 </Box>
@@ -182,8 +181,8 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
             >
                 <MenuItem
                     onClick={() => {
-                        props.message.payload.body.body &&
-                            navigator.clipboard.writeText(props.message.payload.body.body)
+                        props.message.document.body.body &&
+                            navigator.clipboard.writeText(props.message.document.body.body)
                         setMenuAnchor(null)
                     }}
                 >

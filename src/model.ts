@@ -9,9 +9,9 @@ import type {
     TypeText
 } from '@mui/material/styles/createPalette'
 
-import type { CommonstreamSchema, CoreStreamItem, Stream } from '@concurrent-world/client'
+import type { CommunityTimelineSchema, CoreTimelineItem, Timeline } from '@concurrent-world/client'
 
-export interface StreamItemDated extends CoreStreamItem {
+export interface StreamItemDated extends CoreTimelineItem {
     LastUpdated: number
 }
 
@@ -83,11 +83,8 @@ export interface ConcurrentTheme extends Theme {
 }
 
 export interface StreamList {
-    label: string
     pinned: boolean
     expanded: boolean
-    streams: string[]
-    userStreams: userHomeStream[]
     defaultPostStreams: string[]
 }
 
@@ -98,7 +95,7 @@ export interface userHomeStream {
 
 export interface StreamWithDomain {
     domain: string
-    stream: Stream<CommonstreamSchema>
+    stream: Timeline<CommunityTimelineSchema>
 }
 
 export type CCID = string

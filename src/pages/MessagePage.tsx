@@ -20,10 +20,10 @@ import {
     type ReplyMessageSchema,
     type RerouteMessageSchema,
     Schemas,
-    type SimpleNoteSchema,
+    type MarkdownMessageSchema,
     type Association,
-    type LikeSchema,
-    type EmojiAssociationSchema,
+    type LikeAssociationSchema,
+    type ReactionAssociationSchema,
     type ReplyAssociationSchema,
     type RerouteAssociationSchema
 } from '@concurrent-world/client'
@@ -46,7 +46,7 @@ export function MessagePage(): JSX.Element {
     const actions = useGlobalActions()
 
     const [message, setMessage] = useState<Message<
-        SimpleNoteSchema | ReplyMessageSchema | RerouteMessageSchema
+        MarkdownMessageSchema | ReplyMessageSchema | RerouteMessageSchema
     > | null>()
     const [isFetching, setIsFetching] = useState<boolean>(true)
 
@@ -62,8 +62,8 @@ export function MessagePage(): JSX.Element {
             message?: Message<RerouteMessageSchema>
         }>
     >([])
-    const [favorites, setFavorites] = useState<Array<Association<LikeSchema>>>([])
-    const [reactions, setReactions] = useState<Array<Association<EmojiAssociationSchema>>>([])
+    const [favorites, setFavorites] = useState<Array<Association<LikeAssociationSchema>>>([])
+    const [reactions, setReactions] = useState<Array<Association<ReactionAssociationSchema>>>([])
     const [replyTo, setReplyTo] = useState<Message<ReplyMessageSchema> | null>(null)
 
     const tab = (location.hash.slice(1) as 'replies' | 'reroutes' | 'favorites' | 'reactions') || 'replies'
@@ -165,7 +165,7 @@ export function MessagePage(): JSX.Element {
                 </Paper>
             )}
 
-            {(message.schema === Schemas.simpleNote || message.schema === Schemas.replyMessage) && (
+            {(message.schema === Schemas.markdownMessage || message.schema === Schemas.replyMessage) && (
                 <Paper
                     sx={{
                         padding: '20px'
@@ -173,7 +173,7 @@ export function MessagePage(): JSX.Element {
                 >
                     <MessageView
                         forceExpanded
-                        message={message as Message<SimpleNoteSchema | ReplyMessageSchema>}
+                        message={message as Message<MarkdownMessageSchema | ReplyMessageSchema>}
                         lastUpdated={lastUpdated}
                         userCCID={client.ccid}
                     />
@@ -216,7 +216,7 @@ export function MessagePage(): JSX.Element {
                     <Paper variant="outlined">
                         <Draft
                             streamPickerInitial={message.postedStreams ?? []}
-                            streamPickerOptions={actions.allKnownStreams}
+                            streamPickerOptions={actions.allKnownTimelines}
                             placeholder="Write a reply..."
                             onSubmit={async (text: string, streams: string[], options) => {
                                 await message.reply(streams, text, options?.emojis)
