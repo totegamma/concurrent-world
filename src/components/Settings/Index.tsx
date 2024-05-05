@@ -142,6 +142,28 @@ export function SettingsIndex(): JSX.Element {
                     {t('pages.settings.actions.title')}
                 </Typography>
                 <Button
+                    color="info"
+                    onClick={(_) => {
+                        client.api
+                            .fetchWithCredential(client.host, '/api/v1/messages/mine', {}, 60000)
+                            .then((res) => res.blob())
+                            .then((blob) => {
+                                const url = window.URL.createObjectURL(blob)
+                                const a = document.createElement('a')
+                                a.href = url
+                                a.download =
+                                    (client.user?.profile?.payload.body.username ?? 'anonymous') +
+                                    '-backup-' +
+                                    new Date().toLocaleDateString() +
+                                    '.json'
+                                a.click()
+                                window.URL.revokeObjectURL(url)
+                            })
+                    }}
+                >
+                    引っ越しデータのダウンロード
+                </Button>
+                <Button
                     onClick={(_) => {
                         deleteAllCache()
                     }}
