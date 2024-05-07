@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography'
 import { useEffect, useMemo, useState } from 'react'
 import { HDNodeWallet, LangEn } from 'ethers'
 import { LangJa } from '../../utils/lang-ja'
-import { Client, LoadKey, ComputeCCID, IsValid256k1PrivateKey } from '@concurrent-world/client'
+import { Client, LoadKey, ComputeCCID, IsValid256k1PrivateKey, type KeyPair } from '@concurrent-world/client'
 import { IconButton, InputAdornment } from '@mui/material'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
@@ -21,28 +21,24 @@ export function ImportMasterKey(): JSX.Element {
 
     const [suggestFailed, setSuggestFailed] = useState<boolean>(false)
     const [domain, setDomain] = useState<string>('')
-    const [properKey, setProperKey] = useState<string>('')
     const [errorMessage, setErrorMessage] = useState<string>('')
 
-    const primaryKey = useMemo(() => {
-        if (secretInput.length === 0) return
+    const keypair: KeyPair | null = useMemo(() => {
+        if (secretInput.length === 0) return null
 
-        if (IsValid256k1PrivateKey(secretInput)) {
-            const key = LoadKey(secretInput)
-            if (!key) return
-            return key.privatekey
-        }
+        if (IsValid256k1PrivateKey(secretInput)) return LoadKey(secretInput)
 
         const normalized = secretInput.trim().normalize('NFKD')
         const split = normalized.split(' ')
         if (split.length !== 12) {
             setErrorMessage(t('invalidSecret'))
+            return null
         }
 
         try {
+            let wallet
             if (normalized[0].match(/[a-z]/)) {
-                const wallet = HDNodeWallet.fromPhrase(normalized)
-                return wallet.privateKey.slice(2)
+                wallet = HDNodeWallet.fromPhrase(normalized)
             } else {
                 const ja2en = split
                     .map((word) => {
@@ -50,85 +46,47 @@ export function ImportMasterKey(): JSX.Element {
                         return LangEn.wordlist().getWord(wordIndex)
                     })
                     .join(' ')
-                const wallet = HDNodeWallet.fromPhrase(ja2en)
-                return wallet.privateKey.slice(2)
+                wallet = HDNodeWallet.fromPhrase(ja2en)
             }
+            const privatekey = wallet.privateKey.slice(2)
+            const publickey = wallet.publicKey.slice(2)
+            return { privatekey, publickey }
         } catch (e) {
             setErrorMessage(t('invalidSecret'))
             console.log(e)
         }
+        return null
     }, [secretInput])
 
-    const primaryCCID = useMemo(() => {
-        if (!primaryKey) return
-        return ComputeCCID(primaryKey)
-    }, [primaryKey])
-
-    const legacyKey = useMemo(() => {
-        try {
-            const normalized = secretInput.trim().normalize('NFKD')
-            const split = normalized.split(' ')
-            if (split.length !== 12) return
-
-            const wallet = HDNodeWallet.fromPhrase(normalized, undefined, undefined, LangJa.wordlist())
-            return wallet.privateKey.slice(2)
-        } catch (e) {
-            console.error(e)
-        }
-    }, [secretInput])
-
-    const legacyCCID = useMemo(() => {
-        if (!legacyKey) return
-        return ComputeCCID(legacyKey)
-    }, [legacyKey])
-
-    const properCCID = useMemo(() => {
-        if (!properKey) return
-        return ComputeCCID(properKey)
-    }, [properKey])
+    const ccid = useMemo(() => {
+        if (!keypair) return ''
+        return ComputeCCID(keypair.publickey)
+    }, [keypair])
 
     // suggest
     useEffect(() => {
-        if (!primaryKey || !primaryCCID) return
-
+        if (!keypair || !ccid) return
         const searchTarget = domainInput || 'hub.concurrent.world'
-        const keyPair = LoadKey(primaryKey)
-        if (!keyPair) return
 
         const timer = setTimeout(() => {
             setDomain('')
-            setProperKey('')
             try {
-                const client = new Client(searchTarget, keyPair, primaryCCID)
+                const client = new Client(searchTarget, keypair, ccid)
                 client.api
-                    .resolveAddress(primaryCCID)
-                    .then((address) => {
-                        if (address) {
-                            setProperKey(primaryKey)
-                            setDomain(address)
+                    .getEntity(ccid, searchTarget)
+                    .then((entity) => {
+                        console.log(entity)
+                        if (entity?.domain) {
+                            setDomain(entity.domain)
                             setErrorMessage('')
+                        } else {
+                            setSuggestFailed(true)
+                            setErrorMessage(t('notFound'))
                         }
                     })
                     .catch((_) => {
-                        if (!legacyKey || !legacyCCID) {
-                            setSuggestFailed(true)
-                            setErrorMessage(t('notFound'))
-                            return
-                        }
-                        client.api
-                            .resolveAddress(legacyCCID)
-                            .then((address) => {
-                                if (address) {
-                                    setProperKey(legacyKey)
-                                    setDomain(address)
-                                    setErrorMessage('')
-                                }
-                            })
-                            .catch((e) => {
-                                console.error(e)
-                                setSuggestFailed(true)
-                                setErrorMessage(t('notFound'))
-                            })
+                        setSuggestFailed(true)
+                        setErrorMessage(t('notFound'))
                     })
             } catch (e) {
                 console.error(e)
@@ -138,11 +96,11 @@ export function ImportMasterKey(): JSX.Element {
         return () => {
             clearTimeout(timer)
         }
-    }, [primaryCCID, legacyCCID, domainInput])
+    }, [keypair, domainInput])
 
     const accountImport = (): void => {
         localStorage.setItem('Domain', JSON.stringify(domain))
-        localStorage.setItem('PrivateKey', JSON.stringify(properKey))
+        localStorage.setItem('PrivateKey', JSON.stringify(keypair?.privatekey))
         const normalized = secretInput.trim().normalize('NFKD')
         if (normalized.split(' ').length === 12) {
             localStorage.setItem('Mnemonic', JSON.stringify(normalized))
@@ -160,7 +118,7 @@ export function ImportMasterKey(): JSX.Element {
                 onChange={(e) => {
                     setSecretInput(e.target.value)
                 }}
-                disabled={!!properKey}
+                disabled={!!keypair}
                 onPaste={() => {
                     setShowSecret(false)
                 }}
@@ -173,15 +131,15 @@ export function ImportMasterKey(): JSX.Element {
                                 }}
                                 color="primary"
                             >
-                                {properKey ? <CheckCircleIcon /> : showSecret ? <VisibilityOff /> : <Visibility />}
+                                {keypair ? <CheckCircleIcon /> : showSecret ? <VisibilityOff /> : <Visibility />}
                             </IconButton>
                         </InputAdornment>
                     )
                 }}
             />
-            {properCCID && (
+            {keypair && (
                 <Typography sx={{ wordBreak: 'break-all' }}>
-                    {t('welcome')}: {properCCID}
+                    {t('welcome')}: {ccid}
                 </Typography>
             )}
             {suggestFailed && (
@@ -198,7 +156,7 @@ export function ImportMasterKey(): JSX.Element {
                 </>
             )}
             {errorMessage}
-            <Button disabled={!properCCID} onClick={accountImport}>
+            <Button disabled={!keypair || !domain} onClick={accountImport}>
                 {t('import')}
             </Button>
         </>
