@@ -13,16 +13,17 @@ export default function Welcome(): JSX.Element {
 
     return (
         <GuestBase
+            header
             sx={{
                 display: 'flex',
                 gap: 4,
-                width: '100vw',
+                width: '100%',
                 maxWidth: '1280px',
                 margin: 'auto',
-                minHeight: '100dvh',
                 flexDirection: 'column',
                 padding: '20px',
-                color: 'background.contrastText'
+                color: 'text.primary',
+                backgroundColor: 'background.paper'
             }}
             additionalButton={
                 <Button component={Link} to="/import">

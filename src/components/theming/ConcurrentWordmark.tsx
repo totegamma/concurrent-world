@@ -29,7 +29,7 @@ export function ConcurrentWordmark(props: ConcurrentWordmarkProps): JSX.Element 
                     fontSize: '22px'
                 }}
             >
-                Concurrent
+                Concrnt
             </Typography>
         </Box>
     )

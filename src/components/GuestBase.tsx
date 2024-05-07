@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Themes, loadConcurrentTheme } from '../themes'
 import { type ConcurrentTheme } from '../model'
 import { ThemeProvider } from '@emotion/react'
-import { Box, Button, CssBaseline, type SxProps, darken } from '@mui/material'
+import { Box, Button, CssBaseline, type SxProps } from '@mui/material'
 import { ConcurrentWordmark } from './theming/ConcurrentWordmark'
 import { Link } from 'react-router-dom'
 
@@ -10,6 +10,7 @@ export interface GuestBaseProps {
     children: JSX.Element | JSX.Element[]
     sx?: SxProps
     additionalButton?: JSX.Element
+    header?: boolean
 }
 
 export const GuestBase = (props: GuestBaseProps): JSX.Element => {
@@ -30,58 +31,80 @@ export const GuestBase = (props: GuestBaseProps): JSX.Element => {
             <Box
                 sx={{
                     display: 'flex',
-                    justifyContent: 'center',
-                    background: theme.palette.background.default,
-                    minWidth: '100vw',
-                    minHeight: '100dvh'
+                    flexFlow: 'column',
+                    alignItems: 'center',
+                    backgroundColor: (props.sx as any)?.backgroundColor ?? theme.palette.background.default,
+                    width: '100%',
+                    minHeight: '100vh',
+                    overflowY: 'auto',
+                    overflowX: 'hidden'
                 }}
             >
                 <Box
                     sx={{
                         display: 'flex',
-                        flex: 1,
-                        maxWidth: '1280px',
-                        width: '100%'
+                        flexFlow: 'column',
+                        backgroundColor: props.header ? theme.palette.primary.main : undefined,
+                        color: props.header ? theme.palette.primary.contrastText : undefined,
+                        width: '100%',
+                        alignItems: 'center'
                     }}
                 >
                     <Box
+                        display="flex"
+                        justifyContent="space-between"
+                        p={1}
+                        alignItems="center"
                         sx={{
-                            display: 'flex',
-                            flexFlow: 'column',
-                            flex: 1
+                            width: '100%',
+                            maxWidth: '1280px'
                         }}
                     >
-                        <Box display="flex" justifyContent="space-between" mt={2} mx={2}>
-                            <Button
-                                disableRipple
-                                variant="text"
-                                sx={{
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    flexDirection: 'row',
-                                    textTransform: 'none',
-                                    '&:hover': {
-                                        background: 'none'
-                                    }
-                                }}
-                                component={Link}
-                                to="/welcome"
-                            >
-                                <ConcurrentWordmark color={theme.palette.background.contrastText} />
-                            </Button>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    gap: 1
-                                }}
-                            >
-                                <Button onClick={randomTheme}>✨</Button>
-                                {props.additionalButton}
-                            </Box>
+                        <Button
+                            disableRipple
+                            variant="text"
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                flexDirection: 'row',
+                                textTransform: 'none',
+                                '&:hover': {
+                                    background: 'none'
+                                }
+                            }}
+                            component={Link}
+                            to="/welcome"
+                        >
+                            <ConcurrentWordmark
+                                color={
+                                    props.header
+                                        ? theme.palette.primary.contrastText
+                                        : theme.palette.background.contrastText
+                                }
+                            />
+                        </Button>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                gap: 1
+                            }}
+                        >
+                            <Button onClick={randomTheme}>✨</Button>
+                            {props.additionalButton}
                         </Box>
-                        <Box sx={props.sx}>{props.children}</Box>
                     </Box>
+                </Box>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flex: 1,
+                        maxWidth: '1280px',
+                        width: '100%',
+                        flexDirection: 'column'
+                    }}
+                >
+                    <Box sx={props.sx}>{props.children}</Box>
                 </Box>
             </Box>
         </ThemeProvider>
