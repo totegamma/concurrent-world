@@ -84,8 +84,8 @@ export default function Contributors(): JSX.Element {
                     width: '50px',
                     left: '0',
                     zIndex: 1,
-                    background: `linear-gradient(to left, ${alpha(theme.palette.background.default, 0)}, ${
-                        theme.palette.background.default
+                    background: `linear-gradient(to left, ${alpha(theme.palette.background.paper, 0)}, ${
+                        theme.palette.background.paper
                     })`
                 }}
             />
@@ -96,8 +96,8 @@ export default function Contributors(): JSX.Element {
                     width: '50px',
                     right: '0',
                     zIndex: 1,
-                    background: `linear-gradient(to right, ${alpha(useTheme().palette.background.default, 0)}, ${
-                        useTheme().palette.background.default
+                    background: `linear-gradient(to right, ${alpha(useTheme().palette.background.paper, 0)}, ${
+                        useTheme().palette.background.paper
                     })`
                 }}
             />

@@ -271,7 +271,8 @@ export const ConcurrentDefaultTheme = {
                     overscrollBehaviorY: 'none'
                 },
                 body: {
-                    overflowX: 'hidden'
+                    overflowX: 'hidden',
+                    overflowY: 'visible'
                 },
                 '.snackbar-container-mobile': {
                     bottom: 'calc(55px + env(safe-area-inset-bottom))'
