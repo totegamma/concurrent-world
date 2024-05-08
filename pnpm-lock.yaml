@@ -12,8 +12,8 @@ dependencies:
     specifier: ^3.445.0
     version: 3.445.0
   '@concurrent-world/client':
-    specifier: ^6.0.8
-    version: 6.0.8
+    specifier: ^6.0.9
+    version: 6.0.9
   '@emotion/react':
     specifier: ^11.10.5
     version: 11.10.5(@babel/core@7.21.8)(@types/react@18.0.26)(react@18.2.0)
@@ -2391,8 +2391,8 @@ packages:
     dev: true
     optional: true
 
-  /@concurrent-world/client@6.0.8:
-    resolution: {integrity: sha512-h0G39YYhkZ1J6r7TWxSfokSe8YZvmuOFweugttE+pPy5YyONighWDuf2buv3b1TsWnKfjp0ktahpbKLARSjGMQ==}
+  /@concurrent-world/client@6.0.9:
+    resolution: {integrity: sha512-QaSw59XIYUTrwJur4orbELBGtz2qlmZAHRHKR0hzZ2YEJ84WkU+C9bSTPy/ig2BTXhLui3F7PLmf903aUrRaUg==}
     dependencies:
       '@cosmjs/amino': 0.32.3
       '@cosmjs/crypto': 0.32.3

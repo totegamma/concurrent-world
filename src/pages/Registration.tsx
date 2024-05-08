@@ -11,9 +11,9 @@ import {
     type CoreDomain,
     type ProfileSchema,
     LoadKey,
-    generateIdentity,
+    GenerateIdentity,
     type Identity,
-    ComputeCCID
+    LoadIdentity
 } from '@concurrent-world/client'
 import { RegistrationWelcome } from '../components/Registration/Welcome'
 import { ChooseDomain } from '../components/Registration/ChooseDomain'
@@ -23,8 +23,6 @@ import { useTranslation } from 'react-i18next'
 import { Link, useLocation } from 'react-router-dom'
 import { defaultPreference } from '../context/PreferenceContext'
 import { GuestBase } from '../components/GuestBase'
-import { HDNodeWallet, LangEn } from 'ethers'
-import { LangJa } from '../utils/lang-ja'
 
 export function Registration(): JSX.Element {
     const location = useLocation()
@@ -33,7 +31,7 @@ export function Registration(): JSX.Element {
     const [domain, setDomain] = usePersistent<string>('Domain', 'hub.concurrent.world')
     const [client, initializeClient] = useState<Client>()
     const [host, setHost] = useState<CoreDomain | null | undefined>()
-    const [identity, setIdentity] = usePersistent<Identity>('CreatedIdentity', generateIdentity())
+    const [identity, setIdentity] = usePersistent<Identity | null>('Identity', GenerateIdentity())
     const [profile, setProfile] = useState<ProfileSchema | null>(null)
 
     const activeStep = parseInt(location.hash.replace('#', '')) || 0
@@ -46,61 +44,30 @@ export function Registration(): JSX.Element {
     const [errorMessage, setErrorMessage] = useState('')
 
     const manualIdentity: Identity | null = useMemo(() => {
-        const normalized = manualKey.trim().normalize('NFKD')
-        const split = normalized.split(' ')
-        if (split.length !== 12) {
-            setErrorMessage(t('invalidSecret'))
-            return null
+        const key = LoadIdentity(manualKey)
+        if (key) {
+            setErrorMessage('')
+        } else {
+            setErrorMessage('Invalid key')
         }
-
-        try {
-            let wallet
-            if (normalized[0].match(/[a-z]/)) {
-                wallet = HDNodeWallet.fromPhrase(normalized)
-                setErrorMessage('')
-                return {
-                    mnemonic: normalized,
-                    privateKey: wallet.privateKey.slice(2),
-                    publicKey: wallet.publicKey.slice(2),
-                    CCID: ComputeCCID(wallet.publicKey.slice(2))
-                }
-            } else {
-                const ja2en = split
-                    .map((word) => {
-                        const wordIndex = LangJa.wordlist().getWordIndex(word)
-                        return LangEn.wordlist().getWord(wordIndex)
-                    })
-                    .join(' ')
-                wallet = HDNodeWallet.fromPhrase(ja2en)
-                setErrorMessage('')
-                return {
-                    mnemonic: ja2en,
-                    privateKey: wallet.privateKey.slice(2),
-                    publicKey: wallet.publicKey.slice(2),
-                    CCID: ComputeCCID(wallet.publicKey.slice(2))
-                }
-            }
-        } catch (e) {
-            setErrorMessage(t('invalidSecret'))
-            console.log(e)
-            return null
-        }
+        return key
     }, [manualKey])
 
     useEffect(() => {
+        if (!identity) return
         Client.create(identity.privateKey, domain).then((client) => {
             initializeClient(client)
         })
-    }, [])
+    }, [identity, domain])
 
     useEffect(() => {
         if (activeStep !== 0) return
-        const newIdentity = generateIdentity()
+        const newIdentity = GenerateIdentity()
         setIdentity(newIdentity)
     }, [activeStep])
 
     useEffect(() => {
-        if (!host) return
+        if (!host || !identity) return
         setDomain(host.fqdn)
         const keyPair = LoadKey(identity.privateKey)
         if (!keyPair) return
@@ -109,11 +76,9 @@ export function Registration(): JSX.Element {
     }, [host])
 
     const setupAccount = (): void => {
-        if (!client) return
-        if (!host) return
+        if (!client || !host || !identity) return
         localStorage.setItem('Domain', JSON.stringify(host.fqdn))
         localStorage.setItem('PrivateKey', JSON.stringify(identity.privateKey))
-        localStorage.setItem('Mnemonic', JSON.stringify(identity.mnemonic))
 
         console.log('hostAddr', host.ccid)
 
@@ -122,6 +87,8 @@ export function Registration(): JSX.Element {
 
         window.location.href = '/'
     }
+
+    if (!identity) return <>loading...</>
 
     const steps = [
         {

@@ -16,16 +16,14 @@ import { useClient } from '../context/ClientContext'
 import { useMemo, useRef, useState } from 'react'
 import EmailIcon from '@mui/icons-material/Email'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
-import { HDNodeWallet, LangEn } from 'ethers'
-import { LangJa } from '../utils/lang-ja'
 import html2canvas from 'html2canvas'
 import JsPDF from 'jspdf'
 import ccPaper from '../resources/cc-paper.svg'
-import { ComputeCKID, generateIdentity } from '@concurrent-world/client'
+import { ComputeCKID, type Identity, LoadKey, GenerateIdentity } from '@concurrent-world/client'
 import { Trans, useTranslation } from 'react-i18next'
 
 export interface SwitchMasterToSubProps {
-    mnemonic: string
+    identity: Identity
 }
 
 export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.Element {
@@ -37,85 +35,23 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
     const { t, i18n } = useTranslation('', { keyPrefix: 'settings.identity.switchMasterToSub' })
     const [keyFormat, setKeyFormat] = useState<'ja' | 'en'>(i18n.language === 'ja' ? 'ja' : 'en')
 
-    const mnemonicToPrivateKey = (mnemonic: string): string => {
-        const normalized = mnemonic.trim().normalize('NFKD')
-        const split = normalized.split(' ')
-        if (split.length !== 12) {
-            throw new Error('Invalid mnemonic')
-        }
-
-        if (normalized[0].match(/[a-z]/)) {
-            const wallet = HDNodeWallet.fromPhrase(normalized)
-            return wallet.privateKey.slice(2)
-        } else {
-            const ja2en = split
-                .map((word) => {
-                    const wordIndex = LangJa.wordlist().getWordIndex(word)
-                    return LangEn.wordlist().getWord(wordIndex)
-                })
-                .join(' ')
-            const wallet = HDNodeWallet.fromPhrase(ja2en)
-            return wallet.privateKey.slice(2)
-        }
-    }
-
-    const toEnMnemonic = (mnemonic: string): string => {
-        const normalized = mnemonic.trim().normalize('NFKD')
-        const split = normalized.split(' ')
-        if (split.length !== 12) {
-            throw new Error('Invalid mnemonic')
-        }
-
-        if (normalized[0].match(/[a-z]/)) {
-            return mnemonic // nothing to do
-        } else {
-            const ja2en = split
-                .map((word) => {
-                    const wordIndex = LangJa.wordlist().getWordIndex(word)
-                    return LangEn.wordlist().getWord(wordIndex)
-                })
-                .join(' ')
-            return ja2en
-        }
-    }
-
-    const toJaMnemonic = (mnemonic: string): string => {
-        const normalized = mnemonic.trim().normalize('NFKD')
-        const split = normalized.split(' ')
-        if (split.length !== 12) {
-            throw new Error('Invalid mnemonic')
-        }
-
-        if (normalized[0].match(/[a-z]/)) {
-            const en2ja = split
-                .map((word) => {
-                    const wordIndex = LangEn.wordlist().getWordIndex(word)
-                    return LangJa.wordlist().getWord(wordIndex)
-                })
-                .join(' ')
-            return en2ja
-        } else {
-            return mnemonic // nothing to do
-        }
-    }
-
-    const mnemonic = useMemo(() => {
-        if (keyFormat === 'ja') {
-            return toJaMnemonic(props.mnemonic)
-        } else {
-            return toEnMnemonic(props.mnemonic)
-        }
-    }, [props.mnemonic, keyFormat])
-
     const testOK = useMemo(() => {
         try {
-            const master = mnemonicToPrivateKey(props.mnemonic)
-            const test = mnemonicToPrivateKey(mnemonicTest)
+            const master = props.identity.privateKey
+            const test = LoadKey(mnemonic)?.privatekey
             return master === test
         } catch (_) {
             return false
         }
-    }, [props.mnemonic, mnemonicTest])
+    }, [props.identity, mnemonicTest])
+
+    const mnemonic = useMemo(() => {
+        if (keyFormat === 'ja') {
+            return props.identity.mnemonic_ja
+        } else {
+            return props.identity.mnemonic
+        }
+    }, [props.identity, keyFormat])
 
     const ref = useRef<HTMLDivElement>(null)
 
@@ -222,7 +158,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                         onClick={() => {
                             setProcessing(true)
 
-                            const newIdentity = generateIdentity()
+                            const newIdentity = GenerateIdentity()
 
                             const ckid = ComputeCKID(newIdentity.publicKey)
                             console.log('newkey: ', ckid)
