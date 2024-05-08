@@ -9,12 +9,13 @@ import { useTranslation } from 'react-i18next'
 
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { KeyCard } from '../ui/KeyCard'
+import { type Identity } from '@concurrent-world/client'
 
 const SwitchMasterToSub = lazy(() => import('../SwitchMasterToSub'))
 
 export const IdentitySettings = (): JSX.Element => {
     const { client } = useClient()
-    const mnemonic = JSON.parse(localStorage.getItem('Mnemonic') || 'null')
+    const identity: Identity = JSON.parse(localStorage.getItem('Identity') || 'null')
     const subkey = JSON.parse(localStorage.getItem('SubKey') || 'null')
 
     const [keys, setKeys] = useState<Key[]>([])
@@ -52,7 +53,7 @@ export const IdentitySettings = (): JSX.Element => {
                 </Tilt>
             </Box>
 
-            {mnemonic && (
+            {identity && (
                 <Box
                     sx={{
                         display: 'flex',
@@ -63,7 +64,7 @@ export const IdentitySettings = (): JSX.Element => {
                     <Alert severity="warning">{t('loginType.masterKey')}</Alert>
 
                     <Suspense fallback={<>loading...</>}>
-                        <SwitchMasterToSub mnemonic={mnemonic} />
+                        <SwitchMasterToSub identity={identity} />
                     </Suspense>
                 </Box>
             )}
@@ -80,7 +81,7 @@ export const IdentitySettings = (): JSX.Element => {
                 </Box>
             )}
 
-            {!subkey && !mnemonic && <Alert severity="error">{t('loginType.secret')}</Alert>}
+            {!subkey && !identity && <Alert severity="error">{t('loginType.secret')}</Alert>}
 
             <Box
                 sx={{

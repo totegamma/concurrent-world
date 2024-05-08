@@ -1,9 +1,9 @@
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ApiProvider from '../context/ClientContext'
-import { Fade, Paper } from '@mui/material'
+import { Dialog, DialogActions, DialogContent, DialogTitle, Fade, Paper, TextField } from '@mui/material'
 import { usePersistent } from '../hooks/usePersistent'
 import { jumpToDomainRegistration } from '../util'
 import {
@@ -11,8 +11,9 @@ import {
     type CoreDomain,
     type ProfileSchema,
     LoadKey,
-    generateIdentity,
-    type Identity
+    GenerateIdentity,
+    type Identity,
+    LoadIdentity
 } from '@concurrent-world/client'
 import { RegistrationWelcome } from '../components/Registration/Welcome'
 import { ChooseDomain } from '../components/Registration/ChooseDomain'
@@ -30,7 +31,7 @@ export function Registration(): JSX.Element {
     const [domain, setDomain] = usePersistent<string>('Domain', 'hub.concurrent.world')
     const [client, initializeClient] = useState<Client>()
     const [host, setHost] = useState<CoreDomain | null | undefined>()
-    const [identity, setIdentity] = usePersistent<Identity>('CreatedIdentity', generateIdentity())
+    const [identity, setIdentity] = usePersistent<Identity | null>('Identity', GenerateIdentity())
     const [profile, setProfile] = useState<ProfileSchema | null>(null)
 
     const activeStep = parseInt(location.hash.replace('#', '')) || 0
@@ -38,20 +39,35 @@ export function Registration(): JSX.Element {
         window.location.hash = step.toString()
     }
 
+    const [dialogOpened, setDialogOpen] = useState(false)
+    const [manualKey, setManualKey] = useState('')
+    const [errorMessage, setErrorMessage] = useState('')
+
+    const manualIdentity: Identity | null = useMemo(() => {
+        const key = LoadIdentity(manualKey)
+        if (key) {
+            setErrorMessage('')
+        } else {
+            setErrorMessage('Invalid key')
+        }
+        return key
+    }, [manualKey])
+
     useEffect(() => {
+        if (!identity) return
         Client.create(identity.privateKey, domain).then((client) => {
             initializeClient(client)
         })
-    }, [])
+    }, [identity, domain])
 
     useEffect(() => {
         if (activeStep !== 0) return
-        const newIdentity = generateIdentity()
+        const newIdentity = GenerateIdentity()
         setIdentity(newIdentity)
     }, [activeStep])
 
     useEffect(() => {
-        if (!host) return
+        if (!host || !identity) return
         setDomain(host.fqdn)
         const keyPair = LoadKey(identity.privateKey)
         if (!keyPair) return
@@ -60,11 +76,9 @@ export function Registration(): JSX.Element {
     }, [host])
 
     const setupAccount = (): void => {
-        if (!client) return
-        if (!host) return
+        if (!client || !host || !identity) return
         localStorage.setItem('Domain', JSON.stringify(host.fqdn))
         localStorage.setItem('PrivateKey', JSON.stringify(identity.privateKey))
-        localStorage.setItem('Mnemonic', JSON.stringify(identity.mnemonic))
 
         console.log('hostAddr', host.ccid)
 
@@ -73,6 +87,8 @@ export function Registration(): JSX.Element {
 
         window.location.href = '/'
     }
+
+    if (!identity) return <>loading...</>
 
     const steps = [
         {
@@ -216,10 +232,63 @@ export function Registration(): JSX.Element {
                             sx={{
                                 display: 'flex',
                                 flexDirection: 'row',
-                                width: '100%'
+                                width: '100%',
+                                position: 'absolute',
+                                justifyContent: 'space-between',
+                                bottom: 0,
+                                p: 1
                             }}
-                        ></Box>
+                        >
+                            <Box />
+                            <Button
+                                variant="outlined"
+                                onClick={() => {
+                                    setDialogOpen(true)
+                                }}
+                            >
+                                キーを手動で指定する
+                            </Button>
+                        </Box>
                     </Paper>
+                    <Dialog
+                        open={dialogOpened}
+                        onClose={() => {
+                            setDialogOpen(false)
+                        }}
+                    >
+                        <DialogTitle>キーを手動で指定する</DialogTitle>
+                        <DialogContent>
+                            <TextField
+                                label="キー"
+                                value={manualKey}
+                                onChange={(e) => {
+                                    setManualKey(e.target.value)
+                                }}
+                                fullWidth
+                            />
+                            {errorMessage}
+                        </DialogContent>
+                        <DialogActions>
+                            <Button
+                                onClick={() => {
+                                    setDialogOpen(false)
+                                }}
+                            >
+                                閉じる
+                            </Button>
+                            <Button
+                                type="submit"
+                                disabled={!manualIdentity}
+                                onClick={() => {
+                                    if (!manualIdentity) return
+                                    setIdentity(manualIdentity)
+                                    setDialogOpen(false)
+                                }}
+                            >
+                                決定
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
                 </>
             </ApiProvider>
         </GuestBase>

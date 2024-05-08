@@ -2,7 +2,7 @@ import { Alert, Box, Paper, Typography } from '@mui/material'
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useClient } from './ClientContext'
-import { validateSignature, type CoreMessage, type CoreAssociation } from '@concurrent-world/client'
+import { ValidateSignature, type CoreMessage, type CoreAssociation } from '@concurrent-world/client'
 import { Codeblock } from '../components/ui/Codeblock'
 import { MessageContainer } from '../components/Message/MessageContainer'
 import { CCDrawer } from '../components/ui/CCDrawer'
@@ -56,7 +56,7 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
 
     const signatureIsValid = useMemo(() => {
         if (message) {
-            return validateSignature(
+            return ValidateSignature(
                 message._document,
                 message.signature,
                 message.document.keyID ?? message.document.signer
@@ -111,7 +111,7 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                 break
             }
 
-            if (!validateSignature(key.enactDocument, key.enactSignature, key.parent)) {
+            if (!ValidateSignature(key.enactDocument, key.enactSignature, key.parent)) {
                 valid = false
                 reason = 'failed to validate enact signature of key ' + key.id
                 break
@@ -123,7 +123,7 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
             if (key.revokeDocument?.startsWith('{') && key.revokeSignature) {
                 try {
                     const obj = JSON.parse(key.revokeDocument)
-                    if (validateSignature(key.revokeDocument, key.revokeSignature, obj.keyID ?? obj.signer)) {
+                    if (ValidateSignature(key.revokeDocument, key.revokeSignature, obj.keyID ?? obj.signer)) {
                         if (!until || new Date(keyResolution[i].validUntil) > until) {
                             until = new Date(keyResolution[i].validUntil)
                         }

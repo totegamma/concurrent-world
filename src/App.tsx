@@ -52,7 +52,7 @@ function App(): JSX.Element {
     const [theme, setTheme] = useState<ConcurrentTheme>(loadConcurrentTheme(themeName, customThemes))
     const isMobileSize = useMediaQuery(theme.breakpoints.down('sm'))
 
-    const mnemonic = JSON.parse(localStorage.getItem('Mnemonic') || 'null')
+    const masterInfo = JSON.parse(localStorage.getItem('Identity') || 'null')
 
     const subscription = useRef<Subscription>()
 
@@ -256,7 +256,7 @@ function App(): JSX.Element {
                         justifyContent: 'center'
                     }}
                 >
-                    {mnemonic && (
+                    {masterInfo && (
                         <Typography
                             sx={{
                                 textAlign: 'center',

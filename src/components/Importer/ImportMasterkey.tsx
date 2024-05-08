@@ -3,9 +3,15 @@ import Divider from '@mui/material/Divider'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { useEffect, useMemo, useState } from 'react'
-import { HDNodeWallet, LangEn } from 'ethers'
-import { LangJa } from '../../utils/lang-ja'
-import { Client, LoadKey, ComputeCCID, IsValid256k1PrivateKey, type KeyPair } from '@concurrent-world/client'
+import {
+    Client,
+    LoadKey,
+    ComputeCCID,
+    IsValid256k1PrivateKey,
+    type KeyPair,
+    LoadKeyFromMnemonic,
+    LoadIdentity
+} from '@concurrent-world/client'
 import { IconButton, InputAdornment } from '@mui/material'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
@@ -25,37 +31,9 @@ export function ImportMasterKey(): JSX.Element {
 
     const keypair: KeyPair | null = useMemo(() => {
         if (secretInput.length === 0) return null
-
         if (IsValid256k1PrivateKey(secretInput)) return LoadKey(secretInput)
 
-        const normalized = secretInput.trim().normalize('NFKD')
-        const split = normalized.split(' ')
-        if (split.length !== 12) {
-            setErrorMessage(t('invalidSecret'))
-            return null
-        }
-
-        try {
-            let wallet
-            if (normalized[0].match(/[a-z]/)) {
-                wallet = HDNodeWallet.fromPhrase(normalized)
-            } else {
-                const ja2en = split
-                    .map((word) => {
-                        const wordIndex = LangJa.wordlist().getWordIndex(word)
-                        return LangEn.wordlist().getWord(wordIndex)
-                    })
-                    .join(' ')
-                wallet = HDNodeWallet.fromPhrase(ja2en)
-            }
-            const privatekey = wallet.privateKey.slice(2)
-            const publickey = wallet.publicKey.slice(2)
-            return { privatekey, publickey }
-        } catch (e) {
-            setErrorMessage(t('invalidSecret'))
-            console.log(e)
-        }
-        return null
+        return LoadKeyFromMnemonic(secretInput)
     }, [secretInput])
 
     const ccid = useMemo(() => {
@@ -103,7 +81,7 @@ export function ImportMasterKey(): JSX.Element {
         localStorage.setItem('PrivateKey', JSON.stringify(keypair?.privatekey))
         const normalized = secretInput.trim().normalize('NFKD')
         if (normalized.split(' ').length === 12) {
-            localStorage.setItem('Mnemonic', JSON.stringify(normalized))
+            localStorage.setItem('Identity', JSON.stringify(LoadIdentity(normalized)))
         }
         window.location.href = '/'
     }

@@ -1,7 +1,7 @@
 import { Alert, Button, Tab, Tabs, Typography } from '@mui/material'
 import SubkeyInfo from '../SubkeyInfo'
 import { useState } from 'react'
-import { ComputeCKID, generateIdentity } from '@concurrent-world/client'
+import { ComputeCKID, GenerateIdentity } from '@concurrent-world/client'
 import { useClient } from '../../context/ClientContext'
 import { useTranslation } from 'react-i18next'
 
@@ -36,7 +36,7 @@ export function LoginQR(): JSX.Element {
                     ) : (
                         <Button
                             onClick={() => {
-                                const newIdentity = generateIdentity()
+                                const newIdentity = GenerateIdentity()
 
                                 const ckid = ComputeCKID(newIdentity.publicKey)
                                 console.log('newkey: ', ckid)
