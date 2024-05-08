@@ -1,9 +1,9 @@
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ApiProvider from '../context/ClientContext'
-import { Fade, Paper } from '@mui/material'
+import { Dialog, DialogActions, DialogContent, DialogTitle, Fade, Paper, TextField } from '@mui/material'
 import { usePersistent } from '../hooks/usePersistent'
 import { jumpToDomainRegistration } from '../util'
 import {
@@ -12,7 +12,8 @@ import {
     type ProfileSchema,
     LoadKey,
     generateIdentity,
-    type Identity
+    type Identity,
+    ComputeCCID
 } from '@concurrent-world/client'
 import { RegistrationWelcome } from '../components/Registration/Welcome'
 import { ChooseDomain } from '../components/Registration/ChooseDomain'
@@ -22,6 +23,8 @@ import { useTranslation } from 'react-i18next'
 import { Link, useLocation } from 'react-router-dom'
 import { defaultPreference } from '../context/PreferenceContext'
 import { GuestBase } from '../components/GuestBase'
+import { HDNodeWallet, LangEn } from 'ethers'
+import { LangJa } from '../utils/lang-ja'
 
 export function Registration(): JSX.Element {
     const location = useLocation()
@@ -37,6 +40,52 @@ export function Registration(): JSX.Element {
     const setActiveStep = (step: number): void => {
         window.location.hash = step.toString()
     }
+
+    const [dialogOpened, setDialogOpen] = useState(false)
+    const [manualKey, setManualKey] = useState('')
+    const [errorMessage, setErrorMessage] = useState('')
+
+    const manualIdentity: Identity | null = useMemo(() => {
+        const normalized = manualKey.trim().normalize('NFKD')
+        const split = normalized.split(' ')
+        if (split.length !== 12) {
+            setErrorMessage(t('invalidSecret'))
+            return null
+        }
+
+        try {
+            let wallet
+            if (normalized[0].match(/[a-z]/)) {
+                wallet = HDNodeWallet.fromPhrase(normalized)
+                setErrorMessage('')
+                return {
+                    mnemonic: normalized,
+                    privateKey: wallet.privateKey.slice(2),
+                    publicKey: wallet.publicKey.slice(2),
+                    CCID: ComputeCCID(wallet.publicKey.slice(2))
+                }
+            } else {
+                const ja2en = split
+                    .map((word) => {
+                        const wordIndex = LangJa.wordlist().getWordIndex(word)
+                        return LangEn.wordlist().getWord(wordIndex)
+                    })
+                    .join(' ')
+                wallet = HDNodeWallet.fromPhrase(ja2en)
+                setErrorMessage('')
+                return {
+                    mnemonic: ja2en,
+                    privateKey: wallet.privateKey.slice(2),
+                    publicKey: wallet.publicKey.slice(2),
+                    CCID: ComputeCCID(wallet.publicKey.slice(2))
+                }
+            }
+        } catch (e) {
+            setErrorMessage(t('invalidSecret'))
+            console.log(e)
+            return null
+        }
+    }, [manualKey])
 
     useEffect(() => {
         Client.create(identity.privateKey, domain).then((client) => {
@@ -216,10 +265,63 @@ export function Registration(): JSX.Element {
                             sx={{
                                 display: 'flex',
                                 flexDirection: 'row',
-                                width: '100%'
+                                width: '100%',
+                                position: 'absolute',
+                                justifyContent: 'space-between',
+                                bottom: 0,
+                                p: 1
                             }}
-                        ></Box>
+                        >
+                            <Box />
+                            <Button
+                                variant="outlined"
+                                onClick={() => {
+                                    setDialogOpen(true)
+                                }}
+                            >
+                                キーを手動で指定する
+                            </Button>
+                        </Box>
                     </Paper>
+                    <Dialog
+                        open={dialogOpened}
+                        onClose={() => {
+                            setDialogOpen(false)
+                        }}
+                    >
+                        <DialogTitle>キーを手動で指定する</DialogTitle>
+                        <DialogContent>
+                            <TextField
+                                label="キー"
+                                value={manualKey}
+                                onChange={(e) => {
+                                    setManualKey(e.target.value)
+                                }}
+                                fullWidth
+                            />
+                            {errorMessage}
+                        </DialogContent>
+                        <DialogActions>
+                            <Button
+                                onClick={() => {
+                                    setDialogOpen(false)
+                                }}
+                            >
+                                閉じる
+                            </Button>
+                            <Button
+                                type="submit"
+                                disabled={!manualIdentity}
+                                onClick={() => {
+                                    if (!manualIdentity) return
+                                    setIdentity(manualIdentity)
+                                    setDialogOpen(false)
+                                }}
+                            >
+                                決定
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
                 </>
             </ApiProvider>
         </GuestBase>
