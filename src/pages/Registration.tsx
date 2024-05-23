@@ -13,7 +13,8 @@ import {
     LoadKey,
     GenerateIdentity,
     type Identity,
-    LoadIdentity
+    LoadIdentity,
+    type CoreProfile
 } from '@concurrent-world/client'
 import { RegistrationWelcome } from '../components/Registration/Welcome'
 import { ChooseDomain } from '../components/Registration/ChooseDomain'
@@ -32,7 +33,7 @@ export function Registration(): JSX.Element {
     const [client, initializeClient] = useState<Client>()
     const [host, setHost] = useState<CoreDomain | null | undefined>()
     const [identity, setIdentity] = usePersistent<Identity | null>('Identity', GenerateIdentity())
-    const [profile, setProfile] = useState<ProfileSchema | null>(null)
+    const [profile, setProfile] = useState<CoreProfile<ProfileSchema> | null>(null)
 
     const activeStep = parseInt(location.hash.replace('#', '')) || 0
     const setActiveStep = (step: number): void => {
@@ -133,6 +134,7 @@ export function Registration(): JSX.Element {
                         setActiveStep(3)
                     }}
                     client={client}
+                    setProfile={setProfile}
                 />
             )
         },
@@ -145,7 +147,7 @@ export function Registration(): JSX.Element {
                         setupAccount()
                     }}
                     host={host}
-                    profile={profile}
+                    profile={profile?.document.body ?? {}}
                 />
             )
         }

@@ -1,10 +1,16 @@
 import { Box } from '@mui/material'
 import { ProfileEditor } from '../ProfileEditor'
-import { type Client } from '@concurrent-world/client'
+import { type CoreProfile, type Client, type ProfileSchema } from '@concurrent-world/client'
 import { StorageProvider } from '../../context/StorageContext'
 import { useTranslation } from 'react-i18next'
 
-export function CreateProfile(props: { next: () => void; client: Client | undefined }): JSX.Element {
+interface CreateProfileProps {
+    next: () => void
+    setProfile: (profile: CoreProfile<ProfileSchema>) => void
+    client: Client | undefined
+}
+
+export function CreateProfile(props: CreateProfileProps): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'registration.createProfile' })
 
     return (
@@ -26,7 +32,8 @@ export function CreateProfile(props: { next: () => void; client: Client | undefi
                     }}
                 >
                     <ProfileEditor
-                        onSubmit={() => {
+                        onSubmit={(updated) => {
+                            props.setProfile(updated)
                             props.next()
                         }}
                     />

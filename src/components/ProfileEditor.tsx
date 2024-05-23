@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import { useEffect, useState } from 'react'
-import { type ProfileSchema } from '@concurrent-world/client'
+import { type CoreProfile, type ProfileSchema } from '@concurrent-world/client'
 import Button from '@mui/material/Button'
 import { useClient } from '../context/ClientContext'
 import { CCAvatar } from './ui/CCAvatar'
@@ -13,7 +13,7 @@ import { CCWallpaper } from './ui/CCWallpaper'
 
 interface ProfileEditorProps {
     initial?: ProfileSchema
-    onSubmit?: () => void
+    onSubmit?: (updated: CoreProfile<ProfileSchema>) => void
     id?: string
 }
 
@@ -29,8 +29,7 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
 
     const updateProfile = async (): Promise<void> => {
         client.setProfile({ username, description, avatar, banner }).then((data) => {
-            console.log(data)
-            props.onSubmit?.()
+            props.onSubmit?.(data)
         })
     }
 
