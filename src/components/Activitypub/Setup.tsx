@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 import { useClient } from '../../context/ClientContext'
 import { useSnackbar } from 'notistack'
 import { Schemas } from '@concurrent-world/client'
-import { usePreference } from '../../context/PreferenceContext'
 
 import { useTranslation } from 'react-i18next'
 import { useGlobalActions } from '../../context/GlobalActions'
@@ -11,12 +10,13 @@ import { useGlobalActions } from '../../context/GlobalActions'
 export const ApSetup = (): JSX.Element => {
     const { client } = useClient()
     const actions = useGlobalActions()
-    const [lists, setLists] = usePreference('lists')
     const [userID, setUserID] = useState('')
     const { enqueueSnackbar } = useSnackbar()
 
     const [loading, setLoading] = useState<boolean>(false)
     const [entityFound, setEntityFound] = useState<boolean>(false)
+    const [meta, setMeta] = useState<any>({})
+    const proxyCCID = meta?.metadata?.proxyCCID
 
     const { t } = useTranslation('', { keyPrefix: 'settings.ap' })
 
@@ -50,8 +50,22 @@ export const ApSetup = (): JSX.Element => {
         }
     }, [userID])
 
+    useEffect(() => {
+        let mounted = true
+        fetch(`https://${client.host}/ap/nodeinfo/2.0`)
+            .then((res) => res.json())
+            .then((res) => {
+                if (!mounted) return
+                setMeta(res)
+            })
+        return () => {
+            mounted = false
+        }
+    }, [])
+
     const register = async (): Promise<void> => {
-        if (!client?.ccid) {
+        if (!client?.ccid || !proxyCCID) {
+            alert('program error')
             return
         }
 
@@ -65,7 +79,14 @@ export const ApSetup = (): JSX.Element => {
             {
                 semanticID: 'world.concrnt.t-ap',
                 indexable: false,
-                domainOwned: false
+                domainOwned: false,
+                policy: 'https://policy.concrnt.world/t/inline-read-write.json',
+                policyParams: JSON.stringify({
+                    isWritePublic: false,
+                    isReadPublic: false,
+                    writer: [proxyCCID],
+                    reader: [proxyCCID]
+                })
             }
         )
 
