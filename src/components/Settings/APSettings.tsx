@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 import { useClient } from '../../context/ClientContext'
 import { type ApEntity } from '../../model'
 import { ApSetup } from '../Activitypub/Setup'
-import { ApProfileEditor } from '../Activitypub/ProfileEditor'
 import { ApFollowManager } from '../Activitypub/FollowManager'
 import TravelExploreIcon from '@mui/icons-material/TravelExplore'
 import { CCDrawer } from '../ui/CCDrawer'
@@ -68,17 +67,30 @@ export const APSettings = (): JSX.Element => {
                 <ApSetup />
             ) : (
                 <>
-                    <Box display="flex" flexDirection="row" justifyContent="flex-end" gap={1} width="100%">
-                        <IconButton>
-                            <TravelExploreIcon
-                                onClick={() => {
-                                    setOpenInquiry(true)
-                                }}
-                            />
-                        </IconButton>
-                        <WatchButton minimal timelineID={entity.followstream} />
+                    <Box
+                        display="flex"
+                        flexDirection="row"
+                        justifyContent="space-between"
+                        gap={1}
+                        width="100%"
+                        alignItems="center"
+                    >
+                        <Box>
+                            <Typography variant="h2">
+                                @{entity.id}@{client.host}
+                            </Typography>
+                        </Box>
+                        <Box display="flex" flexDirection="row" justifyContent="flex-end" gap={1} width="100%">
+                            <IconButton>
+                                <TravelExploreIcon
+                                    onClick={() => {
+                                        setOpenInquiry(true)
+                                    }}
+                                />
+                            </IconButton>
+                            <WatchButton minimal timelineID={'world.concrnt.t-ap@' + entity.ccid} />
+                        </Box>
                     </Box>
-                    <ApProfileEditor entity={entity} />
                     <ApFollowManager />
                 </>
             )}

@@ -6,10 +6,11 @@ import { Schemas } from '@concurrent-world/client'
 import { usePreference } from '../../context/PreferenceContext'
 
 import { useTranslation } from 'react-i18next'
-import { type StreamList } from '../../model'
+import { useGlobalActions } from '../../context/GlobalActions'
 
 export const ApSetup = (): JSX.Element => {
     const { client } = useClient()
+    const actions = useGlobalActions()
     const [lists, setLists] = usePreference('lists')
     const [userID, setUserID] = useState('')
     const { enqueueSnackbar } = useSnackbar()
@@ -19,14 +20,9 @@ export const ApSetup = (): JSX.Element => {
 
     const { t } = useTranslation('', { keyPrefix: 'settings.ap' })
 
-    const updateList = (id: string, list: StreamList): void => {
-        const old = lists
-        old[id] = list
-        setLists(JSON.parse(JSON.stringify(old)))
-    }
-
     useEffect(() => {
         setLoading(true)
+        if (!userID) return
         const timer = setTimeout(() => {
             const requestOptions = {
                 method: 'GET',
@@ -35,7 +31,7 @@ export const ApSetup = (): JSX.Element => {
                 }
             }
             client.api
-                .fetchWithCredential(client.api.host, `/ap/api/person/${userID}`, requestOptions)
+                .fetchWithCredential(client.api.host, `/ap/api/entity/${userID}`, requestOptions)
                 .then(async (res) => await res.json())
                 .then((profile) => {
                     console.log('profile', profile)
@@ -55,7 +51,7 @@ export const ApSetup = (): JSX.Element => {
     }, [userID])
 
     const register = async (): Promise<void> => {
-        if (!client) {
+        if (!client?.ccid) {
             return
         }
 
@@ -67,17 +63,17 @@ export const ApSetup = (): JSX.Element => {
                 description: 'ActivityPub home stream'
             },
             {
-                semanticID: 'world.concrnt.p-aphome',
+                semanticID: 'world.concrnt.t-ap',
                 indexable: false,
                 domainOwned: false
             }
         )
 
-        const oldhome = lists.home
-        if (oldhome) {
-            // oldhome.streams.push(followstream.id) // TODO
-            // updateList('home', oldhome)
-        }
+        client.api
+            .subscribe('world.concrnt.t-ap@' + client.ccid, Object.keys(actions.listedSubscriptions)[0])
+            .then((subscription) => {
+                console.log(subscription)
+            })
 
         await client.api
             .fetchWithCredential(client.api.host, `/ap/api/entity`, {
@@ -95,26 +91,6 @@ export const ApSetup = (): JSX.Element => {
             .then(async (res) => await res.json())
             .catch((e) => {
                 enqueueSnackbar(`register entity failed: ${e}`, {
-                    variant: 'error'
-                })
-            })
-
-        await client.api
-            .fetchWithCredential(client.api.host, `/ap/api/person`, {
-                method: 'PUT',
-                headers: {
-                    'content-type': 'application/json'
-                },
-                body: JSON.stringify({
-                    id: userID,
-                    name: client?.user?.profile?.username,
-                    summary: client?.user?.profile?.description,
-                    icon_url: client?.user?.profile?.avatar
-                })
-            })
-            .then(async (res) => await res.json())
-            .catch((e) => {
-                enqueueSnackbar(`init profile failed: ${e}`, {
                     variant: 'error'
                 })
             })
