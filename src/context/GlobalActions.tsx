@@ -110,6 +110,9 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     if (timeline) {
                         await client.api.subscribe(timeline, sub.id)
                     }
+                    if (client.ccid) {
+                        await client.api.subscribe('world.concrnt.t-home@' + client.ccid, sub.id)
+                    }
 
                     const list = {
                         [sub.id]: {

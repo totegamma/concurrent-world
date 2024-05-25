@@ -94,6 +94,7 @@ export const ProfileSettings = (): JSX.Element => {
                 }}
             >
                 <ProfileEditor
+                    id={''}
                     initial={client?.user?.profile}
                     onSubmit={() => {
                         enqueueSnackbar(t('updated'), { variant: 'success' })

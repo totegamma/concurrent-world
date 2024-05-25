@@ -105,9 +105,6 @@ export interface ApEntity {
     ccid: string
     publickey: string
     privatekey: string
-    homestream: string
-    notificationstream: string
-    followstream: string
 }
 
 export interface s3Config {
