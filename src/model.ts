@@ -105,6 +105,7 @@ export interface ApEntity {
     ccid: string
     publickey: string
     privatekey: string
+    aliases: string[]
 }
 
 export interface s3Config {
