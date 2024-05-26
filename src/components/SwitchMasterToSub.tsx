@@ -19,7 +19,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import html2canvas from 'html2canvas'
 import JsPDF from 'jspdf'
 import ccPaper from '../resources/cc-paper.svg'
-import { ComputeCKID, type Identity, LoadKey, GenerateIdentity } from '@concurrent-world/client'
+import { ComputeCKID, type Identity, GenerateIdentity, LoadKeyFromMnemonic } from '@concurrent-world/client'
 import { Trans, useTranslation } from 'react-i18next'
 
 export interface SwitchMasterToSubProps {
@@ -38,7 +38,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
     const testOK = useMemo(() => {
         try {
             const master = props.identity.privateKey
-            const test = LoadKey(mnemonic)?.privatekey
+            const test = LoadKeyFromMnemonic(mnemonicTest)?.privatekey
             return master === test
         } catch (_) {
             return false
