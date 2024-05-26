@@ -1,24 +1,9 @@
 import { type Identity, type Client, type CoreDomain } from '@concurrent-world/client'
-import {
-    Alert,
-    AlertTitle,
-    Avatar,
-    Box,
-    Button,
-    Divider,
-    Link,
-    List,
-    ListItemAvatar,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    TextField,
-    Typography
-} from '@mui/material'
+import { Alert, AlertTitle, Box, Button, Divider, Link, List, TextField, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
-import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import { jumpToDomainRegistration } from '../../util'
 import { useTranslation } from 'react-i18next'
+import { ListItemDomain } from '../ui/ListItemDomain'
 
 interface ChooseDomainProps {
     next: () => void
@@ -27,6 +12,9 @@ interface ChooseDomainProps {
     host: CoreDomain | null | undefined
     setHost: (_: CoreDomain | null | undefined) => void
 }
+
+// Send PR your domain to add here!
+const domainlist = ['ariake.concrnt.net', 'denken.concrnt.net', 'zyouya.concrnt.net']
 
 export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'registration.chooseDomain' })
@@ -69,25 +57,17 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
             <Box width="100%" display="flex" flexDirection="column">
                 <Typography variant="h3">{t('chooseFromList')}</Typography>
                 <List>
-                    <ListItemButton
-                        onClick={() => {
-                            setJumped(true)
-                            setServer('hub.concurrent.world')
-                            jumpToDomainRegistration(
-                                props.identity.CCID,
-                                props.identity.privateKey,
-                                'hub.concurrent.world'
-                            )
-                        }}
-                    >
-                        <ListItemAvatar>
-                            <Avatar></Avatar>
-                        </ListItemAvatar>
-                        <ListItemText primary="hub.concurrent.world" />
-                        <ListItemIcon>
-                            <OpenInNewIcon />
-                        </ListItemIcon>
-                    </ListItemButton>
+                    {domainlist.map((domain) => (
+                        <ListItemDomain
+                            key={domain}
+                            domainFQDN={domain}
+                            onClick={() => {
+                                setJumped(true)
+                                setServer(domain)
+                                jumpToDomainRegistration(props.identity.CCID, props.identity.privateKey, domain)
+                            }}
+                        />
+                    ))}
                 </List>
                 <Divider>{t('or')}</Divider>
                 <Typography variant="h3">{t('directInput')}</Typography>
