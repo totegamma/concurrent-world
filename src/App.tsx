@@ -48,6 +48,15 @@ function App(): JSX.Element {
     const [themeName] = usePreference('themeName')
     const [sound] = usePreference('sound')
     const [customThemes] = usePreference('customThemes')
+    const [domainIsOffline, setDomainIsOffline] = useState<boolean>(false)
+
+    useEffect(() => {
+        client.api.getDomain(client.api.host).then((domain) => {
+            if (domain === null) {
+                setDomainIsOffline(true)
+            }
+        })
+    }, [client.user])
 
     const [theme, setTheme] = useState<ConcurrentTheme>(loadConcurrentTheme(themeName, customThemes))
     const isMobileSize = useMediaQuery(theme.breakpoints.down('sm'))
@@ -253,7 +262,8 @@ function App(): JSX.Element {
                         backgroundColor: 'error.main',
                         width: '100%',
                         display: 'flex',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        flexDirection: 'column'
                     }}
                 >
                     {masterInfo && (
@@ -269,6 +279,20 @@ function App(): JSX.Element {
                             to="/settings/identity"
                         >
                             {t('settings.identity.loginType.masterKey')}
+                        </Typography>
+                    )}
+                    {domainIsOffline && (
+                        <Typography
+                            sx={{
+                                textAlign: 'center',
+                                color: 'error.contrastText',
+                                fontSize: '0.8em',
+                                fontWeight: 'bold',
+                                padding: '10px'
+                            }}
+                        >
+                            あなたのドメイン{client.api.host}
+                            は現在オフラインの為、読み込み専用モードです。復旧までしばらくお待ちください。
                         </Typography>
                     )}
                 </Box>

@@ -97,13 +97,13 @@ export function Registration(): JSX.Element {
             component: (
                 <RegistrationWelcome
                     identity={identity}
-                    manualSetup={() => {
-                        const fqdn = 'hub.concurrent.world'
+                    autoSetup={() => {
+                        const fqdn = 'ariake.concrnt.net'
                         client?.api.getDomain(fqdn).then((e) => {
                             if (!e) return
                             setHost(e)
                             setDomain(e.fqdn)
-                            jumpToDomainRegistration(identity.CCID, identity.privateKey, 'hub.concurrent.world')
+                            jumpToDomainRegistration(identity.CCID, identity.privateKey, fqdn)
                         })
                     }}
                     customSetup={() => {

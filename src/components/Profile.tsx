@@ -1,4 +1,4 @@
-import { Box, Button, Typography, useTheme, Link, Divider } from '@mui/material'
+import { Box, Button, Typography, Link, Divider } from '@mui/material'
 
 import { CCAvatar } from '../components/ui/CCAvatar'
 import { WatchButton } from '../components/WatchButton'
@@ -29,7 +29,6 @@ type detail = 'none' | 'ack' | 'acker'
 
 export function Profile(props: ProfileProps): JSX.Element {
     const { client } = useClient()
-    const theme = useTheme()
 
     const isSelf = props.id === client.ccid
 
@@ -120,14 +119,13 @@ export function Profile(props: ProfileProps): JSX.Element {
                     </Box>
                     <Box display="flex" gap={1}>
                         {!isSelf && <AckButton user={props.user} />}
-
                         <WatchButton timelineID={props.user.homeTimeline ?? ''} />
+                        {isSelf && (
+                            <Button variant="outlined" component={NavLink} to="/settings/profile">
+                                Edit Profile
+                            </Button>
+                        )}
                     </Box>
-                    {isSelf && (
-                        <Button variant="outlined" component={NavLink} to="/settings/profile">
-                            Edit Profile
-                        </Button>
-                    )}
                 </Box>
                 <Box>
                     <Typography
