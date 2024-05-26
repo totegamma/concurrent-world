@@ -95,7 +95,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const setupAccountRequired = client?.user !== null && client?.user.profile === undefined
     const noListDetected = Object.keys(lists).length === 0
 
-    const [timelines, setTimelines] = useState<CoreTimeline[]>([])
+    const [timelines, setTimelines] = useState<Array<CoreTimeline<CommunityTimelineSchema>>>([])
     const [selectedTieline, setSelectedTimeline] = useState<string | undefined>(undefined)
 
     const setupList = useCallback(
@@ -573,7 +573,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                 name={timeline.document.body.name}
                                                 description={timeline.document.body.description ?? 'no description'}
                                                 banner={timeline.document.body.banner ?? ''}
-                                                domain={timeline.domain}
+                                                domain={client.host}
                                                 onClick={() => {
                                                     if (selectedTieline === timeline.id) {
                                                         setSelectedTimeline(undefined)
