@@ -10,7 +10,7 @@ import { type Identity } from '@concurrent-world/client'
 
 export function RegistrationWelcome(props: {
     customSetup: () => void
-    manualSetup: () => void
+    autoSetup: () => void
     identity: Identity
 }): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'registration.welcome' })
@@ -57,7 +57,7 @@ export function RegistrationWelcome(props: {
                         gap: 2,
                         cursor: 'pointer'
                     }}
-                    onClick={props.manualSetup}
+                    onClick={props.autoSetup}
                 >
                     <IconButtonWithLabel icon={AutoFixHighIcon} label={'おまかせ'} />
                     <Typography
