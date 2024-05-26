@@ -12,6 +12,7 @@ interface StreamCardProps {
     domain: string
     isOwner?: boolean
     sx?: SxProps
+    onClick?: () => void
 }
 
 export function StreamCard(props: StreamCardProps): JSX.Element {
@@ -22,29 +23,54 @@ export function StreamCard(props: StreamCardProps): JSX.Element {
                 ...props.sx
             }}
         >
-            <CardActionArea component={Link} to={'/stream/' + props.streamID}>
-                <CCWallpaper
-                    sx={{
-                        height: '140px'
-                    }}
-                    override={props.banner}
-                />
-                <CardContent>
-                    <Typography gutterBottom variant="h5" component="div">
-                        {props.name}
-                        {props.isOwner ? ' (owner)' : ''}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        {props.description}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        {props.domain}
-                    </Typography>
-                </CardContent>
-            </CardActionArea>
-            <CardActions>
-                <WatchButton minimal timelineID={props.streamID} />
-            </CardActions>
+            {props.onClick ? (
+                <CardActionArea onClick={props.onClick}>
+                    <CCWallpaper
+                        sx={{
+                            height: '140px'
+                        }}
+                        override={props.banner}
+                    />
+                    <CardContent>
+                        <Typography gutterBottom variant="h5" component="div">
+                            {props.name}
+                            {props.isOwner ? ' (owner)' : ''}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            {props.description}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            {props.domain}
+                        </Typography>
+                    </CardContent>
+                </CardActionArea>
+            ) : (
+                <>
+                    <CardActionArea component={Link} to={'/stream/' + props.streamID}>
+                        <CCWallpaper
+                            sx={{
+                                height: '140px'
+                            }}
+                            override={props.banner}
+                        />
+                        <CardContent>
+                            <Typography gutterBottom variant="h5" component="div">
+                                {props.name}
+                                {props.isOwner ? ' (owner)' : ''}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                {props.description}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                {props.domain}
+                            </Typography>
+                        </CardContent>
+                    </CardActionArea>
+                    <CardActions>
+                        <WatchButton minimal timelineID={props.streamID} />
+                    </CardActions>
+                </>
+            )}
         </Card>
     )
 }
