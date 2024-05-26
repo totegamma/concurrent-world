@@ -16,7 +16,6 @@ import { usePreference } from './PreferenceContext'
 import { ProfileEditor } from '../components/ProfileEditor'
 import { MessageContainer } from '../components/Message/MessageContainer'
 import { Menu } from '../components/Menu/Menu'
-import { LogoutButton } from '../components/Settings/LogoutButton'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import { type EmojiPackage } from '../model'
 import { experimental_VGrid as VGrid } from 'virtua'
@@ -72,7 +71,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
 
     const [allKnownTimelines, setAllKnownTimelines] = useState<Array<Timeline<CommunityTimelineSchema>>>([])
     const [listedSubscriptions, setListedSubscriptions] = useState<Record<string, CoreSubscription<any>>>({})
-    const [domainIsOffline, setDomainIsOffline] = useState<boolean>(false)
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
     const [previewImage, setPreviewImage] = useState<string | undefined>()
 
@@ -210,14 +208,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
             })
         })
     }, [client, lists])
-
-    useEffect(() => {
-        client.api.getDomain(client.api.host).then((domain) => {
-            if (domain === null) {
-                setDomainIsOffline(true)
-            }
-        })
-    }, [client.user])
 
     const openDraft = useCallback(
         (draft?: string) => {
@@ -483,30 +473,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                             </>
                         )}
                     </>
-                </Modal>
-                <Modal open={domainIsOffline} onClose={() => {}}>
-                    <Paper sx={style}>
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                p: 1,
-                                gap: 1
-                            }}
-                        >
-                            <Typography>
-                                あなたのドメイン{client.api.host}は現在オフラインです。復旧までしばらくお待ちください。
-                            </Typography>
-                            <Button
-                                onClick={() => {
-                                    window.location.reload()
-                                }}
-                            >
-                                Reload
-                            </Button>
-                            <LogoutButton />
-                        </Box>
-                    </Paper>
                 </Modal>
                 <Modal open={setupAccountRequired} onClose={() => {}}>
                     <Paper sx={style}>

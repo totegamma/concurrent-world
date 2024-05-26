@@ -169,8 +169,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                                     console.log('subkey enacted')
                                     const subkey = `concurrent-subkey ${newIdentity.privateKey} ${client.ccid}@${client.host} ${client.user?.profile?.username}`
                                     localStorage.setItem('SubKey', JSON.stringify(subkey))
-                                    localStorage.removeItem('Mnemonic')
-                                    localStorage.removeItem('PrivateKey')
+                                    localStorage.removeItem('Identity')
                                     window.location.reload()
                                 })
                                 .catch((e) => {
