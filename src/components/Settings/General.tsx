@@ -175,7 +175,7 @@ export const GeneralSettings = (): JSX.Element => {
                                 const jwt = IssueJWT(client.keyPair.privatekey, {
                                     iss: client.ccid,
                                     aud: client.host,
-                                    sub: 'CONCURRENT_INVITE',
+                                    sub: 'CONCRNT_INVITE',
                                     exp: Math.floor((new Date().getTime() + 24 * 60 * 60 * 1000) / 1000).toString()
                                 }) // 24h validity
                                 setInvitationCode(jwt)
