@@ -44,7 +44,7 @@ export function ImportMasterKey(): JSX.Element {
     // suggest
     useEffect(() => {
         if (!keypair || !ccid) return
-        const searchTarget = domainInput || 'hub.concurrent.world'
+        const searchTarget = domainInput || 'ariake.concrnt.net'
 
         const timer = setTimeout(() => {
             setDomain('')

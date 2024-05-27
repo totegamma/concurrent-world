@@ -128,15 +128,18 @@ export function Profile(props: ProfileProps): JSX.Element {
                     </Box>
                 </Box>
                 <Box>
-                    <Typography
-                        variant="h6"
-                        sx={{
-                            fontWeight: 'bold',
-                            fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.5rem' }
-                        }}
-                    >
-                        {subProfile?.document.body.username ?? props.user.profile?.username ?? 'anonymous'}
-                    </Typography>
+                    <Box display="flex" flexDirection="row" gap={1} alignItems="baseline">
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                fontWeight: 'bold',
+                                fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.5rem' }
+                            }}
+                        >
+                            {subProfile?.document.body.username ?? props.user.profile?.username ?? 'anonymous'}
+                        </Typography>
+                        {props.user.alias && <Typography variant="caption">{props.user.alias}</Typography>}
+                    </Box>
                     <Typography variant="caption">{props.user.ccid}</Typography>
                 </Box>
                 <Box

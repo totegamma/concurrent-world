@@ -48,6 +48,18 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                         props.message.authorUser?.profile?.username ||
                         'anonymous'}
                 </Typography>
+                {props.message.authorUser?.alias && (
+                    <Typography
+                        component="span"
+                        sx={{
+                            color: 'text.secondary',
+                            fontSize: '0.75rem',
+                            marginLeft: '0.25rem'
+                        }}
+                    >
+                        @{props.message.authorUser.alias}
+                    </Typography>
+                )}
                 {myAck && (
                     <Tooltip arrow title="Ackしています" placement="top">
                         <CheckCircleIcon
