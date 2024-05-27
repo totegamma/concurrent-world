@@ -28,8 +28,7 @@ export const GeneralSettings = (): JSX.Element => {
     const [showEditorOnTopMobile, setShowEditorOnTopMobile] = usePreference('showEditorOnTopMobile')
     const [devMode, setDevMode] = usePreference('devMode')
 
-    // const tags = client?.api?.getTokenClaims()?.tag?.split(',') ?? []
-    const tags: string[] = [] // TODO
+    const tags = client?.user?.tag ? client.user.tag.split(',') : []
     const { enqueueSnackbar } = useSnackbar()
 
     const [currentLanguage, setCurrentLanguage] = useState<string>('')
