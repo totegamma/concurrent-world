@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next'
 export function LoginQR(): JSX.Element {
     const { client } = useClient()
     const subkey = JSON.parse(localStorage.getItem('SubKey') || 'null')
-    const [tab, setTab] = useState(0)
+    const [tab, setTab] = useState(subkey ? 0 : 1)
 
     const [generated, setGenerated] = useState<null | string>(null)
 
@@ -22,10 +22,17 @@ export function LoginQR(): JSX.Element {
                     setTab(newValue)
                 }}
             >
-                <Tab label={t('createNew')} />
                 <Tab label={t('showInstalled')} />
+                <Tab label={t('createNew')} />
             </Tabs>
             {tab === 0 && (
+                <>
+                    {subkey && <SubkeyInfo subkey={subkey} />}
+                    {!subkey && <p>この端末はサブキーでログインしていません</p>}
+                </>
+            )}
+
+            {tab === 1 && (
                 <>
                     <Alert severity="warning">{t('tip1')}</Alert>
 
@@ -56,12 +63,6 @@ export function LoginQR(): JSX.Element {
                             {t('createNewSubKey')}
                         </Button>
                     )}
-                </>
-            )}
-            {tab === 1 && (
-                <>
-                    {subkey && <SubkeyInfo subkey={subkey} />}
-                    {!subkey && <p>この端末はサブキーでログインしていません</p>}
                 </>
             )}
 
