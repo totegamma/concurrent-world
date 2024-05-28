@@ -1,4 +1,4 @@
-import { Box, Button, Divider, IconButton, TextField, Typography } from '@mui/material'
+import { Alert, Box, Button, Divider, IconButton, TextField, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useClient } from '../../context/ClientContext'
 import { type ApEntity } from '../../model'
@@ -9,6 +9,7 @@ import { AddListButton } from '../AddListButton'
 import TravelExploreIcon from '@mui/icons-material/TravelExplore'
 import { CCDrawer } from '../ui/CCDrawer'
 import { useNavigate } from 'react-router-dom'
+import LuggageIcon from '@mui/icons-material/Luggage'
 
 export const APSettings = (): JSX.Element => {
     const { client } = useClient()
@@ -16,6 +17,8 @@ export const APSettings = (): JSX.Element => {
     const [openInquiry, setOpenInquiry] = useState(false)
     const [url, setUrl] = useState('')
     const navigate = useNavigate()
+    const [openMigration, setOpenMigration] = useState(false)
+    const [migrateUrl, setMigrateUrl] = useState('')
 
     useEffect(() => {
         const requestOptions = {
@@ -56,6 +59,16 @@ export const APSettings = (): JSX.Element => {
         return <>loading...</>
     }
 
+    if (entity?.movedto) {
+        return (
+            <Box>
+                <Typography variant="h2">
+                    @{entity.id}@{client.api.host}は{entity.movedto}に引っ越しました
+                </Typography>
+            </Box>
+        )
+    }
+
     return (
         <Box
             sx={{
@@ -77,6 +90,13 @@ export const APSettings = (): JSX.Element => {
                             />
                         </IconButton>
                         <AddListButton stream={entity.followstream} />
+                        <IconButton>
+                            <LuggageIcon
+                                onClick={() => {
+                                    setOpenMigration(true)
+                                }}
+                            />
+                        </IconButton>
                     </Box>
                     <ApProfileEditor entity={entity} />
                     <ApFollowManager />
@@ -109,6 +129,58 @@ export const APSettings = (): JSX.Element => {
                             }}
                         >
                             照会
+                        </Button>
+                    </Box>
+                </Box>
+            </CCDrawer>
+            <CCDrawer
+                open={openMigration}
+                onClose={() => {
+                    setOpenMigration(false)
+                }}
+            >
+                <Box display="flex" width="100%" gap={1} padding={1} flexDirection="column">
+                    <Typography variant="h2">Activitypubアカウントの引っ越し</Typography>
+                    <Divider />
+                    <Alert severity="warning">この操作は取り消せません。</Alert>
+                    <Box display="flex" width="100%" gap={1} padding={1}>
+                        <TextField
+                            label="移行先のID"
+                            variant="outlined"
+                            value={migrateUrl}
+                            placeholder="@username@domain"
+                            onChange={(e) => {
+                                setMigrateUrl(e.target.value)
+                            }}
+                            sx={{
+                                flexGrow: 1
+                            }}
+                        />
+                        <Button
+                            color="error"
+                            onClick={() => {
+                                client.api
+                                    .fetchWithCredential(client.api.host, `/ap/api/entities/move`, {
+                                        method: 'POST',
+                                        headers: {
+                                            'content-type': 'application/json'
+                                        },
+                                        body: JSON.stringify({
+                                            move_to: migrateUrl
+                                        })
+                                    })
+                                    .then(async (res) => await res.json())
+                                    .then((data) => {
+                                        console.log(data)
+                                        alert('引っ越しました')
+                                    })
+                                    .catch((e) => {
+                                        console.log(e)
+                                        alert(`引っ越しに失敗しました: ${e}`)
+                                    })
+                            }}
+                        >
+                            引っ越す
                         </Button>
                     </Box>
                 </Box>

@@ -111,6 +111,7 @@ export interface ApEntity {
     homestream: string
     notificationstream: string
     followstream: string
+    movedto: string
 }
 
 export interface s3Config {
