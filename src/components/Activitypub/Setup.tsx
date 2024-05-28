@@ -1,4 +1,4 @@
-import { Box, Button, TextField, Typography } from '@mui/material'
+import { Alert, AlertTitle, Box, Button, TextField, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useClient } from '../../context/ClientContext'
 import { useSnackbar } from 'notistack'
@@ -127,6 +127,15 @@ export const ApSetup = (): JSX.Element => {
                 {t('cantBeChangedOnceRegistered')}
                 <br />
             </Typography>
+            <Typography>この操作により、ドメイン{client.host}にActivityPubのユーザーを登録します。</Typography>
+            <Alert severity="warning">
+                <AlertTitle>
+                    Activitypubアカウントと紐づけるConcrntドメインは、慎重に選択する必要があります。
+                </AlertTitle>
+                Concrntアカウントの引っ越しに伴い、Activitypubアカウントも外部ドメインへ引っ越すことができますが、
+                Concrntアカウントは自由に元のドメインに戻すことができる一方、Activitypub連携は仕様上
+                <b>引っ越し元へ戻すことはできません</b>。
+            </Alert>
             <TextField
                 label="UserID"
                 value={userID}
