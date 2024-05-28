@@ -90,7 +90,7 @@ export const ApFollowManager = (): JSX.Element => {
                             key={x}
                             url={x}
                             remove={(a) => {
-                                unFollow(a)
+                                unFollow(a.shortID)
                             }}
                         />
                     ))}
@@ -134,8 +134,8 @@ export const ApFollowManager = (): JSX.Element => {
     )
 }
 
-export const APUserCard = memo<{ url: string; remove?: (_: string) => void }>(
-    (props: { url: string; remove?: (_: string) => void }): JSX.Element => {
+export const APUserCard = memo<{ url: string; remove?: (_: { URL: string; shortID: string }) => void }>(
+    (props: { url: string; remove?: (_: { URL: string; shortID: string }) => void }): JSX.Element => {
         const { client } = useClient()
         const [person, setPerson] = useState<any>(null)
         const host = props.url.split('/')[2]
@@ -196,7 +196,7 @@ export const APUserCard = memo<{ url: string; remove?: (_: string) => void }>(
                         }}
                     >
                         <IconButton
-                            onClick={() => props.remove?.(shortID)}
+                            onClick={() => props.remove?.({ URL: props.url, shortID })}
                             sx={{
                                 backgroundColor: 'rgba(255,255,255,0.8)',
                                 '&:hover': {
