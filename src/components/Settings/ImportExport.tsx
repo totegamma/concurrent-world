@@ -20,7 +20,44 @@ export function ImportExport(): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'settings.importexport' })
 
     const fileInputRef = useRef<HTMLInputElement>(null)
+    const v0FileInputRef = useRef<HTMLInputElement>(null)
+    const [importStatus, setImportStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
     const [v0importStatus, setV0importStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+
+    const importRepo = (data: string): void => {
+        if (importStatus !== 'idle') return
+
+        setImportStatus('loading')
+        client.api
+            .fetchWithCredential(
+                client.api.host,
+                '/api/v1/repository',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain'
+                    },
+                    body: data
+                },
+                1000 * 60 * 10 // 10 minutes
+            )
+            .then((res) => {
+                if (res.ok) {
+                    console.log('imported')
+                    res.json().then((data) => {
+                        console.log(data)
+                        setImportStatus('success')
+                    })
+                } else {
+                    console.error('failed to import')
+                    setImportStatus('error')
+                }
+            })
+            .catch((e) => {
+                console.error(e)
+                setImportStatus('error')
+            })
+    }
 
     const importFromVersion0 = (backup: v0data): void => {
         if (v0importStatus !== 'idle') return
@@ -30,58 +67,6 @@ export function ImportExport(): JSX.Element {
         if (!client.user?.homeTimeline) return
 
         setV0importStatus('loading')
-        /*
-        {
-            "id": "b564cdd8-033e-4e9a-9def-58545369e030",
-            "author": "CC707E9Aa446961E6e6C33e5d69d827e5420B69E1f",
-            "schema": "https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/messages/note/0.0.1.json",
-            "payload": "{\"signer\":\"CC707E9Aa446961E6e6C33e5d69d827e5420B69E1f\",\"type\":\"Message\",\"schema\":\"https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/messages/note/0.0.1.json\",\"body\":{\"body\":\"ねむいわヨ\",\"emojis\":{},\"mentions\":[],\"profileOverride\":{}},\"meta\":{\"client\":\"develop.dqv3bovj4nar0.amplifyapp.com-develop-21543e8\"},\"signedAt\":\"2024-03-12T05:17:48.980Z\",\"keyID\":\"CK548AF905296C91B2BE410A95DC79231533d31cFd\"}",
-            "signature": "b1f8f8cc2c5f2044795e5f28c4e449f76e0fe93ca6504386ca609b2f07f8d88c244a60945c85e6e6871796c1b04648fd000b3100c6c66fe97e6a6d1ac5ada9dc01",
-            "cdate": "2024-03-12T05:17:48.98Z",
-            "streams": [
-                "ci8qvhep9dcpltmfq3fg@hub.concurrent.world",
-                "cndaednuhc2a8j8f19bg@dev.concurrent.world"
-            ]
-        }
-
-        {
-            "signer": "CC707E9Aa446961E6e6C33e5d69d827e5420B69E1f",
-            "type": "Message",
-            "schema": "https://raw.githubusercontent.com/totegamma/concurrent-schemas/master/messages/note/0.0.1.json",
-            "body": {
-                "body": "ねむいわヨ",
-                "emojis": {},
-                "mentions": [],
-                "profileOverride": {}
-            },
-            "meta": {
-                "client": "develop.dqv3bovj4nar0.amplifyapp.com-develop-21543e8"
-            },
-            "signedAt": "2024-03-12T05:17:48.980Z",
-            "keyID": "CK548AF905296C91B2BE410A95DC79231533d31cFd"
-        }
-
-        to
-
-        {
-            "signer": "con156ylfvc07pf23j6n96jgg9yk6dhkdrngp96g0t",
-            "type": "message",
-            "schema": "https://schema.concrnt.world/m/markdown.json",
-            "body": {
-                "body": "Okay!!",
-                "emojis": {},
-                "mentions": [],
-                "profileOverride": {}
-            },
-            "meta": {
-                "client": "localhost-v1dev-b9e1521"
-            },
-            "timelines": [
-                "world.concrnt.t-home@con156ylfvc07pf23j6n96jgg9yk6dhkdrngp96g0t"
-            ],
-            "signedAt": "2024-05-04T16:55:42.104Z"
-        }
-        */
 
         const logs = []
         for (const message of backup.content) {
@@ -145,7 +130,27 @@ export function ImportExport(): JSX.Element {
         <>
             <Typography variant="h3">{t('export')}</Typography>
 
-            <Button>コミットログのダウンロード</Button>
+            <Button
+                onClick={() => {
+                    client.api
+                        .fetchWithCredential(client.host, '/api/v1/repository', {}, 60000)
+                        .then((res) => res.blob())
+                        .then((blob) => {
+                            const url = window.URL.createObjectURL(blob)
+                            const a = document.createElement('a')
+                            a.href = url
+                            a.download =
+                                (client.user?.profile?.username ?? 'anonymous') +
+                                '-backup-' +
+                                new Date().toLocaleDateString() +
+                                '.txt'
+                            a.click()
+                            window.URL.revokeObjectURL(url)
+                        })
+                }}
+            >
+                レポジトリデータのエクスポート
+            </Button>
 
             <Divider
                 sx={{
@@ -155,14 +160,47 @@ export function ImportExport(): JSX.Element {
 
             <Typography variant="h3">{t('import')}</Typography>
 
-            <Button disabled>コミットログのインポート</Button>
-
-            <Typography variant="h4">その他</Typography>
             <input
                 hidden
                 type="file"
                 accept=".json"
                 ref={fileInputRef}
+                onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                        const reader = new FileReader()
+                        reader.onload = (e) => {
+                            const contents = e.target?.result
+                            if (contents) {
+                                importRepo(contents as string)
+                            }
+                        }
+                        reader.readAsText(file)
+                    }
+                }}
+            />
+            <Button
+                disabled={importStatus === 'loading'}
+                color={importStatus === 'error' ? 'error' : importStatus === 'success' ? 'success' : 'primary'}
+                onClick={() => {
+                    fileInputRef.current?.click()
+                }}
+            >
+                レポジトリデータのインポート
+            </Button>
+
+            <Divider
+                sx={{
+                    marginY: 2
+                }}
+            />
+
+            <Typography variant="h3">その他</Typography>
+            <input
+                hidden
+                type="file"
+                accept=".json"
+                ref={v0FileInputRef}
                 onChange={(e) => {
                     const file = e.target.files?.[0]
                     if (file) {
@@ -182,7 +220,7 @@ export function ImportExport(): JSX.Element {
                 disabled={v0importStatus === 'loading'}
                 color={v0importStatus === 'error' ? 'error' : v0importStatus === 'success' ? 'success' : 'primary'}
                 onClick={() => {
-                    fileInputRef.current?.click()
+                    v0FileInputRef.current?.click()
                 }}
             >
                 {v0status[v0importStatus]}
