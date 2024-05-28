@@ -1,5 +1,5 @@
 {
     "version": 1,
-    "include": ["/og/message/*", "/og/entity/*", "/og/stream/*"],
+    "include": ["/og/message/*", "/og/entity/*", "/og/timeline/*"],
     "exclude": []
 }

@@ -1,16 +1,60 @@
-export interface AddressResponse {
-    content: {
-        payload: string
-    }
+
+export interface ApiResponse<T> {
+    status: string
+    content: T
 }
 
-export interface CharactersResponse {
-    content: {
-        payload: string
-    }[]
+export interface CoreEntity {
+    ccid: string
+    alias?: string
+    tag: string
+    domain: string
+    cdate: string
+    score: number
+
+    affiliationDocument: string
+    affiliationSignature: string
+
+    tombstoneDocument?: string
+    tombstoneSignature?: string
 }
 
-export interface Characters {
+export interface CoreProfile {
+    author: string
+    schema: string
+    id: string
+    document: string
+    signature: string
+    cdate: string
+}
+
+export interface CoreMessage {
+    id: string
+    author: string
+    schema: string
+    document: string
+    signature: string
+    timelines: string[]
+    policy?: string
+    policyParams?: string
+    cdate: string
+}
+
+export interface CoreTimeline {
+    id: string
+    indexable: boolean
+    author: string
+    domainOwned: boolean
+    schema: string
+    policy?: string
+    policyParams?: string
+    document: string
+    signature: string
+    cdate: string
+    mdate: string
+}
+
+export interface WorldProfile {
     username: string
     description: string
     avatar: string
@@ -18,34 +62,15 @@ export interface Characters {
     subprofiles: string
 }
 
-export interface MessageResponse {
-    content: {
-        payload: string
-    }
-}
 
-export interface Message {
+export interface WorldMessage {
     body: string
     emojis: {}
     mentions: []
     profileOverride: {}
 }
 
-export interface CharactersResponse {
-    content: {
-        payload: string
-    }[]
-}
-
-export interface Characters {
-    username: string
-    description: string
-    avatar: string
-    banner: string
-    subprofiles: string
-}
-
-export interface Stream {
+export interface WorldCommunityTimeline {
     name: string
     shortname: string
     description: string
