@@ -37,16 +37,14 @@ export const ProfileSettings = (): JSX.Element => {
 
     const load = (): void => {
         if (!client?.ccid) return
-        // client.api.invalidateProfile(client.ccid)
-
-        client.api.getProfiles({ author: client.ccid }).then((characters) => {
-            setAllProfiles(characters ?? [])
-        })
-
         if (!client.user?.profile) return
 
         client.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', client.ccid).then((profile) => {
             setLatestProfile(profile?.document.body)
+            client.api.getProfiles({ author: client.ccid }).then((characters) => {
+                const profiles = (characters ?? []).filter((c) => c.id !== profile?.id)
+                setAllProfiles(profiles)
+            })
         })
     }
 
