@@ -36,7 +36,7 @@ export const APSettings = (): JSX.Element => {
             .then((data) => {
                 console.log(data)
                 setEntity(data.content)
-                setAliases(data.content.aliases)
+                setAliases(data.content.aliases ?? [])
             })
             .catch((e) => {
                 console.log(e)
