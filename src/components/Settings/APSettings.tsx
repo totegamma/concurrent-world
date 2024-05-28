@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useClient } from '../../context/ClientContext'
 import { type ApEntity } from '../../model'
 import { ApSetup } from '../Activitypub/Setup'
-import { ApFollowManager } from '../Activitypub/FollowManager'
+import { ApFollowManager, APUserCard } from '../Activitypub/FollowManager'
 import { CCDrawer } from '../ui/CCDrawer'
 import { useNavigate } from 'react-router-dom'
 import { WatchButton } from '../WatchButton'
@@ -18,8 +18,9 @@ export const APSettings = (): JSX.Element => {
     const [url, setUrl] = useState('')
     const navigate = useNavigate()
     const [openMigration, setOpenMigration] = useState(false)
-    const [aliases, setAliases] = useState<string>('')
     const { enqueueSnackbar } = useSnackbar()
+    const [aliases, setAliases] = useState<string[]>([])
+    const [newAlias, setNewAlias] = useState('')
 
     useEffect(() => {
         const requestOptions = {
@@ -35,7 +36,7 @@ export const APSettings = (): JSX.Element => {
             .then((data) => {
                 console.log(data)
                 setEntity(data.content)
-                setAliases(data.content.aliases?.join(',') ?? '')
+                setAliases(data.content.aliases)
             })
             .catch((e) => {
                 console.log(e)
@@ -149,11 +150,11 @@ export const APSettings = (): JSX.Element => {
                     <Divider />
                     <Box display="flex" width="100%" gap={1} padding={1}>
                         <TextField
-                            label="引っ越し元一覧"
+                            label="引っ越し元を追加"
                             variant="outlined"
-                            value={aliases}
+                            value={newAlias}
                             onChange={(e) => {
-                                setAliases(e.target.value)
+                                setNewAlias(e.target.value)
                             }}
                             sx={{
                                 flexGrow: 1
@@ -162,26 +163,83 @@ export const APSettings = (): JSX.Element => {
                         <Button
                             onClick={() => {
                                 client.api
-                                    .fetchWithCredential(client.api.host, `/ap/api/entities/aliases`, {
-                                        method: 'POST',
-                                        headers: {
-                                            'content-type': 'application/json'
-                                        },
-                                        body: JSON.stringify({
-                                            aliases: aliases ? aliases.split(',') : []
-                                        })
-                                    })
+                                    .fetchWithCredential(
+                                        client.api.host,
+                                        `/ap/api/resolve/${encodeURIComponent(newAlias)}`,
+                                        {
+                                            method: 'GET',
+                                            headers: {
+                                                accept: 'application/ld+json'
+                                            }
+                                        }
+                                    )
                                     .then(async (res) => await res.json())
                                     .then((data) => {
-                                        console.log(data)
-                                        enqueueSnackbar('更新しました', {
-                                            variant: 'success'
-                                        })
+                                        if (data.content.id) {
+                                            const newAliases = [...new Set([...aliases, data.content.id])]
+
+                                            client.api
+                                                .fetchWithCredential(client.api.host, `/ap/api/entities/aliases`, {
+                                                    method: 'POST',
+                                                    headers: {
+                                                        'content-type': 'application/json'
+                                                    },
+                                                    body: JSON.stringify({
+                                                        aliases: newAliases
+                                                    })
+                                                })
+                                                .then(async (res) => await res.json())
+                                                .then((data) => {
+                                                    console.log(data)
+                                                    enqueueSnackbar('更新しました', {
+                                                        variant: 'success'
+                                                    })
+                                                    setAliases(newAliases)
+                                                })
+                                        }
                                     })
                             }}
                         >
-                            更新
+                            追加
                         </Button>
+                    </Box>
+                    <Box
+                        display="flex"
+                        flexDirection="column"
+                        gap={1}
+                        sx={{
+                            flexGrow: 1
+                        }}
+                    >
+                        {aliases.map((alias) => (
+                            <>
+                                <Typography>{alias}</Typography>
+                                <APUserCard
+                                    url={alias}
+                                    remove={(body) => {
+                                        const newAliases = aliases.filter((a) => a !== body.URL)
+                                        client.api
+                                            .fetchWithCredential(client.api.host, `/ap/api/entities/aliases`, {
+                                                method: 'POST',
+                                                headers: {
+                                                    'content-type': 'application/json'
+                                                },
+                                                body: JSON.stringify({
+                                                    aliases: newAliases
+                                                })
+                                            })
+                                            .then(async (res) => await res.json())
+                                            .then((data) => {
+                                                console.log(data)
+                                                enqueueSnackbar('更新しました', {
+                                                    variant: 'success'
+                                                })
+                                                setAliases(newAliases)
+                                            })
+                                    }}
+                                />
+                            </>
+                        ))}
                     </Box>
                 </Box>
             </CCDrawer>
