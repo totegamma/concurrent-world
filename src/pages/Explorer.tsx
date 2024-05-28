@@ -385,7 +385,7 @@ export function Explorer(): JSX.Element {
                     >
                         {characters.map((character) => (
                             <Paper key={character.id} variant="outlined">
-                                <SubProfileCard character={character} />
+                                <SubProfileCard showccid character={character} />
                             </Paper>
                         ))}
                     </Box>

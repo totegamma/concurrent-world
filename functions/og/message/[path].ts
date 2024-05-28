@@ -1,9 +1,5 @@
 import type {
-    AddressResponse,
-    MessageResponse,
-    Message as CCMessage,
-    Characters,
-    CharactersResponse
+    ApiResponse, CoreEntity, CoreMessage, CoreProfile, WorldMessage, WorldProfile
 } from '../../types/concurrent'
 import { sanitizeHtml } from '../../lib/sanitize'
 
@@ -26,38 +22,39 @@ export const onRequest: PagesFunction = async (context) => {
         const { path } = context.params
         const [messageId, ccid] = (<string>path).split('@')
 
-        const host = await fetch(`https://hub.concurrent.world/api/v1/address/${ccid}`)
-            .then((response) => response.json<AddressResponse>())
+        const entity: CoreEntity = await fetch(`https://ariake.concrnt.net/api/v1/entity/${ccid}`)
+            .then((response) => response.json<ApiResponse<CoreEntity>>())
             .then((data) => data.content)
 
-        const message = await fetch(`https://${host}/api/v1/message/${messageId}`)
-            .then((response) => response.json<MessageResponse>())
-            .then((data) => JSON.parse(data.content.payload).body as CCMessage)
+        const message: CoreMessage = await fetch(`https://${entity.domain}/api/v1/message/${messageId}`)
+            .then((response) => response.json<ApiResponse<CoreMessage>>())
+            .then((data) => data.content)
 
-        const characters = await fetch(
-            `https://${host}/api/v1/characters?author=${ccid}&schema=https%3A%2F%2Fraw.githubusercontent.com%2Ftotegamma%2Fconcurrent-schemas%2Fmaster%2Fcharacters%2Fprofile%2F0.0.2.json`
-        )
-            .then((res) => res.json<CharactersResponse>())
-            .then((data) => JSON.parse(data.content[0].payload).body as Characters)
+        const messageBody: WorldMessage = JSON.parse(message.document).body
+        const content = messageBody.body
 
-        const username = sanitizeHtml(characters.username)
-        const avatar = sanitizeHtml(characters.avatar)
+        const profile: CoreProfile = await fetch(`https://${entity.domain}/api/v1/profile/${entity.ccid}/world.concrnt.p`)
+            .then((response) => response.json<ApiResponse<CoreProfile>>())
+            .then((data) => data.content)
 
-        const description = sanitizeHtml(message.body)
+        const worldProfile: WorldProfile = JSON.parse(profile.document).body
+
+        const username = sanitizeHtml(worldProfile.username)
+        const avatar = sanitizeHtml(worldProfile.avatar)
 
         let responseBody = ''
 
         const imageRegex = /!\[[^\]]*\]\(([^\)]*)\)/
 
-        if (description.match(imageRegex)) {
-            const imageUrl = description.match(imageRegex)[1]
+        if (content.match(imageRegex)) {
+            const imageUrl = content.match(imageRegex)[1]
             responseBody = `
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8">
-    <meta property="og:title" content="${username} on Concurrent">
-    <meta property="og:description" content="${description.slice(0, description.search(imageRegex))}">
+    <meta property="og:title" content="${username} on Concrnt">
+    <meta property="og:description" content="${content.slice(0, content.search(imageRegex))}">
     <meta property="og:image" content="${imageUrl}">
     <meta property="twitter:card" content="summary_large_image">
   </head>
@@ -68,8 +65,8 @@ export const onRequest: PagesFunction = async (context) => {
 <html>
   <head>
     <meta charset="UTF-8">
-    <meta property="og:title" content="${username} on Concurrent">
-    <meta property="og:description" content="${description}">
+    <meta property="og:title" content="${username} on Concrnt">
+    <meta property="og:description" content="${content}">
     <meta property="og:image" content="${avatar}">
     <meta property="twitter:card" content="summary">
   </head>

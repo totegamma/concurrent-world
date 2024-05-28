@@ -1,14 +1,18 @@
 import { type CoreProfile } from '@concurrent-world/client'
-import { Box, IconButton, Menu, Paper, Typography } from '@mui/material'
+import { Box, Chip, IconButton, Menu, Paper, Typography } from '@mui/material'
 import { CCWallpaper } from './ui/CCWallpaper'
 import { CCAvatar } from './ui/CCAvatar'
 import { MarkdownRendererLite } from './ui/MarkdownRendererLite'
 import { useState } from 'react'
+import ContentPasteIcon from '@mui/icons-material/ContentPaste'
+import { useSnackbar } from 'notistack'
+import { Link as routerLink } from 'react-router-dom'
 
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { ProfileProperties } from './ui/ProfileProperties'
 
 export interface SubProfileCardProps {
+    showccid?: boolean
     character: CoreProfile<any>
     additionalMenuItems?: JSX.Element | JSX.Element[]
     children?: JSX.Element | JSX.Element[]
@@ -16,6 +20,7 @@ export interface SubProfileCardProps {
 
 export const SubProfileCard = (props: SubProfileCardProps): JSX.Element => {
     const isProfile = 'username' in props.character.document.body && 'avatar' in props.character.document.body
+    const { enqueueSnackbar } = useSnackbar()
 
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
@@ -52,6 +57,8 @@ export const SubProfileCard = (props: SubProfileCardProps): JSX.Element => {
                 <>
                     <Box position="relative" height={0}>
                         <Box
+                            component={routerLink}
+                            to={'/entity/' + props.character.author}
                             position="relative"
                             sx={{
                                 top: '-30px',
@@ -91,7 +98,19 @@ export const SubProfileCard = (props: SubProfileCardProps): JSX.Element => {
                         mb={1}
                     >
                         <Typography variant="h2">{props.character.document.body.username}</Typography>
-                        <Box />
+                        {props.showccid ? (
+                            <Chip
+                                size="small"
+                                label={`${props.character.author.slice(0, 9)}...`}
+                                deleteIcon={<ContentPasteIcon />}
+                                onDelete={() => {
+                                    navigator.clipboard.writeText(props.character.author)
+                                    enqueueSnackbar('Copied', { variant: 'info' })
+                                }}
+                            />
+                        ) : (
+                            <Box />
+                        )}
                     </Box>
                     <Box
                         sx={{

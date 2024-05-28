@@ -1,4 +1,4 @@
-import type { AddressResponse, Stream } from '../../types/concurrent'
+import type { ApiResponse, CoreTimeline, WorldCommunityTimeline } from '../../types/concurrent'
 import { sanitizeHtml } from '../../lib/sanitize'
 
 const CACHE_TTL_SECONDS = 21600
@@ -20,11 +20,11 @@ export const onRequest: PagesFunction = async (context) => {
         const { path } = context.params
         const [streamId, host] = (<string>path).split('@')
 
-        const { content } = await fetch(`https://${host}/api/v1/stream/${streamId}`)
-            .then((response) => response.json<AddressResponse>())
-            .then((data) => data)
+        const timeline: CoreTimeline = await fetch(`https://${host}/api/v1/timeline/${streamId}`)
+            .then((response) => response.json<ApiResponse<CoreTimeline>>())
+            .then((data) => data.content)
 
-        const payload: Stream = JSON.parse(content.payload)
+        const payload: WorldCommunityTimeline = JSON.parse(timeline.document).body
 
         const name = sanitizeHtml(payload.name)
         const description = sanitizeHtml(payload.description)
