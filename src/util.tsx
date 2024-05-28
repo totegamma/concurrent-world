@@ -26,7 +26,7 @@ export const jumpToDomainRegistration = (ccid: string, privateKey: string, fqdn:
 
     const encodedObject = btoa(signedDoc).replace('+', '-').replace('/', '_').replace('==', '')
 
-    const link = `http://${fqdn}/web/register?registration=${encodedObject}&signature=${signature}&callback=${encodeURIComponent(
+    const link = `https://${fqdn}/web/register?registration=${encodedObject}&signature=${signature}&callback=${encodeURIComponent(
         next
     )}`
 
