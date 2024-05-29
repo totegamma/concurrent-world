@@ -209,7 +209,8 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                 sx={{
                     display: 'flex',
                     flex: 1,
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    flexDirection: 'column'
                 }}
             >
                 {timelineLoading ? (

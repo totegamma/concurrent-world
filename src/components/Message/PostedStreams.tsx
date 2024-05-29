@@ -59,7 +59,7 @@ export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
                             <Link
                                 key={e.id}
                                 component={RouterLink}
-                                to={'/stream/' + e.id}
+                                to={'/timeline/' + e.id}
                                 underline="hover"
                                 sx={{
                                     fontweight: '400',

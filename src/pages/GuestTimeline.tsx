@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Box, Divider, Paper } from '@mui/material'
-import { useLocation, useParams } from 'react-router-dom'
+import { Box, Button, Divider, Paper } from '@mui/material'
+import { useLocation, useParams, Link as NavLink } from 'react-router-dom'
 import { Timeline } from '../components/Timeline/main'
 import { Client, type User } from '@concurrent-world/client'
 import { FullScreenLoading } from '../components/ui/FullScreenLoading'
@@ -17,7 +17,7 @@ import { MessageContainer } from '../components/Message/MessageContainer'
 import { GuestBase } from '../components/GuestBase'
 
 export interface GuestPageProps {
-    page: 'stream' | 'entity' | 'message'
+    page: 'timeline' | 'entity' | 'message'
 }
 
 export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
@@ -35,36 +35,35 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
         if (!id) return
 
         switch (props.page) {
-            case 'stream':
+            case 'timeline':
                 {
                     setTargetStream([id])
                     const resolver = id.split('@')[1]
                     const client = new Client(resolver)
+                    initializeClient(client)
 
                     client.api.getTimeline(id).then((e) => {
                         console.log(e)
                         setTitle(e?.document.body.name ?? '')
                     })
                     setUser(undefined)
-
-                    initializeClient(client)
                 }
                 break
             case 'entity':
                 {
-                    const client = new Client('hub.concurrent.world')
+                    const client = new Client('ariake.concrnt.net')
+                    initializeClient(client)
+
                     client.getUser(id).then((e) => {
                         setUser(e)
                         setTitle(e?.profile?.username ?? '')
                         setTargetStream([e?.homeTimeline ?? ''])
                     })
-
-                    initializeClient(client)
                 }
                 break
             case 'message':
                 {
-                    const client = new Client('hub.concurrent.world')
+                    const client = new Client('ariake.concrnt.net')
                     initializeClient(client)
 
                     const authorID = id.split('@')[1]
@@ -88,10 +87,15 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
             sx={{
                 display: 'flex',
                 flexDirection: 'column',
-                flexGrow: 1,
                 overflow: 'hidden',
-                padding: 1
+                gap: 1,
+                flex: 1
             }}
+            additionalButton={
+                <Button component={NavLink} to="/register">
+                    はじめる
+                </Button>
+            }
         >
             <TickerProvider>
                 <ApiProvider client={client}>
@@ -114,7 +118,7 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
 
                         <Paper
                             sx={{
-                                flexGrow: '1',
+                                flex: 1,
                                 margin: { xs: 0.5, sm: 1 },
                                 mb: { xs: 0, sm: '10px' },
                                 display: 'flex',
@@ -130,7 +134,8 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
                                     minHeight: '100%',
                                     backgroundColor: 'background.paper',
                                     display: 'flex',
-                                    flexDirection: 'column'
+                                    flexDirection: 'column',
+                                    flex: 1
                                 }}
                             >
                                 <TimelineHeader title={title} titleIcon={id ? <AlternateEmailIcon /> : <ListIcon />} />

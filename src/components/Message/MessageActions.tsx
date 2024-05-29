@@ -215,7 +215,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                             <ListItemText>このStreamから削除</ListItemText>
                         </MenuItem>
                     )}
-                    */}
+                */}
                 {props.message.author === props.userCCID && (
                     <MenuItem
                         onClick={() => {
