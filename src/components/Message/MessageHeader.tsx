@@ -108,7 +108,7 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                     fontSize="0.75rem"
                     to={`/message/${props.message.id}@${props.message.author}`}
                 >
-                    <TimeDiff date={new Date(props.message.cdate)} />
+                    <TimeDiff date={new Date(props.message.document.signedAt)} base={new Date(props.message.cdate)} />
                 </Link>
             </Box>
             <Menu
