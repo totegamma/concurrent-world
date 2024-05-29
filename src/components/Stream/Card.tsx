@@ -46,7 +46,7 @@ export function StreamCard(props: StreamCardProps): JSX.Element {
                 </CardActionArea>
             ) : (
                 <>
-                    <CardActionArea component={Link} to={'/stream/' + props.streamID}>
+                    <CardActionArea component={Link} to={'/timeline/' + props.streamID}>
                         <CCWallpaper
                             sx={{
                                 height: '140px'
