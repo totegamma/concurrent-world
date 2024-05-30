@@ -3,7 +3,6 @@ import {
     AlertTitle,
     Box,
     Button,
-    Checkbox,
     Collapse,
     Divider,
     IconButton,
@@ -33,6 +32,7 @@ import { type StreamWithDomain } from '../model'
 import { StreamCard } from '../components/Stream/Card'
 import { SubProfileCard } from '../components/SubProfileCard'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import { DomainCard } from '../components/ui/DomainCard'
 
 // type explorerTab = 'streams' | 'users'
 
@@ -236,39 +236,20 @@ export function Explorer(): JSX.Element {
                     gap: 2
                 }}
             >
-                {domains.map((e) => {
-                    return (
-                        <Paper
-                            key={e}
-                            variant="outlined"
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                padding: '10px',
-                                gap: 1,
-                                outline: selectedDomains.includes(e)
-                                    ? '2px solid ' + theme.palette.primary.main
-                                    : 'none'
-                            }}
-                            onClick={() => {
-                                setSelectedDomains([e])
-                            }}
-                        >
-                            <Typography variant="h4" gutterBottom>
-                                {e}
-                            </Typography>
-                            <Checkbox
-                                checked={selectedDomains.includes(e)}
-                                onChange={(event) => {
-                                    if (event.target.checked) setSelectedDomains([...selectedDomains, e])
-                                    else setSelectedDomains(selectedDomains.filter((f) => f !== e))
-                                }}
-                            />
-                        </Paper>
-                    )
-                })}
+                {domains.map((e) => (
+                    <DomainCard
+                        key={e}
+                        domainFQDN={e}
+                        selected={selectedDomains.includes(e)}
+                        onClick={() => {
+                            setSelectedDomains([e])
+                        }}
+                        onCheck={(state) => {
+                            if (state) setSelectedDomains([...new Set([...selectedDomains, e])])
+                            else setSelectedDomains(selectedDomains.filter((f) => f !== e))
+                        }}
+                    />
+                ))}
             </Box>
             <Divider sx={{ mb: 2 }} />
             <Tabs
