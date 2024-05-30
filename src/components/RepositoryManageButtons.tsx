@@ -21,11 +21,13 @@ const v0status = {
     error: 'インポートに失敗しました(consoleログを確認してください)'
 }
 
-export function RepositoryImportButton(): JSX.Element {
+export function RepositoryImportButton(props: { domain?: string; onImport?: (err: string) => void }): JSX.Element {
     const { client } = useClient()
 
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [importStatus, setImportStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+
+    const target = props.domain ?? client.host
 
     const importRepo = (data: string): void => {
         if (importStatus !== 'idle') return
@@ -33,7 +35,7 @@ export function RepositoryImportButton(): JSX.Element {
         setImportStatus('loading')
         client.api
             .fetchWithCredential(
-                client.api.host,
+                target,
                 '/api/v1/repository',
                 {
                     method: 'POST',
@@ -50,15 +52,18 @@ export function RepositoryImportButton(): JSX.Element {
                     res.json().then((data) => {
                         console.log(data)
                         setImportStatus('success')
+                        props.onImport?.('')
                     })
                 } else {
                     console.error('failed to import')
                     setImportStatus('error')
+                    props.onImport?.(`failed to import: ${res.statusText}`)
                 }
             })
             .catch((e) => {
                 console.error(e)
                 setImportStatus('error')
+                props.onImport?.(`failed to import: ${e}`)
             })
     }
 
