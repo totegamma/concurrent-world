@@ -22,13 +22,13 @@ export default defineConfig({
                 'apple-touch-icon.png',
             ],
             manifest: {
-                "theme_color" : "#023059",
-                "background_color" : "#023059",
+                "theme_color" : "#0476d9",
+                "background_color" : "#0476d9",
                 "display" : "standalone",
                 "scope" : "/",
                 "start_url" : "/",
-                "name" : "Concurrent",
-                "short_name" : "Concurrent",
+                "name" : "Concrnt",
+                "short_name" : "Concrnt",
                 icons: [
                     {
                         "src": "192.png",

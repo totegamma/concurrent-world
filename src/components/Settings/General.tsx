@@ -173,7 +173,7 @@ export const GeneralSettings = (): JSX.Element => {
                                 }
                                 if (!client?.keyPair?.privatekey) return
                                 const jwt = IssueJWT(client.keyPair.privatekey, {
-                                    iss: client.ccid,
+                                    iss: client.api.ckid || client.api.ccid,
                                     aud: client.host,
                                     sub: 'CONCRNT_INVITE',
                                     exp: Math.floor((new Date().getTime() + 24 * 60 * 60 * 1000) / 1000).toString()
