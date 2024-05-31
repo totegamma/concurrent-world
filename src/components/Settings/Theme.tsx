@@ -1,5 +1,6 @@
 import {
     Box,
+    Button,
     Divider,
     IconButton,
     ListItemIcon,
@@ -22,6 +23,7 @@ import { DummyMessageView } from '../Message/DummyMessageView'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { ThemeCard } from '../ThemeCard'
+import { useSnackbar } from 'notistack'
 
 export const ThemeSettings = (): JSX.Element => {
     const { client } = useClient()
@@ -29,6 +31,7 @@ export const ThemeSettings = (): JSX.Element => {
     const [customThemes, setCustomTheme] = usePreference('customThemes')
     const theme = useTheme<ConcurrentTheme>()
     const { t } = useTranslation('', { keyPrefix: 'ui' })
+    const { enqueueSnackbar } = useSnackbar()
 
     const previewTheme: Record<string, ConcurrentTheme> = useMemo(
         () => Object.fromEntries(Object.keys(Themes).map((e) => [e, loadConcurrentTheme(e)])),
@@ -141,6 +144,15 @@ export const ThemeSettings = (): JSX.Element => {
                     ))}
                 </Box>
             </Box>
+            <Button
+                onClick={() => {
+                    const text = JSON.stringify(customThemes, null, 2)
+                    navigator.clipboard.writeText(text)
+                    enqueueSnackbar('コピーしました', { variant: 'success' })
+                }}
+            >
+                全てのテーマをコピー
+            </Button>
             <Divider sx={{ my: 1 }} />
             <ThemeCreator />
             <Menu
