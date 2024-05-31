@@ -1,13 +1,18 @@
-import { Divider, Tab, Tabs, Typography } from '@mui/material'
+import { Box, Button, Dialog, Divider, Tab, Tabs, TextField, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { RepositoryExportButton, RepositoryImportButton, V0RepositoryImportButton } from '../RepositoryManageButtons'
 import { useState } from 'react'
 import { Migrator } from '../Migrator'
+import { usePreference } from '../../context/PreferenceContext'
 
 export function ImportExport(): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'settings.importexport' })
-    // const [tab, setTab] = useState('manage')
-    const [tab, setTab] = useState('migrate')
+    const [customThemes, setCustomTheme] = usePreference('customThemes')
+    const [tab, setTab] = useState('manage')
+    const [importTheme, setImportTheme] = useState('')
+    // const [tab, setTab] = useState('migrate')
+
+    const [openThemeImportDialog, setOpenThemeImportDialog] = useState(false)
 
     return (
         <>
@@ -44,6 +49,54 @@ export function ImportExport(): JSX.Element {
 
                     <Typography variant="h3">その他</Typography>
                     <V0RepositoryImportButton />
+
+                    <Button
+                        fullWidth
+                        onClick={() => {
+                            setOpenThemeImportDialog(true)
+                        }}
+                        variant="contained"
+                        sx={{ mt: 2 }}
+                    >
+                        カスタムテーマのインポート
+                    </Button>
+                    <Dialog
+                        open={openThemeImportDialog}
+                        onClose={() => {
+                            setOpenThemeImportDialog(false)
+                        }}
+                    >
+                        <Box padding={2} display="flex" flexDirection="column">
+                            <Typography variant="h3" sx={{ margin: 2 }}>
+                                カスタムテーマのインポート
+                            </Typography>
+                            <TextField
+                                sx={{ margin: 2 }}
+                                rows={5}
+                                multiline
+                                label="JSON"
+                                value={importTheme}
+                                onChange={(e) => {
+                                    setImportTheme(e.target.value)
+                                }}
+                            />
+                            <Button
+                                onClick={() => {
+                                    const newThemes = JSON.parse(importTheme)
+                                    for (const key in newThemes) {
+                                        if (key in customThemes) continue
+                                        customThemes[key] = newThemes[key]
+                                    }
+                                    setCustomTheme(customThemes)
+                                    setOpenThemeImportDialog(false)
+                                }}
+                                variant="contained"
+                                sx={{ margin: 2 }}
+                            >
+                                インポート
+                            </Button>
+                        </Box>
+                    </Dialog>
                 </>
             )}
 
