@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next'
 import useSound from 'use-sound'
 import { useState } from 'react'
 
+const formats = ['wav', 'mp3']
+
 export const SoundSettings = (): JSX.Element => {
     const [pref, setPref] = usePreference('sound')
 
@@ -12,8 +14,8 @@ export const SoundSettings = (): JSX.Element => {
     const [postSoundURL, setPostSoundURL] = useState(pref.post)
     const [notificationSoundURL, setNotificationSoundURL] = useState(pref.notification)
 
-    const [previewPostSound] = useSound(postSoundURL, { volume: pref.volume / 100 })
-    const [previewNotificationSound] = useSound(notificationSoundURL, { volume: pref.volume / 100 })
+    const [previewPostSound] = useSound(postSoundURL, { volume: pref.volume / 100, format: formats })
+    const [previewNotificationSound] = useSound(notificationSoundURL, { volume: pref.volume / 100, format: formats })
 
     return (
         <Box
@@ -23,7 +25,6 @@ export const SoundSettings = (): JSX.Element => {
                 gap: '30px'
             }}
         >
-            {pref.post}
             <Box display="flex" flexDirection="column" gap={1}>
                 <Typography variant="h3">{t('sound')}</Typography>
                 <Typography variant="h4">{t('volume')}</Typography>
@@ -98,6 +99,8 @@ export const SoundSettings = (): JSX.Element => {
             <Button
                 onClick={() => {
                     setPref(defaultPreference.sound)
+                    setPostSoundURL(defaultPreference.sound.post)
+                    setNotificationSoundURL(defaultPreference.sound.notification)
                 }}
             >
                 reset
