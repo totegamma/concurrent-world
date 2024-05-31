@@ -13,6 +13,7 @@ import useSound from 'use-sound'
 import { usePreference } from '../../context/PreferenceContext'
 import { VList, type VListHandle } from 'virtua'
 import { useClient } from '../../context/ClientContext'
+import { UseSoundFormats } from '../../constants'
 
 export interface TimelineProps {
     streams: string[]
@@ -40,7 +41,11 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
     const [loadable, setLoadable] = useState<boolean>(false)
     const [ptrEnabled, setPtrEnabled] = useState<boolean>(false)
 
-    const [playBubble] = useSound(sound.post, { volume: sound.volume / 100, interrupt: false })
+    const [playBubble] = useSound(sound.post, {
+        volume: sound.volume / 100,
+        interrupt: false,
+        format: UseSoundFormats
+    })
     const playBubbleRef = useRef(playBubble)
 
     const [timelineLoading, setTimelineLoading] = useState<boolean>(true)

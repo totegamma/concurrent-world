@@ -1,11 +1,37 @@
-import { Box, Button, Slider, TextField, Typography } from '@mui/material'
+import { Autocomplete, Box, Button, Slider, TextField, Typography } from '@mui/material'
 import { defaultPreference, usePreference } from '../../context/PreferenceContext'
 import { useTranslation } from 'react-i18next'
+import useSound from 'use-sound'
+import { useState } from 'react'
+import { UseSoundFormats } from '../../constants'
+
+import BubbleSound from '../../resources/Bubble.wav'
+import NotificationSound from '../../resources/Notification.wav'
+import Bright_Post from '../../resources/Bright_Post.wav'
+import Bright_Notification from '../../resources/Bright_Notification.wav'
+
+const soundOptions: Record<string, string> = {
+    pop: BubbleSound,
+    popi: NotificationSound,
+    Bright_Post,
+    Bright_Notification
+}
+
+const soundOptionLabels = Object.keys(soundOptions)
 
 export const SoundSettings = (): JSX.Element => {
     const [pref, setPref] = usePreference('sound')
 
     const { t } = useTranslation('', { keyPrefix: 'settings.sound' })
+
+    const [postSoundURL, setPostSoundURL] = useState(pref.post)
+    const [notificationSoundURL, setNotificationSoundURL] = useState(pref.notification)
+
+    const [previewPostSound] = useSound(postSoundURL, { volume: pref.volume / 100, format: UseSoundFormats })
+    const [previewNotificationSound] = useSound(notificationSoundURL, {
+        volume: pref.volume / 100,
+        format: UseSoundFormats
+    })
 
     return (
         <Box
@@ -29,32 +55,82 @@ export const SoundSettings = (): JSX.Element => {
                     }}
                 />
                 <Typography variant="h4">{t('override.title')}</Typography>
-                <TextField
-                    label={t('override.postSound')}
-                    placeholder="https://example.com/sound.mp3"
-                    value={pref.post}
-                    onChange={(e) => {
-                        setPref({
-                            ...pref,
-                            post: e.target.value
-                        })
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        gap: '10px'
                     }}
-                />
-                <TextField
-                    label={t('override.notificationSound')}
-                    placeholder="https://example.com/sound.mp3"
-                    value={pref.notification}
-                    onChange={(e) => {
-                        setPref({
-                            ...pref,
-                            notification: e.target.value
-                        })
+                >
+                    <Autocomplete
+                        fullWidth
+                        freeSolo
+                        defaultValue={Object.entries(soundOptions).find(([_, v]) => v === pref.post)?.[0] ?? pref.post}
+                        options={soundOptionLabels}
+                        filterOptions={(options, _) => {
+                            return options
+                        }}
+                        onInputChange={(_, value) => {
+                            if (!value) return
+                            setPref({
+                                ...pref,
+                                post: soundOptions[value] ?? value
+                            })
+                            setPostSoundURL(soundOptions[value] ?? value)
+                        }}
+                        renderInput={(params) => <TextField {...params} label={t('override.postSound')} />}
+                    />
+                    <Button
+                        onClick={() => {
+                            previewPostSound()
+                        }}
+                    >
+                        Test
+                    </Button>
+                </Box>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        gap: '10px'
                     }}
-                />
+                >
+                    <Autocomplete
+                        fullWidth
+                        freeSolo
+                        defaultValue={
+                            Object.entries(soundOptions).find(([_, v]) => v === pref.notification)?.[0] ??
+                            pref.notification
+                        }
+                        options={soundOptionLabels}
+                        filterOptions={(options, _) => {
+                            return options
+                        }}
+                        onInputChange={(_, value) => {
+                            if (!value) return
+                            setPref({
+                                ...pref,
+                                notification: soundOptions[value] ?? value
+                            })
+                            setNotificationSoundURL(soundOptions[value] ?? value)
+                        }}
+                        renderInput={(params) => <TextField {...params} label={t('override.notificationSound')} />}
+                    />
+                    <Button
+                        onClick={() => {
+                            previewNotificationSound()
+                        }}
+                    >
+                        Test
+                    </Button>
+                </Box>
             </Box>
             <Button
                 onClick={() => {
                     setPref(defaultPreference.sound)
+                    setPostSoundURL(defaultPreference.sound.post)
+                    setNotificationSoundURL(defaultPreference.sound.notification)
+                    window.location.reload()
                 }}
             >
                 reset
