@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, Divider, Tab, Tabs, TextField, Typography } from '@mui/material'
+import { Alert, Box, Button, Dialog, Divider, Tab, Tabs, TextField, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { RepositoryExportButton, RepositoryImportButton, V0RepositoryImportButton } from '../RepositoryManageButtons'
 import { useState } from 'react'
@@ -102,7 +102,10 @@ export function ImportExport(): JSX.Element {
 
             {tab === 'migrate' && (
                 <>
+                    <Alert severity="info">実装中</Alert>
+                    {/*
                     <Migrator />
+                    */}
                 </>
             )}
         </>
