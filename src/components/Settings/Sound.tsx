@@ -1,11 +1,19 @@
 import { Box, Button, Slider, TextField, Typography } from '@mui/material'
 import { defaultPreference, usePreference } from '../../context/PreferenceContext'
 import { useTranslation } from 'react-i18next'
+import useSound from 'use-sound'
+import { useState } from 'react'
 
 export const SoundSettings = (): JSX.Element => {
     const [pref, setPref] = usePreference('sound')
 
     const { t } = useTranslation('', { keyPrefix: 'settings.sound' })
+
+    const [postSoundURL, setPostSoundURL] = useState(pref.post)
+    const [notificationSoundURL, setNotificationSoundURL] = useState(pref.notification)
+
+    const [previewPostSound] = useSound(postSoundURL, { volume: pref.volume / 100 })
+    const [previewNotificationSound] = useSound(notificationSoundURL, { volume: pref.volume / 100 })
 
     return (
         <Box
@@ -15,6 +23,7 @@ export const SoundSettings = (): JSX.Element => {
                 gap: '30px'
             }}
         >
+            {pref.post}
             <Box display="flex" flexDirection="column" gap={1}>
                 <Typography variant="h3">{t('sound')}</Typography>
                 <Typography variant="h4">{t('volume')}</Typography>
@@ -29,28 +38,62 @@ export const SoundSettings = (): JSX.Element => {
                     }}
                 />
                 <Typography variant="h4">{t('override.title')}</Typography>
-                <TextField
-                    label={t('override.postSound')}
-                    placeholder="https://example.com/sound.mp3"
-                    value={pref.post}
-                    onChange={(e) => {
-                        setPref({
-                            ...pref,
-                            post: e.target.value
-                        })
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        gap: '10px'
                     }}
-                />
-                <TextField
-                    label={t('override.notificationSound')}
-                    placeholder="https://example.com/sound.mp3"
-                    value={pref.notification}
-                    onChange={(e) => {
-                        setPref({
-                            ...pref,
-                            notification: e.target.value
-                        })
+                >
+                    <TextField
+                        fullWidth
+                        label={t('override.postSound')}
+                        placeholder="https://example.com/sound.mp3"
+                        value={postSoundURL}
+                        onChange={(e) => {
+                            setPref({
+                                ...pref,
+                                post: e.target.value
+                            })
+                            setPostSoundURL(e.target.value)
+                        }}
+                    />
+                    <Button
+                        onClick={() => {
+                            previewPostSound()
+                        }}
+                    >
+                        Test
+                    </Button>
+                </Box>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        gap: '10px'
                     }}
-                />
+                >
+                    <TextField
+                        fullWidth
+                        label={t('override.notificationSound')}
+                        placeholder="https://example.com/sound.mp3"
+                        value={notificationSoundURL}
+                        onChange={(e) => {
+                            setPref({
+                                ...pref,
+                                notification: e.target.value
+                            })
+                            setNotificationSoundURL(e.target.value)
+                        }}
+                    />
+                    <Button
+                        onClick={() => {
+                            previewNotificationSound()
+                        }}
+                    >
+                        Test
+                    </Button>
+                </Box>
             </Box>
             <Button
                 onClick={() => {
