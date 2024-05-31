@@ -1,1 +1,1 @@
-const UseSoundFormats = ['wav', 'mp3']
+export const UseSoundFormats = ['wav', 'mp3']

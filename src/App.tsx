@@ -42,6 +42,7 @@ import { StorageProvider } from './context/StorageContext'
 import { MarkdownRendererLite } from './components/ui/MarkdownRendererLite'
 import { useTranslation } from 'react-i18next'
 import { ManageSubsPage } from './pages/ManageSubs'
+import { UseSoundFormats } from './constants'
 
 function App(): JSX.Element {
     const { client } = useClient()

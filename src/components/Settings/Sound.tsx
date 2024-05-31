@@ -3,6 +3,7 @@ import { defaultPreference, usePreference } from '../../context/PreferenceContex
 import { useTranslation } from 'react-i18next'
 import useSound from 'use-sound'
 import { useState } from 'react'
+import { UseSoundFormats } from '../../constants'
 
 export const SoundSettings = (): JSX.Element => {
     const [pref, setPref] = usePreference('sound')

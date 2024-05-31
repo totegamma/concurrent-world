@@ -13,6 +13,7 @@ import useSound from 'use-sound'
 import { usePreference } from '../../context/PreferenceContext'
 import { VList, type VListHandle } from 'virtua'
 import { useClient } from '../../context/ClientContext'
+import { UseSoundFormats } from '../../constants'
 
 export interface TimelineProps {
     streams: string[]
