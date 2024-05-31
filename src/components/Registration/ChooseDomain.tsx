@@ -35,6 +35,15 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
         }
     }, [server])
 
+    let next = window.location.href
+    // strip hash
+    const hashIndex = next.indexOf('#')
+    if (hashIndex !== -1) {
+        next = next.substring(0, hashIndex)
+    }
+    // add next hash
+    next = `${next}#2`
+
     return (
         <Box
             sx={{
@@ -64,7 +73,7 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
                             onClick={() => {
                                 setJumped(true)
                                 setServer(domain)
-                                jumpToDomainRegistration(props.identity.CCID, props.identity.privateKey, domain)
+                                jumpToDomainRegistration(props.identity.CCID, props.identity.privateKey, domain, next)
                             }}
                         />
                     ))}
@@ -96,7 +105,7 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
                         disabled={!props.host}
                         onClick={() => {
                             setJumped(true)
-                            jumpToDomainRegistration(props.identity.CCID, props.identity.privateKey, server)
+                            jumpToDomainRegistration(props.identity.CCID, props.identity.privateKey, server, next)
                         }}
                     >
                         {t('jump')}

@@ -56,7 +56,7 @@ export function Settings(): JSX.Element {
                 <Route path="/activitypub" element={<APSettings />} />
                 <Route path="/loginqr" element={<LoginQR />} />
                 <Route path="/transit" element={<Transit />} />
-                <Route path="/importexport" element={<ImportExport />} />
+                <Route path="/importexport/:tab" element={<ImportExport />} />
             </Routes>
         </Box>
     )

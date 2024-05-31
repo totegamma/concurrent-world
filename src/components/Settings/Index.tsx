@@ -144,7 +144,7 @@ export function SettingsIndex(): JSX.Element {
                     link
                     icon={ImportExportIcon}
                     label={t('settings.importexport.title')}
-                    to="/settings/importexport"
+                    to="/settings/importexport/manage"
                 />
             </Paper>
             <Paper

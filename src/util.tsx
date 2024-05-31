@@ -4,16 +4,7 @@ import { visit } from 'unist-util-visit'
 import { inspect } from 'unist-util-inspect'
 import { Sign, type CCDocument } from '@concurrent-world/client'
 
-export const jumpToDomainRegistration = (ccid: string, privateKey: string, fqdn: string): void => {
-    let next = window.location.href
-    // strip hash
-    const hashIndex = next.indexOf('#')
-    if (hashIndex !== -1) {
-        next = next.substring(0, hashIndex)
-    }
-    // add next hash
-    next = `${next}#2`
-
+export const jumpToDomainRegistration = (ccid: string, privateKey: string, fqdn: string, callback: string): void => {
     const affiliation: CCDocument.Affiliation = {
         signer: ccid,
         type: 'affiliation',
@@ -27,7 +18,7 @@ export const jumpToDomainRegistration = (ccid: string, privateKey: string, fqdn:
     const encodedObject = btoa(signedDoc).replace('+', '-').replace('/', '_').replace('==', '')
 
     const link = `https://${fqdn}/web/register?registration=${encodedObject}&signature=${signature}&callback=${encodeURIComponent(
-        next
+        callback
     )}`
 
     window.location.href = link

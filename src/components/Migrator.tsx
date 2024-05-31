@@ -7,13 +7,17 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import { jumpToDomainRegistration } from '../util'
 import { useSnackbar } from 'notistack'
 import { RepositoryExportButton, RepositoryImportButton } from './RepositoryManageButtons'
+import { usePersistent } from '../hooks/usePersistent'
 
 export function Migrator(): JSX.Element {
     const { client } = useClient()
     const [currentDomain, setCurrentDomain] = useState<CoreDomain | null>(null)
-    const [destFqdn, setDestFqdn] = useState<string>('')
+    const [destFqdn, setDestFqdn] = usePersistent<string>('migrator-dest-fqdn', '')
     const [destinationDomain, setDestinationDomain] = useState<CoreDomain | null>(null)
-    const [activeStep, setActiveStep] = useState(0)
+    const activeStep = parseInt(location.hash.replace('#', '')) || 0
+    const setActiveStep = (step: number): void => {
+        window.location.hash = step.toString()
+    }
     const [registrationOK, setRegistrationOK] = useState(false)
     const [imported, setImported] = useState(false)
     const { enqueueSnackbar } = useSnackbar()
@@ -67,7 +71,12 @@ export function Migrator(): JSX.Element {
                         fullWidth
                         color="primary"
                         onClick={() => {
-                            jumpToDomainRegistration(client.ccid!, client.keyPair!.privatekey, destFqdn)
+                            jumpToDomainRegistration(
+                                client.ccid!,
+                                client.keyPair!.privatekey,
+                                destFqdn,
+                                window.location.href
+                            )
                         }}
                     >
                         引っ越し先登録ページに移動
@@ -194,7 +203,7 @@ export function Migrator(): JSX.Element {
                                     <Button
                                         disabled={activeStep === 0}
                                         onClick={() => {
-                                            setActiveStep((prev) => prev - 1)
+                                            setActiveStep(activeStep - 1)
                                         }}
                                     >
                                         戻る
@@ -203,7 +212,7 @@ export function Migrator(): JSX.Element {
                                         variant="contained"
                                         color="primary"
                                         onClick={() => {
-                                            setActiveStep((prev) => prev + 1)
+                                            setActiveStep(activeStep + 1)
                                         }}
                                         disabled={!step.ok?.()}
                                     >

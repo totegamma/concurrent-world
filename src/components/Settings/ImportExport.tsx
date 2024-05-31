@@ -1,16 +1,17 @@
-import { Alert, Box, Button, Dialog, Divider, Tab, Tabs, TextField, Typography } from '@mui/material'
+import { Box, Button, Dialog, Divider, Tab, Tabs, TextField, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { RepositoryExportButton, RepositoryImportButton, V0RepositoryImportButton } from '../RepositoryManageButtons'
 import { useState } from 'react'
 import { Migrator } from '../Migrator'
 import { usePreference } from '../../context/PreferenceContext'
+import { useParams, useNavigate } from 'react-router-dom'
 
 export function ImportExport(): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'settings.importexport' })
     const [customThemes, setCustomTheme] = usePreference('customThemes')
-    const [tab, setTab] = useState('manage')
     const [importTheme, setImportTheme] = useState('')
-    // const [tab, setTab] = useState('migrate')
+    const { tab } = useParams()
+    const navigate = useNavigate()
 
     const [openThemeImportDialog, setOpenThemeImportDialog] = useState(false)
 
@@ -19,7 +20,7 @@ export function ImportExport(): JSX.Element {
             <Tabs
                 value={tab}
                 onChange={(_, v) => {
-                    setTab(v)
+                    navigate(`/settings/importexport/${v}`)
                 }}
             >
                 <Tab value={'manage'} label={'データ管理'} />
@@ -100,14 +101,7 @@ export function ImportExport(): JSX.Element {
                 </>
             )}
 
-            {tab === 'migrate' && (
-                <>
-                    <Alert severity="info">実装中</Alert>
-                    {/*
-                    <Migrator />
-                    */}
-                </>
-            )}
+            {tab === 'migrate' && <Migrator />}
         </>
     )
 }
