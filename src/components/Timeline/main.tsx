@@ -44,7 +44,7 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
     const [playBubble] = useSound(sound.post, {
         volume: sound.volume / 100,
         interrupt: false,
-        formats: UseSoundFormats
+        format: UseSoundFormats
     })
     const playBubbleRef = useRef(playBubble)
 
