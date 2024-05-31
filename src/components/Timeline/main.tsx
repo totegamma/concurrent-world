@@ -40,7 +40,11 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
     const [loadable, setLoadable] = useState<boolean>(false)
     const [ptrEnabled, setPtrEnabled] = useState<boolean>(false)
 
-    const [playBubble] = useSound(sound.post, { volume: sound.volume / 100, interrupt: false })
+    const [playBubble] = useSound(sound.post, {
+        volume: sound.volume / 100,
+        interrupt: false,
+        formats: UseSoundFormats
+    })
     const playBubbleRef = useRef(playBubble)
 
     const [timelineLoading, setTimelineLoading] = useState<boolean>(true)

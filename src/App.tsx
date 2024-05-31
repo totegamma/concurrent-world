@@ -198,7 +198,7 @@ function App(): JSX.Element {
         })
     }, [client])
 
-    const [playNotification] = useSound(sound.notification, { volume: sound.volume / 100 })
+    const [playNotification] = useSound(sound.notification, { volume: sound.volume / 100, format: UseSoundFormats })
     const playNotificationRef = useRef(playNotification)
     useEffect(() => {
         playNotificationRef.current = playNotification

@@ -4,8 +4,6 @@ import { useTranslation } from 'react-i18next'
 import useSound from 'use-sound'
 import { useState } from 'react'
 
-const formats = ['wav', 'mp3']
-
 export const SoundSettings = (): JSX.Element => {
     const [pref, setPref] = usePreference('sound')
 
@@ -14,8 +12,11 @@ export const SoundSettings = (): JSX.Element => {
     const [postSoundURL, setPostSoundURL] = useState(pref.post)
     const [notificationSoundURL, setNotificationSoundURL] = useState(pref.notification)
 
-    const [previewPostSound] = useSound(postSoundURL, { volume: pref.volume / 100, format: formats })
-    const [previewNotificationSound] = useSound(notificationSoundURL, { volume: pref.volume / 100, format: formats })
+    const [previewPostSound] = useSound(postSoundURL, { volume: pref.volume / 100, format: UseSoundFormats })
+    const [previewNotificationSound] = useSound(notificationSoundURL, {
+        volume: pref.volume / 100,
+        format: UseSoundFormats
+    })
 
     return (
         <Box
