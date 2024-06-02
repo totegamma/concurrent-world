@@ -189,7 +189,14 @@ export function Jobs(): JSX.Element {
                         }}
                     />
 
-                    <TextField type="number" label="Scheduled in minutes" value={jobScheduled} />
+                    <TextField
+                        type="number"
+                        label="Scheduled in minutes"
+                        value={jobScheduled}
+                        onChange={(e) => {
+                            setJobScheduled(parseInt(e.target.value))
+                        }}
+                    />
 
                     <Button
                         onClick={() => {
