@@ -52,9 +52,13 @@
         }
     },
     "time": {
-        "secondsBefore": "秒前",
-        "minutesBefore": "分前",
-        "hoursBefore": "時間前"
+        "seconds": "秒",
+        "minutes": "分",
+        "hours": "時間",
+        "before": "前",
+        "after": "後",
+        "separator": "",
+        "now": "たった今"
     },
     "ui": {
         "profileEditor": {
@@ -210,13 +214,13 @@
             "tip2": "アカウントが持つキーのリストは設定の管理ページから確認できます。",
             "createNewSubKey": "サブキーを新しく生成する"
         },
-        "transit": {
-            "title": "乗り換え"
-        },
         "importexport": {
             "title": "データ管理",
             "import": "インポート",
             "export": "エクスポート"
+        },
+        "jobs": {
+            "title": "ジョブ"
         }
     },
     "welcome": {

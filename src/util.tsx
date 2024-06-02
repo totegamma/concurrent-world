@@ -58,6 +58,8 @@ export type DeepPartial<T> = {
     [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P]
 }
 
+const nowEpsilon = 3000 // 3 seconds
+
 export const humanReadableTimeDiff = (time: Date): string => {
     const current = new Date()
     const msPerMinute = 60 * 1000
@@ -68,12 +70,18 @@ export const humanReadableTimeDiff = (time: Date): string => {
 
     const { t } = useTranslation('', { keyPrefix: 'time' })
 
+    if (Math.abs(elapsed) < nowEpsilon) {
+        return t('now')
+    }
+
+    const postfix = t('separator') + (elapsed < 0 ? t('after') : t('before'))
+
     if (elapsed < msPerMinute) {
-        return `${Math.round(elapsed / 1000)}${t('secondsBefore')}`
+        return `${Math.round(Math.abs(elapsed) / 1000)}${t('seconds')}${postfix}`
     } else if (elapsed < msPerHour) {
-        return `${Math.round(elapsed / msPerMinute)}${t('minutesBefore')}`
+        return `${Math.round(Math.abs(elapsed) / msPerMinute)}${t('minutes')}${postfix}`
     } else if (elapsed < msPerDay) {
-        return `${Math.round(elapsed / msPerHour)}${t('hoursBefore')}`
+        return `${Math.round(Math.abs(elapsed) / msPerHour)}${t('hours')}${postfix}`
     } else {
         return (
             (current.getFullYear() === time.getFullYear() ? '' : `${time.getFullYear()}-`) +

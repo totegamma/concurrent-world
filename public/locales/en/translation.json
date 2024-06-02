@@ -52,9 +52,13 @@
         }
     },
     "time": {
-        "secondsBefore": "s",
-        "minutesBefore": "m",
-        "hoursBefore": "h"
+        "seconds": "s",
+        "minutes": "m",
+        "hours": "h",
+        "before": "ago",
+        "after": "later",
+        "separator": " ",
+        "now": "just now"
     },
     "ui": {
         "profileEditor": {
@@ -210,8 +214,13 @@
             "tip2": "You can check created keys in the Settings > Identity page.",
             "createNewSubKey": "Create New Sub Key"
         },
-        "transit": {
-            "title": "Transit"
+        "importexport": {
+            "title": "Import/Export",
+            "import": "Import",
+            "export": "Export"
+        },
+        "jobs": {
+            "title": "Jobs"
         }
     },
     "welcome": {

@@ -116,3 +116,21 @@ export interface s3Config {
     publicUrl: string
     forcePathStyle: boolean
 }
+
+export interface Job {
+    id: string
+    author: string
+    type: string
+    payload: string
+    scheduled: string
+    status: string
+    result: string
+    createdAt: string
+    completedAt: string
+}
+
+export interface JobRequest {
+    type: string
+    payload: string
+    scheduled: string
+}
