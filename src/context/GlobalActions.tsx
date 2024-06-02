@@ -22,6 +22,7 @@ import { experimental_VGrid as VGrid } from 'virtua'
 import { useSnackbar } from 'notistack'
 import { ImagePreviewModal } from '../components/ui/ImagePreviewModal'
 import { StreamCard } from '../components/Stream/Card'
+import { LogoutButton } from '../components/Settings/LogoutButton'
 
 export interface GlobalActionsState {
     openDraft: (text?: string) => void
@@ -96,6 +97,8 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const [timelines, setTimelines] = useState<Array<CoreTimeline<CommunityTimelineSchema>>>([])
     const [selectedTieline, setSelectedTimeline] = useState<string | undefined>(undefined)
 
+    const [isRegistered, setIsRegistered] = useState<boolean>(true)
+
     const setupList = useCallback(
         (timeline?: string) => {
             client.api
@@ -135,6 +138,19 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     setTimelines(timelines)
                 })
         }
+
+        client.api
+            .fetchWithCredential(client.host, '/api/v1/entity', {
+                method: 'GET'
+            })
+            .then((res) => {
+                if (res.status === 403) {
+                    setIsRegistered(false)
+                }
+            })
+            .catch((e) => {
+                console.error(e)
+            })
     }, [])
 
     useEffect(() => {
@@ -474,21 +490,36 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                         )}
                     </>
                 </Modal>
-                <Modal open={setupAccountRequired} onClose={() => {}}>
-                    <Paper sx={style}>
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column'
-                            }}
-                        >
-                            <Typography variant="h2" component="div">
-                                アカウント設定を完了させましょう！
-                            </Typography>
-                            見つかった問題:
-                            <ul>{!client?.user?.profile && <li>プロフィールが存在していません</li>}</ul>
-                            <ProfileEditor initial={client?.user?.profile} />
-                        </Box>
+                <Modal open={!isRegistered} onClose={() => {}}>
+                    <Paper
+                        sx={{
+                            ...style,
+                            padding: 1,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 2
+                        }}
+                    >
+                        <Typography variant="h2" component="div">
+                            {client.host}に登録情報が見つかりません
+                        </Typography>
+                        <LogoutButton />
+                    </Paper>
+                </Modal>
+                <Modal open={setupAccountRequired && isRegistered} onClose={() => {}}>
+                    <Paper
+                        sx={{
+                            ...style,
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }}
+                    >
+                        <Typography variant="h2" component="div">
+                            アカウント設定を完了させましょう！
+                        </Typography>
+                        見つかった問題:
+                        <ul>{!client?.user?.profile && <li>プロフィールが存在していません</li>}</ul>
+                        <ProfileEditor initial={client?.user?.profile} />
                     </Paper>
                 </Modal>
 
