@@ -1,4 +1,4 @@
-import { type CoreDomain } from '@concurrent-world/client'
+import { Client, type CoreDomain } from '@concurrent-world/client'
 import { useEffect, useState } from 'react'
 import { useClient } from '../context/ClientContext'
 import { Box, Typography, Avatar, TextField, Stepper, Step, StepLabel, StepContent, Button } from '@mui/material'
@@ -19,7 +19,6 @@ export function Migrator(): JSX.Element {
     const setActiveStep = (step: number): void => {
         window.location.hash = step.toString()
     }
-    const [registrationOK, setRegistrationOK] = useState(false)
     const [imported, setImported] = useState(false)
     const { enqueueSnackbar } = useSnackbar()
 
@@ -51,17 +50,34 @@ export function Migrator(): JSX.Element {
         {
             label: '引っ越し先の入力',
             content: (
-                <TextField
-                    label="移行先ドメイン"
-                    fullWidth
-                    value={destFqdn}
-                    onChange={(e) => {
-                        setDestFqdn(e.target.value)
-                    }}
-                />
-            ),
-            ok: () =>
-                currentDomain !== null && destinationDomain !== null && currentDomain.fqdn !== destinationDomain.fqdn
+                <>
+                    <TextField
+                        label="移行先ドメイン"
+                        fullWidth
+                        value={destFqdn}
+                        onChange={(e) => {
+                            setDestFqdn(e.target.value)
+                        }}
+                    />
+                    <Box display="flex" flexDirection="row" justifyContent="space-between">
+                        <Box />
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => {
+                                setActiveStep(activeStep + 1)
+                            }}
+                            disabled={
+                                currentDomain === null ||
+                                destinationDomain === null ||
+                                currentDomain.fqdn === destinationDomain.fqdn
+                            }
+                        >
+                            次へ
+                        </Button>
+                    </Box>
+                </>
+            )
         },
         {
             label: '引っ越し先に登録',
@@ -82,38 +98,53 @@ export function Migrator(): JSX.Element {
                     >
                         引っ越し先登録ページに移動
                     </Button>
-                    <Typography>登録完了後、確認ボタンを押してください。</Typography>
-                    <Button
-                        fullWidth
-                        color="primary"
-                        onClick={() => {
-                            fetch(`https://${destFqdn}/api/v1/entity/${client.ccid!}`)
-                                .then((e) => e.json())
-                                .then((e) => {
-                                    if (e.content.domain === destFqdn) {
-                                        setRegistrationOK(true)
-                                    } else {
-                                        setRegistrationOK(false)
-                                        enqueueSnackbar(
-                                            `登録が完了していないようです。検出された所属: ${e.content.domain}`,
-                                            {
-                                                variant: 'error'
-                                            }
-                                        )
-                                    }
-                                })
-                        }}
-                    >
-                        登録状況を確認
-                    </Button>
+                    <Box display="flex" flexDirection="row" justifyContent="space-between">
+                        <Box />
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => {
+                                fetch(`https://${destFqdn}/api/v1/entity/${client.ccid!}`)
+                                    .then((e) => e.json())
+                                    .then((e) => {
+                                        if (e.content.domain === destFqdn) {
+                                            setActiveStep(activeStep + 1)
+                                        } else {
+                                            enqueueSnackbar(
+                                                `登録が完了していないようです。検出された所属: ${e.content.domain}`,
+                                                {
+                                                    variant: 'error'
+                                                }
+                                            )
+                                        }
+                                    })
+                            }}
+                        >
+                            確認して次へ
+                        </Button>
+                    </Box>
                 </Box>
-            ),
-            ok: () => registrationOK
+            )
         },
         {
             label: '現住所からレポジトリデータをダウンロード',
-            content: <RepositoryExportButton />,
-            ok: () => true
+            content: (
+                <>
+                    <RepositoryExportButton />
+                    <Box display="flex" flexDirection="row" justifyContent="space-between">
+                        <Box />
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => {
+                                setActiveStep(activeStep + 1)
+                            }}
+                        >
+                            次へ
+                        </Button>
+                    </Box>
+                </>
+            )
         },
         {
             label: '移行先にレポジトリデータをアップロード',
@@ -126,6 +157,46 @@ export function Migrator(): JSX.Element {
                             setImported(err === '')
                         }}
                     />
+                    <Box display="flex" flexDirection="row" justifyContent="space-between">
+                        <Box />
+
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => {
+                                setActiveStep(activeStep + 1)
+                            }}
+                        >
+                            次へ
+                        </Button>
+                    </Box>
+                </>
+            )
+        },
+        {
+            label: '移行先に設定をコピー',
+            content: (
+                <>
+                    <Button
+                        fullWidth
+                        onClick={() => {
+                            const settings = localStorage.getItem('preference')
+                            if (!settings) return
+                            Client.create(client.keyPair!.privatekey, destFqdn).then((remoteClient) => {
+                                remoteClient.api
+                                    .writeKV('world.concurrent.preference', settings)
+                                    .then((_) => {
+                                        setActiveStep(activeStep + 1)
+                                    })
+                                    .catch((e) => {
+                                        console.error(e)
+                                        enqueueSnackbar('エラーが発生しました。', { variant: 'error' })
+                                    })
+                            })
+                        }}
+                    >
+                        実行
+                    </Button>
                 </>
             ),
             ok: () => imported
@@ -232,27 +303,7 @@ export function Migrator(): JSX.Element {
                                     gap: 1
                                 }}
                             >
-                                <Box>{step.content}</Box>
-                                <Box display="flex" flexDirection="row" justifyContent="space-between">
-                                    <Button
-                                        disabled={activeStep === 0}
-                                        onClick={() => {
-                                            setActiveStep(activeStep - 1)
-                                        }}
-                                    >
-                                        戻る
-                                    </Button>
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        onClick={() => {
-                                            setActiveStep(activeStep + 1)
-                                        }}
-                                        disabled={!step.ok?.()}
-                                    >
-                                        {activeStep === steps.length - 1 ? '完了' : '次へ'}
-                                    </Button>
-                                </Box>
+                                {step.content}
                             </Box>
                         </StepContent>
                     </Step>
