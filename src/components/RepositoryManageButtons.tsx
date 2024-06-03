@@ -72,7 +72,7 @@ export function RepositoryImportButton(props: { domain?: string; onImport?: (err
             <input
                 hidden
                 type="file"
-                accept=".json"
+                accept=".txt"
                 ref={fileInputRef}
                 onChange={(e) => {
                     const file = e.target.files?.[0]

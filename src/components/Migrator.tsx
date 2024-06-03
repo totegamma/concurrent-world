@@ -8,6 +8,7 @@ import { jumpToDomainRegistration } from '../util'
 import { useSnackbar } from 'notistack'
 import { RepositoryExportButton, RepositoryImportButton } from './RepositoryManageButtons'
 import { usePersistent } from '../hooks/usePersistent'
+import { type JobRequest } from '../model'
 
 export function Migrator(): JSX.Element {
     const { client } = useClient()
@@ -136,14 +137,47 @@ export function Migrator(): JSX.Element {
                     <Typography>
                         猶予を7日で作成するので、問題が発生した場合は削除リクエストをキャンセルすることができます。
                     </Typography>
-                    <Button>削除リクエストを送信</Button>
+                    <Button
+                        onClick={() => {
+                            const job: JobRequest = {
+                                type: 'clean',
+                                payload: '{}',
+                                scheduled: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days
+                            }
+
+                            client?.api
+                                .fetchWithCredential(client.host, '/api/v1/jobs', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(job)
+                                })
+                                .then(async (res) => {
+                                    console.log(res)
+                                    setActiveStep(activeStep + 1)
+                                })
+                        }}
+                    >
+                        削除リクエストを送信
+                    </Button>
                 </>
             ),
-            ok: () => true
+            ok: () => false
         },
         {
             label: '引っ越し完了!',
-            content: <Button>リロードして完了させる</Button>
+            content: (
+                <Button
+                    onClick={() => {
+                        if (!destinationDomain) return
+                        localStorage.setItem('Domain', JSON.stringify(destinationDomain.fqdn))
+                        window.location.href = '/'
+                    }}
+                >
+                    リロードして完了させる
+                </Button>
+            )
         }
     ]
 

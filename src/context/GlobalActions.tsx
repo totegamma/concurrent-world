@@ -23,6 +23,7 @@ import { useSnackbar } from 'notistack'
 import { ImagePreviewModal } from '../components/ui/ImagePreviewModal'
 import { StreamCard } from '../components/Stream/Card'
 import { LogoutButton } from '../components/Settings/LogoutButton'
+import { useGlobalState } from './GlobalState'
 
 export interface GlobalActionsState {
     openDraft: (text?: string) => void
@@ -58,6 +59,7 @@ const RowEmojiCount = 6
 
 export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element => {
     const { client } = useClient()
+    const globalState = useGlobalState()
     const [lists, setLists] = usePreference('lists')
     const [emojiPackages, setEmojiPackages] = usePreference('emojiPackages')
     const { enqueueSnackbar } = useSnackbar()
@@ -96,8 +98,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
 
     const [timelines, setTimelines] = useState<Array<CoreTimeline<CommunityTimelineSchema>>>([])
     const [selectedTieline, setSelectedTimeline] = useState<string | undefined>(undefined)
-
-    const [isRegistered, setIsRegistered] = useState<boolean>(true)
 
     const setupList = useCallback(
         (timeline?: string) => {
@@ -138,19 +138,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     setTimelines(timelines)
                 })
         }
-
-        client.api
-            .fetchWithCredential(client.host, '/api/v1/entity', {
-                method: 'GET'
-            })
-            .then((res) => {
-                if (res.status === 403) {
-                    setIsRegistered(false)
-                }
-            })
-            .catch((e) => {
-                console.error(e)
-            })
     }, [])
 
     useEffect(() => {
@@ -490,7 +477,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                         )}
                     </>
                 </Modal>
-                <Modal open={!isRegistered} onClose={() => {}}>
+                <Modal open={!globalState.isRegistered} onClose={() => {}}>
                     <Paper
                         sx={{
                             ...style,
@@ -506,7 +493,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                         <LogoutButton />
                     </Paper>
                 </Modal>
-                <Modal open={setupAccountRequired && isRegistered} onClose={() => {}}>
+                <Modal
+                    open={globalState.isCanonicalUser && setupAccountRequired && globalState.isRegistered}
+                    onClose={() => {}}
+                >
                     <Paper
                         sx={{
                             ...style,
@@ -523,7 +513,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     </Paper>
                 </Modal>
 
-                <Modal open={noListDetected} onClose={() => {}}>
+                <Modal open={globalState.isCanonicalUser && noListDetected} onClose={() => {}}>
                     <Paper sx={style}>
                         <Box
                             sx={{

@@ -1,5 +1,4 @@
 import Button from '@mui/material/Button'
-import Divider from '@mui/material/Divider'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { useEffect, useMemo, useState } from 'react'
@@ -24,10 +23,8 @@ export function ImportMasterKey(): JSX.Element {
     const [secretInput, setSecretInput] = useState<string>('')
     const [showSecret, setShowSecret] = useState<boolean>(true)
     const [domainInput, setDomainInput] = useState<string>('')
-
-    const [suggestFailed, setSuggestFailed] = useState<boolean>(false)
-    const [domain, setDomain] = useState<string>('')
     const [errorMessage, setErrorMessage] = useState<string>('')
+    const [registrationOK, setRegistrationOK] = useState<boolean>(false)
 
     const keypair: KeyPair | null = useMemo(() => {
         if (secretInput.length === 0) return null
@@ -44,10 +41,9 @@ export function ImportMasterKey(): JSX.Element {
     // suggest
     useEffect(() => {
         if (!keypair || !ccid) return
-        const searchTarget = domainInput || 'ariake.concrnt.net'
+        const searchTarget = 'ariake.concrnt.net'
 
         const timer = setTimeout(() => {
-            setDomain('')
             try {
                 const client = new Client(searchTarget, keypair, ccid)
                 client.api
@@ -55,15 +51,13 @@ export function ImportMasterKey(): JSX.Element {
                     .then((entity) => {
                         console.log(entity)
                         if (entity?.domain) {
-                            setDomain(entity.domain)
+                            setDomainInput(entity.domain)
                             setErrorMessage('')
                         } else {
-                            setSuggestFailed(true)
                             setErrorMessage(t('notFound'))
                         }
                     })
                     .catch((_) => {
-                        setSuggestFailed(true)
                         setErrorMessage(t('notFound'))
                     })
             } catch (e) {
@@ -74,10 +68,31 @@ export function ImportMasterKey(): JSX.Element {
         return () => {
             clearTimeout(timer)
         }
-    }, [keypair, domainInput])
+    }, [keypair])
+
+    useEffect(() => {
+        if (!domainInput || !keypair || !ccid) return
+        const timer = setTimeout(() => {
+            try {
+                const client = new Client(domainInput, keypair, ccid)
+                client.api.fetchWithCredential(domainInput, '/api/v1/entity', {}).then((res) => {
+                    if (res.ok) {
+                        setRegistrationOK(true)
+                    } else {
+                        setRegistrationOK(false)
+                    }
+                })
+            } catch (e) {
+                console.error(e)
+            }
+        }, 300)
+        return () => {
+            clearTimeout(timer)
+        }
+    }, [domainInput])
 
     const accountImport = (): void => {
-        localStorage.setItem('Domain', JSON.stringify(domain))
+        localStorage.setItem('Domain', JSON.stringify(domainInput))
         localStorage.setItem('PrivateKey', JSON.stringify(keypair?.privatekey))
         const normalized = secretInput.trim().normalize('NFKD')
         if (normalized.split(' ').length === 12) {
@@ -120,21 +135,16 @@ export function ImportMasterKey(): JSX.Element {
                     {t('welcome')}: {ccid}
                 </Typography>
             )}
-            {suggestFailed && (
-                <>
-                    <Divider sx={{ my: '30px' }} />
-                    <Typography variant="h3">{t('ドメイン')}</Typography>
-                    <TextField
-                        placeholder="https://example.tld/"
-                        value={domainInput}
-                        onChange={(e) => {
-                            setDomainInput(e.target.value)
-                        }}
-                    />
-                </>
-            )}
+            <TextField
+                placeholder="example.tld"
+                label={t('domain')}
+                value={domainInput}
+                onChange={(e) => {
+                    setDomainInput(e.target.value)
+                }}
+            />
             {errorMessage}
-            <Button disabled={!keypair || !domain} onClick={accountImport}>
+            <Button disabled={!keypair || !registrationOK} onClick={accountImport}>
                 {t('import')}
             </Button>
         </>

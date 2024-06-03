@@ -43,27 +43,16 @@ import { MarkdownRendererLite } from './components/ui/MarkdownRendererLite'
 import { useTranslation } from 'react-i18next'
 import { ManageSubsPage } from './pages/ManageSubs'
 import { UseSoundFormats } from './constants'
+import { useGlobalState } from './context/GlobalState'
 
 function App(): JSX.Element {
     const { client } = useClient()
+    const globalState = useGlobalState()
     const [themeName] = usePreference('themeName')
     const [sound] = usePreference('sound')
     const [customThemes] = usePreference('customThemes')
-    const [domainIsOffline, setDomainIsOffline] = useState<boolean>(false)
-
-    useEffect(() => {
-        client.api.getDomain(client.api.host).then((domain) => {
-            if (domain === null) {
-                setDomainIsOffline(true)
-            }
-        })
-    }, [client.user])
-
     const [theme, setTheme] = useState<ConcurrentTheme>(loadConcurrentTheme(themeName, customThemes))
     const isMobileSize = useMediaQuery(theme.breakpoints.down('sm'))
-
-    const masterInfo = JSON.parse(localStorage.getItem('Identity') || 'null')
-
     const subscription = useRef<Subscription>()
 
     const { t } = useTranslation()
@@ -267,7 +256,20 @@ function App(): JSX.Element {
                         flexDirection: 'column'
                     }}
                 >
-                    {masterInfo && (
+                    {!globalState.isCanonicalUser && (
+                        <Typography
+                            sx={{
+                                textAlign: 'center',
+                                color: 'error.contrastText',
+                                fontSize: '0.8em',
+                                fontWeight: 'bold',
+                                padding: '10px'
+                            }}
+                        >
+                            現在所属ドメインではないドメインにログインしています。引っ越し作業が完了次第、再ログインしてください。
+                        </Typography>
+                    )}
+                    {globalState.isMasterSession && globalState.isCanonicalUser && (
                         <Typography
                             sx={{
                                 textAlign: 'center',
@@ -282,7 +284,7 @@ function App(): JSX.Element {
                             {t('settings.identity.loginType.masterKey')}
                         </Typography>
                     )}
-                    {domainIsOffline && (
+                    {globalState.isDomainOffline && (
                         <Typography
                             sx={{
                                 textAlign: 'center',

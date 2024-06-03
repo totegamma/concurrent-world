@@ -11,6 +11,7 @@ import { GuestTimelinePage } from './pages/GuestTimeline'
 import ApiProvider from './context/ClientContext'
 import { PreferenceProvider } from './context/PreferenceContext'
 import './i18n'
+import { GlobalStateProvider } from './context/GlobalState'
 
 const AppPage = lazy(() => import('./App'))
 const Welcome = lazy(() => import('./pages/Welcome'))
@@ -57,7 +58,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                                 component={
                                     <ApiProvider>
                                         <PreferenceProvider>
-                                            <AppPage />
+                                            <GlobalStateProvider>
+                                                <AppPage />
+                                            </GlobalStateProvider>
                                         </PreferenceProvider>
                                     </ApiProvider>
                                 }
