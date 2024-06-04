@@ -66,64 +66,80 @@ export const AssociationFrame = memo<AssociationFrameProp>((props: AssociationFr
     switch (association.schema) {
         case Schemas.likeAssociation:
             return (
-                <Box sx={props.sx}>
-                    <FavoriteAssociation
-                        association={association as Association<LikeAssociationSchema>}
-                        perspective={props.perspective ?? client.ccid ?? ''}
-                    />
+                <>
+                    <Box sx={props.sx}>
+                        <FavoriteAssociation
+                            association={association as Association<LikeAssociationSchema>}
+                            perspective={props.perspective ?? client.ccid ?? ''}
+                        />
+                    </Box>
                     {props.after}
-                </Box>
+                </>
             )
         case Schemas.reactionAssociation:
             return (
-                <Box sx={props.sx}>
-                    <ReactionAssociation
-                        association={association as Association<ReactionAssociationSchema>}
-                        perspective={props.perspective ?? client.ccid ?? ''}
-                    />
+                <>
+                    <Box sx={props.sx}>
+                        <ReactionAssociation
+                            association={association as Association<ReactionAssociationSchema>}
+                            perspective={props.perspective ?? client.ccid ?? ''}
+                        />
+                    </Box>
                     {props.after}
-                </Box>
+                </>
             )
         case Schemas.replyAssociation:
             return (
-                <Box sx={props.sx}>
-                    <MessageContainer
-                        messageID={(association as Association<ReplyAssociationSchema>).document.body.messageId}
-                        messageOwner={(association as Association<ReplyAssociationSchema>).document.body.messageAuthor}
-                        after={props.after}
-                    />
-                </Box>
+                <>
+                    <Box sx={props.sx}>
+                        <MessageContainer
+                            messageID={(association as Association<ReplyAssociationSchema>).document.body.messageId}
+                            messageOwner={
+                                (association as Association<ReplyAssociationSchema>).document.body.messageAuthor
+                            }
+                        />
+                    </Box>
+                    {props.after}
+                </>
             )
         case Schemas.rerouteAssociation:
             return (
-                <Box sx={props.sx}>
-                    <MessageContainer
-                        messageID={(association as Association<RerouteAssociationSchema>).document.body.messageId}
-                        messageOwner={(association as Association<ReplyAssociationSchema>).document.body.messageAuthor}
-                        after={props.after}
-                    />
-                </Box>
+                <>
+                    <Box sx={props.sx}>
+                        <MessageContainer
+                            messageID={(association as Association<RerouteAssociationSchema>).document.body.messageId}
+                            messageOwner={
+                                (association as Association<ReplyAssociationSchema>).document.body.messageAuthor
+                            }
+                        />
+                    </Box>
+                    {props.after}
+                </>
             )
         case Schemas.mentionAssociation:
             return (
-                <Box sx={props.sx}>
-                    <MentionAssociation
-                        association={association as Association<ReactionAssociationSchema>}
-                        perspective={props.perspective ?? client.ccid ?? ''}
-                    />
+                <>
+                    <Box sx={props.sx}>
+                        <MentionAssociation
+                            association={association as Association<ReactionAssociationSchema>}
+                            perspective={props.perspective ?? client.ccid ?? ''}
+                        />
+                    </Box>
                     {props.after}
-                </Box>
+                </>
             )
         default:
             return (
-                <Box sx={props.sx}>
-                    <ListItem sx={{ display: 'flex', justifyContent: 'center' }}>
-                        <Typography variant="caption" color="text.disabled">
-                            Unknown association schema
-                        </Typography>
-                    </ListItem>
+                <>
+                    <Box sx={props.sx}>
+                        <ListItem sx={{ display: 'flex', justifyContent: 'center' }}>
+                            <Typography variant="caption" color="text.disabled">
+                                Unknown association schema
+                            </Typography>
+                        </ListItem>
+                    </Box>
                     {props.after}
-                </Box>
+                </>
             )
     }
 })

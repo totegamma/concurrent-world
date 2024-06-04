@@ -86,7 +86,7 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                 ))}
                 */}
             </Box>
-            <Box>
+            <Box display="flex" gap={0.5}>
                 {props.additionalMenuItems && (
                     <IconButton
                         sx={{

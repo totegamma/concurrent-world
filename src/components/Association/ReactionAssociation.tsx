@@ -66,7 +66,7 @@ export const ReactionAssociation = (props: ReactionAssociationProps): JSX.Elemen
                         </>
                     )}
                 </Typography>
-                <Box>
+                <Box display="flex" gap={0.5}>
                     {(props.association.author === client?.ccid || props.association.owner === client?.ccid) && (
                         <IconButton
                             sx={{
