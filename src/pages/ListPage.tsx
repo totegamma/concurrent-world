@@ -153,11 +153,7 @@ export function ListPage(): JSX.Element {
                                             p: 1
                                         }}
                                     />
-                                    <Divider
-                                        sx={{
-                                            mb: 1
-                                        }}
-                                    />
+                                    <Divider sx={{ mx: { xs: 0.5, sm: 1, md: 1 } }} />
                                 </Box>
                             </>
                         }
