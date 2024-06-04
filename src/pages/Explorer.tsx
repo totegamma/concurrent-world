@@ -139,7 +139,7 @@ export function Explorer(): JSX.Element {
             .upsertTimeline(Schemas.communityTimeline, stream)
             .then((e: any) => {
                 const id: string = e.id
-                if (id) navigate('/stream/' + id)
+                if (id) navigate('/timeline/' + id)
                 else enqueueSnackbar('ストリームの作成に失敗しました', { variant: 'error' })
             })
             .catch((e) => {
