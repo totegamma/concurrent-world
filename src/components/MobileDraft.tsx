@@ -4,7 +4,6 @@ import {
     Box,
     Button,
     useTheme,
-    IconButton,
     Tooltip,
     List,
     ListItemButton,
@@ -36,6 +35,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useStorage } from '../context/StorageContext'
 import { DummyMessageView } from './Message/DummyMessageView'
+import { CCIconButton } from './ui/CCIconButton'
 
 export interface MobileDraftProps {
     streamPickerInitial: Array<Timeline<CommunityTimelineSchema>>
@@ -283,13 +283,13 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
                     />
                 </Box>
                 <Tooltip title={postHome ? t('postToHome') : t('noPostToHome')} arrow placement="top">
-                    <IconButton
+                    <CCIconButton
                         onClick={() => {
                             setPostHome(!postHome)
                         }}
                     >
                         <HomeIcon color={postHome ? 'primary' : 'disabled'} />
-                    </IconButton>
+                    </CCIconButton>
                 </Tooltip>
             </Box>
             <Box
@@ -524,10 +524,7 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
                         enterDelay={isUploadReady ? 500 : 0}
                     >
                         <span>
-                            <IconButton
-                                sx={{
-                                    color: theme.palette.text.secondary
-                                }}
+                            <CCIconButton
                                 onClick={() => {
                                     if (isUploadReady) {
                                         onFileUploadClick()
@@ -546,14 +543,11 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
                                     }}
                                     accept={'image/*, video/*'}
                                 />
-                            </IconButton>
+                            </CCIconButton>
                         </span>
                     </Tooltip>
                     <Tooltip title={t('emoji')} arrow placement="top" enterDelay={500}>
-                        <IconButton
-                            sx={{
-                                color: 'text.secondary'
-                            }}
+                        <CCIconButton
                             onClick={(e) => {
                                 emojiPicker.open(e.currentTarget, (emoji) => {
                                     insertEmoji(emoji)
@@ -562,14 +556,11 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
                             }}
                         >
                             <EmojiEmotions sx={{ fontSize: '80%' }} />
-                        </IconButton>
+                        </CCIconButton>
                     </Tooltip>
                     <Tooltip title={t('clearDraft')} arrow placement="top" enterDelay={500}>
                         <span>
-                            <IconButton
-                                sx={{
-                                    color: theme.palette.text.secondary
-                                }}
+                            <CCIconButton
                                 onClick={() => {
                                     if (draft.length === 0) return
                                     enqueueSnackbar('Draft Cleared.', {
@@ -591,7 +582,7 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
                                 disabled={draft.length === 0}
                             >
                                 <DeleteIcon sx={{ fontSize: '80%' }} />
-                            </IconButton>
+                            </CCIconButton>
                         </span>
                     </Tooltip>
                 </Box>
