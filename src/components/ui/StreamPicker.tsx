@@ -1,6 +1,7 @@
-import { Autocomplete, Box, Chip, InputBase, type SxProps } from '@mui/material'
+import { Autocomplete, Box, InputBase, type SxProps } from '@mui/material'
 import { type CommunityTimelineSchema, Schemas, type Timeline } from '@concurrent-world/client'
 import { useMemo } from 'react'
+import { CCChip } from './CCChip'
 
 export interface StreamPickerProps {
     selected: Array<Timeline<CommunityTimelineSchema>>
@@ -47,6 +48,10 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
                 onChange={(_, value) => {
                     props.setSelected(value)
                 }}
+                componentsProps={{
+                    clearIndicator: { sx: { color: 'text.disabled' } }
+                }}
+                forcePopupIcon={false}
                 renderInput={(params) => {
                     const { InputLabelProps, InputProps, ...rest } = params
 
@@ -61,7 +66,7 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
                 }}
                 renderTags={(value, getTagProps) =>
                     value.map((option, index) => (
-                        <Chip
+                        <CCChip
                             label={option.document.body.name}
                             sx={{ color: 'text.default' }}
                             {...getTagProps({ index })}

@@ -4,7 +4,6 @@ import {
     Box,
     Button,
     useTheme,
-    IconButton,
     Divider,
     CircularProgress,
     Tooltip,
@@ -53,6 +52,7 @@ import { CCAvatar } from './ui/CCAvatar'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import HeartBrokenIcon from '@mui/icons-material/HeartBroken'
+import { CCIconButton } from './ui/CCIconButton'
 
 export interface DraftProps {
     submitButtonLabel?: string
@@ -302,13 +302,17 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     />
                 </Box>
                 <Tooltip title={postHome ? t('postToHome') : t('noPostToHome')} arrow placement="top">
-                    <IconButton
+                    <CCIconButton
                         onClick={() => {
                             setPostHomeButton(!postHomeButton)
                         }}
                     >
-                        <HomeIcon color={postHome ? 'primary' : 'disabled'} />
-                    </IconButton>
+                        <HomeIcon
+                            sx={{
+                                color: postHome ? 'primary' : theme.palette.text.disabled
+                            }}
+                        />
+                    </CCIconButton>
                 </Tooltip>
             </Box>
             <Box
@@ -522,10 +526,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         enterDelay={isUploadReady ? 500 : 0}
                     >
                         <span>
-                            <IconButton
-                                sx={{
-                                    color: theme.palette.text.secondary
-                                }}
+                            <CCIconButton
                                 onClick={() => {
                                     if (isUploadReady) {
                                         onFileUploadClick()
@@ -544,14 +545,11 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                     }}
                                     accept={'image/*, video/*'}
                                 />
-                            </IconButton>
+                            </CCIconButton>
                         </span>
                     </Tooltip>
                     <Tooltip title={t('emoji')} arrow placement="top" enterDelay={500}>
-                        <IconButton
-                            sx={{
-                                color: 'text.secondary'
-                            }}
+                        <CCIconButton
                             onClick={(e) => {
                                 emojiPicker.open(e.currentTarget, (emoji) => {
                                     insertEmoji(emoji)
@@ -563,14 +561,11 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             }}
                         >
                             <EmojiEmotions sx={{ fontSize: '80%' }} />
-                        </IconButton>
+                        </CCIconButton>
                     </Tooltip>
                     <Tooltip title={t('clearDraft')} arrow placement="top" enterDelay={500}>
                         <span>
-                            <IconButton
-                                sx={{
-                                    color: theme.palette.text.secondary
-                                }}
+                            <CCIconButton
                                 onClick={() => {
                                     if (draft.length === 0) return
                                     enqueueSnackbar('Draft Cleared.', {
@@ -592,7 +587,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                 disabled={draft.length === 0}
                             >
                                 <DeleteIcon sx={{ fontSize: '80%' }} />
-                            </IconButton>
+                            </CCIconButton>
                         </span>
                     </Tooltip>
                 </Box>
@@ -610,7 +605,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         enterDelay={500}
                     >
                         <Fade in={draft.length > 0}>
-                            <IconButton
+                            <CCIconButton
                                 sx={{
                                     color: 'text.secondary'
                                 }}
@@ -625,7 +620,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                                         transition: 'transform 0.2s ease-in-out'
                                     }}
                                 />
-                            </IconButton>
+                            </CCIconButton>
                         </Fade>
                     </Tooltip>
 

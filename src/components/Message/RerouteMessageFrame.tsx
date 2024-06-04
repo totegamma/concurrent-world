@@ -69,7 +69,7 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
                     {props.message.authorUser?.profile?.username || 'Anonymous'} rerouted{' '}
                     {props.message.document.body.body && 'with comment:'}
                 </Typography>
-                <Box>
+                <Box display="flex" gap={0.5}>
                     <IconButton
                         sx={{
                             width: { xs: '12px', sm: '18px' },
