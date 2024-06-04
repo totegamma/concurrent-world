@@ -131,38 +131,20 @@ export default function Welcome(): JSX.Element {
                 <Box display="flex" gap={1} overflow="auto" flexDirection={{ xs: 'row', sm: 'row', md: 'column' }}>
                     <StreamCard
                         sx={{ minWidth: '300px' }}
-                        streamID="ci8qvhep9dcpltmfq3fg@hub.concurrent.world"
+                        streamID="tar69vv26r5s4wk0r067v20bvyw@ariake.concrnt.net"
                         name="Arrival Lounge"
                         description="hub.concurrent.worldサーバーへようこそ！わからない事があれば、ここで呟いてみましょう。"
                         banner="https://worldfile.cc/CC2d97694D850Df2089F48E639B4795dD95D2DCE2E/f696009d-f1f0-44f8-83fe-6387946f1b86"
-                        domain="hub.concurrent.world"
+                        domain="ariake.concrnt.net"
                     />
                     <StreamCard
                         sx={{ minWidth: '300px' }}
-                        streamID="chrmsgep9dcl7anfkgcg@dev.concurrent.world"
+                        streamID="tdvtb8ha1d1pbckx3067v1wv8xr@denken.concrnt.net"
                         name="Dev Central"
                         description="開発者の憩い場"
                         banner="https://worldfile.cc/CC2d97694D850Df2089F48E639B4795dD95D2DCE2E/16e8e34f-460f-4a01-b0d1-6d0661a18ca4"
-                        domain="dev.concurrent.world"
+                        domain="denken.concrnt.net"
                     />
-                    {/*
-                    <StreamCard
-                        sx={{minWidth: '300px'}}
-                        streamID="chrmskup9dcl7anfkge0@hub.concurrent.world"
-                        name="ガジェット探索"
-                        description="My New Gear......"
-                        banner="https://worldfile.cc/CC2d97694D850Df2089F48E639B4795dD95D2DCE2E/077ff86b-99d6-4a96-9bc9-4ec1b59fd22e"
-                        domain="dev.concurrent.world"
-                    />
-                    <StreamCard
-                        sx={{minWidth: '300px'}}
-                        streamID="ck4hekep9dcsa69ohmlg@hub.concurrent.world"
-                        name="Nostr民"
-                        description="Nostr民のたまり場"
-                        banner=""
-                        domain="hub.concurrent.world"
-                    />
-                    */}
                 </Box>
             </Box>
 
