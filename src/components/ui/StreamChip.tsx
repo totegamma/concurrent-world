@@ -57,7 +57,7 @@ export const StreamChip = (props: StreamChipProps): JSX.Element => {
         >
             <Chip
                 component={NavLink}
-                to={'/stream/' + (props.streamID ?? '')}
+                to={'/timeline/' + (props.streamID ?? '')}
                 size={'small'}
                 label={stream?.document.body.name ?? props.streamID}
                 icon={<TagIcon />}
