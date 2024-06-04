@@ -43,7 +43,7 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
                             height: { xs: '12px', sm: '18px' }
                         }}
                         component={routerLink}
-                        to={'/entity/' + props.message.author}
+                        to={'/' + props.message.author}
                     >
                         <CCAvatar
                             avatarURL={props.message.authorUser?.profile?.avatar}
@@ -87,7 +87,7 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
                         underline="hover"
                         color="inherit"
                         fontSize="0.75rem"
-                        to={`/message/${props.message.id}@${props.message.author}`}
+                        to={`/${props.message.author}/${props.message.id}`}
                     >
                         <TimeDiff date={new Date(props.message.cdate)} />
                     </Link>

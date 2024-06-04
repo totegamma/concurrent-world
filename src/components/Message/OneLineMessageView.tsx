@@ -28,7 +28,7 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                     height: { xs: '12px', sm: '18px' }
                 }}
                 component={routerLink}
-                to={'/entity/' + props.message.author}
+                to={'/' + props.message.author}
             >
                 <CCAvatar
                     alt={props.message.authorUser?.profile?.username}
@@ -73,7 +73,7 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                 underline="hover"
                 color="inherit"
                 fontSize="0.75rem"
-                to={`/message/${props.message.id}@${props.message.author}`}
+                to={`/${props.message.author}/${props.message.id}`}
             >
                 <TimeDiff date={new Date(props.message.cdate)} />
             </Link>

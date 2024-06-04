@@ -67,7 +67,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                             justifyContent: 'left',
                             gap: 1
                         }}
-                        to={'/entity/' + (client.ccid ?? '')}
+                        to={'/' + (client.ccid ?? '')}
                         onClick={props.onClick}
                     >
                         <CCAvatar

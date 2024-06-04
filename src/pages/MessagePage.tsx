@@ -37,10 +37,8 @@ import { ReactionAssociation } from '../components/Association/ReactionAssociati
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 
 export function MessagePage(): JSX.Element {
-    const { id } = useParams()
+    const { authorID, messageID } = useParams()
     const { client } = useClient()
-    const messageID = id?.split('@')[0]
-    const authorID = id?.split('@')[1]
     const lastUpdated = 0
 
     const actions = useGlobalActions()

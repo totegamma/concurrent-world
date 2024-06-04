@@ -102,7 +102,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                                         textDecoration: 'none'
                                     }}
                                     component={RouterLink}
-                                    to={fav.document.body.profileOverride?.link ?? '/entity/' + fav.author}
+                                    to={fav.document.body.profileOverride?.link ?? '/' + fav.author}
                                     target={fav.document.body.profileOverride?.link ? '_blank' : undefined}
                                     rel={fav.document.body.profileOverride?.link ? 'noopener noreferrer' : undefined}
                                 >

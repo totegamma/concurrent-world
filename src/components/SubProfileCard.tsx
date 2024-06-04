@@ -58,7 +58,7 @@ export const SubProfileCard = (props: SubProfileCardProps): JSX.Element => {
                     <Box position="relative" height={0}>
                         <Box
                             component={routerLink}
-                            to={'/entity/' + props.character.author}
+                            to={'/' + props.character.author}
                             position="relative"
                             sx={{
                                 top: '-30px',

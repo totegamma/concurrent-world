@@ -358,15 +358,14 @@ function App(): JSX.Element {
                         >
                             <Routes>
                                 <Route index element={<ListPage />} />
-                                <Route path="/stream/:id" element={<StreamPage />} /> {/* for legacy */}
+                                <Route path="/:id" element={<EntityPage />} />
                                 <Route path="/timeline/:id" element={<StreamPage />} />
+                                <Route path="/:authorID/:messageID" element={<MessagePage />} />
                                 <Route path="/associations" element={<Associations />} />
                                 <Route path="/contacts" element={<ContactsPage />} />
                                 <Route path="/explorer/:tab" element={<Explorer />} />
                                 <Route path="/notifications" element={<Notifications />} />
                                 <Route path="/settings/*" element={<Settings />} />
-                                <Route path="/message/:id" element={<MessagePage />} />
-                                <Route path="/entity/:id" element={<EntityPage />} />
                                 <Route path="/devtool" element={<Devtool />} />
                                 <Route path="/subscriptions" element={<ManageSubsPage />} />
                             </Routes>

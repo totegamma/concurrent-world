@@ -54,7 +54,7 @@ export const APSettings = (): JSX.Element => {
             })
             .then(async (res) => await res.json())
             .then((data) => {
-                navigate(`/message/${data.content.id}@${data.content.author}`)
+                navigate(`/${data.content.author}/${data.content.id}`)
             })
     }
 

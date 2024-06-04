@@ -51,7 +51,7 @@ export const ContentWithCCAvatar = (props: ContentWithCCAvatarProps): JSX.Elemen
                         mt: { xs: '3px', sm: '5px' }
                     }}
                     component={routerLink}
-                    to={props.profileOverride?.link ?? '/entity/' + (props.author?.ccid ?? '')}
+                    to={props.profileOverride?.link ?? '/' + (props.author?.ccid ?? '')}
                     target={props.profileOverride?.link ? '_blank' : undefined}
                     rel={props.profileOverride?.link ? 'noopener noreferrer' : undefined}
                 >
