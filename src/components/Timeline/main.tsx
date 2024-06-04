@@ -1,5 +1,5 @@
 import { Box, Divider, ListItem, ListItemIcon, ListItemText, type SxProps, Typography, useTheme } from '@mui/material'
-import React, { memo, useCallback, useEffect, useState, useRef, forwardRef, type ForwardedRef, useMemo } from 'react'
+import React, { memo, useCallback, useEffect, useState, useRef, forwardRef, type ForwardedRef } from 'react'
 import { AssociationFrame } from '../Association/AssociationFrame'
 import { Loading } from '../ui/Loading'
 import { MessageContainer } from '../Message/MessageContainer'
@@ -24,7 +24,18 @@ export interface TimelineProps {
 
 const PTR_HEIGHT = 60
 
-const divider = <Divider variant="inset" component="li" sx={{ mx: 1, mt: 1 }} />
+const divider = (
+    <Divider
+        variant="inset"
+        component="li"
+        sx={{
+            mx: { xs: 0.5, sm: 1, md: 1 }
+        }}
+    />
+)
+const timelineElemSx: SxProps = {
+    p: { xs: 0.5, sm: 1, md: 1 }
+}
 
 const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle>): JSX.Element => {
     const { client } = useClient()
@@ -159,12 +170,6 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                 alreadyFetchInThisRender = false
             })
     }
-
-    const timelineElemSx: SxProps = useMemo(() => {
-        return {
-            p: 0.5
-        }
-    }, [])
 
     return (
         <>
