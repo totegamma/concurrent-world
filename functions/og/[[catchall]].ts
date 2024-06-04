@@ -56,6 +56,7 @@ export const onRequest: PagesFunction = async (context) => {
     <meta property="og:description" content="${content.slice(0, content.search(imageRegex))}">
     <meta property="og:image" content="${imageUrl}">
     <meta property="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#0476d9" />
   </head>
 </html>`
         } else {
@@ -68,6 +69,7 @@ export const onRequest: PagesFunction = async (context) => {
     <meta property="og:description" content="${content}">
     <meta property="og:image" content="${avatar}">
     <meta property="twitter:card" content="summary">
+    <meta name="theme-color" content="#0476d9" />
   </head>
 </html>`
         }

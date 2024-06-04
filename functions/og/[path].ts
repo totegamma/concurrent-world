@@ -43,6 +43,7 @@ export const onRequest: PagesFunction = async (context) => {
     <meta property="og:description" content="${description}">
     <meta property="og:image" content="${avatar}">
     <meta property="twitter:card" content="summary">
+    <meta name="theme-color" content="#0476d9" />
   </head>
 </html>`
 

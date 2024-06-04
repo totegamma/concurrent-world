@@ -1,6 +1,5 @@
 import {
     Alert,
-    AlertTitle,
     Box,
     IconButton,
     Menu,
@@ -29,6 +28,7 @@ import { KeyCard } from '../ui/KeyCard'
 import { Sign, type Identity } from '@concurrent-world/client'
 import { enqueueSnackbar } from 'notistack'
 import { useGlobalState } from '../../context/GlobalState'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 const SwitchMasterToSub = lazy(() => import('../SwitchMasterToSub'))
 
@@ -82,7 +82,15 @@ export const IdentitySettings = (): JSX.Element => {
             </Box>
 
             <Accordion>
-                <AccordionSummary>
+                <AccordionSummary
+                    expandIcon={
+                        <ExpandMoreIcon
+                            sx={{
+                                color: 'text.primary'
+                            }}
+                        />
+                    }
+                >
                     {client.user?.alias ? (
                         <Typography variant="body1">
                             アカウントにはエイリアス{client.user.alias}が設定されています。
