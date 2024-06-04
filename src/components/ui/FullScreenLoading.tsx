@@ -10,7 +10,7 @@ export const FullScreenLoading = (props: FullScreenLoadingProps): JSX.Element =>
         <CssBaseline>
             <Box
                 sx={{
-                    backgroundColor: '#211a3d',
+                    backgroundColor: '#0476d9',
                     color: '#ffffff',
                     display: 'flex',
                     flexDirection: 'column',
@@ -18,11 +18,11 @@ export const FullScreenLoading = (props: FullScreenLoadingProps): JSX.Element =>
                     justifyContent: 'center',
                     height: '100dvh',
                     width: '100dvw',
-                    gap: 5
+                    gap: 2
                 }}
             >
                 <ConcurrentLogo size="100px" upperColor="#fff" lowerColor="#fff" frameColor="#fff" spinning={true} />
-                <Typography variant="h3">{props.message}</Typography>
+                <Typography variant="h5">{props.message}</Typography>
             </Box>
         </CssBaseline>
     )
