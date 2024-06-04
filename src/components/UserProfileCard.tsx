@@ -37,7 +37,7 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
                 <Box
                     position="relative"
                     component={routerLink}
-                    to={'/entity/' + ccid}
+                    to={'/' + ccid}
                     sx={{
                         top: '-30px',
                         left: '10px'

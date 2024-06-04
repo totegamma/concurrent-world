@@ -70,7 +70,7 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                                         textDecoration: 'none'
                                     }}
                                     component={routerLink}
-                                    to={reaction.document.body.profileOverride?.link ?? '/entity/' + reaction.author}
+                                    to={reaction.document.body.profileOverride?.link ?? '/' + reaction.author}
                                     target={reaction.document.body.profileOverride?.link ? '_blank' : undefined}
                                     rel={
                                         reaction.document.body.profileOverride?.link ? 'noopener noreferrer' : undefined

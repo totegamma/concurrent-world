@@ -11,6 +11,7 @@ import { GuestTimelinePage } from './pages/GuestTimeline'
 import ApiProvider from './context/ClientContext'
 import { PreferenceProvider } from './context/PreferenceContext'
 import './i18n'
+import { GlobalStateProvider } from './context/GlobalState'
 
 const AppPage = lazy(() => import('./App'))
 const Welcome = lazy(() => import('./pages/Welcome'))
@@ -47,9 +48,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                     <Route path="/welcome" element={<Welcome />} />
                     <Route path="/register" element={<Registration />} />
                     <Route path="/import" element={<AccountImport />} />
+                    {!logined && <Route path="/:id" element={<GuestTimelinePage page="entity" />} />}
+                    {!logined && <Route path="/:authorID/:messageID" element={<GuestTimelinePage page="message" />} />}
                     {!logined && <Route path="/timeline/:id" element={<GuestTimelinePage page="timeline" />} />}
-                    {!logined && <Route path="/entity/:id" element={<GuestTimelinePage page="entity" />} />}
-                    {!logined && <Route path="/message/:id" element={<GuestTimelinePage page="message" />} />}
                     <Route
                         path="*"
                         element={
@@ -57,7 +58,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                                 component={
                                     <ApiProvider>
                                         <PreferenceProvider>
-                                            <AppPage />
+                                            <GlobalStateProvider>
+                                                <AppPage />
+                                            </GlobalStateProvider>
                                         </PreferenceProvider>
                                     </ApiProvider>
                                 }

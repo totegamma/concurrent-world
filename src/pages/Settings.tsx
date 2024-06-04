@@ -11,8 +11,8 @@ import { LoginQR } from '../components/Settings/LoginQR'
 import { APSettings } from '../components/Settings/APSettings'
 import { IdentitySettings } from '../components/Settings/Identity'
 import { BreadcrumbList } from '../components/ui/BreadcrumbList'
-import { Transit } from '../components/Settings/Transit'
 import { ImportExport } from '../components/Settings/ImportExport'
+import { Jobs } from '../components/Settings/Jobs'
 
 const pathTitles: Record<string, string> = {
     '/settings': 'settings.title',
@@ -25,8 +25,8 @@ const pathTitles: Record<string, string> = {
     '/settings/media': 'settings.media.title',
     '/settings/activitypub': 'settings.ap.title',
     '/settings/loginqr': 'settings.qr.title',
-    '/settings/transit': 'settings.transit.title',
-    '/settings/importexport': 'settings.importexport.title'
+    '/settings/importexport': 'settings.importexport.title',
+    '/settings/jobs': 'settings.jobs.title'
 }
 
 export function Settings(): JSX.Element {
@@ -55,8 +55,8 @@ export function Settings(): JSX.Element {
                 <Route path="/media" element={<MediaSettings />} />
                 <Route path="/activitypub" element={<APSettings />} />
                 <Route path="/loginqr" element={<LoginQR />} />
-                <Route path="/transit" element={<Transit />} />
-                <Route path="/importexport" element={<ImportExport />} />
+                <Route path="/jobs" element={<Jobs />} />
+                <Route path="/importexport/:tab" element={<ImportExport />} />
             </Routes>
         </Box>
     )

@@ -34,8 +34,6 @@ import { SubProfileCard } from '../components/SubProfileCard'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 import { DomainCard } from '../components/ui/DomainCard'
 
-// type explorerTab = 'streams' | 'users'
-
 export function Explorer(): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'pages.explore' })
     const { client } = useClient()

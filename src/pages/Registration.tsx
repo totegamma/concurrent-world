@@ -103,7 +103,16 @@ export function Registration(): JSX.Element {
                             if (!e) return
                             setHost(e)
                             setDomain(e.fqdn)
-                            jumpToDomainRegistration(identity.CCID, identity.privateKey, fqdn)
+
+                            let next = window.location.href
+                            const hashIndex = next.indexOf('#')
+                            if (hashIndex !== -1) {
+                                next = next.substring(0, hashIndex)
+                            }
+                            // add next hash
+                            next = `${next}#2`
+
+                            jumpToDomainRegistration(identity.CCID, identity.privateKey, fqdn, next)
                         })
                     }}
                     customSetup={() => {

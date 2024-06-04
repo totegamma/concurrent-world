@@ -56,7 +56,7 @@ export const ThinMenu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                             justifyContent: 'center',
                             gap: 1
                         }}
-                        to={'/entity/' + (client.ccid ?? '')}
+                        to={'/' + (client.ccid ?? '')}
                         onClick={props.onClick}
                     >
                         <CCAvatar

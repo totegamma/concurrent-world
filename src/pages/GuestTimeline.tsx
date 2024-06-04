@@ -26,17 +26,16 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
     const [user, setUser] = useState<User | null | undefined>(null)
     const [targetStream, setTargetStream] = useState<string[]>([])
 
-    const { id } = useParams()
+    const { id, authorID, messageID } = useParams()
 
     const timelineRef = useRef<VListHandle>(null)
 
     const [client, initializeClient] = useState<Client>()
     useEffect(() => {
-        if (!id) return
-
         switch (props.page) {
             case 'timeline':
                 {
+                    if (!id) return
                     setTargetStream([id])
                     const resolver = id.split('@')[1]
                     const client = new Client(resolver)
@@ -51,22 +50,23 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
                 break
             case 'entity':
                 {
+                    if (!id) return
                     const client = new Client('ariake.concrnt.net')
                     initializeClient(client)
 
                     client.getUser(id).then((e) => {
                         setUser(e)
                         setTitle(e?.profile?.username ?? '')
+                        console.log(e?.homeTimeline)
                         setTargetStream([e?.homeTimeline ?? ''])
                     })
                 }
                 break
             case 'message':
                 {
+                    if (!authorID || !messageID) return
                     const client = new Client('ariake.concrnt.net')
                     initializeClient(client)
-
-                    const authorID = id.split('@')[1]
 
                     client.getUser(authorID).then((e) => {
                         setUser(e)
@@ -100,7 +100,7 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
             <TickerProvider>
                 <ApiProvider client={client}>
                     <>
-                        {props.page === 'message' && (
+                        {props.page === 'message' && messageID && authorID && (
                             <Paper
                                 sx={{
                                     margin: { xs: 0.5, sm: 1 },
@@ -109,10 +109,7 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
                                     p: 2
                                 }}
                             >
-                                <MessageContainer
-                                    messageID={id?.split('@')[0] ?? ''}
-                                    messageOwner={id?.split('@')[1] ?? ''}
-                                />
+                                <MessageContainer messageID={messageID} messageOwner={authorID} />
                             </Paper>
                         )}
 

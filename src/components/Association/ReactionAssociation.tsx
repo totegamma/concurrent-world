@@ -86,7 +86,7 @@ export const ReactionAssociation = (props: ReactionAssociationProps): JSX.Elemen
                         underline="hover"
                         color="inherit"
                         fontSize="0.75rem"
-                        to={`/message/${target?.id ?? ''}@${target?.author ?? ''}`}
+                        to={`/${target?.author ?? ''}/${target?.id ?? ''}`}
                     >
                         <TimeDiff date={new Date(props.association.cdate)} />
                     </Link>

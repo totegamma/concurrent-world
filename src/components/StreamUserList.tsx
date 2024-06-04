@@ -52,7 +52,7 @@ export const StreamUserList = (props: StreamUserProps): JSX.Element => {
                                 textDecoration: 'none'
                             }}
                             component={RouterLink}
-                            to={`/entity/${user.ccid}`}
+                            to={`/${user.ccid}`}
                         >
                             <CCAvatar avatarURL={user.profile?.avatar} identiconSource={user.ccid} />
                             <Link underline="hover">{user.profile?.username}</Link>

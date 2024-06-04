@@ -15,8 +15,8 @@ import { useSnackbar } from 'notistack'
 import { LogoutButton } from './LogoutButton'
 import { IconButtonWithLabel } from '../ui/IconButtonWithLabel'
 import { useTranslation } from 'react-i18next'
-import HailIcon from '@mui/icons-material/Hail'
 import ImportExportIcon from '@mui/icons-material/ImportExport'
+import EventNoteIcon from '@mui/icons-material/EventNote'
 
 export function SettingsIndex(): JSX.Element {
     const { client } = useClient()
@@ -144,8 +144,9 @@ export function SettingsIndex(): JSX.Element {
                     link
                     icon={ImportExportIcon}
                     label={t('settings.importexport.title')}
-                    to="/settings/importexport"
+                    to="/settings/importexport/manage"
                 />
+                <IconButtonWithLabel link icon={EventNoteIcon} label={t('settings.jobs.title')} to="/settings/jobs" />
             </Paper>
             <Paper
                 variant="outlined"

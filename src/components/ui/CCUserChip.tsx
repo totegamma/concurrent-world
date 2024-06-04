@@ -72,7 +72,7 @@ export const CCUserChip = (props: CCUserChipProps): JSX.Element => {
             ) : (
                 <Chip
                     component={NavLink}
-                    to={'/entity/' + (user?.ccid ?? '')}
+                    to={'/' + (user?.ccid ?? '')}
                     size={'small'}
                     label={user?.profile?.username ?? 'anonymous'}
                     icon={icon}
