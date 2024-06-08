@@ -18,6 +18,7 @@ import ExploreIcon from '@mui/icons-material/Explore'
 import SettingsIcon from '@mui/icons-material/Settings'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import ContactsIcon from '@mui/icons-material/Contacts'
+import HailIcon from '@mui/icons-material/Hail'
 import { memo } from 'react'
 // @ts-expect-error vite dynamic import
 import buildTime from '~build/time'
@@ -161,6 +162,16 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                 </ListItemButton>
                             </ListItem>
                         )}
+                        <ListItem disablePadding>
+                            <ListItemButton sx={{ gap: 1 }} component={Link} to="/aboutv1" onClick={props.onClick}>
+                                <HailIcon
+                                    sx={{
+                                        color: 'background.contrastText'
+                                    }}
+                                />
+                                <ListItemText primary={'v1について'} />
+                            </ListItemButton>
+                        </ListItem>
                         <ListItem disablePadding>
                             <ListItemButton sx={{ gap: 1 }} component={Link} to="/settings" onClick={props.onClick}>
                                 <SettingsIcon

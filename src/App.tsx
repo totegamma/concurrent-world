@@ -42,6 +42,7 @@ import { UrlSummaryProvider } from './context/urlSummaryContext'
 import { StorageProvider } from './context/StorageContext'
 import { MarkdownRendererLite } from './components/ui/MarkdownRendererLite'
 import { useTranslation } from 'react-i18next'
+import { AboutV1 } from './pages/AboutV1'
 
 function App(): JSX.Element {
     const { client } = useClient()
@@ -342,6 +343,7 @@ function App(): JSX.Element {
                                 <Route path="/message/:id" element={<MessagePage />} />
                                 <Route path="/entity/:id" element={<EntityPage />} />
                                 <Route path="/devtool" element={<Devtool />} />
+                                <Route path="/aboutV1" element={<AboutV1 />} />
                             </Routes>
                         </Paper>
                         <Box
