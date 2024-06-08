@@ -83,9 +83,9 @@ export const ApSetup = (): JSX.Element => {
                 policy: 'https://policy.concrnt.world/t/inline-read-write.json',
                 policyParams: JSON.stringify({
                     isWritePublic: false,
-                    isReadPublic: false,
+                    isReadPublic: true,
                     writer: [proxyCCID],
-                    reader: [proxyCCID]
+                    reader: []
                 })
             }
         )
