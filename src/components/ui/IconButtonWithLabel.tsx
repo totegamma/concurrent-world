@@ -1,4 +1,4 @@
-import { Typography, ButtonBase, type SvgIconTypeMap } from '@mui/material'
+import { Typography, ButtonBase, type SvgIconTypeMap, Tooltip, Box } from '@mui/material'
 import { type OverridableComponent } from '@mui/material/OverridableComponent'
 import { Link as RouterLink } from 'react-router-dom'
 
@@ -8,39 +8,54 @@ export const IconButtonWithLabel = (props: {
     link?: boolean
     to?: string
     onClick?: () => void
+    disabled?: boolean
+    disableMessage?: string
 }): JSX.Element => {
     return (
-        <ButtonBase
-            sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 1,
-                color: 'primary.main',
-                p: 1,
-                borderRadius: 1,
-                height: '80px',
-                width: '80px'
-            }}
-            component={props.link ? RouterLink : 'button'}
-            to={props.to}
-            onClick={props.onClick}
-        >
-            <props.icon
+        <Tooltip title={props.disabled ? props.disableMessage : ''} arrow>
+            <Box
                 sx={{
-                    fontSize: '40px',
-                    color: 'primary.main'
-                }}
-            />
-            <Typography
-                color="text.primary"
-                sx={{
-                    wordBreak: 'keep-all'
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 1,
+                    alignItems: 'center',
+                    justifyContent: 'center'
                 }}
             >
-                {props.label}
-            </Typography>
-        </ButtonBase>
+                <ButtonBase
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 1,
+                        color: 'primary.main',
+                        p: 1,
+                        borderRadius: 1,
+                        height: '80px',
+                        width: '80px'
+                    }}
+                    component={props.link ? RouterLink : 'button'}
+                    to={props.to}
+                    onClick={props.onClick}
+                    disabled={props.disabled}
+                >
+                    <props.icon
+                        sx={{
+                            fontSize: '40px',
+                            color: props.disabled ? 'text.disabled' : 'primary.main'
+                        }}
+                    />
+                    <Typography
+                        color="text.primary"
+                        sx={{
+                            wordBreak: 'keep-all'
+                        }}
+                    >
+                        {props.label}
+                    </Typography>
+                </ButtonBase>
+            </Box>
+        </Tooltip>
     )
 }
