@@ -17,6 +17,7 @@ import { IconButtonWithLabel } from '../ui/IconButtonWithLabel'
 import { useTranslation } from 'react-i18next'
 import ImportExportIcon from '@mui/icons-material/ImportExport'
 import EventNoteIcon from '@mui/icons-material/EventNote'
+import { useMemo } from 'react'
 
 export function SettingsIndex(): JSX.Element {
     const { client } = useClient()
@@ -37,6 +38,10 @@ export function SettingsIndex(): JSX.Element {
             enqueueSnackbar('No cache to delete', { variant: 'info' })
         }
     }
+
+    const isDomainApAvailable = useMemo(() => {
+        return 'activitypub' in client.domainServices
+    }, [client.domainServices])
 
     return (
         <Box
@@ -127,6 +132,8 @@ export function SettingsIndex(): JSX.Element {
                 <IconButtonWithLabel link icon={PhotoIcon} label={t('settings.media.title')} to="/settings/media" />
                 <IconButtonWithLabel
                     link
+                    disabled={!isDomainApAvailable}
+                    disableMessage={`${client.host}では有効化されていません`}
                     icon={SettingsEthernetIcon}
                     label={t('settings.ap.title')}
                     to="/settings/activitypub"
