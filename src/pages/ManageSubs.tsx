@@ -13,7 +13,7 @@ import { useClient } from '../context/ClientContext'
 import { useTranslation } from 'react-i18next'
 import { usePreference } from '../context/PreferenceContext'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Schemas, type CoreSubscription } from '@concurrent-world/client'
 
 import AddIcon from '@mui/icons-material/Add'
@@ -33,22 +33,13 @@ export function ManageSubsPage(): JSX.Element {
     const { client } = useClient()
     const [lists, setLists] = usePreference('lists')
 
-    const { reloadList } = useGlobalState()
+    const { reloadList, allKnownSubscriptions } = useGlobalState()
 
-    const [ownSubscriptions, setOwnSubscriptions] = useState<Array<CoreSubscription<any>>>([])
     const listedSubs: string[] = Object.keys(lists)
-    const unlistedSubs: Array<CoreSubscription<any>> = ownSubscriptions.filter(
+    const unlistedSubs: Array<CoreSubscription<any>> = allKnownSubscriptions.filter(
         (sub) => !Object.keys(lists).includes(sub.id)
     )
     const [inspectedSub, setInspectedSub] = useState<CoreSubscription<any> | null>(null)
-
-    const [reloader, setReloader] = useState<number>(0)
-
-    useEffect(() => {
-        client.api.getOwnSubscriptions<any>().then((subs) => {
-            setOwnSubscriptions(subs)
-        })
-    }, [reloader])
 
     return (
         <Box
@@ -105,7 +96,7 @@ export function ManageSubsPage(): JSX.Element {
                                     )
                                     .then((subscription) => {
                                         console.log(subscription)
-                                        setReloader((prev) => prev + 1)
+                                        reloadList()
                                     })
                                     .catch((error) => {
                                         console.error(error)
@@ -123,7 +114,7 @@ export function ManageSubsPage(): JSX.Element {
                                 id={subid}
                                 key={subid}
                                 onClick={() => {
-                                    const target = ownSubscriptions.find((sub) => sub.id === subid)
+                                    const target = allKnownSubscriptions.find((sub) => sub.id === subid)
                                     if (target) {
                                         setInspectedSub(target)
                                     } else {
@@ -243,7 +234,6 @@ export function ManageSubsPage(): JSX.Element {
                     <ListSettings
                         subscription={inspectedSub}
                         onModified={() => {
-                            setReloader((prev) => prev + 1)
                             reloadList()
                             setInspectedSub(null)
                         }}

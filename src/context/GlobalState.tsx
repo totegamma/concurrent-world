@@ -15,6 +15,7 @@ export interface GlobalState {
     isMasterSession: boolean
 
     allKnownTimelines: Array<Timeline<CommunityTimelineSchema>>
+    allKnownSubscriptions: Array<CoreSubscription<any>>
     listedSubscriptions: Record<string, CoreSubscription<any>>
     reloadList: () => void
 }
@@ -36,7 +37,14 @@ export const GlobalStateProvider = ({ children }: GlobalStateProps): JSX.Element
     const isMasterSession = JSON.parse(localStorage.getItem('Identity') || 'null') !== null
 
     const [allKnownTimelines, setAllKnownTimelines] = useState<Array<Timeline<CommunityTimelineSchema>>>([])
+    const [allKnownSubscriptions, setAllKnownSubscriptions] = useState<Array<CoreSubscription<any>>>([])
     const [listedSubscriptions, setListedSubscriptions] = useState<Record<string, CoreSubscription<any>>>({})
+
+    useEffect(() => {
+        client.api.getOwnSubscriptions<any>().then((subs) => {
+            setAllKnownSubscriptions(subs)
+        })
+    }, [])
 
     useEffect(() => {
         let unmounted = false
@@ -138,6 +146,7 @@ export const GlobalStateProvider = ({ children }: GlobalStateProps): JSX.Element
                 isDomainOffline,
                 isMasterSession,
                 allKnownTimelines,
+                allKnownSubscriptions,
                 listedSubscriptions,
                 reloadList
             }}
@@ -156,6 +165,7 @@ export function useGlobalState(): GlobalState {
             isDomainOffline: false,
             isMasterSession: false,
             allKnownTimelines: [],
+            allKnownSubscriptions: [],
             listedSubscriptions: {},
             reloadList: () => {}
         }

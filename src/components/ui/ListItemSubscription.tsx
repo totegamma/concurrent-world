@@ -9,8 +9,8 @@ export interface ListItemSubscriptionProps {
 }
 
 export const ListItemSubscription = (props: ListItemSubscriptionProps): JSX.Element => {
-    const globalState = useGlobalState()
-    const subscription = globalState.listedSubscriptions[props.id] as
+    const { allKnownSubscriptions } = useGlobalState()
+    const subscription = allKnownSubscriptions.find((sub) => sub.id === props.id) as
         | CoreSubscription<ListSubscriptionSchema>
         | undefined
 
