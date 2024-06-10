@@ -13,7 +13,7 @@ import { useClient } from '../context/ClientContext'
 import { useTranslation } from 'react-i18next'
 import { usePreference } from '../context/PreferenceContext'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Schemas, type CoreSubscription } from '@concurrent-world/client'
 
 import AddIcon from '@mui/icons-material/Add'
@@ -25,31 +25,21 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import { ListSettings } from '../components/ListSettings'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import { type StreamList } from '../model'
-import { useGlobalActions } from '../context/GlobalActions'
+import { ListItemSubscription } from '../components/ui/ListItemSubscription'
+import { useGlobalState } from '../context/GlobalState'
 
 export function ManageSubsPage(): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'pages.contacts' })
     const { client } = useClient()
     const [lists, setLists] = usePreference('lists')
 
-    const actions = useGlobalActions()
+    const { reloadList, allKnownSubscriptions } = useGlobalState()
 
-    const [ownSubscriptions, setOwnSubscriptions] = useState<Array<CoreSubscription<any>>>([])
-    const listedSubs: Array<CoreSubscription<any>> = Object.keys(lists)
-        .map((id) => ownSubscriptions.find((sub) => sub.id === id))
-        .filter((sub) => sub !== undefined) as Array<CoreSubscription<any>>
-    const unlistedSubs: Array<CoreSubscription<any>> = ownSubscriptions.filter(
+    const listedSubs: string[] = Object.keys(lists)
+    const unlistedSubs: Array<CoreSubscription<any>> = allKnownSubscriptions.filter(
         (sub) => !Object.keys(lists).includes(sub.id)
     )
     const [inspectedSub, setInspectedSub] = useState<CoreSubscription<any> | null>(null)
-
-    const [reloader, setReloader] = useState<number>(0)
-
-    useEffect(() => {
-        client.api.getOwnSubscriptions<any>().then((subs) => {
-            setOwnSubscriptions(subs)
-        })
-    }, [reloader])
 
     return (
         <Box
@@ -80,7 +70,9 @@ export function ManageSubsPage(): JSX.Element {
                     sx={{
                         display: 'flex',
                         flexDirection: 'column',
-                        flex: '1'
+                        flex: '1',
+                        gap: 1,
+                        mb: 2
                     }}
                 >
                     <Box
@@ -104,7 +96,7 @@ export function ManageSubsPage(): JSX.Element {
                                     )
                                     .then((subscription) => {
                                         console.log(subscription)
-                                        setReloader((prev) => prev + 1)
+                                        reloadList()
                                     })
                                     .catch((error) => {
                                         console.error(error)
@@ -116,11 +108,19 @@ export function ManageSubsPage(): JSX.Element {
                         </Button>
                     </Box>
 
-                    <List dense>
-                        {listedSubs.map((sub, i) => (
-                            <ListItem
-                                dense
-                                key={sub.id}
+                    <List dense disablePadding>
+                        {listedSubs.map((subid, i) => (
+                            <ListItemSubscription
+                                id={subid}
+                                key={subid}
+                                onClick={() => {
+                                    const target = allKnownSubscriptions.find((sub) => sub.id === subid)
+                                    if (target) {
+                                        setInspectedSub(target)
+                                    } else {
+                                        console.error('not found')
+                                    }
+                                }}
                                 secondaryAction={
                                     <Box>
                                         <IconButton
@@ -163,7 +163,7 @@ export function ManageSubsPage(): JSX.Element {
                                             disabled={listedSubs.length === 1}
                                             onClick={() => {
                                                 const old = lists
-                                                delete old[sub.id]
+                                                delete old[subid]
                                                 setLists(old)
                                             }}
                                         >
@@ -171,16 +171,7 @@ export function ManageSubsPage(): JSX.Element {
                                         </IconButton>
                                     </Box>
                                 }
-                            >
-                                <ListItemButton
-                                    dense
-                                    onClick={() => {
-                                        setInspectedSub(sub)
-                                    }}
-                                >
-                                    <ListItemText primary={sub.document.body?.name ?? sub.id} />
-                                </ListItemButton>
-                            </ListItem>
+                            />
                         ))}
                     </List>
                 </Box>
@@ -189,16 +180,18 @@ export function ManageSubsPage(): JSX.Element {
                     sx={{
                         display: 'flex',
                         flexDirection: 'column',
-                        flex: '1'
+                        flex: '1',
+                        gap: 1
                     }}
                 >
                     <Typography variant="h3" gutterBottom>
                         非表示のリスト
                     </Typography>
-                    <List dense>
+                    <List dense disablePadding>
                         {unlistedSubs.map((sub) => (
                             <ListItem
                                 dense
+                                disablePadding
                                 key={sub.id}
                                 secondaryAction={
                                     <Box>
@@ -241,8 +234,8 @@ export function ManageSubsPage(): JSX.Element {
                     <ListSettings
                         subscription={inspectedSub}
                         onModified={() => {
-                            setReloader((prev) => prev + 1)
-                            actions.reloadList()
+                            console.log('modified')
+                            reloadList()
                             setInspectedSub(null)
                         }}
                     />

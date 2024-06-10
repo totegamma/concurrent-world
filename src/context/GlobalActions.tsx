@@ -6,7 +6,6 @@ import {
     type Message,
     type Timeline,
     type CommunityTimelineSchema,
-    type CoreSubscription,
     Schemas,
     type CoreTimeline
 } from '@concurrent-world/client'
@@ -30,9 +29,6 @@ export interface GlobalActionsState {
     openReply: (target: Message<any>) => void
     openReroute: (target: Message<any>) => void
     openMobileMenu: (open?: boolean) => void
-    allKnownTimelines: Array<Timeline<CommunityTimelineSchema>>
-    listedSubscriptions: Record<string, CoreSubscription<any>>
-    reloadList: () => void
     draft: string
     openEmojipack: (url: EmojiPackage) => void
     openImageViewer: (url: string) => void
@@ -72,8 +68,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
 
     const isPostStreamsPublic = useMemo(() => postStreams.every((stream) => stream.indexable), [postStreams])
 
-    const [allKnownTimelines, setAllKnownTimelines] = useState<Array<Timeline<CommunityTimelineSchema>>>([])
-    const [listedSubscriptions, setListedSubscriptions] = useState<Record<string, CoreSubscription<any>>>({})
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
     const [previewImage, setPreviewImage] = useState<string | undefined>()
 
@@ -139,78 +133,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                 })
         }
     }, [])
-
-    useEffect(() => {
-        let unmounted = false
-        setAllKnownTimelines([])
-        Promise.all(
-            Object.keys(lists).map((id) =>
-                client.api
-                    .getSubscription(id)
-                    .then((sub) => {
-                        return [id, sub]
-                    })
-                    .catch((e) => {
-                        console.log(e)
-                        return [id, null]
-                    })
-            )
-        ).then((subs) => {
-            if (unmounted) return
-            const validsubsarr = subs.filter((e) => e[1]) as Array<[string, CoreSubscription<any>]>
-            const listedSubs = Object.fromEntries(validsubsarr)
-            setListedSubscriptions(listedSubs)
-
-            const validsubs = validsubsarr.map((e) => e[1])
-
-            const allTimelines = validsubs.flatMap((sub) => sub.items.map((e) => e.id))
-            const uniq = [...new Set(allTimelines)]
-            uniq.forEach((id) => {
-                client.getTimeline<CommunityTimelineSchema>(id).then((stream) => {
-                    if (stream && !unmounted) {
-                        setAllKnownTimelines((prev) => [...prev, stream])
-                    }
-                })
-            })
-        })
-
-        return () => {
-            unmounted = true
-        }
-    }, [lists])
-
-    const reloadList = useCallback(() => {
-        setAllKnownTimelines([])
-        Promise.all(
-            Object.keys(lists).map((id) =>
-                client.api
-                    .getSubscription(id)
-                    .then((sub) => {
-                        return [id, sub]
-                    })
-                    .catch((e) => {
-                        console.log(e)
-                        return [id, null]
-                    })
-            )
-        ).then((subs) => {
-            const validsubsarr = subs.filter((e) => e[1]) as Array<[string, CoreSubscription<any>]>
-            const listedSubs = Object.fromEntries(validsubsarr)
-            setListedSubscriptions(listedSubs)
-
-            const validsubs = validsubsarr.map((e) => e[1])
-
-            const allTimelins = validsubs.flatMap((sub) => sub.items.map((e) => e.id))
-            const uniq = [...new Set(allTimelins)]
-            uniq.forEach((id) => {
-                client.getTimeline<CommunityTimelineSchema>(id).then((stream) => {
-                    if (stream) {
-                        setAllKnownTimelines((prev) => [...prev, stream])
-                    }
-                })
-            })
-        })
-    }, [client, lists])
 
     const openDraft = useCallback(
         (draft?: string) => {
@@ -290,28 +212,22 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     openReply,
                     openReroute,
                     openMobileMenu,
-                    allKnownTimelines,
                     draft,
                     openEmojipack,
                     openImageViewer,
                     postStreams,
-                    setPostStreams,
-                    listedSubscriptions,
-                    reloadList
+                    setPostStreams
                 }
             }, [
                 openDraft,
                 openReply,
                 openReroute,
                 openMobileMenu,
-                allKnownTimelines,
                 draft,
                 openEmojipack,
                 openImageViewer,
                 postStreams,
-                setPostStreams,
-                listedSubscriptions,
-                reloadList
+                setPostStreams
             ])}
         >
             <InspectorProvider>
@@ -349,7 +265,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                             <MobileDraft
                                                 streamPickerInitial={postStreams}
                                                 defaultPostHome={isPostStreamsPublic}
-                                                streamPickerOptions={allKnownTimelines}
+                                                streamPickerOptions={globalState.allKnownTimelines}
                                                 onSubmit={async (text: string, destinations: string[], options) => {
                                                     await client
                                                         .createMarkdownCrnt(text, destinations, options)
@@ -376,7 +292,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                 }
                                                 streamPickerOptions={
                                                     mode === 'reroute'
-                                                        ? allKnownTimelines
+                                                        ? globalState.allKnownTimelines
                                                         : targetMessage.postedStreams ?? []
                                                 }
                                                 onSubmit={async (text, streams, options): Promise<Error | null> => {
@@ -415,7 +331,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                 defaultPostHome={isPostStreamsPublic}
                                                 value={draft}
                                                 streamPickerInitial={postStreams}
-                                                streamPickerOptions={allKnownTimelines}
+                                                streamPickerOptions={globalState.allKnownTimelines}
                                                 onSubmit={async (text: string, destinations: string[], options) => {
                                                     await client
                                                         .createMarkdownCrnt(text, destinations, options)
@@ -454,7 +370,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                 }
                                                 streamPickerOptions={
                                                     mode === 'reroute'
-                                                        ? allKnownTimelines
+                                                        ? globalState.allKnownTimelines
                                                         : targetMessage.postedStreams ?? []
                                                 }
                                                 onSubmit={async (text, streams, options): Promise<Error | null> => {
@@ -713,5 +629,19 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
 }
 
 export function useGlobalActions(): GlobalActionsState {
-    return useContext(GlobalActionsContext) as GlobalActionsState
+    const actions = useContext(GlobalActionsContext)
+    if (!actions) {
+        return {
+            openDraft: () => {},
+            openReply: () => {},
+            openReroute: () => {},
+            openMobileMenu: () => {},
+            draft: '',
+            openEmojipack: () => {},
+            openImageViewer: () => {},
+            postStreams: [],
+            setPostStreams: () => {}
+        }
+    }
+    return actions
 }

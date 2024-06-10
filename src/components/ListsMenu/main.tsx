@@ -1,5 +1,5 @@
 import { List, ListItem, ListItemButton, ListItemText } from '@mui/material'
-import { ListItemSubscription } from '../ui/ListItemSubscription'
+import { ListItemSubscriptionTree } from '../ui/ListItemSubscriptionTree'
 import ListIcon from '@mui/icons-material/List'
 import { useGlobalActions } from '../../context/GlobalActions'
 import { useTranslation } from 'react-i18next'
@@ -29,7 +29,7 @@ export const ListsMenu = (): JSX.Element => {
                 </ListItemButton>
             </ListItem>
             {Object.keys(lists).map((key) => (
-                <ListItemSubscription
+                <ListItemSubscriptionTree
                     key={key}
                     id={key}
                     body={lists[key]}

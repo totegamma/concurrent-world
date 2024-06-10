@@ -5,11 +5,11 @@ import { useSnackbar } from 'notistack'
 import { Schemas } from '@concurrent-world/client'
 
 import { useTranslation } from 'react-i18next'
-import { useGlobalActions } from '../../context/GlobalActions'
+import { useGlobalState } from '../../context/GlobalState'
 
 export const ApSetup = (): JSX.Element => {
     const { client } = useClient()
-    const actions = useGlobalActions()
+    const { listedSubscriptions } = useGlobalState()
     const [userID, setUserID] = useState('')
     const { enqueueSnackbar } = useSnackbar()
 
@@ -91,7 +91,7 @@ export const ApSetup = (): JSX.Element => {
         )
 
         client.api
-            .subscribe('world.concrnt.t-ap@' + client.ccid, Object.keys(actions.listedSubscriptions)[0])
+            .subscribe('world.concrnt.t-ap@' + client.ccid, Object.keys(listedSubscriptions)[0])
             .then((subscription) => {
                 console.log(subscription)
             })

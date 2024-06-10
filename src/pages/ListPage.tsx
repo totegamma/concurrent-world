@@ -20,12 +20,14 @@ import { CCDrawer } from '../components/ui/CCDrawer'
 import { TimelineHeader } from '../components/TimelineHeader'
 import { type VListHandle } from 'virtua'
 import { useGlobalActions } from '../context/GlobalActions'
+import { useGlobalState } from '../context/GlobalState'
 
 export function ListPage(): JSX.Element {
     const { client } = useClient()
     const path = useLocation()
     const navigate = useNavigate()
-    const actions = useGlobalActions()
+    const { setPostStreams, postStreams } = useGlobalActions()
+    const { allKnownTimelines, reloadList } = useGlobalState()
     const [lists, _setLists] = usePreference('lists')
     const [showEditorOnTop] = usePreference('showEditorOnTop')
     const [showEditorOnTopMobile] = usePreference('showEditorOnTopMobile')
@@ -50,7 +52,7 @@ export function ListPage(): JSX.Element {
         if (!list) return
 
         Promise.all(list.defaultPostStreams.map((streamID) => client.getTimeline(streamID))).then((streams) => {
-            actions.setPostStreams(streams.filter((e) => e !== null) as Array<CoreTimeline<CommunityTimelineSchema>>)
+            setPostStreams(streams.filter((e) => e !== null) as Array<CoreTimeline<CommunityTimelineSchema>>)
         })
     }, [id, lists])
 
@@ -139,8 +141,8 @@ export function ListPage(): JSX.Element {
                                     }}
                                 >
                                     <Draft
-                                        streamPickerOptions={actions.allKnownTimelines}
-                                        streamPickerInitial={actions.postStreams}
+                                        streamPickerOptions={allKnownTimelines}
+                                        streamPickerInitial={postStreams}
                                         onSubmit={async (
                                             text: string,
                                             destinations: string[],
@@ -202,7 +204,7 @@ export function ListPage(): JSX.Element {
                         subscription={subscription}
                         onModified={() => {
                             setUpdater((e) => e + 1)
-                            actions.reloadList()
+                            reloadList()
                         }}
                     />
                 ) : (
