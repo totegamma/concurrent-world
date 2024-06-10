@@ -2,10 +2,10 @@ import { Box, Button, ButtonGroup, Checkbox, IconButton, Menu, MenuItem, Tooltip
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useGlobalActions } from '../context/GlobalActions'
 import { useClient } from '../context/ClientContext'
 
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
+import { useGlobalState } from '../context/GlobalState'
 
 export interface WatchButtonProps {
     timelineID: string
@@ -18,15 +18,11 @@ export const WatchButton = (props: WatchButtonProps): JSX.Element => {
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
     const [isHovered, setIsHovered] = useState(false)
-    const actions = useGlobalActions()
-
-    if (!actions) {
-        return <></>
-    }
+    const { allKnownTimelines, listedSubscriptions, reloadList } = useGlobalState()
 
     const { t } = useTranslation('', { keyPrefix: 'common' })
 
-    const watching = actions.allKnownTimelines.find((e) => e.id === props.timelineID) !== undefined
+    const watching = allKnownTimelines.find((e) => e.id === props.timelineID) !== undefined
 
     return (
         <Box>
@@ -53,7 +49,7 @@ export const WatchButton = (props: WatchButtonProps): JSX.Element => {
                                 setMenuAnchor(e.currentTarget)
                             } else {
                                 client.api
-                                    .subscribe(props.timelineID, Object.keys(actions.listedSubscriptions)[0])
+                                    .subscribe(props.timelineID, Object.keys(listedSubscriptions)[0])
                                     .then((subscription) => {
                                         console.log(subscription)
                                     })
@@ -92,22 +88,21 @@ export const WatchButton = (props: WatchButtonProps): JSX.Element => {
                     zIndex: theme.zIndex.tooltip + 1
                 }}
             >
-                {Object.keys(actions.listedSubscriptions).map((key) => (
+                {Object.keys(listedSubscriptions).map((key) => (
                     <MenuItem key={key} onClick={() => {}}>
-                        {actions.listedSubscriptions[key].document.body.name}
+                        {listedSubscriptions[key].document.body.name}
                         <Checkbox
                             checked={
-                                actions.listedSubscriptions[key].items.find((e) => e.id === props.timelineID) !==
-                                undefined
+                                listedSubscriptions[key].items.find((e) => e.id === props.timelineID) !== undefined
                             }
                             onChange={(check) => {
                                 if (check.target.checked) {
                                     client.api.subscribe(props.timelineID, key).then((_) => {
-                                        actions.reloadList()
+                                        reloadList()
                                     })
                                 } else {
                                     client.api.unsubscribe(props.timelineID, key).then((_) => {
-                                        actions.reloadList()
+                                        reloadList()
                                     })
                                 }
                             }}

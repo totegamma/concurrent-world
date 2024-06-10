@@ -6,7 +6,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore'
 import { ListItemTimeline } from './ListItemTimeline'
 import { usePreference } from '../../context/PreferenceContext'
 import { type ListSubscriptionSchema, type CoreSubscription } from '@concurrent-world/client'
-import { useGlobalActions } from '../../context/GlobalActions'
+import { useGlobalState } from '../../context/GlobalState'
 
 export interface ListItemSubscriptionTreeProps {
     id: string
@@ -26,8 +26,10 @@ export const ListItemSubscriptionTree = (props: ListItemSubscriptionTreeProps): 
         updateLists(old)
     }
 
-    const action = useGlobalActions()
-    const subscription = action.listedSubscriptions[props.id] as CoreSubscription<ListSubscriptionSchema> | undefined
+    const globalState = useGlobalState()
+    const subscription = globalState.listedSubscriptions[props.id] as
+        | CoreSubscription<ListSubscriptionSchema>
+        | undefined
 
     return (
         <>

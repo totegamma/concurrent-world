@@ -29,19 +29,19 @@ import {
 } from '@concurrent-world/client'
 import { MessageView } from '../components/Message/MessageView'
 import { Draft } from '../components/Draft'
-import { useGlobalActions } from '../context/GlobalActions'
 import { RerouteMessageFrame } from '../components/Message/RerouteMessageFrame'
 import { FavoriteAssociation } from '../components/Association/FavoriteAssociation'
 import { ReactionAssociation } from '../components/Association/ReactionAssociation'
 
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import { useGlobalState } from '../context/GlobalState'
 
 export function MessagePage(): JSX.Element {
     const { authorID, messageID } = useParams()
     const { client } = useClient()
     const lastUpdated = 0
 
-    const actions = useGlobalActions()
+    const { allKnownTimelines } = useGlobalState()
 
     const [message, setMessage] = useState<Message<
         MarkdownMessageSchema | ReplyMessageSchema | RerouteMessageSchema
@@ -214,7 +214,7 @@ export function MessagePage(): JSX.Element {
                     <Paper variant="outlined">
                         <Draft
                             streamPickerInitial={message.postedStreams ?? []}
-                            streamPickerOptions={actions.allKnownTimelines}
+                            streamPickerOptions={allKnownTimelines}
                             placeholder="Write a reply..."
                             onSubmit={async (text: string, streams: string[], options) => {
                                 await message.reply(streams, text, options?.emojis)

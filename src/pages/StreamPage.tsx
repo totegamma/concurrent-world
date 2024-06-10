@@ -17,10 +17,12 @@ import TagIcon from '@mui/icons-material/Tag'
 import TuneIcon from '@mui/icons-material/Tune'
 import InfoIcon from '@mui/icons-material/Info'
 import LockIcon from '@mui/icons-material/Lock'
+import { useGlobalState } from '../context/GlobalState'
 
 export const StreamPage = memo((): JSX.Element => {
     const { client } = useClient()
-    const actions = useGlobalActions()
+    const { postStreams, setPostStreams } = useGlobalActions()
+    const { allKnownTimelines } = useGlobalState()
 
     const { id } = useParams()
 
@@ -30,7 +32,7 @@ export const StreamPage = memo((): JSX.Element => {
     const timelineRef = useRef<VListHandle>(null)
 
     const targetStreamID = id ?? ''
-    const targetStream = actions.postStreams[0]
+    const targetStream = postStreams[0]
 
     const [streamInfoOpen, setStreamInfoOpen] = useState<boolean>(false)
 
@@ -63,7 +65,7 @@ export const StreamPage = memo((): JSX.Element => {
 
     useEffect(() => {
         client.getTimeline<CommunityTimelineSchema>(targetStreamID).then((stream) => {
-            if (stream) actions.setPostStreams([stream])
+            if (stream) setPostStreams([stream])
         })
     }, [id])
 
@@ -113,9 +115,7 @@ export const StreamPage = memo((): JSX.Element => {
                                             <Draft
                                                 defaultPostHome={!nonPublic}
                                                 streamPickerInitial={streams}
-                                                streamPickerOptions={[
-                                                    ...new Set([...actions.allKnownTimelines, ...streams])
-                                                ]}
+                                                streamPickerOptions={[...new Set([...allKnownTimelines, ...streams])]}
                                                 onSubmit={async (
                                                     text: string,
                                                     destinations: string[],

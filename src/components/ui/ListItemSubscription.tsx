@@ -1,6 +1,6 @@
 import { ListItem, ListItemButton, ListItemText } from '@mui/material'
 import { type ListSubscriptionSchema, type CoreSubscription } from '@concurrent-world/client'
-import { useGlobalActions } from '../../context/GlobalActions'
+import { useGlobalState } from '../../context/GlobalState'
 
 export interface ListItemSubscriptionProps {
     id: string
@@ -9,8 +9,10 @@ export interface ListItemSubscriptionProps {
 }
 
 export const ListItemSubscription = (props: ListItemSubscriptionProps): JSX.Element => {
-    const action = useGlobalActions()
-    const subscription = action.listedSubscriptions[props.id] as CoreSubscription<ListSubscriptionSchema> | undefined
+    const globalState = useGlobalState()
+    const subscription = globalState.listedSubscriptions[props.id] as
+        | CoreSubscription<ListSubscriptionSchema>
+        | undefined
 
     return (
         <ListItem
