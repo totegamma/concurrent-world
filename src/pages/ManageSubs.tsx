@@ -26,6 +26,7 @@ import { ListSettings } from '../components/ListSettings'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import { type StreamList } from '../model'
 import { useGlobalActions } from '../context/GlobalActions'
+import { ListItemSubscription } from '../components/ui/ListItemSubscription'
 
 export function ManageSubsPage(): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'pages.contacts' })
@@ -35,9 +36,7 @@ export function ManageSubsPage(): JSX.Element {
     const actions = useGlobalActions()
 
     const [ownSubscriptions, setOwnSubscriptions] = useState<Array<CoreSubscription<any>>>([])
-    const listedSubs: Array<CoreSubscription<any>> = Object.keys(lists)
-        .map((id) => ownSubscriptions.find((sub) => sub.id === id))
-        .filter((sub) => sub !== undefined) as Array<CoreSubscription<any>>
+    const listedSubs: string[] = Object.keys(lists)
     const unlistedSubs: Array<CoreSubscription<any>> = ownSubscriptions.filter(
         (sub) => !Object.keys(lists).includes(sub.id)
     )
@@ -80,7 +79,9 @@ export function ManageSubsPage(): JSX.Element {
                     sx={{
                         display: 'flex',
                         flexDirection: 'column',
-                        flex: '1'
+                        flex: '1',
+                        gap: 1,
+                        mb: 2
                     }}
                 >
                     <Box
@@ -116,11 +117,19 @@ export function ManageSubsPage(): JSX.Element {
                         </Button>
                     </Box>
 
-                    <List dense>
-                        {listedSubs.map((sub, i) => (
-                            <ListItem
-                                dense
-                                key={sub.id}
+                    <List dense disablePadding>
+                        {listedSubs.map((subid, i) => (
+                            <ListItemSubscription
+                                id={subid}
+                                key={subid}
+                                onClick={() => {
+                                    const target = ownSubscriptions.find((sub) => sub.id === subid)
+                                    if (target) {
+                                        setInspectedSub(target)
+                                    } else {
+                                        console.error('not found')
+                                    }
+                                }}
                                 secondaryAction={
                                     <Box>
                                         <IconButton
@@ -163,7 +172,7 @@ export function ManageSubsPage(): JSX.Element {
                                             disabled={listedSubs.length === 1}
                                             onClick={() => {
                                                 const old = lists
-                                                delete old[sub.id]
+                                                delete old[subid]
                                                 setLists(old)
                                             }}
                                         >
@@ -171,16 +180,7 @@ export function ManageSubsPage(): JSX.Element {
                                         </IconButton>
                                     </Box>
                                 }
-                            >
-                                <ListItemButton
-                                    dense
-                                    onClick={() => {
-                                        setInspectedSub(sub)
-                                    }}
-                                >
-                                    <ListItemText primary={sub.document.body?.name ?? sub.id} />
-                                </ListItemButton>
-                            </ListItem>
+                            />
                         ))}
                     </List>
                 </Box>
@@ -189,16 +189,18 @@ export function ManageSubsPage(): JSX.Element {
                     sx={{
                         display: 'flex',
                         flexDirection: 'column',
-                        flex: '1'
+                        flex: '1',
+                        gap: 1
                     }}
                 >
                     <Typography variant="h3" gutterBottom>
                         非表示のリスト
                     </Typography>
-                    <List dense>
+                    <List dense disablePadding>
                         {unlistedSubs.map((sub) => (
                             <ListItem
                                 dense
+                                disablePadding
                                 key={sub.id}
                                 secondaryAction={
                                     <Box>
