@@ -234,6 +234,7 @@ export function ManageSubsPage(): JSX.Element {
                     <ListSettings
                         subscription={inspectedSub}
                         onModified={() => {
+                            console.log('modified')
                             reloadList()
                             setInspectedSub(null)
                         }}

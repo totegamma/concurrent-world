@@ -116,6 +116,9 @@ export const GlobalStateProvider = ({ children }: GlobalStateProps): JSX.Element
                 })
             })
         })
+        client.api.getOwnSubscriptions<any>().then((subs) => {
+            setAllKnownSubscriptions(subs)
+        })
     }, [client, lists])
 
     useEffect(() => {

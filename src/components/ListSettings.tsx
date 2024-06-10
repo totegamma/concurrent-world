@@ -71,7 +71,7 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
             {props.subscription.schema === Schemas.listSubscription && (
                 <>
                     <Typography variant="h3">{t('name')}</Typography>
-                    <Box display="flex" flexDirection="row">
+                    <Box display="flex" flexDirection="row" gap={1}>
                         <TextField
                             label="list name"
                             variant="outlined"
@@ -85,16 +85,20 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                         />
                         <Button
                             onClick={(_) => {
-                                client.api.upsertSubscription<ListSubscriptionSchema>(
-                                    props.subscription.schema,
-                                    {
-                                        name: listName
-                                    },
-                                    {
-                                        id: props.subscription.id,
-                                        indexable: props.subscription.indexable
-                                    }
-                                )
+                                client.api
+                                    .upsertSubscription<ListSubscriptionSchema>(
+                                        props.subscription.schema,
+                                        {
+                                            name: listName
+                                        },
+                                        {
+                                            id: props.subscription.id,
+                                            indexable: props.subscription.indexable
+                                        }
+                                    )
+                                    .then((_) => {
+                                        props.onModified?.()
+                                    })
                             }}
                         >
                             {t('update')}
