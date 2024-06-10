@@ -1,7 +1,6 @@
-import { Alert, Box, Button, Divider, Paper, Typography } from '@mui/material'
+import { Alert, Box, Divider, Paper, Typography } from '@mui/material'
 import { GuestBase } from '../components/GuestBase'
 import { ImportMasterKey } from '../components/Importer/ImportMasterkey'
-import { Link } from 'react-router-dom'
 import { ImportSubkey } from '../components/Importer/ImportSubkey'
 
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner'
@@ -27,11 +26,6 @@ export function AccountImport(): JSX.Element {
                 flex: 1,
                 gap: 2
             }}
-            additionalButton={
-                <Button component={Link} to="/register">
-                    はじめる
-                </Button>
-            }
         >
             <Paper
                 sx={{

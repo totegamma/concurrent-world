@@ -1,5 +1,5 @@
 import Box from '@mui/material/Box'
-import { Button, IconButton, Typography } from '@mui/material'
+import { Alert, AlertTitle, Button, IconButton, Typography } from '@mui/material'
 import { Link, NavLink } from 'react-router-dom'
 import GitHubIcon from '@mui/icons-material/GitHub'
 import AppMock from '../components/welcome/AppMock'
@@ -30,6 +30,11 @@ export default function Welcome(): JSX.Element {
                 </Button>
             }
         >
+            <Alert severity="info">
+                <AlertTitle>新バージョンがリリースされています</AlertTitle>
+                このページは古いバージョンの Concurrent です。新しいバージョンは{' '}
+                <a href="https://concrnt.world">concrnt.world</a> で利用できます。
+            </Alert>
             <Box /* top */
                 display="flex"
                 minHeight="50vh"
@@ -52,8 +57,9 @@ export default function Welcome(): JSX.Element {
                             marginTop: '20px',
                             width: '100%'
                         }}
+                        disabled={true}
                     >
-                        {t('createAccount')}
+                        旧バージョンのため、新規登録は終了しました
                     </Button>
                     <Box pt={2}>
                         <Typography gutterBottom variant="h3">
@@ -176,8 +182,9 @@ export default function Welcome(): JSX.Element {
                         marginTop: '20px',
                         width: '100%'
                     }}
+                    disabled={true}
                 >
-                    {t('createAccount')}
+                    旧バージョンのため、新規登録は終了しました
                 </Button>
             </Box>
 
