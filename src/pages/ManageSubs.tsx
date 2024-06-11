@@ -1,14 +1,4 @@
-import {
-    Box,
-    Button,
-    Divider,
-    IconButton,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemText,
-    Typography
-} from '@mui/material'
+import { Box, Button, Divider, IconButton, List, Typography } from '@mui/material'
 import { useClient } from '../context/ClientContext'
 import { useTranslation } from 'react-i18next'
 import { usePreference } from '../context/PreferenceContext'
@@ -189,10 +179,12 @@ export function ManageSubsPage(): JSX.Element {
                     </Typography>
                     <List dense disablePadding>
                         {unlistedSubs.map((sub) => (
-                            <ListItem
-                                dense
-                                disablePadding
+                            <ListItemSubscription
+                                id={sub.id}
                                 key={sub.id}
+                                onClick={() => {
+                                    setInspectedSub(sub)
+                                }}
                                 secondaryAction={
                                     <Box>
                                         <IconButton
@@ -201,7 +193,7 @@ export function ManageSubsPage(): JSX.Element {
                                                 old[sub.id] = {
                                                     pinned: false,
                                                     expanded: false,
-                                                    defaultPostStreams: ['all']
+                                                    defaultPostStreams: []
                                                 }
                                                 setLists(old)
                                             }}
@@ -210,16 +202,7 @@ export function ManageSubsPage(): JSX.Element {
                                         </IconButton>
                                     </Box>
                                 }
-                            >
-                                <ListItemButton
-                                    dense
-                                    onClick={() => {
-                                        setInspectedSub(sub)
-                                    }}
-                                >
-                                    <ListItemText primary={sub.document.body?.name ?? sub.id} />
-                                </ListItemButton>
-                            </ListItem>
+                            />
                         ))}
                     </List>
                 </Box>
