@@ -31,7 +31,7 @@ export const ApSetup = (): JSX.Element => {
                 }
             }
             client.api
-                .fetchWithCredential(client.api.host, `/ap/api/entity/${userID}`, requestOptions)
+                .fetchWithCredential(client.api.host, `/ap/api/entity?id=${userID}`, requestOptions)
                 .then(async (res) => await res.json())
                 .then((profile) => {
                     console.log('profile', profile)
