@@ -52,6 +52,7 @@ export const WatchButton = (props: WatchButtonProps): JSX.Element => {
                                     .subscribe(props.timelineID, Object.keys(listedSubscriptions)[0])
                                     .then((subscription) => {
                                         console.log(subscription)
+                                        reloadList()
                                     })
                             }
                         }}
