@@ -119,6 +119,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                         }
                     }
                     setLists(list)
+                    globalState.reloadList()
                 })
         },
         [client]
