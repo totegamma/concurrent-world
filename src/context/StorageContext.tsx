@@ -64,7 +64,6 @@ export const StorageProvider = ({ children }: { children: JSX.Element | JSX.Elem
                         headers: {
                             'Content-Type': file.type,
                             'Content-Encoding': 'base64',
-                            'x-amz-acl': 'public-read',
                             'Content-Disposition': 'inline'
                         },
                         body: byteArray
