@@ -13,7 +13,8 @@ import {
     emojiRemarkPlugin,
     streamLinkRemarkPlugin,
     literalLinkRemarkPlugin,
-    strikeThroughRemarkPlugin
+    strikeThroughRemarkPlugin,
+    colorCodeRemarkPlugin
 } from '../../util'
 import { CCUserChip } from './CCUserChip'
 import { LinkChip } from './LinkChip'
@@ -42,7 +43,9 @@ const sanitizeOption = {
         'streamlink',
         'emoji',
         'social',
-        'emojipack'
+        'emojipack',
+        'font',
+        'colorcode'
     ],
     attributes: {
         ...defaultSchema.attributes,
@@ -53,7 +56,9 @@ const sanitizeOption = {
         streamlink: ['streamId'],
         emoji: ['shortcode'],
         social: ['href', 'service', 'icon'],
-        emojipack: ['src']
+        emojipack: ['src'],
+        font: ['color'],
+        colorcode: ['color']
     }
 }
 
@@ -129,7 +134,8 @@ export const MarkdownRenderer = memo<MarkdownRendererProps>((props: MarkdownRend
                     strikeThroughRemarkPlugin,
                     userMentionRemarkPlugin,
                     streamLinkRemarkPlugin,
-                    emojiRemarkPlugin
+                    emojiRemarkPlugin,
+                    colorCodeRemarkPlugin
                 ]}
                 rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeOption]]}
                 remarkRehypeOptions={{
@@ -142,6 +148,9 @@ export const MarkdownRenderer = memo<MarkdownRendererProps>((props: MarkdownRend
                         },
                         emoji: (h, node) => {
                             return h(node, 'emoji', { shortcode: node.shortcode })
+                        },
+                        colorcode: (h, node) => {
+                            return h(node, 'colorcode', { color: node.color })
                         }
                     }
                 }}
@@ -478,6 +487,25 @@ export const MarkdownRenderer = memo<MarkdownRendererProps>((props: MarkdownRend
                     },
                     emojipack: ({ src }) => {
                         return <EmojipackCard src={src} icon={<ManageSearchIcon />} onClick={actions.openEmojipack} />
+                    },
+                    colorcode: ({ color }) => {
+                        return (
+                            <>
+                                <span>{color}</span>
+                                <span
+                                    style={{
+                                        backgroundColor: color,
+                                        width: '1em',
+                                        height: '1em',
+                                        display: 'inline-block',
+                                        marginLeft: '0.25em',
+                                        borderRadius: '0.2em',
+                                        border: '1px solid rgba(0, 0, 0, 0.1)',
+                                        verticalAlign: '-0.1em'
+                                    }}
+                                />
+                            </>
+                        )
                     }
                 }}
             >

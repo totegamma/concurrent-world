@@ -170,7 +170,7 @@ export const strikeThroughRemarkPlugin = (): any => {
 export const userMentionRemarkPlugin = (): any => {
     return (tree: any) => {
         visit(tree, 'text', (node: any, index?: number, parent?: any) => {
-            const parts = node.value.split(/(@CC\w+)/)
+            const parts = node.value.split(/(@con1\w+)/)
             if (parts.length !== 1) {
                 parent.children.splice(
                     index,
@@ -179,6 +179,27 @@ export const userMentionRemarkPlugin = (): any => {
                         .map((part: string) => {
                             if (part.length === 0) return undefined
                             if (part.startsWith('@')) return { type: 'userlink', ccid: part.slice(1) }
+                            else return { type: 'text', value: part }
+                        })
+                        .filter((node: any) => node !== undefined)
+                )
+            }
+        })
+    }
+}
+
+export const colorCodeRemarkPlugin = (): any => {
+    return (tree: any) => {
+        visit(tree, 'text', (node: any, index?: number, parent?: any) => {
+            const parts = node.value.split(/(#[0-9a-fA-F]{6})(\s|$)/)
+            if (parts.length !== 1) {
+                parent.children.splice(
+                    index,
+                    1,
+                    ...parts
+                        .map((part: string) => {
+                            if (part.length === 0) return undefined
+                            if (part.startsWith('#')) return { type: 'colorcode', color: part }
                             else return { type: 'text', value: part }
                         })
                         .filter((node: any) => node !== undefined)
