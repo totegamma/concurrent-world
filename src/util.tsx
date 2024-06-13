@@ -188,6 +188,27 @@ export const userMentionRemarkPlugin = (): any => {
     }
 }
 
+export const colorCodeRemarkPlugin = (): any => {
+    return (tree: any) => {
+        visit(tree, 'text', (node: any, index?: number, parent?: any) => {
+            const parts = node.value.split(/(#[0-9a-fA-F]{6})/)
+            if (parts.length !== 1) {
+                parent.children.splice(
+                    index,
+                    1,
+                    ...parts
+                        .map((part: string) => {
+                            if (part.length === 0) return undefined
+                            if (part.startsWith('#')) return { type: 'colorcode', color: part }
+                            else return { type: 'text', value: part }
+                        })
+                        .filter((node: any) => node !== undefined)
+                )
+            }
+        })
+    }
+}
+
 export const streamLinkRemarkPlugin = (): any => {
     return (tree: any) => {
         visit(tree, 'text', (node: any, index?: number, parent?: any) => {
