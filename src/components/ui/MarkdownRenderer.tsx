@@ -42,7 +42,8 @@ const sanitizeOption = {
         'streamlink',
         'emoji',
         'social',
-        'emojipack'
+        'emojipack',
+        'font'
     ],
     attributes: {
         ...defaultSchema.attributes,
@@ -53,7 +54,8 @@ const sanitizeOption = {
         streamlink: ['streamId'],
         emoji: ['shortcode'],
         social: ['href', 'service', 'icon'],
-        emojipack: ['src']
+        emojipack: ['src'],
+        font: ['color']
     }
 }
 
