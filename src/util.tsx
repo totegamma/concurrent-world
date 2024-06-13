@@ -191,7 +191,7 @@ export const userMentionRemarkPlugin = (): any => {
 export const colorCodeRemarkPlugin = (): any => {
     return (tree: any) => {
         visit(tree, 'text', (node: any, index?: number, parent?: any) => {
-            const parts = node.value.split(/(#[0-9a-fA-F]{6})/)
+            const parts = node.value.split(/(#[0-9a-fA-F]{6})(\s|$)/)
             if (parts.length !== 1) {
                 parent.children.splice(
                     index,
