@@ -501,7 +501,14 @@ export const MarkdownRenderer = memo<MarkdownRendererProps>((props: MarkdownRend
                                         marginLeft: '0.25em',
                                         borderRadius: '0.2em',
                                         border: '1px solid rgba(0, 0, 0, 0.1)',
-                                        verticalAlign: '-0.1em'
+                                        verticalAlign: '-0.1em',
+                                        cursor: 'pointer'
+                                    }}
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(color)
+                                        enqueueSnackbar(`Copied: ${color}`, {
+                                            autoHideDuration: 1500
+                                        })
                                     }}
                                 />
                             </>
