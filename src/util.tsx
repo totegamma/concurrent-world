@@ -170,7 +170,7 @@ export const strikeThroughRemarkPlugin = (): any => {
 export const userMentionRemarkPlugin = (): any => {
     return (tree: any) => {
         visit(tree, 'text', (node: any, index?: number, parent?: any) => {
-            const parts = node.value.split(/(@CC\w+)/)
+            const parts = node.value.split(/(@con1\w+)/)
             if (parts.length !== 1) {
                 parent.children.splice(
                     index,
