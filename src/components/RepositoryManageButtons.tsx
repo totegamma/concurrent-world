@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { useClient } from '../context/ClientContext'
-import { Button } from '@mui/material'
+import { Button, TextField } from '@mui/material'
 import { type CCDocument, Schemas, Sign } from '@concurrent-world/client'
 
 interface v0data {
@@ -26,6 +26,7 @@ export function RepositoryImportButton(props: { domain?: string; onImport?: (err
 
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [importStatus, setImportStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+    const [sourceDomain, setSourceDomain] = useState<string>('')
 
     const target = props.domain ?? client.host
 
@@ -36,7 +37,7 @@ export function RepositoryImportButton(props: { domain?: string; onImport?: (err
         client.api
             .fetchWithCredential(
                 target,
-                '/api/v1/repository',
+                '/api/v1/repository?from=' + sourceDomain,
                 {
                     method: 'POST',
                     headers: {
@@ -86,6 +87,14 @@ export function RepositoryImportButton(props: { domain?: string; onImport?: (err
                         }
                         reader.readAsText(file)
                     }
+                }}
+            />
+            <TextField
+                label="インポート元ドメイン(オプション)"
+                placeholder="example.com"
+                value={sourceDomain}
+                onChange={(e) => {
+                    setSourceDomain(e.target.value)
                 }}
             />
             <Button
