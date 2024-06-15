@@ -93,7 +93,8 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                                         },
                                         {
                                             id: props.subscription.id,
-                                            indexable: props.subscription.indexable
+                                            indexable: props.subscription.indexable,
+                                            domainOwned: props.subscription.domainOwned
                                         }
                                     )
                                     .then((_) => {
