@@ -125,7 +125,7 @@
                 "secret": "You are currently logged in using the master-key by directly entering the secret key."
             },
             "hideSubKey": "Hide deactivated sub-keys",
-            "deacvtivate": "Deactivate",
+            "deactivate": "Deactivate",
             "switchMasterToSub": {
                 "saveMasterKey": "Securely save the master-key",
                 "descSaveMasterKey": "You will need this key to migrate or recover your account. If it becomes known to others, your account could be accessed illegally, so it must be kept absolutely confidential.",
