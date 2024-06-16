@@ -16,6 +16,7 @@ import { CCWallpaper } from './ui/CCWallpaper'
 import { useTranslation } from 'react-i18next'
 import { SubprofileBadge } from './ui/SubprofileBadge'
 import { ProfileProperties } from './ui/ProfileProperties'
+import { enqueueSnackbar } from 'notistack'
 
 export interface ProfileProps {
     user: User
@@ -133,7 +134,13 @@ export function Profile(props: ProfileProps): JSX.Element {
                             variant="h6"
                             sx={{
                                 fontWeight: 'bold',
-                                fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.5rem' }
+                                fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.5rem' },
+                                cursor: 'pointer'
+                            }}
+                            onClick={() => {
+                                const userid = props.user.alias ?? props.user.ccid
+                                navigator.clipboard.writeText(window.location.origin + '/' + userid)
+                                enqueueSnackbar('リンクをコピーしました', { variant: 'success' })
                             }}
                         >
                             {subProfile?.document.body.username ?? props.user.profile?.username ?? 'anonymous'}

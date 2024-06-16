@@ -26,6 +26,7 @@ import { Link as RouterLink } from 'react-router-dom'
 import { IconButtonWithNumber } from '../ui/IconButtonWithNumber'
 import { useGlobalActions } from '../../context/GlobalActions'
 import { useInspector } from '../../context/Inspector'
+import { enqueueSnackbar } from 'notistack'
 
 export interface MessageActionsProps {
     message: Message<MarkdownMessageSchema | ReplyMessageSchema | RerouteMessageSchema>
@@ -184,6 +185,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     onClick={() => {
                         const userid = props.message.authorUser?.alias ?? props.message.author
                         navigator.clipboard.writeText(window.location.origin + '/' + userid + '/' + props.message.id)
+                        enqueueSnackbar('リンクをコピーしました', { variant: 'success' })
                     }}
                 >
                     <ListItemIcon>
