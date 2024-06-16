@@ -139,7 +139,7 @@ export function Profile(props: ProfileProps): JSX.Element {
                             }}
                             onClick={() => {
                                 const userid = props.user.alias ?? props.user.ccid
-                                navigator.clipboard.writeText(window.location.origin + '/' + userid)
+                                navigator.clipboard.writeText('https://concrnt.world/' + userid)
                                 enqueueSnackbar('リンクをコピーしました', { variant: 'success' })
                             }}
                         >

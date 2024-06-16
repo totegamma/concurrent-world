@@ -184,7 +184,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                 <MenuItem
                     onClick={() => {
                         const userid = props.message.authorUser?.alias ?? props.message.author
-                        navigator.clipboard.writeText(window.location.origin + '/' + userid + '/' + props.message.id)
+                        navigator.clipboard.writeText('https://concrnt.world/' + userid + '/' + props.message.id)
                         enqueueSnackbar('リンクをコピーしました', { variant: 'success' })
                     }}
                 >
