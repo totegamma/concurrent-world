@@ -1,6 +1,5 @@
 import { Autocomplete, Box, InputBase, type SxProps } from '@mui/material'
-import { type CommunityTimelineSchema, Schemas, type Timeline } from '@concurrent-world/client'
-import { useMemo } from 'react'
+import { type CommunityTimelineSchema, type Timeline } from '@concurrent-world/client'
 import { CCChip } from './CCChip'
 
 export interface StreamPickerProps {
@@ -11,21 +10,6 @@ export interface StreamPickerProps {
 }
 
 export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
-    const selected = useMemo(
-        () =>
-            JSON.parse(
-                JSON.stringify(props.selected ?? [], (key, value) => {
-                    if (key === 'client' || key === 'api') {
-                        return undefined
-                    }
-                    return value
-                })
-            ).filter((stream: Timeline<any>) => stream.schema === Schemas.communityTimeline) as Array<
-                Timeline<CommunityTimelineSchema>
-            >,
-        [props.selected]
-    )
-
     return (
         <Box
             sx={{
@@ -40,7 +24,7 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
                 filterSelectedOptions
                 sx={{ width: 1 }}
                 multiple
-                value={selected}
+                value={props.selected}
                 options={props.options}
                 getOptionKey={(option: Timeline<CommunityTimelineSchema>) => option.id ?? ''}
                 getOptionLabel={(option: Timeline<CommunityTimelineSchema>) => option.document.body.name}
