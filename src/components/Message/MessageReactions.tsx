@@ -25,7 +25,7 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
     const ownReactions = useMemo(
         () =>
             Object.fromEntries(
-                props.message.ownAssociations
+                props.message?.ownAssociations
                     .filter((association) => association.schema === Schemas.reactionAssociation)
                     .map((association) => [association.document.body.imageUrl, association])
             ),

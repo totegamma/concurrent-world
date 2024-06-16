@@ -40,7 +40,7 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
     const ownFavorite = useMemo(
-        () => props.message.ownAssociations.find((association) => association.schema === Schemas.likeAssociation),
+        () => props.message?.ownAssociations.find((association) => association.schema === Schemas.likeAssociation),
         [props.message]
     )
     const [favoriteMembers, setFavoriteMembers] = useState<Array<Association<LikeAssociationSchema>>>([])
