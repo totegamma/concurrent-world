@@ -6,6 +6,7 @@ import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import AddReactionIcon from '@mui/icons-material/AddReaction'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import RepeatIcon from '@mui/icons-material/Repeat'
+import LinkIcon from '@mui/icons-material/Link'
 import {
     type Association,
     type LikeAssociationSchema,
@@ -25,6 +26,7 @@ import { Link as RouterLink } from 'react-router-dom'
 import { IconButtonWithNumber } from '../ui/IconButtonWithNumber'
 import { useGlobalActions } from '../../context/GlobalActions'
 import { useInspector } from '../../context/Inspector'
+import { enqueueSnackbar } from 'notistack'
 
 export interface MessageActionsProps {
     message: Message<MarkdownMessageSchema | ReplyMessageSchema | RerouteMessageSchema>
@@ -179,6 +181,18 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     setMenuAnchor(null)
                 }}
             >
+                <MenuItem
+                    onClick={() => {
+                        const userid = props.message.authorUser?.alias ?? props.message.author
+                        navigator.clipboard.writeText('https://concrnt.world/' + userid + '/' + props.message.id)
+                        enqueueSnackbar('リンクをコピーしました', { variant: 'success' })
+                    }}
+                >
+                    <ListItemIcon>
+                        <LinkIcon sx={{ color: 'text.primary' }} />
+                    </ListItemIcon>
+                    <ListItemText>共有リンクをコピー</ListItemText>
+                </MenuItem>
                 <MenuItem
                     onClick={() => {
                         props.message.document.body.body &&

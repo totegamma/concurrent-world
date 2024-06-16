@@ -125,7 +125,7 @@
                 "secret": "現在秘密鍵直接入力によるマスターキーでログインしています。"
             },
             "hideSubKey": "無効化したサブキーを非表示にする",
-            "deacvtivate": "無効化",
+            "deactivate": "無効化",
             "switchMasterToSub": {
                 "saveMasterKey": "マスターキーを安全に保存",
                 "descSaveMasterKey": "アカウントの引っ越しや、復旧にこのキーが必要になります。また、他人に知られた場合アカウントに不正にアクセスされることになるので、絶対に秘密です。",
