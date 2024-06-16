@@ -38,14 +38,12 @@ export const ListItemTimeline = (props: ListItemTimelineProps): JSX.Element | nu
         )
     }
 
+    const split = props.timelineID.split('@')
+    const isUserTimeline = split[0] === 'world.concrnt.t-home'
+    const link = isUserTimeline ? `/${split[1]}` : `/timeline/${props.timelineID}`
+
     return (
-        <ListItemButton
-            dense
-            component={RouterLink}
-            to={`/timeline/${props.timelineID}`}
-            sx={props.sx}
-            onClick={props.onClick}
-        >
+        <ListItemButton dense component={RouterLink} to={link} sx={props.sx} onClick={props.onClick}>
             {timeline?.domainOwned ? <TagIcon /> : <AlternateEmailIcon />}
             {timeline?.document.body.name || userProfile?.profile?.username || 'Unknown'}
         </ListItemButton>
