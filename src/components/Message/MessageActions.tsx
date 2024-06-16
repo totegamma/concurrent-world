@@ -6,6 +6,7 @@ import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import AddReactionIcon from '@mui/icons-material/AddReaction'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import RepeatIcon from '@mui/icons-material/Repeat'
+import LinkIcon from '@mui/icons-material/Link'
 import {
     type Association,
     type LikeAssociationSchema,
@@ -179,6 +180,17 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     setMenuAnchor(null)
                 }}
             >
+                <MenuItem
+                    onClick={() => {
+                        const userid = props.message.authorUser?.alias ?? props.message.author
+                        navigator.clipboard.writeText(window.location.origin + '/' + userid + '/' + props.message.id)
+                    }}
+                >
+                    <ListItemIcon>
+                        <LinkIcon sx={{ color: 'text.primary' }} />
+                    </ListItemIcon>
+                    <ListItemText>共有リンクをコピー</ListItemText>
+                </MenuItem>
                 <MenuItem
                     onClick={() => {
                         props.message.document.body.body &&
