@@ -27,6 +27,12 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
     const inspector = useInspector()
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
+    const profileOverride = props.message.document.body.profileOverride
+
+    const avatarURL = profileOverride?.avatar ?? props.message.authorUser?.profile?.avatar
+    const username = profileOverride?.username ?? props.message.authorUser?.profile?.username ?? 'Anonymous'
+    const link = profileOverride?.link ?? '/' + props.message.author
+
     return (
         <>
             <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 2 }}>
@@ -43,10 +49,10 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
                             height: { xs: '12px', sm: '18px' }
                         }}
                         component={routerLink}
-                        to={'/' + props.message.author}
+                        to={link}
                     >
                         <CCAvatar
-                            avatarURL={props.message.authorUser?.profile?.avatar}
+                            avatarURL={avatarURL}
                             identiconSource={props.message.author}
                             sx={{
                                 width: { xs: '12px', sm: '18px' },
@@ -66,8 +72,18 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
                         flex: 1
                     }}
                 >
-                    {props.message.authorUser?.profile?.username || 'Anonymous'} rerouted{' '}
-                    {props.message.document.body.body && 'with comment:'}
+                    {username}
+                    {profileOverride && (
+                        <CCAvatar
+                            avatarURL={props.message.authorUser?.profile?.avatar}
+                            identiconSource={props.message.author}
+                            sx={{
+                                width: { xs: '12px', sm: '18px' },
+                                height: { xs: '12px', sm: '18px' }
+                            }}
+                        />
+                    )}{' '}
+                    rerouted {props.message.document.body.body && 'with comment:'}
                 </Typography>
                 <Box display="flex" gap={0.5}>
                     <IconButton
