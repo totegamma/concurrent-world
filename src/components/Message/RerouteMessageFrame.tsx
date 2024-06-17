@@ -73,7 +73,7 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
                     }}
                 >
                     {username}
-                    {profileOverride && (
+                    {profileOverride?.avatar && (
                         <CCAvatar
                             avatarURL={props.message.authorUser?.profile?.avatar}
                             identiconSource={props.message.author}
