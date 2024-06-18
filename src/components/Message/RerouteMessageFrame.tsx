@@ -176,6 +176,7 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
                 simple={props.simple}
                 messageID={props.message.document.body.rerouteMessageId}
                 messageOwner={props.message.document.body.rerouteMessageAuthor}
+                resolveHint={props.message.authorUser?.domain}
                 rerouted={props.message}
             />
             <Box
