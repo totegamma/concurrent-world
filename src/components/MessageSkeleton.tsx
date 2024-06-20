@@ -6,15 +6,14 @@ export const MessageSkeleton = (): JSX.Element => {
             sx={{
                 alignItems: 'flex-start',
                 flex: 1,
-                p: { xs: '7px 0', sm: '10px 0' },
-                height: 105,
-                gap: '10px'
+                gap: 1.5,
+                padding: 0
             }}
         >
-            <Skeleton animation="wave" variant="circular" width={40} height={40} />
-            <Box sx={{ flex: 1 }}>
-                <Skeleton animation="wave" />
-                <Skeleton animation="wave" height={80} />
+            <Skeleton animation="wave" variant="rectangular" sx={{ borderRadius: 1 }} width={40} height={40} />
+            <Box sx={{ flex: 1, gap: 1, display: 'flex', flexDirection: 'column' }}>
+                <Skeleton animation="wave" variant="rectangular" width="100%" height={20} sx={{ borderRadius: 1 }} />
+                <Skeleton animation="wave" variant="rectangular" width="100%" height={50} sx={{ borderRadius: 1 }} />
             </Box>
         </ListItem>
     )

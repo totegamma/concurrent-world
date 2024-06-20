@@ -1,37 +1,18 @@
-import {
-    Alert,
-    AlertTitle,
-    Box,
-    Button,
-    Collapse,
-    Divider,
-    IconButton,
-    Paper,
-    Tab,
-    Tabs,
-    TextField,
-    Typography,
-    useTheme
-} from '@mui/material'
+import { Box, Button, Divider, Paper, Tab, Tabs, TextField, Typography, useTheme } from '@mui/material'
 import { type CommunityTimelineSchema, Schemas, type CoreProfile } from '@concurrent-world/client'
 import { useClient } from '../context/ClientContext'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import Fuzzysort from 'fuzzysort'
 
 import { CCDrawer } from '../components/ui/CCDrawer'
-
 import { CCEditor } from '../components/ui/cceditor'
 import { useSnackbar } from 'notistack'
-
-import DoneAllIcon from '@mui/icons-material/DoneAll'
-import RemoveDoneIcon from '@mui/icons-material/RemoveDone'
 import { type StreamWithDomain } from '../model'
 import { StreamCard } from '../components/Stream/Card'
 import { SubProfileCard } from '../components/SubProfileCard'
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 import { DomainCard } from '../components/ui/DomainCard'
 
 export function Explorer(): JSX.Element {
@@ -44,21 +25,41 @@ export function Explorer(): JSX.Element {
     const path = useLocation()
     const hash = path.hash.replace('#', '')
 
+    const hashQuery = useMemo(() => {
+        const queries = hash.split('&')
+        const result: Record<string, string> = {}
+        queries.forEach((e) => {
+            const [key, value] = e.split('=')
+            if (!key || !value) return
+            result[key] = value
+        })
+        return result
+    }, [hash])
+
+    const profileSchema = hashQuery.schema ?? Schemas.profile
+
     const [domains, setDomains] = useState<string[]>([])
-    const [selectedDomains, setSelectedDomains] = useState<string[]>([client.api.host])
 
     const [streams, setStreams] = useState<StreamWithDomain[]>([])
     const [searchResult, setSearchResult] = useState<StreamWithDomain[]>([])
     const [search, setSearch] = useState<string>('')
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
-    const [profileSchema, setProfileSchema] = useState<string>(Schemas.profile)
-
-    const [openTips, setOpenTips] = useState<boolean>(false)
-
     const [characters, setProfiles] = useState<Array<CoreProfile<any>>>([])
     const [timelineDraft, setTimelineDraft] = useState<CommunityTimelineSchema>()
 
     const { enqueueSnackbar } = useSnackbar()
+
+    const selectedDomains = useMemo(() => {
+        return hashQuery.domains?.split(',') ?? [client.api.host]
+    }, [hashQuery, client.api.host])
+
+    const updateHash = (key: string, value: string): void => {
+        hashQuery[key] = value
+        const queries = Object.entries(hashQuery)
+            .map((e) => e.join('='))
+            .join('&')
+        navigate(`/explorer/${tab}#${queries}`)
+    }
 
     const load = (): void => {
         client.api.getDomains().then((e) => {
@@ -69,19 +70,7 @@ export function Explorer(): JSX.Element {
     }
 
     useEffect(() => {
-        if (!hash) return
-        switch (tab) {
-            case 'streams':
-                setSearch(hash)
-                break
-            case 'users':
-                setProfileSchema(hash)
-                break
-        }
-    }, [hash])
-
-    useEffect(() => {
-        if (tab !== 'streams') return
+        if (tab !== 'timelines') return
         if (selectedDomains.length === 0) {
             setStreams([])
             setSearchResult([])
@@ -157,9 +146,10 @@ export function Explorer(): JSX.Element {
             setSearchResult(streams)
             return
         }
+        console.log(streams)
         setSearchResult(
             Fuzzysort.go(search, streams, {
-                keys: ['stream.payload.name', 'stream.payload.description']
+                keys: ['stream.document.body.name', 'stream.document.body.description']
             }).map((e) => e.obj)
         )
     }, [search])
@@ -184,51 +174,6 @@ export function Explorer(): JSX.Element {
             <Divider sx={{ mb: 2 }} />
             <Box
                 sx={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 1
-                }}
-            >
-                <Box display="flex" alignItems="center" flexDirection="row">
-                    <Typography variant="h3">{t('domains')}</Typography>
-                    <IconButton
-                        onClick={() => {
-                            setOpenTips(!openTips)
-                        }}
-                    >
-                        <HelpOutlineIcon />
-                    </IconButton>
-                </Box>
-                <Box>
-                    <IconButton
-                        onClick={() => {
-                            setSelectedDomains([])
-                        }}
-                    >
-                        <RemoveDoneIcon />
-                    </IconButton>
-                    <IconButton
-                        onClick={() => {
-                            setSelectedDomains(domains)
-                        }}
-                    >
-                        <DoneAllIcon />
-                    </IconButton>
-                </Box>
-            </Box>
-            <Box>
-                <Collapse in={openTips}>
-                    <Alert severity="info">
-                        <AlertTitle>どうしてドメインごとに表示が分かれているの？</AlertTitle>
-                        コンカレントは本来ユーザーやデータがどこのサーバー(ドメイン)にあるかを意識しないでに使えることを目指しています。
-                        なのですが、現在はまだ十分な検索機能が実装されていないため、このような表示になっています。今後の進展にご期待ください。
-                    </Alert>
-                </Collapse>
-            </Box>
-            <Box
-                sx={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
                     gap: 2
@@ -240,11 +185,11 @@ export function Explorer(): JSX.Element {
                         domainFQDN={e}
                         selected={selectedDomains.includes(e)}
                         onClick={() => {
-                            setSelectedDomains([e])
+                            updateHash('domains', e)
                         }}
                         onCheck={(state) => {
-                            if (state) setSelectedDomains([...new Set([...selectedDomains, e])])
-                            else setSelectedDomains(selectedDomains.filter((f) => f !== e))
+                            if (state) updateHash('domains', [...new Set([...selectedDomains, e])].join(','))
+                            else updateHash('domains', selectedDomains.filter((f) => f !== e).join(','))
                         }}
                     />
                 ))}
@@ -256,11 +201,11 @@ export function Explorer(): JSX.Element {
                     navigate(`/explorer/${v}`)
                 }}
             >
-                <Tab value={'streams'} label={t('streams')} />
+                <Tab value={'timelines'} label={'タイムライン'} />
                 <Tab value={'users'} label={'ユーザー'} />
             </Tabs>
             <Divider sx={{ mb: 2 }} />
-            {tab === 'streams' && (
+            {tab === 'timelines' && (
                 <>
                     <Box
                         sx={{
@@ -352,7 +297,7 @@ export function Explorer(): JSX.Element {
                         variant="outlined"
                         value={profileSchema}
                         onChange={(e) => {
-                            setProfileSchema(e.target.value)
+                            updateHash('schema', e.target.value)
                         }}
                     />
                     <Box

@@ -89,7 +89,7 @@ export const ProfileProperties = (props: ProfilePropertiesProps): JSX.Element =>
                     <Typography variant="h3">テンプレート: {schema?.title}</Typography>
                     <Box>{schema?.description}</Box>
                     <Box mt={2} gap={1} display="flex" flexDirection="column">
-                        <Button component={RouterLink} to={`/explorer/users#${props.character.schema}`}>
+                        <Button component={RouterLink} to={`/explorer/users#schema=${props.character.schema}`}>
                             このテンプレートのキャラクターを検索
                         </Button>
                         <Button component={RouterLink} to={`/settings/profile#${props.character.schema}`}>
