@@ -128,69 +128,77 @@ export function ListPage(): JSX.Element {
                     ))}
                 </Tabs>
 
-                {timelines.length > 0 ? (
-                    <Timeline
-                        header={
-                            <>
+                {subscription ? (
+                    <>
+                        {timelines.length > 0 ? (
+                            <Timeline
+                                header={
+                                    <>
+                                        <Box
+                                            sx={{
+                                                display: {
+                                                    xs: showEditorOnTopMobile ? 'block' : 'none',
+                                                    sm: showEditorOnTop ? 'block' : 'none'
+                                                }
+                                            }}
+                                        >
+                                            <Draft
+                                                streamPickerOptions={allKnownTimelines}
+                                                streamPickerInitial={postStreams}
+                                                onSubmit={async (
+                                                    text: string,
+                                                    destinations: string[],
+                                                    options?: CreateCurrentOptions
+                                                ): Promise<Error | null> => {
+                                                    await client
+                                                        .createMarkdownCrnt(text, destinations, options)
+                                                        .catch((e) => e)
+                                                    return null
+                                                }}
+                                                sx={{
+                                                    p: 1
+                                                }}
+                                            />
+                                            <Divider sx={{ mx: { xs: 0.5, sm: 1, md: 1 } }} />
+                                        </Box>
+                                    </>
+                                }
+                                streams={timelines}
+                                ref={timelineRef}
+                            />
+                        ) : (
+                            <Box
+                                sx={{
+                                    marginTop: 4,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    display: 'flex',
+                                    flexDirection: 'column'
+                                }}
+                            >
                                 <Box
-                                    sx={{
-                                        display: {
-                                            xs: showEditorOnTopMobile ? 'block' : 'none',
-                                            sm: showEditorOnTop ? 'block' : 'none'
-                                        }
+                                    style={{
+                                        display: 'flex',
+                                        marginTop: 8,
+                                        marginLeft: 8,
+                                        marginRight: 8,
+                                        flexDirection: 'column',
+                                        alignItems: 'center'
                                     }}
                                 >
-                                    <Draft
-                                        streamPickerOptions={allKnownTimelines}
-                                        streamPickerInitial={postStreams}
-                                        onSubmit={async (
-                                            text: string,
-                                            destinations: string[],
-                                            options?: CreateCurrentOptions
-                                        ): Promise<Error | null> => {
-                                            await client.createMarkdownCrnt(text, destinations, options).catch((e) => e)
-                                            return null
-                                        }}
-                                        sx={{
-                                            p: 1
-                                        }}
-                                    />
-                                    <Divider sx={{ mx: { xs: 0.5, sm: 1, md: 1 } }} />
+                                    <Button component={RouterLink} to="/explorer/streams">
+                                        <Typography variant="h1" sx={{ fontWeight: 600, mx: 1 }}>
+                                            Go Explore
+                                        </Typography>
+                                        <ExploreIcon sx={{ fontSize: '10rem', verticalAlign: 'middle' }} />
+                                    </Button>
+                                    <p>フォローするユーザー・ストリームを探しに行く</p>
                                 </Box>
-                            </>
-                        }
-                        streams={timelines}
-                        ref={timelineRef}
-                    />
+                            </Box>
+                        )}
+                    </>
                 ) : (
-                    <Box
-                        sx={{
-                            marginTop: 4,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            display: 'flex',
-                            flexDirection: 'column'
-                        }}
-                    >
-                        <Box
-                            style={{
-                                display: 'flex',
-                                marginTop: 8,
-                                marginLeft: 8,
-                                marginRight: 8,
-                                flexDirection: 'column',
-                                alignItems: 'center'
-                            }}
-                        >
-                            <Button component={RouterLink} to="/explorer/streams">
-                                <Typography variant="h1" sx={{ fontWeight: 600, mx: 1 }}>
-                                    Go Explore
-                                </Typography>
-                                <ExploreIcon sx={{ fontSize: '10rem', verticalAlign: 'middle' }} />
-                            </Button>
-                            <p>フォローするユーザー・ストリームを探しに行く</p>
-                        </Box>
-                    </Box>
+                    <></>
                 )}
             </Box>
             <CCDrawer
