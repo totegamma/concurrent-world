@@ -20,7 +20,7 @@ export const ContentWithCCAvatar = (props: ContentWithCCAvatarProps): JSX.Elemen
                 wordBreak: 'break-word',
                 alignItems: 'flex-start',
                 flex: 1,
-                gap: { xs: 1, sm: 2 }
+                gap: 1
             }}
             disablePadding
         >
