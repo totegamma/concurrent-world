@@ -136,7 +136,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                             <ListItemButton
                                 sx={{ gap: 1 }}
                                 component={Link}
-                                to="/explorer/streams"
+                                to="/explorer/timelines"
                                 onClick={props.onClick}
                             >
                                 <ExploreIcon

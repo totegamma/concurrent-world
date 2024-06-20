@@ -92,7 +92,7 @@ export const ThinMenu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                             }}
                         />
                     </IconButton>
-                    <IconButton sx={{ p: 0.5 }} component={Link} to="/explorer/stream" onClick={props.onClick}>
+                    <IconButton sx={{ p: 0.5 }} component={Link} to="/explorer/timelines" onClick={props.onClick}>
                         <ExploreIcon
                             sx={{
                                 color: 'background.contrastText'
