@@ -68,7 +68,7 @@ export const MobileMenu = (): JSX.Element => {
                 variant="text"
                 sx={{ color: 'background.contrastText', width: 1 }}
                 component={NavLink}
-                to="/explorer/streams"
+                to="/explorer/timelines"
             >
                 <ExploreIcon />
             </Button>
