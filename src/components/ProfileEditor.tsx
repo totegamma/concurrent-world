@@ -10,6 +10,7 @@ import { alpha, useTheme } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { MediaInput } from './ui/MediaInput'
 import { CCWallpaper } from './ui/CCWallpaper'
+import { useSnackbar } from 'notistack'
 
 interface ProfileEditorProps {
     initial?: ProfileSchema
@@ -24,13 +25,19 @@ export function ProfileEditor(props: ProfileEditorProps): JSX.Element {
     const [avatar, setAvatar] = useState<string>(props.initial?.avatar ?? '')
     const [description, setDescription] = useState<string>(props.initial?.description ?? '')
     const [banner, setBanner] = useState<string>(props.initial?.banner ?? '')
+    const { enqueueSnackbar } = useSnackbar()
 
     const { t } = useTranslation('', { keyPrefix: 'ui.profileEditor' })
 
     const updateProfile = async (): Promise<void> => {
-        client.setProfile({ username, description, avatar, banner }).then((data) => {
-            props.onSubmit?.(data)
-        })
+        client
+            .setProfile({ username, description, avatar, banner })
+            .then((data) => {
+                props.onSubmit?.(data)
+            })
+            .catch((e) => {
+                enqueueSnackbar(e.message, { variant: 'error' })
+            })
     }
 
     useEffect(() => {

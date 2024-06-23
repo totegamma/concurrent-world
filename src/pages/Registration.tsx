@@ -29,7 +29,7 @@ export function Registration(): JSX.Element {
     const location = useLocation()
 
     const { t } = useTranslation('', { keyPrefix: 'registration' })
-    const [domain, setDomain] = usePersistent<string>('Domain', 'hub.concurrent.world')
+    const [domain, setDomain] = usePersistent<string>('Domain', 'ariake.concrnt.net')
     const [client, initializeClient] = useState<Client>()
     const [host, setHost] = useState<CoreDomain | null | undefined>()
     const [identity, setIdentity] = usePersistent<Identity | null>('Identity', GenerateIdentity())
@@ -62,12 +62,6 @@ export function Registration(): JSX.Element {
     }, [identity, domain])
 
     useEffect(() => {
-        if (activeStep !== 0) return
-        const newIdentity = GenerateIdentity()
-        setIdentity(newIdentity)
-    }, [activeStep])
-
-    useEffect(() => {
         if (!host || !identity) return
         setDomain(host.fqdn)
         const keyPair = LoadKey(identity.privateKey)
@@ -81,12 +75,16 @@ export function Registration(): JSX.Element {
         localStorage.setItem('Domain', JSON.stringify(host.fqdn))
         localStorage.setItem('PrivateKey', JSON.stringify(identity.privateKey))
 
-        console.log('hostAddr', host.ccid)
-
         const storage = JSON.stringify(defaultPreference)
-        client.api.writeKV('world.concurrent.preference', storage)
-
-        window.location.href = '/'
+        client.api
+            .writeKV('world.concurrent.preference', storage)
+            .then(() => {})
+            .catch((e) => {
+                alert(`Failed to write preference: ${e.message}`)
+            })
+            .finally(() => {
+                window.location.href = '/'
+            })
     }
 
     if (!identity) return <>loading...</>
@@ -239,27 +237,29 @@ export function Registration(): JSX.Element {
                                 </Box>
                             </Fade>
                         ))}
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'row',
-                                width: '100%',
-                                position: 'absolute',
-                                justifyContent: 'space-between',
-                                bottom: 0,
-                                p: 1
-                            }}
-                        >
-                            <Box />
-                            <Button
-                                variant="outlined"
-                                onClick={() => {
-                                    setDialogOpen(true)
+                        {activeStep === 0 && (
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    width: '100%',
+                                    position: 'absolute',
+                                    justifyContent: 'space-between',
+                                    bottom: 0,
+                                    p: 1
                                 }}
                             >
-                                キーを手動で指定する
-                            </Button>
-                        </Box>
+                                <Box />
+                                <Button
+                                    variant="outlined"
+                                    onClick={() => {
+                                        setDialogOpen(true)
+                                    }}
+                                >
+                                    キーを手動で指定する
+                                </Button>
+                            </Box>
+                        )}
                     </Paper>
                     <Dialog
                         open={dialogOpened}
