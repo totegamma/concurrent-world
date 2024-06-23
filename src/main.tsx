@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom/client'
 import { ErrorBoundary } from 'react-error-boundary'
 import { EmergencyKit } from './components/EmergencyKit'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { LoginGuard } from './utils/LoginGuard'
 import { Suspense, lazy } from 'react'
 import { FullScreenLoading } from './components/ui/FullScreenLoading'
@@ -46,7 +46,11 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
             <BrowserRouter>
                 <Routes>
                     <Route path="/welcome" element={<Welcome />} />
-                    <Route path="/register" element={<Registration />} />
+                    {!logined ? (
+                        <Route path="/register" element={<Registration />} />
+                    ) : (
+                        <Route path="/register" element={<Navigate to="/" />} />
+                    )}
                     <Route path="/import" element={<AccountImport />} />
                     {!logined && <Route path="/:id" element={<GuestTimelinePage page="entity" />} />}
                     {!logined && <Route path="/:authorID/:messageID" element={<GuestTimelinePage page="message" />} />}
