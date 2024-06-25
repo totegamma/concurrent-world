@@ -155,28 +155,32 @@ export function Profile(props: ProfileProps): JSX.Element {
                         )}
                     </Box>
                 </Box>
-
-                <Typography
-                    variant="h6"
+                <Box
                     sx={{
-                        fontWeight: 'bold',
-                        fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.5rem' },
-                        cursor: 'pointer',
-                        mt: 1
-                    }}
-                    onClick={() => {
-                        const userid = props.user.alias ?? props.user.ccid
-                        navigator.clipboard.writeText('https://concrnt.world/' + userid)
-                        enqueueSnackbar('リンクをコピーしました', { variant: 'success' })
+                        display: 'flex',
+                        alignItems: 'baseline',
+                        gap: 1
                     }}
                 >
-                    {subProfile?.document.body.username ?? props.user.profile?.username ?? 'anonymous'}
-                </Typography>
-                {props.user.alias && <Typography variant="caption">{props.user.alias}</Typography>}
-
-                <Box sx={{ mt: '10px' }}>
-                    <Typography variant="caption">{props.user.ccid}</Typography>
+                    <Typography
+                        variant="h6"
+                        sx={{
+                            fontWeight: 'bold',
+                            fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.5rem' },
+                            cursor: 'pointer',
+                            mt: 1
+                        }}
+                        onClick={() => {
+                            const userid = props.user.alias ?? props.user.ccid
+                            navigator.clipboard.writeText('https://concrnt.world/' + userid)
+                            enqueueSnackbar('リンクをコピーしました', { variant: 'success' })
+                        }}
+                    >
+                        {subProfile?.document.body.username ?? props.user.profile?.username ?? 'anonymous'}
+                    </Typography>
+                    {props.user.alias && <Typography variant="caption">{props.user.alias}</Typography>}
                 </Box>
+                <Typography variant="caption">{props.user.ccid}</Typography>
 
                 <Box
                     sx={{
