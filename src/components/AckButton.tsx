@@ -23,6 +23,7 @@ export const AckButton = (props: AckButtonProps): JSX.Element => {
         <>
             <Button
                 variant={myAck ? 'outlined' : 'contained'}
+                style={{ width: 'auto', flexShrink: 0, whiteSpace: 'nowrap' }}
                 onMouseEnter={() => {
                     setIsHovered(true)
                 }}

@@ -62,6 +62,7 @@ export const WatchButton = (props: WatchButtonProps): JSX.Element => {
                         onMouseLeave={() => {
                             setIsHovered(false)
                         }}
+                        style={{ width: 'auto', flexShrink: 0, whiteSpace: 'nowrap' }}
                     >
                         {watching ? (isHovered ? t('unwatch') : t('watching')) : t('watch')}
                     </Button>
@@ -73,6 +74,7 @@ export const WatchButton = (props: WatchButtonProps): JSX.Element => {
                         sx={{
                             padding: 0
                         }}
+                        style={{ width: 'auto', flexShrink: 0, whiteSpace: 'nowrap' }}
                     >
                         <ArrowDropDownIcon />
                     </Button>
