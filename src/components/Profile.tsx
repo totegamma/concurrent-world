@@ -96,13 +96,7 @@ export function Profile(props: ProfileProps): JSX.Element {
                             display: 'flex',
                             gap: 1,
                             flexWrap: 'wrap',
-                            overflowX: 'auto',
-                            scrollbarWidth: 'none',
-                            '&::-webkit-scrollbar': {
-                                display: 'none'
-                            },
-                            '-webkit-overflow-scrolling': 'touch',
-                            alignItems: 'end'
+                            alignItems: 'baseline'
                         }}
                     >
                         <CCAvatar
@@ -134,9 +128,7 @@ export function Profile(props: ProfileProps): JSX.Element {
                             display: 'flex',
                             gap: 1,
                             flexWrap: 'wrap',
-                            justifyContent: 'flex-end',
                             mt: 1,
-                            flexShrink: 0,
                             alignItems: 'end',
                             ml: 'auto'
                         }}
