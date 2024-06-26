@@ -300,7 +300,7 @@ export const MediaSettings = (): JSX.Element => {
                             {`[{
     "AllowedOrigins": [
         "https://localhost:5173",
-        "https://concurrent.world"
+        "https://concrnt.world"
     ],
         "AllowedMethods": [
         "GET",
