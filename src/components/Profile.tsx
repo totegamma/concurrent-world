@@ -78,35 +78,40 @@ export function Profile(props: ProfileProps): JSX.Element {
             <Box
                 sx={{
                     display: 'flex',
-                    flexFlow: 'column',
-                    gap: 1,
+                    flexDirection: 'column',
                     p: 1,
-                    position: 'relative'
+                    position: 'relative',
+                    mt: '-64px'
                 }}
             >
-                <Box position="absolute" top="-50px" left="10px">
-                    <CCAvatar
-                        alt={props.user.profile?.username}
-                        avatarURL={props.user.profile?.avatar}
-                        avatarOverride={subProfile ? subProfile.document.body.avatar : undefined}
-                        identiconSource={props.user.ccid}
-                        sx={{
-                            width: '100px',
-                            height: '100px'
-                        }}
-                        onBadgeClick={() => {
-                            props.onSubProfileClicked?.('')
-                        }}
-                    />
-                </Box>
                 <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="space-between"
-                    visibility={props.guest ? 'hidden' : 'visible'}
-                    gap={1}
+                    sx={{
+                        display: 'flex',
+                        gap: 1,
+                        flexWrap: 'wrap'
+                    }}
                 >
-                    <Box ml="110px" display="flex" gap={1}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            gap: 1,
+                            flexWrap: 'wrap',
+                            alignItems: 'baseline'
+                        }}
+                    >
+                        <CCAvatar
+                            alt={props.user.profile?.username}
+                            avatarURL={props.user.profile?.avatar}
+                            avatarOverride={subProfile ? subProfile.document.body.avatar : undefined}
+                            identiconSource={props.user.ccid}
+                            sx={{
+                                width: '100px',
+                                height: '100px'
+                            }}
+                            onBadgeClick={() => {
+                                props.onSubProfileClicked?.('')
+                            }}
+                        />
                         {props.user.profile?.subprofiles?.map((id, _) => (
                             <SubprofileBadge
                                 key={id}
@@ -118,7 +123,16 @@ export function Profile(props: ProfileProps): JSX.Element {
                             />
                         ))}
                     </Box>
-                    <Box display="flex" gap={1}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            gap: 1,
+                            flexWrap: 'wrap',
+                            mt: 1,
+                            alignItems: 'end',
+                            ml: 'auto'
+                        }}
+                    >
                         {!isSelf && <AckButton user={props.user} />}
                         <WatchButton timelineID={props.user.homeTimeline ?? ''} />
                         {isSelf && (
@@ -128,31 +142,38 @@ export function Profile(props: ProfileProps): JSX.Element {
                         )}
                     </Box>
                 </Box>
-                <Box>
-                    <Box display="flex" flexDirection="row" gap={1} alignItems="baseline">
-                        <Typography
-                            variant="h6"
-                            sx={{
-                                fontWeight: 'bold',
-                                fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.5rem' },
-                                cursor: 'pointer'
-                            }}
-                            onClick={() => {
-                                const userid = props.user.alias ?? props.user.ccid
-                                navigator.clipboard.writeText('https://concrnt.world/' + userid)
-                                enqueueSnackbar('リンクをコピーしました', { variant: 'success' })
-                            }}
-                        >
-                            {subProfile?.document.body.username ?? props.user.profile?.username ?? 'anonymous'}
-                        </Typography>
-                        {props.user.alias && <Typography variant="caption">{props.user.alias}</Typography>}
-                    </Box>
-                    <Typography variant="caption">{props.user.ccid}</Typography>
-                </Box>
                 <Box
                     sx={{
                         display: 'flex',
-                        flexFlow: 'column'
+                        alignItems: 'baseline',
+                        gap: 1
+                    }}
+                >
+                    <Typography
+                        variant="h6"
+                        sx={{
+                            fontWeight: 'bold',
+                            fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.5rem' },
+                            cursor: 'pointer',
+                            mt: 1
+                        }}
+                        onClick={() => {
+                            const userid = props.user.alias ?? props.user.ccid
+                            navigator.clipboard.writeText('https://concrnt.world/' + userid)
+                            enqueueSnackbar('リンクをコピーしました', { variant: 'success' })
+                        }}
+                    >
+                        {subProfile?.document.body.username ?? props.user.profile?.username ?? 'anonymous'}
+                    </Typography>
+                    {props.user.alias && <Typography variant="caption">{props.user.alias}</Typography>}
+                </Box>
+                <Typography variant="caption">{props.user.ccid}</Typography>
+
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 1
                     }}
                 >
                     <MarkdownRenderer
@@ -160,11 +181,13 @@ export function Profile(props: ProfileProps): JSX.Element {
                         emojiDict={{}}
                     />
                 </Box>
+
                 <Box>
                     <Typography variant="caption">
                         現住所: {props.user.domain !== '' ? props.user.domain : client.api.host}
                     </Typography>
                 </Box>
+
                 <Box display="flex" gap={1}>
                     <Typography
                         component={Link}
@@ -185,14 +208,16 @@ export function Profile(props: ProfileProps): JSX.Element {
                         {ackerUsers.length} {t('followers')}
                     </Typography>
                 </Box>
+
+                {subProfile && (
+                    <>
+                        <Divider sx={{ mb: 1 }} />
+                        <ProfileProperties showCreateLink character={subProfile} />
+                        <Divider />
+                    </>
+                )}
             </Box>
-            {subProfile && (
-                <>
-                    <Divider sx={{ mb: 1 }} />
-                    <ProfileProperties showCreateLink character={subProfile} />
-                    <Divider />
-                </>
-            )}
+
             <CCDrawer
                 open={detailMode !== 'none'}
                 onClose={() => {
