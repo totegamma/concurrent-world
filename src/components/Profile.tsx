@@ -136,12 +136,7 @@ export function Profile(props: ProfileProps): JSX.Element {
                         {!isSelf && <AckButton user={props.user} />}
                         <WatchButton timelineID={props.user.homeTimeline ?? ''} />
                         {isSelf && (
-                            <Button
-                                variant="outlined"
-                                component={NavLink}
-                                to="/settings/profile"
-                                sx={{ Width: 'auto', height: 'fit-content', flexShrink: 1, whiteSpace: 'nowrap' }}
-                            >
+                            <Button variant="outlined" component={NavLink} to="/settings/profile">
                                 Edit Profile
                             </Button>
                         )}
