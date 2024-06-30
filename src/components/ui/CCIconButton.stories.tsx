@@ -5,15 +5,6 @@ import CottageIcon from '@mui/icons-material/Cottage'
 
 interface Props extends Meta {}
 
-export default {
-    title: 'ui/CCIconButton',
-    component: CCIconButton,
-    tags: [],
-    argTypes: {},
-    args: {},
-    parameters: {}
-}
-
 export const Default = (_: Props): JSX.Element => {
     return (
         <>
@@ -25,4 +16,13 @@ export const Default = (_: Props): JSX.Element => {
             </CCIconButton>
         </>
     )
+}
+
+export default {
+    title: 'ui/CCIconButton',
+    component: Default,
+    tags: [],
+    argTypes: {},
+    args: {},
+    parameters: {}
 }
