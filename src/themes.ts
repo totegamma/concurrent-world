@@ -180,6 +180,50 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         shape: {
             borderRadius: 3
         }
+    },
+    astro: {
+        meta: {
+            name: 'astro',
+            author: 'con1t0tey8uxhkqkd4wcp4hd4jedt7f0vfhk29xdd2'
+        },
+        palette: {
+            primary: {
+                main: '#92dda2',
+                contrastText: '#fff'
+            },
+            secondary: {
+                main: 'rgba(255, 255, 255, 0.8)'
+            },
+            background: {
+                default: '#1c1e2d',
+                paper: '#1c1e2d',
+                contrastText: '#dbfafc'
+            },
+            text: {
+                primary: '#aadff1',
+                secondary: 'rgba(255, 255, 255, 0.8)',
+                disabled: 'rgba(170, 223, 241, 0.5)'
+            },
+            divider: 'rgba(170, 223, 241, 0.12)'
+        },
+        components: {
+            MuiButton: {
+                defaultProps: {
+                    variant: 'outlined',
+                    disableElevation: true
+                }
+            },
+            MuiPaper: {
+                defaultProps: {
+                    variant: 'outlined'
+                }
+            },
+            MuiAppBar: {
+                defaultProps: {
+                    color: 'transparent'
+                }
+            }
+        }
     }
 }
 
