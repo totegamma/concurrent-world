@@ -299,8 +299,7 @@ export const MediaSettings = (): JSX.Element => {
                         <Codeblock language={'json'}>
                             {`[{
     "AllowedOrigins": [
-        "https://localhost:5173",
-        "https://concurrent.world"
+        "*"
     ],
         "AllowedMethods": [
         "GET",

@@ -6,7 +6,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     blue: {
         meta: {
             name: 'blue',
-            author: 'CCb72AAc9dcF088F7088b6718BE5a494fBB3861439', // totegamma
+            author: 'con1t0tey8uxhkqkd4wcp4hd4jedt7f0vfhk29xdd2', // totegamma
             comment: 'コンカレで一番最初に作られたテーマです！'
         },
         palette: {
@@ -25,7 +25,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     blue2: {
         meta: {
             name: 'blue2',
-            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            author: 'con1dlftq82pc75ftccwe8vm8sak5v8jcp565n3p5n', // waonme
             comment: 'コンカレで二番目に作られたわけではないテーマです！'
         },
         palette: {
@@ -61,7 +61,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     darkgray: {
         meta: {
             name: 'darkgray',
-            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            author: 'con1dlftq82pc75ftccwe8vm8sak5v8jcp565n3p5n', // waonme
             comment: '黒背景よりはダークグレーの方が落ち着くんだ'
         },
         palette: {
@@ -101,7 +101,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     cafe: {
         meta: {
             name: 'cafe',
-            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            author: 'con1dlftq82pc75ftccwe8vm8sak5v8jcp565n3p5n', // waonme
             comment: 'すくなくともスタバではなさそうだ'
         },
         palette: {
@@ -124,7 +124,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     rainyday: {
         meta: {
             name: 'rainyday',
-            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            author: 'con1dlftq82pc75ftccwe8vm8sak5v8jcp565n3p5n', // waonme
             comment: 'そういう日もある'
         },
         palette: {
@@ -153,7 +153,7 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
     sacher: {
         meta: {
             name: 'sacher',
-            author: 'CCBFe6f64AEE52A200B7C47D3D83680A226967d83C', // waonme
+            author: 'con1dlftq82pc75ftccwe8vm8sak5v8jcp565n3p5n', // waonme
             comment:
                 '![ザッハさん](https://worldfile.cc/CCBFe6f64AEE52A200B7C47D3D83680A226967d83C/988bf80b-96ca-4bb9-83ff-cd962932b616)'
         },
@@ -179,6 +179,50 @@ export const Themes: Record<string, DeepPartial<ConcurrentTheme>> = {
         },
         shape: {
             borderRadius: 3
+        }
+    },
+    astro: {
+        meta: {
+            name: 'astro',
+            author: 'con1t0tey8uxhkqkd4wcp4hd4jedt7f0vfhk29xdd2'
+        },
+        palette: {
+            primary: {
+                main: '#92dda2',
+                contrastText: '#fff'
+            },
+            secondary: {
+                main: 'rgba(255, 255, 255, 0.8)'
+            },
+            background: {
+                default: '#1c1e2d',
+                paper: '#1c1e2d',
+                contrastText: '#dbfafc'
+            },
+            text: {
+                primary: '#aadff1',
+                secondary: 'rgba(255, 255, 255, 0.8)',
+                disabled: 'rgba(170, 223, 241, 0.5)'
+            },
+            divider: 'rgba(170, 223, 241, 0.12)'
+        },
+        components: {
+            MuiButton: {
+                defaultProps: {
+                    variant: 'outlined',
+                    disableElevation: true
+                }
+            },
+            MuiPaper: {
+                defaultProps: {
+                    variant: 'outlined'
+                }
+            },
+            MuiAppBar: {
+                defaultProps: {
+                    color: 'transparent'
+                }
+            }
         }
     }
 }
