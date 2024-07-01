@@ -31,7 +31,7 @@ export function RepositoryImportButton(props: { domain?: string; onImport?: (err
 
     const target = props.domain ?? client.host
 
-    const importRepo = async (data: string): void => {
+    const importRepo = async (data: string): Promise<void> => {
         if (importStatus !== 'idle') return
 
         setImportStatus('loading')
