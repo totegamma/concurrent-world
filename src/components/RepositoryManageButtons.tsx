@@ -27,45 +27,67 @@ export function RepositoryImportButton(props: { domain?: string; onImport?: (err
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [importStatus, setImportStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
     const [sourceDomain, setSourceDomain] = useState<string>('')
+    const [progress, setProgress] = useState<string>('')
 
     const target = props.domain ?? client.host
 
-    const importRepo = (data: string): void => {
+    const importRepo = async (data: string): void => {
         if (importStatus !== 'idle') return
 
         setImportStatus('loading')
-        client.api
-            .fetchWithCredential(
-                target,
-                '/api/v1/repository?from=' + sourceDomain,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain'
+
+        const lines = data.split('\n')
+        const chunks = []
+        let chunk = ''
+        lines.forEach((line, index) => {
+            chunk += line + '\n'
+            if ((index + 1) % 100 === 0) {
+                chunks.push(chunk)
+                chunk = ''
+            }
+        })
+
+        if (chunk.length > 0) {
+            chunks.push(chunk)
+        }
+
+        for (let i = 0; i < chunks.length; i++) {
+            const chunk = chunks[i]
+            await client.api
+                .fetchWithCredential(
+                    target,
+                    '/api/v1/repository?from=' + sourceDomain,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'text/plain'
+                        },
+                        body: chunk
                     },
-                    body: data
-                },
-                1000 * 60 * 10 // 10 minutes
-            )
-            .then((res) => {
-                if (res.ok) {
-                    console.log('imported')
-                    res.json().then((data) => {
-                        console.log(data)
-                        setImportStatus('success')
-                        props.onImport?.('')
-                    })
-                } else {
-                    console.error('failed to import')
+                    1000 * 60 * 10 // 10 minutes
+                )
+                .then((res) => {
+                    if (res.ok) {
+                        setProgress(`imported ${i}/${chunks.length}`)
+                        res.json().then((data) => {
+                            console.log('imported', i, data)
+                        })
+                    } else {
+                        console.error('failed to import')
+                        setImportStatus('error')
+                        props.onImport?.(`failed to import: ${res.statusText}`)
+                    }
+                })
+                .catch((e) => {
+                    console.error(e)
                     setImportStatus('error')
-                    props.onImport?.(`failed to import: ${res.statusText}`)
-                }
-            })
-            .catch((e) => {
-                console.error(e)
-                setImportStatus('error')
-                props.onImport?.(`failed to import: ${e}`)
-            })
+                    props.onImport?.(`failed to import: ${e}`)
+                })
+        }
+
+        console.log('imported')
+        setImportStatus('success')
+        props.onImport?.('')
     }
 
     return (
@@ -104,7 +126,7 @@ export function RepositoryImportButton(props: { domain?: string; onImport?: (err
                     fileInputRef.current?.click()
                 }}
             >
-                {status[importStatus]}
+                {status[importStatus] + (importStatus === 'loading' ? `(${progress})` : '')}
             </Button>
         </>
     )
