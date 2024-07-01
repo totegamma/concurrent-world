@@ -1,4 +1,4 @@
-import { Box, Collapse, Divider, Tab, Tabs } from '@mui/material'
+import { Box, Collapse, Divider, Tab, Tabs, Typography } from '@mui/material'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { useClient } from '../context/ClientContext'
@@ -45,7 +45,19 @@ export function EntityPage(): JSX.Element {
     }, [user, tab])
 
     if (!user) {
-        return <>loading...</>
+        return (
+            <Box
+                sx={{
+                    width: '100%',
+                    minHeight: '100%',
+                    backgroundColor: 'background.paper',
+                    display: 'flex',
+                    flexDirection: 'column'
+                }}
+            >
+                <Typography>Loading...</Typography>
+            </Box>
+        )
     }
 
     return (

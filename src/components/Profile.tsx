@@ -1,4 +1,4 @@
-import { Box, Button, Typography, Link, Divider } from '@mui/material'
+import { Box, Button, Typography, Link, Divider, Skeleton } from '@mui/material'
 
 import { CCAvatar } from '../components/ui/CCAvatar'
 import { WatchButton } from '../components/WatchButton'
@@ -34,8 +34,8 @@ export function Profile(props: ProfileProps): JSX.Element {
     const isSelf = props.id === client.ccid
 
     const [detailMode, setDetailMode] = useState<detail>('none')
-    const [ackingUsers, setAckingUsers] = useState<User[]>([])
-    const [ackerUsers, setAckerUsers] = useState<User[]>([])
+    const [ackingUsers, setAckingUsers] = useState<User[] | undefined>(undefined)
+    const [ackerUsers, setAckerUsers] = useState<User[] | undefined>(undefined)
 
     const [subProfile, setSubProfile] = useState<CoreProfile<any> | null>(null)
 
@@ -196,7 +196,13 @@ export function Profile(props: ProfileProps): JSX.Element {
                             setDetailMode('ack')
                         }}
                     >
-                        {ackingUsers.length} {t('follow')}
+                        {ackingUsers ? (
+                            <>
+                                {ackingUsers.length} {t('follow')}
+                            </>
+                        ) : (
+                            <Skeleton variant="text" width={80} />
+                        )}
                     </Typography>
                     <Typography
                         component={Link}
@@ -205,7 +211,13 @@ export function Profile(props: ProfileProps): JSX.Element {
                             setDetailMode('acker')
                         }}
                     >
-                        {ackerUsers.length} {t('followers')}
+                        {ackerUsers ? (
+                            <>
+                                {ackerUsers.length} {t('followers')}
+                            </>
+                        ) : (
+                            <Skeleton variant="text" width={80} />
+                        )}
                     </Typography>
                 </Box>
 
