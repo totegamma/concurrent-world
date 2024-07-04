@@ -1,4 +1,4 @@
-import { Box, Collapse, Divider, Tab, Tabs, Typography } from '@mui/material'
+import { Box, Collapse, Divider, Tab, Tabs } from '@mui/material'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { useClient } from '../context/ClientContext'
@@ -44,22 +44,6 @@ export function EntityPage(): JSX.Element {
         return target ? [target] : []
     }, [user, tab])
 
-    if (!user) {
-        return (
-            <Box
-                sx={{
-                    width: '100%',
-                    minHeight: '100%',
-                    backgroundColor: 'background.paper',
-                    display: 'flex',
-                    flexDirection: 'column'
-                }}
-            >
-                <Typography>Loading...</Typography>
-            </Box>
-        )
-    }
-
     return (
         <Box
             sx={{
@@ -73,7 +57,7 @@ export function EntityPage(): JSX.Element {
             <Box position="absolute" top="0" left="0" width="100%" zIndex="1">
                 <Collapse in={showHeader}>
                     <TimelineHeader
-                        title={user.profile?.username || 'anonymous'}
+                        title={user?.profile?.username || 'anonymous'}
                         titleIcon={<AlternateEmailIcon />}
                         onTitleClick={() => {
                             timelineRef.current?.scrollToIndex(0, { align: 'start', smooth: true })
@@ -84,14 +68,14 @@ export function EntityPage(): JSX.Element {
             <Timeline
                 ref={timelineRef}
                 streams={targetStreams}
-                perspective={user.ccid}
+                perspective={user?.ccid}
                 onScroll={(top) => {
                     setShowHeader(top > 180)
                 }}
                 header={
                     <>
                         <Profile
-                            user={user}
+                            user={user ?? undefined}
                             id={id}
                             overrideSubProfileID={subCharacterID}
                             onSubProfileClicked={(id) => {

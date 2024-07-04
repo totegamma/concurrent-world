@@ -25,7 +25,6 @@ import { GlobalActionsProvider } from './context/GlobalActions'
 import { EmojiPickerProvider } from './context/EmojiPickerContext'
 
 import { ThinMenu } from './components/Menu/ThinMenu'
-import { ConcurrentLogo } from './components/theming/ConcurrentLogo'
 import { usePreference } from './context/PreferenceContext'
 import TickerProvider from './context/Ticker'
 import { ContactsPage } from './pages/Contacts'
@@ -44,6 +43,7 @@ import { useTranslation } from 'react-i18next'
 import { ManageSubsPage } from './pages/ManageSubs'
 import { UseSoundFormats } from './constants'
 import { useGlobalState } from './context/GlobalState'
+import { ConcrntLogo } from './components/theming/ConcrntLogo'
 
 function App(): JSX.Element {
     const { client } = useClient()
@@ -399,12 +399,7 @@ function App(): JSX.Element {
                         }
                     }}
                 >
-                    <ConcurrentLogo
-                        size="300px"
-                        upperColor={theme.palette.background.contrastText}
-                        lowerColor={theme.palette.background.contrastText}
-                        frameColor={theme.palette.background.contrastText}
-                    />
+                    <ConcrntLogo size="300px" color={theme.palette.background.contrastText} />
                 </Box>
             </Box>
         </>

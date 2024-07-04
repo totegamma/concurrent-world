@@ -18,12 +18,12 @@ import {
 import { useEffect, useMemo, useState } from 'react'
 import { type ConcurrentTheme } from '../model'
 import { Themes, createConcurrentThemeFromObject } from '../themes'
-import { ConcurrentLogo } from './theming/ConcurrentLogo'
 import { usePreference } from '../context/PreferenceContext'
 import { useClient } from '../context/ClientContext'
 import { HexColorPicker } from 'react-colorful'
 import ColorizeIcon from '@mui/icons-material/Colorize'
 import { useGlobalActions } from '../context/GlobalActions'
+import { ConcrntLogoSplitted } from './theming/ConcrntLogo_Splitted'
 
 export interface ColorPickerProps {
     label: string
@@ -273,7 +273,7 @@ export const ThemeCreator = (): JSX.Element => {
                                 background: newTheme.palette.primary.contrastText
                             }}
                         >
-                            <ConcurrentLogo
+                            <ConcrntLogoSplitted
                                 size="50px"
                                 upperColor={newTheme.palette.primary.main}
                                 lowerColor={newTheme.palette.background.default}

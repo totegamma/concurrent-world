@@ -1,8 +1,8 @@
 import { memo } from 'react'
 import { IconButton, Box, useTheme, AppBar, Toolbar } from '@mui/material'
-import { ConcurrentLogo } from './theming/ConcurrentLogo'
 import type { ConcurrentTheme } from '../model'
 import { useGlobalActions } from '../context/GlobalActions'
+import { ConcrntLogo } from './theming/ConcrntLogo'
 
 export interface TimelineHeaderProps {
     title?: string
@@ -49,7 +49,7 @@ export const TimelineHeader = memo<TimelineHeaderProps>((props: TimelineHeaderPr
                             actions.openMobileMenu(true)
                         }}
                     >
-                        <ConcurrentLogo size="25px" upperColor={color} lowerColor={color} frameColor={color} />
+                        <ConcrntLogo size="25px" color={color} />
                     </IconButton>
                 </Box>
                 <Box display="flex" flex={1} color={color} alignItems="center" justifyContent="center">

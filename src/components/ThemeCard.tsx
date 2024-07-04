@@ -1,7 +1,7 @@
 import { Box, Button, Paper, Typography } from '@mui/material'
 import { type ConcurrentTheme } from '../model'
-import { ConcurrentLogo } from './theming/ConcurrentLogo'
 import { createConcurrentThemeFromObject } from '../themes'
+import { ConcrntLogoSplitted } from './theming/ConcrntLogo_Splitted'
 
 export interface ThemeCardProps {
     theme: ConcurrentTheme
@@ -39,7 +39,7 @@ export const ThemeCard = (props: ThemeCardProps): JSX.Element => {
                         background: theme.palette.primary.contrastText
                     }}
                 >
-                    <ConcurrentLogo
+                    <ConcrntLogoSplitted
                         size="40px"
                         upperColor={theme.palette.primary.main}
                         lowerColor={bgColor}
