@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material'
-import { ConcurrentLogo } from '../theming/ConcurrentLogo'
+import { ConcrntLogo } from '../theming/ConcrntLogo'
 
 export interface LoadingProps {
     message: string
@@ -18,13 +18,7 @@ export const Loading = (props: LoadingProps): JSX.Element => {
                 gap: 1
             }}
         >
-            <ConcurrentLogo
-                size="30px"
-                upperColor={props.color}
-                lowerColor={props.color}
-                frameColor={props.color}
-                spinning={true}
-            />
+            <ConcrntLogo size="30px" color={props.color} spinning={true} />
             <Typography variant="body1">{props.message}</Typography>
         </Box>
     )

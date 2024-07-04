@@ -1,4 +1,4 @@
-import { Avatar, Badge, type SxProps } from '@mui/material'
+import { Avatar, Badge, Skeleton, type SxProps } from '@mui/material'
 import BoringAvatar from 'boring-avatars'
 
 export interface CCAvatarProps {
@@ -9,9 +9,14 @@ export interface CCAvatarProps {
     avatarOverride?: string
     identiconSource?: string
     onBadgeClick?: () => void
+    isLoading?: boolean
 }
 
 export const CCAvatar = (props: CCAvatarProps): JSX.Element => {
+    if (props.isLoading) {
+        return <Skeleton variant="rectangular" sx={props.sx} />
+    }
+
     return (
         <Badge
             overlap="circular"

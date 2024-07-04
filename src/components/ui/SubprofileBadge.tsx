@@ -1,7 +1,7 @@
 import { type CoreProfile } from '@concurrent-world/client'
 import { useEffect, useState } from 'react'
 import { useClient } from '../../context/ClientContext'
-import { Avatar, type SxProps, Tooltip } from '@mui/material'
+import { Avatar, type SxProps, Tooltip, Skeleton } from '@mui/material'
 import BoringAvatar from 'boring-avatars'
 
 export interface SubprofileBadgeProps {
@@ -21,6 +21,8 @@ export function SubprofileBadge(props: SubprofileBadgeProps): JSX.Element {
             setProfile(character ?? null)
         })
     }, [props.characterID])
+
+    if (!character) return <Skeleton variant="rectangular" width={40} height={40} />
 
     return (
         <Tooltip arrow title={character?.document.body.username} placement="top">

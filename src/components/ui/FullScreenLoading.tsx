@@ -1,5 +1,5 @@
 import { Box, CssBaseline, Typography } from '@mui/material'
-import { ConcurrentLogo } from '../theming/ConcurrentLogo'
+import { ConcrntLogo } from '../theming/ConcrntLogo'
 
 export interface FullScreenLoadingProps {
     message: string
@@ -21,7 +21,7 @@ export const FullScreenLoading = (props: FullScreenLoadingProps): JSX.Element =>
                     gap: 2
                 }}
             >
-                <ConcurrentLogo size="100px" upperColor="#fff" lowerColor="#fff" frameColor="#fff" spinning={true} />
+                <ConcrntLogo size="100px" color="#fff" spinning={true} />
                 <Typography variant="h5">{props.message}</Typography>
             </Box>
         </CssBaseline>

@@ -125,7 +125,8 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                             justifyContent: 'space-between',
                             alignItems: 'center',
                             gap: 1,
-                            flexWrap: 'wrap'
+                            flexWrap: 'wrap',
+                            mt: 1
                         }}
                     >
                         <Box display="flex" flexDirection="row" alignItems="center">
