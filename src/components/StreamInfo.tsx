@@ -136,7 +136,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                                 <Typography variant="h3">属性</Typography>
                                 <CCEditor
                                     schemaURL={schemaDraft}
-                                    value={stream.document.body}
+                                    value={documentBody}
                                     setValue={(e) => {
                                         setDocumentBody(e)
                                     }}

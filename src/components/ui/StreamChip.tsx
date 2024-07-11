@@ -1,10 +1,10 @@
-import { Tooltip, Paper, Chip } from '@mui/material'
+import { Tooltip, Paper } from '@mui/material'
 import { type Timeline } from '@concurrent-world/client'
-import { Link as NavLink } from 'react-router-dom'
 import TagIcon from '@mui/icons-material/Tag'
 import { useClient } from '../../context/ClientContext'
 import { useEffect, useState } from 'react'
 import { StreamCard } from '../Stream/Card'
+import { CCChip } from './CCChip'
 
 export interface StreamChipProps {
     streamID?: string
@@ -55,8 +55,7 @@ export const StreamChip = (props: StreamChipProps): JSX.Element => {
                 )
             }
         >
-            <Chip
-                component={NavLink}
+            <CCChip
                 to={'/timeline/' + (props.streamID ?? '')}
                 size={'small'}
                 label={stream?.document.body.name ?? props.streamID}
