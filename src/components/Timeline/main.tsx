@@ -1,14 +1,4 @@
-import {
-    Box,
-    Divider,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
-    type SxProps,
-    Typography,
-    useTheme,
-    alpha
-} from '@mui/material'
+import { Box, Divider, ListItem, ListItemIcon, ListItemText, type SxProps, Typography, useTheme } from '@mui/material'
 import React, { memo, useCallback, useEffect, useState, useRef, forwardRef, type ForwardedRef } from 'react'
 import { AssociationFrame } from '../Association/AssociationFrame'
 import { Loading } from '../ui/Loading'
@@ -24,7 +14,6 @@ import { usePreference } from '../../context/PreferenceContext'
 import { VList, type VListHandle } from 'virtua'
 import { useClient } from '../../context/ClientContext'
 import { UseSoundFormats } from '../../constants'
-import { ConcrntLogo } from '../theming/ConcrntLogo'
 
 export interface TimelineProps {
     streams: string[]
@@ -231,25 +220,9 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                     display: 'flex',
                     flex: 1,
                     overflow: 'hidden',
-                    flexDirection: 'column',
-                    position: 'relative'
+                    flexDirection: 'column'
                 }}
             >
-                {timelineLoading && (
-                    <Box
-                        sx={{
-                            width: '100%',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)'
-                        }}
-                    >
-                        <ConcrntLogo size={'30vw'} color={alpha(theme.palette.text.primary, 0.03)} />
-                    </Box>
-                )}
                 <VList
                     style={{
                         flex: 1,
