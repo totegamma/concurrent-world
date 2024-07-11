@@ -247,7 +247,7 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                             transform: 'translate(-50%, -50%)'
                         }}
                     >
-                        <ConcrntLogo size={'30vw'} color={alpha(theme.palette.text.primary, 0.05)} />
+                        <ConcrntLogo size={'30vw'} color={alpha(theme.palette.text.primary, 0.03)} />
                     </Box>
                 )}
                 <VList
@@ -272,71 +272,67 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
                 >
                     {props.header}
 
-                    {!timelineLoading && (
-                        <>
-                            {(timeline.current?.body.length ?? 0) === 0 ? (
-                                <>
-                                    <Box
-                                        sx={{
-                                            width: '100%',
-                                            display: 'flex',
-                                            justifyContent: 'center'
-                                        }}
-                                    >
-                                        <Typography
-                                            sx={{
-                                                color: 'text.secondary'
-                                            }}
-                                        >
-                                            No currents yet here!
-                                        </Typography>
-                                    </Box>
-                                </>
-                            ) : (
-                                timeline.current?.body.map((e) => {
-                                    let element
-                                    const type = e.resourceID[0]
-                                    switch (type) {
-                                        case 'm':
-                                            element = (
-                                                <MessageContainer
-                                                    sx={timelineElemSx}
-                                                    messageID={e.resourceID}
-                                                    messageOwner={e.owner}
-                                                    resolveHint={e.timelineID.split('@')[1]}
-                                                    lastUpdated={e.lastUpdate?.getTime() ?? 0}
-                                                    after={divider}
-                                                    timestamp={e.cdate}
-                                                />
-                                            )
-                                            break
-                                        case 'a':
-                                            element = (
-                                                <AssociationFrame
-                                                    sx={timelineElemSx}
-                                                    associationID={e.resourceID}
-                                                    associationOwner={e.owner}
-                                                    lastUpdated={e.lastUpdate?.getTime() ?? 0}
-                                                    after={divider}
-                                                    perspective={props.perspective}
-                                                />
-                                            )
-                                            break
-                                        default:
-                                            element = <Typography>Unknown message type: {type}</Typography>
-                                            break
-                                    }
+                    {(timeline.current?.body.length ?? 0) === 0
+                        ? !timelineLoading && (
+                              <Box
+                                  sx={{
+                                      width: '100%',
+                                      display: 'flex',
+                                      justifyContent: 'center'
+                                  }}
+                              >
+                                  <Typography
+                                      sx={{
+                                          color: 'text.secondary'
+                                      }}
+                                  >
+                                      No currents yet here!
+                                  </Typography>
+                              </Box>
+                          )
+                        : (timelineLoading ? [] : timeline.current?.body ?? []).map((e) => {
+                              let element
+                              const type = e.resourceID[0]
+                              switch (type) {
+                                  case 'm':
+                                      element = (
+                                          <MessageContainer
+                                              sx={timelineElemSx}
+                                              messageID={e.resourceID}
+                                              messageOwner={e.owner}
+                                              resolveHint={e.timelineID.split('@')[1]}
+                                              lastUpdated={e.lastUpdate?.getTime() ?? 0}
+                                              after={divider}
+                                              timestamp={e.cdate}
+                                          />
+                                      )
+                                      break
+                                  case 'a':
+                                      element = (
+                                          <AssociationFrame
+                                              sx={timelineElemSx}
+                                              associationID={e.resourceID}
+                                              associationOwner={e.owner}
+                                              lastUpdated={e.lastUpdate?.getTime() ?? 0}
+                                              after={divider}
+                                              perspective={props.perspective}
+                                          />
+                                      )
+                                      break
+                                  default:
+                                      element = <Typography>Unknown message type: {type}</Typography>
+                                      break
+                              }
 
-                                    return (
-                                        <React.Fragment key={e.resourceID}>
-                                            <ErrorBoundary FallbackComponent={renderError}>{element}</ErrorBoundary>
-                                        </React.Fragment>
-                                    )
-                                })
-                            )}
+                              return (
+                                  <React.Fragment key={e.resourceID}>
+                                      <ErrorBoundary FallbackComponent={renderError}>{element}</ErrorBoundary>
+                                  </React.Fragment>
+                              )
+                          })}
 
-                            {isFetching && <Loading key={0} message="Loading..." color={theme.palette.text.primary} />}
-                        </>
+                    {!timelineLoading && isFetching && (
+                        <Loading key={0} message="Loading..." color={theme.palette.text.primary} />
                     )}
                 </VList>
             </Box>
