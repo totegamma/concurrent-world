@@ -268,15 +268,16 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                 defaultPostHome={isPostStreamsPublic}
                                                 streamPickerOptions={globalState.allKnownTimelines}
                                                 onSubmit={async (text: string, destinations: string[], options) => {
-                                                    await client
-                                                        .createMarkdownCrnt(text, destinations, options)
-                                                        .catch((e) => {
-                                                            return e
-                                                        })
-                                                        .finally(() => {
-                                                            setMode('none')
-                                                        })
-                                                    return null
+                                                    try {
+                                                        await client
+                                                            .createMarkdownCrnt(text, destinations, options)
+                                                            .finally(() => {
+                                                                setMode('none')
+                                                            })
+                                                        return null
+                                                    } catch (e) {
+                                                        return e as Error
+                                                    }
                                                 }}
                                                 onCancel={() => {
                                                     setMode('none')
@@ -297,13 +298,17 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                         : targetMessage.postedStreams ?? []
                                                 }
                                                 onSubmit={async (text, streams, options): Promise<Error | null> => {
-                                                    if (mode === 'reroute') {
-                                                        await targetMessage.reroute(streams, text, options)
-                                                    } else if (mode === 'reply') {
-                                                        await targetMessage.reply(streams, text, options)
+                                                    try {
+                                                        if (mode === 'reroute') {
+                                                            await targetMessage.reroute(streams, text, options)
+                                                        } else if (mode === 'reply') {
+                                                            await targetMessage.reply(streams, text, options)
+                                                        }
+                                                        setMode('none')
+                                                        return null
+                                                    } catch (e) {
+                                                        return e as Error
                                                     }
-                                                    setMode('none')
-                                                    return null
                                                 }}
                                                 onCancel={() => {
                                                     setMode('none')
@@ -334,15 +339,16 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                 streamPickerInitial={postStreams}
                                                 streamPickerOptions={globalState.allKnownTimelines}
                                                 onSubmit={async (text: string, destinations: string[], options) => {
-                                                    await client
-                                                        .createMarkdownCrnt(text, destinations, options)
-                                                        .catch((e) => {
-                                                            return e
-                                                        })
-                                                        .finally(() => {
-                                                            setMode('none')
-                                                        })
-                                                    return null
+                                                    try {
+                                                        await client
+                                                            .createMarkdownCrnt(text, destinations, options)
+                                                            .finally(() => {
+                                                                setMode('none')
+                                                            })
+                                                        return null
+                                                    } catch (e) {
+                                                        return e as Error
+                                                    }
                                                 }}
                                                 sx={{
                                                     p: 1
@@ -375,13 +381,17 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                                         : targetMessage.postedStreams ?? []
                                                 }
                                                 onSubmit={async (text, streams, options): Promise<Error | null> => {
-                                                    if (mode === 'reroute') {
-                                                        await targetMessage.reroute(streams, text, options)
-                                                    } else if (mode === 'reply') {
-                                                        await targetMessage.reply(streams, text, options)
+                                                    try {
+                                                        if (mode === 'reroute') {
+                                                            await targetMessage.reroute(streams, text, options)
+                                                        } else if (mode === 'reply') {
+                                                            await targetMessage.reply(streams, text, options)
+                                                        }
+                                                        setMode('none')
+                                                        return null
+                                                    } catch (e) {
+                                                        return e as Error
                                                     }
-                                                    setMode('none')
-                                                    return null
                                                 }}
                                                 sx={{
                                                     p: 1
