@@ -28,7 +28,15 @@ export const PolicyEditor = memo<PolicyEditorProps>((props: PolicyEditorProps): 
         fetchWithTimeout(props.policyURL, { method: 'GET' })
             .then((e) => e.json())
             .then((e) => {
-                setPolicy(e)
+                if (e.versions) {
+                    if (e.versions['2024-07-01']) {
+                        setPolicy(e.versions['2024-07-01'])
+                    }
+                }
+
+                if (e.version) {
+                    setPolicy(e)
+                }
             })
     }, [props.policyURL])
 
