@@ -121,10 +121,12 @@ export const StreamPage = memo((): JSX.Element => {
                                                     destinations: string[],
                                                     options
                                                 ): Promise<Error | null> => {
-                                                    await client
-                                                        .createMarkdownCrnt(text, destinations, options)
-                                                        .catch((e) => e)
-                                                    return null
+                                                    try {
+                                                        await client.createMarkdownCrnt(text, destinations, options)
+                                                        return null
+                                                    } catch (e) {
+                                                        return e as Error
+                                                    }
                                                 }}
                                                 sx={{
                                                     p: 1

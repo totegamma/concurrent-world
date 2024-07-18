@@ -150,10 +150,12 @@ export function ListPage(): JSX.Element {
                                                     destinations: string[],
                                                     options?: CreateCurrentOptions
                                                 ): Promise<Error | null> => {
-                                                    await client
-                                                        .createMarkdownCrnt(text, destinations, options)
-                                                        .catch((e) => e)
-                                                    return null
+                                                    try {
+                                                        await client.createMarkdownCrnt(text, destinations, options)
+                                                        return null
+                                                    } catch (e) {
+                                                        return e as Error
+                                                    }
                                                 }}
                                                 sx={{
                                                     p: 1
