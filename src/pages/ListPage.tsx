@@ -23,7 +23,6 @@ import { type VListHandle } from 'virtua'
 import { useGlobalActions } from '../context/GlobalActions'
 import { useGlobalState } from '../context/GlobalState'
 import { ListItemTimeline } from '../components/ui/ListItemTimeline'
-import { enqueueSnackbar } from 'notistack'
 
 export function ListPage(): JSX.Element {
     const { client } = useClient()
@@ -90,7 +89,6 @@ export function ListPage(): JSX.Element {
     const longtap = useRef<NodeJS.Timeout | null>(null)
     const tabPressStart = useCallback(
         (target: HTMLButtonElement, subid: string) => {
-            enqueueSnackbar('Long tap to open the list', { variant: 'info' })
             longtap.current = setTimeout(() => {
                 const list = allKnownSubscriptions.find((x) => x.id === subid)
                 if (list) {
@@ -105,7 +103,6 @@ export function ListPage(): JSX.Element {
 
     const tabPressEnd = useCallback(
         (subid: string) => {
-            enqueueSnackbar('Tab to switch the list', { variant: 'info' })
             if (longtap.current) {
                 clearTimeout(longtap.current)
                 longtap.current = null
@@ -155,15 +152,19 @@ export function ListPage(): JSX.Element {
                             label={sub.document.body.name}
                             component={Button}
                             onTouchStart={(a) => {
+                                a.preventDefault()
                                 tabPressStart(a.currentTarget, sub.id)
                             }}
-                            onTouchEnd={() => {
+                            onTouchEnd={(a) => {
+                                a.preventDefault()
                                 tabPressEnd(sub.id)
                             }}
                             onMouseDown={(a) => {
+                                a.preventDefault()
                                 tabPressStart(a.currentTarget, sub.id)
                             }}
-                            onMouseUp={() => {
+                            onMouseUp={(a) => {
+                                a.preventDefault()
                                 tabPressEnd(sub.id)
                             }}
                             sx={{ fontSize: '0.9rem', padding: '0', textTransform: 'none' }}
