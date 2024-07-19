@@ -162,16 +162,17 @@ export function Explorer(): JSX.Element {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 1,
-                padding: '20px',
+                paddingX: 1,
+                paddingTop: 1,
                 background: theme.palette.background.paper,
                 minHeight: '100%',
                 overflowY: 'scroll'
             }}
         >
-            <Typography variant="h2" gutterBottom>
-                {t('title')}
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
+            <Box>
+                <Typography variant="h2">{t('title')}</Typography>
+                <Divider sx={{ mb: 1 }} />
+            </Box>
             <Box
                 sx={{
                     display: 'grid',

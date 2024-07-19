@@ -25,12 +25,11 @@ export function Notifications(): JSX.Element {
         >
             <Box
                 sx={{
-                    padding: '20px 20px 0 20px'
+                    paddingX: 1,
+                    paddingTop: 1
                 }}
             >
-                <Typography variant="h2" gutterBottom>
-                    {t('title')}
-                </Typography>
+                <Typography variant="h2">{t('title')}</Typography>
                 <Divider />
             </Box>
             <Timeline streams={streams} />

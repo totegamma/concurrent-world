@@ -19,15 +19,14 @@ export function ContactsPage(): JSX.Element {
         >
             <Box
                 sx={{
-                    padding: '20px 20px 0 20px',
+                    paddingX: 1,
+                    paddingTop: 1,
                     display: 'flex',
                     flexDirection: 'column',
                     overflow: 'hidden'
                 }}
             >
-                <Typography variant="h2" gutterBottom>
-                    {t('title')}
-                </Typography>
+                <Typography variant="h2">{t('title')}</Typography>
                 <Divider />
                 {client.user && <AckList initmode={'acking'} user={client.user} />}
             </Box>

@@ -15,7 +15,8 @@ export const Devtool = memo((): JSX.Element => {
     return (
         <Box
             sx={{
-                padding: '20px',
+                paddingX: 1,
+                paddingTop: 1,
                 backgroundColor: 'background.paper',
                 minHeight: '100%',
                 overflowY: 'scroll',
