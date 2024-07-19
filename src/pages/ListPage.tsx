@@ -1,5 +1,5 @@
 import { Box, Button, Divider, Menu, Tab, Tabs, Typography } from '@mui/material'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate, Link as RouterLink } from 'react-router-dom'
 import { usePreference } from '../context/PreferenceContext'
 import { Timeline } from '../components/Timeline'
@@ -87,6 +87,32 @@ export function ListPage(): JSX.Element {
     }, [id, client, updater])
 
     const longtap = useRef<NodeJS.Timeout | null>(null)
+    const tabPressStart = useCallback(
+        (target: HTMLButtonElement, subid: string) => {
+            longtap.current = setTimeout(() => {
+                const list = allKnownSubscriptions.find((x) => x.id === subid)
+                if (list) {
+                    tabSubAnchor.current = target
+                    setTabSubscription(list.items)
+                }
+                longtap.current = null
+            }, 300)
+        },
+        [allKnownSubscriptions]
+    )
+
+    const tabPressEnd = useCallback((subid: string) => {
+        if (longtap.current) {
+            clearTimeout(longtap.current)
+            longtap.current = null
+            if (subid === tab) {
+                console.log('scroll')
+                timelineRef.current?.scrollToIndex(0, { align: 'start', smooth: true })
+            } else {
+                setTab(subid)
+            }
+        }
+    }, [])
 
     return (
         <>
@@ -123,28 +149,17 @@ export function ListPage(): JSX.Element {
                             value={sub.id}
                             label={sub.document.body.name}
                             component={Button}
+                            onTouchStart={(a) => {
+                                tabPressStart(a.currentTarget, sub.id)
+                            }}
+                            onTouchEnd={() => {
+                                tabPressEnd(sub.id)
+                            }}
                             onMouseDown={(a) => {
-                                longtap.current = setTimeout(() => {
-                                    const list = allKnownSubscriptions.find((x) => x.id === sub.id)
-                                    if (list) {
-                                        console.log(a)
-                                        tabSubAnchor.current = a.target as HTMLButtonElement
-                                        setTabSubscription(list.items)
-                                    }
-                                    longtap.current = null
-                                }, 300)
+                                tabPressStart(a.currentTarget, sub.id)
                             }}
                             onMouseUp={() => {
-                                if (longtap.current) {
-                                    clearTimeout(longtap.current)
-                                    longtap.current = null
-                                    if (sub.id === tab) {
-                                        console.log('scroll')
-                                        timelineRef.current?.scrollToIndex(0, { align: 'start', smooth: true })
-                                    } else {
-                                        setTab(sub.id)
-                                    }
-                                }
+                                tabPressEnd(sub.id)
                             }}
                             sx={{ fontSize: '0.9rem', padding: '0', textTransform: 'none' }}
                         />
