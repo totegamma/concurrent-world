@@ -1,6 +1,7 @@
 import { Autocomplete, Box, InputBase, type SxProps } from '@mui/material'
 import { type CommunityTimelineSchema, type Timeline } from '@concurrent-world/client'
 import { CCChip } from './CCChip'
+import { useMemo } from 'react'
 
 export interface StreamPickerProps {
     selected: Array<Timeline<CommunityTimelineSchema>>
@@ -10,6 +11,20 @@ export interface StreamPickerProps {
 }
 
 export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
+    // WORKAROUND for vite circular JSON dependency
+    const selected = useMemo(
+        () =>
+            JSON.parse(
+                JSON.stringify(props.selected ?? [], (key, value) => {
+                    if (key === 'client' || key === 'api') {
+                        return undefined
+                    }
+                    return value
+                })
+            ),
+        [props.selected]
+    )
+
     return (
         <Box
             sx={{
@@ -24,7 +39,7 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
                 filterSelectedOptions
                 sx={{ width: 1 }}
                 multiple
-                value={props.selected}
+                value={selected}
                 options={props.options}
                 getOptionKey={(option: Timeline<CommunityTimelineSchema>) => option.id ?? ''}
                 getOptionLabel={(option: Timeline<CommunityTimelineSchema>) => option.document.body.name}
@@ -44,7 +59,7 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
                             {...params.InputProps}
                             {...rest}
                             sx={{ color: 'props.theme.palette.text.secondary' }}
-                            placeholder={props.selected.length === 0 ? '投稿先の選択…' : ''}
+                            placeholder={selected.length === 0 ? '投稿先の選択…' : ''}
                         />
                     )
                 }}

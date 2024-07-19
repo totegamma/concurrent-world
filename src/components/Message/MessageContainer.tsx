@@ -10,9 +10,14 @@ import { memo, useEffect, useState } from 'react'
 import { ReplyMessageFrame } from './ReplyMessageFrame'
 import { RerouteMessageFrame } from './RerouteMessageFrame'
 import { MessageSkeleton } from '../MessageSkeleton'
-import { Box, type SxProps, Typography } from '@mui/material'
+import { Box, type SxProps, Typography, Button } from '@mui/material'
 import { MessageView } from './MessageView'
 import { usePreference } from '../../context/PreferenceContext'
+import { ContentWithUserFetch } from '../ContentWithUserFetch'
+
+import SearchOffIcon from '@mui/icons-material/SearchOff'
+import TerminalIcon from '@mui/icons-material/Terminal'
+import { CopyChip } from '../ui/CopyChip'
 
 interface MessageContainerProps {
     messageID: string
@@ -27,7 +32,7 @@ interface MessageContainerProps {
 }
 
 export const MessageContainer = memo<MessageContainerProps>((props: MessageContainerProps): JSX.Element | null => {
-    const { client } = useClient()
+    const { client, forceUpdate } = useClient()
     const [message, setMessage] = useState<Message<
         MarkdownMessageSchema | ReplyMessageSchema | RerouteMessageSchema
     > | null>()
@@ -60,8 +65,58 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
         if (devMode) {
             return (
                 <>
-                    <Typography>Message not found</Typography>
-                    {props.messageID}@{props.messageOwner}
+                    <Box
+                        sx={{
+                            ...props.sx,
+                            backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                        }}
+                    >
+                        <ContentWithUserFetch
+                            ccid={props.messageOwner}
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flex: 1
+                            }}
+                        >
+                            <Box display="flex" flexDirection="row" justifyContent="space-between" gap={1} width="100%">
+                                <Box display="flex" justifyContent="center" alignItems="center" gap={1}>
+                                    <SearchOffIcon />
+                                    <Typography variant="caption">Failed to fetch message.</Typography>
+                                </Box>
+                                <Box display="flex" justifyContent="center" alignItems="center" gap={1}>
+                                    <TerminalIcon />
+                                    <Typography variant="caption">開発者ビュー</Typography>
+                                </Box>
+                            </Box>
+                            <Box display="flex" flexDirection="row" justifyContent="center" gap={1} width="100%">
+                                <Box display="flex" flexWrap="wrap" gap={1} flex={1}>
+                                    <CopyChip label={`ID: ${props.messageID}`} content={props.messageID} />
+                                    <CopyChip label={`Owner: ${props.messageOwner}`} content={props.messageOwner} />
+                                    {props.resolveHint && (
+                                        <CopyChip
+                                            label={`ResolveHint: ${props.resolveHint}`}
+                                            content={props.resolveHint}
+                                        />
+                                    )}
+                                </Box>
+                                <Box display="flex" flexDirection="row" alignItems="flex-end" gap={1}>
+                                    <Button
+                                        size="small"
+                                        variant="outlined"
+                                        onClick={() => {
+                                            client.invalidateMessage(props.messageID)
+                                            forceUpdate()
+                                        }}
+                                    >
+                                        Reload
+                                    </Button>
+                                </Box>
+                            </Box>
+                        </ContentWithUserFetch>
+                    </Box>
                     {props.after}
                 </>
             )
