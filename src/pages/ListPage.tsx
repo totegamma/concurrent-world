@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Tab, Tabs, Typography } from '@mui/material'
+import { Box, Button, Divider, Menu, Tab, Tabs, Typography } from '@mui/material'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate, Link as RouterLink } from 'react-router-dom'
 import { usePreference } from '../context/PreferenceContext'
@@ -10,7 +10,8 @@ import {
     type CommunityTimelineSchema,
     type Timeline as CoreTimeline,
     type CoreSubscription,
-    type ListSubscriptionSchema
+    type ListSubscriptionSchema,
+    type CoreSubscriptionItem
 } from '@concurrent-world/client'
 import TuneIcon from '@mui/icons-material/Tune'
 import ExploreIcon from '@mui/icons-material/Explore'
@@ -21,13 +22,14 @@ import { TimelineHeader } from '../components/TimelineHeader'
 import { type VListHandle } from 'virtua'
 import { useGlobalActions } from '../context/GlobalActions'
 import { useGlobalState } from '../context/GlobalState'
+import { ListItemTimeline } from '../components/ui/ListItemTimeline'
 
 export function ListPage(): JSX.Element {
     const { client } = useClient()
     const path = useLocation()
     const navigate = useNavigate()
     const { setPostStreams, postStreams } = useGlobalActions()
-    const { allKnownTimelines, reloadList } = useGlobalState()
+    const { allKnownTimelines, allKnownSubscriptions, reloadList } = useGlobalState()
     const [lists, _setLists] = usePreference('lists')
     const [showEditorOnTop] = usePreference('showEditorOnTop')
     const [showEditorOnTopMobile] = usePreference('showEditorOnTopMobile')
@@ -45,6 +47,9 @@ export function ListPage(): JSX.Element {
     const [pinnedSubscriptions, setPinnedSubscriptions] = useState<Array<CoreSubscription<ListSubscriptionSchema>>>([])
 
     const [updater, setUpdater] = useState<number>(0)
+
+    const tabSubAnchor = useRef<HTMLButtonElement | null>(null)
+    const [tabSubscription, setTabSubscription] = useState<CoreSubscriptionItem[] | undefined>()
 
     useEffect(() => {
         if (!id) return
@@ -81,6 +86,8 @@ export function ListPage(): JSX.Element {
         })
     }, [id, client, updater])
 
+    const longtap = useRef<NodeJS.Timeout | null>(null)
+
     return (
         <>
             <Box
@@ -105,9 +112,6 @@ export function ListPage(): JSX.Element {
                 />
                 <Tabs
                     value={tab}
-                    onChange={(_, newValue) => {
-                        setTab(newValue)
-                    }}
                     textColor="secondary"
                     indicatorColor="secondary"
                     variant="scrollable"
@@ -118,9 +122,28 @@ export function ListPage(): JSX.Element {
                             key={sub.id}
                             value={sub.id}
                             label={sub.document.body.name}
-                            onClick={() => {
-                                if (sub.id === tab) {
-                                    timelineRef.current?.scrollToIndex(0, { align: 'start', smooth: true })
+                            component={Button}
+                            onMouseDown={(a) => {
+                                longtap.current = setTimeout(() => {
+                                    const list = allKnownSubscriptions.find((x) => x.id === sub.id)
+                                    if (list) {
+                                        console.log(a)
+                                        tabSubAnchor.current = a.target as HTMLButtonElement
+                                        setTabSubscription(list.items)
+                                    }
+                                    longtap.current = null
+                                }, 300)
+                            }}
+                            onMouseUp={() => {
+                                if (longtap.current) {
+                                    clearTimeout(longtap.current)
+                                    longtap.current = null
+                                    if (sub.id === tab) {
+                                        console.log('scroll')
+                                        timelineRef.current?.scrollToIndex(0, { align: 'start', smooth: true })
+                                    } else {
+                                        setTab(sub.id)
+                                    }
                                 }
                             }}
                             sx={{ fontSize: '0.9rem', padding: '0', textTransform: 'none' }}
@@ -221,6 +244,21 @@ export function ListPage(): JSX.Element {
                     <>Loading...</>
                 )}
             </CCDrawer>
+            <Menu
+                anchorEl={tabSubAnchor.current}
+                open={!!tabSubscription}
+                onClose={() => {
+                    setTabSubscription(undefined)
+                }}
+                sx={{
+                    maxHeight: '80vh',
+                    overflowY: 'auto'
+                }}
+            >
+                {tabSubscription?.map((sub) => (
+                    <ListItemTimeline key={sub.id} timelineID={sub.id} />
+                ))}
+            </Menu>
         </>
     )
 }
