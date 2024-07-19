@@ -150,6 +150,7 @@ export function ListPage(): JSX.Element {
                             key={sub.id}
                             value={sub.id}
                             label={sub.document.body.name}
+                            disableRipple
                             component={Button}
                             onTouchStart={(a) => {
                                 a.preventDefault()
@@ -157,7 +158,6 @@ export function ListPage(): JSX.Element {
                             }}
                             onTouchEnd={(a) => {
                                 a.preventDefault()
-                                a.currentTarget.blur()
                                 tabPressEnd(sub.id)
                             }}
                             onMouseDown={(a) => {
@@ -166,7 +166,6 @@ export function ListPage(): JSX.Element {
                             }}
                             onMouseUp={(a) => {
                                 a.preventDefault()
-                                a.currentTarget.blur()
                                 tabPressEnd(sub.id)
                             }}
                             sx={{ fontSize: '0.9rem', padding: '0', textTransform: 'none' }}
