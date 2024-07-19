@@ -145,7 +145,8 @@ export function MessagePage(): JSX.Element {
                 padding: '20px',
                 backgroundColor: 'background.paper',
                 minHeight: '100%',
-                overflow: 'scroll'
+                overflow: 'scroll',
+                userSelect: 'auto'
             }}
         >
             <Typography variant="h2" gutterBottom>
