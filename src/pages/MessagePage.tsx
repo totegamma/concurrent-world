@@ -141,42 +141,40 @@ export function MessagePage(): JSX.Element {
             sx={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '5px',
-                padding: '20px',
+                gap: 1,
+                padding: 1,
                 backgroundColor: 'background.paper',
                 minHeight: '100%',
                 overflow: 'scroll',
                 userSelect: 'auto'
             }}
         >
-            <Typography variant="h2" gutterBottom>
-                Message
-            </Typography>
-            <Divider />
+            <Box>
+                <Typography gutterBottom variant="h2">
+                    Message
+                </Typography>
+                <Divider />
+            </Box>
 
             {replyTo && (
-                <Paper
-                    sx={{
-                        padding: '20px'
-                    }}
-                >
+                <>
                     <MessageView message={replyTo} lastUpdated={lastUpdated} userCCID={client.ccid} />
-                </Paper>
+                    <Divider />
+                </>
             )}
 
             {(message.schema === Schemas.markdownMessage || message.schema === Schemas.replyMessage) && (
-                <Paper
-                    sx={{
-                        padding: '20px'
-                    }}
-                >
-                    <MessageView
-                        forceExpanded
-                        message={message as Message<MarkdownMessageSchema | ReplyMessageSchema>}
-                        lastUpdated={lastUpdated}
-                        userCCID={client.ccid}
-                    />
-                </Paper>
+                <>
+                    <Box>
+                        <MessageView
+                            forceExpanded
+                            message={message as Message<MarkdownMessageSchema | ReplyMessageSchema>}
+                            lastUpdated={lastUpdated}
+                            userCCID={client.ccid}
+                        />
+                    </Box>
+                    <Divider />
+                </>
             )}
 
             <Tabs
