@@ -101,18 +101,20 @@ export function ListPage(): JSX.Element {
         [allKnownSubscriptions]
     )
 
-    const tabPressEnd = useCallback((subid: string) => {
-        if (longtap.current) {
-            clearTimeout(longtap.current)
-            longtap.current = null
-            if (subid === tab) {
-                console.log('scroll')
-                timelineRef.current?.scrollToIndex(0, { align: 'start', smooth: true })
-            } else {
-                setTab(subid)
+    const tabPressEnd = useCallback(
+        (subid: string) => {
+            if (longtap.current) {
+                clearTimeout(longtap.current)
+                longtap.current = null
+                if (subid === tab) {
+                    timelineRef.current?.scrollToIndex(0, { align: 'start', smooth: true })
+                } else {
+                    setTab(subid)
+                }
             }
-        }
-    }, [])
+        },
+        [tab]
+    )
 
     return (
         <>
