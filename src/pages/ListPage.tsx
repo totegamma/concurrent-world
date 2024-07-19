@@ -151,22 +151,23 @@ export function ListPage(): JSX.Element {
                             value={sub.id}
                             label={sub.document.body.name}
                             onTouchStart={(a) => {
-                                a.preventDefault()
                                 tabPressStart(a.currentTarget, sub.id)
                             }}
-                            onTouchEnd={(a) => {
-                                a.preventDefault()
+                            onTouchEnd={() => {
                                 tabPressEnd(sub.id)
                             }}
                             onMouseDown={(a) => {
-                                a.preventDefault()
                                 tabPressStart(a.currentTarget, sub.id)
                             }}
-                            onMouseUp={(a) => {
-                                a.preventDefault()
+                            onMouseUp={() => {
                                 tabPressEnd(sub.id)
                             }}
-                            sx={{ fontSize: '0.9rem', padding: '0', textTransform: 'none' }}
+                            sx={{
+                                fontSize: '0.9rem',
+                                padding: '0',
+                                textTransform: 'none',
+                                userSelect: 'none'
+                            }}
                         />
                     ))}
                 </Tabs>
