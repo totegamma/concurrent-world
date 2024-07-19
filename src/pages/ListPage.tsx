@@ -48,7 +48,7 @@ export function ListPage(): JSX.Element {
 
     const [updater, setUpdater] = useState<number>(0)
 
-    const tabSubAnchor = useRef<HTMLButtonElement | null>(null)
+    const tabSubAnchor = useRef<HTMLDivElement | null>(null)
     const [tabSubscription, setTabSubscription] = useState<CoreSubscriptionItem[] | undefined>()
 
     useEffect(() => {
@@ -88,7 +88,7 @@ export function ListPage(): JSX.Element {
 
     const longtap = useRef<NodeJS.Timeout | null>(null)
     const tabPressStart = useCallback(
-        (target: HTMLButtonElement, subid: string) => {
+        (target: HTMLDivElement, subid: string) => {
             longtap.current = setTimeout(() => {
                 const list = allKnownSubscriptions.find((x) => x.id === subid)
                 if (list) {
@@ -150,8 +150,6 @@ export function ListPage(): JSX.Element {
                             key={sub.id}
                             value={sub.id}
                             label={sub.document.body.name}
-                            disableRipple
-                            component={Button}
                             onTouchStart={(a) => {
                                 a.preventDefault()
                                 tabPressStart(a.currentTarget, sub.id)
