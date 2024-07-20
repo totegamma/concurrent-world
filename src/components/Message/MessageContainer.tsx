@@ -32,14 +32,16 @@ interface MessageContainerProps {
 }
 
 export const MessageContainer = memo<MessageContainerProps>((props: MessageContainerProps): JSX.Element | null => {
-    const { client, forceUpdate } = useClient()
+    const { client } = useClient()
     const [message, setMessage] = useState<Message<
         MarkdownMessageSchema | ReplyMessageSchema | RerouteMessageSchema
     > | null>()
     const [isFetching, setIsFetching] = useState<boolean>(true)
     const [devMode] = usePreference('devMode')
+    const [forceUpdateCount, setForceUpdateCount] = useState<number>(0)
 
     useEffect(() => {
+        console.log('fetching message', props.messageID)
         client
             .getMessage<any>(props.messageID, props.messageOwner, props.resolveHint)
             .then((msg) => {
@@ -48,7 +50,7 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
             .finally(() => {
                 setIsFetching(false)
             })
-    }, [props.messageID, props.messageOwner, props.lastUpdated])
+    }, [props.messageID, props.messageOwner, props.lastUpdated, forceUpdateCount])
 
     if (isFetching) {
         return (
@@ -108,7 +110,7 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
                                         variant="outlined"
                                         onClick={() => {
                                             client.invalidateMessage(props.messageID)
-                                            forceUpdate()
+                                            setForceUpdateCount((prev) => prev + 1)
                                         }}
                                     >
                                         Reload
