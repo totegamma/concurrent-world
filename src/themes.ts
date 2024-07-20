@@ -312,7 +312,8 @@ export const ConcurrentDefaultTheme = {
                     borderRadius: '10px'
                 },
                 html: {
-                    overscrollBehaviorY: 'none'
+                    overscrollBehaviorY: 'none',
+                    userSelect: 'none'
                 },
                 body: {
                     overflowX: 'hidden',

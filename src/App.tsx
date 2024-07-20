@@ -245,7 +245,7 @@ function App(): JSX.Element {
                     width: '100vw',
                     height: '100dvh',
                     overflow: 'hidden',
-                    userSelect: { xs: 'none', sm: 'auto', md: 'auto' }
+                    userSelect: { xs: 'none', sm: 'text', md: 'text' }
                 }}
             >
                 <Box

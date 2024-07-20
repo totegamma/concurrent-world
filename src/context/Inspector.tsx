@@ -179,7 +179,8 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                         sx={{
                             p: 1,
                             wordBreak: 'break-all',
-                            whiteSpace: 'pre-wrap'
+                            whiteSpace: 'pre-wrap',
+                            userSelect: 'text'
                         }}
                     >
                         <Typography variant="h1">Inspect</Typography>

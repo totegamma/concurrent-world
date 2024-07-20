@@ -146,7 +146,7 @@ export function MessagePage(): JSX.Element {
                 backgroundColor: 'background.paper',
                 minHeight: '100%',
                 overflow: 'scroll',
-                userSelect: 'auto'
+                userSelect: 'text'
             }}
         >
             <Box>
