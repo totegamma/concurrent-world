@@ -16,7 +16,8 @@ import {
     Dialog,
     DialogContent,
     DialogTitle,
-    DialogContentText
+    DialogContentText,
+    useTheme
 } from '@mui/material'
 import Tilt from 'react-parallax-tilt'
 import { Passport } from '../theming/Passport'
@@ -33,8 +34,96 @@ import { Sign, type Identity } from '@concurrent-world/client'
 import { enqueueSnackbar } from 'notistack'
 import { useGlobalState } from '../../context/GlobalState'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import { Node, type NodeProps } from '../ui/TreeGraph'
+import { type ConcurrentTheme } from '../../model'
 
 const SwitchMasterToSub = lazy(() => import('../SwitchMasterToSub'))
+
+interface CertChain {
+    id: string
+    key?: Key
+    children: CertChain[]
+}
+
+interface KeyTreeNodeProps extends Omit<NodeProps, 'content'> {
+    certChain: CertChain
+}
+
+const KeyTreeNode = (props: KeyTreeNodeProps): JSX.Element => {
+    return (
+        <Node
+            depth={props.depth}
+            nodeposition={props.nodeposition}
+            content={
+                <Box
+                    sx={{
+                        display: 'flex',
+                        gap: 1
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: '300px'
+                        }}
+                    >
+                        <KeyCard item={props.certChain.key!} />
+                    </Box>
+                </Box>
+            }
+            nodeStyle={props.nodeStyle}
+        >
+            {props.certChain.children.map((child) => (
+                <KeyTreeNode key={child.id} certChain={child} />
+            ))}
+        </Node>
+    )
+}
+
+const KeyTree = ({ certChain }: { certChain: CertChain }): JSX.Element => {
+    const theme = useTheme<ConcurrentTheme>()
+
+    const key: Key = certChain.key ?? {
+        id: certChain.id,
+        root: certChain.id,
+        parent: 'cck1_ROOT_',
+        enactDocument: 'null',
+        enactSignature: 'null',
+        revokeDocument: 'null',
+        revokeSignature: 'null',
+        validSince: 'null',
+        validUntil: 'null'
+    }
+
+    return (
+        <Node
+            content={
+                <Box
+                    sx={{
+                        display: 'flex',
+                        gap: 1
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: '300px'
+                        }}
+                    >
+                        <KeyCard item={key} />
+                    </Box>
+                </Box>
+            }
+            nodeStyle={{
+                nodeGap: '15px',
+                nodeBorderWidth: '2px',
+                nodeBorderColor: theme.palette.primary.main
+            }}
+        >
+            {certChain.children.map((child) => (
+                <KeyTreeNode key={child.id} certChain={child} />
+            ))}
+        </Node>
+    )
+}
 
 export const IdentitySettings = (): JSX.Element => {
     const { client } = useClient()
@@ -48,6 +137,7 @@ export const IdentitySettings = (): JSX.Element => {
     const [hideDisabledSubKey, setHideDisabledSubKey] = usePreference('hideDisabledSubKey')
     const [aliasDraft, setAliasDraft] = useState<string>('')
     const [deactivateTarget, setDeactivateTarget] = useState<string | null>(null)
+    const [certChain, setCertChain] = useState<CertChain | null>(null)
 
     const { t } = useTranslation('', { keyPrefix: 'settings.identity' })
 
@@ -60,7 +150,50 @@ export const IdentitySettings = (): JSX.Element => {
 
     useEffect(() => {
         client.api.getKeyList().then((res) => {
+            console.log(res)
             setKeys(res)
+
+            const certChain: CertChain = {
+                id: client.ccid!,
+                children: []
+            }
+
+            const findChildren = (root: CertChain, id: string): CertChain | null => {
+                if (root.id === id) {
+                    return root
+                }
+                for (const child of root.children) {
+                    const result = findChildren(child, id)
+                    if (result) {
+                        return result
+                    }
+                }
+                return null
+            }
+
+            const pool: Key[] = JSON.parse(JSON.stringify(res))
+            let attemptsRemaining = 1000 // for safety
+            while (pool.length > 0) {
+                const key = pool.shift()!
+                if (key.parent) {
+                    const parent = findChildren(certChain, key.parent)
+                    if (parent) {
+                        parent.children.push({
+                            id: key.id,
+                            key,
+                            children: []
+                        })
+                    } else {
+                        pool.push(key)
+                    }
+                }
+                if (attemptsRemaining-- <= 0) {
+                    console.error('infinite loop detected')
+                    break
+                }
+            }
+            setCertChain(certChain)
+            console.log(certChain)
         })
     }, [])
 
@@ -215,6 +348,8 @@ export const IdentitySettings = (): JSX.Element => {
                         gap: 1
                     }}
                 >
+                    {certChain && <KeyTree certChain={certChain} />}
+                    {/*
                     {keys
                         .filter((key) => key.revokeDocument === 'null' || !hideDisabledSubKey)
                         .map((key) => (
@@ -252,6 +387,7 @@ export const IdentitySettings = (): JSX.Element => {
                             {t('deactivate')}
                         </MenuItem>
                     </Menu>
+                    */}
                 </Box>
             </Box>
             <Dialog
