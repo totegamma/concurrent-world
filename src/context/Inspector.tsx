@@ -236,10 +236,16 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                                             reason: {KeyResolutionSummary.reason}
                                         </Alert>
                                     )}
-
-                                    {keyResolution.map((key) => (
-                                        <KeyCard short key={key.id} item={key} />
-                                    ))}
+                                    <Typography variant="h2" sx={{ mt: 1 }}>
+                                        UsedKeys:
+                                    </Typography>
+                                    <Box>
+                                        {keyResolution.map((key) => (
+                                            <Box key={key.id} maxWidth="300px" margin="0 auto">
+                                                <KeyCard item={key} />
+                                            </Box>
+                                        ))}
+                                    </Box>
                                 </Box>
                             </>
                         )}
