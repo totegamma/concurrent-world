@@ -1,54 +1,76 @@
 import { type Key } from '@concurrent-world/client/dist/types/model/core'
-
-import KeyIcon from '@mui/icons-material/Key'
-import KeyOffIcon from '@mui/icons-material/KeyOff'
-import { Box, Paper, Typography, alpha, useTheme } from '@mui/material'
+import { alpha, useTheme, IconButton } from '@mui/material'
 import { type ConcurrentTheme } from '../../model'
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 
-export const KeyCard = (props: { item: Key; endItem?: JSX.Element; short?: boolean }): JSX.Element => {
-    const valid = props.item.revokeDocument === null
+export interface KeyCardProps {
+    item: Key
+    selected?: boolean
+    onMenuClick?: (event: React.MouseEvent<HTMLButtonElement>, key: Key) => void
+    subText?: string
+}
+
+export const KeyCard = (props: KeyCardProps): JSX.Element => {
+    const valid = !props.item.revokeDocument
 
     const theme = useTheme<ConcurrentTheme>()
 
+    const mainColor = valid ? theme.palette.primary.main : theme.palette.text.disabled
+
     const bodyStyle = {
-        fill: alpha(theme.palette.primary.main, 0.8),
-        stroke: theme.palette.primary.main,
+        fill: props.selected ? theme.palette.background.paper : alpha(mainColor, 0.8),
+        stroke: mainColor,
         strokeWidth: '5px'
     }
 
     const headerStyle = {
         fill: theme.palette.background.paper,
-        stroke: theme.palette.primary.main,
+        stroke: mainColor,
         strokeWidth: '5px'
     }
 
     const decorationStyle = {
-        fill: theme.palette.background.paper
+        fill: props.selected ? mainColor : theme.palette.background.paper
     }
 
     const lineStyle = {
-        stroke: theme.palette.primary.main,
+        stroke: mainColor,
         strokeWidth: '8px'
     }
 
     const bodyText = {
         fontFamily: 'Source Code Pro, monospace',
         fontWeight: 900,
-        fill: theme.palette.primary.contrastText,
-        fontSize: '39px'
+        fill: props.selected ? mainColor : theme.palette.primary.contrastText,
+        fontSize: '35px'
+    }
+
+    const subText = {
+        fontFamily: 'Source Code Pro, monospace',
+        fontWeight: 500,
+        fill: props.selected ? mainColor : theme.palette.primary.contrastText,
+        fontSize: '15px'
+    }
+
+    const kindText = {
+        fontFamily: 'Source Code Pro, monospace',
+        fontWeight: 500,
+        fill: props.selected ? mainColor : theme.palette.primary.contrastText,
+        fontSize: '18px'
     }
 
     const headerText = {
         fontFamily: 'Source Code Pro, monospace',
         fontWeight: 900,
         fill: theme.palette.text.primary,
-        fontSize: '22.41px'
+        fontSize: '22px'
     }
 
     return (
         <div
             style={{
-                marginTop: '15px'
+                marginTop: '15px',
+                position: 'relative'
             }}
         >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 415 115.03">
@@ -65,79 +87,65 @@ export const KeyCard = (props: { item: Key; endItem?: JSX.Element; short?: boole
                 <circle style={decorationStyle} cx="402.5" cy="12.53" r="4" />
                 <circle style={decorationStyle} cx="402.5" cy="92.53" r="4" />
                 <line style={lineStyle} x1="42.5" y1="2.53" x2="42.5" y2="102.53" />
-                <text style={headerText} transform="translate(27.5 95) rotate(-90)">
+                <text style={headerText} textAnchor="middle" transform="translate(29 53) rotate(-90)">
                     <tspan x="0" y="0">
                         {props.item.parent.substring(4, 10)}
                     </tspan>
                 </text>
-                <text style={bodyText} transform="translate(50 67.5)">
+                <text style={kindText} transform="translate(67 38)">
                     <tspan x="0" y="0">
-                        {props.item.id.substring(0, 7) + '…' + props.item.id.substring(35, 42)}
+                        {props.item.id.substring(0, 4)}
+                    </tspan>
+                </text>
+                <text
+                    style={bodyText}
+                    textAnchor="middle"
+                    transform={props.onMenuClick ? 'translate(205 65)' : 'translate(225 65)'}
+                >
+                    <tspan x="0" y="0">
+                        {props.onMenuClick
+                            ? props.item.id.substring(4, 10) + '…' + props.item.id.substring(36, 42)
+                            : props.item.id.substring(4, 11) + '…' + props.item.id.substring(35, 42)}
+                    </tspan>
+                </text>
+                <text style={subText} textAnchor="end" transform="translate(390 95)">
+                    <tspan x="0" y="0">
+                        {props.subText}
+                    </tspan>
+                </text>
+                <text style={subText} textAnchor="middle" transform="translate(223 108)">
+                    <tspan x="0" y="0">
+                        {valid ? ' Key Valid' : 'Key Revoked'}
                     </tspan>
                 </text>
             </svg>
-        </div>
-
-        /*
-    return (
-        <Paper
-            variant="outlined"
-            sx={{
-                padding: 1,
-                display: 'flex',
-                flexDirection: 'row',
-                gap: 1,
-                alignItems: 'center'
-            }}
-        >
-            {valid ? (
-                <KeyIcon
-                    sx={{
-                        width: '40px',
-                        height: '40px'
+            {props.onMenuClick && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: '45%',
+                        right: '0%',
+                        transform: 'translate(-50%, -50%)'
                     }}
-                />
-            ) : (
-                <KeyOffIcon
-                    sx={{
-                        width: '40px',
-                        height: '40px'
-                    }}
-                />
+                >
+                    <IconButton
+                        disabled={!valid}
+                        sx={{
+                            width: '30px',
+                            height: '30px',
+                            backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                            '&:hover': {
+                                backgroundColor: alpha(theme.palette.background.paper, 0.8)
+                            }
+                        }}
+                        onClick={(event) => {
+                            props.onMenuClick?.(event, props.item)
+                        }}
+                    >
+                        <MoreHorizIcon />
+                    </IconButton>
+                </div>
             )}
-            <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 1,
-                    flex: 1
-                }}
-            >
-                {props.short ? (
-                    <>
-                        <Typography>{props.item.id}</Typography>
-                    </>
-                ) : (
-                    <>
-                        <Typography>ID: {props.item.id}</Typography>
-                        <Typography>Parent: {props.item.parent}</Typography>
-
-                        {valid ? (
-                            <>
-                                <Typography>Valid Since: {props.item.validSince}</Typography>
-                            </>
-                        ) : (
-                            <>
-                                <Typography>
-                                    Valid From: {props.item.validSince} to {props.item.validUntil}
-                                </Typography>
-                            </>
-                        )}
-                    </>
-                )}
-            </Box>
-            {props.endItem}
-        </Paper>
-        */
+        </div>
     )
 }
