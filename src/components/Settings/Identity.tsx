@@ -1,12 +1,13 @@
 import {
     Alert,
     Box,
-    IconButton,
     Menu,
     MenuItem,
+    /*
     Switch,
     FormGroup,
     FormControlLabel,
+    */
     Typography,
     TextField,
     Button,
@@ -16,7 +17,8 @@ import {
     Dialog,
     DialogContent,
     DialogTitle,
-    DialogContentText
+    DialogContentText,
+    useTheme
 } from '@mui/material'
 import Tilt from 'react-parallax-tilt'
 import { Passport } from '../theming/Passport'
@@ -27,27 +29,194 @@ import { usePreference } from '../../context/PreferenceContext'
 import { useTranslation } from 'react-i18next'
 import { Codeblock } from '../ui/Codeblock'
 
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { KeyCard } from '../ui/KeyCard'
 import { Sign, type Identity } from '@concurrent-world/client'
 import { enqueueSnackbar } from 'notistack'
 import { useGlobalState } from '../../context/GlobalState'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import { Node, type NodeProps } from '../ui/TreeGraph'
+import { type ConcurrentTheme } from '../../model'
 
 const SwitchMasterToSub = lazy(() => import('../SwitchMasterToSub'))
+
+interface CertChain {
+    id: string
+    key?: Key
+    children: CertChain[]
+}
+
+interface KeyTreeNodeProps extends Omit<NodeProps, 'content'> {
+    certChain: CertChain
+    currentKey?: string
+    onMenuClick: (event: React.MouseEvent<HTMLButtonElement>, key: Key) => void
+}
+
+const KeyTreeNode = (props: KeyTreeNodeProps): JSX.Element => {
+    return (
+        <Node
+            depth={props.depth}
+            nodeposition={props.nodeposition}
+            content={
+                <Box
+                    sx={{
+                        display: 'flex',
+                        gap: 1
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: '300px'
+                        }}
+                    >
+                        <KeyCard
+                            item={props.certChain.key!}
+                            selected={props.certChain.key?.id === props.currentKey}
+                            onMenuClick={props.onMenuClick}
+                            subText={props.certChain.key?.id === props.currentKey ? 'Using' : undefined}
+                        />
+                    </Box>
+                </Box>
+            }
+            nodeStyle={props.nodeStyle}
+        >
+            {props.certChain.children.map((child) => (
+                <KeyTreeNode
+                    key={child.id}
+                    certChain={child}
+                    onMenuClick={props.onMenuClick}
+                    currentKey={props.currentKey}
+                />
+            ))}
+        </Node>
+    )
+}
+
+export interface KeyTreeProps {
+    certChain: CertChain
+    forceUpdateCallback?: () => void
+}
+
+export const KeyTree = (props: KeyTreeProps): JSX.Element => {
+    const { client } = useClient()
+    const theme = useTheme<ConcurrentTheme>()
+    const { t } = useTranslation('', { keyPrefix: 'settings.identity' })
+
+    const key: Key = props.certChain.key ?? {
+        id: props.certChain.id,
+        root: props.certChain.id,
+        parent: 'cck1null',
+        enactDocument: 'null',
+        enactSignature: 'null',
+        validSince: 'null',
+        validUntil: 'null'
+    }
+
+    const currentKey = client.api.ckid ?? client.api.ccid
+
+    const [target, setTarget] = useState<string | null>(null)
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+    const [deactivateTarget, setDeactivateTarget] = useState<string | null>(null)
+
+    return (
+        <>
+            <Node
+                content={
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            gap: 1
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                width: '300px'
+                            }}
+                        >
+                            <KeyCard item={key} />
+                        </Box>
+                    </Box>
+                }
+                nodeStyle={{
+                    nodeGap: '15px',
+                    nodeBorderWidth: '2px',
+                    nodeBorderColor: theme.palette.primary.main
+                }}
+            >
+                {props.certChain.children.map((child) => (
+                    <KeyTreeNode
+                        currentKey={currentKey}
+                        key={child.id}
+                        certChain={child}
+                        onMenuClick={(event, key) => {
+                            setTarget(key.id)
+                            setAnchorEl(event.currentTarget)
+                        }}
+                    />
+                ))}
+            </Node>
+            <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={() => {
+                    setAnchorEl(null)
+                }}
+            >
+                <MenuItem
+                    onClick={() => {
+                        setDeactivateTarget(target)
+                    }}
+                >
+                    {t('deactivate')}
+                </MenuItem>
+            </Menu>
+            <Dialog
+                open={deactivateTarget !== null}
+                onClose={() => {
+                    setDeactivateTarget(null)
+                }}
+            >
+                <DialogTitle>本当に無効化しますか？</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        サブキーを無効化すると、このサブキーでログインしている端末はログアウトされます。
+                    </DialogContentText>
+                    <Button
+                        color="error"
+                        fullWidth
+                        onClick={() => {
+                            if (deactivateTarget === null) {
+                                return
+                            }
+                            client.api.revokeSubkey(deactivateTarget).then(() => {
+                                setTarget(null)
+                                setAnchorEl(null)
+                                props.forceUpdateCallback?.()
+                            })
+                            setDeactivateTarget(null)
+                        }}
+                    >
+                        {t('deactivate')}
+                    </Button>
+                </DialogContent>
+            </Dialog>
+        </>
+    )
+}
 
 export const IdentitySettings = (): JSX.Element => {
     const { client } = useClient()
     const globalState = useGlobalState()
     const identity: Identity = JSON.parse(localStorage.getItem('Identity') || 'null')
-    const subkey = JSON.parse(localStorage.getItem('SubKey') || 'null')
 
-    const [keys, setKeys] = useState<Key[]>([])
-    const [target, setTarget] = useState<string | null>(null)
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
     const [hideDisabledSubKey, setHideDisabledSubKey] = usePreference('hideDisabledSubKey')
     const [aliasDraft, setAliasDraft] = useState<string>('')
-    const [deactivateTarget, setDeactivateTarget] = useState<string | null>(null)
+    const [certChain, setCertChain] = useState<CertChain | null>(null)
+
+    const subkey = client.api.ckid
+    const [forceUpdate, setForceUpdate] = useState(0)
+    const forceUpdateCallback = (): void => {
+        setForceUpdate(forceUpdate + 1)
+    }
 
     const { t } = useTranslation('', { keyPrefix: 'settings.identity' })
 
@@ -60,9 +229,49 @@ export const IdentitySettings = (): JSX.Element => {
 
     useEffect(() => {
         client.api.getKeyList().then((res) => {
-            setKeys(res)
+            const certChain: CertChain = {
+                id: client.ccid!,
+                children: []
+            }
+
+            const findChildren = (root: CertChain, id: string): CertChain | null => {
+                if (root.id === id) {
+                    return root
+                }
+                for (const child of root.children) {
+                    const result = findChildren(child, id)
+                    if (result) {
+                        return result
+                    }
+                }
+                return null
+            }
+
+            const pool: Key[] = JSON.parse(JSON.stringify(res))
+            let attemptsRemaining = 1000 // for safety
+            while (pool.length > 0) {
+                const key = pool.shift()!
+                if (key.parent) {
+                    const parent = findChildren(certChain, key.parent)
+                    if (parent) {
+                        parent.children.push({
+                            id: key.id,
+                            key,
+                            children: []
+                        })
+                    } else {
+                        pool.push(key)
+                    }
+                }
+                if (attemptsRemaining-- <= 0) {
+                    console.error('infinite loop detected')
+                    break
+                }
+            }
+            setCertChain(certChain)
+            console.log(certChain)
         })
-    }, [])
+    }, [forceUpdate])
 
     const toggleHideDisabledSubKey = (): void => {
         setHideDisabledSubKey(!hideDisabledSubKey)
@@ -193,6 +402,7 @@ export const IdentitySettings = (): JSX.Element => {
 
                 {!subkey && !identity && <Alert severity="error">{t('loginType.secret')}</Alert>}
 
+                {/* TODO
                 <Box
                     sx={{
                         padding: { sm: '10px 10px' }
@@ -207,83 +417,19 @@ export const IdentitySettings = (): JSX.Element => {
                         />
                     </FormGroup>
                 </Box>
+                */}
 
                 <Box
                     sx={{
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: 1
+                        gap: 1,
+                        overflow: 'scroll'
                     }}
                 >
-                    {keys
-                        .filter((key) => key.revokeDocument === 'null' || !hideDisabledSubKey)
-                        .map((key) => (
-                            <KeyCard
-                                key={key.id}
-                                item={key}
-                                endItem={
-                                    <IconButton
-                                        sx={{
-                                            width: '40px',
-                                            height: '40px'
-                                        }}
-                                        onClick={(event) => {
-                                            setTarget(key.id)
-                                            setAnchorEl(event.currentTarget)
-                                        }}
-                                    >
-                                        <MoreHorizIcon />
-                                    </IconButton>
-                                }
-                            />
-                        ))}
-                    <Menu
-                        anchorEl={anchorEl}
-                        open={Boolean(anchorEl)}
-                        onClose={() => {
-                            setAnchorEl(null)
-                        }}
-                    >
-                        <MenuItem
-                            onClick={() => {
-                                setDeactivateTarget(target)
-                            }}
-                        >
-                            {t('deactivate')}
-                        </MenuItem>
-                    </Menu>
+                    {certChain && <KeyTree certChain={certChain} forceUpdateCallback={forceUpdateCallback} />}
                 </Box>
             </Box>
-            <Dialog
-                open={deactivateTarget !== null}
-                onClose={() => {
-                    setDeactivateTarget(null)
-                }}
-            >
-                <DialogTitle>本当に無効化しますか？</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        サブキーを無効化すると、このサブキーでログインしている端末はログアウトされます。
-                    </DialogContentText>
-                    <Button
-                        color="error"
-                        fullWidth
-                        onClick={() => {
-                            if (deactivateTarget === null) {
-                                return
-                            }
-                            client.api.revokeSubkey(deactivateTarget).then(() => {
-                                client.api.getKeyList().then((res) => {
-                                    setKeys(res)
-                                })
-                            })
-                            setDeactivateTarget(null)
-                        }}
-                    >
-                        {t('deactivate')}
-                    </Button>
-                </DialogContent>
-            </Dialog>
         </>
     )
 }
