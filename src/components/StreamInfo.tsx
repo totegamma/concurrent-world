@@ -78,7 +78,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                     gap: 1
                 }}
             >
-                <Paper sx={{ flex: 2, padding: 2 }}>
+                <Paper sx={{ flex: 2, padding: 2, userSelect: 'text' }}>
                     <Box
                         sx={{
                             display: 'flex',
@@ -90,7 +90,21 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                         <Typography variant="h1">{stream.document.body.name}</Typography>
                         <WatchButton minimal timelineID={props.id} />
                     </Box>
-                    <Typography variant="caption">{props.id}</Typography>
+                    <Typography
+                        variant="caption"
+                        sx={{
+                            cursor: 'pointer',
+                            '&:hover': {
+                                textDecoration: 'underline'
+                            }
+                        }}
+                        onClick={() => {
+                            navigator.clipboard.writeText(props.id)
+                            enqueueSnackbar('IDをコピーしました', { variant: 'success' })
+                        }}
+                    >
+                        {props.id}
+                    </Typography>
                     <Divider />
                     <Typography>{stream.document.body.description || 'まだ説明はありません'}</Typography>
                 </Paper>
