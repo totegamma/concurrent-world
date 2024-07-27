@@ -67,6 +67,12 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
 
             const chainId = 'concord'
             await window.keplr.enable(chainId)
+            window.keplr.defaultOptions = {
+                sign: {
+                    preferNoSetFee: true,
+                    preferNoSetMemo: true
+                }
+            }
             const offlineSigner = window.keplr.getOfflineSigner(chainId)
             const accounts = await offlineSigner.getAccounts()
             setAddress(accounts[0].address)
@@ -87,8 +93,10 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
                 }
             }
 
-            const defaultGasPrice = GasPrice.fromString('0.01utoken')
-            const defaultSendFee: StdFee = calculateFee(80000, defaultGasPrice)
+            const defaultSendFee: StdFee = {
+                amount: [],
+                gas: '200000'
+            }
 
             const signResult = await cosmJS.signAndBroadcast(address, [sendMsg], defaultSendFee)
             enqueueSnackbar(signResult.code ? signResult.rawLog : 'Success', {
