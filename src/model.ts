@@ -39,7 +39,7 @@ export interface RawEmojiPackage {
 
 export interface EmojiPackage extends RawEmojiPackage {
     packageURL: string
-    fetchedAt: Date
+    fetchedAt?: Date
 }
 
 export interface ImgurSettings {
