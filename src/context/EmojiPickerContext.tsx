@@ -27,6 +27,7 @@ export interface EmojiPickerState {
     open: (anchor: HTMLElement, onSelected: (selected: Emoji) => void) => void
     close: () => void
     search: (input: string) => Emoji[]
+    packages: EmojiPackage[]
 }
 
 const EmojiPickerContext = createContext<EmojiPickerState | undefined>(undefined)
@@ -118,6 +119,39 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
     )
 
     useEffect(() => {
+        setEmojiPackages([])
+        setAllEmojis([])
+        emojiPackageSource.forEach((url) => {
+            const cacheKey = `emojiPackage:${url}`
+            // check cache
+            const cache = localStorage.getItem(cacheKey)
+            if (cache) {
+                const rawpackage = JSON.parse(cache)
+                const packages: EmojiPackage = {
+                    ...rawpackage,
+                    packageURL: url
+                }
+                setEmojiPackages((prev) => [...prev, packages])
+                setAllEmojis((prev) => [...prev, ...packages.emojis])
+            } else {
+                fetchWithTimeout(url, {}, 3000)
+                    .then((j) => j.json())
+                    .then((p: EmojiPackage) => {
+                        const packages: EmojiPackage = {
+                            ...p,
+                            packageURL: url
+                        }
+                        setEmojiPackages((prev) => [...prev, packages])
+                        setAllEmojis((prev) => [...prev, ...packages.emojis])
+                        localStorage.setItem(cacheKey, JSON.stringify(packages))
+                    })
+                    .catch(() => {
+                        console.error('Failed to fetch emoji package', url)
+                    })
+            }
+        })
+
+        /*
         Promise.all(
             emojiPackageSource.map(async (url) => {
                 try {
@@ -137,6 +171,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
             setEmojiPackages(filtered)
             setAllEmojis(filtered.flatMap((p) => p.emojis))
         })
+        */
     }, [emojiPackageSource])
 
     useEffect(() => {
@@ -157,9 +192,10 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                 return {
                     open,
                     close,
-                    search
+                    search,
+                    packages: emojiPackages
                 }
-            }, [open, close, search])}
+            }, [open, close, search, emojiPackages])}
         >
             <>
                 {props.children}

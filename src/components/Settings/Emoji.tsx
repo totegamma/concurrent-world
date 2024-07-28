@@ -10,15 +10,15 @@ import { useSnackbar } from 'notistack'
 import { useLocation } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
-import { fetchWithTimeout } from '../../util'
+import { useEmojiPicker } from '../../context/EmojiPickerContext'
 
 export const EmojiSettings = (): JSX.Element => {
     const [emojiPackages, setEmojiPackages] = usePreference('emojiPackages')
+    const picker = useEmojiPicker()
     const path = useLocation()
     const { enqueueSnackbar } = useSnackbar()
 
     const [addingPackageURL, setAddingPackageURL] = useState<string>('')
-    const [packages, setPackages] = useState<EmojiPackage[]>([])
     const [preview, setPreview] = useState<EmojiPackage | null>(null)
 
     const { t } = useTranslation('', { keyPrefix: 'settings.emoji' })
@@ -29,28 +29,6 @@ export const EmojiSettings = (): JSX.Element => {
             setAddingPackageURL(emojiURL)
         }
     }, [path.hash])
-
-    useEffect(() => {
-        Promise.all(
-            emojiPackages.map(async (url) => {
-                console.log(url)
-                try {
-                    const rawpackage = await fetchWithTimeout(url, {}, 3000).then((j) => j.json())
-                    const packages: EmojiPackage = {
-                        ...rawpackage,
-                        packageURL: url
-                    }
-                    return packages
-                } catch (e) {
-                    console.error(e)
-                    return undefined
-                }
-            })
-        ).then((packages: Array<EmojiPackage | undefined>) => {
-            console.log(packages)
-            setPackages(packages.filter((e) => e) as EmojiPackage[])
-        })
-    }, [emojiPackages])
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -83,7 +61,7 @@ export const EmojiSettings = (): JSX.Element => {
                     gap: 2
                 }}
             >
-                {packages.map((e) => {
+                {picker.packages.map((e) => {
                     return (
                         <Paper
                             key={e.iconURL}
@@ -146,7 +124,7 @@ export const EmojiSettings = (): JSX.Element => {
                     </Typography>
                     <IconButton
                         onClick={() => {
-                            if (!packages.find((p) => p.packageURL === preview.packageURL)) {
+                            if (!picker.packages.find((p) => p.packageURL === preview.packageURL)) {
                                 setEmojiPackages([...emojiPackages, addingPackageURL])
                                 setAddingPackageURL('')
                                 setPreview(null)
