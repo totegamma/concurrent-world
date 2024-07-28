@@ -1,5 +1,6 @@
 import {
     Box,
+    Button,
     IconButton,
     ListItemIcon,
     ListItemText,
@@ -69,8 +70,22 @@ export const EmojiSettings = (): JSX.Element => {
     }, [addingPackageURL])
 
     return (
-        <>
-            <Typography variant="h3">{t('emojiPackage')}</Typography>
+        <Box display="flex" flexDirection="column" gap={1}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap">
+                <Typography variant="h3">{t('emojiPackage')}</Typography>
+                <Button
+                    onClick={() => {
+                        Object.keys(localStorage)
+                            .filter((k) => k.startsWith('emojiPackage:'))
+                            .forEach((k) => {
+                                localStorage.removeItem(k)
+                            })
+                        window.location.reload()
+                    }}
+                >
+                    全ての絵文字パッケージを更新
+                </Button>
+            </Box>
             <Box
                 sx={{
                     display: 'grid',
@@ -101,19 +116,22 @@ export const EmojiSettings = (): JSX.Element => {
                             <Box display="flex">
                                 <Box component="img" src={e.iconURL} alt={e.name} height="60px" />
                             </Box>
-                            <Typography variant="h4" gutterBottom>
-                                {e.name}
-                            </Typography>
+                            <Box display="flex" flexDirection="column" flexGrow={1}>
+                                <Typography variant="h4" gutterBottom>
+                                    {e.name}
+                                </Typography>
+                                <Typography variant="caption">
+                                    取得日: {e.fetchedAt && new Date(e.fetchedAt).toLocaleString()}
+                                </Typography>
+                            </Box>
                             <IconButton
                                 onClick={(a) => {
+                                    a.stopPropagation()
                                     setMenuAnchor(a.currentTarget)
+                                    console.log('aaa', e.packageURL)
                                     setSelectedPackageURL(e.packageURL)
                                 }}
-                                sx={{
-                                    position: 'absolute',
-                                    top: '0px',
-                                    right: '0px'
-                                }}
+                                sx={{}}
                             >
                                 <MoreHorizIcon />
                             </IconButton>
@@ -130,6 +148,7 @@ export const EmojiSettings = (): JSX.Element => {
             >
                 <MenuItem
                     onClick={() => {
+                        console.log(selectedPackageURL)
                         if (selectedPackageURL) picker.updateEmojiPackage(selectedPackageURL)
                         setMenuAnchor(null)
                     }}
@@ -190,6 +209,6 @@ export const EmojiSettings = (): JSX.Element => {
                     setAddingPackageURL(e.target.value)
                 }}
             />
-        </>
+        </Box>
     )
 }

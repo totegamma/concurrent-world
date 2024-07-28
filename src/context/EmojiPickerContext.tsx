@@ -137,6 +137,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
     )
 
     const updateEmojiPackage = useCallback((url: string) => {
+        console.log('updateEmojiPackage', url)
         const cacheKey = `emojiPackage:${url}`
         localStorage.removeItem(cacheKey)
         setEmojiPackages((prev) => prev.filter((pkg) => pkg.packageURL !== url))
@@ -160,12 +161,14 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
     useEffect(() => {
         setEmojiPackages([])
         setAllEmojis([])
+        let unmounted = false
         emojiPackageURLs.forEach((url) => {
             const cacheKey = `emojiPackage:${url}`
             // check cache
             const cache = localStorage.getItem(cacheKey)
             if (cache) {
                 const pkg = JSON.parse(cache)
+                if (unmounted) return
                 setEmojiPackages((prev) => [...prev, pkg])
                 setAllEmojis((prev) => [...prev, ...pkg.emojis])
             } else {
@@ -177,6 +180,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                             packageURL: url,
                             fetchedAt: new Date()
                         }
+                        if (unmounted) return
                         setEmojiPackages((prev) => [...prev, packages])
                         setAllEmojis((prev) => [...prev, ...packages.emojis])
                         localStorage.setItem(cacheKey, JSON.stringify(packages))
@@ -186,6 +190,9 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                     })
             }
         })
+        return () => {
+            unmounted = true
+        }
     }, [emojiPackageURLs])
 
     useEffect(() => {
