@@ -13,7 +13,7 @@ import {
     Button
 } from '@mui/material'
 import { usePreference } from './PreferenceContext'
-import { type EmojiPackage, type Emoji } from '../model'
+import { type EmojiPackage, type Emoji, type RawEmojiPackage } from '../model'
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled'
 import SearchIcon from '@mui/icons-material/Search'
 import { usePersistent } from '../hooks/usePersistent'
@@ -27,6 +27,10 @@ export interface EmojiPickerState {
     open: (anchor: HTMLElement, onSelected: (selected: Emoji) => void) => void
     close: () => void
     search: (input: string) => Emoji[]
+    packages: EmojiPackage[]
+    addEmojiPackage: (url: string) => void
+    removeEmojiPackage: (url: string) => void
+    updateEmojiPackage: (url: string) => void
 }
 
 const EmojiPickerContext = createContext<EmojiPickerState | undefined>(undefined)
@@ -36,7 +40,7 @@ interface EmojiPickerProps {
 }
 
 export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
-    const [emojiPackageSource] = usePreference('emojiPackages')
+    const [emojiPackageURLs, setEmojiPackageURLs] = usePreference('emojiPackages')
     const theme = useTheme()
 
     const RowEmojiCount = 6
@@ -117,27 +121,79 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
         [frequentEmojis]
     )
 
-    useEffect(() => {
-        Promise.all(
-            emojiPackageSource.map(async (url) => {
-                try {
-                    const rawpackage = await fetchWithTimeout(url, {}, 3000).then((j) => j.json())
-                    const packages: EmojiPackage = {
-                        ...rawpackage,
-                        packageURL: url
-                    }
-                    return packages
-                } catch (e) {
-                    console.error('Failed to fetch emoji package', url, e)
-                    return undefined
+    const addEmojiPackage = useCallback(
+        (url: string) => {
+            if (emojiPackageURLs.includes(url)) return
+            setEmojiPackageURLs([...emojiPackageURLs, url])
+        },
+        [emojiPackageURLs]
+    )
+
+    const removeEmojiPackage = useCallback(
+        (url: string) => {
+            setEmojiPackageURLs(emojiPackageURLs.filter((u) => u !== url))
+        },
+        [emojiPackageURLs]
+    )
+
+    const updateEmojiPackage = useCallback((url: string) => {
+        console.log('updateEmojiPackage', url)
+        const cacheKey = `emojiPackage:${url}`
+        localStorage.removeItem(cacheKey)
+        setEmojiPackages((prev) => prev.filter((pkg) => pkg.packageURL !== url))
+        fetchWithTimeout(url, {}, 3000)
+            .then((j) => j.json())
+            .then((p: RawEmojiPackage) => {
+                const packages: EmojiPackage = {
+                    ...p,
+                    packageURL: url,
+                    fetchedAt: new Date()
                 }
+                setEmojiPackages((prev) => [...prev, packages])
+                setAllEmojis((prev) => [...prev, ...packages.emojis])
+                localStorage.setItem(cacheKey, JSON.stringify(packages))
             })
-        ).then((packages: Array<EmojiPackage | undefined>) => {
-            const filtered = packages.filter((p) => p !== undefined) as EmojiPackage[]
-            setEmojiPackages(filtered)
-            setAllEmojis(filtered.flatMap((p) => p.emojis))
+            .catch(() => {
+                console.error('Failed to fetch emoji package', url)
+            })
+    }, [])
+
+    useEffect(() => {
+        setEmojiPackages([])
+        setAllEmojis([])
+        let unmounted = false
+        emojiPackageURLs.forEach((url) => {
+            const cacheKey = `emojiPackage:${url}`
+            // check cache
+            const cache = localStorage.getItem(cacheKey)
+            if (cache) {
+                const pkg = JSON.parse(cache)
+                if (unmounted) return
+                setEmojiPackages((prev) => [...prev, pkg])
+                setAllEmojis((prev) => [...prev, ...pkg.emojis])
+            } else {
+                fetchWithTimeout(url, {}, 3000)
+                    .then((j) => j.json())
+                    .then((p: RawEmojiPackage) => {
+                        const packages: EmojiPackage = {
+                            ...p,
+                            packageURL: url,
+                            fetchedAt: new Date()
+                        }
+                        if (unmounted) return
+                        setEmojiPackages((prev) => [...prev, packages])
+                        setAllEmojis((prev) => [...prev, ...packages.emojis])
+                        localStorage.setItem(cacheKey, JSON.stringify(packages))
+                    })
+                    .catch(() => {
+                        console.error('Failed to fetch emoji package', url)
+                    })
+            }
         })
-    }, [emojiPackageSource])
+        return () => {
+            unmounted = true
+        }
+    }, [emojiPackageURLs])
 
     useEffect(() => {
         if (query.length > 0) {
@@ -157,9 +213,13 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                 return {
                     open,
                     close,
-                    search
+                    search,
+                    packages: emojiPackages,
+                    addEmojiPackage,
+                    removeEmojiPackage,
+                    updateEmojiPackage
                 }
-            }, [open, close, search])}
+            }, [open, close, search, emojiPackages])}
         >
             <>
                 {props.children}
