@@ -1,25 +1,39 @@
-import { Box, IconButton, Paper, TextField, Typography } from '@mui/material'
+import {
+    Box,
+    IconButton,
+    ListItemIcon,
+    ListItemText,
+    Menu,
+    MenuItem,
+    Paper,
+    TextField,
+    Typography
+} from '@mui/material'
 import { useEffect, useState } from 'react'
 
-import { usePreference } from '../../context/PreferenceContext'
 import { type EmojiPackage, type RawEmojiPackage } from '../../model'
 
 import AddCircleIcon from '@mui/icons-material/AddCircle'
-import CancelIcon from '@mui/icons-material/Cancel'
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { useSnackbar } from 'notistack'
 import { useLocation } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
 import { useEmojiPicker } from '../../context/EmojiPickerContext'
 
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import CachedIcon from '@mui/icons-material/Cached'
+
 export const EmojiSettings = (): JSX.Element => {
-    const [emojiPackages, setEmojiPackages] = usePreference('emojiPackages')
     const picker = useEmojiPicker()
     const path = useLocation()
     const { enqueueSnackbar } = useSnackbar()
 
     const [addingPackageURL, setAddingPackageURL] = useState<string>('')
-    const [preview, setPreview] = useState<EmojiPackage | null>(null)
+    const [preview, setPreview] = useState<Partial<EmojiPackage> | null>(null)
+
+    const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
+    const [selectedPackageURL, setSelectedPackageURL] = useState<null | string>(null)
 
     const { t } = useTranslation('', { keyPrefix: 'settings.emoji' })
 
@@ -36,7 +50,10 @@ export const EmojiSettings = (): JSX.Element => {
                 fetch(addingPackageURL)
                     .then((j) => j.json())
                     .then((p: RawEmojiPackage) => {
-                        setPreview({ ...p, packageURL: addingPackageURL })
+                        setPreview({
+                            ...p,
+                            packageURL: addingPackageURL
+                        })
                     })
                     .catch(() => {
                         setPreview(null)
@@ -88,8 +105,9 @@ export const EmojiSettings = (): JSX.Element => {
                                 {e.name}
                             </Typography>
                             <IconButton
-                                onClick={() => {
-                                    setEmojiPackages(emojiPackages.filter((p) => p !== e.packageURL))
+                                onClick={(a) => {
+                                    setMenuAnchor(a.currentTarget)
+                                    setSelectedPackageURL(e.packageURL)
                                 }}
                                 sx={{
                                     position: 'absolute',
@@ -97,12 +115,42 @@ export const EmojiSettings = (): JSX.Element => {
                                     right: '0px'
                                 }}
                             >
-                                <CancelIcon />
+                                <MoreHorizIcon />
                             </IconButton>
                         </Paper>
                     )
                 })}
             </Box>
+            <Menu
+                anchorEl={menuAnchor}
+                open={Boolean(menuAnchor)}
+                onClose={() => {
+                    setMenuAnchor(null)
+                }}
+            >
+                <MenuItem
+                    onClick={() => {
+                        if (selectedPackageURL) picker.updateEmojiPackage(selectedPackageURL)
+                        setMenuAnchor(null)
+                    }}
+                >
+                    <ListItemIcon>
+                        <CachedIcon sx={{ color: 'text.primary' }} />
+                    </ListItemIcon>
+                    <ListItemText>更新</ListItemText>
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        if (selectedPackageURL) picker.removeEmojiPackage(selectedPackageURL)
+                        setMenuAnchor(null)
+                    }}
+                >
+                    <ListItemIcon>
+                        <DeleteForeverIcon sx={{ color: 'text.primary' }} />
+                    </ListItemIcon>
+                    <ListItemText>削除</ListItemText>
+                </MenuItem>
+            </Menu>
 
             {preview && (
                 <Paper
@@ -124,13 +172,9 @@ export const EmojiSettings = (): JSX.Element => {
                     </Typography>
                     <IconButton
                         onClick={() => {
-                            if (!picker.packages.find((p) => p.packageURL === preview.packageURL)) {
-                                setEmojiPackages([...emojiPackages, addingPackageURL])
-                                setAddingPackageURL('')
-                                setPreview(null)
-                            } else {
-                                enqueueSnackbar(t('alreadyAdded'), { variant: 'error' })
-                            }
+                            if (preview.packageURL) picker.addEmojiPackage(preview.packageURL)
+                            setAddingPackageURL('')
+                            setPreview(null)
                         }}
                     >
                         <AddCircleIcon />
