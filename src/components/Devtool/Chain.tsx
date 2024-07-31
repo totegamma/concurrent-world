@@ -1,5 +1,6 @@
 import {
     Alert,
+    AlertTitle,
     Box,
     Button,
     Divider,
@@ -39,6 +40,8 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
     const [inspectTxDraft, setInspectTxDraft] = useState<string>('')
     const [inspectTxHash, setInspectTxHash] = useState<string>('')
     const [inspectedTx, setInspectedTx] = useState<any>(null)
+
+    const [processing, setProcessing] = useState<boolean>(false)
 
     useEffect(() => {
         if (inspectTxHash) {
@@ -130,14 +133,25 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
             }
 
             const defaultSendFee: StdFee = {
-                amount: [],
-                gas: '200000'
+                amount: [
+                    {
+                        denom: 'uAmpere',
+                        amount: '500'
+                    }
+                ],
+                gas: '100000'
             }
 
-            const signResult = await cosmJS.signAndBroadcast(address, [sendMsg], defaultSendFee)
+            setProcessing(true)
+            const signResult = await cosmJS.signAndBroadcast(address, [sendMsg], defaultSendFee).finally(() => {
+                setProcessing(false)
+            })
+
             enqueueSnackbar(signResult.code ? signResult.rawLog : 'Success', {
                 variant: signResult.code ? 'error' : 'success'
             })
+
+            setInspectTxDraft(signResult.transactionHash)
 
             console.log(signResult)
         }
@@ -229,11 +243,12 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
                         }}
                     />
                     <Button
+                        disabled={processing || !sendAmount || !sendDenom || !sendRecipient || !cosmJS}
                         onClick={() => {
                             sendTokens()
                         }}
                     >
-                        Send
+                        {processing ? 'Sending...' : 'Send'}
                     </Button>
                 </Box>
                 <Divider />
@@ -242,16 +257,13 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
                     placeholder="0xE4F706D0B3D255954D344CCE4BBDFF51F3B3A2B76B4AB63867F421639670343A"
                     value={inspectTxDraft}
                     onChange={(e) => {
-                        let hash = e.target.value
-                        if (!hash.startsWith('0x')) {
-                            hash = '0x' + hash
-                        }
-                        setInspectTxDraft(hash)
+                        setInspectTxDraft(e.target.value)
                     }}
                 />
                 <Button
+                    disabled={!inspectTxDraft}
                     onClick={() => {
-                        setInspectTxHash(inspectTxDraft)
+                        setInspectTxHash(inspectTxDraft.startsWith('0x') ? inspectTxDraft : '0x' + inspectTxDraft)
                     }}
                 >
                     Inspect
@@ -275,25 +287,25 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
                             <>
                                 <Typography variant="h2">Hash</Typography>
                                 <Typography>
-                                    {inspectedTx.result.hash}@{inspectedTx.result.height}
+                                    {inspectedTx.result?.hash}@{inspectedTx.result?.height}
                                 </Typography>
-                                {/*
-                            <Typography>{inspectedTx.result.tx_result.code}</Typography>
-                            */}
 
-                                {inspectedTx.result.tx_result.log && (
-                                    <Alert severity="error">{inspectedTx.result.tx_result.log}</Alert>
+                                {inspectedTx.result?.tx_result?.log && (
+                                    <Alert severity="error">
+                                        <AlertTitle>Transaction Error</AlertTitle>
+                                        {inspectedTx.result.tx_result.log}
+                                    </Alert>
                                 )}
 
                                 <Typography variant="h2">Fee</Typography>
                                 <Typography>
-                                    used {inspectedTx.result.tx_result.gas_used} / wanted{' '}
-                                    {inspectedTx.result.tx_result.gas_wanted}
+                                    used {inspectedTx.result?.tx_result?.gas_used} / wanted{' '}
+                                    {inspectedTx.result?.tx_result?.gas_wanted}
                                 </Typography>
 
                                 <Typography variant="h2">Events</Typography>
                                 <Codeblock language="json">
-                                    {JSON.stringify(inspectedTx.result.tx_result.events, null, 2)}
+                                    {JSON.stringify(inspectedTx.result?.tx_result?.events, null, 2)}
                                 </Codeblock>
                             </>
                         )}
