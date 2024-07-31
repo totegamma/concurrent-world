@@ -1,14 +1,28 @@
-import { Box, Button, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import {
+    Alert,
+    Box,
+    Button,
+    Divider,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    TextField,
+    Typography
+} from '@mui/material'
 import { forwardRef, useEffect, useState } from 'react'
 import { useSnackbar } from 'notistack'
 import { SigningStargateClient, coins, GasPrice, calculateFee } from '@cosmjs/stargate'
 import { type StdFee } from '@keplr-wallet/types'
+import { CCDrawer } from '../ui/CCDrawer'
+import { Codeblock } from '../ui/Codeblock'
 
 export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
     const { enqueueSnackbar } = useSnackbar()
 
-    const endpoint = 'http://localhost:1317'
-    const rpcEndpoint = 'http://localhost:26657'
+    const endpoint = 'http://concord-testseed.concrnt.net:1317'
+    const rpcEndpoint = 'http://concord-testseed.concrnt.net:26657'
     const balanceAPI = `${endpoint}/cosmos/bank/v1beta1/balances`
     const basgesAPI = `${endpoint}/concrnt/concord/badge/badges`
 
@@ -21,6 +35,28 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
     const [sendAmount, setSendAmount] = useState<string>('')
     const [sendDenom, setSendDenom] = useState<string>('')
     const [sendRecipient, setSendRecipient] = useState<string>('')
+
+    const [inspectTxDraft, setInspectTxDraft] = useState<string>('')
+    const [inspectTxHash, setInspectTxHash] = useState<string>('')
+    const [inspectedTx, setInspectedTx] = useState<any>(null)
+
+    useEffect(() => {
+        if (inspectTxHash) {
+            fetch(`${rpcEndpoint}/tx?hash=${inspectTxHash}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json'
+                }
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    setInspectedTx(data)
+                })
+                .catch((err) => {
+                    console.error(err)
+                })
+        }
+    }, [inspectTxHash])
 
     useEffect(() => {
         if (address) {
@@ -118,6 +154,7 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
                 }}
             >
                 <Typography variant="h3">ChainDev</Typography>
+                <Typography>{address}</Typography>
                 <Button
                     disabled={!!address}
                     onClick={() => {
@@ -126,7 +163,7 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
                 >
                     {address ? 'Connected' : 'Connect Keplr'}
                 </Button>
-                <Typography>{address}</Typography>
+                <Divider />
                 <Table>
                     <TableHead>
                         <TableRow>
@@ -143,6 +180,7 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
                         ))}
                     </TableBody>
                 </Table>
+                <Divider />
                 <Box>
                     <Typography variant="h5">Badges</Typography>
                     {badges?.map((b: any) => (
@@ -161,6 +199,7 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
                         </Box>
                     ))}
                 </Box>
+                <Divider />
                 <Box
                     sx={{
                         display: 'flex',
@@ -197,6 +236,69 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
                         Send
                     </Button>
                 </Box>
+                <Divider />
+                <TextField
+                    label="Inspect Tx"
+                    placeholder="0xE4F706D0B3D255954D344CCE4BBDFF51F3B3A2B76B4AB63867F421639670343A"
+                    value={inspectTxDraft}
+                    onChange={(e) => {
+                        let hash = e.target.value
+                        if (!hash.startsWith('0x')) {
+                            hash = '0x' + hash
+                        }
+                        setInspectTxDraft(hash)
+                    }}
+                />
+                <Button
+                    onClick={() => {
+                        setInspectTxHash(inspectTxDraft)
+                    }}
+                >
+                    Inspect
+                </Button>
+                <CCDrawer
+                    open={!!inspectTxHash}
+                    onClose={() => {
+                        setInspectTxHash('')
+                    }}
+                >
+                    <Box
+                        sx={{
+                            p: 1,
+                            wordBreak: 'break-all',
+                            whiteSpace: 'pre-wrap',
+                            userSelect: 'text'
+                        }}
+                    >
+                        <Typography variant="h1">Inspect Tx</Typography>
+                        {inspectedTx && (
+                            <>
+                                <Typography variant="h2">Hash</Typography>
+                                <Typography>
+                                    {inspectedTx.result.hash}@{inspectedTx.result.height}
+                                </Typography>
+                                {/*
+                            <Typography>{inspectedTx.result.tx_result.code}</Typography>
+                            */}
+
+                                {inspectedTx.result.tx_result.log && (
+                                    <Alert severity="error">{inspectedTx.result.tx_result.log}</Alert>
+                                )}
+
+                                <Typography variant="h2">Fee</Typography>
+                                <Typography>
+                                    used {inspectedTx.result.tx_result.gas_used} / wanted{' '}
+                                    {inspectedTx.result.tx_result.gas_wanted}
+                                </Typography>
+
+                                <Typography variant="h2">Events</Typography>
+                                <Codeblock language="json">
+                                    {JSON.stringify(inspectedTx.result.tx_result.events, null, 2)}
+                                </Codeblock>
+                            </>
+                        )}
+                    </Box>
+                </CCDrawer>
             </Box>
         </div>
     )
