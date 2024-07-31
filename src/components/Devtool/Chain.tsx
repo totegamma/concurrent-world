@@ -4,6 +4,9 @@ import {
     Box,
     Button,
     Divider,
+    List,
+    ListItemButton,
+    ListItemText,
     Table,
     TableBody,
     TableCell,
@@ -14,7 +17,7 @@ import {
 } from '@mui/material'
 import { forwardRef, useEffect, useState } from 'react'
 import { useSnackbar } from 'notistack'
-import { SigningStargateClient, coins, GasPrice, calculateFee } from '@cosmjs/stargate'
+import { SigningStargateClient, coins } from '@cosmjs/stargate'
 import { type StdFee } from '@keplr-wallet/types'
 import { CCDrawer } from '../ui/CCDrawer'
 import { Codeblock } from '../ui/Codeblock'
@@ -42,6 +45,24 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
     const [inspectedTx, setInspectedTx] = useState<any>(null)
 
     const [processing, setProcessing] = useState<boolean>(false)
+
+    const [recentTxs, setRecentTxs] = useState<any>(null)
+
+    useEffect(() => {
+        fetch(`${rpcEndpoint}/tx_search?query="tx.height>0"&order_by="desc"`, {
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json'
+            }
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                setRecentTxs(data)
+            })
+            .catch((err) => {
+                console.error(err)
+            })
+    }, [])
 
     useEffect(() => {
         if (inspectTxHash) {
@@ -268,6 +289,23 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
                 >
                     Inspect
                 </Button>
+                <Divider />
+                <Typography variant="h3">Recent Transactions</Typography>
+                <List disablePadding>
+                    {recentTxs?.result?.txs?.map((tx: any, i: number) => (
+                        <ListItemButton
+                            key={i}
+                            onClick={() => {
+                                setInspectTxHash(`0x${tx.hash}`)
+                            }}
+                        >
+                            <ListItemText
+                                primary={`${tx.hash.slice(0, 10)}...${tx.hash.slice(-10)}@${tx.height}`}
+                                secondary={tx.tx_result.code ? 'Error' : 'Success'}
+                            />
+                        </ListItemButton>
+                    ))}
+                </List>
                 <CCDrawer
                     open={!!inspectTxHash}
                     onClose={() => {
