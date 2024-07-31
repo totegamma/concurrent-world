@@ -315,6 +315,8 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
 timeline.displayName = 'timeline'
 
 const renderError = ({ error }: FallbackProps): JSX.Element => {
+    const [isDevMode] = usePreference('devMode')
+    if (!isDevMode) return <></>
     return (
         <ListItem>
             <ListItemIcon>

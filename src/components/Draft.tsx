@@ -676,30 +676,37 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         </Box>
                     )}
                 >
-                    <DummyMessageView
-                        message={{
-                            body: draft,
-                            emojis: emojiDict
+                    <Box
+                        sx={{
+                            maxHeight: '200px',
+                            overflowY: 'auto'
                         }}
-                        user={client.user?.profile}
-                        userCCID={client.user?.ccid}
-                        subprofileID={selectedSubprofile}
-                        timestamp={
-                            <Typography
-                                sx={{
-                                    backgroundColor: 'divider',
-                                    color: 'primary.contrastText',
-                                    px: 1,
-                                    fontSize: '0.75rem'
-                                }}
-                            >
-                                {t('preview')}
-                            </Typography>
-                        }
-                        onAvatarClick={(e) => {
-                            setProfileSelectAnchorEl(e.currentTarget)
-                        }}
-                    />
+                    >
+                        <DummyMessageView
+                            message={{
+                                body: draft,
+                                emojis: emojiDict
+                            }}
+                            user={client.user?.profile}
+                            userCCID={client.user?.ccid}
+                            subprofileID={selectedSubprofile}
+                            timestamp={
+                                <Typography
+                                    sx={{
+                                        backgroundColor: 'divider',
+                                        color: 'primary.contrastText',
+                                        px: 1,
+                                        fontSize: '0.75rem'
+                                    }}
+                                >
+                                    {t('preview')}
+                                </Typography>
+                            }
+                            onAvatarClick={(e) => {
+                                setProfileSelectAnchorEl(e.currentTarget)
+                            }}
+                        />
+                    </Box>
                 </ErrorBoundary>
             </Collapse>
             <Menu

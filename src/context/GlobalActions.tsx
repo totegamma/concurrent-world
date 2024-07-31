@@ -44,9 +44,9 @@ interface GlobalActionsProps {
 
 const style = {
     position: 'absolute',
-    top: '30%',
+    top: '10%',
     left: '50%',
-    transform: 'translate(-50%, -50%)',
+    transform: 'translate(-50%, 0%)',
     width: '700px',
     maxWidth: '90vw'
 }
