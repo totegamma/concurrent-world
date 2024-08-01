@@ -77,28 +77,31 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                         </Select>
                     </Box>
                     <Box display="flex" gap={1}>
-                        <Button
-                            component="a"
-                            target="_blank"
-                            href={t('mailHerf', { ccid: client?.ccid, mnemonic })}
-                            startIcon={<EmailIcon />}
-                        >
-                            {t('sendEmail')}
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                html2canvas(ref.current as HTMLElement).then((canvas) => {
-                                    const url = canvas.toDataURL('image/png', 2.0)
-                                    const pdf = new JsPDF('p', 'mm', 'a4')
-                                    pdf.addImage(url, 'svg', 0, 0, 210, 297)
-                                    pdf.save('concurrent_master_key.pdf')
-                                })
-                            }}
-                            startIcon={<FileDownloadIcon />}
-                        >
-                            {t('downloadPDF')}
-                        </Button>
-                        <Box flexGrow={1} />
+                        <Box display="flex" flexDirection="column" gap={1} flexGrow={1}>
+                            <Button
+                                fullWidth
+                                component="a"
+                                target="_blank"
+                                href={t('mailHerf', { ccid: client?.ccid, mnemonic })}
+                                startIcon={<EmailIcon />}
+                            >
+                                {t('sendEmail')}
+                            </Button>
+                            <Button
+                                fullWidth
+                                onClick={() => {
+                                    html2canvas(ref.current as HTMLElement).then((canvas) => {
+                                        const url = canvas.toDataURL('image/png', 2.0)
+                                        const pdf = new JsPDF('p', 'mm', 'a4')
+                                        pdf.addImage(url, 'svg', 0, 0, 210, 297)
+                                        pdf.save('concurrent_master_key.pdf')
+                                    })
+                                }}
+                                startIcon={<FileDownloadIcon />}
+                            >
+                                {t('downloadPDF')}
+                            </Button>
+                        </Box>
                         <Button
                             onClick={() => {
                                 setActiveStep(1)
@@ -170,6 +173,7 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                                     const subkey = `concurrent-subkey ${newIdentity.privateKey} ${client.ccid}@${client.host} ${client.user?.profile?.username}`
                                     localStorage.setItem('SubKey', JSON.stringify(subkey))
                                     localStorage.removeItem('Identity')
+                                    localStorage.removeItem('PrivateKey')
                                     window.location.reload()
                                 })
                                 .catch((e) => {
@@ -213,7 +217,8 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                         backgroundImage: `url(${ccPaper})`,
                         position: 'relative',
                         color: 'black',
-                        fontFamily: 'serif'
+                        fontFamily: 'serif',
+                        backgroundRepeat: 'no-repeat'
                     }}
                 >
                     <div
@@ -311,7 +316,8 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                                     <Box
                                         component={Grid}
                                         style={{
-                                            overflow: 'hidden'
+                                            overflow: 'hidden',
+                                            width: '100%'
                                         }}
                                         spacing={1}
                                         columns={3}
@@ -321,8 +327,9 @@ export default function SwitchMasterToSub(props: SwitchMasterToSubProps): JSX.El
                                             <Grid
                                                 key={i}
                                                 item
-                                                xs={2}
+                                                xs={1}
                                                 sm={1}
+                                                md={1}
                                                 sx={{
                                                     display: 'flex',
                                                     alignItems: 'center',
