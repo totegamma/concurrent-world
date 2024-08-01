@@ -145,6 +145,7 @@ export const KeyCard = (props: KeyCardProps): JSX.Element => {
                             }
                         }}
                         onClick={(event) => {
+                            event.stopPropagation()
                             props.onMenuClick?.(event, props.item)
                         }}
                     >
