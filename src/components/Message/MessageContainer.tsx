@@ -58,10 +58,12 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
 
     if (isFetching) {
         return (
-            <Box sx={props.sx}>
-                <MessageSkeleton />
+            <>
+                <Box sx={props.sx}>
+                    <MessageSkeleton />
+                </Box>
                 {props.after}
-            </Box>
+            </>
         )
     }
 

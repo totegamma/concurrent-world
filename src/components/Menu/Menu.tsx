@@ -7,11 +7,11 @@ import {
     ListItem,
     ListItemButton,
     ListItemText,
-    Typography
+    Typography,
+    Link
 } from '@mui/material'
 import CreateIcon from '@mui/icons-material/Create'
-import { Link } from 'react-router-dom'
-
+import { Link as NavLink } from 'react-router-dom'
 import HomeIcon from '@mui/icons-material/Home'
 import TerminalIcon from '@mui/icons-material/Terminal'
 import ExploreIcon from '@mui/icons-material/Explore'
@@ -19,18 +19,12 @@ import SettingsIcon from '@mui/icons-material/Settings'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import ContactsIcon from '@mui/icons-material/Contacts'
 import { memo } from 'react'
-// @ts-expect-error vite dynamic import
-import buildTime from '~build/time'
-// @ts-expect-error vite dynamic import
-import { branch, sha } from '~build/info'
 import { ListsMenu } from '../ListsMenu/main'
 import { CCAvatar } from '../ui/CCAvatar'
 import { useClient } from '../../context/ClientContext'
 import { usePreference } from '../../context/PreferenceContext'
 import { useGlobalActions } from '../../context/GlobalActions'
 import { useTranslation } from 'react-i18next'
-
-const branchName = branch || window.location.host.split('.')[0]
 
 export interface MenuProps {
     onClick?: () => void
@@ -60,7 +54,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
             >
                 <Box sx={{ px: 2, pb: 1 }}>
                     <ButtonBase
-                        component={Link}
+                        component={NavLink}
                         sx={{
                             display: 'flex',
                             alignItems: 'center',
@@ -96,7 +90,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                 >
                     <List dense sx={{ py: 0.5, width: '100%' }}>
                         <ListItem disablePadding>
-                            <ListItemButton sx={{ gap: 1 }} component={Link} to="/" onClick={props.onClick}>
+                            <ListItemButton sx={{ gap: 1 }} component={NavLink} to="/" onClick={props.onClick}>
                                 <HomeIcon
                                     sx={{
                                         color: 'background.contrastText'
@@ -108,7 +102,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         <ListItem disablePadding>
                             <ListItemButton
                                 sx={{ gap: 1 }}
-                                component={Link}
+                                component={NavLink}
                                 to="/notifications"
                                 onClick={props.onClick}
                             >
@@ -122,7 +116,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
-                            <ListItemButton sx={{ gap: 1 }} component={Link} to="/contacts" onClick={props.onClick}>
+                            <ListItemButton sx={{ gap: 1 }} component={NavLink} to="/contacts" onClick={props.onClick}>
                                 <ContactsIcon
                                     sx={{
                                         color: 'background.contrastText'
@@ -135,7 +129,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         <ListItem disablePadding>
                             <ListItemButton
                                 sx={{ gap: 1 }}
-                                component={Link}
+                                component={NavLink}
                                 to="/explorer/timelines"
                                 onClick={props.onClick}
                             >
@@ -150,7 +144,12 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         </ListItem>
                         {devMode && (
                             <ListItem disablePadding>
-                                <ListItemButton sx={{ gap: 1 }} component={Link} to="/devtool" onClick={props.onClick}>
+                                <ListItemButton
+                                    sx={{ gap: 1 }}
+                                    component={NavLink}
+                                    to="/devtool"
+                                    onClick={props.onClick}
+                                >
                                     <TerminalIcon
                                         sx={{
                                             color: 'background.contrastText'
@@ -162,7 +161,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                             </ListItem>
                         )}
                         <ListItem disablePadding>
-                            <ListItemButton sx={{ gap: 1 }} component={Link} to="/settings" onClick={props.onClick}>
+                            <ListItemButton sx={{ gap: 1 }} component={NavLink} to="/settings" onClick={props.onClick}>
                                 <SettingsIcon
                                     sx={{
                                         color: 'background.contrastText'
@@ -213,13 +212,26 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                     }}
                 >
                     <Box sx={{ textAlign: 'center', fontWeight: 600, mb: 'env(safe-area-inset-bottom)' }}>
-                        開発中α版
+                        Concrnt-World 開発中β版
+                        <br />
+                        <Link
+                            underline="hover"
+                            color="background.contrastText"
+                            href="https://square.concrnt.net/"
+                            target="_blank"
+                        >
+                            ドキュメント
+                        </Link>
+                        {' / '}
+                        <Link
+                            underline="hover"
+                            color="background.contrastText"
+                            href="https://github.com/totegamma/concurrent-world"
+                            target="_blank"
+                        >
+                            GitHub
+                        </Link>
                     </Box>
-                    buildTime: {buildTime.toLocaleString()}
-                    <br />
-                    branch: {branchName}
-                    <br />
-                    sha: {sha.slice(0, 7)}
                 </Box>
             </Box>
         </Box>
