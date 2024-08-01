@@ -25,7 +25,7 @@ import { Codeblock } from '../ui/Codeblock'
 export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
     const { enqueueSnackbar } = useSnackbar()
 
-    const endpoint = 'https://concord-testseed.concrnt.net:1317'
+    const endpoint = 'https://concord-testseed.concrnt.net'
     const rpcEndpoint = 'https://concord-testseed.concrnt.net:26657'
     const balanceAPI = `${endpoint}/cosmos/bank/v1beta1/balances`
     const basgesAPI = `${endpoint}/concrnt/concord/badge/badges`
