@@ -26,9 +26,19 @@ export default function Welcome(): JSX.Element {
                 backgroundColor: 'background.paper'
             }}
             additionalButton={
-                <Button component={Link} to="/import">
-                    {t('import')}
-                </Button>
+                <>
+                    <Button
+                        component={Link}
+                        to="https://square.concrnt.net/general/world/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        ユーザーガイド
+                    </Button>
+                    <Button component={Link} to="/import">
+                        {t('import')}
+                    </Button>
+                </>
             }
         >
             <Box /* top */

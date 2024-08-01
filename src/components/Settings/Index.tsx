@@ -19,6 +19,13 @@ import ImportExportIcon from '@mui/icons-material/ImportExport'
 import EventNoteIcon from '@mui/icons-material/EventNote'
 import { useMemo } from 'react'
 
+// @ts-expect-error vite dynamic import
+import buildTime from '~build/time'
+// @ts-expect-error vite dynamic import
+import { branch, sha } from '~build/info'
+
+const branchName = branch || window.location.host.split('.')[0]
+
 export function SettingsIndex(): JSX.Element {
     const { client } = useClient()
     const { enqueueSnackbar } = useSnackbar()
@@ -182,6 +189,24 @@ export function SettingsIndex(): JSX.Element {
                     {t('pages.settings.actions.forceReload')}
                 </Button>
                 <LogoutButton />
+            </Paper>
+            <Paper
+                variant="outlined"
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 1,
+                    padding: 1
+                }}
+            >
+                <Typography variant="h2" gutterBottom>
+                    Concrnt-World
+                </Typography>
+                buildTime: {buildTime.toLocaleString()}
+                <br />
+                branch: {branchName}
+                <br />
+                sha: {sha}
             </Paper>
         </Box>
     )
