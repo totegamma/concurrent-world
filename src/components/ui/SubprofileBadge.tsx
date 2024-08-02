@@ -3,17 +3,19 @@ import { useEffect, useState } from 'react'
 import { useClient } from '../../context/ClientContext'
 import { Avatar, type SxProps, Tooltip, Skeleton } from '@mui/material'
 import BoringAvatar from 'boring-avatars'
+import { useGlobalActions } from '../../context/GlobalActions'
 
 export interface SubprofileBadgeProps {
     characterID: string
     authorCCID: string
     onClick?: (characterID: string) => void
     sx?: SxProps
+    enablePreview?: boolean
 }
 
 export function SubprofileBadge(props: SubprofileBadgeProps): JSX.Element {
     const { client } = useClient()
-
+    const actions = useGlobalActions()
     const [character, setProfile] = useState<CoreProfile<any> | null>(null)
 
     useEffect(() => {
@@ -34,7 +36,13 @@ export function SubprofileBadge(props: SubprofileBadgeProps): JSX.Element {
                     borderRadius: 1
                 }}
                 variant="square"
-                onClick={() => props.onClick?.(props.characterID)}
+                onClick={() => {
+                    if (props.enablePreview) {
+                        actions?.openImageViewer(character?.document.body.avatar)
+                    } else {
+                        props.onClick?.(props.characterID)
+                    }
+                }}
             >
                 <BoringAvatar square name={character?.document.body.username} variant="beam" size={1000} />
             </Avatar>
