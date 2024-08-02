@@ -115,7 +115,7 @@ export function Profile(props: ProfileProps): JSX.Element {
                                 if (props.overrideSubProfileID) {
                                     props.onSubProfileClicked?.('')
                                 } else {
-                                    actions?.openImageViewer(props.user?.profile?.avatar)
+                                    props.user?.profile?.avatar && actions?.openImageViewer(props.user?.profile?.avatar)
                                 }
                             }}
                         />
