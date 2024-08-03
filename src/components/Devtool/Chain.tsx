@@ -20,7 +20,7 @@ import { useSnackbar } from 'notistack'
 import { SigningStargateClient, coins } from '@cosmjs/stargate'
 import { type StdFee } from '@keplr-wallet/types'
 import { CCDrawer } from '../ui/CCDrawer'
-import { Codeblock } from '../ui/Codeblock'
+import { EventCard } from '../ui/EventCard'
 
 export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
     const { enqueueSnackbar } = useSnackbar()
@@ -342,9 +342,17 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
                                 </Typography>
 
                                 <Typography variant="h2">Events</Typography>
-                                <Codeblock language="json">
-                                    {JSON.stringify(inspectedTx.result?.tx_result?.events, null, 2)}
-                                </Codeblock>
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '10px'
+                                    }}
+                                >
+                                    {inspectedTx.result?.tx_result?.events?.map((e: any, i: number) => (
+                                        <EventCard key={i} id={`${i}`} label={e.type} content={e.attributes} />
+                                    ))}
+                                </Box>
                             </>
                         )}
                     </Box>
