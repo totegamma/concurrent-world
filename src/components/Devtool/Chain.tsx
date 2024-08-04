@@ -17,13 +17,12 @@ import {
 } from '@mui/material'
 import { forwardRef, useEffect, useState } from 'react'
 import { useSnackbar } from 'notistack'
-import { SigningStargateClient, coins, defaultRegistryTypes } from '@cosmjs/stargate'
-import { type DecodedTxRaw, decodeTxRaw, Registry } from '@cosmjs/proto-signing'
+import { SigningStargateClient, coins } from '@cosmjs/stargate'
+import { type DecodedTxRaw, decodeTxRaw } from '@cosmjs/proto-signing'
 import { fromBase64 } from '@cosmjs/encoding'
 import { type StdFee } from '@keplr-wallet/types'
 import { CCDrawer } from '../ui/CCDrawer'
 import { EventCard } from '../ui/EventCard'
-import { MsgCreateTemplate } from '../../proto/concord'
 
 const chainInfo = {
     chainId: 'concord',
@@ -68,12 +67,9 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
     const endpoint = 'https://concord-testseed.concrnt.net'
     const rpcEndpoint = 'https://concord-testseed.concrnt.net:26657'
     const balanceAPI = `${endpoint}/cosmos/bank/v1beta1/balances`
-    const basgesAPI = `${endpoint}/concrnt/concord/badge/badges`
 
     const [address, setAddress] = useState<string>('')
     const [balance, setBalance] = useState<any>(null)
-    const [badges, setBadges] = useState<any>(null)
-    const [templates, setTemplates] = useState<any>(null)
     const [cosmJS, setCosmJS] = useState<SigningStargateClient | undefined>(undefined)
 
     const [sendAmount, setSendAmount] = useState<string>('')
@@ -142,25 +138,6 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
                 .catch((err) => {
                     console.error(err)
                 })
-
-            fetch(basgesAPI + '/' + address, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json'
-                }
-            })
-                .then((res) => res.json())
-                .then((data) => {
-                    setBadges(data.nfts)
-                    const classmap = new Map<string, any>()
-                    for (const cls of data.classes) {
-                        classmap.set(cls.id, cls)
-                    }
-                    setTemplates(classmap)
-                })
-                .catch((err) => {
-                    console.error(err)
-                })
         }
     }, [address])
 
@@ -184,14 +161,7 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
             const accounts = await offlineSigner.getAccounts()
             setAddress(accounts[0].address)
 
-            const registry = new Registry(defaultRegistryTypes)
-            registry.register('/concord.badge.MsgCreateTemplate', MsgCreateTemplate)
-
-            setCosmJS(
-                await SigningStargateClient.connectWithSigner(rpcEndpoint, offlineSigner, {
-                    registry
-                })
-            )
+            setCosmJS(await SigningStargateClient.connectWithSigner(rpcEndpoint, offlineSigner))
         }
     }
 
@@ -226,48 +196,6 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
                 })
 
             enqueueSnackbar(signResult.code ? 'error' : 'Success', {
-                variant: signResult.code ? 'error' : 'success'
-            })
-
-            setInspectTxDraft(signResult.transactionHash)
-
-            console.log(signResult)
-        }
-    }
-
-    const createBadgeTemplate = async (): Promise<void> => {
-        if (!cosmJS) {
-            enqueueSnackbar('CosmJS not found', { variant: 'error' })
-        } else {
-            const sendMsg = {
-                typeUrl: '/concord.badge.MsgCreateTemplate',
-                value: {
-                    name: 'My Badge',
-                    creator: address,
-                    description: 'My Badge Description',
-                    uri: 'https://example.com',
-                    transferable: true
-                }
-            }
-
-            const defaultSendFee: StdFee = {
-                amount: [
-                    {
-                        denom: 'uAmpere',
-                        amount: '500'
-                    }
-                ],
-                gas: '100000'
-            }
-
-            setProcessing(true)
-            const signResult = await cosmJS
-                .signAndBroadcast(address, [sendMsg], defaultSendFee, 'mymsg')
-                .finally(() => {
-                    setProcessing(false)
-                })
-
-            enqueueSnackbar(signResult.code ? 'Error' : 'Success', {
                 variant: signResult.code ? 'error' : 'success'
             })
 
@@ -314,32 +242,6 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
                         ))}
                     </TableBody>
                 </Table>
-                <Divider />
-                <Box>
-                    <Typography variant="h5">Badges</Typography>
-                    {badges?.map((b: any) => (
-                        <Box
-                            key={b.id}
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '10px'
-                            }}
-                        >
-                            <img src={templates?.get(b.class_id)?.uri} width="50px" alt={b.id} />
-                            <Typography>{templates?.get(b.class_id)?.name}</Typography>
-                            <Typography>{templates?.get(b.class_id)?.description}</Typography>
-                            <Typography>{templates?.get(b.class_id)?.data?.creator}</Typography>
-                        </Box>
-                    ))}
-                </Box>
-                <Button
-                    onClick={() => {
-                        createBadgeTemplate()
-                    }}
-                >
-                    Create Badge Template
-                </Button>
                 <Divider />
                 <Box
                     sx={{
