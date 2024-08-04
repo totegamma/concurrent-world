@@ -17,12 +17,13 @@ import {
 } from '@mui/material'
 import { forwardRef, useEffect, useState } from 'react'
 import { useSnackbar } from 'notistack'
-import { SigningStargateClient, coins } from '@cosmjs/stargate'
-import { type DecodedTxRaw, decodeTxRaw } from '@cosmjs/proto-signing'
+import { SigningStargateClient, coins, defaultRegistryTypes } from '@cosmjs/stargate'
+import { type DecodedTxRaw, decodeTxRaw, Registry } from '@cosmjs/proto-signing'
 import { fromBase64 } from '@cosmjs/encoding'
 import { type StdFee } from '@keplr-wallet/types'
 import { CCDrawer } from '../ui/CCDrawer'
 import { EventCard } from '../ui/EventCard'
+import { MsgCreateTemplate } from '../../proto/concord'
 
 const chainInfo = {
     chainId: 'concord',
@@ -182,7 +183,15 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
             const offlineSigner = window.keplr.getOfflineSigner(chainId)
             const accounts = await offlineSigner.getAccounts()
             setAddress(accounts[0].address)
-            setCosmJS(await SigningStargateClient.connectWithSigner(rpcEndpoint, offlineSigner))
+
+            const registry = new Registry(defaultRegistryTypes)
+            registry.register('/concord.badge.MsgCreateTemplate', MsgCreateTemplate)
+
+            setCosmJS(
+                await SigningStargateClient.connectWithSigner(rpcEndpoint, offlineSigner, {
+                    registry
+                })
+            )
         }
     }
 
@@ -216,7 +225,49 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
                     setProcessing(false)
                 })
 
-            enqueueSnackbar(signResult.code ? signResult.rawLog : 'Success', {
+            enqueueSnackbar(signResult.code ? 'error' : 'Success', {
+                variant: signResult.code ? 'error' : 'success'
+            })
+
+            setInspectTxDraft(signResult.transactionHash)
+
+            console.log(signResult)
+        }
+    }
+
+    const createBadgeTemplate = async (): Promise<void> => {
+        if (!cosmJS) {
+            enqueueSnackbar('CosmJS not found', { variant: 'error' })
+        } else {
+            const sendMsg = {
+                typeUrl: '/concord.badge.MsgCreateTemplate',
+                value: {
+                    name: 'My Badge',
+                    creator: address,
+                    description: 'My Badge Description',
+                    uri: 'https://example.com',
+                    transferable: true
+                }
+            }
+
+            const defaultSendFee: StdFee = {
+                amount: [
+                    {
+                        denom: 'uAmpere',
+                        amount: '500'
+                    }
+                ],
+                gas: '100000'
+            }
+
+            setProcessing(true)
+            const signResult = await cosmJS
+                .signAndBroadcast(address, [sendMsg], defaultSendFee, 'mymsg')
+                .finally(() => {
+                    setProcessing(false)
+                })
+
+            enqueueSnackbar(signResult.code ? 'Error' : 'Success', {
                 variant: signResult.code ? 'error' : 'success'
             })
 
@@ -282,6 +333,13 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
                         </Box>
                     ))}
                 </Box>
+                <Button
+                    onClick={() => {
+                        createBadgeTemplate()
+                    }}
+                >
+                    Create Badge Template
+                </Button>
                 <Divider />
                 <Box
                     sx={{
