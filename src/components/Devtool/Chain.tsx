@@ -18,9 +18,48 @@ import {
 import { forwardRef, useEffect, useState } from 'react'
 import { useSnackbar } from 'notistack'
 import { SigningStargateClient, coins } from '@cosmjs/stargate'
+import { type DecodedTxRaw, decodeTxRaw } from '@cosmjs/proto-signing'
+import { fromBase64 } from '@cosmjs/encoding'
 import { type StdFee } from '@keplr-wallet/types'
 import { CCDrawer } from '../ui/CCDrawer'
 import { EventCard } from '../ui/EventCard'
+
+const chainInfo = {
+    chainId: 'concord',
+    chainName: 'Concord',
+    rpc: 'https://concord-testseed.concrnt.net:26657',
+    rest: 'https://concord-testseed.concrnt.net',
+    bip44: {
+        coinType: 118
+    },
+    bech32Config: {
+        bech32PrefixAccAddr: 'con',
+        bech32PrefixAccPub: 'con' + 'pub',
+        bech32PrefixValAddr: 'con' + 'valoper',
+        bech32PrefixValPub: 'con' + 'valoperpub',
+        bech32PrefixConsAddr: 'con' + 'valcons',
+        bech32PrefixConsPub: 'con' + 'valconspub'
+    },
+    currencies: [
+        {
+            coinDenom: 'Ampere',
+            coinMinimalDenom: 'uAmpere',
+            coinDecimals: 6
+        }
+    ],
+    feeCurrencies: [
+        {
+            coinDenom: 'Ampere',
+            coinMinimalDenom: 'uAmpere',
+            coinDecimals: 6
+        }
+    ],
+    stakeCurrency: {
+        coinDenom: 'Ampere',
+        coinMinimalDenom: 'uAmpere',
+        coinDecimals: 6
+    }
+}
 
 export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => {
     const { enqueueSnackbar } = useSnackbar()
@@ -45,8 +84,13 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
     const [inspectedTx, setInspectedTx] = useState<any>(null)
 
     const [processing, setProcessing] = useState<boolean>(false)
-
     const [recentTxs, setRecentTxs] = useState<any>(null)
+
+    const inspectedTxRaw = inspectedTx?.result?.tx
+    const inspectedTxRawDecoded: DecodedTxRaw | undefined = inspectedTxRaw
+        ? decodeTxRaw(fromBase64(inspectedTxRaw))
+        : undefined
+    console.log(inspectedTxRawDecoded)
 
     useEffect(() => {
         fetch(`${rpcEndpoint}/tx_search?query="tx.height>0"&order_by="desc"`, {
@@ -125,6 +169,8 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
         } else {
             enqueueSnackbar('Keplr found', { variant: 'success' })
 
+            window.keplr.experimentalSuggestChain(chainInfo)
+
             const chainId = 'concord'
             await window.keplr.enable(chainId)
             window.keplr.defaultOptions = {
@@ -164,9 +210,11 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
             }
 
             setProcessing(true)
-            const signResult = await cosmJS.signAndBroadcast(address, [sendMsg], defaultSendFee).finally(() => {
-                setProcessing(false)
-            })
+            const signResult = await cosmJS
+                .signAndBroadcast(address, [sendMsg], defaultSendFee, 'mymsg')
+                .finally(() => {
+                    setProcessing(false)
+                })
 
             enqueueSnackbar(signResult.code ? signResult.rawLog : 'Success', {
                 variant: signResult.code ? 'error' : 'success'
@@ -334,6 +382,23 @@ export const ChainDev = forwardRef<HTMLDivElement>((props, ref): JSX.Element => 
                                         {inspectedTx.result.tx_result.log}
                                     </Alert>
                                 )}
+
+                                <Typography variant="h2">Transaction</Typography>
+                                <Typography>memo: {inspectedTxRawDecoded?.body?.memo || '<none>'}</Typography>
+                                <Typography>messages:</Typography>
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '10px'
+                                    }}
+                                >
+                                    {inspectedTxRawDecoded?.body?.messages?.map((m, i) => (
+                                        <Box key={i}>
+                                            <Typography>{m.typeUrl}</Typography>
+                                        </Box>
+                                    ))}
+                                </Box>
 
                                 <Typography variant="h2">Fee</Typography>
                                 <Typography>
