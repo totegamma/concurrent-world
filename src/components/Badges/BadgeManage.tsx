@@ -12,6 +12,8 @@ export const BadgeManage = (props: BadgeManageProps): JSX.Element => {
     const endpoint = 'https://concord-testseed.concrnt.net'
     const [processing, setProcessing] = useState<boolean>(false)
 
+    const [classes, setClasses] = useState<any>([])
+
     const createBadgeTemplate = async (): Promise<void> => {
         const sendMsg = {
             typeUrl: '/concord.badge.MsgCreateTemplate',
@@ -48,6 +50,7 @@ export const BadgeManage = (props: BadgeManageProps): JSX.Element => {
         <Box>
             <Typography variant="h5">Manage</Typography>
             <Button
+                disabled={processing}
                 onClick={() => {
                     createBadgeTemplate()
                 }}
