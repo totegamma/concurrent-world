@@ -1,5 +1,6 @@
-import { Box, Typography } from '@mui/material'
+import { Box, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
+import { CCUserChip } from '../ui/CCUserChip'
 
 export interface BadgeListProps {
     address: string
@@ -35,22 +36,31 @@ export const BadgeList = (props: BadgeListProps): JSX.Element => {
 
     return (
         <Box>
-            <Typography variant="h5">Badges</Typography>
-            {badges?.map((b: any) => (
-                <Box
-                    key={b.id}
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '10px'
-                    }}
-                >
-                    <img src={templates?.get(b.class_id)?.uri} width="50px" alt={b.id} />
-                    <Typography>{templates?.get(b.class_id)?.name}</Typography>
-                    <Typography>{templates?.get(b.class_id)?.description}</Typography>
-                    <Typography>{templates?.get(b.class_id)?.data?.creator}</Typography>
-                </Box>
-            ))}
+            <Typography variant="h2">Badges</Typography>
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableCell>Visual</TableCell>
+                        <TableCell>Name</TableCell>
+                        <TableCell>Description</TableCell>
+                        <TableCell>CreatedBy</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {badges?.map((b: any) => (
+                        <TableRow key={b.id}>
+                            <TableCell>
+                                <img src={templates?.get(b.class_id)?.uri} width="50px" alt={b.id} />
+                            </TableCell>
+                            <TableCell>{templates?.get(b.class_id)?.name}</TableCell>
+                            <TableCell>{templates?.get(b.class_id)?.description}</TableCell>
+                            <TableCell>
+                                <CCUserChip avatar ccid={templates?.get(b.class_id)?.data?.creator} />
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
         </Box>
     )
 }

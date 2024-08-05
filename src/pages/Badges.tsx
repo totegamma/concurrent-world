@@ -7,7 +7,7 @@ import { useSnackbar } from 'notistack'
 import { Registry } from '@cosmjs/proto-signing'
 
 import { SigningStargateClient, defaultRegistryTypes } from '@cosmjs/stargate'
-import { MsgCreateTemplate } from '../proto/concord'
+import { MsgCreateTemplate, MsgMintBadge } from '../proto/concord'
 import { BadgeManage } from '../components/Badges/BadgeManage'
 
 type widgets = 'list' | 'manage'
@@ -51,10 +51,11 @@ const chainInfo = {
 
 export const BadgesPage = memo((): JSX.Element => {
     const path = useLocation()
-    const tab: widgets = (path.hash.replace('#', '') as widgets) || 'debug'
+    const tab: widgets = (path.hash.replace('#', '') as widgets) || 'list'
 
     const { client } = useClient()
     const { enqueueSnackbar } = useSnackbar()
+    const [address, setAddress] = useState<string | undefined>(undefined)
 
     const rpcEndpoint = 'https://concord-testseed.concrnt.net:26657'
     const [cosmJS, setCosmJS] = useState<SigningStargateClient | undefined>(undefined)
@@ -88,12 +89,15 @@ export const BadgesPage = memo((): JSX.Element => {
 
             const registry = new Registry(defaultRegistryTypes)
             registry.register('/concord.badge.MsgCreateTemplate', MsgCreateTemplate)
+            registry.register('/concord.badge.MsgMintBadge', MsgMintBadge)
 
             setCosmJS(
                 await SigningStargateClient.connectWithSigner(rpcEndpoint, offlineSigner, {
                     registry
                 })
             )
+
+            setAddress((await offlineSigner.getAccounts())[0].address)
         }
     }
 
@@ -109,14 +113,24 @@ export const BadgesPage = memo((): JSX.Element => {
             }}
         >
             <Typography variant="h2">BadgesPage</Typography>
-            <Button
-                disabled={!!cosmJS}
-                onClick={() => {
-                    connectKeplr()
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    my: 1
                 }}
             >
-                {cosmJS ? 'Connected' : 'Connect Keplr'}
-            </Button>
+                <Typography>{address ? `Connected as ${address}` : 'Not connected'}</Typography>
+                <Button
+                    disabled={!!cosmJS}
+                    onClick={() => {
+                        connectKeplr()
+                    }}
+                >
+                    {cosmJS ? 'Connected' : 'Connect Keplr'}
+                </Button>
+            </Box>
             <Divider />
             <Tabs
                 value={tab}
