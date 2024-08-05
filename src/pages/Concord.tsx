@@ -9,8 +9,9 @@ import { SigningStargateClient, defaultRegistryTypes } from '@cosmjs/stargate'
 import { MsgCreateTemplate, MsgMintBadge } from '../proto/concord'
 import { Assets } from '../components/Concord/Assets'
 import { BadgeSeries } from '../components/Concord/BadgeSeries'
+import { ConcordExplorer } from '../components/Concord/Explorer'
 
-type widgets = 'assets' | 'badge'
+type widgets = 'assets' | 'badge' | 'explorer'
 
 const chainInfo = {
     chainId: 'concord',
@@ -138,11 +139,17 @@ export const ConcordPage = memo((): JSX.Element => {
             >
                 <Tab value="assets" label="Assets" />
                 <Tab value="badge" label="Badge" />
+                <Tab value="explorer" label="Explorer" />
             </Tabs>
-            <Divider />
+            <Divider
+                sx={{
+                    marginBottom: 1
+                }}
+            />
             <Routes>
                 <Route path="/assets" element={<Assets address={client.ccid} cosmJS={cosmJS} />} />
                 <Route path="/badge" element={<BadgeSeries address={client.ccid} cosmJS={cosmJS} />} />
+                <Route path="/explorer" element={<ConcordExplorer />} />
             </Routes>
         </Box>
     )

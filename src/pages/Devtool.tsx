@@ -5,9 +5,8 @@ import { CCComposer } from '../components/Devtool/CCComposer'
 import { IdentityGenerator } from '../components/Devtool/IdentityGenerator'
 import { useLocation } from 'react-router-dom'
 import { Debugger } from '../components/Devtool/Debugger'
-import { ChainDev } from '../components/Devtool/Chain'
 
-type widgets = 'debug' | 'chain' | 'composer' | 'userJWT' | 'idgen'
+type widgets = 'debug' | 'composer' | 'userJWT' | 'idgen'
 
 export const Devtool = memo((): JSX.Element => {
     const path = useLocation()
@@ -35,7 +34,6 @@ export const Devtool = memo((): JSX.Element => {
                 indicatorColor="secondary"
             >
                 <Tab value="debug" label="Debugger" />
-                <Tab value="chain" label="Chain" />
                 <Tab value="composer" label="Composer" />
                 <Tab value="userJWT" label="UserJWT" />
                 <Tab value="idgen" label="IdentityGenerator" />
@@ -45,11 +43,6 @@ export const Devtool = memo((): JSX.Element => {
                 <Fade in={tab === 'debug'} unmountOnExit>
                     <Box sx={{ position: 'absolute', width: '100%' }}>
                         <Debugger />
-                    </Box>
-                </Fade>
-                <Fade in={tab === 'chain'} unmountOnExit>
-                    <Box sx={{ position: 'absolute', width: '100%' }}>
-                        <ChainDev />
                     </Box>
                 </Fade>
                 <Fade in={tab === 'composer'} unmountOnExit>
