@@ -15,13 +15,13 @@ import { useEffect, useState } from 'react'
 import { CCDrawer } from '../ui/CCDrawer'
 import { type DeepPartial } from '../../util'
 
-export interface BadgeManageProps {
+export interface BadgeSeriesProps {
     address: string
-    cosmJS: SigningStargateClient
+    cosmJS?: SigningStargateClient
     onDone?: (hash: string) => void
 }
 
-interface BadgeSeries {
+interface BadgeClass {
     id: string
     name: string
     symbol: string
@@ -34,16 +34,16 @@ interface BadgeSeries {
     }
 }
 
-export const BadgeManage = (props: BadgeManageProps): JSX.Element => {
+export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
     const endpoint = 'https://concord-testseed.concrnt.net'
     const classesAPI = `${endpoint}/cosmos/nft/v1beta1/classes`
     const [processing, setProcessing] = useState<boolean>(false)
 
-    const [series, setSeries] = useState<BadgeSeries[]>([])
-    const mySeries = series.filter((c: BadgeSeries) => c.data?.creator === props.address)
+    const [series, setSeries] = useState<BadgeClass[]>([])
+    const mySeries = series.filter((c: BadgeClass) => c.data?.creator === props.address)
 
     const [createSeries, setCreateSeries] = useState<boolean>(false)
-    const [seriesDraft, setSeriesDraft] = useState<DeepPartial<BadgeSeries>>({})
+    const [seriesDraft, setSeriesDraft] = useState<DeepPartial<BadgeClass>>({})
 
     const [mintingClass, setMintingClass] = useState<string>('')
     const [receiverDraft, setReceiverDraft] = useState<string>('')
@@ -67,6 +67,7 @@ export const BadgeManage = (props: BadgeManageProps): JSX.Element => {
     }, [props.address])
 
     const createBadgeTemplate = async (): Promise<void> => {
+        if (!props.cosmJS) return
         const sendMsg = {
             typeUrl: '/concord.badge.MsgCreateTemplate',
             value: {
@@ -100,6 +101,7 @@ export const BadgeManage = (props: BadgeManageProps): JSX.Element => {
     }
 
     const mintBadge = async (): Promise<void> => {
+        if (!props.cosmJS) return
         const sendMsg = {
             typeUrl: '/concord.badge.MsgMintBadge',
             value: {
@@ -141,7 +143,7 @@ export const BadgeManage = (props: BadgeManageProps): JSX.Element => {
             >
                 <Typography variant="h3">シリーズ</Typography>
                 <Button
-                    disabled={processing}
+                    disabled={processing || !props.cosmJS}
                     onClick={() => {
                         setCreateSeries(true)
                     }}
@@ -169,6 +171,7 @@ export const BadgeManage = (props: BadgeManageProps): JSX.Element => {
                                 <TableCell>{b.data.transferable ? 'Yes' : 'No'}</TableCell>
                                 <TableCell>
                                     <Button
+                                        disabled={!props.cosmJS}
                                         onClick={() => {
                                             setMintingClass(b.id)
                                         }}

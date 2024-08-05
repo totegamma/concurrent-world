@@ -1,4 +1,8 @@
 import {
+    Accordion,
+    AccordionActions,
+    AccordionDetails,
+    AccordionSummary,
     Box,
     Button,
     Divider,
@@ -27,6 +31,7 @@ export const GeneralSettings = (): JSX.Element => {
     const [showEditorOnTop, setShowEditorOnTop] = usePreference('showEditorOnTop')
     const [showEditorOnTopMobile, setShowEditorOnTopMobile] = usePreference('showEditorOnTopMobile')
     const [devMode, setDevMode] = usePreference('devMode')
+    const [enableConcord, setEnableConcord] = usePreference('enableConcord')
 
     const tags = client?.user?.tag ? client.user.tag.split(',') : []
     const { enqueueSnackbar } = useSnackbar()
@@ -98,8 +103,52 @@ export const GeneralSettings = (): JSX.Element => {
                         }
                         label={t('developerMode')}
                     />
+                    {enableConcord && (
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={enableConcord}
+                                    onChange={(e) => {
+                                        setEnableConcord(e.target.checked)
+                                    }}
+                                />
+                            }
+                            label={'Concord Network'}
+                        />
+                    )}
                 </FormGroup>
             </Box>
+            {!enableConcord && (
+                <Accordion>
+                    <AccordionSummary>
+                        <Typography variant="h4">Concord Network(プレビュー)</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                        Concord
+                        NetworkはConcrnt本体の機能を拡張する、別の分散合意ネットワークです。以下の規約の元、有効化することができます。
+                        <br />
+                        <ul>
+                            <li>
+                                Concord
+                                Networkは現在プレビュー版です。ネットワークは予告なくリセット・変更される予定で、その際ネットワーク上のデータは失われます。それらは再生されません。
+                            </li>
+                            <li>
+                                Concord
+                                Networkでは、内部でおたのしみ機能としてポイント機能が提供されますが、いかなる場合でもポイントを換金することはできません。これは、現金化、その他の有価物との交換、その他の仮想通貨とのスワップを含むがこれに限られません。
+                            </li>
+                        </ul>
+                    </AccordionDetails>
+                    <AccordionActions>
+                        <Button
+                            onClick={(_) => {
+                                setEnableConcord(true)
+                            }}
+                        >
+                            同意してConcord Networkを有効化
+                        </Button>
+                    </AccordionActions>
+                </Accordion>
+            )}
             <Divider />
 
             {devMode && (

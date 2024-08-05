@@ -18,7 +18,7 @@ import ExploreIcon from '@mui/icons-material/Explore'
 import SettingsIcon from '@mui/icons-material/Settings'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import ContactsIcon from '@mui/icons-material/Contacts'
-import VerifiedIcon from '@mui/icons-material/Verified'
+import CellTowerIcon from '@mui/icons-material/CellTower'
 import { memo } from 'react'
 import { ListsMenu } from '../ListsMenu/main'
 import { CCAvatar } from '../ui/CCAvatar'
@@ -36,6 +36,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
     const actions = useGlobalActions()
     const { t } = useTranslation('', { keyPrefix: 'pages' })
     const [devMode] = usePreference('devMode')
+    const [enableConcord] = usePreference('enableConcord')
     const [showEditorOnTop] = usePreference('showEditorOnTop')
 
     return (
@@ -143,41 +144,41 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                 <ListItemText primary={t('explore.title')} />
                             </ListItemButton>
                         </ListItem>
+                        {enableConcord && (
+                            <ListItem disablePadding>
+                                <ListItemButton
+                                    sx={{ gap: 1 }}
+                                    component={NavLink}
+                                    to="/concord/assets"
+                                    onClick={props.onClick}
+                                >
+                                    <CellTowerIcon
+                                        sx={{
+                                            color: 'background.contrastText'
+                                        }}
+                                    />
+
+                                    <ListItemText primary={'Concord'} />
+                                </ListItemButton>
+                            </ListItem>
+                        )}
                         {devMode && (
-                            <>
-                                <ListItem disablePadding>
-                                    <ListItemButton
-                                        sx={{ gap: 1 }}
-                                        component={NavLink}
-                                        to="/badges"
-                                        onClick={props.onClick}
-                                    >
-                                        <VerifiedIcon
-                                            sx={{
-                                                color: 'background.contrastText'
-                                            }}
-                                        />
+                            <ListItem disablePadding>
+                                <ListItemButton
+                                    sx={{ gap: 1 }}
+                                    component={NavLink}
+                                    to="/devtool"
+                                    onClick={props.onClick}
+                                >
+                                    <TerminalIcon
+                                        sx={{
+                                            color: 'background.contrastText'
+                                        }}
+                                    />
 
-                                        <ListItemText primary={'バッジ'} />
-                                    </ListItemButton>
-                                </ListItem>
-                                <ListItem disablePadding>
-                                    <ListItemButton
-                                        sx={{ gap: 1 }}
-                                        component={NavLink}
-                                        to="/devtool"
-                                        onClick={props.onClick}
-                                    >
-                                        <TerminalIcon
-                                            sx={{
-                                                color: 'background.contrastText'
-                                            }}
-                                        />
-
-                                        <ListItemText primary={t('devtool.title')} />
-                                    </ListItemButton>
-                                </ListItem>
-                            </>
+                                    <ListItemText primary={t('devtool.title')} />
+                                </ListItemButton>
+                            </ListItem>
                         )}
                         <ListItem disablePadding>
                             <ListItemButton sx={{ gap: 1 }} component={NavLink} to="/settings" onClick={props.onClick}>

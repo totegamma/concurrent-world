@@ -1,16 +1,16 @@
 import { memo, useState } from 'react'
 import { Box, Button, Divider, Tab, Tabs, Typography } from '@mui/material'
-import { useLocation } from 'react-router-dom'
-import { BadgeList } from '../components/Badges/BadgeList'
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { useClient } from '../context/ClientContext'
 import { useSnackbar } from 'notistack'
 import { Registry } from '@cosmjs/proto-signing'
 
 import { SigningStargateClient, defaultRegistryTypes } from '@cosmjs/stargate'
 import { MsgCreateTemplate, MsgMintBadge } from '../proto/concord'
-import { BadgeManage } from '../components/Badges/BadgeManage'
+import { Assets } from '../components/Concord/Assets'
+import { BadgeSeries } from '../components/Concord/BadgeSeries'
 
-type widgets = 'list' | 'manage'
+type widgets = 'assets' | 'badge'
 
 const chainInfo = {
     chainId: 'concord',
@@ -49,9 +49,10 @@ const chainInfo = {
     }
 }
 
-export const BadgesPage = memo((): JSX.Element => {
-    const path = useLocation()
-    const tab: widgets = (path.hash.replace('#', '') as widgets) || 'list'
+export const ConcordPage = memo((): JSX.Element => {
+    const navigate = useNavigate()
+    const location = useLocation()
+    const tab = location.pathname.split('/').pop() as widgets
 
     const { client } = useClient()
     const { enqueueSnackbar } = useSnackbar()
@@ -62,11 +63,6 @@ export const BadgesPage = memo((): JSX.Element => {
 
     if (!client?.ccid) {
         return <Box>Loading...</Box>
-    }
-
-    const pages: Record<string, JSX.Element> = {
-        list: <BadgeList address={client.ccid} />,
-        manage: cosmJS ? <BadgeManage address={client.ccid} cosmJS={cosmJS} /> : <Box>Connect Keplr first</Box>
     }
 
     const connectKeplr = async (): Promise<void> => {
@@ -112,7 +108,7 @@ export const BadgesPage = memo((): JSX.Element => {
                 overflowX: 'hidden'
             }}
         >
-            <Typography variant="h2">BadgesPage</Typography>
+            <Typography variant="h2">Concord Network</Typography>
             <Box
                 sx={{
                     display: 'flex',
@@ -134,19 +130,22 @@ export const BadgesPage = memo((): JSX.Element => {
             <Divider />
             <Tabs
                 value={tab}
-                onChange={(_, next) => {
-                    window.location.hash = next
+                onChange={(_, v) => {
+                    navigate(`/concord/${v}`)
                 }}
                 textColor="secondary"
                 indicatorColor="secondary"
             >
-                <Tab value="list" label="List" />
-                <Tab value="manage" label="Manage" />
+                <Tab value="assets" label="Assets" />
+                <Tab value="badge" label="Badge" />
             </Tabs>
             <Divider />
-            <Box sx={{ mt: '20px' }}>{pages[tab]}</Box>
+            <Routes>
+                <Route path="/assets" element={<Assets address={client.ccid} cosmJS={cosmJS} />} />
+                <Route path="/badge" element={<BadgeSeries address={client.ccid} cosmJS={cosmJS} />} />
+            </Routes>
         </Box>
     )
 })
 
-BadgesPage.displayName = 'BadgesPage'
+ConcordPage.displayName = 'ConcordPage'
