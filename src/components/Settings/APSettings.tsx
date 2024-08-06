@@ -8,8 +8,11 @@ import { CCDrawer } from '../ui/CCDrawer'
 import { useNavigate } from 'react-router-dom'
 import { WatchButton } from '../WatchButton'
 import TravelExploreIcon from '@mui/icons-material/TravelExplore'
-import LuggageIcon from '@mui/icons-material/Luggage'
 import { useSnackbar } from 'notistack'
+import SettingsIcon from '@mui/icons-material/Settings'
+import { StreamPicker } from '../ui/StreamPicker'
+import { useGlobalState } from '../../context/GlobalState'
+import { type Timeline } from '@concurrent-world/client'
 
 export const APSettings = (): JSX.Element => {
     const { client } = useClient()
@@ -17,10 +20,12 @@ export const APSettings = (): JSX.Element => {
     const [openInquiry, setOpenInquiry] = useState(false)
     const [url, setUrl] = useState('')
     const navigate = useNavigate()
-    const [openMigration, setOpenMigration] = useState(false)
+    const [openSettings, setOpenSettings] = useState(false)
     const { enqueueSnackbar } = useSnackbar()
     const [aliases, setAliases] = useState<string[]>([])
     const [newAlias, setNewAlias] = useState('')
+    const [listenTimelines, setListenTimelines] = useState<Array<Timeline<any>>>([])
+    const { allKnownTimelines } = useGlobalState()
 
     useEffect(() => {
         const requestOptions = {
@@ -34,7 +39,6 @@ export const APSettings = (): JSX.Element => {
             .fetchWithCredential(client.api.host, `/ap/api/entity/${client.ccid}`, requestOptions)
             .then(async (res) => await res.json())
             .then((data) => {
-                console.log(data)
                 setEntity(data.content)
                 setAliases(data.content.aliases ?? [])
             })
@@ -43,6 +47,38 @@ export const APSettings = (): JSX.Element => {
                 setEntity(null)
             })
     }, [])
+
+    useEffect(() => {
+        client.api
+            .fetchWithCredential(client.api.host, `/ap/api/settings`, {})
+            .then(async (res) => await res.json())
+            .then((data) => {
+                console.log(data)
+                console.log(allKnownTimelines)
+                setListenTimelines(allKnownTimelines.filter((t) => data.content.listen_timelines.includes(t.id)))
+            })
+            .catch((e) => {
+                console.log(e)
+            })
+    }, [allKnownTimelines])
+
+    const updateSettings = (): void => {
+        client.api
+            .fetchWithCredential(client.api.host, `/ap/api/settings`, {
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                    listen_timelines: listenTimelines.map((t) => t.id)
+                })
+            })
+            .then(() => {
+                enqueueSnackbar('更新しました', {
+                    variant: 'success'
+                })
+            })
+    }
 
     const inquery = (url: string): void => {
         client.api
@@ -97,9 +133,9 @@ export const APSettings = (): JSX.Element => {
                             </IconButton>
                             <WatchButton minimal timelineID={'world.concrnt.t-ap@' + entity.ccid} />
                             <IconButton>
-                                <LuggageIcon
+                                <SettingsIcon
                                     onClick={() => {
-                                        setOpenMigration(true)
+                                        setOpenSettings(true)
                                     }}
                                 />
                             </IconButton>
@@ -140,12 +176,30 @@ export const APSettings = (): JSX.Element => {
                 </Box>
             </CCDrawer>
             <CCDrawer
-                open={openMigration}
+                open={openSettings}
                 onClose={() => {
-                    setOpenMigration(false)
+                    setOpenSettings(false)
                 }}
             >
                 <Box display="flex" width="100%" gap={1} padding={1} flexDirection="column">
+                    <Typography variant="h2">設定</Typography>
+                    <Typography variant="h2">転送元タイムライン</Typography>
+                    空の場合はホームタイムラインを使用します
+                    <StreamPicker
+                        options={allKnownTimelines}
+                        selected={listenTimelines}
+                        setSelected={(streams) => {
+                            setListenTimelines(streams)
+                        }}
+                    />
+                    <Button
+                        onClick={() => {
+                            updateSettings()
+                        }}
+                    >
+                        更新
+                    </Button>
+                    <Divider />
                     <Typography variant="h2">引っ越しオプション</Typography>
                     <Divider />
                     <Box display="flex" width="100%" gap={1} padding={1}>

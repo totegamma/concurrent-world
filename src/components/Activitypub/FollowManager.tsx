@@ -26,7 +26,6 @@ export const ApFollowManager = (): JSX.Element => {
             })
             .then(async (res) => await res.json())
             .then((data) => {
-                console.log(data)
                 getStats()
                 setDrawerOpen(false)
             })
@@ -42,7 +41,6 @@ export const ApFollowManager = (): JSX.Element => {
             })
             .then(async (res) => await res.json())
             .then((data) => {
-                console.log(data)
                 getStats()
             })
     }
@@ -154,8 +152,6 @@ export const APUserCard = memo<{ url: string; remove?: (_: { URL: string; shortI
                     setPerson(data.content)
                 })
         }, [props.url])
-
-        console.log(person)
 
         if (!person) return <>loading...</>
 
