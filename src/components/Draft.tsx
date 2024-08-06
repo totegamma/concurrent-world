@@ -183,7 +183,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         } else {
             setDraft(draft.replace(uploadingText, ''))
             if (imageFile.type.startsWith('video')) {
-                setDraft(draft + `<video controls><source src="${result}"></video>`)
+                setDraft(draft + `<video controls><source src="${result}#t=0.1"></video>`)
             } else {
                 setDraft(draft + `![image](${result})`)
             }
