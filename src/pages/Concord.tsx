@@ -6,7 +6,7 @@ import { useSnackbar } from 'notistack'
 import { Registry } from '@cosmjs/proto-signing'
 
 import { SigningStargateClient, defaultRegistryTypes } from '@cosmjs/stargate'
-import { MsgCreateTemplate, MsgMintBadge } from '../proto/concord'
+import { MsgCreateSeries, MsgMintBadge } from '../proto/concord'
 import { Assets } from '../components/Concord/Assets'
 import { BadgeSeries } from '../components/Concord/BadgeSeries'
 import { ConcordExplorer } from '../components/Concord/Explorer'
@@ -85,7 +85,7 @@ export const ConcordPage = memo((): JSX.Element => {
             const offlineSigner = window.keplr.getOfflineSigner(chainId)
 
             const registry = new Registry(defaultRegistryTypes)
-            registry.register('/concord.badge.MsgCreateTemplate', MsgCreateTemplate)
+            registry.register('/concord.badge.MsgCreateSeries', MsgCreateSeries)
             registry.register('/concord.badge.MsgMintBadge', MsgMintBadge)
 
             setCosmJS(

@@ -27,11 +27,10 @@ export interface AssetsProps {
 export const Assets = (props: AssetsProps): JSX.Element => {
     const endpoint = 'https://concord-testseed.concrnt.net'
     const balanceAPI = `${endpoint}/cosmos/bank/v1beta1/balances`
-    const badgesAPI = `${endpoint}/concrnt/concord/badge/badges`
+    const badgesAPI = `${endpoint}/concrnt/concord/badge/get_badges_by_owner`
 
     const [balance, setBalance] = useState<any>(null)
     const [badges, setBadges] = useState<any>(null)
-    const [templates, setTemplates] = useState<any>(null)
 
     const [openSend, setOpenSend] = useState<boolean>(false)
 
@@ -65,12 +64,7 @@ export const Assets = (props: AssetsProps): JSX.Element => {
         })
             .then((res) => res.json())
             .then((data) => {
-                setBadges(data.nfts)
-                const classmap = new Map<string, any>()
-                for (const cls of data.classes) {
-                    classmap.set(cls.id, cls)
-                }
-                setTemplates(classmap)
+                setBadges(data.badges)
             })
             .catch((err) => {
                 console.error(err)
@@ -159,12 +153,12 @@ export const Assets = (props: AssetsProps): JSX.Element => {
                     {badges?.map((b: any) => (
                         <TableRow key={b.id}>
                             <TableCell>
-                                <img src={templates?.get(b.class_id)?.uri} width="50px" alt={b.id} />
+                                <img src={b.uri} width="50px" alt={b.id} />
                             </TableCell>
-                            <TableCell>{templates?.get(b.class_id)?.name}</TableCell>
-                            <TableCell>{templates?.get(b.class_id)?.description}</TableCell>
+                            <TableCell>{b.name}</TableCell>
+                            <TableCell>{b.description}</TableCell>
                             <TableCell>
-                                <CCUserChip avatar ccid={templates?.get(b.class_id)?.data?.creator} />
+                                <CCUserChip avatar ccid={b.creator} />
                             </TableCell>
                         </TableRow>
                     ))}

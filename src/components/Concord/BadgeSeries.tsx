@@ -24,7 +24,6 @@ export interface BadgeSeriesProps {
 interface BadgeClass {
     id: string
     name: string
-    symbol: string
     description: string
     uri: string
     uri_hash: string
@@ -36,21 +35,21 @@ interface BadgeClass {
 
 export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
     const endpoint = 'https://concord-testseed.concrnt.net'
-    const classesAPI = `${endpoint}/cosmos/nft/v1beta1/classes`
+    const classesAPI = `${endpoint}/concrnt/concord/badge/get_series_by_owner`
     const [processing, setProcessing] = useState<boolean>(false)
 
     const [series, setSeries] = useState<BadgeClass[]>([])
-    const mySeries = series.filter((c: BadgeClass) => c.data?.creator === props.address)
 
     const [createSeries, setCreateSeries] = useState<boolean>(false)
     const [seriesDraft, setSeriesDraft] = useState<DeepPartial<BadgeClass>>({})
 
-    const [mintingClass, setMintingClass] = useState<string>('')
+    const [mintingSeries, setMintingSeries] = useState<string>('')
+    const [mintUriDraft, setMintUriDraft] = useState<string>('')
     const [receiverDraft, setReceiverDraft] = useState<string>('')
 
     useEffect(() => {
         if (!props.address) return
-        fetch(classesAPI, {
+        fetch(classesAPI + '/' + props.address, {
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json'
@@ -58,21 +57,19 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
         })
             .then((res) => res.json())
             .then((data) => {
-                setSeries(data.classes)
-                console.log(data)
+                setSeries(data.series)
             })
             .catch((err) => {
                 console.error(err)
             })
     }, [props.address])
 
-    const createBadgeTemplate = async (): Promise<void> => {
+    const createBadgeSeries = async (): Promise<void> => {
         if (!props.cosmJS) return
         const sendMsg = {
-            typeUrl: '/concord.badge.MsgCreateTemplate',
+            typeUrl: '/concord.badge.MsgCreateSeries',
             value: {
                 name: seriesDraft?.name,
-                // symbol: seriesDraft?.symbol,
                 description: seriesDraft?.description,
                 uri: seriesDraft?.uri,
                 creator: props.address,
@@ -91,11 +88,9 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
         }
 
         setProcessing(true)
-        const signResult = await props.cosmJS
-            .signAndBroadcast(props.address, [sendMsg], defaultSendFee, 'mymsg')
-            .finally(() => {
-                setProcessing(false)
-            })
+        const signResult = await props.cosmJS.signAndBroadcast(props.address, [sendMsg], defaultSendFee).finally(() => {
+            setProcessing(false)
+        })
 
         props.onDone?.(signResult?.transactionHash)
     }
@@ -106,7 +101,8 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
             typeUrl: '/concord.badge.MsgMintBadge',
             value: {
                 creator: props.address,
-                class: mintingClass,
+                series: mintingSeries,
+                uri: mintUriDraft,
                 receiver: receiverDraft
             }
         }
@@ -122,11 +118,9 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
         }
 
         setProcessing(true)
-        const signResult = await props.cosmJS
-            .signAndBroadcast(props.address, [sendMsg], defaultSendFee, 'mymsg')
-            .finally(() => {
-                setProcessing(false)
-            })
+        const signResult = await props.cosmJS.signAndBroadcast(props.address, [sendMsg], defaultSendFee).finally(() => {
+            setProcessing(false)
+        })
 
         props.onDone?.(signResult?.transactionHash)
     }
@@ -155,7 +149,7 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Symbol</TableCell>
+                            <TableCell>Visual</TableCell>
                             <TableCell>Name</TableCell>
                             <TableCell>Description</TableCell>
                             <TableCell>isTransferable</TableCell>
@@ -163,9 +157,11 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {mySeries?.map((b: any, i: number) => (
+                        {series?.map((b: any, i: number) => (
                             <TableRow key={i}>
-                                <TableCell>{b.symbol}</TableCell>
+                                <TableCell>
+                                    <img src={b.uri} alt={b.name} width="64" height="64" />
+                                </TableCell>
                                 <TableCell>{b.name}</TableCell>
                                 <TableCell>{b.description}</TableCell>
                                 <TableCell>{b.data.transferable ? 'Yes' : 'No'}</TableCell>
@@ -173,7 +169,7 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
                                     <Button
                                         disabled={!props.cosmJS}
                                         onClick={() => {
-                                            setMintingClass(b.id)
+                                            setMintingSeries(b.id)
                                         }}
                                     >
                                         発行
@@ -207,13 +203,6 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
                         value={seriesDraft?.name}
                         onChange={(e) => {
                             setSeriesDraft({ ...seriesDraft, name: e.target.value })
-                        }}
-                    />
-                    <TextField
-                        label="Symbol"
-                        value={seriesDraft?.symbol}
-                        onChange={(e) => {
-                            setSeriesDraft({ ...seriesDraft, symbol: e.target.value })
                         }}
                     />
                     <TextField
@@ -252,7 +241,7 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
                     <Button
                         disabled={processing}
                         onClick={() => {
-                            createBadgeTemplate().then(() => {
+                            createBadgeSeries().then(() => {
                                 setCreateSeries(false)
                             })
                         }}
@@ -262,9 +251,9 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
                 </Box>
             </CCDrawer>
             <CCDrawer
-                open={!!mintingClass}
+                open={!!mintingSeries}
                 onClose={() => {
-                    setMintingClass('')
+                    setMintingSeries('')
                 }}
             >
                 <Box
@@ -279,6 +268,7 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
                     }}
                 >
                     <Typography variant="h3">バッジ発行</Typography>
+                    <Typography>{mintingSeries}</Typography>
                     <TextField
                         label="Receiver"
                         value={receiverDraft}
@@ -286,11 +276,18 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
                             setReceiverDraft(e.target.value)
                         }}
                     />
+                    <TextField
+                        label="URI"
+                        value={mintUriDraft}
+                        onChange={(e) => {
+                            setMintUriDraft(e.target.value)
+                        }}
+                    />
                     <Button
                         disabled={processing}
                         onClick={() => {
                             mintBadge().then(() => {
-                                setMintingClass('')
+                                setMintingSeries('')
                             })
                         }}
                     >
