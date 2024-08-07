@@ -66,8 +66,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
 
     const [postStreams, setPostStreams] = useState<Array<Timeline<CommunityTimelineSchema>>>([])
 
-    const isPostStreamsPublic = useMemo(() => postStreams.every((stream) => stream.indexable), [postStreams])
-
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
     const [previewImage, setPreviewImage] = useState<string | undefined>()
 
@@ -265,7 +263,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                         {mode === 'compose' && (
                                             <MobileDraft
                                                 streamPickerInitial={postStreams}
-                                                defaultPostHome={isPostStreamsPublic}
                                                 streamPickerOptions={globalState.allKnownTimelines}
                                                 onSubmit={async (text: string, destinations: string[], options) => {
                                                     try {
@@ -287,7 +284,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                         {targetMessage && (mode === 'reply' || mode === 'reroute') && (
                                             <MobileDraft
                                                 allowEmpty={mode === 'reroute'}
-                                                defaultPostHome={isPostStreamsPublic}
                                                 submitButtonLabel={mode === 'reply' ? 'Reply' : 'Reroute'}
                                                 streamPickerInitial={
                                                     mode === 'reroute' ? postStreams : targetMessage.postedStreams ?? []
@@ -334,7 +330,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                         <Box sx={{ display: 'flex' }}>
                                             <Draft
                                                 autoFocus
-                                                defaultPostHome={isPostStreamsPublic}
                                                 value={draft}
                                                 streamPickerInitial={postStreams}
                                                 streamPickerOptions={globalState.allKnownTimelines}
@@ -369,7 +364,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                                         <Box sx={{ display: 'flex' }}>
                                             <Draft
                                                 autoFocus
-                                                defaultPostHome={isPostStreamsPublic}
                                                 allowEmpty={mode === 'reroute'}
                                                 submitButtonLabel={mode === 'reply' ? 'Reply' : 'Reroute'}
                                                 streamPickerInitial={
