@@ -24,6 +24,7 @@ export interface Preference {
     }
     customThemes: Record<string, DeepPartial<ConcurrentTheme>>
     hideDisabledSubKey: boolean
+    enableConcord: boolean
 }
 
 export const defaultPreference: Preference = {
@@ -49,7 +50,8 @@ export const defaultPreference: Preference = {
         volume: 50
     },
     customThemes: {},
-    hideDisabledSubKey: false
+    hideDisabledSubKey: false,
+    enableConcord: false
 }
 
 interface PreferenceState {

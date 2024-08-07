@@ -145,7 +145,7 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
         } else {
             setDraft(draft.replace(uploadingText, ''))
             if (imageFile.type.startsWith('video')) {
-                setDraft(draft + `<video controls><source src="${result}" type="${imageFile.type}"></video>`)
+                setDraft(draft + `<video controls><source src="${result}#t=0.1"></video>`)
             } else {
                 setDraft(draft + `![image](${result})`)
             }

@@ -37,6 +37,7 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
         >
             <Autocomplete
                 filterSelectedOptions
+                disableClearable
                 sx={{ width: 1 }}
                 multiple
                 value={selected}

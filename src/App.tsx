@@ -44,6 +44,7 @@ import { ManageSubsPage } from './pages/ManageSubs'
 import { UseSoundFormats } from './constants'
 import { useGlobalState } from './context/GlobalState'
 import { ConcrntLogo } from './components/theming/ConcrntLogo'
+import { ConcordPage } from './pages/Concord'
 
 function App(): JSX.Element {
     const { client } = useClient()
@@ -369,6 +370,7 @@ function App(): JSX.Element {
                                 <Route path="/settings/*" element={<Settings />} />
                                 <Route path="/devtool" element={<Devtool />} />
                                 <Route path="/subscriptions" element={<ManageSubsPage />} />
+                                <Route path="/concord/*" element={<ConcordPage />} />
                             </Routes>
                         </Paper>
                         <Box
