@@ -53,6 +53,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 
 import HeartBrokenIcon from '@mui/icons-material/HeartBroken'
 import { CCIconButton } from './ui/CCIconButton'
+import ReplayIcon from '@mui/icons-material/Replay'
 
 export interface DraftProps {
     submitButtonLabel?: string
@@ -77,6 +78,10 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
     const [destTimelines, setDestTimelines] = useState<Array<Timeline<CommunityTimelineSchema>>>(
         props.streamPickerInitial
     )
+
+    const destinationModified =
+        destTimelines.length !== props.streamPickerInitial.length ||
+        destTimelines.some((dest, i) => dest.id !== props.streamPickerInitial[i].id)
 
     const [draft, setDraft] = usePersistent<string>('draft', '')
     const [openPreview, setOpenPreview] = useState<boolean>(true)
@@ -287,11 +292,18 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                 </Backdrop>
             )}
 
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}
+            >
                 <Box
                     sx={{
                         display: 'flex',
                         alignItems: 'center',
+                        justifyContent: 'center',
                         flex: 1
                     }}
                 >
@@ -300,6 +312,16 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         selected={destTimelines}
                         setSelected={setDestTimelines}
                     />
+                    <CCIconButton
+                        sx={{
+                            visibility: destinationModified ? 'visible' : 'hidden'
+                        }}
+                        onClick={() => {
+                            setDestTimelines(props.streamPickerInitial)
+                        }}
+                    >
+                        <ReplayIcon />
+                    </CCIconButton>
                 </Box>
                 <Tooltip title={postHome ? t('postToHome') : t('noPostToHome')} arrow placement="top">
                     <CCIconButton
