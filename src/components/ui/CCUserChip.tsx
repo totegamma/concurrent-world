@@ -6,6 +6,7 @@ import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import { useClient } from '../../context/ClientContext'
 import { useEffect, useState } from 'react'
 import { CCAvatar } from './CCAvatar'
+import { type ProfileOverride } from '@concurrent-world/client/dist/types/model/core'
 
 export interface CCUserChipProps {
     user?: User
@@ -13,6 +14,7 @@ export interface CCUserChipProps {
     iconOverride?: JSX.Element
     onDelete?: () => void
     avatar?: boolean
+    profileOverride?: ProfileOverride
 }
 
 export const CCUserChip = (props: CCUserChipProps): JSX.Element => {
@@ -65,7 +67,7 @@ export const CCUserChip = (props: CCUserChipProps): JSX.Element => {
             {props.onDelete ? (
                 <Chip
                     size={'small'}
-                    label={user?.profile?.username ?? 'anonymous'}
+                    label={props.profileOverride?.username ?? user?.profile?.username ?? 'anonymous'}
                     icon={icon}
                     onDelete={props.onDelete}
                 />
@@ -74,7 +76,7 @@ export const CCUserChip = (props: CCUserChipProps): JSX.Element => {
                     component={NavLink}
                     to={'/' + (user?.ccid ?? '')}
                     size={'small'}
-                    label={user?.profile?.username ?? 'anonymous'}
+                    label={props.profileOverride?.username ?? user?.profile?.username ?? 'anonymous'}
                     icon={icon}
                 />
             )}
