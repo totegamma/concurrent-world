@@ -214,9 +214,11 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     }, [])
     const endpoint = 'https://concord-testseed.concrnt.net'
     const badgeAPI = `${endpoint}/concrnt/concord/badge/get_badge/${inspectingBadgeRef?.seriesId}/${inspectingBadgeRef?.badgeId}`
-    const [badge, setBadge] = useState<Badge | null>(null)
+    const ownersAPI = `${endpoint}/concrnt/concord/badge/get_badges_by_series/${inspectingBadgeRef?.seriesId}`
     const txQuery = 'https://concord-testseed.concrnt.net:26657/tx_search?query='
+    const [badge, setBadge] = useState<Badge | null>(null)
     const [mintedTx, setMintedTx] = useState<any | null>(null)
+    const [owners, setOwners] = useState<Badge[]>([])
 
     useEffect(() => {
         if (!inspectingBadgeRef) {
@@ -228,6 +230,14 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
             .then((response) => response.json())
             .then((resp) => {
                 setBadge(resp.badge)
+            })
+
+        fetch(ownersAPI, {
+            cache: 'force-cache'
+        })
+            .then((response) => response.json())
+            .then((resp) => {
+                setOwners(resp.badges)
             })
 
         fetch(txQuery + `"cosmos.nft.v1beta1.EventMint.id='\\"${inspectingBadgeRef?.badgeId}\\"'"`)
@@ -670,7 +680,15 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                         setInspectingBadgeRef(null)
                     }}
                 >
-                    <Box p={2} display="flex" flexDirection="column" gap={2}>
+                    <Box
+                        p={2}
+                        display="flex"
+                        flexDirection="column"
+                        gap={2}
+                        sx={{
+                            userSelect: 'text'
+                        }}
+                    >
                         <Typography variant="h1">Badge</Typography>
                         <Box display="flex" flexDirection="row" alignItems="center">
                             <Box
@@ -710,50 +728,62 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                             <CCUserChip avatar ccid={badge?.owner} />
                         </Box>
 
-                        <Divider />
-
-                        <Typography variant="h1">Logs</Typography>
-                        <Box display="flex" flexDirection="column" gap={1}>
-                            <Typography variant="h2">Minted</Typography>
-                            <Paper
-                                variant="outlined"
+                        <Typography variant="h2">Minted at</Typography>
+                        <Paper
+                            variant="outlined"
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                gap: 1,
+                                overflow: 'hidden',
+                                cursor: 'pointer'
+                            }}
+                            onClick={() => {
+                                setInspectingBadgeRef(null)
+                                navigate(`/concord/explorer#${mintedTx?.hash}`)
+                            }}
+                        >
+                            <Box
                                 sx={{
+                                    backgroundColor: 'primary.main',
+                                    color: 'primary.contrastText',
                                     display: 'flex',
-                                    flexDirection: 'row',
-                                    gap: 1,
-                                    overflow: 'hidden',
-                                    cursor: 'pointer'
-                                }}
-                                onClick={() => {
-                                    setInspectingBadgeRef(null)
-                                    navigate(`/concord/explorer#${mintedTx?.hash}`)
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    flexShrink: 0,
+                                    p: 1
                                 }}
                             >
-                                <Box
-                                    sx={{
-                                        backgroundColor: 'primary.main',
-                                        color: 'primary.contrastText',
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        flexShrink: 0,
-                                        p: 1
-                                    }}
-                                >
-                                    @{mintedTx?.height}
+                                @{mintedTx?.height}
+                            </Box>
+                            <Box
+                                sx={{
+                                    flexGrow: 1,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    p: 1
+                                }}
+                            >
+                                0x{mintedTx?.hash.slice(0, 32)}...
+                            </Box>
+                        </Paper>
+
+                        <Divider />
+                        <Typography variant="h2">Series Owners</Typography>
+                        <Box display="flex" flexDirection="column" gap={1}>
+                            {owners?.map((badge: Badge) => (
+                                <Box display="flex" flexDirection="row" gap={1} key={badge.badgeId} alignItems="center">
+                                    <Box
+                                        component="img"
+                                        src={badge.uri}
+                                        sx={{
+                                            width: '30px',
+                                            height: '30px'
+                                        }}
+                                    />
+                                    <CCUserChip avatar ccid={badge.owner} />
                                 </Box>
-                                <Box
-                                    sx={{
-                                        flexGrow: 1,
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        p: 1
-                                    }}
-                                >
-                                    0x{mintedTx?.hash.slice(0, 32)}...
-                                </Box>
-                            </Paper>
-                            <Typography variant="h2">Past Owner</Typography>
+                            ))}
                         </Box>
                     </Box>
                 </CCDrawer>
