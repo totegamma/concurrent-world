@@ -1,9 +1,9 @@
-import { Box, Button, ListItemIcon, ListItemText, MenuItem, TextField, Typography } from '@mui/material'
+import { Box, Button, Grid, ListItemIcon, ListItemText, Menu, MenuItem, TextField, Typography } from '@mui/material'
 import { ProfileEditor } from '../ProfileEditor'
 import { useClient } from '../../context/ClientContext'
 import { useSnackbar } from 'notistack'
 import { useTranslation } from 'react-i18next'
-import { type ProfileSchema, type CoreProfile, type Schema } from '@concurrent-world/client'
+import { type ProfileSchema, type CoreProfile, type Schema, type BadgeRef } from '@concurrent-world/client'
 import { useEffect, useState } from 'react'
 import { CCDrawer } from '../ui/CCDrawer'
 import { CCEditor } from '../ui/cceditor'
@@ -14,6 +14,8 @@ import PublishIcon from '@mui/icons-material/Publish'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import EditIcon from '@mui/icons-material/Edit'
 import { useLocation } from 'react-router-dom'
+import { type Badge } from '../../model'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 
 export const ProfileSettings = (): JSX.Element => {
     const { client } = useClient()
@@ -35,6 +37,12 @@ export const ProfileSettings = (): JSX.Element => {
 
     const [subprofileDraft, setSubprofileDraft] = useState<any>(null)
 
+    // --- TEMPORARY CODE --- (from Assets.tsx)
+    const endpoint = 'https://concord-testseed.concrnt.net'
+    const [badges, setBadges] = useState<Badge[]>([])
+    const badgesAPI = `${endpoint}/concrnt/concord/badge/get_badges_by_owner`
+    // --- TEMPORARY CODE ---
+
     const load = (): void => {
         if (!client?.ccid) return
         if (!client.user?.profile) return
@@ -46,6 +54,22 @@ export const ProfileSettings = (): JSX.Element => {
                 setAllProfiles(profiles)
             })
         })
+
+        // --- TEMPORARY CODE --- (from Assets.tsx)
+        fetch(badgesAPI + '/' + client.ccid, {
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json'
+            }
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                setBadges(data.badges)
+            })
+            .catch((err) => {
+                console.error(err)
+            })
+        // --- TEMPORARY CODE ---
     }
 
     useEffect(() => {
@@ -74,12 +98,16 @@ export const ProfileSettings = (): JSX.Element => {
         }
     }, [hash])
 
+    const [badgeMenuAnchor, setBadgeMenuAnchor] = useState<null | HTMLElement>(null)
+    const [selectedBadge, setSelectedBadge] = useState<null | Badge>(null)
+    const [badgeAction, setBadgeAction] = useState<null | 'publish' | 'unpublish'>(null)
+
     return (
         <Box
             sx={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '30px'
+                gap: 1
             }}
         >
             <Typography variant="h3">{t('title')}</Typography>
@@ -99,6 +127,123 @@ export const ProfileSettings = (): JSX.Element => {
                     }}
                 />
             </Box>
+
+            {badges.length > 0 && (
+                <>
+                    <Typography variant="h3">バッジ</Typography>
+                    <Box>
+                        <Grid container spacing={2}>
+                            {badges.map((badge) => {
+                                const published = latestProfile?.badges?.find(
+                                    (b) => b.badgeId === badge.badgeId && b.seriesId === badge.classId
+                                )
+                                return (
+                                    <Grid item key={badge.badgeId}>
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                gap: 1,
+                                                width: '80px',
+                                                height: '80px',
+                                                position: 'relative',
+                                                cursor: 'pointer'
+                                            }}
+                                            onClick={(e) => {
+                                                setBadgeMenuAnchor(e.currentTarget)
+                                                setSelectedBadge(badge)
+                                                setBadgeAction(published ? 'unpublish' : 'publish')
+                                            }}
+                                        >
+                                            {published && (
+                                                <CheckCircleIcon
+                                                    sx={{
+                                                        position: 'absolute',
+                                                        right: 0,
+                                                        bottom: 0,
+                                                        color: 'primary.main',
+                                                        fontSize: '2rem',
+                                                        backgroundColor: 'background.paper',
+                                                        borderRadius: '50%',
+                                                        transform: 'translate(20%, 20%)'
+                                                    }}
+                                                />
+                                            )}
+                                            <Box
+                                                component="img"
+                                                src={badge.uri}
+                                                alt={badge.name}
+                                                sx={{
+                                                    borderRadius: 1
+                                                }}
+                                            />
+                                        </Box>
+                                    </Grid>
+                                )
+                            })}
+                        </Grid>
+                        <Menu
+                            anchorEl={badgeMenuAnchor}
+                            open={Boolean(badgeMenuAnchor)}
+                            onClose={() => {
+                                setBadgeMenuAnchor(null)
+                            }}
+                        >
+                            {badgeAction === 'publish' && (
+                                <MenuItem
+                                    onClick={() => {
+                                        if (!latestProfile || !selectedBadge) return
+                                        const newBadgeRef: BadgeRef = {
+                                            badgeId: selectedBadge.badgeId,
+                                            seriesId: selectedBadge.classId
+                                        }
+                                        const badges = [...(latestProfile.badges ?? []), newBadgeRef]
+                                        client
+                                            .setProfile({
+                                                badges
+                                            })
+                                            .then((_) => {
+                                                setBadgeMenuAnchor(null)
+                                                load()
+                                            })
+                                    }}
+                                >
+                                    <ListItemIcon>
+                                        <PublishIcon />
+                                    </ListItemIcon>
+                                    <ListItemText>公開する</ListItemText>
+                                </MenuItem>
+                            )}
+                            {badgeAction === 'unpublish' && (
+                                <MenuItem
+                                    onClick={() => {
+                                        if (!latestProfile || !selectedBadge) return
+                                        const badges = (latestProfile.badges ?? []).filter(
+                                            (b) =>
+                                                b.badgeId !== selectedBadge.badgeId ||
+                                                b.seriesId !== selectedBadge.classId
+                                        )
+                                        client
+                                            .setProfile({
+                                                badges
+                                            })
+                                            .then((_) => {
+                                                setBadgeMenuAnchor(null)
+                                                load()
+                                            })
+                                    }}
+                                >
+                                    <ListItemIcon>
+                                        <VisibilityOffIcon />
+                                    </ListItemIcon>
+                                    <ListItemText>非公開にする</ListItemText>
+                                </MenuItem>
+                            )}
+                        </Menu>
+                    </Box>
+                </>
+            )}
+
             <Box
                 sx={{
                     display: 'flex',

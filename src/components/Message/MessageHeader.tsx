@@ -7,11 +7,13 @@ import { type Message, type ReplyMessageSchema, type MarkdownMessageSchema } fro
 
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { useClient } from '../../context/ClientContext'
+import { ConcordBadge } from '../ui/Badge'
 
 export interface MessageHeaderProps {
     message: Message<MarkdownMessageSchema | ReplyMessageSchema>
     usernameOverride?: string
     additionalMenuItems?: JSX.Element | JSX.Element[]
+    timeLink?: string
 }
 
 export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
@@ -33,7 +35,8 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
             <Box
                 sx={{
                     display: 'flex',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    gap: 0.5
                 }}
             >
                 <Typography
@@ -48,43 +51,37 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                         props.message.authorUser?.profile?.username ||
                         'anonymous'}
                 </Typography>
-                {props.message.authorUser?.alias && (
-                    <Typography
-                        component="span"
-                        sx={{
-                            color: 'text.secondary',
-                            fontSize: '0.75rem',
-                            marginLeft: '0.25rem'
-                        }}
-                    >
-                        @{props.message.authorUser.alias}
-                    </Typography>
-                )}
                 {myAck && (
                     <Tooltip arrow title="Ackしています" placement="top">
                         <CheckCircleIcon
                             sx={{
                                 fontSize: '1rem',
-                                color: 'primary.main',
-                                marginLeft: '0.25rem'
+                                color: 'primary.main'
                             }}
                         />
                     </Tooltip>
                 )}
-                {/*
-                {props.message.authorUser?.certs?.map((cert, i) => (
-                    <Tooltip arrow key={i} title={cert.description} placement="top">
-                        <Box
-                            component="img"
-                            src={cert.icon}
-                            sx={{
-                                height: '0.9rem',
-                                marginLeft: '0.25rem'
-                            }}
-                        />
-                    </Tooltip>
+                {props.message.authorUser?.profile?.badges?.map((badge, i) => (
+                    <ConcordBadge
+                        key={i}
+                        badgeRef={badge}
+                        sx={{
+                            height: '0.9rem',
+                            borderRadius: 0.5
+                        }}
+                    />
                 ))}
-                */}
+                {props.message.authorUser?.alias && (
+                    <Typography
+                        component="span"
+                        sx={{
+                            color: 'text.secondary',
+                            fontSize: '0.75rem'
+                        }}
+                    >
+                        @{props.message.authorUser.alias}
+                    </Typography>
+                )}
             </Box>
             <Box display="flex" gap={0.5}>
                 {props.additionalMenuItems && (
@@ -106,7 +103,8 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                     underline="hover"
                     color="inherit"
                     fontSize="0.75rem"
-                    to={`/${props.message.author}/${props.message.id}`}
+                    to={props.timeLink ?? `/${props.message.author}/${props.message.id}`}
+                    target={props.timeLink ? '_blank' : '_self'}
                 >
                     <TimeDiff date={new Date(props.message.document.signedAt)} base={new Date(props.message.cdate)} />
                 </Link>

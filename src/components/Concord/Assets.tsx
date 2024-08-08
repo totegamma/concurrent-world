@@ -18,6 +18,7 @@ import { CCDrawer } from '../ui/CCDrawer'
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward'
 import { type SigningStargateClient, type StdFee, coins } from '@cosmjs/stargate'
 import { useSnackbar } from 'notistack'
+import { type Badge } from '../../model'
 
 export interface AssetsProps {
     address: string
@@ -30,7 +31,7 @@ export const Assets = (props: AssetsProps): JSX.Element => {
     const badgesAPI = `${endpoint}/concrnt/concord/badge/get_badges_by_owner`
 
     const [balance, setBalance] = useState<any>(null)
-    const [badges, setBadges] = useState<any>(null)
+    const [badges, setBadges] = useState<Badge[]>([])
 
     const [openSend, setOpenSend] = useState<boolean>(false)
 
@@ -150,7 +151,7 @@ export const Assets = (props: AssetsProps): JSX.Element => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {badges?.map((b: any) => (
+                    {badges.map((b: any) => (
                         <TableRow key={b.id}>
                             <TableCell>
                                 <img src={b.uri} width="50px" alt={b.id} />

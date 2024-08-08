@@ -81,10 +81,10 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
             amount: [
                 {
                     denom: 'uAmpere',
-                    amount: '500'
+                    amount: '1000'
                 }
             ],
-            gas: '100000'
+            gas: '200000'
         }
 
         setProcessing(true)
@@ -111,10 +111,10 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
             amount: [
                 {
                     denom: 'uAmpere',
-                    amount: '500'
+                    amount: '1000'
                 }
             ],
-            gas: '100000'
+            gas: '200000'
         }
 
         setProcessing(true)

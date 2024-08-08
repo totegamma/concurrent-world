@@ -77,6 +77,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                 usernameOverride={characterOverride?.document.body.username}
                 message={props.message}
                 additionalMenuItems={props.additionalMenuItems}
+                timeLink={props.message.document.meta?.apObjectRef}
             />
             {props.beforeMessage}
             <Box
