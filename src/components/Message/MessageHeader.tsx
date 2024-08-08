@@ -12,6 +12,7 @@ export interface MessageHeaderProps {
     message: Message<MarkdownMessageSchema | ReplyMessageSchema>
     usernameOverride?: string
     additionalMenuItems?: JSX.Element | JSX.Element[]
+    timeLink?: string
 }
 
 export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
@@ -106,7 +107,8 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                     underline="hover"
                     color="inherit"
                     fontSize="0.75rem"
-                    to={`/${props.message.author}/${props.message.id}`}
+                    to={props.timeLink ?? `/${props.message.author}/${props.message.id}`}
+                    target={props.timeLink ? '_blank' : '_self'}
                 >
                     <TimeDiff date={new Date(props.message.document.signedAt)} base={new Date(props.message.cdate)} />
                 </Link>
