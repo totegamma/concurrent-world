@@ -16,10 +16,12 @@ import EditIcon from '@mui/icons-material/Edit'
 import { useLocation } from 'react-router-dom'
 import { type Badge } from '../../model'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import { usePreference } from '../../context/PreferenceContext'
 
 export const ProfileSettings = (): JSX.Element => {
     const { client } = useClient()
     const { enqueueSnackbar } = useSnackbar()
+    const [enableConcord] = usePreference('enableConcord')
 
     const { t } = useTranslation('', { keyPrefix: 'settings.profile' })
 
@@ -128,7 +130,7 @@ export const ProfileSettings = (): JSX.Element => {
                 />
             </Box>
 
-            {badges.length > 0 && (
+            {enableConcord && badges.length > 0 && (
                 <>
                     <Typography variant="h3">バッジ</Typography>
                     <Box>
