@@ -16,6 +16,7 @@ import { CCDrawer } from '../ui/CCDrawer'
 import { type DecodedTxRaw, decodeTxRaw } from '@cosmjs/proto-signing'
 import { fromBase64 } from '@cosmjs/encoding'
 import { EventCard } from '../ui/EventCard'
+import { useLocation } from 'react-router-dom'
 
 export const ConcordExplorer = (): JSX.Element => {
     const rpcEndpoint = 'https://concord-testseed.concrnt.net:26657'
@@ -31,7 +32,15 @@ export const ConcordExplorer = (): JSX.Element => {
         ? decodeTxRaw(fromBase64(inspectedTxRaw))
         : undefined
 
+    const path = useLocation()
+    const inspectHash = path.hash.replace('#', '')
+
     useEffect(() => {
+        if (inspectHash?.length === 64) {
+            if (inspectHash.startsWith('0x')) setInspectTxHash(inspectHash)
+            else setInspectTxHash('0x' + inspectHash)
+        }
+
         fetch(`${rpcEndpoint}/tx_search?query="tx.height>0"&order_by="desc"`, {
             headers: {
                 'Content-Type': 'application/json',

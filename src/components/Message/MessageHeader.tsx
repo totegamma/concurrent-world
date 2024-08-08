@@ -64,8 +64,7 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                 {props.message.authorUser?.profile?.badges?.map((badge, i) => (
                     <ConcordBadge
                         key={i}
-                        badgeId={badge.badgeId}
-                        seriesId={badge.seriesId}
+                        badgeRef={badge}
                         sx={{
                             height: '0.9rem',
                             borderRadius: 0.5
