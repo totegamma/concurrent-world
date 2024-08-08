@@ -1,4 +1,4 @@
-import { Tooltip, Paper, Chip, Avatar } from '@mui/material'
+import { Tooltip, Paper, Chip } from '@mui/material'
 import { UserProfileCard } from '../UserProfileCard'
 import { type User } from '@concurrent-world/client'
 import { Link as NavLink } from 'react-router-dom'
@@ -27,7 +27,7 @@ export const CCUserChip = (props: CCUserChipProps): JSX.Element => {
         client.getUser(props.ccid).then((user) => {
             setUser(user)
         })
-    }, [])
+    }, [props.ccid])
 
     const icon = props.avatar
         ? (
