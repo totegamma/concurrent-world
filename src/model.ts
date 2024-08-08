@@ -135,3 +135,14 @@ export interface JobRequest {
     payload: string
     scheduled: string
 }
+
+export interface Badge {
+    classId: string
+    badgeId: string
+    name: string
+    description: string
+    uri: string
+    creator: string
+    owner: string
+    transferable: boolean
+}
