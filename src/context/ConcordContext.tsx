@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 import { CCDrawer } from '../components/ui/CCDrawer'
 import { type BadgeRef, type Message } from '@concurrent-world/client'
 import { type Emoji, type Badge } from '../model'
-import { Box, Button, Divider, Paper, TextField, Typography } from '@mui/material'
+import { Alert, AlertTitle, Box, Button, Divider, Paper, TextField, Typography } from '@mui/material'
 import { CCUserChip } from '../components/ui/CCUserChip'
 import { useNavigate } from 'react-router-dom'
 import { type StdFee, coins, type DeliverTxResponse } from '@cosmjs/stargate'
@@ -15,9 +15,11 @@ import { useClient } from './ClientContext'
 import { MessageContainer } from '../components/Message/MessageContainer'
 import { useEmojiPicker } from './EmojiPickerContext'
 import { fromBase64 } from '@cosmjs/encoding'
+import { EventCard } from '../components/ui/EventCard'
 
 export interface ConcordContextState {
     inspectBadge: (ref: BadgeRef) => void
+    inspectTx: (txHash: string) => void
     connectWallet: () => Promise<void>
     cosmJS: SigningStargateClient | undefined
     getBalance: (addr: string) => Promise<any>
@@ -34,6 +36,7 @@ export interface ConcordContextState {
     ) => Promise<DeliverTxResponse | null>
     mintBadge: (series: string, uri: string, receiver: string) => Promise<DeliverTxResponse | null>
     getRawTx: (txHash: string) => Promise<DecodedTxRaw | undefined>
+    getRecentTxs: () => Promise<any>
 }
 
 export interface BadgeSeriesType {
@@ -50,6 +53,7 @@ export interface BadgeSeriesType {
 
 const ConcordContext = createContext<ConcordContextState>({
     inspectBadge: () => {},
+    inspectTx: () => {},
     connectWallet: async () => undefined,
     cosmJS: undefined,
     getBalance: async () => undefined,
@@ -60,7 +64,8 @@ const ConcordContext = createContext<ConcordContextState>({
     createBadgeSeries: async () => null,
     mintBadge: async () => null,
     draftSuperReaction: () => {},
-    getRawTx: async () => undefined
+    getRawTx: async () => undefined,
+    getRecentTxs: async () => undefined
 })
 
 interface ConcordContextProps {
@@ -132,6 +137,46 @@ export const ConcordProvider = ({ children }: ConcordContextProps): JSX.Element 
     const [superReactionTarget, setSuperReactionTarget] = useState<Message<any> | undefined>(undefined)
     const [draftEmoji, setDraftEmoji] = useState<Emoji | undefined>(undefined)
     const [amount, setAmount] = useState<string>('')
+
+    const [inspectedTx, setInspectedTx] = useState<any>(null)
+
+    const inspectedTxRaw = inspectedTx?.result?.tx
+    const inspectedTxRawDecoded: DecodedTxRaw | undefined = inspectedTxRaw
+        ? decodeTxRaw(fromBase64(inspectedTxRaw))
+        : undefined
+
+    const inspectTx = useCallback((txHash: string) => {
+        const inspectTxHash = txHash.startsWith('0x') ? txHash : '0x' + txHash
+        fetch(`${rpcEndpoint}/tx?hash=${inspectTxHash}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json'
+            }
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                setInspectedTx(data)
+            })
+            .catch((err) => {
+                console.error(err)
+            })
+    }, [])
+
+    const getRecentTxs = async (): Promise<any> => {
+        return await fetch(`${rpcEndpoint}/tx_search?query="tx.height>0"&order_by="desc"`, {
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json'
+            }
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                return data
+            })
+            .catch((err) => {
+                console.error(err)
+            })
+    }
 
     const draftSuperReaction = (target: Message<any>): void => {
         setSuperReactionTarget(target)
@@ -368,6 +413,7 @@ export const ConcordProvider = ({ children }: ConcordContextProps): JSX.Element 
         <ConcordContext.Provider
             value={{
                 inspectBadge,
+                inspectTx,
                 connectWallet: connectKeplr,
                 cosmJS,
                 getBalance,
@@ -378,7 +424,8 @@ export const ConcordProvider = ({ children }: ConcordContextProps): JSX.Element 
                 createBadgeSeries,
                 mintBadge,
                 draftSuperReaction,
-                getRawTx
+                getRawTx,
+                getRecentTxs
             }}
         >
             {children}
@@ -495,6 +542,75 @@ export const ConcordProvider = ({ children }: ConcordContextProps): JSX.Element 
                     </Box>
                 </Box>
             </CCDrawer>
+            <CCDrawer
+                open={!!inspectedTx}
+                onClose={() => {
+                    setInspectedTx(null)
+                }}
+            >
+                <Box
+                    sx={{
+                        p: 1,
+                        wordBreak: 'break-all',
+                        whiteSpace: 'pre-wrap',
+                        userSelect: 'text'
+                    }}
+                >
+                    <Typography variant="h1">Inspect Tx</Typography>
+                    {inspectedTx && (
+                        <>
+                            <Typography variant="h2">Hash</Typography>
+                            <Typography>
+                                {inspectedTx.result?.hash}@{inspectedTx.result?.height}
+                            </Typography>
+
+                            {inspectedTx.result?.tx_result?.log && (
+                                <Alert severity="error">
+                                    <AlertTitle>Transaction Error</AlertTitle>
+                                    {inspectedTx.result.tx_result.log}
+                                </Alert>
+                            )}
+
+                            <Typography variant="h2">Transaction</Typography>
+                            <Typography>memo: {inspectedTxRawDecoded?.body?.memo || '<none>'}</Typography>
+                            <Typography>messages:</Typography>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '10px'
+                                }}
+                            >
+                                {inspectedTxRawDecoded?.body?.messages?.map((m, i) => (
+                                    <Box key={i}>
+                                        <Typography>{m.typeUrl}</Typography>
+                                    </Box>
+                                ))}
+                            </Box>
+
+                            <Typography variant="h2">Fee</Typography>
+                            <Typography>
+                                used {inspectedTx.result?.tx_result?.gas_used} / wanted{' '}
+                                {inspectedTx.result?.tx_result?.gas_wanted}
+                            </Typography>
+
+                            <Typography variant="h2">Events</Typography>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '10px'
+                                }}
+                            >
+                                {inspectedTx.result?.tx_result?.events?.map((e: any, i: number) => (
+                                    <EventCard key={i} id={`${i}`} label={e.type} content={e.attributes} />
+                                ))}
+                            </Box>
+                        </>
+                    )}
+                </Box>
+            </CCDrawer>
+
             <CCDrawer
                 open={!!superReactionTarget}
                 onClose={() => {

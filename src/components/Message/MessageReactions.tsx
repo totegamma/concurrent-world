@@ -177,7 +177,9 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                                 textTransform: 'none'
                             }}
                             variant="outlined"
-                            onClick={() => {}}
+                            onClick={() => {
+                                concord.inspectTx(reaction.txhash)
+                            }}
                         >
                             <Box component="img" height="20px" src={reaction.reaction.document.body.imageUrl} />
                             <Typography color={superReactionColorText}>{reaction.amount}uA</Typography>
