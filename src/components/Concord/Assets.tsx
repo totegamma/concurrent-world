@@ -134,9 +134,6 @@ export const Assets = (props: AssetsProps): JSX.Element => {
                         <Typography variant="h3" fontSize="2.5rem">
                             {Ampere}A
                         </Typography>
-                        <Typography fontSize="1rem" variant="caption">
-                            = $0
-                        </Typography>
                     </Box>
                 </Tooltip>
             </Box>
