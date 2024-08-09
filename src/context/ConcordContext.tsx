@@ -6,20 +6,67 @@ import { Box, Divider, Paper, Typography } from '@mui/material'
 import { CCUserChip } from '../components/ui/CCUserChip'
 import { useNavigate } from 'react-router-dom'
 
+import { useSnackbar } from 'notistack'
+import { Registry } from '@cosmjs/proto-signing'
+import { MsgCreateSeries, MsgMintBadge } from '../proto/concord'
+import { SigningStargateClient, defaultRegistryTypes } from '@cosmjs/stargate'
+
 export interface ConcordContextState {
     inspectBadge: (ref: BadgeRef) => void
+    connectWallet: () => Promise<void>
+    cosmJS: SigningStargateClient | undefined
 }
 
 const ConcordContext = createContext<ConcordContextState>({
-    inspectBadge: () => {}
+    inspectBadge: () => {},
+    connectWallet: async () => undefined,
+    cosmJS: undefined
 })
 
 interface ConcordContextProps {
     children: JSX.Element | JSX.Element[]
 }
 
+const chainInfo = {
+    chainId: 'concord',
+    chainName: 'Concord',
+    rpc: 'https://concord-testseed.concrnt.net:26657',
+    rest: 'https://concord-testseed.concrnt.net',
+    bip44: {
+        coinType: 118
+    },
+    bech32Config: {
+        bech32PrefixAccAddr: 'con',
+        bech32PrefixAccPub: 'con' + 'pub',
+        bech32PrefixValAddr: 'con' + 'valoper',
+        bech32PrefixValPub: 'con' + 'valoperpub',
+        bech32PrefixConsAddr: 'con' + 'valcons',
+        bech32PrefixConsPub: 'con' + 'valconspub'
+    },
+    currencies: [
+        {
+            coinDenom: 'Ampere',
+            coinMinimalDenom: 'uAmpere',
+            coinDecimals: 6
+        }
+    ],
+    feeCurrencies: [
+        {
+            coinDenom: 'Ampere',
+            coinMinimalDenom: 'uAmpere',
+            coinDecimals: 6
+        }
+    ],
+    stakeCurrency: {
+        coinDenom: 'Ampere',
+        coinMinimalDenom: 'uAmpere',
+        coinDecimals: 6
+    }
+}
+
 export const ConcordProvider = ({ children }: ConcordContextProps): JSX.Element => {
     const navigate = useNavigate()
+    const { enqueueSnackbar } = useSnackbar()
 
     const [inspectingBadgeRef, setInspectingBadgeRef] = useState<BadgeRef | null>(null)
     const inspectBadge = useCallback((ref: BadgeRef) => {
@@ -32,6 +79,42 @@ export const ConcordProvider = ({ children }: ConcordContextProps): JSX.Element 
     const [badge, setBadge] = useState<Badge | null>(null)
     const [mintedTx, setMintedTx] = useState<any | null>(null)
     const [owners, setOwners] = useState<Badge[]>([])
+
+    const rpcEndpoint = 'https://concord-testseed.concrnt.net:26657'
+    const [cosmJS, setCosmJS] = useState<SigningStargateClient | undefined>(undefined)
+    const [address, setAddress] = useState<string | undefined>(undefined)
+
+    const connectKeplr = async (): Promise<void> => {
+        if (!window.keplr) {
+            enqueueSnackbar('Keplr not found', { variant: 'error' })
+        } else {
+            enqueueSnackbar('Keplr found', { variant: 'success' })
+
+            window.keplr.experimentalSuggestChain(chainInfo)
+
+            const chainId = 'concord'
+            await window.keplr.enable(chainId)
+            window.keplr.defaultOptions = {
+                sign: {
+                    preferNoSetFee: true,
+                    preferNoSetMemo: true
+                }
+            }
+            const offlineSigner = window.keplr.getOfflineSigner(chainId)
+
+            const registry = new Registry(defaultRegistryTypes)
+            registry.register('/concord.badge.MsgCreateSeries', MsgCreateSeries)
+            registry.register('/concord.badge.MsgMintBadge', MsgMintBadge)
+
+            setCosmJS(
+                await SigningStargateClient.connectWithSigner(rpcEndpoint, offlineSigner, {
+                    registry
+                })
+            )
+
+            setAddress((await offlineSigner.getAccounts())[0].address)
+        }
+    }
 
     useEffect(() => {
         if (!inspectingBadgeRef) {
@@ -61,7 +144,9 @@ export const ConcordProvider = ({ children }: ConcordContextProps): JSX.Element 
     return (
         <ConcordContext.Provider
             value={{
-                inspectBadge
+                inspectBadge,
+                connectWallet: connectKeplr,
+                cosmJS
             }}
         >
             {children}

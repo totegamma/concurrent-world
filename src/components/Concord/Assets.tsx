@@ -16,16 +16,18 @@ import { CCUserChip } from '../ui/CCUserChip'
 import { CCDrawer } from '../ui/CCDrawer'
 
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward'
-import { type SigningStargateClient, type StdFee, coins } from '@cosmjs/stargate'
+import { type StdFee, coins } from '@cosmjs/stargate'
 import { useSnackbar } from 'notistack'
 import { type Badge } from '../../model'
+import { useConcord } from '../../context/ConcordContext'
 
 export interface AssetsProps {
     address: string
-    cosmJS?: SigningStargateClient
 }
 
 export const Assets = (props: AssetsProps): JSX.Element => {
+    const concord = useConcord()
+
     const endpoint = 'https://concord-testseed.concrnt.net'
     const balanceAPI = `${endpoint}/cosmos/bank/v1beta1/balances`
     const badgesAPI = `${endpoint}/concrnt/concord/badge/get_badges_by_owner`
@@ -73,7 +75,7 @@ export const Assets = (props: AssetsProps): JSX.Element => {
     }, [props.address])
 
     const sendTokens = async (): Promise<void> => {
-        if (!props.cosmJS) return
+        if (!concord.cosmJS) return
         const sendMsg = {
             typeUrl: '/cosmos.bank.v1beta1.MsgSend',
             value: {
@@ -93,7 +95,7 @@ export const Assets = (props: AssetsProps): JSX.Element => {
             gas: '100000'
         }
 
-        const signResult = await props.cosmJS.signAndBroadcast(props.address, [sendMsg], defaultSendFee)
+        const signResult = await concord.cosmJS.signAndBroadcast(props.address, [sendMsg], defaultSendFee)
 
         enqueueSnackbar(signResult.code ? 'error' : 'Success', {
             variant: signResult.code ? 'error' : 'success'
@@ -109,7 +111,7 @@ export const Assets = (props: AssetsProps): JSX.Element => {
             <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
                 <Typography variant="h2">Points</Typography>
                 <Button
-                    disabled={!props.cosmJS}
+                    disabled={!concord.cosmJS}
                     size="small"
                     onClick={() => {
                         setOpenSend(true)

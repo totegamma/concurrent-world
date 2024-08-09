@@ -14,10 +14,10 @@ import {
 import { useEffect, useState } from 'react'
 import { CCDrawer } from '../ui/CCDrawer'
 import { type DeepPartial } from '../../util'
+import { useConcord } from '../../context/ConcordContext'
 
 export interface BadgeSeriesProps {
     address: string
-    cosmJS?: SigningStargateClient
     onDone?: (hash: string) => void
 }
 
@@ -34,6 +34,8 @@ interface BadgeClass {
 }
 
 export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
+    const concord = useConcord()
+
     const endpoint = 'https://concord-testseed.concrnt.net'
     const classesAPI = `${endpoint}/concrnt/concord/badge/get_series_by_owner`
     const [processing, setProcessing] = useState<boolean>(false)
@@ -65,7 +67,7 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
     }, [props.address])
 
     const createBadgeSeries = async (): Promise<void> => {
-        if (!props.cosmJS) return
+        if (!concord.cosmJS) return
         const sendMsg = {
             typeUrl: '/concord.badge.MsgCreateSeries',
             value: {
@@ -88,15 +90,17 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
         }
 
         setProcessing(true)
-        const signResult = await props.cosmJS.signAndBroadcast(props.address, [sendMsg], defaultSendFee).finally(() => {
-            setProcessing(false)
-        })
+        const signResult = await concord.cosmJS
+            .signAndBroadcast(props.address, [sendMsg], defaultSendFee)
+            .finally(() => {
+                setProcessing(false)
+            })
 
         props.onDone?.(signResult?.transactionHash)
     }
 
     const mintBadge = async (): Promise<void> => {
-        if (!props.cosmJS) return
+        if (!concord.cosmJS) return
         const sendMsg = {
             typeUrl: '/concord.badge.MsgMintBadge',
             value: {
@@ -118,9 +122,11 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
         }
 
         setProcessing(true)
-        const signResult = await props.cosmJS.signAndBroadcast(props.address, [sendMsg], defaultSendFee).finally(() => {
-            setProcessing(false)
-        })
+        const signResult = await concord.cosmJS
+            .signAndBroadcast(props.address, [sendMsg], defaultSendFee)
+            .finally(() => {
+                setProcessing(false)
+            })
 
         props.onDone?.(signResult?.transactionHash)
     }
@@ -137,7 +143,7 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
             >
                 <Typography variant="h3">シリーズ</Typography>
                 <Button
-                    disabled={processing || !props.cosmJS}
+                    disabled={processing || !concord.cosmJS}
                     onClick={() => {
                         setCreateSeries(true)
                     }}
@@ -167,7 +173,7 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
                                 <TableCell>{b.data.transferable ? 'Yes' : 'No'}</TableCell>
                                 <TableCell>
                                     <Button
-                                        disabled={!props.cosmJS}
+                                        disabled={!concord.cosmJS}
                                         onClick={() => {
                                             setMintingSeries(b.id)
                                         }}
