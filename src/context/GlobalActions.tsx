@@ -232,9 +232,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                 setBadge(resp.badge)
             })
 
-        fetch(ownersAPI, {
-            cache: 'force-cache'
-        })
+        fetch(ownersAPI)
             .then((response) => response.json())
             .then((resp) => {
                 setOwners(resp.badges)

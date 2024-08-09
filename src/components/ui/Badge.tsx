@@ -36,7 +36,10 @@ export const ConcordBadge = (props: ConcordBadgeProps): JSX.Element => {
                 }}
                 component="img"
                 src={badge?.uri}
-                sx={props.sx}
+                sx={{
+                    ...props.sx,
+                    cursor: 'pointer'
+                }}
             />
         </Tooltip>
     )
