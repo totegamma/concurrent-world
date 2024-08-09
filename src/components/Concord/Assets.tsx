@@ -18,6 +18,7 @@ import { CCDrawer } from '../ui/CCDrawer'
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward'
 import { type Badge } from '../../model'
 import { useConcord } from '../../context/ConcordContext'
+import { CurrencyText } from '../ui/CurrencyText'
 
 export interface AssetsProps {
     address: string
@@ -44,7 +45,6 @@ export const Assets = (props: AssetsProps): JSX.Element => {
 
     const uAmpere = balance?.balances?.find((b: any) => b.denom === 'uAmpere')?.amount ?? 0
     const mAmpere = uAmpere / 1000
-    const Ampere = mAmpere / 1000
 
     return (
         <Box>
@@ -74,7 +74,7 @@ export const Assets = (props: AssetsProps): JSX.Element => {
                 >
                     <Box display="flex" flexDirection="row" alignItems="baseline" gap={1}>
                         <Typography variant="h3" fontSize="2.5rem">
-                            {Ampere}A
+                            <CurrencyText value={uAmpere} />
                         </Typography>
                     </Box>
                 </Tooltip>

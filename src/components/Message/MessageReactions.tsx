@@ -1,5 +1,6 @@
 import { Box, Button, Divider, Tooltip, Typography, alpha, useTheme } from '@mui/material'
 import { CCAvatar } from '../ui/CCAvatar'
+import { CurrencyText } from '../ui/CurrencyText'
 import { useEffect, useMemo, useState } from 'react'
 import { Link as routerLink } from 'react-router-dom'
 
@@ -182,7 +183,9 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                             }}
                         >
                             <Box component="img" height="20px" src={reaction.reaction.document.body.imageUrl} />
-                            <Typography color={superReactionColorText}>{reaction.amount}uA</Typography>
+                            <Typography color={superReactionColorText}>
+                                <CurrencyText value={parseInt(reaction.amount)} />
+                            </Typography>
                         </Button>
                     </Tooltip>
                 ))}
