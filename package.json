@@ -13,7 +13,7 @@
     "dependencies": {
         "@aws-sdk/client-s3": "^3.592.0",
         "@aws-sdk/s3-request-presigner": "^3.592.0",
-        "@concurrent-world/client": "^6.0.25",
+        "@concurrent-world/client": "^6.0.26",
         "@cosmjs/encoding": "^0.32.4",
         "@cosmjs/proto-signing": "^0.32.4",
         "@cosmjs/stargate": "^0.32.4",
@@ -32,6 +32,7 @@
         "@zxing/browser": "^0.1.4",
         "@zxing/library": "^0.20.0",
         "boring-avatars": "github:totegamma/boring-avatars#49ed345027665e1d6135ae6b0b6f2a442ff52915",
+        "cosmjs-types": "^0.9.0",
         "elliptic": "^6.5.4",
         "ethers": "^6.3.0",
         "fuzzysort": "^2.0.4",

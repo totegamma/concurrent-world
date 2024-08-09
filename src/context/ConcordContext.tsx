@@ -8,12 +8,13 @@ import { useNavigate } from 'react-router-dom'
 import { type StdFee, coins, type DeliverTxResponse } from '@cosmjs/stargate'
 
 import { useSnackbar } from 'notistack'
-import { Registry } from '@cosmjs/proto-signing'
+import { type DecodedTxRaw, Registry, decodeTxRaw } from '@cosmjs/proto-signing'
 import { MsgCreateSeries, MsgMintBadge } from '../proto/concord'
 import { SigningStargateClient, defaultRegistryTypes } from '@cosmjs/stargate'
 import { useClient } from './ClientContext'
 import { MessageContainer } from '../components/Message/MessageContainer'
 import { useEmojiPicker } from './EmojiPickerContext'
+import { fromBase64 } from '@cosmjs/encoding'
 
 export interface ConcordContextState {
     inspectBadge: (ref: BadgeRef) => void
@@ -32,6 +33,7 @@ export interface ConcordContextState {
         transferable: boolean
     ) => Promise<DeliverTxResponse | null>
     mintBadge: (series: string, uri: string, receiver: string) => Promise<DeliverTxResponse | null>
+    getRawTx: (txHash: string) => Promise<DecodedTxRaw | undefined>
 }
 
 export interface BadgeSeriesType {
@@ -57,7 +59,8 @@ const ConcordContext = createContext<ConcordContextState>({
     sendTokens: async () => null,
     createBadgeSeries: async () => null,
     mintBadge: async () => null,
-    draftSuperReaction: () => {}
+    draftSuperReaction: () => {},
+    getRawTx: async () => undefined
 })
 
 interface ConcordContextProps {
@@ -318,6 +321,24 @@ export const ConcordProvider = ({ children }: ConcordContextProps): JSX.Element 
         return await cosmJS.signAndBroadcast(address, [sendMsg], defaultSendFee)
     }
 
+    const getRawTx = async (txHash: string): Promise<DecodedTxRaw | undefined> => {
+        const inspectTxHash = txHash.startsWith('0x') ? txHash : '0x' + txHash
+        return await fetch(`${rpcEndpoint}/tx?hash=${inspectTxHash}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json'
+            }
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                const inspectedTxRaw = data?.result?.tx
+                if (!inspectedTxRaw) {
+                    return undefined
+                }
+                return decodeTxRaw(fromBase64(inspectedTxRaw))
+            })
+    }
+
     useEffect(() => {
         if (!inspectingBadgeRef) {
             return
@@ -356,7 +377,8 @@ export const ConcordProvider = ({ children }: ConcordContextProps): JSX.Element 
                 sendTokens,
                 createBadgeSeries,
                 mintBadge,
-                draftSuperReaction
+                draftSuperReaction,
+                getRawTx
             }}
         >
             {children}
