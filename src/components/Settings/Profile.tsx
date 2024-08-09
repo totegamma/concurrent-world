@@ -17,9 +17,11 @@ import { useLocation } from 'react-router-dom'
 import { type Badge } from '../../model'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { usePreference } from '../../context/PreferenceContext'
+import { useConcord } from '../../context/ConcordContext'
 
 export const ProfileSettings = (): JSX.Element => {
     const { client } = useClient()
+    const concord = useConcord()
     const { enqueueSnackbar } = useSnackbar()
     const [enableConcord] = usePreference('enableConcord')
 
@@ -38,12 +40,7 @@ export const ProfileSettings = (): JSX.Element => {
     const [latestProfile, setLatestProfile] = useState<ProfileSchema | null | undefined>(client.user?.profile)
 
     const [subprofileDraft, setSubprofileDraft] = useState<any>(null)
-
-    // --- TEMPORARY CODE --- (from Assets.tsx)
-    const endpoint = 'https://concord-testseed.concrnt.net'
     const [badges, setBadges] = useState<Badge[]>([])
-    const badgesAPI = `${endpoint}/concrnt/concord/badge/get_badges_by_owner`
-    // --- TEMPORARY CODE ---
 
     const load = (): void => {
         if (!client?.ccid) return
@@ -57,21 +54,9 @@ export const ProfileSettings = (): JSX.Element => {
             })
         })
 
-        // --- TEMPORARY CODE --- (from Assets.tsx)
-        fetch(badgesAPI + '/' + client.ccid, {
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json'
-            }
+        concord.getBadges(client.ccid).then((badges) => {
+            setBadges(badges)
         })
-            .then((res) => res.json())
-            .then((data) => {
-                setBadges(data.badges)
-            })
-            .catch((err) => {
-                console.error(err)
-            })
-        // --- TEMPORARY CODE ---
     }
 
     useEffect(() => {

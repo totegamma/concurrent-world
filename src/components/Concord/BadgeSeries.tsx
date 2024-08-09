@@ -1,4 +1,3 @@
-import { type SigningStargateClient, type StdFee } from '@cosmjs/stargate'
 import {
     Box,
     Button,
@@ -14,36 +13,22 @@ import {
 import { useEffect, useState } from 'react'
 import { CCDrawer } from '../ui/CCDrawer'
 import { type DeepPartial } from '../../util'
-import { useConcord } from '../../context/ConcordContext'
+import { type BadgeSeriesType, useConcord } from '../../context/ConcordContext'
 
 export interface BadgeSeriesProps {
     address: string
     onDone?: (hash: string) => void
 }
 
-interface BadgeClass {
-    id: string
-    name: string
-    description: string
-    uri: string
-    uri_hash: string
-    data: {
-        creator: string
-        transferable: boolean
-    }
-}
-
 export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
     const concord = useConcord()
 
-    const endpoint = 'https://concord-testseed.concrnt.net'
-    const classesAPI = `${endpoint}/concrnt/concord/badge/get_series_by_owner`
     const [processing, setProcessing] = useState<boolean>(false)
 
-    const [series, setSeries] = useState<BadgeClass[]>([])
+    const [series, setSeries] = useState<BadgeSeriesType[]>([])
 
     const [createSeries, setCreateSeries] = useState<boolean>(false)
-    const [seriesDraft, setSeriesDraft] = useState<DeepPartial<BadgeClass>>({})
+    const [seriesDraft, setSeriesDraft] = useState<DeepPartial<BadgeSeriesType>>({})
 
     const [mintingSeries, setMintingSeries] = useState<string>('')
     const [mintUriDraft, setMintUriDraft] = useState<string>('')
@@ -51,85 +36,10 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
 
     useEffect(() => {
         if (!props.address) return
-        fetch(classesAPI + '/' + props.address, {
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json'
-            }
+        concord.getSeries(props.address).then((resp) => {
+            setSeries(resp)
         })
-            .then((res) => res.json())
-            .then((data) => {
-                setSeries(data.series)
-            })
-            .catch((err) => {
-                console.error(err)
-            })
     }, [props.address])
-
-    const createBadgeSeries = async (): Promise<void> => {
-        if (!concord.cosmJS) return
-        const sendMsg = {
-            typeUrl: '/concord.badge.MsgCreateSeries',
-            value: {
-                name: seriesDraft?.name,
-                description: seriesDraft?.description,
-                uri: seriesDraft?.uri,
-                creator: props.address,
-                transferable: true
-            }
-        }
-
-        const defaultSendFee: StdFee = {
-            amount: [
-                {
-                    denom: 'uAmpere',
-                    amount: '1000'
-                }
-            ],
-            gas: '200000'
-        }
-
-        setProcessing(true)
-        const signResult = await concord.cosmJS
-            .signAndBroadcast(props.address, [sendMsg], defaultSendFee)
-            .finally(() => {
-                setProcessing(false)
-            })
-
-        props.onDone?.(signResult?.transactionHash)
-    }
-
-    const mintBadge = async (): Promise<void> => {
-        if (!concord.cosmJS) return
-        const sendMsg = {
-            typeUrl: '/concord.badge.MsgMintBadge',
-            value: {
-                creator: props.address,
-                series: mintingSeries,
-                uri: mintUriDraft,
-                receiver: receiverDraft
-            }
-        }
-
-        const defaultSendFee: StdFee = {
-            amount: [
-                {
-                    denom: 'uAmpere',
-                    amount: '1000'
-                }
-            ],
-            gas: '200000'
-        }
-
-        setProcessing(true)
-        const signResult = await concord.cosmJS
-            .signAndBroadcast(props.address, [sendMsg], defaultSendFee)
-            .finally(() => {
-                setProcessing(false)
-            })
-
-        props.onDone?.(signResult?.transactionHash)
-    }
 
     return (
         <Box>
@@ -247,9 +157,22 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
                     <Button
                         disabled={processing}
                         onClick={() => {
-                            createBadgeSeries().then(() => {
-                                setCreateSeries(false)
-                            })
+                            if (!concord) return
+                            setProcessing(true)
+                            concord
+                                .createBadgeSeries(
+                                    seriesDraft?.name || '',
+                                    seriesDraft?.description || '',
+                                    seriesDraft?.uri || '',
+                                    seriesDraft?.data?.transferable || false
+                                )
+                                .then((resp) => {
+                                    console.log(resp)
+                                })
+                                .finally(() => {
+                                    setProcessing(false)
+                                    setCreateSeries(false)
+                                })
                         }}
                     >
                         作成
@@ -292,9 +215,17 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
                     <Button
                         disabled={processing}
                         onClick={() => {
-                            mintBadge().then(() => {
-                                setMintingSeries('')
-                            })
+                            if (!concord) return
+                            setProcessing(true)
+                            concord
+                                .mintBadge(mintingSeries, mintUriDraft, receiverDraft)
+                                .then((resp) => {
+                                    console.log(resp)
+                                })
+                                .finally(() => {
+                                    setProcessing(false)
+                                    setMintingSeries('')
+                                })
                         }}
                     >
                         発行

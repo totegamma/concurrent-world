@@ -16,8 +16,6 @@ import { CCUserChip } from '../ui/CCUserChip'
 import { CCDrawer } from '../ui/CCDrawer'
 
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward'
-import { type StdFee, coins } from '@cosmjs/stargate'
-import { useSnackbar } from 'notistack'
 import { type Badge } from '../../model'
 import { useConcord } from '../../context/ConcordContext'
 
@@ -28,10 +26,6 @@ export interface AssetsProps {
 export const Assets = (props: AssetsProps): JSX.Element => {
     const concord = useConcord()
 
-    const endpoint = 'https://concord-testseed.concrnt.net'
-    const balanceAPI = `${endpoint}/cosmos/bank/v1beta1/balances`
-    const badgesAPI = `${endpoint}/concrnt/concord/badge/get_badges_by_owner`
-
     const [balance, setBalance] = useState<any>(null)
     const [badges, setBadges] = useState<Badge[]>([])
 
@@ -40,67 +34,13 @@ export const Assets = (props: AssetsProps): JSX.Element => {
     const [sendAmount, setSendAmount] = useState<string>('')
     const [sendRecipient, setSendRecipient] = useState<string>('')
 
-    const { enqueueSnackbar } = useSnackbar()
-
     useEffect(() => {
         if (!props.address) return
-
-        fetch(balanceAPI + '/' + props.address, {
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json'
-            }
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                setBalance(data)
-            })
-            .catch((err) => {
-                console.error(err)
-            })
-
-        fetch(badgesAPI + '/' + props.address, {
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json'
-            }
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                setBadges(data.badges)
-            })
-            .catch((err) => {
-                console.error(err)
-            })
+        ;(async () => {
+            setBalance(await concord.getBalance(props.address))
+            setBadges(await concord.getBadges(props.address))
+        })()
     }, [props.address])
-
-    const sendTokens = async (): Promise<void> => {
-        if (!concord.cosmJS) return
-        const sendMsg = {
-            typeUrl: '/cosmos.bank.v1beta1.MsgSend',
-            value: {
-                fromAddress: props.address,
-                toAddress: sendRecipient,
-                amount: coins(sendAmount, 'uAmpere')
-            }
-        }
-
-        const defaultSendFee: StdFee = {
-            amount: [
-                {
-                    denom: 'uAmpere',
-                    amount: '500'
-                }
-            ],
-            gas: '100000'
-        }
-
-        const signResult = await concord.cosmJS.signAndBroadcast(props.address, [sendMsg], defaultSendFee)
-
-        enqueueSnackbar(signResult.code ? 'error' : 'Success', {
-            variant: signResult.code ? 'error' : 'success'
-        })
-    }
 
     const uAmpere = balance?.balances?.find((b: any) => b.denom === 'uAmpere')?.amount ?? 0
     const mAmpere = uAmpere / 1000
@@ -194,7 +134,8 @@ export const Assets = (props: AssetsProps): JSX.Element => {
 
                     <Button
                         onClick={() => {
-                            sendTokens().then(() => {
+                            if (!concord.cosmJS) return
+                            concord.sendTokens(sendRecipient, sendAmount).then(() => {
                                 setOpenSend(false)
                             })
                         }}

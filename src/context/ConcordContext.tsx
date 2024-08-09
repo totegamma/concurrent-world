@@ -5,6 +5,7 @@ import { type Badge } from '../model'
 import { Box, Divider, Paper, Typography } from '@mui/material'
 import { CCUserChip } from '../components/ui/CCUserChip'
 import { useNavigate } from 'react-router-dom'
+import { type StdFee, coins, type DeliverTxResponse } from '@cosmjs/stargate'
 
 import { useSnackbar } from 'notistack'
 import { Registry } from '@cosmjs/proto-signing'
@@ -15,12 +16,43 @@ export interface ConcordContextState {
     inspectBadge: (ref: BadgeRef) => void
     connectWallet: () => Promise<void>
     cosmJS: SigningStargateClient | undefined
+    getBalance: (addr: string) => Promise<any>
+    getBadge: (seriesId: string, badgeId: string) => Promise<Badge | null>
+    getBadges: (owner: string) => Promise<Badge[]>
+    getSeries: (owner: string) => Promise<BadgeSeriesType[]>
+    sendTokens: (to: string, amount: string) => Promise<DeliverTxResponse | null>
+    createBadgeSeries: (
+        name: string,
+        description: string,
+        uri: string,
+        transferable: boolean
+    ) => Promise<DeliverTxResponse | null>
+    mintBadge: (series: string, uri: string, receiver: string) => Promise<DeliverTxResponse | null>
+}
+
+export interface BadgeSeriesType {
+    id: string
+    name: string
+    description: string
+    uri: string
+    uri_hash: string
+    data: {
+        creator: string
+        transferable: boolean
+    }
 }
 
 const ConcordContext = createContext<ConcordContextState>({
     inspectBadge: () => {},
     connectWallet: async () => undefined,
-    cosmJS: undefined
+    cosmJS: undefined,
+    getBalance: async () => undefined,
+    getBadges: async () => [],
+    getBadge: async () => null,
+    getSeries: async () => [],
+    sendTokens: async () => null,
+    createBadgeSeries: async () => null,
+    mintBadge: async () => null
 })
 
 interface ConcordContextProps {
@@ -73,6 +105,9 @@ export const ConcordProvider = ({ children }: ConcordContextProps): JSX.Element 
         setInspectingBadgeRef(ref)
     }, [])
     const endpoint = 'https://concord-testseed.concrnt.net'
+    const balanceAPI = `${endpoint}/cosmos/bank/v1beta1/balances`
+    const badgesAPI = `${endpoint}/concrnt/concord/badge/get_badges_by_owner`
+    const seriesAPI = `${endpoint}/concrnt/concord/badge/get_series_by_owner`
     const badgeAPI = `${endpoint}/concrnt/concord/badge/get_badge/${inspectingBadgeRef?.seriesId}/${inspectingBadgeRef?.badgeId}`
     const ownersAPI = `${endpoint}/concrnt/concord/badge/get_badges_by_series/${inspectingBadgeRef?.seriesId}`
     const txQuery = 'https://concord-testseed.concrnt.net:26657/tx_search?query='
@@ -116,6 +151,158 @@ export const ConcordProvider = ({ children }: ConcordContextProps): JSX.Element 
         }
     }
 
+    const getBalance = async (addr: string): Promise<any> => {
+        return await fetch(balanceAPI + '/' + addr, {
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json'
+            }
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                return data
+            })
+            .catch((err) => {
+                console.error(err)
+            })
+    }
+
+    const getBadges = async (owner: string): Promise<Badge[]> => {
+        return await fetch(badgesAPI + '/' + owner, {
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json'
+            }
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                return data.badges
+            })
+            .catch((err) => {
+                console.error(err)
+            })
+    }
+
+    const badgeCache: Record<string, Promise<Badge | null>> = {}
+    const getBadge = async (seriesId: string, badgeId: string): Promise<Badge | null> => {
+        const cacheKey = `${seriesId}/${badgeId}`
+        if (cacheKey in badgeCache) {
+            return await badgeCache[cacheKey]
+        }
+        const badgeAPI = `${endpoint}/concrnt/concord/badge/get_badge/${seriesId}/${badgeId}`
+        badgeCache[cacheKey] = fetch(badgeAPI, {
+            cache: 'force-cache'
+        })
+            .then((response) => response.json())
+            .then((resp) => {
+                return resp.badge
+            })
+        return await badgeCache[cacheKey]
+    }
+
+    const getSeries = async (owner: string): Promise<BadgeSeriesType[]> => {
+        return await fetch(seriesAPI + '/' + owner, {
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json'
+            }
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                return data.series
+            })
+            .catch((err) => {
+                console.error(err)
+            })
+    }
+
+    const sendTokens = async (to: string, amount: string): Promise<DeliverTxResponse | null> => {
+        if (!cosmJS || !address) return null
+
+        const sendMsg = {
+            typeUrl: '/cosmos.bank.v1beta1.MsgSend',
+            value: {
+                fromAddress: address,
+                toAddress: to,
+                amount: coins(amount, 'uAmpere')
+            }
+        }
+
+        const defaultSendFee: StdFee = {
+            amount: [
+                {
+                    denom: 'uAmpere',
+                    amount: '500'
+                }
+            ],
+            gas: '100000'
+        }
+
+        const signResult = await cosmJS.signAndBroadcast(address, [sendMsg], defaultSendFee)
+
+        enqueueSnackbar(signResult.code ? 'error' : 'Success', {
+            variant: signResult.code ? 'error' : 'success'
+        })
+
+        return signResult
+    }
+
+    const createBadgeSeries = async (
+        name: string,
+        description: string,
+        uri: string,
+        transferable: boolean
+    ): Promise<DeliverTxResponse | null> => {
+        if (!cosmJS || !address) return null
+        const sendMsg = {
+            typeUrl: '/concord.badge.MsgCreateSeries',
+            value: {
+                name,
+                description,
+                uri,
+                creator: address,
+                transferable
+            }
+        }
+
+        const defaultSendFee: StdFee = {
+            amount: [
+                {
+                    denom: 'uAmpere',
+                    amount: '1000'
+                }
+            ],
+            gas: '200000'
+        }
+
+        return await cosmJS.signAndBroadcast(address, [sendMsg], defaultSendFee)
+    }
+
+    const mintBadge = async (series: string, uri: string, receiver: string): Promise<DeliverTxResponse | null> => {
+        if (!cosmJS || !address) return null
+        const sendMsg = {
+            typeUrl: '/concord.badge.MsgMintBadge',
+            value: {
+                creator: address,
+                series,
+                uri,
+                receiver
+            }
+        }
+
+        const defaultSendFee: StdFee = {
+            amount: [
+                {
+                    denom: 'uAmpere',
+                    amount: '1000'
+                }
+            ],
+            gas: '200000'
+        }
+
+        return await cosmJS.signAndBroadcast(address, [sendMsg], defaultSendFee)
+    }
+
     useEffect(() => {
         if (!inspectingBadgeRef) {
             return
@@ -146,7 +333,14 @@ export const ConcordProvider = ({ children }: ConcordContextProps): JSX.Element 
             value={{
                 inspectBadge,
                 connectWallet: connectKeplr,
-                cosmJS
+                cosmJS,
+                getBalance,
+                getBadges,
+                getBadge,
+                getSeries,
+                sendTokens,
+                createBadgeSeries,
+                mintBadge
             }}
         >
             {children}
