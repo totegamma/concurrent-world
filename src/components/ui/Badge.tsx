@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { type Badge } from '../../model'
 import { Box, type SxProps, Tooltip } from '@mui/material'
 import { type BadgeRef } from '@concurrent-world/client'
-import { useGlobalActions } from '../../context/GlobalActions'
+import { useConcord } from '../../context/ConcordContext'
 
 export interface ConcordBadgeProps {
     badgeRef: BadgeRef
@@ -10,7 +10,7 @@ export interface ConcordBadgeProps {
 }
 
 export const ConcordBadge = (props: ConcordBadgeProps): JSX.Element => {
-    const actions = useGlobalActions()
+    const concord = useConcord()
     const [badge, setBadge] = useState<Badge | null>(null)
 
     // --- TEMPORARY CODE --- (from Assets.tsx)
@@ -32,7 +32,7 @@ export const ConcordBadge = (props: ConcordBadgeProps): JSX.Element => {
         <Tooltip arrow title={badge?.name} placement="top">
             <Box
                 onClick={() => {
-                    actions.inspectBadge(props.badgeRef)
+                    concord.inspectBadge(props.badgeRef)
                 }}
                 component="img"
                 src={badge?.uri}

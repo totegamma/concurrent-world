@@ -22,11 +22,16 @@ export const CCUserChip = (props: CCUserChipProps): JSX.Element => {
     const [user, setUser] = useState<User | null | undefined>(props.user)
 
     useEffect(() => {
-        if (user !== undefined) return
+        if (props.user !== undefined) return
         if (!props.ccid) return
+        let unmounted = false
         client.getUser(props.ccid).then((user) => {
+            if (unmounted) return
             setUser(user)
         })
+        return () => {
+            unmounted = true
+        }
     }, [props.ccid])
 
     const icon = props.avatar

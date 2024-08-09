@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { Routes, Route, Link as RouterLink } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider, CssBaseline, Typography, useMediaQuery } from '@mui/material'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
+import { ConcordProvider } from './context/ConcordContext'
 
 import { loadConcurrentTheme } from './themes'
 import { Menu } from './components/Menu/Menu'
@@ -222,7 +223,9 @@ function App(): JSX.Element {
                     <UrlSummaryProvider host={client.host}>
                         <EmojiPickerProvider>
                             <StorageProvider>
-                                <GlobalActionsProvider>{childs}</GlobalActionsProvider>
+                                <ConcordProvider>
+                                    <GlobalActionsProvider>{childs}</GlobalActionsProvider>
+                                </ConcordProvider>
                             </StorageProvider>
                         </EmojiPickerProvider>
                     </UrlSummaryProvider>
