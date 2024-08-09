@@ -72,7 +72,6 @@ function App(): JSX.Element {
                 if (!a) return
                 if (a.schema === Schemas.replyAssociation) {
                     const replyassociation = a as CCDocument.Association<ReplyAssociationSchema>
-                    console.log(replyassociation)
                     client?.api
                         .getMessageWithAuthor(replyassociation.body.messageId, replyassociation.body.messageAuthor)
                         .then((m) => {
@@ -145,7 +144,6 @@ function App(): JSX.Element {
 
                 if (a.schema === Schemas.reactionAssociation) {
                     client.api.getMessageWithAuthor(a.target, event.item.owner).then((m) => {
-                        console.log(m)
                         m &&
                             client.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.signer).then((c) => {
                                 playNotificationRef.current()

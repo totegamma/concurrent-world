@@ -1,8 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { CCDrawer } from '../components/ui/CCDrawer'
-import { type BadgeRef } from '@concurrent-world/client'
-import { type Badge } from '../model'
-import { Box, Divider, Paper, Typography } from '@mui/material'
+import { type BadgeRef, type Message } from '@concurrent-world/client'
+import { type Emoji, type Badge } from '../model'
+import { Box, Button, Divider, Paper, TextField, Typography } from '@mui/material'
 import { CCUserChip } from '../components/ui/CCUserChip'
 import { useNavigate } from 'react-router-dom'
 import { type StdFee, coins, type DeliverTxResponse } from '@cosmjs/stargate'
@@ -11,6 +11,9 @@ import { useSnackbar } from 'notistack'
 import { Registry } from '@cosmjs/proto-signing'
 import { MsgCreateSeries, MsgMintBadge } from '../proto/concord'
 import { SigningStargateClient, defaultRegistryTypes } from '@cosmjs/stargate'
+import { useClient } from './ClientContext'
+import { MessageContainer } from '../components/Message/MessageContainer'
+import { useEmojiPicker } from './EmojiPickerContext'
 
 export interface ConcordContextState {
     inspectBadge: (ref: BadgeRef) => void
@@ -20,7 +23,8 @@ export interface ConcordContextState {
     getBadge: (seriesId: string, badgeId: string) => Promise<Badge | null>
     getBadges: (owner: string) => Promise<Badge[]>
     getSeries: (owner: string) => Promise<BadgeSeriesType[]>
-    sendTokens: (to: string, amount: string) => Promise<DeliverTxResponse | null>
+    sendTokens: (to: string, amount: string, memo?: string) => Promise<DeliverTxResponse | null>
+    draftSuperReaction: (target: Message<any>) => void
     createBadgeSeries: (
         name: string,
         description: string,
@@ -52,7 +56,8 @@ const ConcordContext = createContext<ConcordContextState>({
     getSeries: async () => [],
     sendTokens: async () => null,
     createBadgeSeries: async () => null,
-    mintBadge: async () => null
+    mintBadge: async () => null,
+    draftSuperReaction: () => {}
 })
 
 interface ConcordContextProps {
@@ -99,6 +104,8 @@ const chainInfo = {
 export const ConcordProvider = ({ children }: ConcordContextProps): JSX.Element => {
     const navigate = useNavigate()
     const { enqueueSnackbar } = useSnackbar()
+    const { client } = useClient()
+    const emojiPicker = useEmojiPicker()
 
     const [inspectingBadgeRef, setInspectingBadgeRef] = useState<BadgeRef | null>(null)
     const inspectBadge = useCallback((ref: BadgeRef) => {
@@ -118,6 +125,14 @@ export const ConcordProvider = ({ children }: ConcordContextProps): JSX.Element 
     const rpcEndpoint = 'https://concord-testseed.concrnt.net:26657'
     const [cosmJS, setCosmJS] = useState<SigningStargateClient | undefined>(undefined)
     const [address, setAddress] = useState<string | undefined>(undefined)
+
+    const [superReactionTarget, setSuperReactionTarget] = useState<Message<any> | undefined>(undefined)
+    const [draftEmoji, setDraftEmoji] = useState<Emoji | undefined>(undefined)
+    const [amount, setAmount] = useState<string>('')
+
+    const draftSuperReaction = (target: Message<any>): void => {
+        setSuperReactionTarget(target)
+    }
 
     const connectKeplr = async (): Promise<void> => {
         if (!window.keplr) {
@@ -216,7 +231,7 @@ export const ConcordProvider = ({ children }: ConcordContextProps): JSX.Element 
             })
     }
 
-    const sendTokens = async (to: string, amount: string): Promise<DeliverTxResponse | null> => {
+    const sendTokens = async (to: string, amount: string, memo?: string): Promise<DeliverTxResponse | null> => {
         if (!cosmJS || !address) return null
 
         const sendMsg = {
@@ -238,7 +253,7 @@ export const ConcordProvider = ({ children }: ConcordContextProps): JSX.Element 
             gas: '100000'
         }
 
-        const signResult = await cosmJS.signAndBroadcast(address, [sendMsg], defaultSendFee)
+        const signResult = await cosmJS.signAndBroadcast(address, [sendMsg], defaultSendFee, memo)
 
         enqueueSnackbar(signResult.code ? 'error' : 'Success', {
             variant: signResult.code ? 'error' : 'success'
@@ -340,7 +355,8 @@ export const ConcordProvider = ({ children }: ConcordContextProps): JSX.Element 
                 getSeries,
                 sendTokens,
                 createBadgeSeries,
-                mintBadge
+                mintBadge,
+                draftSuperReaction
             }}
         >
             {children}
@@ -455,6 +471,92 @@ export const ConcordProvider = ({ children }: ConcordContextProps): JSX.Element 
                             </Box>
                         ))}
                     </Box>
+                </Box>
+            </CCDrawer>
+            <CCDrawer
+                open={!!superReactionTarget}
+                onClose={() => {
+                    setSuperReactionTarget(undefined)
+                }}
+            >
+                <Box
+                    p={2}
+                    display="flex"
+                    flexDirection="column"
+                    gap={2}
+                    sx={{
+                        userSelect: 'text'
+                    }}
+                >
+                    <Typography variant="h1">Super Reaction</Typography>
+                    <Typography variant="h2">Target</Typography>
+                    {superReactionTarget && (
+                        <Paper sx={{ p: 1 }} elevation={0} variant="outlined">
+                            <MessageContainer
+                                messageID={superReactionTarget.id}
+                                messageOwner={superReactionTarget.author}
+                            />
+                        </Paper>
+                    )}
+
+                    <Typography variant="h2">Emoji</Typography>
+                    <Button
+                        variant="outlined"
+                        onClick={(e) => {
+                            emojiPicker.open(e.currentTarget, (emoji: Emoji) => {
+                                setDraftEmoji(emoji)
+                                emojiPicker.close()
+                            })
+                        }}
+                    >
+                        {draftEmoji ? draftEmoji.shortcode : 'Select Emoji'}
+                    </Button>
+
+                    <Typography variant="h2">Amount</Typography>
+                    <TextField
+                        label="Amount"
+                        value={amount}
+                        onChange={(e) => {
+                            setAmount(e.target.value)
+                        }}
+                        InputProps={{
+                            endAdornment: 'uAmpere'
+                        }}
+                    />
+
+                    <Button
+                        variant="contained"
+                        disabled={!!cosmJS}
+                        color="primary"
+                        onClick={() => {
+                            connectKeplr().then(() => {})
+                        }}
+                    >
+                        {cosmJS ? 'Connected' : 'Connect Wallet'}
+                    </Button>
+
+                    <Button
+                        disabled={!superReactionTarget || !draftEmoji || !amount || !cosmJS || !client}
+                        variant="contained"
+                        color="primary"
+                        onClick={() => {
+                            if (!superReactionTarget || !draftEmoji) return
+                            superReactionTarget.reaction(draftEmoji.shortcode, draftEmoji.imageURL).then((r) => {
+                                const memo = `ccref:${r.id}`
+                                sendTokens(superReactionTarget.author, amount, memo).then((tx) => {
+                                    if (!tx) {
+                                        enqueueSnackbar('Failed to send points', { variant: 'error' })
+                                        return
+                                    }
+                                    superReactionTarget.upgrade(tx.transactionHash).then(() => {
+                                        enqueueSnackbar('Super Reaction Sent', { variant: 'success' })
+                                    })
+                                })
+                            })
+                        }}
+                    >
+                        Execute
+                    </Button>
                 </Box>
             </CCDrawer>
         </ConcordContext.Provider>
