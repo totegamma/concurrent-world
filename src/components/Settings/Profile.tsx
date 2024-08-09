@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
 import { CCDrawer } from '../ui/CCDrawer'
 import { CCEditor } from '../ui/cceditor'
 import { SubProfileCard } from '../SubProfileCard'
+import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import PublishIcon from '@mui/icons-material/Publish'
@@ -226,6 +227,21 @@ export const ProfileSettings = (): JSX.Element => {
                                     <ListItemText>非公開にする</ListItemText>
                                 </MenuItem>
                             )}
+                            <MenuItem
+                                onClick={() => {
+                                    if (!selectedBadge) return
+                                    concord.inspectBadge({
+                                        seriesId: selectedBadge.classId,
+                                        badgeId: selectedBadge.badgeId
+                                    })
+                                    setBadgeMenuAnchor(null)
+                                }}
+                            >
+                                <ListItemIcon>
+                                    <ManageSearchIcon />
+                                </ListItemIcon>
+                                <ListItemText>詳細</ListItemText>
+                            </MenuItem>
                         </Menu>
                     </Box>
                 </>

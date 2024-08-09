@@ -90,10 +90,20 @@ export const Assets = (props: AssetsProps): JSX.Element => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {badges.map((b: any) => (
-                        <TableRow key={b.id}>
+                    {badges.map((b: Badge) => (
+                        <TableRow key={b.badgeId}>
                             <TableCell>
-                                <img src={b.uri} width="50px" alt={b.id} />
+                                <img
+                                    src={b.uri}
+                                    width="50px"
+                                    alt={b.name}
+                                    onClick={() => {
+                                        concord.inspectBadge({
+                                            seriesId: b.classId,
+                                            badgeId: b.badgeId
+                                        })
+                                    }}
+                                />
                             </TableCell>
                             <TableCell>{b.name}</TableCell>
                             <TableCell>{b.description}</TableCell>
