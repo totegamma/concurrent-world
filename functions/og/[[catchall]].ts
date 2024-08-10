@@ -4,11 +4,21 @@ import type {
 import { sanitizeHtml } from '../lib/sanitize'
 import { CACHE_TTL_SECONDS, CCWORLD } from '../constants'
 
+// catchall: [ccid, messageId]
+
 export const onRequest: PagesFunction = async (context) => {
 
     const url = new URL(context.request.url)
     const cacheKey = url.origin + url.pathname
     const originalPath = CCWORLD + url.pathname.replace('/og', '')
+
+    if (url.pathname.split('/').length !== 4) {
+        // redirect to home
+        return Response.redirect(
+            CCWORLD,
+            301
+        )
+    }
 
     // Cloudflare Workersの@CacheStorageタイプはcaches.defaultがあるが、ブラウザのCacheStorageはcaches.defaultがないのでエラーが出る
     // @ts-ignore
