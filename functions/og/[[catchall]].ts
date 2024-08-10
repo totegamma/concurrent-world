@@ -2,18 +2,17 @@ import type {
     ApiResponse, CoreEntity, CoreMessage, CoreProfile, WorldMessage, WorldProfile
 } from '../types/concurrent'
 import { sanitizeHtml } from '../lib/sanitize'
-
-const CACHE_TTL_SECONDS = 21600
+import { CACHE_TTL_SECONDS, CCWORLD } from '../constants'
 
 export const onRequest: PagesFunction = async (context) => {
-    const cacheUrl = new URL(context.request.url)
 
-    const cacheKey = new Request(cacheUrl.toString(), context.request)
+    const url = new URL(context.request.url)
+    const cacheKey = url.origin + url.pathname
+    const originalPath = CCWORLD + url.pathname.replace('/og', '')
 
     // Cloudflare Workersの@CacheStorageタイプはcaches.defaultがあるが、ブラウザのCacheStorageはcaches.defaultがないのでエラーが出る
     // @ts-ignore
     const cache = caches.default
-
     let response = await cache.match(cacheKey)
 
     if (!response) {
@@ -57,6 +56,9 @@ export const onRequest: PagesFunction = async (context) => {
     <meta property="og:image" content="${imageUrl}">
     <meta property="twitter:card" content="summary_large_image">
     <meta name="theme-color" content="#0476d9" />
+    <script>
+        window.location.href = "${originalPath}"
+    </script>
   </head>
 </html>`
         } else {
@@ -70,6 +72,9 @@ export const onRequest: PagesFunction = async (context) => {
     <meta property="og:image" content="${avatar}">
     <meta property="twitter:card" content="summary">
     <meta name="theme-color" content="#0476d9" />
+    <script>
+        window.location.href = "${originalPath}"
+    </script>
   </head>
 </html>`
         }
