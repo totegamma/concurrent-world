@@ -6,6 +6,7 @@ import StarOutlineIcon from '@mui/icons-material/StarOutline'
 import AddReactionIcon from '@mui/icons-material/AddReaction'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import RepeatIcon from '@mui/icons-material/Repeat'
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import LinkIcon from '@mui/icons-material/Link'
 import {
     type Association,
@@ -27,6 +28,8 @@ import { IconButtonWithNumber } from '../ui/IconButtonWithNumber'
 import { useGlobalActions } from '../../context/GlobalActions'
 import { useInspector } from '../../context/Inspector'
 import { enqueueSnackbar } from 'notistack'
+import { usePreference } from '../../context/PreferenceContext'
+import { useConcord } from '../../context/ConcordContext'
 
 export interface MessageActionsProps {
     message: Message<MarkdownMessageSchema | ReplyMessageSchema | RerouteMessageSchema>
@@ -36,6 +39,8 @@ export interface MessageActionsProps {
 export const MessageActions = (props: MessageActionsProps): JSX.Element => {
     const actions = useGlobalActions()
     const inspector = useInspector()
+    const concord = useConcord()
+    const [enableConcord] = usePreference('enableConcord')
 
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
@@ -205,6 +210,19 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     </ListItemIcon>
                     <ListItemText>ソースをコピー</ListItemText>
                 </MenuItem>
+                {enableConcord && (
+                    <MenuItem
+                        onClick={() => {
+                            concord.draftSuperReaction(props.message)
+                            setMenuAnchor(null)
+                        }}
+                    >
+                        <ListItemIcon>
+                            <AutoAwesomeIcon sx={{ color: 'text.primary' }} />
+                        </ListItemIcon>
+                        <ListItemText>スーパーリアクション</ListItemText>
+                    </MenuItem>
+                )}
                 <MenuItem
                     onClick={() => {
                         inspector.inspectItem({ messageId: props.message.id, author: props.message.author })

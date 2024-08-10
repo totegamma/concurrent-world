@@ -9,7 +9,8 @@ export interface TimeDiffProps {
     base?: Date
 }
 
-const threshold = 60 * 60 // 1 hour
+// 1 hour
+const threshold = 60 * 60 * 1000
 
 export const TimeDiff = (props: TimeDiffProps): JSX.Element => {
     useTicker()

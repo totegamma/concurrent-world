@@ -1,78 +1,18 @@
-import {
-    Box,
-    Typography,
-    Button,
-    TextField,
-    Divider,
-    List,
-    ListItemButton,
-    ListItemText,
-    Alert,
-    AlertTitle
-} from '@mui/material'
+import { Box, Typography, Button, TextField, Divider, List, ListItemButton, ListItemText } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { CCDrawer } from '../ui/CCDrawer'
-
-import { type DecodedTxRaw, decodeTxRaw } from '@cosmjs/proto-signing'
-import { fromBase64 } from '@cosmjs/encoding'
-import { EventCard } from '../ui/EventCard'
-import { useLocation } from 'react-router-dom'
+import { useConcord } from '../../context/ConcordContext'
 
 export const ConcordExplorer = (): JSX.Element => {
-    const rpcEndpoint = 'https://concord-testseed.concrnt.net:26657'
-
     const [inspectTxDraft, setInspectTxDraft] = useState<string>('')
-    const [inspectTxHash, setInspectTxHash] = useState<string>('')
-    const [inspectedTx, setInspectedTx] = useState<any>(null)
-
     const [recentTxs, setRecentTxs] = useState<any>(null)
 
-    const inspectedTxRaw = inspectedTx?.result?.tx
-    const inspectedTxRawDecoded: DecodedTxRaw | undefined = inspectedTxRaw
-        ? decodeTxRaw(fromBase64(inspectedTxRaw))
-        : undefined
-
-    const path = useLocation()
-    const inspectHash = path.hash.replace('#', '')
+    const concord = useConcord()
 
     useEffect(() => {
-        if (inspectHash?.length === 64) {
-            if (inspectHash.startsWith('0x')) setInspectTxHash(inspectHash)
-            else setInspectTxHash('0x' + inspectHash)
-        }
-
-        fetch(`${rpcEndpoint}/tx_search?query="tx.height>0"&order_by="desc"`, {
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json'
-            }
+        concord.getRecentTxs().then((txs) => {
+            setRecentTxs(txs)
         })
-            .then((res) => res.json())
-            .then((data) => {
-                setRecentTxs(data)
-            })
-            .catch((err) => {
-                console.error(err)
-            })
     }, [])
-
-    useEffect(() => {
-        if (inspectTxHash) {
-            fetch(`${rpcEndpoint}/tx?hash=${inspectTxHash}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json'
-                }
-            })
-                .then((res) => res.json())
-                .then((data) => {
-                    setInspectedTx(data)
-                })
-                .catch((err) => {
-                    console.error(err)
-                })
-        }
-    }, [inspectTxHash])
 
     return (
         <Box
@@ -107,7 +47,7 @@ export const ConcordExplorer = (): JSX.Element => {
                     }}
                     disabled={!inspectTxDraft}
                     onClick={() => {
-                        setInspectTxHash(inspectTxDraft.startsWith('0x') ? inspectTxDraft : '0x' + inspectTxDraft)
+                        concord.inspectTx(inspectTxDraft)
                     }}
                 >
                     Inspect
@@ -120,7 +60,7 @@ export const ConcordExplorer = (): JSX.Element => {
                     <ListItemButton
                         key={i}
                         onClick={() => {
-                            setInspectTxHash(`0x${tx.hash}`)
+                            concord.inspectTx(tx.hash)
                         }}
                     >
                         <ListItemText
@@ -130,74 +70,6 @@ export const ConcordExplorer = (): JSX.Element => {
                     </ListItemButton>
                 ))}
             </List>
-            <CCDrawer
-                open={!!inspectTxHash}
-                onClose={() => {
-                    setInspectTxHash('')
-                }}
-            >
-                <Box
-                    sx={{
-                        p: 1,
-                        wordBreak: 'break-all',
-                        whiteSpace: 'pre-wrap',
-                        userSelect: 'text'
-                    }}
-                >
-                    <Typography variant="h1">Inspect Tx</Typography>
-                    {inspectedTx && (
-                        <>
-                            <Typography variant="h2">Hash</Typography>
-                            <Typography>
-                                {inspectedTx.result?.hash}@{inspectedTx.result?.height}
-                            </Typography>
-
-                            {inspectedTx.result?.tx_result?.log && (
-                                <Alert severity="error">
-                                    <AlertTitle>Transaction Error</AlertTitle>
-                                    {inspectedTx.result.tx_result.log}
-                                </Alert>
-                            )}
-
-                            <Typography variant="h2">Transaction</Typography>
-                            <Typography>memo: {inspectedTxRawDecoded?.body?.memo || '<none>'}</Typography>
-                            <Typography>messages:</Typography>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: '10px'
-                                }}
-                            >
-                                {inspectedTxRawDecoded?.body?.messages?.map((m, i) => (
-                                    <Box key={i}>
-                                        <Typography>{m.typeUrl}</Typography>
-                                    </Box>
-                                ))}
-                            </Box>
-
-                            <Typography variant="h2">Fee</Typography>
-                            <Typography>
-                                used {inspectedTx.result?.tx_result?.gas_used} / wanted{' '}
-                                {inspectedTx.result?.tx_result?.gas_wanted}
-                            </Typography>
-
-                            <Typography variant="h2">Events</Typography>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: '10px'
-                                }}
-                            >
-                                {inspectedTx.result?.tx_result?.events?.map((e: any, i: number) => (
-                                    <EventCard key={i} id={`${i}`} label={e.type} content={e.attributes} />
-                                ))}
-                            </Box>
-                        </>
-                    )}
-                </Box>
-            </CCDrawer>
         </Box>
     )
 }

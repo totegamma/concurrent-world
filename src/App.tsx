@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { Routes, Route, Link as RouterLink } from 'react-router-dom'
 import { darken, Box, Paper, ThemeProvider, CssBaseline, Typography, useMediaQuery } from '@mui/material'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
+import { ConcordProvider } from './context/ConcordContext'
 
 import { loadConcurrentTheme } from './themes'
 import { Menu } from './components/Menu/Menu'
@@ -71,7 +72,6 @@ function App(): JSX.Element {
                 if (!a) return
                 if (a.schema === Schemas.replyAssociation) {
                     const replyassociation = a as CCDocument.Association<ReplyAssociationSchema>
-                    console.log(replyassociation)
                     client?.api
                         .getMessageWithAuthor(replyassociation.body.messageId, replyassociation.body.messageAuthor)
                         .then((m) => {
@@ -144,7 +144,6 @@ function App(): JSX.Element {
 
                 if (a.schema === Schemas.reactionAssociation) {
                     client.api.getMessageWithAuthor(a.target, event.item.owner).then((m) => {
-                        console.log(m)
                         m &&
                             client.api.getProfileBySemanticID<ProfileSchema>('world.concrnt.p', a.signer).then((c) => {
                                 playNotificationRef.current()
@@ -222,7 +221,9 @@ function App(): JSX.Element {
                     <UrlSummaryProvider host={client.host}>
                         <EmojiPickerProvider>
                             <StorageProvider>
-                                <GlobalActionsProvider>{childs}</GlobalActionsProvider>
+                                <ConcordProvider>
+                                    <GlobalActionsProvider>{childs}</GlobalActionsProvider>
+                                </ConcordProvider>
                             </StorageProvider>
                         </EmojiPickerProvider>
                     </UrlSummaryProvider>

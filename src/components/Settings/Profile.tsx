@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
 import { CCDrawer } from '../ui/CCDrawer'
 import { CCEditor } from '../ui/cceditor'
 import { SubProfileCard } from '../SubProfileCard'
+import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import PublishIcon from '@mui/icons-material/Publish'
@@ -17,9 +18,11 @@ import { useLocation } from 'react-router-dom'
 import { type Badge } from '../../model'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { usePreference } from '../../context/PreferenceContext'
+import { useConcord } from '../../context/ConcordContext'
 
 export const ProfileSettings = (): JSX.Element => {
     const { client } = useClient()
+    const concord = useConcord()
     const { enqueueSnackbar } = useSnackbar()
     const [enableConcord] = usePreference('enableConcord')
 
@@ -38,12 +41,7 @@ export const ProfileSettings = (): JSX.Element => {
     const [latestProfile, setLatestProfile] = useState<ProfileSchema | null | undefined>(client.user?.profile)
 
     const [subprofileDraft, setSubprofileDraft] = useState<any>(null)
-
-    // --- TEMPORARY CODE --- (from Assets.tsx)
-    const endpoint = 'https://concord-testseed.concrnt.net'
     const [badges, setBadges] = useState<Badge[]>([])
-    const badgesAPI = `${endpoint}/concrnt/concord/badge/get_badges_by_owner`
-    // --- TEMPORARY CODE ---
 
     const load = (): void => {
         if (!client?.ccid) return
@@ -57,21 +55,9 @@ export const ProfileSettings = (): JSX.Element => {
             })
         })
 
-        // --- TEMPORARY CODE --- (from Assets.tsx)
-        fetch(badgesAPI + '/' + client.ccid, {
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json'
-            }
+        concord.getBadges(client.ccid).then((badges) => {
+            setBadges(badges)
         })
-            .then((res) => res.json())
-            .then((data) => {
-                setBadges(data.badges)
-            })
-            .catch((err) => {
-                console.error(err)
-            })
-        // --- TEMPORARY CODE ---
     }
 
     useEffect(() => {
@@ -241,6 +227,21 @@ export const ProfileSettings = (): JSX.Element => {
                                     <ListItemText>非公開にする</ListItemText>
                                 </MenuItem>
                             )}
+                            <MenuItem
+                                onClick={() => {
+                                    if (!selectedBadge) return
+                                    concord.inspectBadge({
+                                        seriesId: selectedBadge.classId,
+                                        badgeId: selectedBadge.badgeId
+                                    })
+                                    setBadgeMenuAnchor(null)
+                                }}
+                            >
+                                <ListItemIcon>
+                                    <ManageSearchIcon />
+                                </ListItemIcon>
+                                <ListItemText>詳細</ListItemText>
+                            </MenuItem>
                         </Menu>
                     </Box>
                 </>
