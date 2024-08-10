@@ -495,7 +495,7 @@ export const ConcordProvider = ({ children }: ConcordContextProps): JSX.Element 
                         }}
                         onClick={() => {
                             setInspectingBadgeRef(null)
-                            navigate(`/concord/explorer#${mintedTx?.hash}`)
+                            inspectTx(mintedTx?.hash)
                         }}
                     >
                         <Box
