@@ -1,6 +1,5 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { Box, Divider, Typography } from '@mui/material'
-import { Draft } from '../components/Draft'
 import { useParams } from 'react-router-dom'
 import { TimelineHeader } from '../components/TimelineHeader'
 import { useClient } from '../context/ClientContext'
@@ -18,6 +17,7 @@ import TuneIcon from '@mui/icons-material/Tune'
 import InfoIcon from '@mui/icons-material/Info'
 import LockIcon from '@mui/icons-material/Lock'
 import { useGlobalState } from '../context/GlobalState'
+import { CCPostEditor } from '../components/Editor/CCPostEditor'
 
 export const StreamPage = memo((): JSX.Element => {
     const { client } = useClient()
@@ -112,7 +112,9 @@ export const StreamPage = memo((): JSX.Element => {
                                                 }
                                             }}
                                         >
-                                            <Draft
+                                            <CCPostEditor
+                                                minRows={3}
+                                                maxRows={7}
                                                 defaultPostHome={!nonPublic}
                                                 streamPickerInitial={streams}
                                                 streamPickerOptions={[...new Set([...allKnownTimelines, ...streams])]}

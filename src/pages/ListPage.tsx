@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate, Link as RouterLink } from 'react-router-dom'
 import { usePreference } from '../context/PreferenceContext'
 import { Timeline } from '../components/Timeline'
-import { Draft } from '../components/Draft'
 import { useClient } from '../context/ClientContext'
 import {
     type CreateCurrentOptions,
@@ -23,6 +22,7 @@ import { type VListHandle } from 'virtua'
 import { useGlobalActions } from '../context/GlobalActions'
 import { useGlobalState } from '../context/GlobalState'
 import { ListItemTimeline } from '../components/ui/ListItemTimeline'
+import { CCPostEditor } from '../components/Editor/CCPostEditor'
 
 export function ListPage(): JSX.Element {
     const { client } = useClient()
@@ -186,7 +186,9 @@ export function ListPage(): JSX.Element {
                                                 }
                                             }}
                                         >
-                                            <Draft
+                                            <CCPostEditor
+                                                minRows={3}
+                                                maxRows={7}
                                                 streamPickerOptions={allKnownTimelines}
                                                 streamPickerInitial={postStreams}
                                                 onSubmit={async (
