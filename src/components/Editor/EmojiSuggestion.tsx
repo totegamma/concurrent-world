@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { type Emoji, type EmojiLite } from '../../model'
-import { Box, List, ListItemButton, ListItemIcon, ListItemText, Paper, Popper } from '@mui/material'
+import { Box, Collapse, List, ListItemButton, ListItemIcon, ListItemText, Paper, Popper } from '@mui/material'
 import caretPosition from 'textarea-caret'
 import { useEmojiPicker } from '../../context/EmojiPickerContext'
 
@@ -9,6 +9,7 @@ export interface EmojiSuggestionProps {
     text: string
     setText: (text: string) => void
     updateEmojiDict: (update: (prev: Record<string, EmojiLite>) => Record<string, EmojiLite>) => void
+    mobile?: boolean
 }
 
 export const EmojiSuggestion = (props: EmojiSuggestionProps): JSX.Element => {
@@ -93,7 +94,46 @@ export const EmojiSuggestion = (props: EmojiSuggestionProps): JSX.Element => {
         }
     }, [props.textInputRef, onKeyDown])
 
-    return (
+    return props.mobile ? (
+        <Collapse in={enableSuggestions}>
+            <List
+                dense
+                sx={{
+                    display: 'flex',
+                    overflowX: 'auto',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                    gap: 0.5
+                }}
+            >
+                {emojiSuggestions.map((emoji, index) => (
+                    <ListItemButton
+                        key={emoji.imageURL}
+                        selected={index === selectedSuggestions}
+                        onClick={() => {
+                            onEmojiSuggestConfirm(index)
+                        }}
+                        sx={{
+                            p: 0,
+                            width: '2em',
+                            height: '2em',
+                            maxWidth: '2em',
+                            maxHeight: '2em'
+                        }}
+                    >
+                        <Box
+                            component="img"
+                            src={emoji.imageURL}
+                            sx={{
+                                width: '100%',
+                                height: '100%'
+                            }}
+                        />
+                    </ListItemButton>
+                ))}
+            </List>
+        </Collapse>
+    ) : (
         <Popper
             open={enableSuggestions}
             anchorEl={props.textInputRef}

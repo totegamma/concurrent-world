@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Box, List, ListItemButton, ListItemIcon, ListItemText, Paper, Popper } from '@mui/material'
+import { Box, Collapse, List, ListItemButton, ListItemIcon, ListItemText, Paper, Popper } from '@mui/material'
 import caretPosition from 'textarea-caret'
 import { type User } from '@concurrent-world/client'
 import { useClient } from '../../context/ClientContext'
@@ -8,6 +8,7 @@ export interface UserSuggestionProps {
     textInputRef: HTMLInputElement
     text: string
     setText: (text: string) => void
+    mobile?: boolean
 }
 
 export const UserSuggestion = (props: UserSuggestionProps): JSX.Element => {
@@ -88,7 +89,45 @@ export const UserSuggestion = (props: UserSuggestionProps): JSX.Element => {
         }
     }, [props.textInputRef, onKeyDown])
 
-    return (
+    return props.mobile ? (
+        <Collapse in={enableSuggestions}>
+            <List
+                dense
+                sx={{
+                    display: 'flex',
+                    overflowX: 'auto',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start'
+                }}
+            >
+                {userSuggestions.map((user, index) => (
+                    <ListItemButton
+                        key={user.profile?.avatar}
+                        selected={index === selectedSuggestions}
+                        onClick={() => {
+                            onUserSuggestConfirm(index)
+                        }}
+                        sx={{
+                            p: 0,
+                            width: '2em',
+                            height: '2em',
+                            maxWidth: '2em',
+                            maxHeight: '2em'
+                        }}
+                    >
+                        <Box
+                            component="img"
+                            src={user.profile?.avatar}
+                            sx={{
+                                width: '100%',
+                                height: '100%'
+                            }}
+                        />
+                    </ListItemButton>
+                ))}
+            </List>
+        </Collapse>
+    ) : (
         <Popper
             open={enableSuggestions}
             anchorEl={props.textInputRef}

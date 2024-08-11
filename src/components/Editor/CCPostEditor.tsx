@@ -22,8 +22,6 @@ import { CCIconButton } from '../ui/CCIconButton'
 import ReplayIcon from '@mui/icons-material/Replay'
 import { EmojiSuggestion } from '../Editor/EmojiSuggestion'
 import { UserSuggestion } from '../Editor/UserSuggestion'
-import { MobileUserSuggestion } from './MobileUserSuggestion'
-import { MobileEmojiSuggestion } from './MobileEmojiSuggestion'
 import { useStorage } from '../../context/StorageContext'
 import { EditorActions } from './EditorActions'
 import { EditorPreview } from './EditorPreview'
@@ -303,13 +301,19 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                     </Collapse>
                     {textInputRef.current && (
                         <>
-                            <MobileEmojiSuggestion
+                            <EmojiSuggestion
+                                mobile
                                 textInputRef={textInputRef.current}
                                 text={draft}
                                 setText={setDraft}
                                 updateEmojiDict={setEmojiDict}
                             />
-                            <MobileUserSuggestion textInputRef={textInputRef.current} text={draft} setText={setDraft} />
+                            <UserSuggestion
+                                mobile
+                                textInputRef={textInputRef.current}
+                                text={draft}
+                                setText={setDraft}
+                            />
                         </>
                     )}
                     <EditorActions
