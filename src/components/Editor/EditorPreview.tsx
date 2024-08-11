@@ -15,6 +15,7 @@ interface EditorPreviewProps {
     emojiDict: Record<string, EmojiLite>
     selectedSubprofile?: string
     setSelectedSubprofile: (subprofileID?: string) => void
+    hideActions?: boolean
 }
 
 export const EditorPreview = (props: EditorPreviewProps): JSX.Element => {
@@ -54,6 +55,7 @@ export const EditorPreview = (props: EditorPreviewProps): JSX.Element => {
                     user={client.user?.profile}
                     userCCID={client.user?.ccid}
                     subprofileID={props.selectedSubprofile}
+                    hideActions={props.hideActions}
                     timestamp={
                         <Typography
                             sx={{

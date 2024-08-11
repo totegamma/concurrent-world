@@ -287,6 +287,7 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                         />
 
                         <EditorPreview
+                            hideActions
                             draft={draft}
                             emojiDict={emojiDict}
                             selectedSubprofile={selectedSubprofile}
