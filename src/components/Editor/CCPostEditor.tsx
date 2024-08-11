@@ -8,7 +8,8 @@ import {
     Tooltip,
     Collapse,
     Backdrop,
-    type SxProps
+    type SxProps,
+    Menu
 } from '@mui/material'
 import { StreamPicker } from '../ui/StreamPicker'
 import { useSnackbar } from 'notistack'
@@ -26,6 +27,10 @@ import { useStorage } from '../../context/StorageContext'
 import { EditorActions } from './EditorActions'
 import { EditorPreview } from './EditorPreview'
 
+import { FaMarkdown } from 'react-icons/fa'
+import PermMediaIcon from '@mui/icons-material/PermMedia'
+import TextFieldsIcon from '@mui/icons-material/TextFields'
+
 export interface CCPostEditorProps {
     autoFocus?: boolean
     mobile?: boolean
@@ -42,12 +47,22 @@ export interface CCPostEditorProps {
     maxRows?: number
 }
 
+type EditorMode = 'plaintext' | 'markdown' | 'media'
+
+const ModeIcons = {
+    plaintext: <TextFieldsIcon />,
+    markdown: <FaMarkdown />,
+    media: <PermMediaIcon />
+}
+
 export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): JSX.Element => {
     const theme = useTheme()
     const { client } = useClient()
     const { uploadFile } = useStorage()
     const { enqueueSnackbar } = useSnackbar()
     const { t } = useTranslation('', { keyPrefix: 'ui.draft' })
+    const [mode, setMode] = useState<EditorMode>('markdown')
+    const [modeMenuAnchor, setModeMenuAnchor] = useState<null | HTMLElement>(null)
 
     const [destTimelines, setDestTimelines] = useState<Array<Timeline<CommunityTimelineSchema>>>(
         props.streamPickerInitial
@@ -193,6 +208,13 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                         flex: 1
                     }}
                 >
+                    <CCIconButton
+                        onClick={(e) => {
+                            setModeMenuAnchor(e.currentTarget)
+                        }}
+                    >
+                        {ModeIcons[mode]}
+                    </CCIconButton>
                     <StreamPicker
                         options={props.streamPickerOptions}
                         selected={destTimelines}
@@ -373,6 +395,28 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                     </Collapse>
                 </>
             )}
+
+            <Menu
+                anchorEl={modeMenuAnchor}
+                open={Boolean(modeMenuAnchor)}
+                onClose={() => {
+                    setModeMenuAnchor(null)
+                }}
+            >
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    {Object.keys(ModeIcons).map((key) => (
+                        <CCIconButton
+                            key={key}
+                            onClick={() => {
+                                setMode(key as EditorMode)
+                                setModeMenuAnchor(null)
+                            }}
+                        >
+                            {ModeIcons[key as EditorMode]}
+                        </CCIconButton>
+                    ))}
+                </Box>
+            </Menu>
         </Box>
     )
 })
