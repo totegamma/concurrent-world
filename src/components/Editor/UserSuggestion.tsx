@@ -1,18 +1,17 @@
 import { useCallback, useEffect, useState } from 'react'
-import { type Emoji, type EmojiLite } from '../../model'
 import { Box, List, ListItemButton, ListItemIcon, ListItemText, Paper, Popper } from '@mui/material'
 import caretPosition from 'textarea-caret'
-import { useEmojiPicker } from '../../context/EmojiPickerContext'
+import { type User } from '@concurrent-world/client'
+import { useClient } from '../../context/ClientContext'
 
-export interface EmojiSuggestionProps {
+export interface UserSuggestionProps {
     textInputRef: HTMLInputElement
     text: string
     setText: (text: string) => void
-    updateEmojiDict: (update: (prev: Record<string, EmojiLite>) => Record<string, EmojiLite>) => void
 }
 
-export const EmojiSuggestion = (props: EmojiSuggestionProps): JSX.Element => {
-    const emojiPicker = useEmojiPicker()
+export const UserSuggestion = (props: UserSuggestionProps): JSX.Element => {
+    const { client } = useClient()
 
     const ref = props.textInputRef
     const text = props.text
@@ -25,33 +24,29 @@ export const EmojiSuggestion = (props: EmojiSuggestionProps): JSX.Element => {
     }
 
     const before = text.slice(0, cursorPos ?? 0) ?? ''
-    const query = /:(\w+)$/.exec(before)?.[1]
-
-    const [emojiSuggestions, setEmojiSuggestions] = useState<Emoji[]>([])
-    const [selectedSuggestions, setSelectedSuggestions] = useState<number>(0)
+    const query = /@([^\s]+)$/.exec(before)?.[1]
 
     const [forceOff, setForceOff] = useState<boolean>(false)
     const enableSuggestions = query !== undefined && !forceOff
 
-    const onEmojiSuggestConfirm = (index: number): void => {
-        const colonPos = before.lastIndexOf(':')
-        if (colonPos === -1) return
-        const after = text.slice(cursorPos) ?? ''
-        const selected = emojiSuggestions[index]
-
-        props.setText(before.slice(0, colonPos) + `:${selected.shortcode}: ` + after)
-        setSelectedSuggestions(0)
-
-        props.updateEmojiDict((prev) => ({
-            ...prev,
-            [selected.shortcode]: { imageURL: selected.imageURL }
-        }))
-    }
+    const [selectedSuggestions, setSelectedSuggestions] = useState<number>(0)
+    const [userSuggestions, setUserSuggestions] = useState<User[]>([])
 
     useEffect(() => {
         if (!query) return
-        setEmojiSuggestions(emojiPicker.search(query))
+        setUserSuggestions(client.ackings?.filter((q) => q.profile?.username?.toLowerCase()?.includes(query)) ?? [])
     }, [query])
+
+    const onUserSuggestConfirm = (index: number): void => {
+        console.log('user confirm', index)
+        const before = text.slice(0, cursorPos) ?? ''
+        const colonPos = before.lastIndexOf('@')
+        if (colonPos === -1) return
+        const after = text.slice(cursorPos) ?? ''
+
+        const selected = userSuggestions[index]
+        props.setText(before.slice(0, colonPos) + `@${selected.ccid} ` + after)
+    }
 
     const onKeyDown = useCallback(
         (e: KeyboardEvent) => {
@@ -59,20 +54,20 @@ export const EmojiSuggestion = (props: EmojiSuggestionProps): JSX.Element => {
             if (!enableSuggestions) return
             if (e.key === 'ArrowUp') {
                 e.preventDefault()
-                setSelectedSuggestions((selectedSuggestions - 1 + emojiSuggestions.length) % emojiSuggestions.length)
+                setSelectedSuggestions((selectedSuggestions - 1 + userSuggestions.length) % userSuggestions.length)
                 return
             }
             if (e.key === 'ArrowDown') {
                 e.preventDefault()
-                setSelectedSuggestions((selectedSuggestions + 1) % emojiSuggestions.length)
+                setSelectedSuggestions((selectedSuggestions + 1) % userSuggestions.length)
                 return
             }
             if (e.key === 'Enter') {
                 e.preventDefault()
-                onEmojiSuggestConfirm(selectedSuggestions)
+                onUserSuggestConfirm(selectedSuggestions)
             }
         },
-        [selectedSuggestions, emojiSuggestions, enableSuggestions]
+        [selectedSuggestions, userSuggestions, enableSuggestions]
     )
 
     const onBlur = useCallback(() => {
@@ -110,20 +105,20 @@ export const EmojiSuggestion = (props: EmojiSuggestionProps): JSX.Element => {
         >
             <Paper>
                 <List dense>
-                    {emojiSuggestions.map((emoji, index) => (
+                    {userSuggestions.map((user, index) => (
                         <ListItemButton
                             dense
-                            key={emoji.imageURL}
+                            key={user.profile?.avatar}
                             selected={index === selectedSuggestions}
                             onClick={() => {
-                                onEmojiSuggestConfirm(index)
+                                onUserSuggestConfirm(index)
                                 ref.focus()
                             }}
                         >
                             <ListItemIcon>
-                                <Box component="img" src={emoji.imageURL} sx={{ width: '1em', height: '1em' }} />
+                                <Box component="img" src={user.profile?.avatar} sx={{ width: '1em', height: '1em' }} />
                             </ListItemIcon>
-                            <ListItemText>{emoji.shortcode}</ListItemText>
+                            <ListItemText>{user.profile?.username}</ListItemText>
                         </ListItemButton>
                     ))}
                 </List>

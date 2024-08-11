@@ -44,6 +44,7 @@ import { CCIconButton } from './ui/CCIconButton'
 import ReplayIcon from '@mui/icons-material/Replay'
 import { EmojiSuggestion } from './Editor/EmojiSuggestion'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
+import { UserSuggestion } from './Editor/UserSuggestion'
 
 export interface DraftProps {
     submitButtonLabel?: string
@@ -187,28 +188,6 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         }
     }
 
-    /*
-    const [userSuggestions, setUserSuggestions] = useState<User[]>([])
-    const onUserSuggestConfirm = (index: number): void => {
-        console.log('user confirm', index)
-        const before = draft.slice(0, textInputRef.current?.selectionEnd ?? 0) ?? ''
-        const colonPos = before.lastIndexOf('@')
-        if (colonPos === -1) return
-        const after = draft.slice(textInputRef.current?.selectionEnd ?? 0) ?? ''
-
-        const selected = userSuggestions[index]
-
-        setDraft(before.slice(0, colonPos) + `@${selected.ccid} ` + after)
-        setEnableUserPicker(false)
-
-        if (timerRef.current) {
-            clearTimeout(timerRef.current)
-            timerRef.current = null
-            textInputRef.current?.focus()
-        }
-    }
-    */
-
     const { t } = useTranslation('', { keyPrefix: 'ui.draft' })
 
     return (
@@ -325,56 +304,17 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     }}
                     inputRef={textInputRef}
                 />
-                {/*
-                <Popper
-                    open={enableUserPicker}
-                    anchorEl={textInputRef.current ?? undefined}
-                    placement="bottom-start"
-                    modifiers={[
-                        {
-                            name: 'offset',
-                            options: {
-                                offset: [caretPos.left, caretPos.top]
-                            }
-                        }
-                    ]}
-                    sx={{
-                        zIndex: (theme) => theme.zIndex.tooltip + 1
-                    }}
-                >
-                    <Paper>
-                        <List dense>
-                            {userSuggestions.map((user, index) => (
-                                <ListItemButton
-                                    dense
-                                    key={user.profile?.avatar}
-                                    selected={index === selectedSuggestions}
-                                    onClick={() => {
-                                        onUserSuggestConfirm(index)
-                                    }}
-                                >
-                                    <ListItemIcon>
-                                        <Box
-                                            component="img"
-                                            src={user.profile?.avatar}
-                                            sx={{ width: '1em', height: '1em' }}
-                                        />
-                                    </ListItemIcon>
-                                    <ListItemText>{user.profile?.username}</ListItemText>
-                                </ListItemButton>
-                            ))}
-                        </List>
-                    </Paper>
-                </Popper>
-                */}
             </Box>
             {textInputRef.current && (
-                <EmojiSuggestion
-                    textInputRef={textInputRef.current}
-                    text={draft}
-                    setText={setDraft}
-                    updateEmojiDict={setEmojiDict}
-                />
+                <>
+                    <EmojiSuggestion
+                        textInputRef={textInputRef.current}
+                        text={draft}
+                        setText={setDraft}
+                        updateEmojiDict={setEmojiDict}
+                    />
+                    <UserSuggestion textInputRef={textInputRef.current} text={draft} setText={setDraft} />
+                </>
             )}
             <Box
                 sx={{
