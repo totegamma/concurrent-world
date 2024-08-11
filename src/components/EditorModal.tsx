@@ -54,10 +54,14 @@ export const EditorModal = (props: EditorModalProps): JSX.Element => {
                         p: 1
                     }}
                 >
-                    {props.context}
-                    <Divider />
+                    {props.context && (
+                        <>
+                            {props.context}
+                            <Divider />
+                        </>
+                    )}
 
-                    <CCPostEditor minRows={3} maxRows={7} {...props} />
+                    <CCPostEditor autoFocus minRows={3} maxRows={7} {...props} />
                 </Paper>
             ) : (
                 <Box
