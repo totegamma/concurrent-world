@@ -7,17 +7,12 @@ import {
     Divider,
     CircularProgress,
     Tooltip,
-    Paper,
-    List,
     ListItemIcon,
-    ListItemText,
-    ListItemButton,
     Collapse,
     Fade,
     Typography,
     Backdrop,
     type SxProps,
-    Popper,
     Menu,
     MenuItem
 } from '@mui/material'
@@ -30,15 +25,8 @@ import HomeIcon from '@mui/icons-material/Home'
 import ImageIcon from '@mui/icons-material/Image'
 import DeleteIcon from '@mui/icons-material/Delete'
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown'
-import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 import { useEmojiPicker } from '../context/EmojiPickerContext'
-import caretPosition from 'textarea-caret'
-import {
-    type CommunityTimelineSchema,
-    type Timeline,
-    type User,
-    type CreateCurrentOptions
-} from '@concurrent-world/client'
+import { type CommunityTimelineSchema, type Timeline, type CreateCurrentOptions } from '@concurrent-world/client'
 import { useClient } from '../context/ClientContext'
 import { type Emoji, type EmojiLite } from '../model'
 import { useNavigate } from 'react-router-dom'
@@ -54,6 +42,8 @@ import { ErrorBoundary } from 'react-error-boundary'
 import HeartBrokenIcon from '@mui/icons-material/HeartBroken'
 import { CCIconButton } from './ui/CCIconButton'
 import ReplayIcon from '@mui/icons-material/Replay'
+import { EmojiSuggestion } from './Editor/EmojiSuggestion'
+import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 
 export interface DraftProps {
     submitButtonLabel?: string
@@ -95,23 +85,22 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
 
     let [sending, setSending] = useState<boolean>(false)
 
-    const [caretPos, setCaretPos] = useState<{ left: number; top: number }>({ left: 0, top: 0 })
-
-    const [enableSuggestions, setEnableSuggestions] = useState<boolean>(false)
-    const [emojiSuggestions, setEmojiSuggestions] = useState<Emoji[]>([])
-
-    const [enableUserPicker, setEnableUserPicker] = useState<boolean>(false)
-    const [userSuggestions, setUserSuggestions] = useState<User[]>([])
-
-    const [selectedSuggestions, setSelectedSuggestions] = useState<number>(0)
-
     const [profileSelectAnchorEl, setProfileSelectAnchorEl] = useState<null | HTMLElement>(null)
-
-    const timerRef = useRef<any | null>(null)
 
     const { enqueueSnackbar } = useSnackbar()
 
     const [selectedSubprofile, setSelectedSubprofile] = useState<string | undefined>(undefined)
+
+    const [emojiDict, setEmojiDict] = useState<Record<string, EmojiLite>>({})
+
+    const insertEmoji = (emoji: Emoji): void => {
+        const newDraft =
+            draft.slice(0, textInputRef.current?.selectionEnd ?? 0) +
+            `:${emoji.shortcode}:` +
+            draft.slice(textInputRef.current?.selectionEnd ?? 0)
+        setDraft(newDraft)
+        setEmojiDict((prev) => ({ ...prev, [emoji.shortcode]: { imageURL: emoji.imageURL } }))
+    }
 
     useEffect(() => {
         setDestTimelines(props.streamPickerInitial)
@@ -122,19 +111,6 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             setDraft(props.value)
         }
     }, [props.value])
-
-    const [emojiDict, setEmojiDict] = useState<Record<string, EmojiLite>>({})
-
-    const insertEmoji = (emoji: Emoji): void => {
-        const newDraft =
-            draft.slice(0, textInputRef.current?.selectionEnd ?? 0) +
-            `:${emoji.shortcode}:` +
-            draft.slice(textInputRef.current?.selectionEnd ?? 0)
-        setDraft(newDraft)
-        setEnableSuggestions(false)
-        setSelectedSuggestions(0)
-        setEmojiDict((prev) => ({ ...prev, [emoji.shortcode]: { imageURL: emoji.imageURL } }))
-    }
 
     const post = (postHome: boolean): void => {
         if (!props.allowEmpty && (draft.length === 0 || draft.trim().length === 0)) {
@@ -211,39 +187,8 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
         }
     }
 
-    const onSuggestConfirm = (index: number): void => {
-        if (enableSuggestions) {
-            onEmojiSuggestConfirm(index)
-        } else if (enableUserPicker) {
-            onUserSuggestConfirm(index)
-        }
-    }
-
-    const onEmojiSuggestConfirm = (index: number): void => {
-        console.log('confirm', index)
-        const before = draft.slice(0, textInputRef.current?.selectionEnd ?? 0) ?? ''
-        const colonPos = before.lastIndexOf(':')
-        if (colonPos === -1) return
-        const after = draft.slice(textInputRef.current?.selectionEnd ?? 0) ?? ''
-
-        const selected = emojiSuggestions[index]
-
-        setDraft(before.slice(0, colonPos) + `:${selected.shortcode}:` + after)
-        setSelectedSuggestions(0)
-        setEnableSuggestions(false)
-
-        setEmojiDict((prev) => ({
-            ...prev,
-            [selected.shortcode]: { imageURL: selected.imageURL }
-        }))
-
-        if (timerRef.current) {
-            clearTimeout(timerRef.current)
-            timerRef.current = null
-            textInputRef.current?.focus()
-        }
-    }
-
+    /*
+    const [userSuggestions, setUserSuggestions] = useState<User[]>([])
     const onUserSuggestConfirm = (index: number): void => {
         console.log('user confirm', index)
         const before = draft.slice(0, textInputRef.current?.selectionEnd ?? 0) ?? ''
@@ -262,6 +207,7 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
             textInputRef.current?.focus()
         }
     }
+    */
 
     const { t } = useTranslation('', { keyPrefix: 'ui.draft' })
 
@@ -353,45 +299,6 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                     value={draft}
                     onChange={(e) => {
                         setDraft(e.target.value)
-
-                        const before = e.target.value.slice(0, e.target.selectionEnd ?? 0) ?? ''
-                        const query = /:(\w+)$/.exec(before)?.[1]
-                        const userQuery = /@([^\s@]+)$/.exec(before)?.[1]
-
-                        if (!query) {
-                            setEnableSuggestions(false)
-                        }
-
-                        if (!userQuery) {
-                            setEnableUserPicker(false)
-                        }
-
-                        if (!query && !userQuery) {
-                            return
-                        }
-
-                        if (query) {
-                            setEmojiSuggestions(emojiPicker.search(query))
-                            setEnableSuggestions(true)
-                        }
-
-                        if (userQuery) {
-                            setUserSuggestions(
-                                client.ackings?.filter((q) =>
-                                    q.profile?.username?.toLowerCase()?.includes(userQuery)
-                                ) ?? []
-                            )
-                            setEnableUserPicker(true)
-                        }
-
-                        // move suggestion box
-                        const pos = caretPosition(e.target, e.target.selectionEnd ?? 0, {})
-                        if (pos) {
-                            setCaretPos({
-                                top: pos.top - 50,
-                                left: pos.left + 10
-                            })
-                        }
                     }}
                     onPaste={(e) => {
                         handlePasteImage(e)
@@ -403,32 +310,6 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         fontSize: '0.95rem'
                     }}
                     onKeyDown={(e: any) => {
-                        if (
-                            (enableSuggestions && emojiSuggestions.length > 0) ||
-                            (enableUserPicker && userSuggestions.length > 0)
-                        ) {
-                            if (e.key === 'Enter') {
-                                e.preventDefault()
-                                onSuggestConfirm(selectedSuggestions)
-                                return
-                            }
-                            if (e.key === 'ArrowUp') {
-                                e.preventDefault()
-                                setSelectedSuggestions(
-                                    (selectedSuggestions - 1 + emojiSuggestions.length) % emojiSuggestions.length
-                                )
-                                return
-                            }
-                            if (e.key === 'ArrowDown') {
-                                e.preventDefault()
-                                setSelectedSuggestions((selectedSuggestions + 1) % emojiSuggestions.length)
-                                return
-                            }
-                            if (e.key === ':') {
-                                e.preventDefault()
-                                onSuggestConfirm(0)
-                            }
-                        }
                         if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
                             setHoldCtrlShift(true)
                         }
@@ -442,56 +323,9 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                             setHoldCtrlShift(false)
                         }
                     }}
-                    onBlur={() => {
-                        timerRef.current = setTimeout(() => {
-                            if (enableSuggestions) {
-                                setEnableSuggestions(false)
-                                setSelectedSuggestions(0)
-                            }
-                        }, 100)
-                    }}
                     inputRef={textInputRef}
                 />
-                <Popper
-                    open={enableSuggestions}
-                    anchorEl={textInputRef.current ?? undefined}
-                    placement="bottom-start"
-                    modifiers={[
-                        {
-                            name: 'offset',
-                            options: {
-                                offset: [caretPos.left, caretPos.top]
-                            }
-                        }
-                    ]}
-                    sx={{
-                        zIndex: (theme) => theme.zIndex.tooltip + 1
-                    }}
-                >
-                    <Paper>
-                        <List dense>
-                            {emojiSuggestions.map((emoji, index) => (
-                                <ListItemButton
-                                    dense
-                                    key={emoji.imageURL}
-                                    selected={index === selectedSuggestions}
-                                    onClick={() => {
-                                        onEmojiSuggestConfirm(index)
-                                    }}
-                                >
-                                    <ListItemIcon>
-                                        <Box
-                                            component="img"
-                                            src={emoji.imageURL}
-                                            sx={{ width: '1em', height: '1em' }}
-                                        />
-                                    </ListItemIcon>
-                                    <ListItemText>{emoji.shortcode}</ListItemText>
-                                </ListItemButton>
-                            ))}
-                        </List>
-                    </Paper>
-                </Popper>
+                {/*
                 <Popper
                     open={enableUserPicker}
                     anchorEl={textInputRef.current ?? undefined}
@@ -532,7 +366,16 @@ export const Draft = memo<DraftProps>((props: DraftProps): JSX.Element => {
                         </List>
                     </Paper>
                 </Popper>
+                */}
             </Box>
+            {textInputRef.current && (
+                <EmojiSuggestion
+                    textInputRef={textInputRef.current}
+                    text={draft}
+                    setText={setDraft}
+                    updateEmojiDict={setEmojiDict}
+                />
+            )}
             <Box
                 sx={{
                     display: 'flex',

@@ -24,6 +24,7 @@
         "@keplr-wallet/types": "^0.12.114",
         "@mui/icons-material": "^5.11.16",
         "@mui/material": "^5.14.19",
+        "@react-hooks-library/core": "^0.6.2",
         "@rjsf/core": "^5.7.3",
         "@rjsf/mui": "^5.7.3",
         "@rjsf/utils": "^5.7.3",

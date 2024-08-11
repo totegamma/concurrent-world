@@ -44,6 +44,9 @@ dependencies:
   '@mui/material':
     specifier: ^5.14.19
     version: 5.14.19(@emotion/react@11.10.5)(@emotion/styled@11.10.5)(@types/react@18.0.26)(react-dom@18.2.0)(react@18.2.0)
+  '@react-hooks-library/core':
+    specifier: ^0.6.2
+    version: 0.6.2(react@18.2.0)
   '@rjsf/core':
     specifier: ^5.7.3
     version: 5.7.3(@rjsf/utils@5.7.3)(react@18.2.0)
@@ -3569,6 +3572,19 @@ packages:
       '@types/react': 18.0.26
       react: 18.2.0
     dev: true
+
+  /@react-hooks-library/core@0.6.2(react@18.2.0):
+    resolution: {integrity: sha512-Ca6ccj9mfUiQ0hbDJV0hzUaweZU7D0E5Xwtp3ba5oT6/yWj1tzoPe0y3AwGQyUSUKA5G6OADylU2fwEqZwrpNA==}
+    peerDependencies:
+      react: '>=16.9.0'
+    dependencies:
+      '@react-hooks-library/shared': 0.6.2
+      react: 18.2.0
+    dev: false
+
+  /@react-hooks-library/shared@0.6.2:
+    resolution: {integrity: sha512-tasvVgcoRhnHYZSVfQjDK7VDviVrO9BqqS/yEvjJ4/QRTVFQTNmt5Jfj3ym0Uju2B63Dc9892DuLhb9V9oysWA==}
+    dev: false
 
   /@remix-run/router@1.6.0:
     resolution: {integrity: sha512-N13NRw3T2+6Xi9J//3CGLsK2OqC8NMme3d/YX+nh05K9YHWGcv8DycHJrqGScSP4T75o8IN6nqIMhVFU8ohg8w==}
