@@ -76,15 +76,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
 
     const isMobileSize = useMediaQuery(theme.breakpoints.down('sm'))
 
-    const [viewportHeight, setViewportHeight] = useState<number>(visualViewport?.height ?? 0)
-    useEffect(() => {
-        function handleResize(): void {
-            setViewportHeight(visualViewport?.height ?? 0)
-        }
-        visualViewport?.addEventListener('resize', handleResize)
-        return () => visualViewport?.removeEventListener('resize', handleResize)
-    }, [])
-
     const setupAccountRequired = client?.user !== null && client?.user.profile === undefined
     const noListDetected = Object.keys(lists).length === 0
 
@@ -241,87 +232,66 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     <>
                         {isMobileSize ? (
                             <>
-                                <Box
-                                    sx={{
-                                        height: viewportHeight,
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        overflow: 'hidden',
-                                        p: 0.5,
-                                        backgroundColor: 'background.default'
-                                    }}
-                                >
-                                    <Paper
-                                        sx={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            overflow: 'hidden',
-                                            flex: 1,
-                                            p: 0.5
-                                        }}
-                                    >
-                                        {mode === 'compose' && (
-                                            <MobileDraft
-                                                streamPickerInitial={postStreams}
-                                                streamPickerOptions={globalState.allKnownTimelines}
-                                                onSubmit={async (text: string, destinations: string[], options) => {
-                                                    try {
-                                                        await client
-                                                            .createMarkdownCrnt(text, destinations, options)
-                                                            .finally(() => {
-                                                                setMode('none')
-                                                            })
-                                                        return null
-                                                    } catch (e) {
-                                                        return e as Error
-                                                    }
-                                                }}
-                                                onCancel={() => {
-                                                    setMode('none')
-                                                }}
-                                            />
-                                        )}
-                                        {targetMessage && (mode === 'reply' || mode === 'reroute') && (
-                                            <MobileDraft
-                                                allowEmpty={mode === 'reroute'}
-                                                submitButtonLabel={mode === 'reply' ? 'Reply' : 'Reroute'}
-                                                streamPickerInitial={
-                                                    mode === 'reroute' ? postStreams : targetMessage.postedStreams ?? []
-                                                }
-                                                streamPickerOptions={
-                                                    mode === 'reroute'
-                                                        ? globalState.allKnownTimelines
-                                                        : targetMessage.postedStreams ?? []
-                                                }
-                                                onSubmit={async (text, streams, options): Promise<Error | null> => {
-                                                    try {
-                                                        if (mode === 'reroute') {
-                                                            await targetMessage.reroute(streams, text, options)
-                                                        } else if (mode === 'reply') {
-                                                            await targetMessage.reply(streams, text, options)
-                                                        }
+                                {mode === 'compose' && (
+                                    <MobileDraft
+                                        streamPickerInitial={postStreams}
+                                        streamPickerOptions={globalState.allKnownTimelines}
+                                        onSubmit={async (text: string, destinations: string[], options) => {
+                                            try {
+                                                await client
+                                                    .createMarkdownCrnt(text, destinations, options)
+                                                    .finally(() => {
                                                         setMode('none')
-                                                        return null
-                                                    } catch (e) {
-                                                        return e as Error
-                                                    }
-                                                }}
-                                                onCancel={() => {
-                                                    setMode('none')
-                                                }}
-                                                context={
-                                                    <Box width="100%" maxHeight="3rem" overflow="auto">
-                                                        <MessageContainer
-                                                            simple
-                                                            messageID={targetMessage.id}
-                                                            messageOwner={targetMessage.author}
-                                                        />
-                                                    </Box>
+                                                    })
+                                                return null
+                                            } catch (e) {
+                                                return e as Error
+                                            }
+                                        }}
+                                        onCancel={() => {
+                                            setMode('none')
+                                        }}
+                                    />
+                                )}
+                                {targetMessage && (mode === 'reply' || mode === 'reroute') && (
+                                    <MobileDraft
+                                        allowEmpty={mode === 'reroute'}
+                                        submitButtonLabel={mode === 'reply' ? 'Reply' : 'Reroute'}
+                                        streamPickerInitial={
+                                            mode === 'reroute' ? postStreams : targetMessage.postedStreams ?? []
+                                        }
+                                        streamPickerOptions={
+                                            mode === 'reroute'
+                                                ? globalState.allKnownTimelines
+                                                : targetMessage.postedStreams ?? []
+                                        }
+                                        onSubmit={async (text, streams, options): Promise<Error | null> => {
+                                            try {
+                                                if (mode === 'reroute') {
+                                                    await targetMessage.reroute(streams, text, options)
+                                                } else if (mode === 'reply') {
+                                                    await targetMessage.reply(streams, text, options)
                                                 }
-                                            />
-                                        )}
-                                    </Paper>
-                                </Box>
+                                                setMode('none')
+                                                return null
+                                            } catch (e) {
+                                                return e as Error
+                                            }
+                                        }}
+                                        onCancel={() => {
+                                            setMode('none')
+                                        }}
+                                        context={
+                                            <Box width="100%" maxHeight="3rem" overflow="auto">
+                                                <MessageContainer
+                                                    simple
+                                                    messageID={targetMessage.id}
+                                                    messageOwner={targetMessage.author}
+                                                />
+                                            </Box>
+                                        }
+                                    />
+                                )}
                             </>
                         ) : (
                             <>

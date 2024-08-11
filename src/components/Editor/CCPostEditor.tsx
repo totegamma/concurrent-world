@@ -161,6 +161,7 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                 borderColor: 'text.disabled',
                 width: '100%',
                 height: '100%',
+                overflow: 'hidden',
                 ...props.sx
             }}
         >
@@ -278,14 +279,20 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
 
             {props.mobile ? (
                 <>
-                    <Collapse unmountOnExit in={draft.length > 0}>
+                    <Collapse
+                        unmountOnExit
+                        in={draft.length > 0}
+                        sx={{
+                            maxHeight: '20%',
+                            overflowY: 'auto'
+                        }}
+                    >
                         <Divider
                             sx={{
                                 my: 1,
                                 borderStyle: 'dashed'
                             }}
                         />
-
                         <EditorPreview
                             hideActions
                             draft={draft}
@@ -293,23 +300,18 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                             selectedSubprofile={selectedSubprofile}
                             setSelectedSubprofile={setSelectedSubprofile}
                         />
-
-                        {textInputRef.current && (
-                            <>
-                                <MobileEmojiSuggestion
-                                    textInputRef={textInputRef.current}
-                                    text={draft}
-                                    setText={setDraft}
-                                    updateEmojiDict={setEmojiDict}
-                                />
-                                <MobileUserSuggestion
-                                    textInputRef={textInputRef.current}
-                                    text={draft}
-                                    setText={setDraft}
-                                />
-                            </>
-                        )}
                     </Collapse>
+                    {textInputRef.current && (
+                        <>
+                            <MobileEmojiSuggestion
+                                textInputRef={textInputRef.current}
+                                text={draft}
+                                setText={setDraft}
+                                updateEmojiDict={setEmojiDict}
+                            />
+                            <MobileUserSuggestion textInputRef={textInputRef.current} text={draft} setText={setDraft} />
+                        </>
+                    )}
                     <EditorActions
                         post={() => {
                             post(postHome)

@@ -41,38 +41,31 @@ export const EditorPreview = (props: EditorPreviewProps): JSX.Element => {
                 </Box>
             )}
         >
-            <Box
-                sx={{
-                    maxHeight: '200px',
-                    overflowY: 'auto'
+            <DummyMessageView
+                message={{
+                    body: props.draft,
+                    emojis: props.emojiDict
                 }}
-            >
-                <DummyMessageView
-                    message={{
-                        body: props.draft,
-                        emojis: props.emojiDict
-                    }}
-                    user={client.user?.profile}
-                    userCCID={client.user?.ccid}
-                    subprofileID={props.selectedSubprofile}
-                    hideActions={props.hideActions}
-                    timestamp={
-                        <Typography
-                            sx={{
-                                backgroundColor: 'divider',
-                                color: 'primary.contrastText',
-                                px: 1,
-                                fontSize: '0.75rem'
-                            }}
-                        >
-                            {t('preview')}
-                        </Typography>
-                    }
-                    onAvatarClick={(e) => {
-                        setProfileSelectAnchorEl(e.currentTarget)
-                    }}
-                />
-            </Box>
+                user={client.user?.profile}
+                userCCID={client.user?.ccid}
+                subprofileID={props.selectedSubprofile}
+                hideActions={props.hideActions}
+                timestamp={
+                    <Typography
+                        sx={{
+                            backgroundColor: 'divider',
+                            color: 'primary.contrastText',
+                            px: 1,
+                            fontSize: '0.75rem'
+                        }}
+                    >
+                        {t('preview')}
+                    </Typography>
+                }
+                onAvatarClick={(e) => {
+                    setProfileSelectAnchorEl(e.currentTarget)
+                }}
+            />
             <Menu
                 anchorEl={profileSelectAnchorEl}
                 open={Boolean(profileSelectAnchorEl)}

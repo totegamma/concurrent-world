@@ -1,6 +1,7 @@
-import { Box, Button, Divider } from '@mui/material'
+import { Box, Button, Divider, Paper } from '@mui/material'
 import { type CommunityTimelineSchema, type Timeline, type CreateCurrentOptions } from '@concurrent-world/client'
 import { CCPostEditor } from './Editor/CCPostEditor'
+import { useEffect, useState } from 'react'
 
 export interface MobileDraftProps {
     streamPickerInitial: Array<Timeline<CommunityTimelineSchema>>
@@ -16,52 +17,73 @@ export interface MobileDraftProps {
 }
 
 export const MobileDraft = (props: MobileDraftProps): JSX.Element => {
+    const [viewportHeight, setViewportHeight] = useState<number>(visualViewport?.height ?? 0)
+    useEffect(() => {
+        function handleResize(): void {
+            setViewportHeight(visualViewport?.height ?? 0)
+        }
+        visualViewport?.addEventListener('resize', handleResize)
+        return () => visualViewport?.removeEventListener('resize', handleResize)
+    }, [])
+
     return (
         <Box
             sx={{
+                height: viewportHeight,
+                maxHeight: '60vh',
                 display: 'flex',
                 flexDirection: 'column',
-                borderColor: 'text.disabled',
-                width: '100%',
-                height: '100%'
+                overflow: 'hidden',
+                p: 0.5,
+                backgroundColor: 'background.default'
             }}
         >
-            <Box
+            <Paper
                 sx={{
                     display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
+                    flexDirection: 'column',
+                    overflow: 'hidden',
+                    flex: 1,
+                    p: 0.5
                 }}
             >
-                <Button
-                    variant="text"
-                    onClick={() => {
-                        props.onCancel?.()
-                    }}
+                <Box
                     sx={{
-                        px: 1
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
                     }}
                 >
-                    Cancel
-                </Button>
-            </Box>
-            {props.context && (
-                <>
-                    <Divider />
-                    <Box
+                    <Button
+                        variant="text"
+                        onClick={() => {
+                            props.onCancel?.()
+                        }}
                         sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            py: 1
+                            px: 1
                         }}
                     >
-                        {props.context}
-                    </Box>
-                </>
-            )}
-            <Divider />
-            <CCPostEditor mobile autoFocus {...props} />
+                        Cancel
+                    </Button>
+                </Box>
+                {props.context && (
+                    <>
+                        <Divider />
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                py: 1
+                            }}
+                        >
+                            {props.context}
+                        </Box>
+                    </>
+                )}
+                <Divider />
+                <CCPostEditor mobile autoFocus {...props} />
+            </Paper>
         </Box>
     )
 }
