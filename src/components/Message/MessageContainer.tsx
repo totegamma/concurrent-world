@@ -18,6 +18,8 @@ import { ContentWithUserFetch } from '../ContentWithUserFetch'
 import SearchOffIcon from '@mui/icons-material/SearchOff'
 import TerminalIcon from '@mui/icons-material/Terminal'
 import { CopyChip } from '../ui/CopyChip'
+import { type PlaintextMessageSchema } from '../../../../concurrent-client/dist/types'
+import { PlainMessageView } from './PlainMessageView'
 
 interface MessageContainerProps {
     messageID: string
@@ -34,7 +36,7 @@ interface MessageContainerProps {
 export const MessageContainer = memo<MessageContainerProps>((props: MessageContainerProps): JSX.Element | null => {
     const { client } = useClient()
     const [message, setMessage] = useState<Message<
-        MarkdownMessageSchema | ReplyMessageSchema | RerouteMessageSchema
+        MarkdownMessageSchema | ReplyMessageSchema | RerouteMessageSchema | PlaintextMessageSchema
     > | null>()
     const [isFetching, setIsFetching] = useState<boolean>(true)
     const [devMode] = usePreference('devMode')
@@ -187,6 +189,13 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
                         message={message as Message<RerouteMessageSchema>}
                         lastUpdated={props.lastUpdated}
                     />
+                </Box>
+            )
+            break
+        case Schemas.plaintextMessage:
+            body = (
+                <Box sx={props.sx}>
+                    <PlainMessageView message={message as Message<PlaintextMessageSchema>} />
                 </Box>
             )
             break

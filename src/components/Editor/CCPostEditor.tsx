@@ -122,23 +122,55 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
         const mentions = draft.match(/@([^\s@]+)/g)?.map((e) => e.slice(1)) ?? []
 
         setSending((sending = true))
-        props
-            .onSubmit(draft, dest, {
-                emojis: emojiDict,
-                mentions,
-                profileOverride: { characterID: selectedSubprofile }
-            })
-            .then((error) => {
-                if (error) {
-                    enqueueSnackbar(`Failed to post message: ${error.message}`, { variant: 'error' })
-                } else {
-                    setDraft('')
-                    setEmojiDict({})
-                }
-            })
-            .finally(() => {
-                setSending(false)
-            })
+
+        switch (mode) {
+            case 'plaintext':
+                client
+                    .createPlainTextCrnt(draft, dest, {
+                        profileOverride: { profileID: selectedSubprofile }
+                    })
+                    .then((error) => {
+                        if (error) {
+                            enqueueSnackbar(`Failed to post message: ${error.message}`, { variant: 'error' })
+                        } else {
+                            setDraft('')
+                            setEmojiDict({})
+                        }
+                    })
+                    .finally(() => {
+                        setSending(false)
+                    })
+
+                break
+            case 'markdown':
+                client
+                    .createMarkdownCrnt(draft, dest, {
+                        emojis: emojiDict,
+                        mentions,
+                        profileOverride: { profileID: selectedSubprofile }
+                    })
+                    .then((error) => {
+                        if (error) {
+                            enqueueSnackbar(`Failed to post message: ${error.message}`, { variant: 'error' })
+                        } else {
+                            setDraft('')
+                            setEmojiDict({})
+                        }
+                    })
+                    .finally(() => {
+                        setSending(false)
+                    })
+
+                break
+            case 'media':
+                break
+            /*
+                client.createMediaCrnt(draft, dest, {
+                    emojis: emojiDict,
+                    profileOverride: { profileID: selectedSubprofile }
+                })
+                */
+        }
     }
 
     const uploadImage = async (imageFile: File): Promise<void> => {
