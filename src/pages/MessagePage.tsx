@@ -28,13 +28,13 @@ import {
     type RerouteAssociationSchema
 } from '@concurrent-world/client'
 import { MessageView } from '../components/Message/MessageView'
-import { Draft } from '../components/Draft'
 import { RerouteMessageFrame } from '../components/Message/RerouteMessageFrame'
 import { FavoriteAssociation } from '../components/Association/FavoriteAssociation'
 import { ReactionAssociation } from '../components/Association/ReactionAssociation'
 
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { useGlobalState } from '../context/GlobalState'
+import { CCPostEditor } from '../components/Editor/CCPostEditor'
 
 export function MessagePage(): JSX.Element {
     const { authorID, messageID } = useParams()
@@ -211,7 +211,9 @@ export function MessagePage(): JSX.Element {
             {tab === 'replies' && (
                 <>
                     <Paper variant="outlined">
-                        <Draft
+                        <CCPostEditor
+                            minRows={3}
+                            maxRows={7}
                             streamPickerInitial={message.postedStreams ?? []}
                             streamPickerOptions={allKnownTimelines}
                             placeholder="Write a reply..."
