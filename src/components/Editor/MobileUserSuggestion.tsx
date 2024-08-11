@@ -1,27 +1,20 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Box, List, ListItemButton, ListItemIcon, ListItemText, Paper, Popper } from '@mui/material'
-import caretPosition from 'textarea-caret'
+import { Box, Collapse, List, ListItemButton } from '@mui/material'
 import { type User } from '@concurrent-world/client'
 import { useClient } from '../../context/ClientContext'
 
-export interface UserSuggestionProps {
+export interface MobileUserSuggestionProps {
     textInputRef: HTMLInputElement
     text: string
     setText: (text: string) => void
 }
 
-export const UserSuggestion = (props: UserSuggestionProps): JSX.Element => {
+export const MobileUserSuggestion = (props: MobileUserSuggestionProps): JSX.Element => {
     const { client } = useClient()
 
     const ref = props.textInputRef
     const text = props.text
     const cursorPos = ref.selectionEnd ?? 0
-
-    const caretPos = caretPosition(ref, cursorPos)
-    const caretPosOffsetted = {
-        top: caretPos.top - 50,
-        left: caretPos.left + 10
-    }
 
     const before = text.slice(0, cursorPos ?? 0) ?? ''
     const query = /@([^\s]+)$/.exec(before)?.[1]
@@ -89,42 +82,42 @@ export const UserSuggestion = (props: UserSuggestionProps): JSX.Element => {
     }, [props.textInputRef, onKeyDown])
 
     return (
-        <Popper
-            open={enableSuggestions}
-            anchorEl={props.textInputRef}
-            placement="bottom-start"
-            modifiers={[
-                {
-                    name: 'offset',
-                    options: {
-                        offset: [caretPosOffsetted.left, caretPosOffsetted.top]
-                    }
-                }
-            ]}
-            sx={{
-                zIndex: (theme) => theme.zIndex.tooltip + 1
-            }}
-        >
-            <Paper>
-                <List dense>
-                    {userSuggestions.map((user, index) => (
-                        <ListItemButton
-                            dense
-                            key={user.profile?.avatar}
-                            selected={index === selectedSuggestions}
-                            onClick={() => {
-                                onUserSuggestConfirm(index)
-                                ref.focus()
+        <Collapse in={enableSuggestions}>
+            <List
+                dense
+                sx={{
+                    display: 'flex',
+                    overflowX: 'auto',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start'
+                }}
+            >
+                {userSuggestions.map((user, index) => (
+                    <ListItemButton
+                        key={user.profile?.avatar}
+                        selected={index === selectedSuggestions}
+                        onClick={() => {
+                            onUserSuggestConfirm(index)
+                        }}
+                        sx={{
+                            p: 0,
+                            width: '2em',
+                            height: '2em',
+                            maxWidth: '2em',
+                            maxHeight: '2em'
+                        }}
+                    >
+                        <Box
+                            component="img"
+                            src={user.profile?.avatar}
+                            sx={{
+                                width: '100%',
+                                height: '100%'
                             }}
-                        >
-                            <ListItemIcon>
-                                <Box component="img" src={user.profile?.avatar} sx={{ width: '1em', height: '1em' }} />
-                            </ListItemIcon>
-                            <ListItemText>{user.profile?.username}</ListItemText>
-                        </ListItemButton>
-                    ))}
-                </List>
-            </Paper>
-        </Popper>
+                        />
+                    </ListItemButton>
+                ))}
+            </List>
+        </Collapse>
     )
 }

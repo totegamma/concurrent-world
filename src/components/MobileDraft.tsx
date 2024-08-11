@@ -1,16 +1,5 @@
 import { useState, useEffect, useRef, memo } from 'react'
-import {
-    InputBase,
-    Box,
-    Button,
-    useTheme,
-    Tooltip,
-    List,
-    ListItemButton,
-    Divider,
-    Typography,
-    Collapse
-} from '@mui/material'
+import { InputBase, Box, Button, useTheme, Tooltip, Divider, Typography } from '@mui/material'
 import { StreamPicker } from './ui/StreamPicker'
 import { closeSnackbar, useSnackbar } from 'notistack'
 import { usePersistent } from '../hooks/usePersistent'
@@ -21,12 +10,7 @@ import ImageIcon from '@mui/icons-material/Image'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 import { useEmojiPicker } from '../context/EmojiPickerContext'
-import {
-    type CommunityTimelineSchema,
-    type Timeline,
-    type User,
-    type CreateCurrentOptions
-} from '@concurrent-world/client'
+import { type CommunityTimelineSchema, type Timeline, type CreateCurrentOptions } from '@concurrent-world/client'
 import { useClient } from '../context/ClientContext'
 import { type Emoji, type EmojiLite } from '../model'
 import { useNavigate } from 'react-router-dom'
@@ -36,6 +20,8 @@ import { useTranslation } from 'react-i18next'
 import { useStorage } from '../context/StorageContext'
 import { DummyMessageView } from './Message/DummyMessageView'
 import { CCIconButton } from './ui/CCIconButton'
+import { MobileEmojiSuggestion } from './Editor/MobileEmojiSuggestion'
+import { MobileUserSuggestion } from './Editor/MobileUserSuggestion'
 
 export interface MobileDraftProps {
     streamPickerInitial: Array<Timeline<CommunityTimelineSchema>>
@@ -67,16 +53,6 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
     const [postHome, setPostHome] = useState<boolean>(props.defaultPostHome ?? true)
     const [sending, setSending] = useState<boolean>(false)
 
-    const [enableSuggestions, setEnableSuggestions] = useState<boolean>(false)
-    const [emojiSuggestions, setEmojiSuggestions] = useState<Emoji[]>([])
-
-    const [enableUserPicker, setEnableUserPicker] = useState<boolean>(false)
-    const [userSuggestions, setUserSuggestions] = useState<User[]>([])
-
-    const [selectedSuggestions, setSelectedSuggestions] = useState<number>(0)
-
-    const timerRef = useRef<any | null>(null)
-
     const { enqueueSnackbar } = useSnackbar()
 
     useEffect(() => {
@@ -98,8 +74,6 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
             `:${emoji.shortcode}:` +
             draft.slice(textInputRef.current?.selectionEnd ?? 0)
         setDraft(newDraft)
-        setEnableSuggestions(false)
-        setSelectedSuggestions(0)
         setEmojiDict((prev) => ({ ...prev, [emoji.shortcode]: { imageURL: emoji.imageURL } }))
     }
 
@@ -161,58 +135,6 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
     const onFileUploadClick = (): void => {
         if (fileInputRef.current) {
             fileInputRef.current.click()
-        }
-    }
-
-    const onSuggestConfirm = (index: number): void => {
-        if (enableSuggestions) {
-            onEmojiSuggestConfirm(index)
-        } else if (enableUserPicker) {
-            onUserSuggestConfirm(index)
-        }
-    }
-
-    const onEmojiSuggestConfirm = (index: number): void => {
-        console.log('confirm', index)
-        const before = draft.slice(0, textInputRef.current?.selectionEnd ?? 0) ?? ''
-        const colonPos = before.lastIndexOf(':')
-        if (colonPos === -1) return
-        const after = draft.slice(textInputRef.current?.selectionEnd ?? 0) ?? ''
-
-        const selected = emojiSuggestions[index]
-
-        setDraft(before.slice(0, colonPos) + `:${selected.shortcode}:` + after)
-        setSelectedSuggestions(0)
-        setEnableSuggestions(false)
-
-        setEmojiDict((prev) => ({
-            ...prev,
-            [selected.shortcode]: { imageURL: selected.imageURL }
-        }))
-
-        if (timerRef.current) {
-            clearTimeout(timerRef.current)
-            timerRef.current = null
-            textInputRef.current?.focus()
-        }
-    }
-
-    const onUserSuggestConfirm = (index: number): void => {
-        console.log('user confirm', index)
-        const before = draft.slice(0, textInputRef.current?.selectionEnd ?? 0) ?? ''
-        const colonPos = before.lastIndexOf('@')
-        if (colonPos === -1) return
-        const after = draft.slice(textInputRef.current?.selectionEnd ?? 0) ?? ''
-
-        const selected = userSuggestions[index]
-
-        setDraft(before.slice(0, colonPos) + `@${selected.ccid} ` + after)
-        setEnableUserPicker(false)
-
-        if (timerRef.current) {
-            clearTimeout(timerRef.current)
-            timerRef.current = null
-            textInputRef.current?.focus()
         }
     }
 
@@ -319,76 +241,12 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
                     }}
                     onChange={(e) => {
                         setDraft(e.target.value)
-
-                        const before = e.target.value.slice(0, e.target.selectionEnd ?? 0) ?? ''
-                        const query = /:(\w+)$/.exec(before)?.[1]
-                        const userQuery = /@([^\s@]+)$/.exec(before)?.[1]
-
-                        if (!query) {
-                            setEnableSuggestions(false)
-                        }
-
-                        if (!userQuery) {
-                            setEnableUserPicker(false)
-                        }
-
-                        if (!query && !userQuery) {
-                            return
-                        }
-
-                        if (query) {
-                            setEmojiSuggestions(emojiPicker.search(query))
-                            setEnableSuggestions(true)
-                        }
-
-                        if (userQuery) {
-                            setUserSuggestions(
-                                client.ackings?.filter((q) =>
-                                    q.profile?.username?.toLowerCase()?.includes(userQuery)
-                                ) ?? []
-                            )
-                            setEnableUserPicker(true)
-                        }
                     }}
                     onKeyDown={(e: any) => {
-                        if (
-                            (enableSuggestions && emojiSuggestions.length > 0) ||
-                            (enableUserPicker && userSuggestions.length > 0)
-                        ) {
-                            if (e.key === 'Enter') {
-                                e.preventDefault()
-                                onSuggestConfirm(selectedSuggestions)
-                                return
-                            }
-                            if (e.key === 'ArrowUp') {
-                                e.preventDefault()
-                                setSelectedSuggestions(
-                                    (selectedSuggestions - 1 + emojiSuggestions.length) % emojiSuggestions.length
-                                )
-                                return
-                            }
-                            if (e.key === 'ArrowDown') {
-                                e.preventDefault()
-                                setSelectedSuggestions((selectedSuggestions + 1) % emojiSuggestions.length)
-                                return
-                            }
-                            if (e.key === ':') {
-                                e.preventDefault()
-                                onSuggestConfirm(0)
-                            }
-                        }
                         if (draft.length === 0 || draft.trim().length === 0) return
                         if (e.key === 'Enter' && (e.ctrlKey === true || e.metaKey === true)) {
                             post()
                         }
-                    }}
-                    onBlur={() => {
-                        timerRef.current = setTimeout(() => {
-                            if (enableSuggestions) {
-                                setEnableSuggestions(false)
-                                setSelectedSuggestions(0)
-                            }
-                        }, 100)
                     }}
                     inputRef={textInputRef}
                 />
@@ -405,104 +263,38 @@ export const MobileDraft = memo<MobileDraftProps>((props: MobileDraftProps): JSX
                     overflowY: 'auto'
                 }}
             >
-                <Collapse in={!enableSuggestions && !enableUserPicker}>
-                    <DummyMessageView
-                        hideActions
-                        message={{
-                            body: draft,
-                            emojis: emojiDict
-                        }}
-                        user={client.user?.profile}
-                        userCCID={client.user?.ccid}
-                        timestamp={
-                            <Typography
-                                sx={{
-                                    backgroundColor: 'divider',
-                                    color: 'primary.contrastText',
-                                    px: 1,
-                                    fontSize: '0.75rem'
-                                }}
-                            >
-                                {t('preview')}
-                            </Typography>
-                        }
-                    />
-                </Collapse>
-                <Collapse in={enableSuggestions}>
-                    <List
-                        dense
-                        sx={{
-                            display: 'flex',
-                            overflowX: 'auto',
-                            alignItems: 'center',
-                            justifyContent: 'flex-start',
-                            gap: 0.5
-                        }}
-                    >
-                        {emojiSuggestions.map((emoji, index) => (
-                            <ListItemButton
-                                key={emoji.imageURL}
-                                selected={index === selectedSuggestions}
-                                onClick={() => {
-                                    onEmojiSuggestConfirm(index)
-                                }}
-                                sx={{
-                                    p: 0,
-                                    width: '2em',
-                                    height: '2em',
-                                    maxWidth: '2em',
-                                    maxHeight: '2em'
-                                }}
-                            >
-                                <Box
-                                    component="img"
-                                    src={emoji.imageURL}
-                                    sx={{
-                                        width: '100%',
-                                        height: '100%'
-                                    }}
-                                />
-                            </ListItemButton>
-                        ))}
-                    </List>
-                </Collapse>
-                <Collapse in={enableUserPicker}>
-                    <List
-                        dense
-                        sx={{
-                            display: 'flex',
-                            overflowX: 'auto',
-                            alignItems: 'center',
-                            justifyContent: 'flex-start'
-                        }}
-                    >
-                        {userSuggestions.map((user, index) => (
-                            <ListItemButton
-                                key={user.profile?.avatar}
-                                selected={index === selectedSuggestions}
-                                onClick={() => {
-                                    onUserSuggestConfirm(index)
-                                }}
-                                sx={{
-                                    p: 0,
-                                    width: '2em',
-                                    height: '2em',
-                                    maxWidth: '2em',
-                                    maxHeight: '2em'
-                                }}
-                            >
-                                <Box
-                                    component="img"
-                                    src={user.profile?.avatar}
-                                    sx={{
-                                        width: '100%',
-                                        height: '100%'
-                                    }}
-                                />
-                            </ListItemButton>
-                        ))}
-                    </List>
-                </Collapse>
+                <DummyMessageView
+                    hideActions
+                    message={{
+                        body: draft,
+                        emojis: emojiDict
+                    }}
+                    user={client.user?.profile}
+                    userCCID={client.user?.ccid}
+                    timestamp={
+                        <Typography
+                            sx={{
+                                backgroundColor: 'divider',
+                                color: 'primary.contrastText',
+                                px: 1,
+                                fontSize: '0.75rem'
+                            }}
+                        >
+                            {t('preview')}
+                        </Typography>
+                    }
+                />
+                {textInputRef.current && (
+                    <>
+                        <MobileEmojiSuggestion
+                            textInputRef={textInputRef.current}
+                            text={draft}
+                            setText={setDraft}
+                            updateEmojiDict={setEmojiDict}
+                        />
+                        <MobileUserSuggestion textInputRef={textInputRef.current} text={draft} setText={setDraft} />
+                    </>
+                )}
             </Box>
             <Divider
                 sx={{

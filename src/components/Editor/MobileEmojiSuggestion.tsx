@@ -1,28 +1,21 @@
 import { useCallback, useEffect, useState } from 'react'
 import { type Emoji, type EmojiLite } from '../../model'
-import { Box, List, ListItemButton, ListItemIcon, ListItemText, Paper, Popper } from '@mui/material'
-import caretPosition from 'textarea-caret'
+import { Box, Collapse, List, ListItemButton } from '@mui/material'
 import { useEmojiPicker } from '../../context/EmojiPickerContext'
 
-export interface EmojiSuggestionProps {
+export interface MobileEmojiSuggestionProps {
     textInputRef: HTMLInputElement
     text: string
     setText: (text: string) => void
     updateEmojiDict: (update: (prev: Record<string, EmojiLite>) => Record<string, EmojiLite>) => void
 }
 
-export const EmojiSuggestion = (props: EmojiSuggestionProps): JSX.Element => {
+export const MobileEmojiSuggestion = (props: MobileEmojiSuggestionProps): JSX.Element => {
     const emojiPicker = useEmojiPicker()
 
     const ref = props.textInputRef
     const text = props.text
     const cursorPos = ref.selectionEnd ?? 0
-
-    const caretPos = caretPosition(ref, cursorPos)
-    const caretPosOffsetted = {
-        top: caretPos.top - 50,
-        left: caretPos.left + 10
-    }
 
     const before = text.slice(0, cursorPos ?? 0) ?? ''
     const query = /:(\w+)$/.exec(before)?.[1]
@@ -46,7 +39,6 @@ export const EmojiSuggestion = (props: EmojiSuggestionProps): JSX.Element => {
             ...prev,
             [selected.shortcode]: { imageURL: selected.imageURL }
         }))
-
         setForceOff(true)
     }
 
@@ -59,16 +51,6 @@ export const EmojiSuggestion = (props: EmojiSuggestionProps): JSX.Element => {
         (e: KeyboardEvent) => {
             setForceOff(false)
             if (!enableSuggestions) return
-            if (e.key === 'ArrowUp') {
-                e.preventDefault()
-                setSelectedSuggestions((selectedSuggestions - 1 + emojiSuggestions.length) % emojiSuggestions.length)
-                return
-            }
-            if (e.key === 'ArrowDown') {
-                e.preventDefault()
-                setSelectedSuggestions((selectedSuggestions + 1) % emojiSuggestions.length)
-                return
-            }
             if (e.key === 'Enter') {
                 e.preventDefault()
                 onEmojiSuggestConfirm(selectedSuggestions)
@@ -94,42 +76,43 @@ export const EmojiSuggestion = (props: EmojiSuggestionProps): JSX.Element => {
     }, [props.textInputRef, onKeyDown])
 
     return (
-        <Popper
-            open={enableSuggestions}
-            anchorEl={props.textInputRef}
-            placement="bottom-start"
-            modifiers={[
-                {
-                    name: 'offset',
-                    options: {
-                        offset: [caretPosOffsetted.left, caretPosOffsetted.top]
-                    }
-                }
-            ]}
-            sx={{
-                zIndex: (theme) => theme.zIndex.tooltip + 1
-            }}
-        >
-            <Paper>
-                <List dense>
-                    {emojiSuggestions.map((emoji, index) => (
-                        <ListItemButton
-                            dense
-                            key={emoji.imageURL}
-                            selected={index === selectedSuggestions}
-                            onClick={() => {
-                                onEmojiSuggestConfirm(index)
-                                ref.focus()
+        <Collapse in={enableSuggestions}>
+            <List
+                dense
+                sx={{
+                    display: 'flex',
+                    overflowX: 'auto',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                    gap: 0.5
+                }}
+            >
+                {emojiSuggestions.map((emoji, index) => (
+                    <ListItemButton
+                        key={emoji.imageURL}
+                        selected={index === selectedSuggestions}
+                        onClick={() => {
+                            onEmojiSuggestConfirm(index)
+                        }}
+                        sx={{
+                            p: 0,
+                            width: '2em',
+                            height: '2em',
+                            maxWidth: '2em',
+                            maxHeight: '2em'
+                        }}
+                    >
+                        <Box
+                            component="img"
+                            src={emoji.imageURL}
+                            sx={{
+                                width: '100%',
+                                height: '100%'
                             }}
-                        >
-                            <ListItemIcon>
-                                <Box component="img" src={emoji.imageURL} sx={{ width: '1em', height: '1em' }} />
-                            </ListItemIcon>
-                            <ListItemText>{emoji.shortcode}</ListItemText>
-                        </ListItemButton>
-                    ))}
-                </List>
-            </Paper>
-        </Popper>
+                        />
+                    </ListItemButton>
+                ))}
+            </List>
+        </Collapse>
     )
 }
