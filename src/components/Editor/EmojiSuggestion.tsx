@@ -53,7 +53,7 @@ export const EmojiSuggestion = (props: EmojiSuggestionProps): JSX.Element => {
 
     useEffect(() => {
         if (!query) return
-        setEmojiSuggestions(emojiPicker.search(query))
+        setEmojiSuggestions(emojiPicker.search(query, 16))
     }, [query])
 
     const onKeyDown = useCallback(
@@ -118,7 +118,8 @@ export const EmojiSuggestion = (props: EmojiSuggestionProps): JSX.Element => {
                             width: '2em',
                             height: '2em',
                             maxWidth: '2em',
-                            maxHeight: '2em'
+                            maxHeight: '2em',
+                            flexShrink: 0
                         }}
                     >
                         <Box

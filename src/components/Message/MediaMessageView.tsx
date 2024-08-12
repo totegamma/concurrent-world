@@ -1,4 +1,4 @@
-import { Box, Button, Paper, alpha, useTheme } from '@mui/material'
+import { Box, Button, alpha, useTheme } from '@mui/material'
 import { SimpleNote } from './SimpleNote'
 import { MessageHeader } from './MessageHeader'
 import { MessageActions } from './MessageActions'
@@ -127,19 +127,19 @@ export const MediaMessageView = (props: MediaMessageViewProps): JSX.Element => {
                 }}
             >
                 {props.message.document.body.medias?.map((media, index) => (
-                    <Paper
+                    <Box
                         key={index}
-                        elevation={0}
                         onClick={() => {
                             actions.openImageViewer(media.mediaURL)
                         }}
                         sx={{
-                            height: '10vh',
+                            height: '15vh',
                             aspectRatio: '4/3',
                             backgroundImage: `url(${media.mediaURL})`,
                             backgroundSize: 'cover',
                             backgroundPosition: 'center',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            borderRadius: 1
                         }}
                     />
                 ))}

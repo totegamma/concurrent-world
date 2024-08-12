@@ -156,8 +156,12 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
     }
 
     const post = (postHome: boolean): void => {
-        if (!props.allowEmpty && (draft.length === 0 || draft.trim().length === 0)) {
+        if (!props.allowEmpty && (draft.length === 0 || draft.trim().length === 0) && mode !== 'media') {
             enqueueSnackbar('Message must not be empty!', { variant: 'error' })
+            return
+        }
+        if (mode === 'media' && medias.length === 0) {
+            enqueueSnackbar('Media required', { variant: 'error' })
             return
         }
         if (destTimelines.length === 0 && !postHome) {
@@ -549,15 +553,26 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                     {Object.keys(ModeSets)
                         .filter((key) => ModeSets[key as EditorMode].selectable)
                         .map((key) => (
-                            <CCIconButton
+                            <Tooltip
                                 key={key}
-                                onClick={() => {
-                                    setMode(key as EditorMode)
-                                    setModeMenuAnchor(null)
+                                title={key}
+                                arrow
+                                placement="right"
+                                sx={{
+                                    '& .MuiTooltip-tooltip': {
+                                        fontSize: '0.8rem'
+                                    }
                                 }}
                             >
-                                {ModeSets[key as EditorMode].icon}
-                            </CCIconButton>
+                                <CCIconButton
+                                    onClick={() => {
+                                        setMode(key as EditorMode)
+                                        setModeMenuAnchor(null)
+                                    }}
+                                >
+                                    {ModeSets[key as EditorMode].icon}
+                                </CCIconButton>
+                            </Tooltip>
                         ))}
                 </Box>
             </Menu>
