@@ -509,6 +509,8 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                         post={() => {
                             post(postHome)
                         }}
+                        disableMedia={mode === 'plaintext'}
+                        disableEmoji={mode === 'plaintext'}
                         sending={sending}
                         draft={draft}
                         setDraft={setDraft}
