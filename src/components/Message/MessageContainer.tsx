@@ -3,7 +3,9 @@ import {
     type ReplyMessageSchema,
     type RerouteMessageSchema,
     Schemas,
-    type MarkdownMessageSchema
+    type MarkdownMessageSchema,
+    type MediaMessageSchema,
+    type PlaintextMessageSchema
 } from '@concurrent-world/client'
 import { useClient } from '../../context/ClientContext'
 import { memo, useEffect, useState } from 'react'
@@ -18,6 +20,8 @@ import { ContentWithUserFetch } from '../ContentWithUserFetch'
 import SearchOffIcon from '@mui/icons-material/SearchOff'
 import TerminalIcon from '@mui/icons-material/Terminal'
 import { CopyChip } from '../ui/CopyChip'
+import { PlainMessageView } from './PlainMessageView'
+import { MediaMessageView } from './MediaMessageView'
 
 interface MessageContainerProps {
     messageID: string
@@ -34,7 +38,7 @@ interface MessageContainerProps {
 export const MessageContainer = memo<MessageContainerProps>((props: MessageContainerProps): JSX.Element | null => {
     const { client } = useClient()
     const [message, setMessage] = useState<Message<
-        MarkdownMessageSchema | ReplyMessageSchema | RerouteMessageSchema
+        MarkdownMessageSchema | ReplyMessageSchema | RerouteMessageSchema | PlaintextMessageSchema | MediaMessageSchema
     > | null>()
     const [isFetching, setIsFetching] = useState<boolean>(true)
     const [devMode] = usePreference('devMode')
@@ -186,6 +190,26 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
                         simple={props.simple}
                         message={message as Message<RerouteMessageSchema>}
                         lastUpdated={props.lastUpdated}
+                    />
+                </Box>
+            )
+            break
+        case Schemas.plaintextMessage:
+            body = (
+                <Box sx={props.sx}>
+                    <PlainMessageView message={message as Message<PlaintextMessageSchema>} />
+                </Box>
+            )
+            break
+        case Schemas.mediaMessage:
+            body = (
+                <Box sx={props.sx}>
+                    <MediaMessageView
+                        simple={props.simple}
+                        message={message as Message<MediaMessageSchema>}
+                        lastUpdated={props.lastUpdated}
+                        userCCID={client.ccid}
+                        rerouted={props.rerouted}
                     />
                 </Box>
             )

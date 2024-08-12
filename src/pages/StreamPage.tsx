@@ -118,18 +118,6 @@ export const StreamPage = memo((): JSX.Element => {
                                                 defaultPostHome={!nonPublic}
                                                 streamPickerInitial={streams}
                                                 streamPickerOptions={[...new Set([...allKnownTimelines, ...streams])]}
-                                                onSubmit={async (
-                                                    text: string,
-                                                    destinations: string[],
-                                                    options
-                                                ): Promise<Error | null> => {
-                                                    try {
-                                                        await client.createMarkdownCrnt(text, destinations, options)
-                                                        return null
-                                                    } catch (e) {
-                                                        return e as Error
-                                                    }
-                                                }}
                                                 sx={{
                                                     p: 1
                                                 }}

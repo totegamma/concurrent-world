@@ -217,6 +217,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                         setMode('none')
                     }}
                     variant={isMobileSize ? 'mobile' : 'desktop'}
+                    mode={mode !== 'reply' && mode !== 'reroute' ? undefined : mode}
                     streamPickerInitial={
                         mode === 'compose'
                             ? postStreams
@@ -226,21 +227,10 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     }
                     streamPickerOptions={globalState.allKnownTimelines}
                     allowEmpty={mode === 'reroute'}
+                    actionTo={targetMessage ?? undefined}
                     submitButtonLabel={mode === 'compose' ? 'Post' : mode === 'reply' ? 'Reply' : 'Reroute'}
-                    onSubmit={async (text: string, destinations: string[], options) => {
-                        try {
-                            if (mode === 'compose') {
-                                await client.createMarkdownCrnt(text, destinations, options)
-                            } else if (mode === 'reroute') {
-                                await targetMessage?.reroute(destinations, text, options)
-                            } else if (mode === 'reply') {
-                                await targetMessage?.reply(destinations, text, options)
-                            }
-                            setMode('none')
-                            return null
-                        } catch (e) {
-                            return e as Error
-                        }
+                    onPost={() => {
+                        setMode('none')
                     }}
                     onCancel={() => {
                         setMode('none')
