@@ -1,22 +1,13 @@
 import { Box, Button, Divider, Modal, Paper } from '@mui/material'
-import { type CommunityTimelineSchema, type Timeline, type CreateCurrentOptions } from '@concurrent-world/client'
-import { CCPostEditor } from './Editor/CCPostEditor'
+import { CCPostEditor, type CCPostEditorProps } from './Editor/CCPostEditor'
 import { useEffect, useState } from 'react'
 
-export interface EditorModalProps {
+export interface EditorModalProps extends CCPostEditorProps {
+    variant: 'desktop' | 'mobile'
     open: boolean
     onClose: () => void
-    variant: 'desktop' | 'mobile'
-    streamPickerInitial: Array<Timeline<CommunityTimelineSchema>>
-    streamPickerOptions: Array<Timeline<CommunityTimelineSchema>>
-    onSubmit: (text: string, destinations: string[], options?: CreateCurrentOptions) => Promise<Error | null>
     onCancel?: () => void
-    submitButtonLabel?: string
-    allowEmpty?: boolean
-    placeholder?: string
-    value?: string
     context?: JSX.Element
-    defaultPostHome?: boolean
 }
 
 export const EditorModal = (props: EditorModalProps): JSX.Element => {
