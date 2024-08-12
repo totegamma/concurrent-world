@@ -9,13 +9,19 @@ import {
     Collapse,
     Backdrop,
     type SxProps,
-    Menu
+    Menu,
+    Paper
 } from '@mui/material'
 import { StreamPicker } from '../ui/StreamPicker'
 import { useSnackbar } from 'notistack'
 import { usePersistent } from '../../hooks/usePersistent'
 import HomeIcon from '@mui/icons-material/Home'
-import { type CommunityTimelineSchema, type Timeline, type Message } from '@concurrent-world/client'
+import {
+    type CommunityTimelineSchema,
+    type Timeline,
+    type Message,
+    type MediaMessageSchema
+} from '@concurrent-world/client'
 import { useClient } from '../../context/ClientContext'
 import { type Emoji, type EmojiLite } from '../../model'
 import { useTranslation } from 'react-i18next'
@@ -32,6 +38,7 @@ import PermMediaIcon from '@mui/icons-material/PermMedia'
 import TextFieldsIcon from '@mui/icons-material/TextFields'
 import ReplyIcon from '@mui/icons-material/Reply'
 import RepeatIcon from '@mui/icons-material/Repeat'
+import CancelIcon from '@mui/icons-material/Cancel'
 
 const ModeSets = {
     plaintext: {
@@ -76,11 +83,13 @@ export interface CCPostEditorProps {
     onPost?: () => void
 }
 
+type MediaType = NonNullable<MediaMessageSchema['medias']>[number]
+
 export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): JSX.Element => {
     const theme = useTheme()
     const { client } = useClient()
     const { uploadFile } = useStorage()
-    const { enqueueSnackbar } = useSnackbar()
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar()
     const { t } = useTranslation('', { keyPrefix: 'ui.draft' })
 
     const textInputRef = useRef<HTMLInputElement>(null)
@@ -120,6 +129,7 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
 
     useEffect(() => {
         if (props.value && props.value !== '') {
+            reset()
             setDraft(props.value)
         }
     }, [props.value])
@@ -134,6 +144,15 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
             draft.slice(textInputRef.current?.selectionEnd ?? 0)
         setDraft(newDraft)
         setEmojiDict((prev) => ({ ...prev, [emoji.shortcode]: { imageURL: emoji.imageURL } }))
+    }
+
+    // media
+    const [medias, setMedias] = useState<MediaType[]>([])
+
+    const reset = (): void => {
+        setDraft('')
+        setEmojiDict({})
+        setMedias([])
     }
 
     const post = (postHome: boolean): void => {
@@ -169,7 +188,11 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                 })
                 break
             case 'media':
-                // not implemented
+                req = client.createMediaCrnt(draft, dest, {
+                    emojis: emojiDict,
+                    medias,
+                    profileOverride: { profileID: selectedSubprofile }
+                })
                 break
             case 'reply':
                 if (!props.actionTo) {
@@ -194,8 +217,7 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
         }
 
         req?.then(() => {
-            setDraft('')
-            setEmojiDict({})
+            reset()
             props.onPost?.()
         })
             .catch((error) => {
@@ -207,18 +229,36 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
     }
 
     const uploadImage = async (imageFile: File): Promise<void> => {
-        const uploadingText = ' ![uploading...]()'
-        setDraft(draft + uploadingText)
-        const result = await uploadFile(imageFile)
-        if (!result) {
-            setDraft(draft.replace(uploadingText, ''))
-            setDraft(draft + `![upload failed]()`)
-        } else {
-            setDraft(draft.replace(uploadingText, ''))
-            if (imageFile.type.startsWith('video')) {
-                setDraft(draft + `<video controls><source src="${result}#t=0.1"></video>`)
+        if (mode === 'media') {
+            const notif = enqueueSnackbar('Uploading...', { persist: true })
+            const result = await uploadFile(imageFile)
+            if (!result) {
+                enqueueSnackbar('Failed to upload image', { variant: 'error' })
             } else {
-                setDraft(draft + `![image](${result})`)
+                setMedias((medias) => [
+                    ...medias,
+                    {
+                        mediaURL: result,
+                        mediaType: imageFile.type
+                    }
+                ])
+            }
+            closeSnackbar(notif)
+            enqueueSnackbar('Uploaded', { variant: 'success' })
+        } else {
+            const uploadingText = ' ![uploading...]()'
+            setDraft(draft + uploadingText)
+            const result = await uploadFile(imageFile)
+            if (!result) {
+                setDraft(draft.replace(uploadingText, ''))
+                setDraft(draft + `![upload failed]()`)
+            } else {
+                setDraft(draft.replace(uploadingText, ''))
+                if (imageFile.type.startsWith('video')) {
+                    setDraft(draft + `<video controls><source src="${result}#t=0.1"></video>`)
+                } else {
+                    setDraft(draft + `![image](${result})`)
+                }
             }
         }
     }
@@ -360,6 +400,41 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                     }}
                     inputRef={textInputRef}
                 />
+            </Box>
+
+            <Box display="flex" gap={1}>
+                {medias.map((media, i) => (
+                    <Paper
+                        key={i}
+                        elevation={0}
+                        sx={{
+                            position: 'relative',
+                            width: '75px',
+                            height: '75px',
+                            backgroundImage: `url(${media.mediaURL})`,
+                            backgroundSize: 'cover'
+                        }}
+                    >
+                        <CCIconButton
+                            onClick={() => {
+                                setMedias((medias) => medias.filter((_, j) => i !== j))
+                            }}
+                            sx={{
+                                position: 'absolute',
+                                backgroundColor: 'background.paper',
+                                p: 0.1,
+                                top: -10,
+                                right: -10
+                            }}
+                        >
+                            <CancelIcon
+                                sx={{
+                                    color: 'text.primary'
+                                }}
+                            />
+                        </CCIconButton>
+                    </Paper>
+                ))}
             </Box>
 
             {props.mobile ? (
