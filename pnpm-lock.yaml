@@ -168,8 +168,8 @@ dependencies:
     specifier: ^9.0.0
     version: 9.0.0
   virtua:
-    specifier: ^0.23.2
-    version: 0.23.2(react-dom@18.2.0)(react@18.2.0)
+    specifier: ^0.33.5
+    version: 0.33.5(react-dom@18.2.0)(react@18.2.0)
 
 devDependencies:
   '@cloudflare/workers-types':
@@ -11984,12 +11984,13 @@ packages:
       vfile-message: 3.1.4
     dev: false
 
-  /virtua@0.23.2(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-LeLVubuO+Saxi3yRbr/cBYyCmM60v1IQLHNnoSzTowZQW7o9qoAY9JfTXjagseokUoo5PVQjovG5rSUcbCmOFw==}
+  /virtua@0.33.5(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-dpohZLgUartIixJgIiQ6HstlsryHS1PY58lGJooMUGI7zAdFm3tNkaO8WB6BmmpZfpXz58UMsd7D7hOoSQuvfQ==}
     peerDependencies:
       react: '>=16.14.0'
       react-dom: '>=16.14.0'
       solid-js: '>=1.0'
+      svelte: '>=4.0'
       vue: '>=3.2'
     peerDependenciesMeta:
       react:
@@ -11997,6 +11998,8 @@ packages:
       react-dom:
         optional: true
       solid-js:
+        optional: true
+      svelte:
         optional: true
       vue:
         optional: true

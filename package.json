@@ -65,7 +65,7 @@
         "unist-util-visit": "^5.0.0",
         "use-sound": "^4.0.1",
         "uuid": "^9.0.0",
-        "virtua": "^0.23.2"
+        "virtua": "^0.33.5"
     },
     "devDependencies": {
         "@cloudflare/workers-types": "^4.20240405.0",

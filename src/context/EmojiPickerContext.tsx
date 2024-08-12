@@ -23,13 +23,13 @@ import { usePersistent } from '../hooks/usePersistent'
 import { Link as RouterLink } from 'react-router-dom'
 
 import Fuzzysort from 'fuzzysort'
-import { experimental_VGrid as VGrid, type VGridHandle } from 'virtua'
+import { experimental_VGrid as VGrid, type VGridHandle, VList } from 'virtua'
 import { fetchWithTimeout } from '../util'
 
 export interface EmojiPickerState {
     open: (anchor: HTMLElement, onSelected: (selected: Emoji) => void) => void
     close: () => void
-    search: (input: string) => Emoji[]
+    search: (input: string, limit?: number) => Emoji[]
     packages: EmojiPackage[]
     addEmojiPackage: (url: string) => void
     removeEmojiPackage: (url: string) => void
@@ -212,7 +212,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
 
     useEffect(() => {
         if (query.length > 0) {
-            setSearchResults(search(query, 100))
+            setSearchResults(search(query, 64))
         } else {
             setSearchResults([])
         }
@@ -333,26 +333,24 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                         alignItems="center"
                                         width="100%"
                                         gap={1}
-                                        sx={{
-                                            overflowX: 'auto',
-                                            overflowY: 'hidden'
-                                        }}
                                     >
-                                        {displayEmojis.map((emoji, index) => (
-                                            <IconButton
-                                                key={emoji.imageURL}
-                                                onMouseDown={() => {
-                                                    onSelectEmoji(emoji)
-                                                }}
-                                            >
-                                                <img
-                                                    src={emoji.imageURL}
-                                                    alt={emoji.shortcode}
-                                                    height="30px"
-                                                    width="30px"
-                                                />
-                                            </IconButton>
-                                        ))}
+                                        <VList horizontal style={{ height: '50px', width: '100%' }}>
+                                            {displayEmojis.map((emoji, _) => (
+                                                <IconButton
+                                                    key={emoji.imageURL}
+                                                    onMouseDown={() => {
+                                                        onSelectEmoji(emoji)
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={emoji.imageURL}
+                                                        alt={emoji.shortcode}
+                                                        height="30px"
+                                                        width="30px"
+                                                    />
+                                                </IconButton>
+                                            ))}
+                                        </VList>
                                     </Box>
                                     <Divider />
                                     <TextField
