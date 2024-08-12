@@ -1,16 +1,14 @@
-import { Box, Button, alpha, useTheme } from '@mui/material'
-import { SimpleNote } from './SimpleNote'
+import { Box, Button, Typography, alpha, useTheme } from '@mui/material'
 import { MessageHeader } from './MessageHeader'
 import { MessageActions } from './MessageActions'
 import { MessageReactions } from './MessageReactions'
 import { MessageUrlPreview } from './MessageUrlPreview'
 import {
-    type RerouteMessageSchema,
     type Message,
-    type ReplyMessageSchema,
-    type MarkdownMessageSchema,
+    type PlaintextMessageSchema,
     Schemas,
-    type CoreProfile
+    type CoreProfile,
+    type RerouteMessageSchema
 } from '@concurrent-world/client'
 import { PostedStreams } from './PostedStreams'
 import { ContentWithCCAvatar } from '../ContentWithCCAvatar'
@@ -19,8 +17,8 @@ import ReplayIcon from '@mui/icons-material/Replay'
 import { useEffect, useMemo, useState } from 'react'
 import { useClient } from '../../context/ClientContext'
 
-export interface MessageViewProps {
-    message: Message<MarkdownMessageSchema | ReplyMessageSchema>
+export interface PlainMessageViewProps {
+    message: Message<PlaintextMessageSchema>
     rerouted?: Message<RerouteMessageSchema>
     userCCID?: string
     beforeMessage?: JSX.Element
@@ -33,7 +31,7 @@ export interface MessageViewProps {
 
 const gradationHeight = 80
 
-export const MessageView = (props: MessageViewProps): JSX.Element => {
+export const PlainMessageView = (props: PlainMessageViewProps): JSX.Element => {
     const theme = useTheme()
     const clipHeight = props.clipHeight ?? 450
     const [expanded, setExpanded] = useState(props.forceExpanded ?? false)
@@ -113,7 +111,15 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                         Show more
                     </Button>
                 </Box>
-                <SimpleNote message={props.message} />
+
+                <Typography
+                    sx={{
+                        whiteSpace: 'pre-wrap'
+                    }}
+                >
+                    {props.message.document.body.body}
+                </Typography>
+
                 {!props.simple && <MessageUrlPreview messageBody={props.message.document.body.body} />}
             </Box>
             {(!props.simple && (

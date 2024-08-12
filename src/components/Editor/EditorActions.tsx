@@ -24,6 +24,8 @@ export interface EditorActionsProps {
     insertEmoji: (emoji: Emoji) => void
     setEmojiDict: Dispatch<SetStateAction<Record<string, EmojiLite>>>
     submitButtonLabel?: string
+    disableMedia?: boolean
+    disableEmoji?: boolean
 }
 
 export const EditorActions = (props: EditorActionsProps): JSX.Element => {
@@ -71,6 +73,7 @@ export const EditorActions = (props: EditorActionsProps): JSX.Element => {
                 >
                     <span>
                         <CCIconButton
+                            disabled={props.disableMedia}
                             onClick={() => {
                                 if (isUploadReady) {
                                     onFileUploadClick()
@@ -94,6 +97,7 @@ export const EditorActions = (props: EditorActionsProps): JSX.Element => {
                 </Tooltip>
                 <Tooltip title={t('emoji')} arrow placement="top" enterDelay={500}>
                     <CCIconButton
+                        disabled={props.disableEmoji}
                         onClick={(e) => {
                             emojiPicker.open(e.currentTarget, (emoji) => {
                                 props.insertEmoji(emoji)

@@ -8,13 +8,20 @@ import {
     Tooltip,
     Collapse,
     Backdrop,
-    type SxProps
+    type SxProps,
+    Menu,
+    Paper
 } from '@mui/material'
 import { StreamPicker } from '../ui/StreamPicker'
 import { useSnackbar } from 'notistack'
 import { usePersistent } from '../../hooks/usePersistent'
 import HomeIcon from '@mui/icons-material/Home'
-import { type CommunityTimelineSchema, type Timeline, type CreateCurrentOptions } from '@concurrent-world/client'
+import {
+    type CommunityTimelineSchema,
+    type Timeline,
+    type Message,
+    type MediaMessageSchema
+} from '@concurrent-world/client'
 import { useClient } from '../../context/ClientContext'
 import { type Emoji, type EmojiLite } from '../../model'
 import { useTranslation } from 'react-i18next'
@@ -26,13 +33,46 @@ import { useStorage } from '../../context/StorageContext'
 import { EditorActions } from './EditorActions'
 import { EditorPreview } from './EditorPreview'
 
+import { FaMarkdown } from 'react-icons/fa'
+import PermMediaIcon from '@mui/icons-material/PermMedia'
+import TextFieldsIcon from '@mui/icons-material/TextFields'
+import ReplyIcon from '@mui/icons-material/Reply'
+import RepeatIcon from '@mui/icons-material/Repeat'
+import CancelIcon from '@mui/icons-material/Cancel'
+
+const ModeSets = {
+    plaintext: {
+        icon: <TextFieldsIcon />,
+        selectable: true
+    },
+    markdown: {
+        icon: <FaMarkdown />,
+        selectable: true
+    },
+    media: {
+        icon: <PermMediaIcon />,
+        selectable: true
+    },
+    reply: {
+        icon: <ReplyIcon />,
+        selectable: false
+    },
+    reroute: {
+        icon: <RepeatIcon />,
+        selectable: false
+    }
+}
+
+export type EditorMode = keyof typeof ModeSets
+
 export interface CCPostEditorProps {
+    mode?: EditorMode
+    actionTo?: Message<any>
     autoFocus?: boolean
     mobile?: boolean
     submitButtonLabel?: string
     streamPickerInitial: Array<Timeline<CommunityTimelineSchema>>
     streamPickerOptions: Array<Timeline<CommunityTimelineSchema>>
-    onSubmit: (text: string, destinations: string[], options?: CreateCurrentOptions) => Promise<Error | null>
     allowEmpty?: boolean
     placeholder?: string
     sx?: SxProps
@@ -40,35 +80,61 @@ export interface CCPostEditorProps {
     defaultPostHome?: boolean
     minRows?: number
     maxRows?: number
+    onPost?: () => void
 }
+
+type MediaType = NonNullable<MediaMessageSchema['medias']>[number]
 
 export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): JSX.Element => {
     const theme = useTheme()
     const { client } = useClient()
     const { uploadFile } = useStorage()
-    const { enqueueSnackbar } = useSnackbar()
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar()
     const { t } = useTranslation('', { keyPrefix: 'ui.draft' })
 
+    const textInputRef = useRef<HTMLInputElement>(null)
+    let [sending, setSending] = useState<boolean>(false)
+    const [selectedSubprofile, setSelectedSubprofile] = useState<string | undefined>(undefined)
+
+    // mode handling
+    const [mode, setMode] = useState<EditorMode>('markdown')
+    const [modeMenuAnchor, setModeMenuAnchor] = useState<null | HTMLElement>(null)
+    useEffect(() => {
+        if (props.mode) {
+            setMode(props.mode)
+        } else {
+            setMode('markdown')
+        }
+    }, [props.mode])
+
+    // destination handling
     const [destTimelines, setDestTimelines] = useState<Array<Timeline<CommunityTimelineSchema>>>(
         props.streamPickerInitial
     )
+
+    useEffect(() => {
+        setDestTimelines(props.streamPickerInitial)
+    }, [props.streamPickerInitial])
 
     const destinationModified =
         destTimelines.length !== props.streamPickerInitial.length ||
         destTimelines.some((dest, i) => dest.id !== props.streamPickerInitial[i].id)
 
-    const [draft, setDraft] = usePersistent<string>('draft', '')
-
-    const textInputRef = useRef<HTMLInputElement>(null)
-
     const [postHomeButton, setPostHomeButton] = useState<boolean>(props.defaultPostHome ?? true)
     const [holdCtrlShift, setHoldCtrlShift] = useState<boolean>(false)
     const postHome = postHomeButton && !holdCtrlShift
 
-    let [sending, setSending] = useState<boolean>(false)
+    // draft handling
+    const [draft, setDraft] = usePersistent<string>('draft', '')
 
-    const [selectedSubprofile, setSelectedSubprofile] = useState<string | undefined>(undefined)
+    useEffect(() => {
+        if (props.value && props.value !== '') {
+            reset()
+            setDraft(props.value)
+        }
+    }, [props.value])
 
+    // emoji
     const [emojiDict, setEmojiDict] = useState<Record<string, EmojiLite>>({})
 
     const insertEmoji = (emoji: Emoji): void => {
@@ -80,15 +146,14 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
         setEmojiDict((prev) => ({ ...prev, [emoji.shortcode]: { imageURL: emoji.imageURL } }))
     }
 
-    useEffect(() => {
-        setDestTimelines(props.streamPickerInitial)
-    }, [props.streamPickerInitial])
+    // media
+    const [medias, setMedias] = useState<MediaType[]>([])
 
-    useEffect(() => {
-        if (props.value && props.value !== '') {
-            setDraft(props.value)
-        }
-    }, [props.value])
+    const reset = (): void => {
+        setDraft('')
+        setEmojiDict({})
+        setMedias([])
+    }
 
     const post = (postHome: boolean): void => {
         if (!props.allowEmpty && (draft.length === 0 || draft.trim().length === 0)) {
@@ -107,19 +172,56 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
         const mentions = draft.match(/@([^\s@]+)/g)?.map((e) => e.slice(1)) ?? []
 
         setSending((sending = true))
-        props
-            .onSubmit(draft, dest, {
-                emojis: emojiDict,
-                mentions,
-                profileOverride: { characterID: selectedSubprofile }
-            })
-            .then((error) => {
-                if (error) {
-                    enqueueSnackbar(`Failed to post message: ${error.message}`, { variant: 'error' })
-                } else {
-                    setDraft('')
-                    setEmojiDict({})
+
+        let req
+        switch (mode) {
+            case 'plaintext':
+                req = client.createPlainTextCrnt(draft, dest, {
+                    profileOverride: { profileID: selectedSubprofile }
+                })
+                break
+            case 'markdown':
+                req = client.createMarkdownCrnt(draft, dest, {
+                    emojis: emojiDict,
+                    mentions,
+                    profileOverride: { profileID: selectedSubprofile }
+                })
+                break
+            case 'media':
+                req = client.createMediaCrnt(draft, dest, {
+                    emojis: emojiDict,
+                    medias,
+                    profileOverride: { profileID: selectedSubprofile }
+                })
+                break
+            case 'reply':
+                if (!props.actionTo) {
+                    req = Promise.reject(new Error('No actionTo'))
+                    break
                 }
+                req = props.actionTo.reply(dest, draft, {
+                    profileOverride: { profileID: selectedSubprofile }
+                })
+                break
+            case 'reroute':
+                if (!props.actionTo) {
+                    req = Promise.reject(new Error('No actionTo'))
+                    break
+                }
+                req = props.actionTo.reroute(dest, draft, {
+                    profileOverride: { profileID: selectedSubprofile }
+                })
+                break
+            default:
+                enqueueSnackbar('Invalid mode', { variant: 'error' })
+        }
+
+        req?.then(() => {
+            reset()
+            props.onPost?.()
+        })
+            .catch((error) => {
+                enqueueSnackbar(`Failed to post message: ${error.message}`, { variant: 'error' })
             })
             .finally(() => {
                 setSending(false)
@@ -127,18 +229,36 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
     }
 
     const uploadImage = async (imageFile: File): Promise<void> => {
-        const uploadingText = ' ![uploading...]()'
-        setDraft(draft + uploadingText)
-        const result = await uploadFile(imageFile)
-        if (!result) {
-            setDraft(draft.replace(uploadingText, ''))
-            setDraft(draft + `![upload failed]()`)
-        } else {
-            setDraft(draft.replace(uploadingText, ''))
-            if (imageFile.type.startsWith('video')) {
-                setDraft(draft + `<video controls><source src="${result}#t=0.1"></video>`)
+        if (mode === 'media') {
+            const notif = enqueueSnackbar('Uploading...', { persist: true })
+            const result = await uploadFile(imageFile)
+            if (!result) {
+                enqueueSnackbar('Failed to upload image', { variant: 'error' })
             } else {
-                setDraft(draft + `![image](${result})`)
+                setMedias((medias) => [
+                    ...medias,
+                    {
+                        mediaURL: result,
+                        mediaType: imageFile.type
+                    }
+                ])
+            }
+            closeSnackbar(notif)
+            enqueueSnackbar('Uploaded', { variant: 'success' })
+        } else {
+            const uploadingText = ' ![uploading...]()'
+            setDraft(draft + uploadingText)
+            const result = await uploadFile(imageFile)
+            if (!result) {
+                setDraft(draft.replace(uploadingText, ''))
+                setDraft(draft + `![upload failed]()`)
+            } else {
+                setDraft(draft.replace(uploadingText, ''))
+                if (imageFile.type.startsWith('video')) {
+                    setDraft(draft + `<video controls><source src="${result}#t=0.1"></video>`)
+                } else {
+                    setDraft(draft + `![image](${result})`)
+                }
             }
         }
     }
@@ -193,6 +313,13 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                         flex: 1
                     }}
                 >
+                    <CCIconButton
+                        onClick={(e) => {
+                            if (ModeSets[mode].selectable) setModeMenuAnchor(e.currentTarget)
+                        }}
+                    >
+                        {ModeSets[mode].icon}
+                    </CCIconButton>
                     <StreamPicker
                         options={props.streamPickerOptions}
                         selected={destTimelines}
@@ -275,6 +402,41 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                 />
             </Box>
 
+            <Box display="flex" gap={1}>
+                {medias.map((media, i) => (
+                    <Paper
+                        key={i}
+                        elevation={0}
+                        sx={{
+                            position: 'relative',
+                            width: '75px',
+                            height: '75px',
+                            backgroundImage: `url(${media.mediaURL})`,
+                            backgroundSize: 'cover'
+                        }}
+                    >
+                        <CCIconButton
+                            onClick={() => {
+                                setMedias((medias) => medias.filter((_, j) => i !== j))
+                            }}
+                            sx={{
+                                position: 'absolute',
+                                backgroundColor: 'background.paper',
+                                p: 0.1,
+                                top: -10,
+                                right: -10
+                            }}
+                        >
+                            <CancelIcon
+                                sx={{
+                                    color: 'text.primary'
+                                }}
+                            />
+                        </CCIconButton>
+                    </Paper>
+                ))}
+            </Box>
+
             {props.mobile ? (
                 <>
                     <Collapse
@@ -347,6 +509,8 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                         post={() => {
                             post(postHome)
                         }}
+                        disableMedia={mode === 'plaintext'}
+                        disableEmoji={mode === 'plaintext'}
                         sending={sending}
                         draft={draft}
                         setDraft={setDraft}
@@ -373,6 +537,30 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                     </Collapse>
                 </>
             )}
+
+            <Menu
+                anchorEl={modeMenuAnchor}
+                open={Boolean(modeMenuAnchor)}
+                onClose={() => {
+                    setModeMenuAnchor(null)
+                }}
+            >
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    {Object.keys(ModeSets)
+                        .filter((key) => ModeSets[key as EditorMode].selectable)
+                        .map((key) => (
+                            <CCIconButton
+                                key={key}
+                                onClick={() => {
+                                    setMode(key as EditorMode)
+                                    setModeMenuAnchor(null)
+                                }}
+                            >
+                                {ModeSets[key as EditorMode].icon}
+                            </CCIconButton>
+                        ))}
+                </Box>
+            </Menu>
         </Box>
     )
 })

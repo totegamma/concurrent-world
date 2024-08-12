@@ -191,18 +191,6 @@ export function ListPage(): JSX.Element {
                                                 maxRows={7}
                                                 streamPickerOptions={allKnownTimelines}
                                                 streamPickerInitial={postStreams}
-                                                onSubmit={async (
-                                                    text: string,
-                                                    destinations: string[],
-                                                    options?: CreateCurrentOptions
-                                                ): Promise<Error | null> => {
-                                                    try {
-                                                        await client.createMarkdownCrnt(text, destinations, options)
-                                                        return null
-                                                    } catch (e) {
-                                                        return e as Error
-                                                    }
-                                                }}
                                                 sx={{
                                                     p: 1
                                                 }}

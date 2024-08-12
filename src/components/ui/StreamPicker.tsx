@@ -30,7 +30,6 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
             sx={{
                 ...props.sx,
                 borderRadius: 2,
-                padding: '0px 10px',
                 flex: '1',
                 backgroundColor: 'background.paper'
             }}

@@ -214,17 +214,13 @@ export function MessagePage(): JSX.Element {
                         <CCPostEditor
                             minRows={3}
                             maxRows={7}
-                            streamPickerInitial={message.postedStreams ?? []}
+                            streamPickerInitial={
+                                message.postedStreams?.filter((t) => t.schema === Schemas.communityTimeline) ?? []
+                            }
                             streamPickerOptions={allKnownTimelines}
                             placeholder="Write a reply..."
-                            onSubmit={async (text: string, streams: string[], options): Promise<Error | null> => {
-                                try {
-                                    await message.reply(streams, text, options?.emojis)
-                                    return null
-                                } catch (e) {
-                                    return e as Error
-                                }
-                            }}
+                            actionTo={message}
+                            mode="reply"
                             sx={{
                                 p: 1
                             }}

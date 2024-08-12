@@ -1,4 +1,4 @@
-import { Box, Button, alpha, useTheme } from '@mui/material'
+import { Box, Button, Paper, alpha, useTheme } from '@mui/material'
 import { SimpleNote } from './SimpleNote'
 import { MessageHeader } from './MessageHeader'
 import { MessageActions } from './MessageActions'
@@ -7,10 +7,9 @@ import { MessageUrlPreview } from './MessageUrlPreview'
 import {
     type RerouteMessageSchema,
     type Message,
-    type ReplyMessageSchema,
-    type MarkdownMessageSchema,
     Schemas,
-    type CoreProfile
+    type CoreProfile,
+    type MediaMessageSchema
 } from '@concurrent-world/client'
 import { PostedStreams } from './PostedStreams'
 import { ContentWithCCAvatar } from '../ContentWithCCAvatar'
@@ -18,9 +17,10 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import ReplayIcon from '@mui/icons-material/Replay'
 import { useEffect, useMemo, useState } from 'react'
 import { useClient } from '../../context/ClientContext'
+import { useGlobalActions } from '../../context/GlobalActions'
 
-export interface MessageViewProps {
-    message: Message<MarkdownMessageSchema | ReplyMessageSchema>
+export interface MediaMessageViewProps {
+    message: Message<MediaMessageSchema>
     rerouted?: Message<RerouteMessageSchema>
     userCCID?: string
     beforeMessage?: JSX.Element
@@ -33,8 +33,9 @@ export interface MessageViewProps {
 
 const gradationHeight = 80
 
-export const MessageView = (props: MessageViewProps): JSX.Element => {
+export const MediaMessageView = (props: MediaMessageViewProps): JSX.Element => {
     const theme = useTheme()
+    const actions = useGlobalActions()
     const clipHeight = props.clipHeight ?? 450
     const [expanded, setExpanded] = useState(props.forceExpanded ?? false)
 
@@ -114,8 +115,36 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                     </Button>
                 </Box>
                 <SimpleNote message={props.message} />
+
                 {!props.simple && <MessageUrlPreview messageBody={props.message.document.body.body} />}
             </Box>
+            <Box
+                display="flex"
+                gap={1}
+                sx={{
+                    overflowX: 'auto',
+                    overflowY: 'hidden'
+                }}
+            >
+                {props.message.document.body.medias?.map((media, index) => (
+                    <Paper
+                        key={index}
+                        elevation={0}
+                        onClick={() => {
+                            actions.openImageViewer(media.mediaURL)
+                        }}
+                        sx={{
+                            height: '10vh',
+                            aspectRatio: '4/3',
+                            backgroundImage: `url(${media.mediaURL})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            cursor: 'pointer'
+                        }}
+                    />
+                ))}
+            </Box>
+
             {(!props.simple && (
                 <>
                     <MessageReactions message={props.message} />
