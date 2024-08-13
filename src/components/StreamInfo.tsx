@@ -63,6 +63,9 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
         return <>stream information not found</>
     }
 
+    const settingValid =
+        schemaDraft.startsWith('https://') && (policyDraft === '' || policyDraft?.startsWith('https://'))
+
     return (
         <>
             <CCWallpaper
@@ -138,9 +141,10 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                                 <Typography>空の場合パブリックになります。</Typography>
                             </Box>
                             <Typography variant="h3">スキーマ</Typography>
-                            ※基本的に変更する必要はありません。
                             <TextField
                                 label="Schema"
+                                error={!schemaDraft?.startsWith('https://')}
+                                helperText="JsonSchema URLを入力。基本的に変更する必要はありません"
                                 value={schemaDraft}
                                 onChange={(e) => {
                                     setSchemaDraft(e.target.value)
@@ -159,6 +163,12 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                             <Typography variant="h3">ポリシー</Typography>
                             <TextField
                                 label="Policy"
+                                error={!policyDraft?.startsWith('https://') && policyDraft !== ''}
+                                helperText={
+                                    policyDraft === ''
+                                        ? '空の場合はデフォルトポリシーが適用されます'
+                                        : 'PolicyJSONのURLを入力。'
+                                }
                                 value={policyDraft}
                                 onChange={(e) => {
                                     setPolicyDraft(e.target.value)
@@ -180,6 +190,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                                 onClick={() => {
                                     updateStream()
                                 }}
+                                disabled={!settingValid}
                             >
                                 保存
                             </Button>
