@@ -68,6 +68,12 @@ export interface WorldMessage {
     emojis: {}
     mentions: []
     profileOverride: {}
+    medias?: {
+        mediaURL: string;
+        mediaType: string;
+        thumbnailURL?: string;
+        blurhash?: string;
+    }[]
 }
 
 export interface WorldCommunityTimeline {
