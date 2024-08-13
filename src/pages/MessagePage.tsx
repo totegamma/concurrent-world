@@ -35,6 +35,8 @@ import { ReactionAssociation } from '../components/Association/ReactionAssociati
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { useGlobalState } from '../context/GlobalState'
 import { CCPostEditor } from '../components/Editor/CCPostEditor'
+import { PlainMessageView } from '../components/Message/PlainMessageView'
+import { MediaMessageView } from '../components/Message/MediaMessageView'
 
 export function MessagePage(): JSX.Element {
     const { authorID, messageID } = useParams()
@@ -167,6 +169,34 @@ export function MessagePage(): JSX.Element {
                 <>
                     <Box>
                         <MessageView
+                            forceExpanded
+                            message={message as Message<MarkdownMessageSchema | ReplyMessageSchema>}
+                            lastUpdated={lastUpdated}
+                            userCCID={client.ccid}
+                        />
+                    </Box>
+                    <Divider />
+                </>
+            )}
+
+            {message.schema === Schemas.plaintextMessage && (
+                <>
+                    <Box>
+                        <PlainMessageView
+                            forceExpanded
+                            message={message as Message<MarkdownMessageSchema | ReplyMessageSchema>}
+                            lastUpdated={lastUpdated}
+                            userCCID={client.ccid}
+                        />
+                    </Box>
+                    <Divider />
+                </>
+            )}
+
+            {message.schema === Schemas.mediaMessage && (
+                <>
+                    <Box>
+                        <MediaMessageView
                             forceExpanded
                             message={message as Message<MarkdownMessageSchema | ReplyMessageSchema>}
                             lastUpdated={lastUpdated}
