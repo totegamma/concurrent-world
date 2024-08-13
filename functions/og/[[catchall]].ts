@@ -33,10 +33,22 @@ export const onRequest: PagesFunction = async (context) => {
         const entity: CoreEntity = await fetch(`https://ariake.concrnt.net/api/v1/entity/${ccid}`)
             .then((response) => response.json<ApiResponse<CoreEntity>>())
             .then((data) => data.content)
+        if (!entity) {
+            return Response.redirect(
+                CCWORLD,
+                301
+            )
+        }
 
         const message: CoreMessage = await fetch(`https://${entity.domain}/api/v1/message/${messageId}`)
             .then((response) => response.json<ApiResponse<CoreMessage>>())
             .then((data) => data.content)
+        if (!message) {
+            return Response.redirect(
+                CCWORLD,
+                301
+            )
+        }
 
         const messageBody: WorldMessage = JSON.parse(message.document).body
         const content = messageBody.body
@@ -44,50 +56,50 @@ export const onRequest: PagesFunction = async (context) => {
         const profile: CoreProfile = await fetch(`https://${entity.domain}/api/v1/profile/${entity.ccid}/world.concrnt.p`)
             .then((response) => response.json<ApiResponse<CoreProfile>>())
             .then((data) => data.content)
+        if (!profile) {
+            return Response.redirect(
+                CCWORLD,
+                301
+            )
+        }
 
         const worldProfile: WorldProfile = JSON.parse(profile.document).body
 
         const username = sanitizeHtml(worldProfile.username)
         const avatar = sanitizeHtml(worldProfile.avatar)
 
-        let responseBody = ''
+        const imageRegex = /!\[[^\]]*\]\(([^\)]*)\)/g
 
-        const imageRegex = /!\[[^\]]*\]\(([^\)]*)\)/
+        const matches = content.matchAll(imageRegex)
+        const images = Array.from(matches, m => m[1])
 
-        if (content.match(imageRegex)) {
-            const imageUrl = content.match(imageRegex)[1]
-            responseBody = `
+        const medias = messageBody.medias
+        medias?.forEach((media) => {
+            if (media.mediaType.startsWith('image')) {
+                images.push(media.mediaURL)
+            }
+        })
+
+        const responseBody = `
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8">
     <meta property="og:title" content="${username} on Concrnt">
     <meta property="og:description" content="${content.slice(0, content.search(imageRegex))}">
-    <meta property="og:image" content="${imageUrl}">
-    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:card" content="${images.length > 0 ? 'summary_large_image' : 'summary'}">
+    ${
+        images.length > 0 
+            ? images.map((imageUrl) => `<meta property="og:image" content="${imageUrl}">`).join('\n')
+            : `<meta property="og:image" content="${avatar}">`
+    }
     <meta name="theme-color" content="#0476d9" />
     <script>
         window.location.href = "${originalPath}"
     </script>
   </head>
-</html>`
-        } else {
-            responseBody = `
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <meta property="og:title" content="${username} on Concrnt">
-    <meta property="og:description" content="${content}">
-    <meta property="og:image" content="${avatar}">
-    <meta property="twitter:card" content="summary">
-    <meta name="theme-color" content="#0476d9" />
-    <script>
-        window.location.href = "${originalPath}"
-    </script>
-  </head>
-</html>`
-        }
+</html>
+`
 
         response = new Response(responseBody, {
             headers: {

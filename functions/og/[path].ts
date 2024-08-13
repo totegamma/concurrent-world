@@ -23,10 +23,22 @@ export const onRequest: PagesFunction = async (context) => {
         const entity: CoreEntity = await fetch(`https://ariake.concrnt.net/api/v1/entity/${ccid}`)
             .then((response) => response.json<ApiResponse<CoreEntity>>())
             .then((data) => data.content)
+        if (!entity) {
+            return Response.redirect(
+                CCWORLD,
+                301
+            )
+        }
 
         const profile: CoreProfile = await fetch(`https://${entity.domain}/api/v1/profile/${entity.ccid}/world.concrnt.p`)
             .then((response) => response.json<ApiResponse<CoreProfile>>())
             .then((data) => data.content)
+        if (!profile) {
+            return Response.redirect(
+                CCWORLD,
+                301
+            )
+        }
 
         const worldProfile: WorldProfile = JSON.parse(profile.document).body
 
