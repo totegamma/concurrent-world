@@ -83,7 +83,7 @@ export interface CCPostEditorProps {
     onPost?: () => void
 }
 
-type MediaType = NonNullable<MediaMessageSchema['medias']>[number]
+export type MediaType = NonNullable<MediaMessageSchema['medias']>[number]
 
 export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): JSX.Element => {
     const theme = useTheme()
@@ -494,6 +494,13 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                         insertEmoji={insertEmoji}
                         setEmojiDict={setEmojiDict}
                         submitButtonLabel={props.submitButtonLabel}
+                        onAddMedia={
+                            mode === 'media'
+                                ? (media) => {
+                                      setMedias((medias) => [...medias, media])
+                                  }
+                                : undefined
+                        }
                     />
                 </>
             ) : (
@@ -523,6 +530,13 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                         insertEmoji={insertEmoji}
                         setEmojiDict={setEmojiDict}
                         submitButtonLabel={props.submitButtonLabel}
+                        onAddMedia={
+                            mode === 'media'
+                                ? (media) => {
+                                      setMedias((medias) => [...medias, media])
+                                  }
+                                : undefined
+                        }
                     />
                     <Collapse unmountOnExit in={draft.length > 0}>
                         <Divider
