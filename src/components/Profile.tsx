@@ -7,8 +7,8 @@ import { MarkdownRenderer } from '../components/ui/MarkdownRenderer'
 
 import { Link as NavLink } from 'react-router-dom'
 
-import { useEffect, useState } from 'react'
-import { type CoreProfile, type User } from '@concurrent-world/client'
+import { useEffect, useMemo, useState } from 'react'
+import { type CCDocument, type CoreProfile, type User } from '@concurrent-world/client'
 import { useClient } from '../context/ClientContext'
 import { CCDrawer } from './ui/CCDrawer'
 import { AckList } from '../components/AckList'
@@ -55,6 +55,18 @@ export function Profile(props: ProfileProps): JSX.Element {
         })
         return () => {
             unmounted = true
+        }
+    }, [props.user])
+
+    const affiliationDate = useMemo(() => {
+        try {
+            const document = props.user?.affiliationDocument
+            if (!document) return null
+
+            const doc: CCDocument.Affiliation = JSON.parse(document)
+            return new Date(doc.signedAt)
+        } catch (e) {
+            console.error(e)
         }
     }, [props.user])
 
@@ -212,7 +224,7 @@ export function Profile(props: ProfileProps): JSX.Element {
                     <Typography variant="caption">
                         {props.user ? (
                             `現住所: ${props.user?.domain !== '' ? props.user.domain : client.api.host}` +
-                            (props.user?.cdate ? ` (${new Date(props.user.cdate).toLocaleDateString()}~)` : '')
+                            ` (${affiliationDate?.toLocaleDateString() ?? ''}~)`
                         ) : (
                             <Skeleton variant="text" width={200} />
                         )}
