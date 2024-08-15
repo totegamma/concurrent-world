@@ -14,7 +14,7 @@ export function Passport(): JSX.Element {
             name={client?.user?.profile?.username || ''}
             avatar={client?.user?.profile?.avatar || ''}
             host={client.api.host || ''}
-            cdate={'N/A'}
+            cdate={client.user?.cdate ? new Date(client.user.cdate).toLocaleDateString() : 'N/A'}
             trust={100}
         />
     )
@@ -98,7 +98,7 @@ export function PassportRenderer(props: PassportRendererProps): JSX.Element {
 
                     <text style={style3} transform="translate(12 14)">
                         <tspan x="0" y="0">
-                            CONCURRENT
+                            CONCRNT
                         </tspan>
                     </text>
 
