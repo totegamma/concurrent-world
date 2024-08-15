@@ -211,7 +211,8 @@ export function Profile(props: ProfileProps): JSX.Element {
                 <Box>
                     <Typography variant="caption">
                         {props.user ? (
-                            `現住所: ${props.user?.domain !== '' ? props.user.domain : client.api.host}`
+                            `現住所: ${props.user?.domain !== '' ? props.user.domain : client.api.host}` +
+                            (props.user?.cdate ? ` (${new Date(props.user.cdate).toLocaleDateString()}~)` : '')
                         ) : (
                             <Skeleton variant="text" width={200} />
                         )}
