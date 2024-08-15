@@ -1,12 +1,25 @@
 import { useTheme } from '@mui/material'
 import { type ConcurrentTheme } from '../../model'
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useClient } from '../../context/ClientContext'
 import BoringAvatar from 'boring-avatars'
 import html2canvas from 'html2canvas'
+import { type CCDocument } from '@concurrent-world/client'
 
 export function Passport(): JSX.Element {
     const { client } = useClient()
+
+    const affiliationDate = useMemo(() => {
+        try {
+            const document = client.user?.affiliationDocument
+            if (!document) return null
+
+            const doc: CCDocument.Affiliation = JSON.parse(document)
+            return new Date(doc.signedAt)
+        } catch (e) {
+            console.error(e)
+        }
+    }, [client.user])
 
     return (
         <PassportRenderer
@@ -14,7 +27,7 @@ export function Passport(): JSX.Element {
             name={client?.user?.profile?.username || ''}
             avatar={client?.user?.profile?.avatar || ''}
             host={client.api.host || ''}
-            cdate={client.user?.cdate ? new Date(client.user.cdate).toLocaleDateString() : 'N/A'}
+            cdate={affiliationDate?.toLocaleDateString() || 'N/A'}
             trust={100}
         />
     )
