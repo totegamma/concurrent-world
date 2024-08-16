@@ -103,6 +103,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                         [sub.id]: {
                             pinned: true,
                             expanded: false,
+                            defaultPostHome: true,
                             defaultPostStreams: timeline ? [timeline] : []
                         }
                     }

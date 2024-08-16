@@ -193,6 +193,7 @@ export function ManageSubsPage(): JSX.Element {
                                                 old[sub.id] = {
                                                     pinned: false,
                                                     expanded: false,
+                                                    defaultPostHome: true,
                                                     defaultPostStreams: []
                                                 }
                                                 setLists(old)
