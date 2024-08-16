@@ -129,6 +129,16 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                             }}
                         />
                     </Box>
+                    <Typography variant="h3">ホーム投稿</Typography>
+                    <Switch
+                        checked={list.defaultPostHome}
+                        onChange={(_) => {
+                            updateList(props.subscription.id, {
+                                ...list,
+                                defaultPostHome: !list.defaultPostHome
+                            })
+                        }}
+                    />
                     <Typography variant="h3">{t('pin')}</Typography>
                     <Switch
                         checked={list.pinned}

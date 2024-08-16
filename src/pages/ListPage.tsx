@@ -5,7 +5,6 @@ import { usePreference } from '../context/PreferenceContext'
 import { Timeline } from '../components/Timeline'
 import { useClient } from '../context/ClientContext'
 import {
-    type CreateCurrentOptions,
     type CommunityTimelineSchema,
     type Timeline as CoreTimeline,
     type CoreSubscription,
@@ -191,6 +190,7 @@ export function ListPage(): JSX.Element {
                                                 maxRows={7}
                                                 streamPickerOptions={allKnownTimelines}
                                                 streamPickerInitial={postStreams}
+                                                defaultPostHome={lists[tab].defaultPostHome}
                                                 sx={{
                                                     p: 1
                                                 }}

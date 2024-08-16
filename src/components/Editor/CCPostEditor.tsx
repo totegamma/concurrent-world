@@ -128,6 +128,11 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
     const [holdCtrlShift, setHoldCtrlShift] = useState<boolean>(false)
     const postHome = postHomeButton && !holdCtrlShift
 
+    useEffect(() => {
+        if (props.defaultPostHome === undefined) return
+        setPostHomeButton(props.defaultPostHome)
+    }, [props.defaultPostHome])
+
     // draft handling
     const [draft, setDraft] = usePersistent<string>('draft', '')
 
