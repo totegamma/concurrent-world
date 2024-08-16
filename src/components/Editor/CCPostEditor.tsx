@@ -355,7 +355,13 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                 </Box>
             )}
 
-            <Box sx={{ ...props.sx }}>
+            <Box
+                sx={{
+                    ...props.sx,
+                    display: 'flex',
+                    flexDirection: 'column'
+                }}
+            >
                 <Box
                     sx={{
                         display: 'flex',
