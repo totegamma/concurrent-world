@@ -204,6 +204,7 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                     break
                 }
                 req = props.actionTo.reply(dest, draft, {
+                    emojis: emojiDict,
                     profileOverride: { profileID: selectedSubprofile }
                 })
                 break
@@ -213,6 +214,7 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                     break
                 }
                 req = props.actionTo.reroute(dest, draft, {
+                    emojis: emojiDict,
                     profileOverride: { profileID: selectedSubprofile }
                 })
                 break
