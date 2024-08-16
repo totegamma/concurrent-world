@@ -63,12 +63,6 @@ export const EditorActions = (props: EditorActionsProps): JSX.Element => {
         props.textInputRef.current?.focus()
     }
 
-    const onFileUploadClick = (): void => {
-        if (fileInputRef.current) {
-            fileInputRef.current.click()
-        }
-    }
-
     const [mediaMenuAnchorEl, setMediaMenuAnchorEl] = useState<HTMLButtonElement | null>(null)
 
     const mediaButtonTimer = useRef<NodeJS.Timeout | null>(null)
@@ -89,7 +83,7 @@ export const EditorActions = (props: EditorActionsProps): JSX.Element => {
                 mediaButtonTimer.current = null
 
                 if (isUploadReady) {
-                    onFileUploadClick()
+                    fileInputRef.current.click()
                 } else {
                     navigate('/settings/media')
                 }
@@ -121,11 +115,9 @@ export const EditorActions = (props: EditorActionsProps): JSX.Element => {
                             onMouseDown={(e) => {
                                 mediaButtonOnPress(e.currentTarget)
                             }}
-                            onTouchStart={(e) => {
-                                mediaButtonOnPress(e.currentTarget)
+                            onMouseUp={() => {
+                                mediaButtonOnRelease()
                             }}
-                            onMouseUp={mediaButtonOnRelease}
-                            onTouchEnd={mediaButtonOnRelease}
                         >
                             <ImageIcon sx={{ fontSize: '80%' }} />
                             <input
