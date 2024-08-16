@@ -133,10 +133,14 @@ export function Profile(props: ProfileProps): JSX.Element {
                     sx={{
                         display: 'flex',
                         gap: 1,
-                        flexWrap: 'wrap',
-                        pl: '108px'
+                        flexWrap: 'wrap'
                     }}
                 >
+                    <Box
+                        sx={{
+                            width: '100px'
+                        }}
+                    />
                     {props.user && (
                         <>
                             {props.user.profile?.subprofiles?.map((id, _) => (
