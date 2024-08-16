@@ -24,13 +24,9 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
     const { client } = useClient()
 
     const [lists, setLists] = usePreference('lists')
+    const list = lists[props.subscription.id]
 
-    const listSubscription =
-        props.subscription.schema === Schemas.listSubscription
-            ? (props.subscription as CoreSubscription<ListSubscriptionSchema>)
-            : null
-
-    const [listName, setListName] = useState<string>(listSubscription ? listSubscription.document.body.name : '')
+    const [listName, setListName] = useState<string>('')
 
     const { t } = useTranslation('', { keyPrefix: 'ui.listSettings' })
 
@@ -39,14 +35,15 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
 
     const [tab, setTab] = useState<'stream' | 'user'>('stream')
 
-    const list = lists[props.subscription.id]
-
     useEffect(() => {
-        if (!list) return
+        console.log(props.subscription)
+        setListName(props.subscription.document.body.name)
+
         Promise.all(props.subscription.items.map((sub) => client.getTimeline(sub.id))).then((streams) => {
             setOptions(streams.filter((e) => e !== null) as Array<Timeline<CommunityTimelineSchema>>)
         })
 
+        if (!list) return
         Promise.all(list.defaultPostStreams.map((streamID) => client.getTimeline(streamID))).then((streams) => {
             setPostStreams(streams.filter((stream) => stream !== null) as Array<Timeline<CommunityTimelineSchema>>)
         })
