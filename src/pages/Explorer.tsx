@@ -199,7 +199,7 @@ export function Explorer(): JSX.Element {
             <Tabs
                 value={tab}
                 onChange={(_, v) => {
-                    navigate(`/explorer/${v}`)
+                    navigate(`/explorer/${v}#${hash}`)
                 }}
             >
                 <Tab value={'timelines'} label={'タイムライン'} />
