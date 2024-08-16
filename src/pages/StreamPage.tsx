@@ -40,20 +40,19 @@ export const StreamPage = memo((): JSX.Element => {
         return targetStream?.author === client.ccid
     }, [targetStream])
 
-    const writeable = useMemo(
-        // () => isOwner || targetStream?.writer.length === 0 || targetStream?.writer.includes(client.ccid ?? ''),
-        () => true,
-        [targetStream]
-    )
+    const isRestricted = targetStream?.policy === 'https://policy.concrnt.world/t/inline-read-write.json'
 
-    const readable = useMemo(
-        // () => isOwner || targetStream?.reader.length === 0 || targetStream?.reader.includes(client.ccid ?? ''),
-        () => true,
-        [targetStream]
-    )
+    const writeable = isRestricted
+        ? targetStream?.policyParams?.isWritePublic
+            ? true
+            : targetStream?.policyParams?.writer?.includes(client.ccid ?? '')
+        : true
 
-    // const nonPublic = useMemo(() => targetStream?.reader.length !== 0 || !targetStream?.visible, [targetStream])
-    const nonPublic = useMemo(() => false, [targetStream])
+    const readable = isRestricted
+        ? targetStream?.policyParams?.isReadPublic
+            ? true
+            : targetStream?.policyParams?.reader?.includes(client.ccid ?? '')
+        : true
 
     const streams = useMemo(() => {
         return targetStream ? [targetStream] : []
@@ -82,7 +81,7 @@ export const StreamPage = memo((): JSX.Element => {
             >
                 <TimelineHeader
                     title={targetStream?.document.body.name ?? 'Not Found'}
-                    titleIcon={<TagIcon />}
+                    titleIcon={isRestricted ? <LockIcon /> : <TagIcon />}
                     secondaryAction={isOwner ? <TuneIcon /> : <InfoIcon />}
                     onTitleClick={() => {
                         timelineRef.current?.scrollToIndex(0, { align: 'start', smooth: true })
@@ -115,7 +114,6 @@ export const StreamPage = memo((): JSX.Element => {
                                             <CCPostEditor
                                                 minRows={3}
                                                 maxRows={7}
-                                                defaultPostHome={!nonPublic}
                                                 streamPickerInitial={streams}
                                                 streamPickerOptions={[...new Set([...allKnownTimelines, ...streams])]}
                                                 sx={{
@@ -147,7 +145,7 @@ export const StreamPage = memo((): JSX.Element => {
                                     fontSize: '10rem'
                                 }}
                             />
-                            <Typography variant="h5">このストリームは鍵がかかっています。</Typography>
+                            <Typography variant="h5">このタイムラインはプライベートです。</Typography>
                         </Box>
                     </Box>
                 )}
