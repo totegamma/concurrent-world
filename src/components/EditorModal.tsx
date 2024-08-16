@@ -45,10 +45,14 @@ export const EditorModal = (props: EditorModalProps): JSX.Element => {
                     }}
                 >
                     {props.context && (
-                        <>
+                        <Box
+                            sx={{
+                                p: 1
+                            }}
+                        >
                             {props.context}
                             <Divider />
-                        </>
+                        </Box>
                     )}
 
                     <CCPostEditor

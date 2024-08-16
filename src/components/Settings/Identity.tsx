@@ -18,7 +18,8 @@ import {
     DialogContent,
     DialogTitle,
     DialogContentText,
-    useTheme
+    useTheme,
+    AlertTitle
 } from '@mui/material'
 import Tilt from 'react-parallax-tilt'
 import { Passport } from '../theming/Passport'
@@ -36,6 +37,8 @@ import { useGlobalState } from '../../context/GlobalState'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { Node, type NodeProps } from '../ui/TreeGraph'
 import { type ConcurrentTheme } from '../../model'
+import { CCIconButton } from '../ui/CCIconButton'
+import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 
 const SwitchMasterToSub = lazy(() => import('../SwitchMasterToSub'))
 
@@ -396,7 +399,26 @@ export const IdentitySettings = (): JSX.Element => {
                             gap: 1
                         }}
                     >
-                        <Alert severity="info">{t('loginType.subKey')}</Alert>
+                        <Alert
+                            severity="info"
+                            action={
+                                <CCIconButton
+                                    onClick={() => {
+                                        try {
+                                            navigator.clipboard.writeText(JSON.parse(localStorage.getItem('SubKey')!))
+                                            enqueueSnackbar('Copied', { variant: 'info' })
+                                        } catch (e) {
+                                            enqueueSnackbar('No SubKey found', { variant: 'error' })
+                                        }
+                                    }}
+                                >
+                                    <ContentPasteIcon />
+                                </CCIconButton>
+                            }
+                        >
+                            <AlertTitle>{t('loginType.subKey')}</AlertTitle>
+                            右のボタンからサブキーをコピーできますが、サブキーはパスワードと同じく機密情報なので扱いには注意してください。
+                        </Alert>
                     </Box>
                 )}
 
