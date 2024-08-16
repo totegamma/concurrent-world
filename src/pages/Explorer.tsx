@@ -129,11 +129,11 @@ export function Explorer(): JSX.Element {
             .then((e: any) => {
                 const id: string = e.id
                 if (id) navigate('/timeline/' + id)
-                else enqueueSnackbar('ストリームの作成に失敗しました', { variant: 'error' })
+                else enqueueSnackbar('コミュニティの作成に失敗しました', { variant: 'error' })
             })
             .catch((e) => {
                 console.error(e)
-                enqueueSnackbar('ストリームの作成に失敗しました', { variant: 'error' })
+                enqueueSnackbar('コミュニティの作成に失敗しました', { variant: 'error' })
             })
     }
 
@@ -199,7 +199,7 @@ export function Explorer(): JSX.Element {
             <Tabs
                 value={tab}
                 onChange={(_, v) => {
-                    navigate(`/explorer/${v}`)
+                    navigate(`/explorer/${v}#${hash}`)
                 }}
             >
                 <Tab value={'timelines'} label={'タイムライン'} />
@@ -217,7 +217,7 @@ export function Explorer(): JSX.Element {
                         }}
                     >
                         <Typography variant="h3" gutterBottom>
-                            {t('streams')}
+                            {t('community')}
                         </Typography>
                         <Button
                             onClick={() => {
@@ -264,12 +264,12 @@ export function Explorer(): JSX.Element {
                     >
                         <Box p={1}>
                             <Typography variant="h3" gutterBottom>
-                                {t('createNewStream.title')}
+                                {t('createNewCommunity.title')}
                             </Typography>
                             <Typography variant="body1" gutterBottom>
-                                {t('createNewStream.desc1')}
+                                {t('createNewCommunity.desc1')}
                                 {client.api.host}
-                                {t('createNewStream.desc2')}
+                                {t('createNewCommunity.desc2')}
                             </Typography>
                             <Divider />
                             <CCEditor

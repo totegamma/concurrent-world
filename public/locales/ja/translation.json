@@ -25,10 +25,10 @@
         "explore": {
             "title": "探索",
             "domains": "ドメイン",
-            "streams": "ストリーム",
+            "community": "コミュニティ",
             "createNew": "新しく作る",
-            "createNewStream": {
-                "title": "ストリーム新規作成",
+            "createNewCommunity": {
+                "title": "コミュニティの新規作成",
                 "desc1": "あなたの管轄ドメイン",
                 "desc2": "に新しいストリームを作成します。"
             }

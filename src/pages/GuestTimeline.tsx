@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Box, Button, Divider, Paper } from '@mui/material'
+import { Box, Button, Divider, Paper, Typography } from '@mui/material'
 import { useLocation, useParams, Link as NavLink } from 'react-router-dom'
 import { Timeline } from '../components/Timeline/main'
 import { Client, type User } from '@concurrent-world/client'
@@ -11,6 +11,8 @@ import { type VListHandle } from 'virtua'
 import { TimelineHeader } from '../components/TimelineHeader'
 
 import ListIcon from '@mui/icons-material/List'
+import TagIcon from '@mui/icons-material/Tag'
+import LockIcon from '@mui/icons-material/Lock'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import { Profile } from '../components/Profile'
 import { MessageContainer } from '../components/Message/MessageContainer'
@@ -25,6 +27,7 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
     const [title, setTitle] = useState<string>('')
     const [user, setUser] = useState<User | null | undefined>(null)
     const [targetStream, setTargetStream] = useState<string[]>([])
+    const [isPrivateTimeline, setIsPrivateTimeline] = useState<boolean>(false)
 
     const { id, authorID, messageID } = useParams()
 
@@ -42,8 +45,16 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
                     initializeClient(client)
 
                     client.api.getTimeline(id).then((e) => {
-                        console.log(e)
                         setTitle(e?.document.body.name ?? '')
+
+                        if (e?.policy === 'https://policy.concrnt.world/t/inline-read-write.json' && e?.policyParams) {
+                            try {
+                                const params = JSON.parse(e.policyParams)
+                                setIsPrivateTimeline(!params.isReadPublic)
+                            } catch (e) {
+                                setIsPrivateTimeline(true)
+                            }
+                        }
                     })
                     setUser(undefined)
                 }
@@ -135,29 +146,61 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
                                     flex: 1
                                 }}
                             >
-                                <TimelineHeader title={title} titleIcon={id ? <AlternateEmailIcon /> : <ListIcon />} />
-
-                                <Timeline
-                                    ref={timelineRef}
-                                    streams={targetStream}
-                                    header={
-                                        <Box
-                                            sx={{
-                                                overflowX: 'hidden',
-                                                overflowY: 'auto',
-                                                overscrollBehaviorY: 'contain'
-                                            }}
-                                            ref={scrollParentRef}
-                                        >
-                                            {user && (
-                                                <>
-                                                    <Profile user={user} id={id} guest={true} />
-                                                    <Divider />
-                                                </>
-                                            )}
-                                        </Box>
+                                <TimelineHeader
+                                    title={title}
+                                    titleIcon={
+                                        isPrivateTimeline ? (
+                                            <LockIcon />
+                                        ) : props.page === 'entity' ? (
+                                            <AlternateEmailIcon />
+                                        ) : (
+                                            <TagIcon />
+                                        )
                                     }
                                 />
+
+                                {isPrivateTimeline ? (
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            height: '100%',
+                                            color: 'text.disabled',
+                                            p: 2
+                                        }}
+                                    >
+                                        <LockIcon
+                                            sx={{
+                                                fontSize: '10rem'
+                                            }}
+                                        />
+                                        <Typography variant="h5">このストリームはプライベートです。</Typography>
+                                    </Box>
+                                ) : (
+                                    <Timeline
+                                        ref={timelineRef}
+                                        streams={targetStream}
+                                        header={
+                                            <Box
+                                                sx={{
+                                                    overflowX: 'hidden',
+                                                    overflowY: 'auto',
+                                                    overscrollBehaviorY: 'contain'
+                                                }}
+                                                ref={scrollParentRef}
+                                            >
+                                                {user && (
+                                                    <>
+                                                        <Profile user={user} id={id} guest={true} />
+                                                        <Divider />
+                                                    </>
+                                                )}
+                                            </Box>
+                                        }
+                                    />
+                                )}
                             </Box>
                         </Paper>
                     </>
