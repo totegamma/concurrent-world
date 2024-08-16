@@ -81,7 +81,11 @@ export function Profile(props: ProfileProps): JSX.Element {
     }, [client, props.overrideSubProfileID, props.user])
 
     return (
-        <>
+        <Box
+            sx={{
+                position: 'relative'
+            }}
+        >
             <CCWallpaper
                 override={props.user?.profile?.banner}
                 sx={{
@@ -89,20 +93,48 @@ export function Profile(props: ProfileProps): JSX.Element {
                 }}
                 isLoading={!props.user}
             />
+
+            <Box
+                sx={{
+                    display: 'flex',
+                    position: 'absolute',
+                    top: '90px',
+                    p: 1
+                }}
+            >
+                <CCAvatar
+                    isLoading={!props.user}
+                    alt={props.user?.profile?.username}
+                    avatarURL={props.user?.profile?.avatar}
+                    avatarOverride={subProfile ? subProfile.document.body.avatar : undefined}
+                    identiconSource={props.user?.ccid}
+                    sx={{
+                        width: '100px',
+                        height: '100px'
+                    }}
+                    onBadgeClick={() => {
+                        if (props.overrideSubProfileID) {
+                            props.onSubProfileClicked?.('')
+                        } else {
+                            props.user?.profile?.avatar && actions?.openImageViewer(props.user?.profile?.avatar)
+                        }
+                    }}
+                />
+            </Box>
+
             <Box
                 sx={{
                     display: 'flex',
                     flexDirection: 'column',
-                    p: 1,
-                    position: 'relative',
-                    mt: '-64px'
+                    p: 1
                 }}
             >
                 <Box
                     sx={{
                         display: 'flex',
                         gap: 1,
-                        flexWrap: 'wrap'
+                        flexWrap: 'wrap',
+                        pl: '108px'
                     }}
                 >
                     <Box
@@ -113,24 +145,6 @@ export function Profile(props: ProfileProps): JSX.Element {
                             alignItems: 'baseline'
                         }}
                     >
-                        <CCAvatar
-                            isLoading={!props.user}
-                            alt={props.user?.profile?.username}
-                            avatarURL={props.user?.profile?.avatar}
-                            avatarOverride={subProfile ? subProfile.document.body.avatar : undefined}
-                            identiconSource={props.user?.ccid}
-                            sx={{
-                                width: '100px',
-                                height: '100px'
-                            }}
-                            onBadgeClick={() => {
-                                if (props.overrideSubProfileID) {
-                                    props.onSubProfileClicked?.('')
-                                } else {
-                                    props.user?.profile?.avatar && actions?.openImageViewer(props.user?.profile?.avatar)
-                                }
-                            }}
-                        />
                         {props.user && (
                             <>
                                 {props.user.profile?.subprofiles?.map((id, _) => (
@@ -294,6 +308,6 @@ export function Profile(props: ProfileProps): JSX.Element {
                     </Box>
                 </CCDrawer>
             )}
-        </>
+        </Box>
     )
 }
