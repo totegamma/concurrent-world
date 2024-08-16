@@ -10,7 +10,8 @@ import {
     Backdrop,
     type SxProps,
     Menu,
-    Paper
+    Paper,
+    Typography
 } from '@mui/material'
 import { StreamPicker } from '../ui/StreamPicker'
 import { useSnackbar } from 'notistack'
@@ -34,6 +35,7 @@ import { EditorActions } from './EditorActions'
 import { EditorPreview } from './EditorPreview'
 
 import { FaMarkdown } from 'react-icons/fa'
+import CloudUploadIcon from '@mui/icons-material/CloudUpload'
 import PermMediaIcon from '@mui/icons-material/PermMedia'
 import TextFieldsIcon from '@mui/icons-material/TextFields'
 import ReplyIcon from '@mui/icons-material/Reply'
@@ -91,6 +93,8 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
     const { uploadFile } = useStorage()
     const { enqueueSnackbar, closeSnackbar } = useSnackbar()
     const { t } = useTranslation('', { keyPrefix: 'ui.draft' })
+
+    const [dragging, setDragging] = useState<boolean>(false)
 
     const textInputRef = useRef<HTMLInputElement>(null)
     let [sending, setSending] = useState<boolean>(false)
@@ -282,11 +286,27 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'stretch',
-                borderColor: 'text.disabled',
                 width: '100%',
                 height: '100%',
-                overflow: 'hidden',
-                ...props.sx
+                overflow: 'hidden'
+            }}
+            onDragEnter={(e) => {
+                setDragging(true)
+                e.preventDefault()
+                e.stopPropagation()
+            }}
+            onDragOver={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+            }}
+            onDrop={(e) => {
+                setDragging(false)
+                e.preventDefault()
+                e.stopPropagation()
+                const files = e.dataTransfer.files
+                if (files.length > 0) {
+                    uploadImage(files[0])
+                }
             }}
         >
             {sending && (
@@ -304,259 +324,292 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                 </Backdrop>
             )}
 
-            <Box
-                sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                }}
-            >
+            {dragging && (
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        zIndex: (theme) => theme.zIndex.drawer,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        width: 'calc(100% - 0.5rem)',
+                        height: 'calc(100% - 0.5rem)',
+                        borderRadius: 1,
+                        border: '2px dashed, rgba(0, 0, 0, 0.2)',
+                        margin: '0.25rem',
+                        color: 'text.disabled'
+                    }}
+                    onDragLeave={(e) => {
+                        setDragging(false)
+                        e.preventDefault()
+                        e.stopPropagation()
+                    }}
+                >
+                    <CloudUploadIcon
+                        sx={{
+                            fontSize: '5rem'
+                        }}
+                    />
+                    <Typography>Drop to upload</Typography>
+                </Box>
+            )}
+
+            <Box sx={{ ...props.sx }}>
                 <Box
                     sx={{
                         display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flex: 1
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
                     }}
                 >
-                    <CCIconButton
-                        onClick={(e) => {
-                            if (ModeSets[mode].selectable) setModeMenuAnchor(e.currentTarget)
-                        }}
-                    >
-                        {ModeSets[mode].icon}
-                    </CCIconButton>
-                    <StreamPicker
-                        options={props.streamPickerOptions}
-                        selected={destTimelines}
-                        setSelected={setDestTimelines}
-                    />
-                    <CCIconButton
+                    <Box
                         sx={{
-                            visibility: destinationModified ? 'visible' : 'hidden'
-                        }}
-                        onClick={() => {
-                            setDestTimelines(props.streamPickerInitial)
-                        }}
-                    >
-                        <ReplayIcon />
-                    </CCIconButton>
-                </Box>
-                <Tooltip title={postHome ? t('postToHome') : t('noPostToHome')} arrow placement="top">
-                    <CCIconButton
-                        onClick={() => {
-                            setPostHomeButton(!postHomeButton)
-                        }}
-                    >
-                        <HomeIcon
-                            sx={{
-                                color: postHome ? 'primary' : theme.palette.text.disabled
-                            }}
-                        />
-                    </CCIconButton>
-                </Tooltip>
-            </Box>
-            <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: { xs: 'column', md: 'row' },
-                    alignItems: 'start',
-                    px: 1,
-                    flex: 1,
-                    cursor: 'text',
-                    overflowY: 'auto'
-                }}
-                onClick={() => {
-                    if (textInputRef.current) {
-                        textInputRef.current.focus()
-                    }
-                }}
-            >
-                <InputBase
-                    multiline
-                    fullWidth
-                    value={draft}
-                    autoFocus={props.autoFocus}
-                    placeholder={props.placeholder ?? t('placeholder')}
-                    minRows={props.minRows}
-                    maxRows={props.maxRows}
-                    onChange={(e) => {
-                        setDraft(e.target.value)
-                    }}
-                    onPaste={(e) => {
-                        handlePasteImage(e)
-                    }}
-                    sx={{
-                        width: 1,
-                        fontSize: '0.95rem'
-                    }}
-                    onKeyDown={(e: any) => {
-                        if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
-                            setHoldCtrlShift(true)
-                        }
-                        if (draft.length === 0 || draft.trim().length === 0) return
-                        if (e.key === 'Enter' && (e.ctrlKey === true || e.metaKey === true) && !sending) {
-                            post(postHome)
-                        }
-                    }}
-                    onKeyUp={(e: any) => {
-                        if (e.key === 'Shift' || e.key === 'Control') {
-                            setHoldCtrlShift(false)
-                        }
-                    }}
-                    inputRef={textInputRef}
-                />
-            </Box>
-
-            <Box display="flex" gap={1}>
-                {medias.map((media, i) => (
-                    <Paper
-                        key={i}
-                        elevation={0}
-                        sx={{
-                            position: 'relative',
-                            width: '75px',
-                            height: '75px',
-                            backgroundImage: `url(${media.mediaURL})`,
-                            backgroundSize: 'cover'
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flex: 1
                         }}
                     >
                         <CCIconButton
-                            onClick={() => {
-                                setMedias((medias) => medias.filter((_, j) => i !== j))
-                            }}
-                            sx={{
-                                position: 'absolute',
-                                backgroundColor: 'background.paper',
-                                p: 0.1,
-                                top: -10,
-                                right: -10
+                            onClick={(e) => {
+                                if (ModeSets[mode].selectable) setModeMenuAnchor(e.currentTarget)
                             }}
                         >
-                            <CancelIcon
+                            {ModeSets[mode].icon}
+                        </CCIconButton>
+                        <StreamPicker
+                            options={props.streamPickerOptions}
+                            selected={destTimelines}
+                            setSelected={setDestTimelines}
+                        />
+                        <CCIconButton
+                            sx={{
+                                visibility: destinationModified ? 'visible' : 'hidden'
+                            }}
+                            onClick={() => {
+                                setDestTimelines(props.streamPickerInitial)
+                            }}
+                        >
+                            <ReplayIcon />
+                        </CCIconButton>
+                    </Box>
+                    <Tooltip title={postHome ? t('postToHome') : t('noPostToHome')} arrow placement="top">
+                        <CCIconButton
+                            onClick={() => {
+                                setPostHomeButton(!postHomeButton)
+                            }}
+                        >
+                            <HomeIcon
                                 sx={{
-                                    color: 'text.primary'
+                                    color: postHome ? 'primary' : theme.palette.text.disabled
                                 }}
                             />
                         </CCIconButton>
-                    </Paper>
-                ))}
-            </Box>
-
-            {props.mobile ? (
-                <>
-                    <Collapse
-                        unmountOnExit
-                        in={draft.length > 0}
+                    </Tooltip>
+                </Box>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: { xs: 'column', md: 'row' },
+                        alignItems: 'start',
+                        px: 1,
+                        flex: 1,
+                        cursor: 'text',
+                        overflowY: 'auto'
+                    }}
+                    onClick={() => {
+                        if (textInputRef.current) {
+                            textInputRef.current.focus()
+                        }
+                    }}
+                >
+                    <InputBase
+                        multiline
+                        fullWidth
+                        value={draft}
+                        autoFocus={props.autoFocus}
+                        placeholder={props.placeholder ?? t('placeholder')}
+                        minRows={props.minRows}
+                        maxRows={props.maxRows}
+                        onChange={(e) => {
+                            setDraft(e.target.value)
+                        }}
+                        onPaste={(e) => {
+                            handlePasteImage(e)
+                        }}
                         sx={{
-                            maxHeight: '20%',
-                            overflowY: 'auto'
+                            width: 1,
+                            fontSize: '0.95rem'
                         }}
-                    >
-                        <Divider
-                            sx={{
-                                my: 1,
-                                borderStyle: 'dashed'
-                            }}
-                        />
-                        <EditorPreview
-                            hideActions
-                            draft={draft}
-                            emojiDict={emojiDict}
-                            selectedSubprofile={selectedSubprofile}
-                            setSelectedSubprofile={setSelectedSubprofile}
-                        />
-                    </Collapse>
-                    {textInputRef.current && (
-                        <>
-                            <EmojiSuggestion
-                                mobile
-                                textInputRef={textInputRef.current}
-                                text={draft}
-                                setText={setDraft}
-                                updateEmojiDict={setEmojiDict}
-                            />
-                            <UserSuggestion
-                                mobile
-                                textInputRef={textInputRef.current}
-                                text={draft}
-                                setText={setDraft}
-                            />
-                        </>
-                    )}
-                    <EditorActions
-                        post={() => {
-                            post(postHome)
+                        onKeyDown={(e: any) => {
+                            if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
+                                setHoldCtrlShift(true)
+                            }
+                            if (draft.length === 0 || draft.trim().length === 0) return
+                            if (e.key === 'Enter' && (e.ctrlKey === true || e.metaKey === true) && !sending) {
+                                post(postHome)
+                            }
                         }}
-                        sending={sending}
-                        draft={draft}
-                        setDraft={setDraft}
-                        textInputRef={textInputRef}
-                        uploadImage={uploadImage}
-                        insertEmoji={insertEmoji}
-                        setEmojiDict={setEmojiDict}
-                        submitButtonLabel={props.submitButtonLabel}
-                        onAddMedia={
-                            mode === 'media'
-                                ? (media) => {
-                                      setMedias((medias) => [...medias, media])
-                                  }
-                                : undefined
-                        }
+                        onKeyUp={(e: any) => {
+                            if (e.key === 'Shift' || e.key === 'Control') {
+                                setHoldCtrlShift(false)
+                            }
+                        }}
+                        inputRef={textInputRef}
                     />
-                </>
-            ) : (
-                <>
-                    {textInputRef.current && (
-                        <>
-                            <EmojiSuggestion
-                                textInputRef={textInputRef.current}
-                                text={draft}
-                                setText={setDraft}
-                                updateEmojiDict={setEmojiDict}
-                            />
-                            <UserSuggestion textInputRef={textInputRef.current} text={draft} setText={setDraft} />
-                        </>
-                    )}
-                    <EditorActions
-                        post={() => {
-                            post(postHome)
-                        }}
-                        disableMedia={mode === 'plaintext'}
-                        disableEmoji={mode === 'plaintext'}
-                        sending={sending}
-                        draft={draft}
-                        setDraft={setDraft}
-                        textInputRef={textInputRef}
-                        uploadImage={uploadImage}
-                        insertEmoji={insertEmoji}
-                        setEmojiDict={setEmojiDict}
-                        submitButtonLabel={props.submitButtonLabel}
-                        onAddMedia={
-                            mode === 'media'
-                                ? (media) => {
-                                      setMedias((medias) => [...medias, media])
-                                  }
-                                : undefined
-                        }
-                    />
-                    <Collapse unmountOnExit in={draft.length > 0}>
-                        <Divider
-                            sx={{
-                                my: 1,
-                                borderStyle: 'dashed'
-                            }}
-                        />
+                </Box>
 
-                        <EditorPreview
+                <Box display="flex" gap={1}>
+                    {medias.map((media, i) => (
+                        <Paper
+                            key={i}
+                            elevation={0}
+                            sx={{
+                                position: 'relative',
+                                width: '75px',
+                                height: '75px',
+                                backgroundImage: `url(${media.mediaURL})`,
+                                backgroundSize: 'cover'
+                            }}
+                        >
+                            <CCIconButton
+                                onClick={() => {
+                                    setMedias((medias) => medias.filter((_, j) => i !== j))
+                                }}
+                                sx={{
+                                    position: 'absolute',
+                                    backgroundColor: 'background.paper',
+                                    p: 0.1,
+                                    top: -10,
+                                    right: -10
+                                }}
+                            >
+                                <CancelIcon
+                                    sx={{
+                                        color: 'text.primary'
+                                    }}
+                                />
+                            </CCIconButton>
+                        </Paper>
+                    ))}
+                </Box>
+
+                {props.mobile ? (
+                    <>
+                        <Collapse
+                            unmountOnExit
+                            in={draft.length > 0}
+                            sx={{
+                                maxHeight: '20%',
+                                overflowY: 'auto'
+                            }}
+                        >
+                            <Divider
+                                sx={{
+                                    my: 1,
+                                    borderStyle: 'dashed'
+                                }}
+                            />
+                            <EditorPreview
+                                hideActions
+                                draft={draft}
+                                emojiDict={emojiDict}
+                                selectedSubprofile={selectedSubprofile}
+                                setSelectedSubprofile={setSelectedSubprofile}
+                            />
+                        </Collapse>
+                        {textInputRef.current && (
+                            <>
+                                <EmojiSuggestion
+                                    mobile
+                                    textInputRef={textInputRef.current}
+                                    text={draft}
+                                    setText={setDraft}
+                                    updateEmojiDict={setEmojiDict}
+                                />
+                                <UserSuggestion
+                                    mobile
+                                    textInputRef={textInputRef.current}
+                                    text={draft}
+                                    setText={setDraft}
+                                />
+                            </>
+                        )}
+                        <EditorActions
+                            post={() => {
+                                post(postHome)
+                            }}
+                            sending={sending}
                             draft={draft}
-                            emojiDict={emojiDict}
-                            selectedSubprofile={selectedSubprofile}
-                            setSelectedSubprofile={setSelectedSubprofile}
+                            setDraft={setDraft}
+                            textInputRef={textInputRef}
+                            uploadImage={uploadImage}
+                            insertEmoji={insertEmoji}
+                            setEmojiDict={setEmojiDict}
+                            submitButtonLabel={props.submitButtonLabel}
+                            onAddMedia={
+                                mode === 'media'
+                                    ? (media) => {
+                                          setMedias((medias) => [...medias, media])
+                                      }
+                                    : undefined
+                            }
                         />
-                    </Collapse>
-                </>
-            )}
+                    </>
+                ) : (
+                    <>
+                        {textInputRef.current && (
+                            <>
+                                <EmojiSuggestion
+                                    textInputRef={textInputRef.current}
+                                    text={draft}
+                                    setText={setDraft}
+                                    updateEmojiDict={setEmojiDict}
+                                />
+                                <UserSuggestion textInputRef={textInputRef.current} text={draft} setText={setDraft} />
+                            </>
+                        )}
+                        <EditorActions
+                            post={() => {
+                                post(postHome)
+                            }}
+                            disableMedia={mode === 'plaintext'}
+                            disableEmoji={mode === 'plaintext'}
+                            sending={sending}
+                            draft={draft}
+                            setDraft={setDraft}
+                            textInputRef={textInputRef}
+                            uploadImage={uploadImage}
+                            insertEmoji={insertEmoji}
+                            setEmojiDict={setEmojiDict}
+                            submitButtonLabel={props.submitButtonLabel}
+                            onAddMedia={
+                                mode === 'media'
+                                    ? (media) => {
+                                          setMedias((medias) => [...medias, media])
+                                      }
+                                    : undefined
+                            }
+                        />
+                        <Collapse unmountOnExit in={draft.length > 0}>
+                            <Divider
+                                sx={{
+                                    my: 1,
+                                    borderStyle: 'dashed'
+                                }}
+                            />
+
+                            <EditorPreview
+                                draft={draft}
+                                emojiDict={emojiDict}
+                                selectedSubprofile={selectedSubprofile}
+                                setSelectedSubprofile={setSelectedSubprofile}
+                            />
+                        </Collapse>
+                    </>
+                )}
+            </Box>
 
             <Menu
                 anchorEl={modeMenuAnchor}
