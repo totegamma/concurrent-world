@@ -133,43 +133,43 @@ export function Profile(props: ProfileProps): JSX.Element {
                     sx={{
                         display: 'flex',
                         gap: 1,
-                        flexWrap: 'wrap',
-                        pl: '108px'
+                        flexWrap: 'wrap'
                     }}
                 >
                     <Box
                         sx={{
-                            display: 'flex',
-                            gap: 1,
-                            flexWrap: 'wrap',
-                            alignItems: 'baseline'
+                            width: '100px'
                         }}
-                    >
-                        {props.user && (
-                            <>
-                                {props.user.profile?.subprofiles?.map((id, _) => (
-                                    <SubprofileBadge
-                                        key={id}
-                                        characterID={id}
-                                        authorCCID={props.user!.ccid}
-                                        onClick={() => {
-                                            props.onSubProfileClicked?.(id)
-                                        }}
-                                        enablePreview={id === props.overrideSubProfileID}
-                                    />
-                                ))}
-                            </>
-                        )}
-                    </Box>
+                    />
+                    {props.user && (
+                        <>
+                            {props.user.profile?.subprofiles?.map((id, _) => (
+                                <SubprofileBadge
+                                    key={id}
+                                    characterID={id}
+                                    authorCCID={props.user!.ccid}
+                                    onClick={() => {
+                                        props.onSubProfileClicked?.(id)
+                                    }}
+                                    enablePreview={id === props.overrideSubProfileID}
+                                />
+                            ))}
+                        </>
+                    )}
+                    <Box
+                        sx={{
+                            flexGrow: 1
+                        }}
+                    />
                     {props.user && (
                         <Box
                             sx={{
-                                display: 'flex',
                                 gap: 1,
-                                flexWrap: 'wrap',
-                                mt: 1,
-                                alignItems: 'end',
-                                ml: 'auto'
+                                flexGrow: 1,
+                                flexShrink: 0,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'flex-end'
                             }}
                         >
                             {!isSelf && <AckButton user={props.user} />}
