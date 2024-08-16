@@ -17,6 +17,7 @@ import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import { Profile } from '../components/Profile'
 import { MessageContainer } from '../components/Message/MessageContainer'
 import { GuestBase } from '../components/GuestBase'
+import { StreamInfo } from '../components/StreamInfo'
 
 export interface GuestPageProps {
     page: 'timeline' | 'entity' | 'message'
@@ -160,23 +161,26 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
                                 />
 
                                 {isPrivateTimeline ? (
-                                    <Box
-                                        sx={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            justifyContent: 'center',
-                                            alignItems: 'center',
-                                            height: '100%',
-                                            color: 'text.disabled',
-                                            p: 2
-                                        }}
-                                    >
-                                        <LockIcon
+                                    <Box>
+                                        {id && <StreamInfo id={id} />}
+                                        <Box
                                             sx={{
-                                                fontSize: '10rem'
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                justifyContent: 'center',
+                                                alignItems: 'center',
+                                                height: '100%',
+                                                color: 'text.disabled',
+                                                p: 2
                                             }}
-                                        />
-                                        <Typography variant="h5">このストリームはプライベートです。</Typography>
+                                        >
+                                            <LockIcon
+                                                sx={{
+                                                    fontSize: '10rem'
+                                                }}
+                                            />
+                                            <Typography variant="h5">このストリームはプライベートです。</Typography>
+                                        </Box>
                                     </Box>
                                 ) : (
                                     <Timeline
