@@ -128,7 +128,7 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                     </Box>
                     <Typography variant="h3">ホーム投稿</Typography>
                     <Switch
-                        checked={list.defaultPostHome}
+                        checked={list.defaultPostHome === undefined ? true : list.defaultPostHome}
                         onChange={(_) => {
                             updateList(props.subscription.id, {
                                 ...list,

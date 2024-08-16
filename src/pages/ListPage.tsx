@@ -190,7 +190,11 @@ export function ListPage(): JSX.Element {
                                                 maxRows={7}
                                                 streamPickerOptions={allKnownTimelines}
                                                 streamPickerInitial={postStreams}
-                                                defaultPostHome={lists[tab].defaultPostHome}
+                                                defaultPostHome={
+                                                    lists[tab].defaultPostHome === undefined
+                                                        ? true
+                                                        : lists[tab].defaultPostHome
+                                                }
                                                 sx={{
                                                     p: 1
                                                 }}
