@@ -25,10 +25,10 @@
         "explore": {
             "title": "Explore",
             "domains": "Domains",
-            "streams": "Streams",
+            "community": "Community",
             "createNew": "Create new",
-            "createNewStream": {
-                "title": "Create new stream",
+            "createNewCommunity": {
+                "title": "Create new community",
                 "desc1": "Create a new stream on ",
                 "desc2": " with the following settings."
             }
