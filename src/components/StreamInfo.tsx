@@ -1,4 +1,16 @@
-import { Box, Button, Divider, FormControlLabel, FormGroup, Paper, Switch, TextField, Typography } from '@mui/material'
+import {
+    Box,
+    Button,
+    Divider,
+    FormControlLabel,
+    FormGroup,
+    Paper,
+    Switch,
+    Tab,
+    Tabs,
+    TextField,
+    Typography
+} from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
 import { useClient } from '../context/ClientContext'
 import { type CommunityTimelineSchema, type CoreTimeline } from '@concurrent-world/client'
@@ -7,10 +19,13 @@ import { useSnackbar } from 'notistack'
 import { CCWallpaper } from './ui/CCWallpaper'
 import { WatchButton } from './WatchButton'
 import { PolicyEditor } from './ui/PolicyEditor'
+import { CCUserChip } from './ui/CCUserChip'
 
 export interface StreamInfoProps {
     id: string
     detailed?: boolean
+    writers?: string[]
+    readers?: string[]
 }
 
 export function StreamInfo(props: StreamInfoProps): JSX.Element {
@@ -25,6 +40,8 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
 
     const [documentBody, setDocumentBody] = useState<CommunityTimelineSchema | undefined>(stream?.document.body)
     const [policyParams, setPolicyParams] = useState<string | undefined>()
+
+    const [tab, setTab] = useState<'info' | 'edit'>('info')
 
     useEffect(() => {
         if (!props.id) return
@@ -114,7 +131,62 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
             </CCWallpaper>
             {props.detailed && (
                 <>
-                    {isAuthor ? (
+                    <Tabs
+                        value={tab}
+                        onChange={(_, v) => {
+                            setTab(v)
+                        }}
+                    >
+                        <Tab value="info" label={'情報'} />
+                        <Tab value="edit" label={'編集'} disabled={!isAuthor} />
+                    </Tabs>
+                    <Divider />
+
+                    {tab === 'info' && (
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '20px',
+                                p: 1
+                            }}
+                        >
+                            {props.writers && props.writers.length > 0 && (
+                                <>
+                                    <Typography variant="h3">Writer</Typography>
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            gap: 1,
+                                            flexWrap: 'wrap'
+                                        }}
+                                    >
+                                        {props.writers.map((e) => (
+                                            <CCUserChip avatar key={e} ccid={e} />
+                                        ))}
+                                    </Box>
+                                </>
+                            )}
+
+                            {props.readers && props.readers.length > 0 && (
+                                <>
+                                    <Typography variant="h3">Reader</Typography>
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            gap: 1,
+                                            flexWrap: 'wrap'
+                                        }}
+                                    >
+                                        {props.readers.map((e) => (
+                                            <CCUserChip avatar key={e} ccid={e} />
+                                        ))}
+                                    </Box>
+                                </>
+                            )}
+                        </Box>
+                    )}
+                    {tab === 'edit' && (
                         <Box
                             sx={{
                                 display: 'flex',
@@ -205,8 +277,6 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                                 削除
                             </Button>
                         </Box>
-                    ) : (
-                        <></>
                     )}
                 </>
             )}
