@@ -88,7 +88,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
             <CCWallpaper
                 override={stream.document.body.banner}
                 sx={{
-                    height: '150px'
+                    minHeight: '150px'
                 }}
                 innerSx={{
                     display: 'flex',
