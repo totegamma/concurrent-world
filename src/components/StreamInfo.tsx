@@ -151,6 +151,16 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                                 p: 1
                             }}
                         >
+                            <Typography variant="h3">Creator</Typography>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    gap: 1,
+                                    flexWrap: 'wrap'
+                                }}
+                            >
+                                <CCUserChip avatar ccid={stream.author} />
+                            </Box>
                             {props.writers && props.writers.length > 0 && (
                                 <>
                                     <Typography variant="h3">Writer</Typography>
