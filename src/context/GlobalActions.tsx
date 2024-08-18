@@ -2,7 +2,7 @@ import { Box, Paper, Modal, Typography, Divider, Button, Drawer, useTheme, Toolt
 import { InspectorProvider } from '../context/Inspector'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useClient } from './ClientContext'
-import { type Timeline, type CommunityTimelineSchema, Schemas, type CoreTimeline } from '@concurrent-world/client'
+import { type CommunityTimelineSchema, Schemas, type CoreTimeline } from '@concurrent-world/client'
 import { usePreference } from './PreferenceContext'
 import { ProfileEditor } from '../components/ProfileEditor'
 import { Menu } from '../components/Menu/Menu'
@@ -14,14 +14,11 @@ import { ImagePreviewModal } from '../components/ui/ImagePreviewModal'
 import { StreamCard } from '../components/Stream/Card'
 import { LogoutButton } from '../components/Settings/LogoutButton'
 import { useGlobalState } from './GlobalState'
-// import { EditorModal } from '../components/EditorModal'
 
 export interface GlobalActionsState {
     openMobileMenu: (open?: boolean) => void
     openEmojipack: (url: EmojiPackage) => void
     openImageViewer: (url: string) => void
-    postStreams: Array<Timeline<CommunityTimelineSchema>>
-    setPostStreams: (streams: Array<Timeline<CommunityTimelineSchema>>) => void
 }
 
 const GlobalActionsContext = createContext<GlobalActionsState | undefined>(undefined)
@@ -48,8 +45,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const [emojiPackages, setEmojiPackages] = usePreference('emojiPackages')
     const { enqueueSnackbar } = useSnackbar()
     const theme = useTheme()
-
-    const [postStreams, setPostStreams] = useState<Array<Timeline<CommunityTimelineSchema>>>([])
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
     const [previewImage, setPreviewImage] = useState<string | undefined>()
@@ -126,11 +121,9 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                 return {
                     openMobileMenu,
                     openEmojipack,
-                    openImageViewer,
-                    postStreams,
-                    setPostStreams
+                    openImageViewer
                 }
-            }, [openMobileMenu, openEmojipack, openImageViewer, postStreams, setPostStreams])}
+            }, [openMobileMenu, openEmojipack, openImageViewer])}
         >
             <InspectorProvider>
                 <>{props.children}</>
@@ -375,9 +368,7 @@ export function useGlobalActions(): GlobalActionsState {
         return {
             openMobileMenu: () => {},
             openEmojipack: () => {},
-            openImageViewer: () => {},
-            postStreams: [],
-            setPostStreams: () => {}
+            openImageViewer: () => {}
         }
     }
     return actions
