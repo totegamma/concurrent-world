@@ -24,8 +24,8 @@ import { ListsMenu } from '../ListsMenu/main'
 import { CCAvatar } from '../ui/CCAvatar'
 import { useClient } from '../../context/ClientContext'
 import { usePreference } from '../../context/PreferenceContext'
-import { useGlobalActions } from '../../context/GlobalActions'
 import { useTranslation } from 'react-i18next'
+import { useEditorModal } from '../EditorModal'
 
 export interface MenuProps {
     onClick?: () => void
@@ -33,7 +33,7 @@ export interface MenuProps {
 
 export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
     const { client } = useClient()
-    const actions = useGlobalActions()
+    const editorModal = useEditorModal()
     const { t } = useTranslation('', { keyPrefix: 'pages' })
     const [devMode] = usePreference('devMode')
     const [enableConcord] = usePreference('enableConcord')
@@ -210,7 +210,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                     <Button
                         endIcon={<CreateIcon />}
                         onClick={() => {
-                            actions.openDraft()
+                            editorModal.open()
                         }}
                         sx={{
                             display: { xs: 'none', sm: 'flex' },

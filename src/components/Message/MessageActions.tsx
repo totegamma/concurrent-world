@@ -25,11 +25,11 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { useEmojiPicker } from '../../context/EmojiPickerContext'
 import { Link as RouterLink } from 'react-router-dom'
 import { IconButtonWithNumber } from '../ui/IconButtonWithNumber'
-import { useGlobalActions } from '../../context/GlobalActions'
 import { useInspector } from '../../context/Inspector'
 import { enqueueSnackbar } from 'notistack'
 import { usePreference } from '../../context/PreferenceContext'
 import { useConcord } from '../../context/ConcordContext'
+import { useEditorModal } from '../EditorModal'
 
 export interface MessageActionsProps {
     message: Message<MarkdownMessageSchema | ReplyMessageSchema | RerouteMessageSchema>
@@ -37,10 +37,10 @@ export interface MessageActionsProps {
 }
 
 export const MessageActions = (props: MessageActionsProps): JSX.Element => {
-    const actions = useGlobalActions()
     const inspector = useInspector()
     const concord = useConcord()
     const [enableConcord] = usePreference('enableConcord')
+    const editorModal = useEditorModal()
 
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
@@ -78,14 +78,23 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                 <IconButtonWithNumber
                     icon={<ReplyIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />}
                     onClick={() => {
-                        actions.openReply(props.message)
+                        editorModal.open({
+                            mode: 'reply',
+                            target: props.message,
+                            streamPickerInitial: props.message.postedStreams?.filter(
+                                (t) => t.schema === Schemas.communityTimeline
+                            )
+                        })
                     }}
                     message={replyCount}
                 />
                 <IconButtonWithNumber
                     icon={<RepeatIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />}
                     onClick={() => {
-                        actions.openReroute(props.message)
+                        editorModal.open({
+                            mode: 'reroute',
+                            target: props.message
+                        })
                     }}
                     message={rerouteCount}
                 />

@@ -18,16 +18,16 @@ import ListIcon from '@mui/icons-material/List'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import { TimelineHeader } from '../components/TimelineHeader'
 import { type VListHandle } from 'virtua'
-import { useGlobalActions } from '../context/GlobalActions'
 import { useGlobalState } from '../context/GlobalState'
 import { ListItemTimeline } from '../components/ui/ListItemTimeline'
 import { CCPostEditor } from '../components/Editor/CCPostEditor'
+import { useEditorModal } from '../components/EditorModal'
 
 export function ListPage(): JSX.Element {
     const { client } = useClient()
     const path = useLocation()
     const navigate = useNavigate()
-    const { setPostStreams, postStreams } = useGlobalActions()
+    const editorModal = useEditorModal()
     const { allKnownTimelines, allKnownSubscriptions, reloadList } = useGlobalState()
     const [lists, _setLists] = usePreference('lists')
     const [showEditorOnTop] = usePreference('showEditorOnTop')
@@ -43,32 +43,40 @@ export function ListPage(): JSX.Element {
 
     const timelines = useMemo(() => subscription?.items.map((e) => e.id) ?? [], [subscription])
 
-    const [pinnedSubscriptions, setPinnedSubscriptions] = useState<Array<CoreSubscription<ListSubscriptionSchema>>>([])
-
     const [updater, setUpdater] = useState<number>(0)
 
     const tabSubAnchor = useRef<HTMLDivElement | null>(null)
     const [tabSubscription, setTabSubscription] = useState<CoreSubscriptionItem[] | undefined>()
 
-    useEffect(() => {
-        if (!id) return
-        const list = lists[id]
-        if (!list) return
+    const list = lists[id]
+    const postStreams = useMemo(() => {
+        if (!list) return []
+        return list.defaultPostStreams
+            .map((streamID) => allKnownTimelines.find((e) => e.id === streamID))
+            .filter((e) => e !== undefined) as Array<CoreTimeline<CommunityTimelineSchema>>
+    }, [list, allKnownTimelines])
 
-        Promise.all(list.defaultPostStreams.map((streamID) => client.getTimeline(streamID))).then((streams) => {
-            setPostStreams(streams.filter((e) => e !== null) as Array<CoreTimeline<CommunityTimelineSchema>>)
-        })
-    }, [id, lists])
+    const defaultPostHome = useMemo(() => {
+        return list.defaultPostHome === undefined ? true : list.defaultPostHome
+    }, [list])
 
     useEffect(() => {
-        Promise.all(
-            Object.keys(lists)
-                .filter((e) => lists[e].pinned)
-                .map((e) => client.api.getSubscription(e))
-        ).then((subs) => {
-            setPinnedSubscriptions(subs.filter((e) => e !== null) as Array<CoreSubscription<ListSubscriptionSchema>>)
-        })
-    }, [lists, client])
+        const opts = {
+            streamPickerInitial: postStreams,
+            defaultPostHome
+        }
+        editorModal.registerOptions(opts)
+        return () => {
+            editorModal.unregisterOptions(opts)
+        }
+    }, [postStreams, defaultPostHome])
+
+    const pinnedSubscriptions = useMemo(() => {
+        return Object.keys(lists)
+            .filter((e) => lists[e].pinned)
+            .map((e) => allKnownSubscriptions.find((x) => x.id === e))
+            .filter((e) => e !== undefined) as Array<CoreSubscription<ListSubscriptionSchema>>
+    }, [lists, allKnownSubscriptions])
 
     useEffect(() => {
         if (id) setTab(id)
@@ -190,11 +198,7 @@ export function ListPage(): JSX.Element {
                                                 maxRows={7}
                                                 streamPickerOptions={allKnownTimelines}
                                                 streamPickerInitial={postStreams}
-                                                defaultPostHome={
-                                                    lists[tab].defaultPostHome === undefined
-                                                        ? true
-                                                        : lists[tab].defaultPostHome
-                                                }
+                                                defaultPostHome={defaultPostHome}
                                                 sx={{
                                                     p: 1
                                                 }}

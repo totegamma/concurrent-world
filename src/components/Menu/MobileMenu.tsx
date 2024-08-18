@@ -9,10 +9,12 @@ import NotificationsIcon from '@mui/icons-material/Notifications'
 import { NavLink } from 'react-router-dom'
 import { useGlobalActions } from '../../context/GlobalActions'
 import type { ConcurrentTheme } from '../../model'
+import { useEditorModal } from '../EditorModal'
 
 export const MobileMenu = (): JSX.Element => {
-    const actions = useGlobalActions()
     const theme = useTheme<ConcurrentTheme>()
+    const actions = useGlobalActions()
+    const editorModal = useEditorModal()
 
     return (
         <Box
@@ -85,7 +87,7 @@ export const MobileMenu = (): JSX.Element => {
                     }
                 }}
                 onClick={() => {
-                    actions.openDraft()
+                    editorModal.open()
                 }}
             >
                 <CreateIcon

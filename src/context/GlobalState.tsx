@@ -133,7 +133,6 @@ export const GlobalStateProvider = ({ children }: GlobalStateProps): JSX.Element
                     setIsRegistered(false)
                 }
                 res.json().then((json) => {
-                    console.log('hogehoge', json.content)
                     setEntity(json.content)
                 })
             })

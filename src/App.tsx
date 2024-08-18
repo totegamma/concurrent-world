@@ -46,6 +46,7 @@ import { UseSoundFormats } from './constants'
 import { useGlobalState } from './context/GlobalState'
 import { ConcrntLogo } from './components/theming/ConcrntLogo'
 import { ConcordPage } from './pages/Concord'
+import { EditorModalProvider } from './components/EditorModal'
 
 function App(): JSX.Element {
     const { client } = useClient()
@@ -222,7 +223,9 @@ function App(): JSX.Element {
                         <EmojiPickerProvider>
                             <StorageProvider>
                                 <ConcordProvider>
-                                    <GlobalActionsProvider>{childs}</GlobalActionsProvider>
+                                    <EditorModalProvider>
+                                        <GlobalActionsProvider>{childs}</GlobalActionsProvider>
+                                    </EditorModalProvider>
                                 </ConcordProvider>
                             </StorageProvider>
                         </EmojiPickerProvider>

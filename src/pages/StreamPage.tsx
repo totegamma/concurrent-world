@@ -6,11 +6,10 @@ import { useClient } from '../context/ClientContext'
 import { Timeline } from '../components/Timeline/main'
 import { StreamInfo } from '../components/StreamInfo'
 import { usePreference } from '../context/PreferenceContext'
-import { type CommunityTimelineSchema } from '@concurrent-world/client'
+import { type CommunityTimelineSchema, type Timeline as typeTimeline } from '@concurrent-world/client'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import WatchingStreamContextProvider from '../context/WatchingStreamContext'
 import { type VListHandle } from 'virtua'
-import { useGlobalActions } from '../context/GlobalActions'
 
 import TagIcon from '@mui/icons-material/Tag'
 import TuneIcon from '@mui/icons-material/Tune'
@@ -18,10 +17,10 @@ import InfoIcon from '@mui/icons-material/Info'
 import LockIcon from '@mui/icons-material/Lock'
 import { useGlobalState } from '../context/GlobalState'
 import { CCPostEditor } from '../components/Editor/CCPostEditor'
+import { useEditorModal } from '../components/EditorModal'
 
 export const StreamPage = memo((): JSX.Element => {
     const { client } = useClient()
-    const { postStreams, setPostStreams } = useGlobalActions()
     const { allKnownTimelines } = useGlobalState()
 
     const { id } = useParams()
@@ -32,7 +31,7 @@ export const StreamPage = memo((): JSX.Element => {
     const timelineRef = useRef<VListHandle>(null)
 
     const targetStreamID = id ?? ''
-    const targetStream = postStreams[0]
+    const [targetStream, setTargetStream] = useState<typeTimeline<CommunityTimelineSchema> | null>(null)
 
     const [streamInfoOpen, setStreamInfoOpen] = useState<boolean>(false)
 
@@ -64,9 +63,23 @@ export const StreamPage = memo((): JSX.Element => {
 
     useEffect(() => {
         client.getTimeline<CommunityTimelineSchema>(targetStreamID).then((stream) => {
-            if (stream) setPostStreams([stream])
+            if (stream) {
+                setTargetStream(stream)
+            }
         })
     }, [id])
+
+    const editorModal = useEditorModal()
+    useEffect(() => {
+        if (!targetStream) return
+        const opts = {
+            streamPickerInitial: [targetStream]
+        }
+        editorModal.registerOptions(opts)
+        return () => {
+            editorModal.unregisterOptions(opts)
+        }
+    }, [targetStream])
 
     return (
         <>
