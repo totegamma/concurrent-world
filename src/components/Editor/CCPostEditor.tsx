@@ -72,7 +72,6 @@ export interface CCPostEditorProps {
     actionTo?: Message<any>
     autoFocus?: boolean
     mobile?: boolean
-    submitButtonLabel?: string
     streamPickerInitial: Array<Timeline<CommunityTimelineSchema>>
     streamPickerOptions: Array<Timeline<CommunityTimelineSchema>>
     allowEmpty?: boolean
@@ -93,6 +92,7 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
     const { uploadFile } = useStorage()
     const { enqueueSnackbar, closeSnackbar } = useSnackbar()
     const { t } = useTranslation('', { keyPrefix: 'ui.draft' })
+    const { t: et } = useTranslation('', { keyPrefix: 'ui.postButton' })
 
     const [dragging, setDragging] = useState<boolean>(false)
 
@@ -559,7 +559,7 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                             uploadImage={uploadImage}
                             insertEmoji={insertEmoji}
                             setEmojiDict={setEmojiDict}
-                            submitButtonLabel={props.submitButtonLabel}
+                            submitButtonLabel={et(mode)}
                             onAddMedia={
                                 mode === 'media'
                                     ? (media) => {
@@ -595,7 +595,7 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                             uploadImage={uploadImage}
                             insertEmoji={insertEmoji}
                             setEmojiDict={setEmojiDict}
-                            submitButtonLabel={props.submitButtonLabel}
+                            submitButtonLabel={et(mode)}
                             onAddMedia={
                                 mode === 'media'
                                     ? (media) => {

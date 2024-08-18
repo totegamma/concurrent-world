@@ -61,6 +61,13 @@
         "now": "just now"
     },
     "ui": {
+        "postButton": {
+            "plaintext": "Post",
+            "markdown": "Post",
+            "media": "Post",
+            "reply": "Reply",
+            "reroute": "Reroute"
+        },
         "profileEditor": {
             "update": "Update",
             "updateSuccess": "Updated Successfully",

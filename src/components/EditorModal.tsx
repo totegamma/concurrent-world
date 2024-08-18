@@ -100,8 +100,6 @@ export const EditorModalProvider = (props: EditorModalProps): JSX.Element => {
                 </Box>
             ) : undefined,
             allowEmpty: openOpts?.mode === 'reroute',
-            submitButtonLabel:
-                openOpts?.mode === 'plaintext' ? 'Post' : openOpts?.mode === 'reply' ? 'Reply' : 'Reroute',
             onPost: () => {
                 setPostProps(null)
             },
