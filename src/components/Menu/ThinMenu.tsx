@@ -15,6 +15,7 @@ import { useGlobalActions } from '../../context/GlobalActions'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import { MinimalListsMenu } from '../ListsMenu/minimal'
 import TerminalIcon from '@mui/icons-material/Terminal'
+import { useEditorModal } from '../EditorModal'
 
 export interface MenuProps {
     onClick?: () => void
@@ -23,6 +24,7 @@ export interface MenuProps {
 export const ThinMenu = memo<MenuProps>((props: MenuProps): JSX.Element => {
     const { client } = useClient()
     const actions = useGlobalActions()
+    const editorModal = useEditorModal()
     const [devMode] = usePreference('devMode')
     const [showEditorOnTop] = usePreference('showEditorOnTop')
 
@@ -135,7 +137,7 @@ export const ThinMenu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                     {!showEditorOnTop && (
                         <IconButton
                             onClick={() => {
-                                actions.openDraft()
+                                editorModal.open()
                             }}
                             sx={{
                                 color: 'background.contrastText'

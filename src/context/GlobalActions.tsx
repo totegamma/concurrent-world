@@ -1,17 +1,10 @@
-import { Box, Paper, Modal, Typography, Divider, Button, Drawer, useTheme, useMediaQuery, Tooltip } from '@mui/material'
+import { Box, Paper, Modal, Typography, Divider, Button, Drawer, useTheme, Tooltip } from '@mui/material'
 import { InspectorProvider } from '../context/Inspector'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useClient } from './ClientContext'
-import {
-    type Message,
-    type Timeline,
-    type CommunityTimelineSchema,
-    Schemas,
-    type CoreTimeline
-} from '@concurrent-world/client'
+import { type Timeline, type CommunityTimelineSchema, Schemas, type CoreTimeline } from '@concurrent-world/client'
 import { usePreference } from './PreferenceContext'
 import { ProfileEditor } from '../components/ProfileEditor'
-import { MessageContainer } from '../components/Message/MessageContainer'
 import { Menu } from '../components/Menu/Menu'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import { type EmojiPackage } from '../model'
@@ -21,14 +14,10 @@ import { ImagePreviewModal } from '../components/ui/ImagePreviewModal'
 import { StreamCard } from '../components/Stream/Card'
 import { LogoutButton } from '../components/Settings/LogoutButton'
 import { useGlobalState } from './GlobalState'
-import { EditorModal } from '../components/EditorModal'
+// import { EditorModal } from '../components/EditorModal'
 
 export interface GlobalActionsState {
-    openDraft: (text?: string) => void
-    openReply: (target: Message<any>) => void
-    openReroute: (target: Message<any>) => void
     openMobileMenu: (open?: boolean) => void
-    draft: string
     openEmojipack: (url: EmojiPackage) => void
     openImageViewer: (url: string) => void
     postStreams: Array<Timeline<CommunityTimelineSchema>>
@@ -59,9 +48,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const [emojiPackages, setEmojiPackages] = usePreference('emojiPackages')
     const { enqueueSnackbar } = useSnackbar()
     const theme = useTheme()
-    const [draft, setDraft] = useState<string>('')
-    const [mode, setMode] = useState<'compose' | 'reply' | 'reroute' | 'none'>('none')
-    const [targetMessage, setTargetMessage] = useState<Message<any> | null>(null)
 
     const [postStreams, setPostStreams] = useState<Array<Timeline<CommunityTimelineSchema>>>([])
 
@@ -72,8 +58,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const emojiPackAlreadyAdded = useMemo(() => {
         return emojiPackages.find((p) => p === emojiPack?.packageURL) !== undefined
     }, [emojiPack, emojiPackages])
-
-    const isMobileSize = useMediaQuery(theme.breakpoints.down('sm'))
 
     const setupAccountRequired = client?.user !== null && client?.user.profile === undefined
     const noListDetected = Object.keys(lists).length === 0
@@ -124,47 +108,9 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         }
     }, [])
 
-    const openDraft = useCallback(
-        (draft?: string) => {
-            setDraft(draft ?? '')
-            setMode('compose')
-        },
-        [setDraft, setMode]
-    )
-
-    const openReply = useCallback((target: Message<any>) => {
-        setTargetMessage(target)
-        setMode('reply')
-    }, [])
-
-    const openReroute = useCallback(
-        (target: Message<any>) => {
-            setTargetMessage(target)
-            setMode('reroute')
-        },
-        [setTargetMessage, setMode]
-    )
-
     const openMobileMenu = useCallback((open?: boolean) => {
         setMobileMenuOpen(open ?? true)
     }, [])
-
-    const handleKeyPress = useCallback(
-        (event: KeyboardEvent) => {
-            if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
-                return
-            }
-            switch (event.key) {
-                case 'n':
-                    setTimeout(() => {
-                        // XXX: this is a hack to prevent the keypress from being captured by the draft
-                        openDraft()
-                    }, 0)
-                    break
-            }
-        },
-        [openDraft]
-    )
 
     const openEmojipack = useCallback((pack: EmojiPackage) => {
         setEmojiPack(pack)
@@ -174,80 +120,20 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         setPreviewImage(url)
     }, [])
 
-    useEffect(() => {
-        // attach the event listener
-        document.addEventListener('keydown', handleKeyPress)
-
-        // remove the event listener
-        return () => {
-            document.removeEventListener('keydown', handleKeyPress)
-        }
-    }, [handleKeyPress])
-
     return (
         <GlobalActionsContext.Provider
             value={useMemo(() => {
                 return {
-                    openDraft,
-                    openReply,
-                    openReroute,
                     openMobileMenu,
-                    draft,
                     openEmojipack,
                     openImageViewer,
                     postStreams,
                     setPostStreams
                 }
-            }, [
-                openDraft,
-                openReply,
-                openReroute,
-                openMobileMenu,
-                draft,
-                openEmojipack,
-                openImageViewer,
-                postStreams,
-                setPostStreams
-            ])}
+            }, [openMobileMenu, openEmojipack, openImageViewer, postStreams, setPostStreams])}
         >
             <InspectorProvider>
                 <>{props.children}</>
-                <EditorModal
-                    open={mode !== 'none'}
-                    onClose={() => {
-                        setMode('none')
-                    }}
-                    variant={isMobileSize ? 'mobile' : 'desktop'}
-                    mode={mode !== 'reply' && mode !== 'reroute' ? undefined : mode}
-                    streamPickerInitial={
-                        mode === 'compose'
-                            ? postStreams
-                            : mode === 'reroute'
-                            ? postStreams
-                            : targetMessage?.postedStreams?.filter((t) => t.schema === Schemas.communityTimeline) ?? []
-                    }
-                    streamPickerOptions={globalState.allKnownTimelines}
-                    allowEmpty={mode === 'reroute'}
-                    actionTo={targetMessage ?? undefined}
-                    submitButtonLabel={mode === 'compose' ? 'Post' : mode === 'reply' ? 'Reply' : 'Reroute'}
-                    onPost={() => {
-                        setMode('none')
-                    }}
-                    onCancel={() => {
-                        setMode('none')
-                    }}
-                    context={
-                        targetMessage && (mode === 'reply' || mode === 'reroute') ? (
-                            <Box width="100%" maxHeight={isMobileSize ? '3rem' : 'unset'} overflow="auto">
-                                <MessageContainer
-                                    simple
-                                    messageID={targetMessage.id}
-                                    messageOwner={targetMessage.author}
-                                />
-                            </Box>
-                        ) : undefined
-                    }
-                />
                 <Modal open={!globalState.isRegistered} onClose={() => {}}>
                     <Paper
                         sx={{
@@ -487,11 +373,7 @@ export function useGlobalActions(): GlobalActionsState {
     const actions = useContext(GlobalActionsContext)
     if (!actions) {
         return {
-            openDraft: () => {},
-            openReply: () => {},
-            openReroute: () => {},
             openMobileMenu: () => {},
-            draft: '',
             openEmojipack: () => {},
             openImageViewer: () => {},
             postStreams: [],
