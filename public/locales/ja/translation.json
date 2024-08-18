@@ -61,6 +61,13 @@
         "now": "たった今"
     },
     "ui": {
+        "postButton": {
+            "plaintext": "カレント",
+            "markdown": "カレント",
+            "media": "カレント",
+            "reply": "リプライ",
+            "reroute": "リルート"
+        },
         "profileEditor": {
             "update": "更新",
             "updateSuccess": "更新成功",
