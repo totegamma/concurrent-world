@@ -39,7 +39,7 @@ export const EmbeddedGallery = (props: EmbeddedGalleryProps): JSX.Element => {
                     <Box
                         key={index}
                         onClick={() => {
-                            mediaViewer.openSingle(media.mediaURL)
+                            mediaViewer.openMedias(props.medias, index)
                         }}
                         sx={{
                             height: '15vh',

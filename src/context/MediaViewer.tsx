@@ -1,15 +1,27 @@
-import { Box, Button, CircularProgress, Modal, useMediaQuery, useTheme } from '@mui/material'
+import { Box, Button, CircularProgress, IconButton, Modal, useMediaQuery, useTheme } from '@mui/material'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { type ReactZoomPanPinchRef, TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
 
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft'
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
+
 const zoomFactor = 8
+
+interface Media {
+    mediaURL: string
+    mediaType: string
+    thumbnailURL?: string
+    blurhash?: string
+}
 
 export interface MediaViewerState {
     openSingle: (src?: string) => void
+    openMedias: (medias: Media[], startIndex?: number) => void
 }
 
 const MediaViewerContext = createContext<MediaViewerState>({
-    openSingle: () => {}
+    openSingle: () => {},
+    openMedias: () => {}
 })
 
 interface MediaViewerProviderProps {
@@ -18,9 +30,17 @@ interface MediaViewerProviderProps {
 
 export const MediaViewerProvider = (props: MediaViewerProviderProps): JSX.Element => {
     const [previewImage, setPreviewImage] = useState<string | undefined>()
+    const [previewIndex, setPreviewIndex] = useState<number>(0)
+    const [medias, setMedias] = useState<Media[]>([])
 
     const openSingle = (src?: string): void => {
         setPreviewImage(src)
+    }
+
+    const openMedias = (medias: Media[], startIndex?: number): void => {
+        setMedias(medias)
+        setPreviewIndex(startIndex ?? 0)
+        setPreviewImage(medias[startIndex ?? 0].mediaURL)
     }
 
     const theme = useTheme()
@@ -93,7 +113,7 @@ export const MediaViewerProvider = (props: MediaViewerProviderProps): JSX.Elemen
     }, [previewImage])
 
     return (
-        <MediaViewerContext.Provider value={{ openSingle }}>
+        <MediaViewerContext.Provider value={{ openSingle, openMedias }}>
             {props.children}
             <Modal
                 open={!!previewImage}
@@ -160,6 +180,48 @@ export const MediaViewerProvider = (props: MediaViewerProviderProps): JSX.Elemen
                             />
                         )}
                     </Box>
+
+                    {medias && previewIndex > 0 && (
+                        <IconButton
+                            onClick={() => {
+                                setPreviewIndex(previewIndex - 1)
+                                setPreviewImage(medias[previewIndex - 1].mediaURL)
+                            }}
+                            sx={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: 0,
+                                transform: 'translateY(-50%)',
+                                zIndex: 1,
+                                '&:hover': {
+                                    backgroundColor: 'rgba(255, 255, 255, 0.3)'
+                                }
+                            }}
+                        >
+                            <KeyboardArrowLeftIcon />
+                        </IconButton>
+                    )}
+
+                    {medias && previewIndex < medias.length - 1 && (
+                        <IconButton
+                            onClick={() => {
+                                setPreviewIndex(previewIndex + 1)
+                                setPreviewImage(medias[previewIndex + 1].mediaURL)
+                            }}
+                            sx={{
+                                position: 'absolute',
+                                top: '50%',
+                                right: 0,
+                                transform: 'translateY(-50%)',
+                                zIndex: 1,
+                                '&:hover': {
+                                    backgroundColor: 'rgba(255, 255, 255, 0.3)'
+                                }
+                            }}
+                        >
+                            <KeyboardArrowRightIcon />
+                        </IconButton>
+                    )}
                     <Box
                         width="100%"
                         display="flex"
