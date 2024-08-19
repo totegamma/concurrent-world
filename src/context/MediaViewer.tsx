@@ -1,9 +1,20 @@
-import { Box, Button, CircularProgress, IconButton, Modal, useMediaQuery, useTheme } from '@mui/material'
+import {
+    Box,
+    Button,
+    CircularProgress,
+    IconButton,
+    ImageList,
+    ImageListItem,
+    Modal,
+    useMediaQuery,
+    useTheme
+} from '@mui/material'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { type ReactZoomPanPinchRef, TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
 
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
+import AppsIcon from '@mui/icons-material/Apps'
 
 const zoomFactor = 8
 
@@ -33,11 +44,15 @@ export const MediaViewerProvider = (props: MediaViewerProviderProps): JSX.Elemen
     const [previewIndex, setPreviewIndex] = useState<number>(0)
     const [medias, setMedias] = useState<Media[]>([])
 
+    const [mode, setMode] = useState<'single' | 'gallery'>('single')
+
     const openSingle = (src?: string): void => {
+        setMode('single')
         setPreviewImage(src)
     }
 
     const openMedias = (medias: Media[], startIndex?: number): void => {
+        setMode('single')
         setMedias(medias)
         setPreviewIndex(startIndex ?? 0)
         setPreviewImage(medias[startIndex ?? 0].mediaURL)
@@ -128,119 +143,193 @@ export const MediaViewerProvider = (props: MediaViewerProviderProps): JSX.Elemen
                     position: 'absolute'
                 }}
             >
-                <>
-                    <Box
-                        flex={1}
-                        position="absolute"
-                        width="100vw"
-                        height="100dvh"
-                        top={0}
-                        left={0}
-                        ref={(el: HTMLDivElement | null) => {
-                            setContainer(el)
-                        }}
-                        onClick={(e) => {
-                            if (e.target !== imageRef.current?.parentElement) {
-                                setPreviewImage(undefined)
-                            }
-                        }}
-                        display="flex"
-                        justifyContent="center"
-                        alignItems="center"
-                    >
-                        {imageScale > 0 ? (
-                            <TransformWrapper
-                                initialScale={imageScale}
-                                initialPositionX={centerPosition.x}
-                                initialPositionY={centerPosition.y}
-                                minScale={imageScale}
-                                maxScale={imageScale * zoomFactor}
-                                ref={transformComponentRef}
+                {mode === 'single' ? (
+                    <>
+                        <Box
+                            flex={1}
+                            position="absolute"
+                            width="100vw"
+                            height="100dvh"
+                            top={0}
+                            left={0}
+                            ref={(el: HTMLDivElement | null) => {
+                                setContainer(el)
+                            }}
+                            onClick={(e) => {
+                                if (e.target !== imageRef.current?.parentElement) {
+                                    setPreviewImage(undefined)
+                                }
+                            }}
+                            display="flex"
+                            justifyContent="center"
+                            alignItems="center"
+                        >
+                            {imageScale > 0 ? (
+                                <TransformWrapper
+                                    initialScale={imageScale}
+                                    initialPositionX={centerPosition.x}
+                                    initialPositionY={centerPosition.y}
+                                    minScale={imageScale}
+                                    maxScale={imageScale * zoomFactor}
+                                    ref={transformComponentRef}
+                                >
+                                    <TransformComponent
+                                        wrapperStyle={{
+                                            width: '100%',
+                                            height: '100%'
+                                        }}
+                                    >
+                                        <img
+                                            src={previewImage}
+                                            alt="preview"
+                                            ref={(el: HTMLImageElement | null) => {
+                                                imageRef.current = el
+                                            }}
+                                        />
+                                    </TransformComponent>
+                                </TransformWrapper>
+                            ) : (
+                                <CircularProgress
+                                    sx={{
+                                        color: 'white'
+                                    }}
+                                />
+                            )}
+                        </Box>
+
+                        {medias && (
+                            <IconButton
+                                disabled={previewIndex === 0}
+                                onClick={() => {
+                                    setPreviewIndex(previewIndex - 1)
+                                    setPreviewImage(medias[previewIndex - 1].mediaURL)
+                                }}
+                                sx={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    left: '4px',
+                                    transform: 'translateY(-50%)',
+                                    zIndex: 1,
+                                    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                                    '&:hover': {
+                                        backgroundColor: 'rgba(255, 255, 255, 0.5)'
+                                    }
+                                }}
                             >
-                                <TransformComponent
-                                    wrapperStyle={{
-                                        width: '100%',
-                                        height: '100%'
+                                <KeyboardArrowLeftIcon />
+                            </IconButton>
+                        )}
+
+                        {medias && (
+                            <IconButton
+                                disabled={previewIndex === medias.length - 1}
+                                onClick={() => {
+                                    setPreviewIndex(previewIndex + 1)
+                                    setPreviewImage(medias[previewIndex + 1].mediaURL)
+                                }}
+                                sx={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    right: '4px',
+                                    transform: 'translateY(-50%)',
+                                    zIndex: 1,
+                                    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                                    '&:hover': {
+                                        backgroundColor: 'rgba(255, 255, 255, 0.5)'
+                                    }
+                                }}
+                            >
+                                <KeyboardArrowRightIcon />
+                            </IconButton>
+                        )}
+                        {medias && (
+                            <IconButton
+                                onClick={() => {
+                                    setMode('gallery')
+                                }}
+                                sx={{
+                                    position: 'absolute',
+                                    top: '3%',
+                                    right: '3%',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                                    '&:hover': {
+                                        backgroundColor: 'rgba(255, 255, 255, 5)'
+                                    }
+                                }}
+                            >
+                                <AppsIcon />
+                            </IconButton>
+                        )}
+                        <Box
+                            width="100%"
+                            display="flex"
+                            justifyContent="center"
+                            alignItems="center"
+                            flexDirection="row"
+                            p={1}
+                            position="absolute"
+                            bottom={'env(safe-area-inset-bottom)'}
+                        >
+                            <Button
+                                onClick={() => {
+                                    setPreviewImage(undefined)
+                                }}
+                            >
+                                Close
+                            </Button>
+                        </Box>
+                    </>
+                ) : (
+                    <>
+                        <ImageList
+                            variant="masonry"
+                            cols={3}
+                            rowHeight={164}
+                            sx={{
+                                maxWidth: '90vw'
+                            }}
+                        >
+                            {medias.map((media, index) => (
+                                <ImageListItem
+                                    key={index}
+                                    cols={index === 0 ? 2 : 1}
+                                    onClick={() => {
+                                        setPreviewIndex(index)
+                                        setPreviewImage(media.mediaURL)
+                                        setMode('single')
                                     }}
                                 >
                                     <img
-                                        src={previewImage}
-                                        alt="preview"
-                                        ref={(el: HTMLImageElement | null) => {
-                                            imageRef.current = el
+                                        src={media.thumbnailURL ?? media.mediaURL}
+                                        alt={media.mediaType}
+                                        onClick={() => {
+                                            setPreviewIndex(index)
+                                            setPreviewImage(media.mediaURL)
                                         }}
                                     />
-                                </TransformComponent>
-                            </TransformWrapper>
-                        ) : (
-                            <CircularProgress
-                                sx={{
-                                    color: 'white'
+                                </ImageListItem>
+                            ))}
+                        </ImageList>
+                        <Box
+                            width="100%"
+                            display="flex"
+                            justifyContent="center"
+                            alignItems="center"
+                            flexDirection="row"
+                            p={1}
+                            position="absolute"
+                            bottom={'env(safe-area-inset-bottom)'}
+                        >
+                            <Button
+                                onClick={() => {
+                                    setPreviewImage(undefined)
                                 }}
-                            />
-                        )}
-                    </Box>
-
-                    {medias && previewIndex > 0 && (
-                        <IconButton
-                            onClick={() => {
-                                setPreviewIndex(previewIndex - 1)
-                                setPreviewImage(medias[previewIndex - 1].mediaURL)
-                            }}
-                            sx={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: 0,
-                                transform: 'translateY(-50%)',
-                                zIndex: 1,
-                                '&:hover': {
-                                    backgroundColor: 'rgba(255, 255, 255, 0.3)'
-                                }
-                            }}
-                        >
-                            <KeyboardArrowLeftIcon />
-                        </IconButton>
-                    )}
-
-                    {medias && previewIndex < medias.length - 1 && (
-                        <IconButton
-                            onClick={() => {
-                                setPreviewIndex(previewIndex + 1)
-                                setPreviewImage(medias[previewIndex + 1].mediaURL)
-                            }}
-                            sx={{
-                                position: 'absolute',
-                                top: '50%',
-                                right: 0,
-                                transform: 'translateY(-50%)',
-                                zIndex: 1,
-                                '&:hover': {
-                                    backgroundColor: 'rgba(255, 255, 255, 0.3)'
-                                }
-                            }}
-                        >
-                            <KeyboardArrowRightIcon />
-                        </IconButton>
-                    )}
-                    <Box
-                        width="100%"
-                        display="flex"
-                        justifyContent="center"
-                        alignItems="center"
-                        flexDirection="row"
-                        p={1}
-                        position="absolute"
-                        bottom={'env(safe-area-inset-bottom)'}
-                    >
-                        <Button
-                            onClick={() => {
-                                setPreviewImage(undefined)
-                            }}
-                        >
-                            Close
-                        </Button>
-                    </Box>
-                </>
+                            >
+                                Close
+                            </Button>
+                        </Box>
+                    </>
+                )}
             </Modal>
         </MediaViewerContext.Provider>
     )
