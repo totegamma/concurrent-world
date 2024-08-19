@@ -47,6 +47,7 @@ import { useGlobalState } from './context/GlobalState'
 import { ConcrntLogo } from './components/theming/ConcrntLogo'
 import { ConcordPage } from './pages/Concord'
 import { EditorModalProvider } from './components/EditorModal'
+import { MediaViewerProvider } from './context/MediaViewer'
 
 function App(): JSX.Element {
     const { client } = useClient()
@@ -220,15 +221,17 @@ function App(): JSX.Element {
                 <CssBaseline />
                 <TickerProvider>
                     <UrlSummaryProvider host={client.host}>
-                        <EmojiPickerProvider>
-                            <StorageProvider>
-                                <ConcordProvider>
-                                    <EditorModalProvider>
-                                        <GlobalActionsProvider>{childs}</GlobalActionsProvider>
-                                    </EditorModalProvider>
-                                </ConcordProvider>
-                            </StorageProvider>
-                        </EmojiPickerProvider>
+                        <MediaViewerProvider>
+                            <EmojiPickerProvider>
+                                <StorageProvider>
+                                    <ConcordProvider>
+                                        <EditorModalProvider>
+                                            <GlobalActionsProvider>{childs}</GlobalActionsProvider>
+                                        </EditorModalProvider>
+                                    </ConcordProvider>
+                                </StorageProvider>
+                            </EmojiPickerProvider>
+                        </MediaViewerProvider>
                     </UrlSummaryProvider>
                 </TickerProvider>
             </ThemeProvider>

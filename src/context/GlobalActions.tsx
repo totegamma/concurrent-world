@@ -10,7 +10,6 @@ import { CCDrawer } from '../components/ui/CCDrawer'
 import { type EmojiPackage } from '../model'
 import { experimental_VGrid as VGrid } from 'virtua'
 import { useSnackbar } from 'notistack'
-import { ImagePreviewModal } from '../components/ui/ImagePreviewModal'
 import { StreamCard } from '../components/Stream/Card'
 import { LogoutButton } from '../components/Settings/LogoutButton'
 import { useGlobalState } from './GlobalState'
@@ -18,7 +17,6 @@ import { useGlobalState } from './GlobalState'
 export interface GlobalActionsState {
     openMobileMenu: (open?: boolean) => void
     openEmojipack: (url: EmojiPackage) => void
-    openImageViewer: (url: string) => void
 }
 
 const GlobalActionsContext = createContext<GlobalActionsState | undefined>(undefined)
@@ -47,7 +45,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
     const theme = useTheme()
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
-    const [previewImage, setPreviewImage] = useState<string | undefined>()
 
     const [emojiPack, setEmojiPack] = useState<EmojiPackage>()
     const emojiPackAlreadyAdded = useMemo(() => {
@@ -111,19 +108,14 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
         setEmojiPack(pack)
     }, [])
 
-    const openImageViewer = useCallback((url: string) => {
-        setPreviewImage(url)
-    }, [])
-
     return (
         <GlobalActionsContext.Provider
             value={useMemo(() => {
                 return {
                     openMobileMenu,
-                    openEmojipack,
-                    openImageViewer
+                    openEmojipack
                 }
-            }, [openMobileMenu, openEmojipack, openImageViewer])}
+            }, [openMobileMenu, openEmojipack])}
         >
             <InspectorProvider>
                 <>{props.children}</>
@@ -243,12 +235,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     </Paper>
                 </Modal>
 
-                <ImagePreviewModal
-                    src={previewImage}
-                    onClose={() => {
-                        setPreviewImage(undefined)
-                    }}
-                />
                 <Drawer
                     anchor={'left'}
                     open={mobileMenuOpen}
@@ -367,8 +353,7 @@ export function useGlobalActions(): GlobalActionsState {
     if (!actions) {
         return {
             openMobileMenu: () => {},
-            openEmojipack: () => {},
-            openImageViewer: () => {}
+            openEmojipack: () => {}
         }
     }
     return actions
