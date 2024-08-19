@@ -130,7 +130,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                 (frequentEmoji) => frequentEmoji.shortcode !== emoji.shortcode
             )
             newFrequentEmojis.unshift(emoji)
-            setFrequentEmojis(newFrequentEmojis.slice(0, 32))
+            setFrequentEmojis(newFrequentEmojis.slice(0, 60))
             onSelectedRef.current?.(emoji)
         },
         [frequentEmojis]
