@@ -127,14 +127,17 @@ export const MediaViewerProvider = (props: MediaViewerProviderProps): JSX.Elemen
         }
     }, [previewImage])
 
+    const close = (): void => {
+        setPreviewImage(undefined)
+        setMedias([])
+    }
+
     return (
         <MediaViewerContext.Provider value={{ openSingle, openMedias }}>
             {props.children}
             <Modal
                 open={!!previewImage}
-                onClose={() => {
-                    setPreviewImage(undefined)
-                }}
+                onClose={close}
                 sx={{
                     display: 'flex',
                     alignItems: 'center',
@@ -157,7 +160,7 @@ export const MediaViewerProvider = (props: MediaViewerProviderProps): JSX.Elemen
                             }}
                             onClick={(e) => {
                                 if (e.target !== imageRef.current?.parentElement) {
-                                    setPreviewImage(undefined)
+                                    close()
                                 }
                             }}
                             display="flex"
@@ -197,7 +200,7 @@ export const MediaViewerProvider = (props: MediaViewerProviderProps): JSX.Elemen
                             )}
                         </Box>
 
-                        {medias && (
+                        {medias.length > 1 && (
                             <IconButton
                                 disabled={previewIndex === 0}
                                 onClick={() => {
@@ -220,7 +223,7 @@ export const MediaViewerProvider = (props: MediaViewerProviderProps): JSX.Elemen
                             </IconButton>
                         )}
 
-                        {medias && (
+                        {medias.length > 1 && (
                             <IconButton
                                 disabled={previewIndex === medias.length - 1}
                                 onClick={() => {
@@ -242,7 +245,7 @@ export const MediaViewerProvider = (props: MediaViewerProviderProps): JSX.Elemen
                                 <KeyboardArrowRightIcon />
                             </IconButton>
                         )}
-                        {medias && (
+                        {medias.length > 1 && (
                             <IconButton
                                 onClick={() => {
                                     setMode('gallery')
@@ -270,13 +273,7 @@ export const MediaViewerProvider = (props: MediaViewerProviderProps): JSX.Elemen
                             position="absolute"
                             bottom={'env(safe-area-inset-bottom)'}
                         >
-                            <Button
-                                onClick={() => {
-                                    setPreviewImage(undefined)
-                                }}
-                            >
-                                Close
-                            </Button>
+                            <Button onClick={close}>Close</Button>
                         </Box>
                     </>
                 ) : (
@@ -320,13 +317,7 @@ export const MediaViewerProvider = (props: MediaViewerProviderProps): JSX.Elemen
                             position="absolute"
                             bottom={'env(safe-area-inset-bottom)'}
                         >
-                            <Button
-                                onClick={() => {
-                                    setPreviewImage(undefined)
-                                }}
-                            >
-                                Close
-                            </Button>
+                            <Button onClick={close}>Close</Button>
                         </Box>
                     </>
                 )}
