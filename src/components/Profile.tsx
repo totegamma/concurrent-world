@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next'
 import { SubprofileBadge } from './ui/SubprofileBadge'
 import { ProfileProperties } from './ui/ProfileProperties'
 import { enqueueSnackbar } from 'notistack'
-import { useGlobalActions } from '../context/GlobalActions'
+import { useMediaViewer } from '../context/MediaViewer'
 
 export interface ProfileProps {
     user?: User
@@ -31,7 +31,7 @@ type detail = 'none' | 'ack' | 'acker'
 
 export function Profile(props: ProfileProps): JSX.Element {
     const { client } = useClient()
-    const actions = useGlobalActions()
+    const mediaViewer = useMediaViewer()
     const isSelf = props.id === client.ccid
 
     const [detailMode, setDetailMode] = useState<detail>('none')
@@ -116,7 +116,7 @@ export function Profile(props: ProfileProps): JSX.Element {
                         if (props.overrideSubProfileID) {
                             props.onSubProfileClicked?.('')
                         } else {
-                            props.user?.profile?.avatar && actions?.openImageViewer(props.user?.profile?.avatar)
+                            props.user?.profile?.avatar && mediaViewer.openSingle(props.user?.profile?.avatar)
                         }
                     }}
                 />

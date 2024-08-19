@@ -26,6 +26,7 @@ import { EmojipackCard } from '../EmojipackCard'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import { useGlobalActions } from '../../context/GlobalActions'
 import { StreamChip } from './StreamChip'
+import { useMediaViewer } from '../../context/MediaViewer'
 
 export interface MarkdownRendererProps {
     messagebody: string
@@ -64,6 +65,7 @@ const sanitizeOption = {
 
 export const MarkdownRenderer = memo<MarkdownRendererProps>((props: MarkdownRendererProps): JSX.Element => {
     const actions = useGlobalActions()
+    const mediaViewer = useMediaViewer()
     const { enqueueSnackbar } = useSnackbar()
     const [themeName, setThemeName] = usePreference('themeName')
     const [customThemes, setCustomThemes] = usePreference('customThemes')
@@ -430,8 +432,10 @@ export const MarkdownRenderer = memo<MarkdownRendererProps>((props: MarkdownRend
                                 sx={{
                                     maxHeight: '20vh'
                                 }}
-                                onClick={() => {
-                                    actions.openImageViewer(props.src ?? '')
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    e.preventDefault()
+                                    mediaViewer.openSingle(props.src)
                                 }}
                             />
                         )

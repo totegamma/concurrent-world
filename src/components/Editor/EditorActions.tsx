@@ -54,12 +54,14 @@ export const EditorActions = (props: EditorActionsProps): JSX.Element => {
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     const onFileInputChange = async (event: any): Promise<void> => {
-        const file = event.target.files[0]
-        if (!file) {
-            console.log('no file')
-            return
+        for (const file of event.target.files) {
+            if (!file) {
+                console.log('no file')
+                continue
+            }
+            await props.uploadImage(file)
         }
-        await props.uploadImage(file)
+
         props.textInputRef.current?.focus()
     }
 
@@ -122,6 +124,7 @@ export const EditorActions = (props: EditorActionsProps): JSX.Element => {
                             <ImageIcon sx={{ fontSize: '80%' }} />
                             <input
                                 hidden
+                                multiple
                                 ref={fileInputRef}
                                 type="file"
                                 onChange={(e) => {

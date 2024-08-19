@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useClient } from '../../context/ClientContext'
 import { Avatar, type SxProps, Tooltip, Skeleton } from '@mui/material'
 import BoringAvatar from 'boring-avatars'
-import { useGlobalActions } from '../../context/GlobalActions'
+import { useMediaViewer } from '../../context/MediaViewer'
 
 export interface SubprofileBadgeProps {
     characterID: string
@@ -15,7 +15,7 @@ export interface SubprofileBadgeProps {
 
 export function SubprofileBadge(props: SubprofileBadgeProps): JSX.Element {
     const { client } = useClient()
-    const actions = useGlobalActions()
+    const mediaViewer = useMediaViewer()
     const [character, setProfile] = useState<CoreProfile<any> | null>(null)
 
     useEffect(() => {
@@ -38,7 +38,7 @@ export function SubprofileBadge(props: SubprofileBadgeProps): JSX.Element {
                 variant="square"
                 onClick={() => {
                     if (props.enablePreview) {
-                        actions?.openImageViewer(character?.document.body.avatar)
+                        mediaViewer.openSingle(character?.document.body.avatar)
                     } else {
                         props.onClick?.(props.characterID)
                     }

@@ -17,7 +17,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import ReplayIcon from '@mui/icons-material/Replay'
 import { useEffect, useMemo, useState } from 'react'
 import { useClient } from '../../context/ClientContext'
-import { useGlobalActions } from '../../context/GlobalActions'
+import { EmbeddedGallery } from '../ui/EmbeddedGarelly'
 
 export interface MediaMessageViewProps {
     message: Message<MediaMessageSchema>
@@ -35,7 +35,6 @@ const gradationHeight = 80
 
 export const MediaMessageView = (props: MediaMessageViewProps): JSX.Element => {
     const theme = useTheme()
-    const actions = useGlobalActions()
     const clipHeight = props.clipHeight ?? 450
     const [expanded, setExpanded] = useState(props.forceExpanded ?? false)
 
@@ -118,32 +117,8 @@ export const MediaMessageView = (props: MediaMessageViewProps): JSX.Element => {
 
                 {!props.simple && <MessageUrlPreview messageBody={props.message.document.body.body} />}
             </Box>
-            <Box
-                display="flex"
-                gap={1}
-                sx={{
-                    overflowX: 'auto',
-                    overflowY: 'hidden'
-                }}
-            >
-                {props.message.document.body.medias?.map((media, index) => (
-                    <Box
-                        key={index}
-                        onClick={() => {
-                            actions.openImageViewer(media.mediaURL)
-                        }}
-                        sx={{
-                            height: '15vh',
-                            aspectRatio: '4/3',
-                            backgroundImage: `url(${media.mediaURL})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            cursor: 'pointer',
-                            borderRadius: 1
-                        }}
-                    />
-                ))}
-            </Box>
+
+            {props.message.document.body.medias && <EmbeddedGallery medias={props.message.document.body.medias} />}
 
             {(!props.simple && (
                 <>
