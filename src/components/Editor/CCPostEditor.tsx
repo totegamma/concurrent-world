@@ -262,26 +262,31 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
             enqueueSnackbar('Uploaded', { variant: 'success' })
         } else {
             const uploadingText = ' ![uploading...]()'
-            setDraft(draft + uploadingText)
+            setDraft((before) => before + uploadingText)
             const result = await uploadFile(imageFile)
             if (!result) {
-                setDraft(draft.replace(uploadingText, ''))
-                setDraft(draft + `![upload failed]()`)
+                setDraft((before) => before.replace(uploadingText, '') + `\n![upload failed]()`)
             } else {
-                setDraft(draft.replace(uploadingText, ''))
                 if (imageFile.type.startsWith('video')) {
-                    setDraft(draft + `<video controls><source src="${result}#t=0.1"></video>`)
+                    setDraft(
+                        (before) =>
+                            before.replace(uploadingText, '') +
+                            `\n<video controls><source src="${result}#t=0.1"></video>`
+                    )
                 } else {
-                    setDraft(draft + `![image](${result})`)
+                    setDraft((before) => before.replace(uploadingText, '') + `\n![image](${result})`)
                 }
             }
         }
     }
 
     const handlePasteImage = async (event: any): Promise<void> => {
-        const imageFile = event.clipboardData?.items[0].getAsFile()
-        if (!imageFile) return
-        await uploadImage(imageFile)
+        if (!event.clipboardData) return
+        for (const item of event.clipboardData.items) {
+            const imageFile = item.getAsFile()
+            if (!imageFile) continue
+            await uploadImage(imageFile)
+        }
     }
 
     return (
@@ -304,13 +309,15 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                 e.preventDefault()
                 e.stopPropagation()
             }}
-            onDrop={(e) => {
+            onDrop={async (e) => {
                 setDragging(false)
                 e.preventDefault()
                 e.stopPropagation()
                 const files = e.dataTransfer.files
                 if (files.length > 0) {
-                    uploadImage(files[0])
+                    for (const file of files) {
+                        await uploadImage(file)
+                    }
                 }
             }}
         >
