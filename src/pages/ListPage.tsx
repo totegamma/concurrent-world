@@ -57,6 +57,7 @@ export function ListPage(): JSX.Element {
     }, [list, allKnownTimelines])
 
     const defaultPostHome = useMemo(() => {
+        if (!list) return true
         return list.defaultPostHome === undefined ? true : list.defaultPostHome
     }, [list])
 
