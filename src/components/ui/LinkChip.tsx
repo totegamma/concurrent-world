@@ -14,7 +14,8 @@ import {
     faPatreon,
     faBandcamp,
     faSoundcloud,
-    faXTwitter
+    faXTwitter,
+    faTelegram
 } from '@fortawesome/free-brands-svg-icons'
 
 const iconMap: Record<string, JSX.Element> = {
@@ -30,6 +31,7 @@ const iconMap: Record<string, JSX.Element> = {
     patreon: <FontAwesomeIcon icon={faPatreon} />,
     bandcamp: <FontAwesomeIcon icon={faBandcamp} />,
     soundcloud: <FontAwesomeIcon icon={faSoundcloud} />,
+    telegram: <FontAwesomeIcon icon={faTelegram} />,
     x: <FontAwesomeIcon icon={faXTwitter} />
 }
 
