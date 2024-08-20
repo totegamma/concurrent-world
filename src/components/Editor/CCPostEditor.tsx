@@ -11,20 +11,22 @@ import {
     type SxProps,
     Menu,
     Paper,
-    Typography
+    Typography,
+    MenuItem,
+    Popover,
+    TextField,
+    FormControl,
+    InputLabel,
+    Select,
+    Button
 } from '@mui/material'
 import { StreamPicker } from '../ui/StreamPicker'
 import { useSnackbar } from 'notistack'
 import { usePersistent } from '../../hooks/usePersistent'
 import HomeIcon from '@mui/icons-material/Home'
-import {
-    type CommunityTimelineSchema,
-    type Timeline,
-    type Message,
-    type MediaMessageSchema
-} from '@concurrent-world/client'
+import { type CommunityTimelineSchema, type Timeline, type Message } from '@concurrent-world/client'
 import { useClient } from '../../context/ClientContext'
-import { type Emoji, type EmojiLite } from '../../model'
+import { type WorldMedia, type Emoji, type EmojiLite } from '../../model'
 import { useTranslation } from 'react-i18next'
 import { CCIconButton } from '../ui/CCIconButton'
 import ReplayIcon from '@mui/icons-material/Replay'
@@ -41,6 +43,7 @@ import TextFieldsIcon from '@mui/icons-material/TextFields'
 import ReplyIcon from '@mui/icons-material/Reply'
 import RepeatIcon from '@mui/icons-material/Repeat'
 import CancelIcon from '@mui/icons-material/Cancel'
+import FeedbackIcon from '@mui/icons-material/Feedback'
 
 const ModeSets = {
     plaintext: {
@@ -83,8 +86,6 @@ export interface CCPostEditorProps {
     maxRows?: number
     onPost?: () => void
 }
-
-export type MediaType = NonNullable<MediaMessageSchema['medias']>[number]
 
 export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): JSX.Element => {
     const theme = useTheme()
@@ -156,13 +157,16 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
     }
 
     // media
-    const [medias, setMedias] = useState<MediaType[]>([])
+    const [medias, setMedias] = useState<WorldMedia[]>([])
 
     const reset = (): void => {
         setDraft('')
         setEmojiDict({})
         setMedias([])
     }
+
+    const [mediaMenuAnchorEl, setMediaMenuAnchorEl] = useState<null | HTMLElement>(null)
+    const [selectedMediaIndex, setSelectedMediaIndex] = useState<number>(-1)
 
     const post = (postHome: boolean): void => {
         if (!props.allowEmpty && (draft.length === 0 || draft.trim().length === 0) && mode !== 'media') {
@@ -491,6 +495,10 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                                 backgroundImage: `url(${media.mediaURL})`,
                                 backgroundSize: 'cover'
                             }}
+                            onClick={(e) => {
+                                setMediaMenuAnchorEl(e.currentTarget)
+                                setSelectedMediaIndex(i)
+                            }}
                         >
                             <CCIconButton
                                 onClick={() => {
@@ -510,6 +518,19 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                                     }}
                                 />
                             </CCIconButton>
+                            {media.flag && (
+                                <Tooltip title={media.flag} arrow placement="top">
+                                    <FeedbackIcon
+                                        sx={{
+                                            position: 'absolute',
+                                            backgroundColor: 'background.paper',
+                                            p: 0.1,
+                                            bottom: -10,
+                                            right: -10
+                                        }}
+                                    />
+                                </Tooltip>
+                            )}
                         </Paper>
                     ))}
                 </Box>
@@ -664,6 +685,89 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                         ))}
                 </Box>
             </Menu>
+            <Popover
+                open={Boolean(mediaMenuAnchorEl)}
+                anchorEl={mediaMenuAnchorEl}
+                onClose={() => {
+                    setMediaMenuAnchorEl(null)
+                }}
+                slotProps={{
+                    paper: {
+                        sx: {
+                            padding: 1,
+                            display: 'flex',
+                            gap: 1,
+                            flexDirection: 'column'
+                        }
+                    }
+                }}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'center'
+                }}
+            >
+                <TextField
+                    label="URL"
+                    value={medias[selectedMediaIndex]?.mediaURL}
+                    onChange={(e) => {
+                        // setAddingMediaURL(e.target.value)
+                        setMedias((medias) => {
+                            const newMedias = [...medias]
+                            newMedias[selectedMediaIndex] = {
+                                ...newMedias[selectedMediaIndex],
+                                mediaURL: e.target.value
+                            }
+                            return newMedias
+                        })
+                    }}
+                />
+                <FormControl>
+                    <InputLabel>Type</InputLabel>
+                    <Select
+                        label="Type"
+                        value={medias[selectedMediaIndex]?.mediaType}
+                        onChange={(e) => {
+                            // setAddingMediaType(e.target.value)
+                            setMedias((medias) => {
+                                const newMedias = [...medias]
+                                newMedias[selectedMediaIndex] = {
+                                    ...newMedias[selectedMediaIndex],
+                                    mediaType: e.target.value
+                                }
+                                return newMedias
+                            })
+                        }}
+                    >
+                        <MenuItem value="image/png">PNG</MenuItem>
+                        <MenuItem value="image/jpeg">JPEG</MenuItem>
+                        <MenuItem value="image/gif">GIF</MenuItem>
+                        <MenuItem value="video/mp4">MP4</MenuItem>
+                        <MenuItem value="video/mov">MOV</MenuItem>
+                    </Select>
+                </FormControl>
+                <TextField
+                    label="flag(optional)"
+                    value={medias[selectedMediaIndex]?.flag}
+                    onChange={(e) => {
+                        // setAddingMediaFlag(e.target.value)
+                        setMedias((medias) => {
+                            const newMedias = [...medias]
+                            newMedias[selectedMediaIndex] = {
+                                ...newMedias[selectedMediaIndex],
+                                flag: e.target.value === '' ? undefined : e.target.value
+                            }
+                            return newMedias
+                        })
+                    }}
+                />
+                <Button
+                    onClick={() => {
+                        setMediaMenuAnchorEl(null)
+                    }}
+                >
+                    Done
+                </Button>
+            </Popover>
         </Box>
     )
 })

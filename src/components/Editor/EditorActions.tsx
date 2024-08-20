@@ -23,8 +23,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 import { type Dispatch, type SetStateAction, useRef, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { type Emoji, type EmojiLite } from '../../model'
-import { type MediaType } from './CCPostEditor'
+import { type WorldMedia, type Emoji, type EmojiLite } from '../../model'
 
 export interface EditorActionsProps {
     post: () => void
@@ -35,7 +34,7 @@ export interface EditorActionsProps {
     uploadImage: (file: File) => Promise<void>
     insertEmoji: (emoji: Emoji) => void
     setEmojiDict: Dispatch<SetStateAction<Record<string, EmojiLite>>>
-    onAddMedia?: (media: MediaType) => void
+    onAddMedia?: (media: WorldMedia) => void
     submitButtonLabel?: string
     disableMedia?: boolean
     disableEmoji?: boolean

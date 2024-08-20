@@ -147,3 +147,11 @@ export interface Badge {
     owner: string
     transferable: boolean
 }
+
+export interface WorldMedia {
+    mediaURL: string
+    mediaType: string
+    thumbnailURL?: string
+    blurhash?: string
+    flag?: string
+}
