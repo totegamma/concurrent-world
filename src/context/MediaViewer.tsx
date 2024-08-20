@@ -15,19 +15,13 @@ import { type ReactZoomPanPinchRef, TransformComponent, TransformWrapper } from 
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import AppsIcon from '@mui/icons-material/Apps'
+import { type WorldMedia } from '../model'
 
 const zoomFactor = 8
 
-interface Media {
-    mediaURL: string
-    mediaType: string
-    thumbnailURL?: string
-    blurhash?: string
-}
-
 export interface MediaViewerState {
     openSingle: (src?: string) => void
-    openMedias: (medias: Media[], startIndex?: number) => void
+    openMedias: (medias: WorldMedia[], startIndex?: number) => void
 }
 
 const MediaViewerContext = createContext<MediaViewerState>({
@@ -42,7 +36,7 @@ interface MediaViewerProviderProps {
 export const MediaViewerProvider = (props: MediaViewerProviderProps): JSX.Element => {
     const [previewImage, setPreviewImage] = useState<string | undefined>()
     const [previewIndex, setPreviewIndex] = useState<number>(0)
-    const [medias, setMedias] = useState<Media[]>([])
+    const [medias, setMedias] = useState<WorldMedia[]>([])
 
     const [mode, setMode] = useState<'single' | 'gallery'>('single')
 
@@ -51,7 +45,7 @@ export const MediaViewerProvider = (props: MediaViewerProviderProps): JSX.Elemen
         setPreviewImage(src)
     }
 
-    const openMedias = (medias: Media[], startIndex?: number): void => {
+    const openMedias = (medias: WorldMedia[], startIndex?: number): void => {
         setMode('single')
         setMedias(medias)
         setPreviewIndex(startIndex ?? 0)
