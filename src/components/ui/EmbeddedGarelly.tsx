@@ -85,8 +85,8 @@ export const EmbeddedGallery = (props: EmbeddedGalleryProps): JSX.Element => {
                                 >
                                     <Blurhash
                                         hash={media.blurhash}
-                                        height={'15vh'}
-                                        width={'20vh'}
+                                        height={'100%'}
+                                        width={'100%'}
                                         punch={1}
                                         resolutionX={32}
                                         resolutionY={32}
