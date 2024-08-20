@@ -7,6 +7,7 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import { type WorldMedia } from '../../model'
+import { Blurhash } from 'react-blurhash'
 
 export interface EmbeddedGalleryProps {
     medias: WorldMedia[]
@@ -68,19 +69,44 @@ export const EmbeddedGallery = (props: EmbeddedGalleryProps): JSX.Element => {
                                 cursor: 'pointer',
                                 borderRadius: 1,
                                 mx: 0.5,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                flexFlow: 'column',
-                                gap: 1,
-                                position: 'relative'
+                                position: 'relative',
+                                overflow: 'hidden'
                             }}
                         >
+                            {isHidden && media.blurhash && (
+                                <Box
+                                    sx={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        width: '100%',
+                                        height: '100%'
+                                    }}
+                                >
+                                    <Blurhash
+                                        hash={media.blurhash}
+                                        height={'100%'}
+                                        width={'100%'}
+                                        punch={1}
+                                        resolutionX={32}
+                                        resolutionY={32}
+                                    />
+                                </Box>
+                            )}
                             {isHidden && (
-                                <>
+                                <Box
+                                    sx={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        left: '50%',
+                                        transform: 'translate(-50%, -50%)',
+                                        color: 'rgba(255, 255, 255, 0.5)',
+                                        textAlign: 'center'
+                                    }}
+                                >
                                     <Typography variant="h3">{media.flag}</Typography>
                                     <Typography variant="caption">Click to reveal</Typography>
-                                </>
+                                </Box>
                             )}
                             {media.flag && !isHidden && (
                                 <VisibilityOffIcon

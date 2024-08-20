@@ -315,6 +315,14 @@ export const MarkdownRenderer = memo<MarkdownRendererProps>((props: MarkdownRend
                                 </LinkChip>
                             )
                         }
+                        const matchTelegram = href?.match(/https:\/\/t\.me\/(\w+)\/?$/)
+                        if (matchTelegram) {
+                            return (
+                                <LinkChip service="telegram" href={href}>
+                                    {matchTelegram[1]}
+                                </LinkChip>
+                            )
+                        }
                         const matchYoutubeVideo = href?.match(/https:\/\/www\.youtube\.com\/watch\?v=(\w+)$/)
                         if (matchYoutubeVideo) {
                             return (
