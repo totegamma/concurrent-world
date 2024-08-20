@@ -35,6 +35,7 @@ import { UserSuggestion } from '../Editor/UserSuggestion'
 import { useStorage } from '../../context/StorageContext'
 import { EditorActions } from './EditorActions'
 import { EditorPreview } from './EditorPreview'
+import { encode } from 'blurhash'
 
 import { FaMarkdown } from 'react-icons/fa'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
@@ -247,6 +248,27 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
             })
     }
 
+    const loadImage = async (src: string): Promise<HTMLImageElement> =>
+        await new Promise((resolve, reject) => {
+            const img = new Image()
+            img.onload = () => {
+                resolve(img)
+            }
+            img.onerror = (...args) => {
+                reject(args)
+            }
+            img.src = src
+        })
+
+    const getImageData = (image: HTMLImageElement, resolutionX: number, resolutionY: number): ImageData | undefined => {
+        const canvas = document.createElement('canvas')
+        canvas.width = resolutionX
+        canvas.height = resolutionY
+        const context = canvas.getContext('2d')
+        context?.drawImage(image, 0, 0, resolutionX, resolutionY)
+        return context?.getImageData(0, 0, resolutionX, resolutionY)
+    }
+
     const uploadImage = async (imageFile: File): Promise<void> => {
         if (mode === 'media') {
             const notif = enqueueSnackbar('Uploading...', { persist: true })
@@ -254,11 +276,20 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
             if (!result) {
                 enqueueSnackbar('Failed to upload image', { variant: 'error' })
             } else {
+                let blurhash: string | undefined
+                const url = URL.createObjectURL(imageFile)
+                const img = await loadImage(url)
+                const data = getImageData(img, img.width, img.height)
+                if (data) {
+                    blurhash = encode(data.data, img.width, img.height, 4, 4)
+                }
+
                 setMedias((medias) => [
                     ...medias,
                     {
                         mediaURL: result,
-                        mediaType: imageFile.type
+                        mediaType: imageFile.type,
+                        blurhash
                     }
                 ])
             }
