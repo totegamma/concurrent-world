@@ -8,6 +8,8 @@ import { type Message, type ReplyMessageSchema, type MarkdownMessageSchema } fro
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { useClient } from '../../context/ClientContext'
 import { ConcordBadge } from '../ui/Badge'
+import LockIcon from '@mui/icons-material/Lock'
+import { CCUserChip } from '../ui/CCUserChip'
 
 export interface MessageHeaderProps {
     message: Message<MarkdownMessageSchema | ReplyMessageSchema>
@@ -23,6 +25,9 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
     const myAck = useMemo(() => {
         return client.ackings?.find((ack) => ack.ccid === props.message.author)
     }, [props.message, client])
+
+    const isWhisper = props.message?.policy === 'https://policy.concrnt.world/m/whisper.json'
+    const participants: string[] = isWhisper ? props.message.policyParams?.participants : []
 
     return (
         <Box
@@ -97,6 +102,28 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                     >
                         <MoreHorizIcon sx={{ fontSize: '80%' }} />
                     </IconButton>
+                )}
+                {isWhisper && (
+                    <Tooltip
+                        arrow
+                        placement="top"
+                        title={
+                            <Box>
+                                <Typography color="white">Whisper to:</Typography>
+                                {participants?.map((participant, i) => (
+                                    <CCUserChip avatar key={i} ccid={participant} />
+                                ))}
+                            </Box>
+                        }
+                    >
+                        <LockIcon
+                            sx={{
+                                width: '1rem',
+                                height: '1rem',
+                                color: 'text.disabled'
+                            }}
+                        />
+                    </Tooltip>
                 )}
                 <Link
                     component={RouterLink}

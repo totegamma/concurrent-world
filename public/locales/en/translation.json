@@ -85,7 +85,8 @@
             "clearDraft": "Clear draft",
             "postToHome": "Also posting to home stream",
             "noPostToHome": "Not posting to home stream",
-            "current": "Post"
+            "current": "Post",
+            "whisper": "Whisper"
         },
         "secret": {
             "clickToReveal": "Click to reveal",

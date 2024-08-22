@@ -24,7 +24,7 @@ import { StreamPicker } from '../ui/StreamPicker'
 import { useSnackbar } from 'notistack'
 import { usePersistent } from '../../hooks/usePersistent'
 import HomeIcon from '@mui/icons-material/Home'
-import { type CommunityTimelineSchema, type Timeline, type Message } from '@concurrent-world/client'
+import { type CommunityTimelineSchema, type Timeline, type Message, type User } from '@concurrent-world/client'
 import { useClient } from '../../context/ClientContext'
 import { type WorldMedia, type Emoji, type EmojiLite } from '../../model'
 import { useTranslation } from 'react-i18next'
@@ -169,6 +169,10 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
     const [mediaMenuAnchorEl, setMediaMenuAnchorEl] = useState<null | HTMLElement>(null)
     const [selectedMediaIndex, setSelectedMediaIndex] = useState<number>(-1)
 
+    // whisper
+    const [participants, setParticipants] = useState<User[]>([])
+    const whisper = participants.map((p) => p.ccid)
+
     const post = (postHome: boolean): void => {
         if (!props.allowEmpty && (draft.length === 0 || draft.trim().length === 0) && mode !== 'media') {
             enqueueSnackbar('Message must not be empty!', { variant: 'error' })
@@ -195,21 +199,24 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
         switch (mode) {
             case 'plaintext':
                 req = client.createPlainTextCrnt(draft, dest, {
-                    profileOverride: { profileID: selectedSubprofile }
+                    profileOverride: { profileID: selectedSubprofile },
+                    whisper
                 })
                 break
             case 'markdown':
                 req = client.createMarkdownCrnt(draft, dest, {
                     emojis: emojiDict,
                     mentions,
-                    profileOverride: { profileID: selectedSubprofile }
+                    profileOverride: { profileID: selectedSubprofile },
+                    whisper
                 })
                 break
             case 'media':
                 req = client.createMediaCrnt(draft, dest, {
                     emojis: emojiDict,
                     medias,
-                    profileOverride: { profileID: selectedSubprofile }
+                    profileOverride: { profileID: selectedSubprofile },
+                    whisper
                 })
                 break
             case 'reply':
@@ -219,7 +226,8 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                 }
                 req = props.actionTo.reply(dest, draft, {
                     emojis: emojiDict,
-                    profileOverride: { profileID: selectedSubprofile }
+                    profileOverride: { profileID: selectedSubprofile },
+                    whisper
                 })
                 break
             case 'reroute':
@@ -229,7 +237,8 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                 }
                 req = props.actionTo.reroute(dest, draft, {
                     emojis: emojiDict,
-                    profileOverride: { profileID: selectedSubprofile }
+                    profileOverride: { profileID: selectedSubprofile },
+                    whisper
                 })
                 break
             default:
@@ -626,6 +635,8 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                                       }
                                     : undefined
                             }
+                            whisperUsers={participants}
+                            setWhisperUsers={setParticipants}
                         />
                     </>
                 ) : (
@@ -662,6 +673,8 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                                       }
                                     : undefined
                             }
+                            whisperUsers={participants}
+                            setWhisperUsers={setParticipants}
                         />
                         <Collapse unmountOnExit in={draft.length > 0}>
                             <Divider

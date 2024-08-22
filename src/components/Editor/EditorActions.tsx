@@ -8,6 +8,7 @@ import {
     Select,
     TextField,
     Tooltip,
+    Typography,
     useTheme
 } from '@mui/material'
 import { CCIconButton } from '../ui/CCIconButton'
@@ -21,9 +22,12 @@ import SendIcon from '@mui/icons-material/Send'
 import ImageIcon from '@mui/icons-material/Image'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { type Dispatch, type SetStateAction, useRef, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { type WorldMedia, type Emoji, type EmojiLite } from '../../model'
+import { UserPicker } from '../ui/UserPicker'
+import { type User } from '@concurrent-world/client'
 
 export interface EditorActionsProps {
     post: () => void
@@ -38,6 +42,8 @@ export interface EditorActionsProps {
     submitButtonLabel?: string
     disableMedia?: boolean
     disableEmoji?: boolean
+    whisperUsers: User[]
+    setWhisperUsers: Dispatch<SetStateAction<User[]>>
 }
 
 export const EditorActions = (props: EditorActionsProps): JSX.Element => {
@@ -94,6 +100,8 @@ export const EditorActions = (props: EditorActionsProps): JSX.Element => {
 
     const [addingMediaURL, setAddingMediaURL] = useState<string>('')
     const [addingMediaType, setAddingMediaType] = useState<string>('image/png')
+
+    const [detailMenuAnchorEl, setDetailMenuAnchorEl] = useState<null | HTMLElement>(null)
 
     return (
         <Box
@@ -231,6 +239,42 @@ export const EditorActions = (props: EditorActionsProps): JSX.Element => {
                         </CCIconButton>
                     </span>
                 </Tooltip>
+                <CCIconButton
+                    onClick={(e) => {
+                        setDetailMenuAnchorEl(e.currentTarget)
+                    }}
+                >
+                    <MoreHorizIcon sx={{ fontSize: '80%' }} />
+                </CCIconButton>
+                <Popover
+                    open={Boolean(detailMenuAnchorEl)}
+                    anchorEl={detailMenuAnchorEl}
+                    onClose={() => {
+                        setDetailMenuAnchorEl(null)
+                    }}
+                    slotProps={{
+                        paper: {
+                            sx: {
+                                width: '200px',
+                                padding: 1,
+                                display: 'flex',
+                                gap: 1,
+                                flexDirection: 'column'
+                            }
+                        }
+                    }}
+                >
+                    <Typography>ウィスパー</Typography>
+                    <UserPicker selected={props.whisperUsers} setSelected={props.setWhisperUsers} />
+                    <Button
+                        onClick={() => {
+                            setDetailMenuAnchorEl(null)
+                            props.textInputRef.current?.focus()
+                        }}
+                    >
+                        Close
+                    </Button>
+                </Popover>
             </Box>
             <Box
                 sx={{
@@ -254,6 +298,7 @@ export const EditorActions = (props: EditorActionsProps): JSX.Element => {
                         }}
                         endIcon={<SendIcon />}
                     >
+                        {props.whisperUsers.length > 0 ? t('whisper') : ''}
                         {props.submitButtonLabel ?? t('current')}
                     </Button>
                 </Box>
