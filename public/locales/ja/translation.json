@@ -85,7 +85,8 @@
             "clearDraft": "下書きを削除",
             "postToHome": "ホーム同時投稿モード",
             "noPostToHome": "ストリーム限定投稿モード",
-            "current": "カレント"
+            "current": "カレント",
+            "whisper": "ウィスパー"
         },
         "secret": {
             "clickToReveal": "クリックして表示",
