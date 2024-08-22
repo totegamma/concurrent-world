@@ -1,6 +1,9 @@
 import {
+    Alert,
+    AlertTitle,
     Box,
     Button,
+    Collapse,
     FormControl,
     InputLabel,
     MenuItem,
@@ -23,11 +26,13 @@ import ImageIcon from '@mui/icons-material/Image'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EmojiEmotions from '@mui/icons-material/EmojiEmotions'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { type Dispatch, type SetStateAction, useRef, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { type WorldMedia, type Emoji, type EmojiLite } from '../../model'
 import { UserPicker } from '../ui/UserPicker'
 import { type User } from '@concurrent-world/client'
+import { usePersistent } from '../../hooks/usePersistent'
 
 export interface EditorActionsProps {
     post: () => void
@@ -102,6 +107,7 @@ export const EditorActions = (props: EditorActionsProps): JSX.Element => {
     const [addingMediaType, setAddingMediaType] = useState<string>('image/png')
 
     const [detailMenuAnchorEl, setDetailMenuAnchorEl] = useState<null | HTMLElement>(null)
+    const [openWhisperWarning, setOpenWhisperWarning] = usePersistent('openWhisperWarning', true)
 
     return (
         <Box
@@ -147,6 +153,10 @@ export const EditorActions = (props: EditorActionsProps): JSX.Element => {
                     anchorEl={mediaMenuAnchorEl}
                     onClose={() => {
                         setMediaMenuAnchorEl(null)
+                    }}
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'center'
                     }}
                     slotProps={{
                         paper: {
@@ -252,28 +262,77 @@ export const EditorActions = (props: EditorActionsProps): JSX.Element => {
                     onClose={() => {
                         setDetailMenuAnchorEl(null)
                     }}
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'center'
+                    }}
                     slotProps={{
                         paper: {
                             sx: {
-                                width: '200px',
+                                maxWidth: '90vw',
                                 padding: 1,
                                 display: 'flex',
-                                gap: 1,
                                 flexDirection: 'column'
                             }
                         }
                     }}
                 >
-                    <Typography>ウィスパー</Typography>
-                    <UserPicker selected={props.whisperUsers} setSelected={props.setWhisperUsers} />
-                    <Button
-                        onClick={() => {
-                            setDetailMenuAnchorEl(null)
-                            props.textInputRef.current?.focus()
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                            justifyContent: 'space-between'
                         }}
                     >
-                        Close
-                    </Button>
+                        <Typography variant="h4">ウィスパー</Typography>
+                        <Typography
+                            onClick={() => {
+                                setOpenWhisperWarning(!openWhisperWarning)
+                            }}
+                            sx={{
+                                cursor: 'pointer',
+                                color: theme.palette.text.secondary,
+                                display: 'flex',
+                                alignItems: 'center'
+                            }}
+                        >
+                            注意事項
+                            <ExpandMoreIcon
+                                sx={{
+                                    marginLeft: 1,
+                                    transform: openWhisperWarning ? 'rotate(180deg)' : 'rotate(0deg)'
+                                }}
+                            />
+                        </Typography>
+                    </Box>
+                    <Collapse in={openWhisperWarning}>
+                        <Alert severity="warning">
+                            <AlertTitle>wisperはe2e暗号化されません</AlertTitle>
+                            あくまで基本的な保護機能です。機密情報をConcrntで共有しないでください。
+                        </Alert>
+                    </Collapse>
+                    <Typography variant="caption">
+                        ここでユーザーを選択すると、そのユーザーにのみ閲覧可能な投稿になります。
+                    </Typography>
+                    <Box
+                        sx={{
+                            my: 1
+                        }}
+                    >
+                        <UserPicker selected={props.whisperUsers} setSelected={props.setWhisperUsers} />
+                    </Box>
+                    <Box display="flex" justifyContent="flex-end">
+                        <Button
+                            onClick={() => {
+                                setOpenWhisperWarning(false)
+                                setDetailMenuAnchorEl(null)
+                                props.textInputRef.current?.focus()
+                            }}
+                        >
+                            Close
+                        </Button>
+                    </Box>
                 </Popover>
             </Box>
             <Box
