@@ -164,6 +164,7 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
         setDraft('')
         setEmojiDict({})
         setMedias([])
+        setParticipants([])
     }
 
     const [mediaMenuAnchorEl, setMediaMenuAnchorEl] = useState<null | HTMLElement>(null)
