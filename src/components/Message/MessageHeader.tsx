@@ -105,16 +105,24 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                 )}
                 {isWhisper && (
                     <Tooltip
-                        arrow
                         placement="top"
                         title={
                             <Box>
-                                <Typography color="white">Whisper to:</Typography>
+                                <Typography color="text.primary">Whisper to:</Typography>
                                 {participants?.map((participant, i) => (
                                     <CCUserChip avatar key={i} ccid={participant} />
                                 ))}
                             </Box>
                         }
+                        componentsProps={{
+                            tooltip: {
+                                sx: {
+                                    backgroundColor: 'background.paper',
+                                    border: '1px solid',
+                                    borderColor: 'divider'
+                                }
+                            }
+                        }}
                     >
                         <LockIcon
                             sx={{
