@@ -114,8 +114,9 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
                     </Button>
                 </Box>
                 <SimpleNote message={props.message} />
-                {!props.simple && <MessageUrlPreview messageBody={props.message.document.body.body} />}
             </Box>
+            {(!props.simple && <MessageUrlPreview limit={1} messageBody={props.message.document.body.body} />) ||
+                undefined}
             {(!props.simple && (
                 <>
                     <MessageReactions message={props.message} />

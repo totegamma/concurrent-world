@@ -5,6 +5,7 @@ import { type Summary, useUrlSummary } from '../../context/urlSummaryContext'
 
 export interface MessageUrlPreviewProps {
     messageBody: string
+    limit?: number
 }
 
 export const MessageUrlPreview = (props: MessageUrlPreviewProps): JSX.Element | null => {
@@ -36,6 +37,10 @@ export const MessageUrlPreview = (props: MessageUrlPreviewProps): JSX.Element | 
     const urls = replaced.match(/(https?:\/\/[\w.\-?=/&%#,@]+)/g)
 
     if (!urls) return null
+
+    if (props.limit && urls.length > props.limit) {
+        urls.length = props.limit
+    }
 
     return (
         <Box

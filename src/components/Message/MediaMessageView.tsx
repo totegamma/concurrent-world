@@ -114,11 +114,12 @@ export const MediaMessageView = (props: MediaMessageViewProps): JSX.Element => {
                     </Button>
                 </Box>
                 <SimpleNote message={props.message} />
-
-                {!props.simple && <MessageUrlPreview messageBody={props.message.document.body.body} />}
             </Box>
 
             {props.message.document.body.medias && <EmbeddedGallery medias={props.message.document.body.medias} />}
+
+            {(!props.simple && <MessageUrlPreview limit={1} messageBody={props.message.document.body.body} />) ||
+                undefined}
 
             {(!props.simple && (
                 <>
