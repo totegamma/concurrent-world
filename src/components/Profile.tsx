@@ -1,4 +1,4 @@
-import { Box, Button, Typography, Link, Divider, Skeleton } from '@mui/material'
+import { Box, Button, Typography, Link, Divider, Skeleton, useTheme, alpha } from '@mui/material'
 
 import { CCAvatar } from '../components/ui/CCAvatar'
 import { WatchButton } from '../components/WatchButton'
@@ -33,6 +33,7 @@ type detail = 'none' | 'ack' | 'acker'
 
 export function Profile(props: ProfileProps): JSX.Element {
     const { client } = useClient()
+    const theme = useTheme()
     const mediaViewer = useMediaViewer()
     const isSelf = props.id === client.ccid
 
@@ -102,9 +103,9 @@ export function Profile(props: ProfileProps): JSX.Element {
                     top: '10px',
                     right: '10px',
                     zIndex: 1,
-                    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                    backgroundColor: alpha(theme.palette.primary.main, 0.5),
                     '&:hover': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.8)'
+                        backgroundColor: alpha(theme.palette.primary.main, 0.7)
                     }
                 }}
                 onClick={() => {
@@ -114,7 +115,11 @@ export function Profile(props: ProfileProps): JSX.Element {
                     }
                 }}
             >
-                <IosShareIcon />
+                <IosShareIcon
+                    sx={{
+                        color: theme.palette.primary.contrastText
+                    }}
+                />
             </CCIconButton>
 
             <Box
