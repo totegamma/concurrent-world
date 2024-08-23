@@ -10,7 +10,6 @@ import TickerProvider from '../context/Ticker'
 import { type VListHandle } from 'virtua'
 import { TimelineHeader } from '../components/TimelineHeader'
 
-import ListIcon from '@mui/icons-material/List'
 import TagIcon from '@mui/icons-material/Tag'
 import LockIcon from '@mui/icons-material/Lock'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
@@ -104,7 +103,15 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
                 flex: 1
             }}
             additionalButton={
-                <Button component={NavLink} to="/register">
+                <Button
+                    component={NavLink}
+                    to="/register"
+                    onClick={() => {
+                        if (props.page === 'timeline' && id) {
+                            localStorage.setItem('preferredTimeline', id)
+                        }
+                    }}
+                >
                     はじめる
                 </Button>
             }

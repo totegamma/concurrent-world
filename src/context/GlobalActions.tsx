@@ -95,6 +95,17 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
             client
                 .getTimelinesBySchema<CommunityTimelineSchema>(client.host, Schemas.communityTimeline)
                 .then((timelines) => {
+                    const preferredTimeline = localStorage.getItem('preferredTimeline')
+                    if (preferredTimeline && timelines.find((t) => t.id === preferredTimeline)) {
+                        setSelectedTimeline(preferredTimeline)
+                        // move to the top
+                        const t = timelines.find((t) => t.id === preferredTimeline)
+                        if (t) {
+                            timelines.splice(timelines.indexOf(t), 1)
+                            timelines.unshift(t)
+                        }
+                    }
+
                     setTimelines(timelines)
                 })
         }
