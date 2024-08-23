@@ -14,12 +14,14 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 import { useClient } from '../context/ClientContext'
 import { type CommunityTimelineSchema, type CoreTimeline } from '@concurrent-world/client'
+import IosShareIcon from '@mui/icons-material/IosShare'
 import { CCEditor } from './ui/cceditor'
 import { useSnackbar } from 'notistack'
 import { CCWallpaper } from './ui/CCWallpaper'
 import { WatchButton } from './WatchButton'
 import { PolicyEditor } from './ui/PolicyEditor'
 import { CCUserChip } from './ui/CCUserChip'
+import { CCIconButton } from './ui/CCIconButton'
 
 export interface StreamInfoProps {
     id: string
@@ -104,11 +106,23 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                             display: 'flex',
                             flexDirection: 'row',
                             alignItems: 'center',
-                            gap: '10px'
+                            gap: 1
                         }}
                     >
                         <Typography variant="h1">{stream.document.body.name}</Typography>
                         <WatchButton minimal timelineID={props.id} />
+                        <CCIconButton
+                            onClick={() => {
+                                navigator.clipboard.writeText(`https://concrnt.world/timeline/${props.id}`)
+                                enqueueSnackbar('リンクをコピーしました', { variant: 'success' })
+                            }}
+                        >
+                            <IosShareIcon
+                                sx={{
+                                    color: 'text.primary'
+                                }}
+                            />
+                        </CCIconButton>
                     </Box>
                     <Typography
                         variant="caption"

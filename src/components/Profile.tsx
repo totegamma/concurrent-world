@@ -1,4 +1,4 @@
-import { Box, Button, Typography, Link, Divider, Skeleton } from '@mui/material'
+import { Box, Button, Typography, Link, Divider, Skeleton, useTheme, alpha } from '@mui/material'
 
 import { CCAvatar } from '../components/ui/CCAvatar'
 import { WatchButton } from '../components/WatchButton'
@@ -18,6 +18,8 @@ import { SubprofileBadge } from './ui/SubprofileBadge'
 import { ProfileProperties } from './ui/ProfileProperties'
 import { enqueueSnackbar } from 'notistack'
 import { useMediaViewer } from '../context/MediaViewer'
+import IosShareIcon from '@mui/icons-material/IosShare'
+import { CCIconButton } from './ui/CCIconButton'
 
 export interface ProfileProps {
     user?: User
@@ -31,6 +33,7 @@ type detail = 'none' | 'ack' | 'acker'
 
 export function Profile(props: ProfileProps): JSX.Element {
     const { client } = useClient()
+    const theme = useTheme()
     const mediaViewer = useMediaViewer()
     const isSelf = props.id === client.ccid
 
@@ -93,6 +96,31 @@ export function Profile(props: ProfileProps): JSX.Element {
                 }}
                 isLoading={!props.user}
             />
+
+            <CCIconButton
+                sx={{
+                    position: 'absolute',
+                    top: '10px',
+                    right: '10px',
+                    zIndex: 1,
+                    backgroundColor: alpha(theme.palette.primary.main, 0.5),
+                    '&:hover': {
+                        backgroundColor: alpha(theme.palette.primary.main, 0.7)
+                    }
+                }}
+                onClick={() => {
+                    if (props.user) {
+                        navigator.clipboard.writeText('https://concrnt.world/' + props.user.ccid)
+                        enqueueSnackbar('リンクをコピーしました', { variant: 'success' })
+                    }
+                }}
+            >
+                <IosShareIcon
+                    sx={{
+                        color: theme.palette.primary.contrastText
+                    }}
+                />
+            </CCIconButton>
 
             <Box
                 sx={{
@@ -197,15 +225,6 @@ export function Profile(props: ProfileProps): JSX.Element {
                             cursor: 'pointer',
                             mt: 1
                         }}
-                        onClick={() => {
-                            const userid = props.user?.alias ?? props.user?.ccid
-                            if (!userid) {
-                                enqueueSnackbar('ユーザーIDが取得できませんでした', { variant: 'error' })
-                                return
-                            }
-                            navigator.clipboard.writeText('https://concrnt.world/' + userid)
-                            enqueueSnackbar('リンクをコピーしました', { variant: 'success' })
-                        }}
                     >
                         {props.user ? (
                             subProfile?.document.body.username ?? props.user.profile?.username ?? 'anonymous'
@@ -216,7 +235,20 @@ export function Profile(props: ProfileProps): JSX.Element {
                     {props.user?.alias && <Typography variant="caption">{props.user?.alias}</Typography>}
                 </Box>
                 {props.user ? (
-                    <Typography variant="caption">{props.user.ccid}</Typography>
+                    <Typography
+                        onClick={() => {
+                            if (props.user) {
+                                navigator.clipboard.writeText(props.user.ccid)
+                                enqueueSnackbar('CCIDをコピーしました', { variant: 'success' })
+                            }
+                        }}
+                        sx={{
+                            cursor: 'pointer'
+                        }}
+                        variant="caption"
+                    >
+                        {props.user.ccid}
+                    </Typography>
                 ) : (
                     <Skeleton variant="text" width={200} />
                 )}

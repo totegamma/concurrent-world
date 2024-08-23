@@ -119,9 +119,9 @@ export const PlainMessageView = (props: PlainMessageViewProps): JSX.Element => {
                 >
                     {props.message.document.body.body}
                 </Typography>
-
-                {!props.simple && <MessageUrlPreview messageBody={props.message.document.body.body} />}
             </Box>
+            {(!props.simple && <MessageUrlPreview limit={1} messageBody={props.message.document.body.body} />) ||
+                undefined}
             {(!props.simple && (
                 <>
                     <MessageReactions message={props.message} />
