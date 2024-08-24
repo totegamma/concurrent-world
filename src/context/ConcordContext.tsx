@@ -243,6 +243,7 @@ export const ConcordProvider = ({ children }: ConcordContextProps): JSX.Element 
             })
             .catch((err) => {
                 console.error(err)
+                return []
             })
     }
 
