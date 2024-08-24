@@ -2,7 +2,7 @@ import { Box, Chip, Divider, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { useClient } from '../context/ClientContext'
 import { QueryTimelineReader } from '../components/QueryTimeline'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Schemas } from '@concurrent-world/client'
 
 export function Notifications(): JSX.Element {
@@ -12,6 +12,10 @@ export function Notifications(): JSX.Element {
     const timeline = client.user?.notificationTimeline
 
     const [selected, setSelected] = useState<string | undefined>(undefined)
+
+    const query = useMemo(() => {
+        return selected ? { schema: selected } : {}
+    }, [selected])
 
     return (
         <Box
@@ -87,14 +91,7 @@ export function Notifications(): JSX.Element {
                 </Box>
                 <Divider />
             </Box>
-            {timeline && (
-                <QueryTimelineReader
-                    timeline={timeline}
-                    query={{
-                        schema: selected
-                    }}
-                />
-            )}
+            {timeline && <QueryTimelineReader timeline={timeline} query={query} />}
         </Box>
     )
 }
