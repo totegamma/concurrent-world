@@ -23,19 +23,19 @@ let subkey = ''
 try {
     domain = JSON.parse(localStorage.getItem('Domain') || '')
 } catch (e) {
-    console.log(e)
+    console.error(e)
 }
 
 try {
     prvkey = JSON.parse(localStorage.getItem('PrivateKey') || '')
 } catch (e) {
-    console.log(e)
+    console.error(e)
 }
 
 try {
     subkey = JSON.parse(localStorage.getItem('SubKey') || '')
 } catch (e) {
-    console.log(e)
+    console.error(e)
 }
 
 const logined = domain !== '' && (prvkey !== '' || subkey !== '')
@@ -45,6 +45,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <Suspense fallback={<FullScreenLoading message="Loading..." />}>
             <BrowserRouter>
                 <Routes>
+                    <Route path="/crash" element={<EmergencyKit error={null} resetErrorBoundary={() => {}} />} />
                     <Route path="/welcome" element={<Welcome />} />
                     {!logined ? (
                         <Route path="/register" element={<Registration />} />

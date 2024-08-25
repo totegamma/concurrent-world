@@ -152,7 +152,6 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
     )
 
     const updateEmojiPackage = useCallback((url: string) => {
-        console.log('updateEmojiPackage', url)
         const cacheKey = `emojiPackage:${url}`
         localStorage.removeItem(cacheKey)
         setEmojiPackages((prev) => prev.filter((pkg) => pkg.packageURL !== url))

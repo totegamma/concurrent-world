@@ -137,7 +137,6 @@ export const ThemeCreator = (): JSX.Element => {
     const comment = _comment.trim().length > 0 ? _comment : undefined
 
     useEffect(() => {
-        console.log('currentTHeme:', currentTheme)
         setTitle(currentTheme)
     }, [currentTheme])
 

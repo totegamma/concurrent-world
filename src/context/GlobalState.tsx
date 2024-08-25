@@ -58,7 +58,6 @@ export const GlobalStateProvider = ({ children }: GlobalStateProps): JSX.Element
                         return [id, sub]
                     })
                     .catch((e) => {
-                        console.log(e)
                         return [id, null]
                     })
             )
@@ -97,7 +96,6 @@ export const GlobalStateProvider = ({ children }: GlobalStateProps): JSX.Element
                         return [id, sub]
                     })
                     .catch((e) => {
-                        console.log(e)
                         return [id, null]
                     })
             )

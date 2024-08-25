@@ -68,7 +68,6 @@ export function GuestTimelinePage(props: GuestPageProps): JSX.Element {
                     client.getUser(id).then((e) => {
                         setUser(e)
                         setTitle(e?.profile?.username ?? '')
-                        console.log(e?.homeTimeline)
                         setTargetStream([e?.homeTimeline ?? ''])
                     })
                 }

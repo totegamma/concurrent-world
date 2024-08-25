@@ -49,7 +49,6 @@ export function ImportMasterKey(): JSX.Element {
                 client.api
                     .getEntity(ccid, searchTarget)
                     .then((entity) => {
-                        console.log(entity)
                         if (entity?.domain) {
                             setDomainInput(entity.domain)
                             setErrorMessage('')

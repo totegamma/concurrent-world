@@ -91,7 +91,6 @@ export const PreferenceProvider = (props: PreferenceProviderProps): JSX.Element 
             })
             .catch((e: any) => {
                 setInitialized(true)
-                console.log(e)
             })
     }, [])
 

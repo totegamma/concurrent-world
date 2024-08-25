@@ -215,7 +215,6 @@ export function Jobs(): JSX.Element {
                                     body: JSON.stringify(job)
                                 })
                                 .then(async (res) => {
-                                    console.log(res)
                                     loadJobs()
                                 })
                         }}
@@ -240,7 +239,6 @@ export function Jobs(): JSX.Element {
                                 method: 'DELETE'
                             })
                             .then(async (res) => {
-                                console.log(res)
                                 loadJobs()
                             })
                         setMenuAnchorEl(null)

@@ -9,8 +9,8 @@ interface ChooseDomainProps {
     next: () => void
     identity: Identity
     client: Client | undefined
-    host: CoreDomain | null | undefined
-    setHost: (_: CoreDomain | null | undefined) => void
+    domain: string
+    setDomain: (domain: string) => void
 }
 
 // Send PR your domain to add here!
@@ -18,22 +18,27 @@ const domainlist = ['ariake.concrnt.net', 'denken.concrnt.net', 'zyouya.concrnt.
 
 export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'registration.chooseDomain' })
-    const [server, setServer] = useState<string>('')
     const [jumped, setJumped] = useState<boolean>(false)
 
+    const [fqdnDraft, setFqdnDraft] = useState<string>('')
+    const [serverFound, setServerFound] = useState<boolean>(false)
+
     useEffect(() => {
+        setServerFound(false)
         let unmounted = false
         if (!props.client) return
-        const fqdn = server.replace('https://', '').replace('/', '')
+        const fqdn = fqdnDraft.replace('https://', '').replace('/', '')
+        if (fqdn === '') return
         props.client.api.getDomain(fqdn).then((e) => {
+            console.log(e)
             if (unmounted) return
-            props.setHost(e)
+            if (!e?.fqdn) return
+            setServerFound(true)
         })
-        console.log(fqdn)
         return () => {
             unmounted = true
         }
-    }, [server])
+    }, [fqdnDraft])
 
     let next = window.location.href
     // strip hash
@@ -72,7 +77,7 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
                             domainFQDN={domain}
                             onClick={() => {
                                 setJumped(true)
-                                setServer(domain)
+                                props.setDomain(domain)
                                 jumpToDomainRegistration(props.identity.CCID, props.identity.privateKey, domain, next)
                             }}
                         />
@@ -93,19 +98,20 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
                 <Box sx={{ display: 'flex', gap: '10px' }}>
                     <TextField
                         placeholder="concurrent.example.tld"
-                        value={server}
+                        value={fqdnDraft}
                         onChange={(e) => {
-                            setServer(e.target.value)
+                            setFqdnDraft(e.target.value)
                         }}
                         sx={{
                             flex: 1
                         }}
                     />
                     <Button
-                        disabled={!props.host}
+                        disabled={!serverFound}
                         onClick={() => {
                             setJumped(true)
-                            jumpToDomainRegistration(props.identity.CCID, props.identity.privateKey, server, next)
+                            props.setDomain(fqdnDraft)
+                            jumpToDomainRegistration(props.identity.CCID, props.identity.privateKey, fqdnDraft, next)
                         }}
                     >
                         {t('jump')}

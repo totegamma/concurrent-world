@@ -66,7 +66,6 @@ export const EditorActions = (props: EditorActionsProps): JSX.Element => {
     const onFileInputChange = async (event: any): Promise<void> => {
         for (const file of event.target.files) {
             if (!file) {
-                console.log('no file')
                 continue
             }
             await props.uploadImage(file)

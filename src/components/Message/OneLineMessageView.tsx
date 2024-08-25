@@ -42,7 +42,7 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                 />
             </IconButton>
             <Box display="flex" flex={1} overflow="hidden">
-                <Typography
+                <Box
                     overflow="hidden"
                     whiteSpace="nowrap"
                     textOverflow="ellipsis"
@@ -67,7 +67,7 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                             />
                         </Box>
                     </Tooltip>
-                </Typography>
+                </Box>
             </Box>
             <Link
                 component={RouterLink}

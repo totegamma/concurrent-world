@@ -15,7 +15,6 @@ export const onRequest: PagesFunction = async (context) => {
     let response = await cache.match(cacheKey)
 
     if (!response) {
-        console.log(`[entity, cache not found]`)
 
         const { path } = context.params
         const ccid = path
@@ -70,8 +69,6 @@ export const onRequest: PagesFunction = async (context) => {
         })
 
         context.waitUntil(cache.put(cacheKey, response.clone()))
-    } else {
-        console.log(`[entity, cache found]`)
     }
 
     return response

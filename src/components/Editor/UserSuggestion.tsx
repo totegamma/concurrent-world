@@ -39,7 +39,6 @@ export const UserSuggestion = (props: UserSuggestionProps): JSX.Element => {
     }, [query])
 
     const onUserSuggestConfirm = (index: number): void => {
-        console.log('user confirm', index)
         const before = text.slice(0, cursorPos) ?? ''
         const colonPos = before.lastIndexOf('@')
         if (colonPos === -1) return

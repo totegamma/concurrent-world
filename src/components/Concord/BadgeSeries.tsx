@@ -166,9 +166,6 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
                                     seriesDraft?.uri || '',
                                     seriesDraft?.data?.transferable || false
                                 )
-                                .then((resp) => {
-                                    console.log(resp)
-                                })
                                 .finally(() => {
                                     setProcessing(false)
                                     setCreateSeries(false)
@@ -217,15 +214,10 @@ export const BadgeSeries = (props: BadgeSeriesProps): JSX.Element => {
                         onClick={() => {
                             if (!concord) return
                             setProcessing(true)
-                            concord
-                                .mintBadge(mintingSeries, mintUriDraft, receiverDraft)
-                                .then((resp) => {
-                                    console.log(resp)
-                                })
-                                .finally(() => {
-                                    setProcessing(false)
-                                    setMintingSeries('')
-                                })
+                            concord.mintBadge(mintingSeries, mintUriDraft, receiverDraft).finally(() => {
+                                setProcessing(false)
+                                setMintingSeries('')
+                            })
                         }}
                     >
                         発行

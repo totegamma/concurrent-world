@@ -49,9 +49,7 @@ export const PolicyEditor = memo<PolicyEditorProps>((props: PolicyEditorProps): 
         if (props.value) {
             value = JSON.parse(props.value)
         }
-    } catch (e) {
-        console.log(e)
-    }
+    } catch (_) {}
 
     return (
         <Box>

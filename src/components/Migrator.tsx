@@ -224,8 +224,7 @@ export function Migrator(): JSX.Element {
                                     },
                                     body: JSON.stringify(job)
                                 })
-                                .then(async (res) => {
-                                    console.log(res)
+                                .then(async (_res) => {
                                     setActiveStep(activeStep + 1)
                                 })
                         }}

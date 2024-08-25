@@ -14,7 +14,6 @@ export const onRequest: PagesFunction = async (context) => {
     let response = await cache.match(cacheKey)
 
     if (!response) {
-        console.log(`\n[stream, cache not found]`)
 
         const { path } = context.params
         const [streamId, host] = (<string>path).split('@')
@@ -52,8 +51,6 @@ export const onRequest: PagesFunction = async (context) => {
         })
 
         context.waitUntil(cache.put(cacheKey, response.clone()))
-    } else {
-        console.log(`\n[stream, cache found]`)
     }
 
     return response

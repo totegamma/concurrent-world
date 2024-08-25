@@ -26,7 +26,6 @@ export const onRequest: PagesFunction = async (context) => {
     let response = await cache.match(cacheKey)
 
     if (!response) {
-        console.log(`[message, cache not found]`)
 
         const [ccid, messageId] = context.params.catchall
 
@@ -109,8 +108,6 @@ export const onRequest: PagesFunction = async (context) => {
         })
 
         context.waitUntil(cache.put(cacheKey, response.clone()))
-    } else {
-        console.log(`[message, cache found]`)
     }
 
     return response

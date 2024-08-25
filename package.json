@@ -8,12 +8,14 @@
         "dev": "vite dev",
         "build": "tsc && vite build",
         "storybook": "storybook dev -p 6006",
-        "build-storybook": "storybook build"
+        "build-storybook": "storybook build",
+        "test": "playwright test --project=chromium",
+        "test-all": "playwright test"
     },
     "dependencies": {
         "@aws-sdk/client-s3": "^3.592.0",
         "@aws-sdk/s3-request-presigner": "^3.592.0",
-        "@concurrent-world/client": "^6.0.34",
+        "@concurrent-world/client": "^6.0.35",
         "@cosmjs/encoding": "^0.32.4",
         "@cosmjs/proto-signing": "^0.32.4",
         "@cosmjs/stargate": "^0.32.4",
@@ -71,6 +73,7 @@
     },
     "devDependencies": {
         "@cloudflare/workers-types": "^4.20240405.0",
+        "@playwright/test": "^1.46.1",
         "@storybook/addon-essentials": "^8.1.11",
         "@storybook/react": "^8.1.11",
         "@storybook/react-vite": "^8.1.11",

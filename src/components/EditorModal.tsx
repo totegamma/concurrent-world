@@ -77,7 +77,6 @@ export const EditorModalProvider = (props: EditorModalProps): JSX.Element => {
     const [lists] = usePreference('lists')
     const home = Object.keys(lists).length > 0 ? lists[Object.keys(lists)[0]] : null
     const homePostTimelines = useMemo(() => {
-        console.log(home)
         if (!home) return []
         return home.defaultPostStreams
             .map((timelineID) => globalState.allKnownTimelines.find((e) => e.id === timelineID))
@@ -86,7 +85,6 @@ export const EditorModalProvider = (props: EditorModalProps): JSX.Element => {
 
     const open = (openOpts?: OpenOptions): void => {
         const opts = options ?? {}
-        console.log(openOpts?.streamPickerInitial, opts.streamPickerInitial, homePostTimelines)
         setPostProps({
             streamPickerInitial: openOpts?.streamPickerInitial ?? opts.streamPickerInitial ?? homePostTimelines,
             streamPickerOptions: globalState.allKnownTimelines,

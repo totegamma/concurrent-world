@@ -4,7 +4,6 @@ import { useEffect, useRef } from 'react'
 
 export default function QRCodeReader(props: { onRead: (result: string) => void }): JSX.Element {
     useEffect(() => {
-        console.log('start!')
         const hints = new Map()
         hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.QR_CODE])
         hints.set(DecodeHintType.TRY_HARDER, true)

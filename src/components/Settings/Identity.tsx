@@ -272,7 +272,6 @@ export const IdentitySettings = (): JSX.Element => {
                 }
             }
             setCertChain(certChain)
-            console.log(certChain)
         })
     }, [forceUpdate])
 
@@ -353,7 +352,6 @@ export const IdentitySettings = (): JSX.Element => {
                                         fetch(`https://${client.host}/api/v1/entity/${aliasDraft}`)
                                             .then(async (res) => {
                                                 const resjson = await res.json()
-                                                console.log(resjson)
                                                 if (resjson.content.alias) {
                                                     enqueueSnackbar('検証成功', { variant: 'success' })
                                                 } else {

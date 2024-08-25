@@ -36,7 +36,6 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
             if (!isMounted) return
             setMessage(msg)
             if (msg.document.keyID && msg.document.keyID !== '') {
-                console.log('fetching keychain for', msg.document.keyID, inspectingItem.author)
                 client.api.getKeyResolution(msg.document.keyID, inspectingItem.author).then((keys) => {
                     if (!isMounted) return
                     setKeyResolution(keys)

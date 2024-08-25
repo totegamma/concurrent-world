@@ -1,0 +1,47 @@
+name: Playwright Tests
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+    - v1release
+    - develop
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - project: chromium
+            browser: chromium
+          - project: firefox
+            browser: firefox
+          - project: webkit
+            browser: webkit
+          - project: mobile_chrome
+            browser: chromium
+#         - project: mobile_safari
+#           browser: webkit
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+
+    - name: Install dependencies
+      run: npm install -g pnpm && pnpm install
+
+    - name: Install Playwright Browsers
+      run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
+
+    - name: Run Playwright tests
+      run: pnpm exec playwright test --project=${{ matrix.project }}
+
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report-${{ matrix.project }}
+        path: playwright-report/
+        retention-days: 30

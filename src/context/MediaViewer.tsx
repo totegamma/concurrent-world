@@ -103,7 +103,6 @@ export const MediaViewerProvider = (props: MediaViewerProviderProps): JSX.Elemen
     }, [handleResize])
 
     const handleImageOnLoad = (image: HTMLImageElement): void => {
-        console.log('image loaded!', image.naturalWidth, image.naturalHeight)
         setImageNaturalWidth(image.naturalWidth)
         setImageNaturalHeight(image.naturalHeight)
     }

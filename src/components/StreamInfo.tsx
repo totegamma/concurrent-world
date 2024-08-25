@@ -59,8 +59,6 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
     }, [props.id])
 
     const updateStream = useCallback(() => {
-        console.log('policyDraft', policyDraft)
-        console.log('policyParams', policyParams)
         if (!stream) return
         client.api
             .upsertTimeline(schemaDraft, documentBody, {

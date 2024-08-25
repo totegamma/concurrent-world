@@ -27,3 +27,5 @@ stats.html
 package-lock.yaml
 
 .wrangler
+test-results
+playwright-report

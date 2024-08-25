@@ -77,7 +77,6 @@ export function AccountImport(): JSX.Element {
                         <Suspense fallback={<Typography>loading...</Typography>}>
                             <QRCodeReader
                                 onRead={(result) => {
-                                    console.log(result)
                                     try {
                                         Client.createFromSubkey(result).then((client) => {
                                             localStorage.setItem('Domain', JSON.stringify(client.host))
