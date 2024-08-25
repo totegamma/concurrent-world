@@ -1,17 +1,21 @@
 import { Box, Divider, Typography } from '@mui/material'
-import { useMemo } from 'react'
-import { Timeline } from '../components/Timeline'
 import { useTranslation } from 'react-i18next'
 import { useClient } from '../context/ClientContext'
+import { QueryTimelineReader } from '../components/QueryTimeline'
+import { useMemo, useState } from 'react'
+import { TimelineFilter } from '../components/TimelineFilter'
 
 export function Notifications(): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'pages.notifications' })
     const { client } = useClient()
 
-    const streams = useMemo(() => {
-        const target = client.user?.notificationTimeline
-        return target ? [target] : []
-    }, [client])
+    const timeline = client.user?.notificationTimeline
+
+    const [selected, setSelected] = useState<string | undefined>(undefined)
+
+    const query = useMemo(() => {
+        return selected ? { schema: selected } : {}
+    }, [selected])
 
     return (
         <Box
@@ -31,8 +35,10 @@ export function Notifications(): JSX.Element {
             >
                 <Typography variant="h2">{t('title')}</Typography>
                 <Divider />
+                <TimelineFilter selected={selected} setSelected={setSelected} />
+                <Divider />
             </Box>
-            <Timeline streams={streams} />
+            {timeline && <QueryTimelineReader timeline={timeline} query={query} />}
         </Box>
     )
 }

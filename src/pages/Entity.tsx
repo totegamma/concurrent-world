@@ -2,12 +2,13 @@ import { Box, Collapse, Divider, Tab, Tabs } from '@mui/material'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { useClient } from '../context/ClientContext'
-import { Timeline } from '../components/Timeline'
-import { type User } from '@concurrent-world/client'
+import { Schemas, type User } from '@concurrent-world/client'
 import { type VListHandle } from 'virtua'
 import { TimelineHeader } from '../components/TimelineHeader'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import { Profile } from '../components/Profile'
+import { QueryTimelineReader } from '../components/QueryTimeline'
+import { TimelineFilter } from '../components/TimelineFilter'
 
 export function EntityPage(): JSX.Element {
     const { client } = useClient()
@@ -24,6 +25,8 @@ export function EntityPage(): JSX.Element {
     const path = useLocation()
     const subCharacterID = path.hash.replace('#', '')
 
+    const [filter, setFilter] = useState<string | undefined>(undefined)
+
     useEffect(() => {
         if (!id) return
         client.getUser(id).then((user) => {
@@ -31,18 +34,30 @@ export function EntityPage(): JSX.Element {
         })
     }, [id])
 
-    const targetStreams = useMemo(() => {
+    const targetTimeline = useMemo(() => {
         let target
         switch (tab) {
             case 0:
+            case 1:
                 target = user?.homeTimeline
                 break
-            case 1:
+            case 2:
                 target = user?.associationTimeline
                 break
         }
-        return target ? [target] : []
+        return target
     }, [user, tab])
+
+    const query = useMemo(() => {
+        switch (tab) {
+            case 1:
+                return { schema: Schemas.mediaMessage }
+            case 2:
+                return { schema: filter }
+            default:
+                return {}
+        }
+    }, [tab, filter])
 
     return (
         <Box
@@ -65,38 +80,48 @@ export function EntityPage(): JSX.Element {
                     />
                 </Collapse>
             </Box>
-            <Timeline
-                ref={timelineRef}
-                streams={targetStreams}
-                perspective={user?.ccid}
-                onScroll={(top) => {
-                    setShowHeader(top > 180)
-                }}
-                header={
-                    <>
-                        <Profile
-                            user={user ?? undefined}
-                            id={id}
-                            overrideSubProfileID={subCharacterID}
-                            onSubProfileClicked={(id) => {
-                                window.location.hash = id
-                            }}
-                        />
-                        <Tabs
-                            value={tab}
-                            onChange={(_, index) => {
-                                setTab(index)
-                            }}
-                            textColor="secondary"
-                            indicatorColor="secondary"
-                        >
-                            <Tab label="カレント" />
-                            <Tab label="アクティビティ" />
-                        </Tabs>
-                        <Divider />
-                    </>
-                }
-            />
+            {targetTimeline && (
+                <QueryTimelineReader
+                    ref={timelineRef}
+                    timeline={targetTimeline}
+                    query={query}
+                    perspective={user?.ccid}
+                    onScroll={(top) => {
+                        setShowHeader(top > 180)
+                    }}
+                    header={
+                        <>
+                            <Profile
+                                user={user ?? undefined}
+                                id={id}
+                                overrideSubProfileID={subCharacterID}
+                                onSubProfileClicked={(id) => {
+                                    window.location.hash = id
+                                }}
+                            />
+                            <Tabs
+                                value={tab}
+                                onChange={(_, index) => {
+                                    setTab(index)
+                                }}
+                                textColor="secondary"
+                                indicatorColor="secondary"
+                            >
+                                <Tab label="カレント" />
+                                <Tab label="メディア" />
+                                <Tab label="アクティビティ" />
+                            </Tabs>
+                            <Divider />
+                            {tab === 2 && (
+                                <>
+                                    <TimelineFilter selected={filter} setSelected={setFilter} sx={{ px: 1 }} />
+                                    <Divider />
+                                </>
+                            )}
+                        </>
+                    }
+                />
+            )}
         </Box>
     )
 }
