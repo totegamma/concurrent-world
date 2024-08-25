@@ -46,17 +46,15 @@ export function LoginQR(): JSX.Element {
                                 const newIdentity = GenerateIdentity()
 
                                 const ckid = ComputeCKID(newIdentity.publicKey)
-                                console.log('newkey: ', ckid)
 
                                 client.api
                                     .enactSubkey(ckid)
                                     .then(() => {
-                                        console.log('subkey enacted')
                                         const subkey = `concurrent-subkey ${newIdentity.privateKey} ${client.ccid}@${client.host} ${client.user?.profile?.username}`
                                         setGenerated(subkey)
                                     })
                                     .catch((e) => {
-                                        console.log('error: ', e)
+                                        console.error('error: ', e)
                                     })
                             }}
                         >

@@ -84,8 +84,7 @@ export function ManageSubsPage(): JSX.Element {
                                         },
                                         { indexable: false, domainOwned: false }
                                     )
-                                    .then((subscription) => {
-                                        console.log(subscription)
+                                    .then((_subscription) => {
                                         reloadList()
                                     })
                                     .catch((error) => {
@@ -218,7 +217,6 @@ export function ManageSubsPage(): JSX.Element {
                     <ListSettings
                         subscription={inspectedSub}
                         onModified={() => {
-                            console.log('modified')
                             reloadList()
                             setInspectedSub(null)
                         }}

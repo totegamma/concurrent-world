@@ -78,7 +78,6 @@ export function MessagePage(): JSX.Element {
         setReplyTo(null)
 
         let isMounted = true
-        console.log('loadMessage', messageID, authorID)
         if (!messageID || !authorID) return
         client
             .getMessage<any>(messageID, authorID)

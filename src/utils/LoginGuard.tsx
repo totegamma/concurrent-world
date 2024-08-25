@@ -21,23 +21,19 @@ export const LoginGuard = (props: Props): JSX.Element => {
     try {
         domain = JSON.parse(localStorage.getItem('Domain') || '')
     } catch (e) {
-        console.log(e)
+        console.error(e)
     }
-
-    console.log('domain', domain)
 
     try {
         prvkey = JSON.parse(localStorage.getItem('PrivateKey') || '')
     } catch (e) {
-        console.log(e)
+        console.error(e)
     }
-
-    console.log('prvkey', prvkey)
 
     try {
         subkey = JSON.parse(localStorage.getItem('SubKey') || '')
     } catch (e) {
-        console.log(e)
+        console.error(e)
     }
 
     if (domain === '' || (prvkey === '' && subkey === '')) redirect = true

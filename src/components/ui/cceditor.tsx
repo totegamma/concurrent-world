@@ -34,7 +34,6 @@ const UserPickerWidget = (props: WidgetProps): JSX.Element => {
             <UserPicker
                 selected={selected}
                 setSelected={(value) => {
-                    console.log(value)
                     setSelected(value)
                     props.onChange(value.map((e) => e.ccid))
                 }}

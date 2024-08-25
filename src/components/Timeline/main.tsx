@@ -158,7 +158,6 @@ const timeline = forwardRef((props: TimelineProps, ref: ForwardedRef<VListHandle
         setIsFetching(true)
         alreadyFetchInThisRender = true
 
-        console.log('readMore!!')
         timeline.current
             ?.readMore()
             .then((hasMore) => {

@@ -55,7 +55,6 @@ export default function ClientProvider(props: ClientProviderProps): JSX.Element 
     }, [domain, prvkey])
 
     const forceUpdate = useCallback(() => {
-        console.log('force update')
         updater((prev) => prev + 1)
     }, [updatecount])
 

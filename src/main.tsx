@@ -23,19 +23,19 @@ let subkey = ''
 try {
     domain = JSON.parse(localStorage.getItem('Domain') || '')
 } catch (e) {
-    console.log(e)
+    console.error(e)
 }
 
 try {
     prvkey = JSON.parse(localStorage.getItem('PrivateKey') || '')
 } catch (e) {
-    console.log(e)
+    console.error(e)
 }
 
 try {
     subkey = JSON.parse(localStorage.getItem('SubKey') || '')
 } catch (e) {
-    console.log(e)
+    console.error(e)
 }
 
 const logined = domain !== '' && (prvkey !== '' || subkey !== '')

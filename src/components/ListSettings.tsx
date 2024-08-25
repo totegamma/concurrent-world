@@ -36,7 +36,6 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
     const [tab, setTab] = useState<'stream' | 'user'>('stream')
 
     useEffect(() => {
-        console.log(props.subscription)
         setListName(props.subscription.document.body.name)
 
         Promise.all(props.subscription.items.map((sub) => client.getTimeline(sub.id))).then((streams) => {

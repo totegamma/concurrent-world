@@ -126,7 +126,6 @@ export const StorageProvider = ({ children }: { children: JSX.Element | JSX.Elem
     )
 
     const isUploadReady = useMemo(() => {
-        console.log(client.domainServices)
         if (storageProvider === 's3') {
             return !!s3Config.endpoint
         } else if (storageProvider === 'imgur') {

@@ -128,7 +128,6 @@ export const EmojiSettings = (): JSX.Element => {
                                 onClick={(a) => {
                                     a.stopPropagation()
                                     setMenuAnchor(a.currentTarget)
-                                    console.log('aaa', e.packageURL)
                                     setSelectedPackageURL(e.packageURL)
                                 }}
                                 sx={{}}
@@ -148,7 +147,6 @@ export const EmojiSettings = (): JSX.Element => {
             >
                 <MenuItem
                     onClick={() => {
-                        console.log(selectedPackageURL)
                         if (selectedPackageURL) picker.updateEmojiPackage(selectedPackageURL)
                         setMenuAnchor(null)
                     }}

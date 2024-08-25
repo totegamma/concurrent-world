@@ -43,7 +43,6 @@ export const APSettings = (): JSX.Element => {
                 setAliases(data.content.aliases ?? [])
             })
             .catch((e) => {
-                console.log(e)
                 setEntity(null)
             })
     }, [])
@@ -53,12 +52,10 @@ export const APSettings = (): JSX.Element => {
             .fetchWithCredential(client.api.host, `/ap/api/settings`, {})
             .then(async (res) => await res.json())
             .then((data) => {
-                console.log(data)
-                console.log(allKnownTimelines)
                 setListenTimelines(allKnownTimelines.filter((t) => data.content.listen_timelines.includes(t.id)))
             })
             .catch((e) => {
-                console.log(e)
+                console.error(e)
             })
     }, [allKnownTimelines])
 
@@ -244,7 +241,6 @@ export const APSettings = (): JSX.Element => {
                                                 })
                                                 .then(async (res) => await res.json())
                                                 .then((data) => {
-                                                    console.log(data)
                                                     enqueueSnackbar('更新しました', {
                                                         variant: 'success'
                                                     })
@@ -284,7 +280,6 @@ export const APSettings = (): JSX.Element => {
                                             })
                                             .then(async (res) => await res.json())
                                             .then((data) => {
-                                                console.log(data)
                                                 enqueueSnackbar('更新しました', {
                                                     variant: 'success'
                                                 })

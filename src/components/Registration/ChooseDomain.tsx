@@ -29,7 +29,6 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
             if (unmounted) return
             props.setHost(e)
         })
-        console.log(fqdn)
         return () => {
             unmounted = true
         }
