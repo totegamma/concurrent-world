@@ -4,7 +4,7 @@ test(`detect-crash`, async ({ page }) => {
     await page.goto(`http://localhost:5173/crash`);
     await page.waitForLoadState('networkidle');
     const errorButton = page.getByRole('button', { name: 'とりあえずリロード' })
-    expect(errorButton).toHaveCount(1);
+    await expect(errorButton).toHaveCount(1);
 })
 
 
@@ -24,7 +24,7 @@ guestTests.forEach((t) => {
         await page.goto(`http://localhost:5173${t.path}`);
         await page.waitForLoadState('networkidle');
         const errorButton = page.getByRole('button', { name: 'とりあえずリロード' })
-        expect(errorButton).toHaveCount(0);
+        await expect(errorButton).toHaveCount(0);
     });
 })
 
@@ -66,7 +66,7 @@ loggedinTests.forEach((t) => {
         await page.goto(`http://localhost:5173${t.path}`);
         await page.waitForLoadState('networkidle');
         const errorButton = page.getByRole('button', { name: 'とりあえずリロード' })
-        expect(errorButton).toHaveCount(0);
+        await expect(errorButton).toHaveCount(0);
     });
 })
 

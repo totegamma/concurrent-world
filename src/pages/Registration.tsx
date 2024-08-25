@@ -8,9 +8,7 @@ import { usePersistent } from '../hooks/usePersistent'
 import { jumpToDomainRegistration } from '../util'
 import {
     Client,
-    type CoreDomain,
     type ProfileSchema,
-    LoadKey,
     GenerateIdentity,
     type Identity,
     LoadIdentity,
@@ -29,11 +27,10 @@ export function Registration(): JSX.Element {
     const location = useLocation()
 
     const { t } = useTranslation('', { keyPrefix: 'registration' })
-    const [domain, setDomain] = usePersistent<string>('Domain', 'ariake.concrnt.net')
     const [client, initializeClient] = useState<Client>()
-    const [host, setHost] = useState<CoreDomain | null | undefined>()
     const [identity, setIdentity] = usePersistent<Identity | null>('Identity', GenerateIdentity())
     const [profile, setProfile] = useState<CoreProfile<ProfileSchema> | null>(null)
+    const [domain, setDomain] = usePersistent<string>('Domain', 'ariake.concrnt.net')
 
     const activeStep = parseInt(location.hash.replace('#', '')) || 0
     const setActiveStep = (step: number): void => {
@@ -61,18 +58,9 @@ export function Registration(): JSX.Element {
         })
     }, [identity, domain])
 
-    useEffect(() => {
-        if (!host || !identity) return
-        setDomain(host.fqdn)
-        const keyPair = LoadKey(identity.privateKey)
-        if (!keyPair) return
-        const api = new Client(host.fqdn, keyPair, identity.CCID)
-        initializeClient(api)
-    }, [host])
-
     const setupAccount = (): void => {
-        if (!client || !host || !identity) return
-        localStorage.setItem('Domain', JSON.stringify(host.fqdn))
+        if (!client || !identity) return
+        localStorage.setItem('Domain', JSON.stringify(domain))
         localStorage.setItem('PrivateKey', JSON.stringify(identity.privateKey))
 
         const storage = JSON.stringify(defaultPreference)
@@ -99,7 +87,6 @@ export function Registration(): JSX.Element {
                         const fqdn = 'ariake.concrnt.net'
                         client?.api.getDomain(fqdn).then((e) => {
                             if (!e) return
-                            setHost(e)
                             setDomain(e.fqdn)
 
                             let next = window.location.href
@@ -128,8 +115,8 @@ export function Registration(): JSX.Element {
                         setActiveStep(2)
                     }}
                     client={client}
-                    host={host}
-                    setHost={setHost}
+                    domain={domain}
+                    setDomain={setDomain}
                 />
             )
         },
@@ -153,7 +140,7 @@ export function Registration(): JSX.Element {
                     next={() => {
                         setupAccount()
                     }}
-                    host={host}
+                    domain={domain}
                     profile={profile?.document.body ?? {}}
                 />
             )

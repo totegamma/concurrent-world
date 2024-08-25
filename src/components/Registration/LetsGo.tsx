@@ -1,14 +1,14 @@
 import { Box, Button } from '@mui/material'
 import Tilt from 'react-parallax-tilt'
 import { PassportRenderer } from '../theming/Passport'
-import { type Identity, type CoreDomain, type ProfileSchema } from '@concurrent-world/client'
+import { type Identity, type ProfileSchema } from '@concurrent-world/client'
 import { useTranslation } from 'react-i18next'
 
 export function RegistrationReady(props: {
     next: () => void
     identity: Identity
     profile: ProfileSchema | null
-    host: CoreDomain | null | undefined
+    domain: string
 }): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'registration.ready' })
 
@@ -26,7 +26,7 @@ export function RegistrationReady(props: {
                         ccid={props.identity.CCID}
                         name={props.profile?.username ?? ''}
                         avatar={props.profile?.avatar ?? ''}
-                        host={props.host?.fqdn ?? ''}
+                        host={props.domain}
                         cdate={new Date().toLocaleDateString()}
                         trust={0}
                     />

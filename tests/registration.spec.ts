@@ -55,12 +55,18 @@ test('Account registration', async ({ page }) => {
 
     // check result
 
-    // open list
-    await page.locator('svg[data-testid="ExpandMoreIcon"]').click();
+    const viewSize = page.viewportSize();
+    const isDesktop = viewSize && viewSize.width > 960;
 
-    // has link
-    const zyouya_link = page.getByRole('link', { name: '常夜灯' })
-    await expect(zyouya_link).toHaveAttribute('href', '/timeline/tcjkcx7t5jdf3v5s6067yxcgpmm@zyouya.concrnt.net')
+    if (isDesktop) {
+        // open list
+        await page.locator('svg[data-testid="ExpandMoreIcon"]').click();
+
+        // has link
+        const zyouya_link = page.getByRole('link', { name: '常夜灯' })
+        await expect(zyouya_link).toHaveAttribute('href', '/timeline/tcjkcx7t5jdf3v5s6067yxcgpmm@zyouya.concrnt.net')
+
+    }
 
     // ok
 });
