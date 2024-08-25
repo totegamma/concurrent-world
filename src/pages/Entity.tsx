@@ -8,6 +8,7 @@ import { TimelineHeader } from '../components/TimelineHeader'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import { Profile } from '../components/Profile'
 import { QueryTimelineReader } from '../components/QueryTimeline'
+import { TimelineFilter } from '../components/TimelineFilter'
 
 export function EntityPage(): JSX.Element {
     const { client } = useClient()
@@ -23,6 +24,8 @@ export function EntityPage(): JSX.Element {
 
     const path = useLocation()
     const subCharacterID = path.hash.replace('#', '')
+
+    const [filter, setFilter] = useState<string | undefined>(undefined)
 
     useEffect(() => {
         if (!id) return
@@ -49,10 +52,12 @@ export function EntityPage(): JSX.Element {
         switch (tab) {
             case 1:
                 return { schema: Schemas.mediaMessage }
+            case 2:
+                return { schema: filter }
             default:
                 return {}
         }
-    }, [tab])
+    }, [tab, filter])
 
     return (
         <Box
@@ -107,6 +112,12 @@ export function EntityPage(): JSX.Element {
                                 <Tab label="アクティビティ" />
                             </Tabs>
                             <Divider />
+                            {tab === 2 && (
+                                <>
+                                    <TimelineFilter selected={filter} setSelected={setFilter} sx={{ px: 1 }} />
+                                    <Divider />
+                                </>
+                            )}
                         </>
                     }
                 />
