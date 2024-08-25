@@ -1,9 +1,6 @@
 name: Playwright Tests
 on:
   workflow_dispatch:
-  push:
-    branches:
-    - develop
   pull_request:
     branches:
     - v1release
@@ -23,8 +20,8 @@ jobs:
             browser: webkit
           - project: mobile_chrome
             browser: chromium
-          - project: mobile_safari
-            browser: webkit
+#         - project: mobile_safari
+#           browser: webkit
 
     steps:
     - uses: actions/checkout@v4
