@@ -4,7 +4,7 @@ import { Box, Chip, type SxProps } from '@mui/material'
 export interface TimelineFilterProps {
     selected: string | undefined
     setSelected: (value: string | undefined) => void
-    sx: SxProps
+    sx?: SxProps
 }
 
 export const TimelineFilter = (props: TimelineFilterProps): JSX.Element => {
