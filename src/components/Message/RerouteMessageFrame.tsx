@@ -144,32 +144,30 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
             {props.message.document.body.body && (
                 <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 2 }}>
                     <Box display="flex" flexDirection="row-reverse" width={{ xs: '38px', sm: '48px' }} flexShrink={0} />
-                    <Typography
-                        overflow="hidden"
-                        whiteSpace="nowrap"
-                        textOverflow="ellipsis"
-                        minWidth={0}
-                        sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
+                    <Tooltip
+                        arrow
+                        placement="top"
+                        title={
+                            <MarkdownRenderer
+                                messagebody={props.message.document.body.body}
+                                emojiDict={props.message.document.body.emojis ?? {}}
+                            />
+                        }
                     >
-                        <Tooltip
-                            arrow
-                            placement="top"
-                            title={
-                                <MarkdownRenderer
-                                    messagebody={props.message.document.body.body}
-                                    emojiDict={props.message.document.body.emojis ?? {}}
-                                />
-                            }
+                        <Box
+                            overflow="hidden"
+                            whiteSpace="nowrap"
+                            textOverflow="ellipsis"
+                            minWidth={0}
+                            sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
                         >
-                            <Box>
-                                <MarkdownRendererLite
-                                    messagebody={props.message.document.body.body}
-                                    emojiDict={props.message.document.body.emojis ?? {}}
-                                    forceOneline={true}
-                                />
-                            </Box>
-                        </Tooltip>
-                    </Typography>
+                            <MarkdownRendererLite
+                                messagebody={props.message.document.body.body}
+                                emojiDict={props.message.document.body.emojis ?? {}}
+                                forceOneline={true}
+                            />
+                        </Box>
+                    </Tooltip>
                 </Box>
             )}
             <MessageContainer

@@ -52,7 +52,6 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
                 setMessage(msg)
             })
             .catch((e) => {
-                console.error('failed to fetch message', e)
                 setError(e.toString())
             })
             .finally(() => {

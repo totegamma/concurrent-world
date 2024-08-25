@@ -73,7 +73,7 @@ export const FavoriteAssociation = (props: FavoriteAssociationProps): JSX.Elemen
                         underline="hover"
                         color="inherit"
                         fontSize="0.75rem"
-                        to={`/${target?.author ?? ''}/${target?.id ?? ''}`}
+                        to={target ? `/${target.author}/${target.id}` : '/'}
                     >
                         <TimeDiff date={new Date(props.association.cdate)} />
                     </Link>
