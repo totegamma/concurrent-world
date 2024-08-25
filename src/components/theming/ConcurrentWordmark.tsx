@@ -14,7 +14,7 @@ export function ConcurrentWordmark(props: ConcurrentWordmarkProps): JSX.Element 
                 justifyContent: 'center'
             }}
         >
-            <Box>
+            <Box id="emblem">
                 <ConcrntLogo size="32px" color={props.color} />
             </Box>
             <Typography

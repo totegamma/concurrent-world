@@ -394,19 +394,16 @@ function App(): JSX.Element {
                     </Box>
                 </Box>
                 <Box
+                    id="emblem"
                     sx={{
                         position: 'fixed',
                         zIndex: '-1',
-                        opacity: { xs: '0.2', sm: '0.1' },
+                        opacity: { xs: '0', sm: '0.1', md: '0.1' },
                         left: '-30px',
                         bottom: '-30px',
                         width: '300px',
                         height: '300px',
-                        display: {
-                            xs: 'none',
-                            sm: 'block',
-                            md: 'block'
-                        }
+                        display: 'block'
                     }}
                 >
                     <ConcrntLogo size="300px" color={theme.palette.background.contrastText} />

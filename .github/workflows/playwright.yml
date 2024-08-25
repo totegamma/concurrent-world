@@ -12,17 +12,30 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        browser:
+          - chromium
+          - firefox
+          - webkit
+          - 'mobile_chrome'
+          - 'mobile_safari'
     steps:
     - uses: actions/checkout@v4
+
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
+
     - name: Install dependencies
       run: npm install -g pnpm && pnpm install
+
     - name: Install Playwright Browsers
-      run: pnpm exec playwright install --with-deps
+      run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
+
     - name: Run Playwright tests
-      run: pnpm exec playwright test
+      run: pnpm exec playwright test --project=${{ matrix.browser }}
+
     - uses: actions/upload-artifact@v4
       if: always()
       with:
