@@ -33,7 +33,7 @@ export function CreateProfile(props: CreateProfileProps): JSX.Element {
                 >
                     <ProfileEditor
                         onSubmit={(updated) => {
-                            props.setProfile(updated)
+                            if (updated) props.setProfile(updated)
                             props.next()
                         }}
                     />

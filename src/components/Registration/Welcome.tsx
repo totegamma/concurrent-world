@@ -1,4 +1,4 @@
-import { Alert, AlertTitle, Box, Paper, Typography } from '@mui/material'
+import { Box, Paper, Typography } from '@mui/material'
 import Tilt from 'react-parallax-tilt'
 import { PassportRenderer } from '../theming/Passport'
 import { useTranslation } from 'react-i18next'
@@ -48,6 +48,7 @@ export function RegistrationWelcome(props: {
                 }}
             >
                 <Paper
+                    id="RegistrationAutoSetupButton"
                     variant="outlined"
                     sx={{
                         width: '90%',
@@ -70,6 +71,7 @@ export function RegistrationWelcome(props: {
                     </Typography>
                 </Paper>
                 <Paper
+                    id="RegistrationCustomButton"
                     variant="outlined"
                     sx={{
                         width: '90%',
