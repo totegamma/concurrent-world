@@ -14,16 +14,17 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        - project: chromium
-          browser: chromium
-        - project: firefox
-          browser: firefox
-        - project: webkit
-          browser: webkit
-        - project: mobile_chrome
-          browser: chromium
-        - project: mobile_safari
-          browser: webkit
+        include:
+          - project: chromium
+            browser: chromium
+          - project: firefox
+            browser: firefox
+          - project: webkit
+            browser: webkit
+          - project: mobile_chrome
+            browser: chromium
+          - project: mobile_safari
+            browser: webkit
 
     steps:
     - uses: actions/checkout@v4
