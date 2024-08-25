@@ -45,6 +45,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <Suspense fallback={<FullScreenLoading message="Loading..." />}>
             <BrowserRouter>
                 <Routes>
+                    <Route path="/crash" element={<EmergencyKit error={null} resetErrorBoundary={() => {}} />} />
                     <Route path="/welcome" element={<Welcome />} />
                     {!logined ? (
                         <Route path="/register" element={<Registration />} />
