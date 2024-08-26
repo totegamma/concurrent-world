@@ -1,4 +1,4 @@
-import { Box, IconButton, ListItem, Typography } from '@mui/material'
+import { Box, IconButton, ListItem, type SxProps, Typography } from '@mui/material'
 import { CCAvatar } from '../ui/CCAvatar'
 import { type ProfileSchema, type ReplyMessageSchema, type MarkdownMessageSchema } from '@concurrent-world/client'
 import { MarkdownRenderer } from '../ui/MarkdownRenderer'
