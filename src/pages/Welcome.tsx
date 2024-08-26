@@ -326,7 +326,7 @@ function WelcomeBody(): JSX.Element {
                     backgroundColor: alpha(theme.palette.background.paper, 0.8)
                 }}
             >
-                <Box flex={1} display="flex" flexDirection="column" gap={2}>
+                <Box flex={3} display="flex" flexDirection="column" gap={2}>
                     <Box>
                         <Typography variant="h1" fontSize="40px">
                             あなたのアカウントはあなたのもの
@@ -351,7 +351,7 @@ function WelcomeBody(): JSX.Element {
                         </Typography>
                     </Box>
                 </Box>
-                <Box flex={1}>
+                <Box flex={2}>
                     <Box minWidth="350px">
                         <Tilt glareEnable={true} glareBorderRadius="5%">
                             <PassportRenderer
