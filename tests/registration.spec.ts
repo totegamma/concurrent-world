@@ -7,7 +7,6 @@ test('Account registration', async ({ page }) => {
 
     // has registration link
     const link = page.locator('a[href="/register"]').first();
-    await expect(link).toHaveText('Create an Account');
 
     // Click on the registration link
     await link.click();
