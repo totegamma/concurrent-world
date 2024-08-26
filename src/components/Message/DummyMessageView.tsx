@@ -20,6 +20,7 @@ export interface DummyMessageViewProps {
     hideActions?: boolean
     onAvatarClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
     subprofileID?: string
+    sx?: SxProps
 }
 
 export const DummyMessageView = (props: DummyMessageViewProps): JSX.Element => {
@@ -29,7 +30,8 @@ export const DummyMessageView = (props: DummyMessageViewProps): JSX.Element => {
                 wordBreak: 'break-word',
                 alignItems: 'flex-start',
                 flex: 1,
-                gap: { xs: 1, sm: 2 }
+                gap: { xs: 1, sm: 2 },
+                ...props.sx
             }}
             disablePadding
         >
