@@ -90,7 +90,9 @@ export const GuestBase = (props: GuestBaseProps): JSX.Element => {
                                 gap: 1
                             }}
                         >
-                            <Button onClick={randomTheme}>✨</Button>
+                            <Button variant="text" onClick={randomTheme}>
+                                ✨
+                            </Button>
                             {props.additionalButton}
                         </Box>
                     </Box>
