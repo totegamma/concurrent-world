@@ -1,5 +1,5 @@
 import Box from '@mui/material/Box'
-import { Button, Divider, IconButton, Typography, alpha, useTheme } from '@mui/material'
+import { Button, Divider, IconButton, Paper, Typography, alpha, useTheme } from '@mui/material'
 import { Link, NavLink } from 'react-router-dom'
 import GitHubIcon from '@mui/icons-material/GitHub'
 import AppMock from '../components/welcome/AppMock'
@@ -200,8 +200,9 @@ function WelcomeBody(): JSX.Element {
                             ...decoration.style,
                             backgroundColor: theme.palette.background.paper,
                             borderRadius: '4px',
-                            border: '1px solid rgba(0, 0, 0, 0.1)',
-                            padding: '4px'
+                            border: '1px solid',
+                            borderColor: alpha(theme.palette.text.disabled, 0.1),
+                            padding: '0 4px'
                         }}
                         parallaxAmount={decoration.parallax}
                     >
@@ -225,7 +226,7 @@ function WelcomeBody(): JSX.Element {
             </Box>
 
             <Box /* top */
-                mt={{ xs: '50px', sm: '100px', md: '100px' }}
+                mt={{ xs: '0', sm: '0', md: '100px' }}
                 display="flex"
                 flexDirection="column"
                 alignItems="center"
@@ -242,11 +243,36 @@ function WelcomeBody(): JSX.Element {
                         padding: '20px'
                     }}
                 >
-                    <Typography variant="h1" fontSize={{ xs: '30px', sm: '40px', md: '50px' }} mb="50px" zIndex="1">
+                    <Typography
+                        variant="h1"
+                        fontSize="50px"
+                        mb="50px"
+                        zIndex="1"
+                        display={{ xs: 'none', sm: 'none', md: 'block' }}
+                    >
                         もし、こんなSNSがあったら...
                     </Typography>
+
+                    <Paper
+                        variant="outlined"
+                        sx={{
+                            px: 1,
+                            display: { xs: 'flex', sm: 'flex', md: 'none' },
+                            my: '30px'
+                        }}
+                    >
+                        <DummyMessageView
+                            user={{
+                                username: 'Concrnt'
+                            }}
+                            message={{
+                                body: '## もし、こんなSNSがあったら...'
+                            }}
+                        />
+                    </Paper>
+
                     <Box maxWidth="800px" display="flex" flexDirection="column" gap={2} zIndex="1">
-                        <Typography variant="body1" align="center" fontSize={{ xs: '18px', sm: '20px', md: '20px' }}>
+                        <Typography variant="body1" align="center" fontSize={{ xs: '18px', sm: '18px', md: '20px' }}>
                             自分の友達や興味のある人が「いま、なにしてる」のかをリアルタイムで知れる。
                             <br />
                             1つのアカウントで、複数のコミュニティと交流できる。
@@ -255,18 +281,20 @@ function WelcomeBody(): JSX.Element {
                             <br />
                             そんなSNSが、あったらいいですよね。
                         </Typography>
-                        <Typography variant="body1" align="center" fontSize={{ xs: '18px', sm: '20px', md: '20px' }}>
+                        <Typography variant="body1" align="center" fontSize={{ xs: '18px', sm: '18px', md: '20px' }}>
                             Concrntは、この願いにこたえるために開発されました。
                             <br />
                             新時代のSNSへ、ようこそ。
                         </Typography>
                     </Box>
                     <Button
-                        size="large"
                         component={NavLink}
                         to="/register"
                         sx={{
-                            marginTop: '20px'
+                            marginTop: '20px',
+                            px: '80px',
+                            py: '10px',
+                            fontSize: '16px'
                         }}
                     >
                         はじめる
@@ -406,6 +434,7 @@ function WelcomeBody(): JSX.Element {
                     overflow="auto"
                     flexDirection={{ xs: 'row', sm: 'row', md: 'column' }}
                     flexShrink={1}
+                    width={{ xs: '100%', sm: '100%', md: 'unset' }}
                 >
                     <StreamCard
                         sx={{ minWidth: '300px' }}
@@ -478,14 +507,25 @@ export default function Welcome(): JSX.Element {
             additionalButton={
                 <>
                     <Button
+                        variant="text"
                         component={Link}
                         to="https://square.concrnt.net/general/world/"
                         target="_blank"
                         rel="noopener noreferrer"
+                        sx={{
+                            color: 'primary.contrastText'
+                        }}
                     >
                         ユーザーガイド
                     </Button>
-                    <Button component={Link} to="/import">
+                    <Button
+                        variant="text"
+                        component={Link}
+                        to="/import"
+                        sx={{
+                            color: 'primary.contrastText'
+                        }}
+                    >
                         {t('import')}
                     </Button>
                 </>
