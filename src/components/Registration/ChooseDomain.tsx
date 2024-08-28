@@ -58,16 +58,6 @@ export function ChooseDomain(props: ChooseDomainProps): JSX.Element {
                 gap: '20px'
             }}
         >
-            <Typography>
-                {t('desc1')}
-                <br />
-                {t('desc2')}
-                <br />
-                {t('desc3')}
-            </Typography>
-            <Alert severity="info">
-                <AlertTitle>{t('notice')}</AlertTitle>
-            </Alert>
             <Box width="100%" display="flex" flexDirection="column">
                 <Typography variant="h3">{t('chooseFromList')}</Typography>
                 <List>

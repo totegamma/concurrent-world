@@ -1,11 +1,10 @@
-import { Box, Paper, Typography } from '@mui/material'
+import { Alert, Box, Button, AlertTitle, Paper, Typography } from '@mui/material'
 import Tilt from 'react-parallax-tilt'
 import { PassportRenderer } from '../theming/Passport'
 import { useTranslation } from 'react-i18next'
 import { IconButtonWithLabel } from '../ui/IconButtonWithLabel'
 
-import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh'
-import BuildIcon from '@mui/icons-material/Build'
+import LaunchIcon from '@mui/icons-material/Launch'
 import { type Identity } from '@concurrent-world/client'
 
 export function RegistrationWelcome(props: {
@@ -16,6 +15,17 @@ export function RegistrationWelcome(props: {
     const { t } = useTranslation('', { keyPrefix: 'registration.welcome' })
     return (
         <>
+            <Typography
+                variant="h4"
+                sx={{
+                    textAlign: 'center',
+                    wordBreak: 'keep-all'
+                }}
+            >
+                Concrntは分散型SNSの1つです。
+                <wbr />
+                サーバーを選んで登録します。
+            </Typography>
             <Box
                 sx={{
                     padding: '20px',
@@ -28,73 +38,55 @@ export function RegistrationWelcome(props: {
                 </Tilt>
             </Box>
 
-            <Typography
-                variant="h4"
-                sx={{
-                    textAlign: 'center',
-                    marginY: '20px'
-                }}
-            >
-                作成方法を選んでください
-            </Typography>
-
             <Box
                 sx={{
                     display: 'flex',
                     flexDirection: 'column',
                     gap: 2,
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    width: '90%',
+                    maxWidth: '800px',
+                    margin: '0 auto'
                 }}
             >
-                <Paper
+                <Alert severity="info">
+                    <AlertTitle>どのサーバーでも大丈夫！</AlertTitle>
+                    Concrntではサーバー間の隔たりがありません。携帯キャリアみたいなものです。
+                    <br />
+                    また、いつでもサーバー間の引っ越しが可能なので、こだわりがない場合はおまかせがオススメです。
+                </Alert>
+
+                <Button
                     id="RegistrationAutoSetupButton"
-                    variant="outlined"
+                    variant="contained"
                     sx={{
-                        width: '90%',
-                        maxWidth: '800px',
                         display: 'flex',
-                        alignItems: 'center',
-                        gap: 2,
-                        cursor: 'pointer'
+                        gap: 1,
+                        p: 1,
+                        width: '100%',
+                        justifyContent: 'center'
                     }}
                     onClick={props.autoSetup}
                 >
-                    <IconButtonWithLabel icon={AutoFixHighIcon} label={'おまかせ'} />
-                    <Typography
-                        sx={{
-                            flex: 1,
-                            textAlign: 'center'
-                        }}
-                    >
-                        あなたのデータを保持するサーバーを自動で選択します
+                    <Typography>
+                        おまかせでサーバーを選んで
+                        <wbr />
+                        はじめる
                     </Typography>
-                </Paper>
-                <Paper
-                    id="RegistrationCustomButton"
-                    variant="outlined"
+                    <LaunchIcon />
+                </Button>
+                <Box
                     sx={{
-                        width: '90%',
-                        maxWidth: '800px',
+                        width: '100%',
                         display: 'flex',
-                        alignItems: 'center',
-                        gap: 2,
-                        cursor: 'pointer'
+                        justifyContent: 'flex-end'
                     }}
-                    onClick={props.customSetup}
                 >
-                    <IconButtonWithLabel icon={BuildIcon} label={'カスタム'} />
-                    <Typography
-                        sx={{
-                            flex: 1,
-                            textAlign: 'center'
-                        }}
-                    >
-                        自分でサーバーを選択してセットアップします
-                        <br />
-                        ※現在は自分でサーバーを建てた人向け
-                    </Typography>
-                </Paper>
+                    <Button variant="text" onClick={props.customSetup}>
+                        自分でサーバーを選ぶ
+                    </Button>
+                </Box>
             </Box>
         </>
     )
