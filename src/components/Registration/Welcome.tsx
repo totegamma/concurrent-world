@@ -83,7 +83,7 @@ export function RegistrationWelcome(props: {
                         justifyContent: 'flex-end'
                     }}
                 >
-                    <Button variant="text" onClick={props.customSetup}>
+                    <Button id="RegistrationCustomButton" variant="text" onClick={props.customSetup}>
                         自分でサーバーを選ぶ
                     </Button>
                 </Box>

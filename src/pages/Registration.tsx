@@ -232,7 +232,7 @@ export function Registration(): JSX.Element {
                                     width: '100%',
                                     position: 'absolute',
                                     justifyContent: 'space-between',
-                                    bottom: 0,
+                                    top: 0,
                                     p: 1
                                 }}
                             >
