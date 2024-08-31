@@ -45,6 +45,7 @@ import ReplyIcon from '@mui/icons-material/Reply'
 import RepeatIcon from '@mui/icons-material/Repeat'
 import CancelIcon from '@mui/icons-material/Cancel'
 import FeedbackIcon from '@mui/icons-material/Feedback'
+import { usePreference } from '../../context/PreferenceContext'
 
 const ModeSets = {
     plaintext: {
@@ -96,6 +97,7 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
     const { t: et } = useTranslation('', { keyPrefix: 'ui.postButton' })
 
     const [dragging, setDragging] = useState<boolean>(false)
+    const [autoSwitchMediaPostType] = usePreference('autoSwitchMediaPostType')
 
     const textInputRef = useRef<HTMLInputElement>(null)
     let [sending, setSending] = useState<boolean>(false)
@@ -280,7 +282,7 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
 
     const uploadImage = async (imageFile: File): Promise<void> => {
         const mediaExists = draft.match(/!\[[^\]]*\]\([^)]*\)/g)
-        if (!mediaExists && mode === 'markdown') {
+        if (!mediaExists && mode === 'markdown' && autoSwitchMediaPostType) {
             setMode((mode = 'media'))
         }
 

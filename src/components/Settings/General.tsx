@@ -32,6 +32,7 @@ export const GeneralSettings = (): JSX.Element => {
     const [showEditorOnTopMobile, setShowEditorOnTopMobile] = usePreference('showEditorOnTopMobile')
     const [devMode, setDevMode] = usePreference('devMode')
     const [enableConcord, setEnableConcord] = usePreference('enableConcord')
+    const [autoSwitchMediaPostType, setAutoSwitchMediaPostType] = usePreference('autoSwitchMediaPostType')
 
     const tags = client?.user?.tag ? client.user.tag.split(',') : []
     const { enqueueSnackbar } = useSnackbar()
@@ -91,6 +92,17 @@ export const GeneralSettings = (): JSX.Element => {
                             />
                         }
                         label={t('showEditorOnTopMobile')}
+                    />
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={autoSwitchMediaPostType}
+                                onChange={(e) => {
+                                    setAutoSwitchMediaPostType(e.target.checked)
+                                }}
+                            />
+                        }
+                        label={'画像添付時に自動的に投稿タイプを切り替える'}
                     />
                     <FormControlLabel
                         control={
