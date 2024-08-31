@@ -162,6 +162,7 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
     const [medias, setMedias] = useState<WorldMedia[]>([])
 
     const reset = (): void => {
+        setMode('markdown')
         setDraft('')
         setEmojiDict({})
         setMedias([])
@@ -197,27 +198,30 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
 
         setSending((sending = true))
 
+        const emojis = Object.keys(emojiDict).length > 0 ? emojiDict : undefined
+        const profileOverride = selectedSubprofile ? { profileID: selectedSubprofile } : undefined
+
         let req
         switch (mode) {
             case 'plaintext':
                 req = client.createPlainTextCrnt(draft, dest, {
-                    profileOverride: { profileID: selectedSubprofile },
+                    profileOverride,
                     whisper
                 })
                 break
             case 'markdown':
                 req = client.createMarkdownCrnt(draft, dest, {
-                    emojis: emojiDict,
+                    emojis,
                     mentions,
-                    profileOverride: { profileID: selectedSubprofile },
+                    profileOverride,
                     whisper
                 })
                 break
             case 'media':
                 req = client.createMediaCrnt(draft, dest, {
-                    emojis: emojiDict,
+                    emojis,
                     medias,
-                    profileOverride: { profileID: selectedSubprofile },
+                    profileOverride,
                     whisper
                 })
                 break
@@ -227,8 +231,8 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                     break
                 }
                 req = props.actionTo.reply(dest, draft, {
-                    emojis: emojiDict,
-                    profileOverride: { profileID: selectedSubprofile },
+                    emojis,
+                    profileOverride,
                     whisper
                 })
                 break
@@ -238,8 +242,8 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                     break
                 }
                 req = props.actionTo.reroute(dest, draft, {
-                    emojis: emojiDict,
-                    profileOverride: { profileID: selectedSubprofile },
+                    emojis,
+                    profileOverride,
                     whisper
                 })
                 break

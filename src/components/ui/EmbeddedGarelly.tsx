@@ -13,11 +13,7 @@ export interface EmbeddedGalleryProps {
     medias: WorldMedia[]
 }
 
-export const EmbeddedGallery = (props: EmbeddedGalleryProps): JSX.Element => {
-    const mediaViewer = useMediaViewer()
-    const listRef = useRef<VListHandle>(null)
-
-    const [range, setRange] = useState({ start: 0, end: 0 })
+export const MediaCard = ({ media, onExpand }: { media: WorldMedia; onExpand?: () => void }): JSX.Element => {
     const [_, setForceUpdate] = useState(0)
 
     const setAllowedUrl = (url: string): void => {
@@ -37,6 +33,120 @@ export const EmbeddedGallery = (props: EmbeddedGalleryProps): JSX.Element => {
         return localStorage.getItem(key) === 'true'
     }
 
+    const isHidden = media.flag && !checkUrlAllowed(media.mediaURL)
+
+    return (
+        <Box
+            sx={{
+                height: '15vh',
+                aspectRatio: '4/3',
+                backgroundColor: '#111',
+                borderRadius: 1,
+                mx: 0.5,
+                position: 'relative',
+                overflow: 'hidden',
+                userSelect: 'none'
+            }}
+            onClick={() => {
+                if (isHidden) setAllowedUrl(media.mediaURL)
+                else onExpand?.()
+            }}
+        >
+            {!isHidden ? (
+                <>
+                    {media.mediaType.startsWith('image') && (
+                        <img
+                            src={media.mediaURL}
+                            style={{
+                                display: isHidden ? 'none' : 'block',
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                cursor: 'pointer'
+                            }}
+                        />
+                    )}
+
+                    {media.mediaType.startsWith('video') && (
+                        <>
+                            <video
+                                controls
+                                style={{
+                                    display: isHidden ? 'none' : 'block',
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'contain',
+                                    cursor: 'pointer'
+                                }}
+                                muted
+                            >
+                                <source src={media.mediaURL} type={media.mediaType} />
+                            </video>
+                        </>
+                    )}
+
+                    {media.flag && (
+                        <VisibilityOffIcon
+                            sx={{
+                                position: 'absolute',
+                                bottom: 0,
+                                right: 0,
+                                color: 'rgba(255, 255, 255, 0.5)'
+                            }}
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                resetAllowedUrls(media.mediaURL)
+                            }}
+                        />
+                    )}
+                </>
+            ) : (
+                <>
+                    {media.blurhash && (
+                        <Box
+                            sx={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%'
+                            }}
+                        >
+                            <Blurhash
+                                hash={media.blurhash}
+                                height={'100%'}
+                                width={'100%'}
+                                punch={1}
+                                resolutionX={32}
+                                resolutionY={32}
+                            />
+                        </Box>
+                    )}
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            color: 'rgba(255, 255, 255, 0.5)',
+                            textAlign: 'center'
+                        }}
+                    >
+                        <Typography variant="h3">{media.flag}</Typography>
+                        <Typography variant="caption">Click to reveal</Typography>
+                    </Box>
+                </>
+            )}
+        </Box>
+    )
+}
+
+export const EmbeddedGallery = (props: EmbeddedGalleryProps): JSX.Element => {
+    const listRef = useRef<VListHandle>(null)
+    const mediaViewer = useMediaViewer()
+
+    const range = useRef({ start: 0, end: 0 })
+
     return (
         <Box position="relative">
             <VList
@@ -47,129 +157,62 @@ export const EmbeddedGallery = (props: EmbeddedGalleryProps): JSX.Element => {
                 }}
                 ref={listRef}
                 onRangeChange={(start, end) => {
-                    setRange({ start, end })
+                    range.current.start = start
+                    range.current.end = end
                 }}
             >
                 {props.medias.map((media, index) => {
-                    const isHidden = media.flag && !checkUrlAllowed(media.mediaURL)
                     return (
-                        <Box
+                        <MediaCard
                             key={index}
-                            onClick={() => {
-                                if (isHidden) setAllowedUrl(media.mediaURL)
-                                else mediaViewer.openMedias(props.medias, index)
+                            media={media}
+                            onExpand={() => {
+                                mediaViewer.openMedias(props.medias, index)
                             }}
-                            sx={{
-                                height: '15vh',
-                                aspectRatio: '4/3',
-                                backgroundImage: isHidden ? 'unset' : `url(${media.mediaURL})`,
-                                backgroundColor: isHidden ? 'rgba(0, 0, 0, 0.3)' : 'unset',
-                                backgroundSize: 'cover',
-                                backgroundPosition: 'center',
-                                cursor: 'pointer',
-                                borderRadius: 1,
-                                mx: 0.5,
-                                position: 'relative',
-                                overflow: 'hidden'
-                            }}
-                        >
-                            {isHidden && media.blurhash && (
-                                <Box
-                                    sx={{
-                                        position: 'absolute',
-                                        top: 0,
-                                        left: 0,
-                                        width: '100%',
-                                        height: '100%'
-                                    }}
-                                >
-                                    <Blurhash
-                                        hash={media.blurhash}
-                                        height={'100%'}
-                                        width={'100%'}
-                                        punch={1}
-                                        resolutionX={32}
-                                        resolutionY={32}
-                                    />
-                                </Box>
-                            )}
-                            {isHidden && (
-                                <Box
-                                    sx={{
-                                        position: 'absolute',
-                                        top: '50%',
-                                        left: '50%',
-                                        transform: 'translate(-50%, -50%)',
-                                        color: 'rgba(255, 255, 255, 0.5)',
-                                        textAlign: 'center'
-                                    }}
-                                >
-                                    <Typography variant="h3">{media.flag}</Typography>
-                                    <Typography variant="caption">Click to reveal</Typography>
-                                </Box>
-                            )}
-                            {media.flag && !isHidden && (
-                                <VisibilityOffIcon
-                                    sx={{
-                                        position: 'absolute',
-                                        bottom: 0,
-                                        right: 0,
-                                        color: 'rgba(255, 255, 255, 0.5)'
-                                    }}
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        resetAllowedUrls(media.mediaURL)
-                                    }}
-                                />
-                            )}
-                        </Box>
+                        />
                     )
                 })}
             </VList>
-            {range.start !== range.end && (
-                <>
-                    <IconButton
-                        onClick={() => {
-                            listRef.current?.scrollToIndex(range.start, {
-                                align: 'center',
-                                smooth: true
-                            })
-                        }}
-                        sx={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: 0,
-                            transform: 'translateY(-50%)',
-                            zIndex: 1,
-                            '&:hover': {
-                                backgroundColor: 'rgba(255, 255, 255, 0.3)'
-                            }
-                        }}
-                    >
-                        <KeyboardArrowLeftIcon />
-                    </IconButton>
-                    <IconButton
-                        onClick={() => {
-                            listRef.current?.scrollToIndex(range.end, {
-                                align: 'center',
-                                smooth: true
-                            })
-                        }}
-                        sx={{
-                            position: 'absolute',
-                            top: '50%',
-                            right: 0,
-                            transform: 'translateY(-50%)',
-                            zIndex: 1,
-                            '&:hover': {
-                                backgroundColor: 'rgba(255, 255, 255, 0.3)'
-                            }
-                        }}
-                    >
-                        <KeyboardArrowRightIcon />
-                    </IconButton>
-                </>
-            )}
+            <IconButton
+                onClick={() => {
+                    listRef.current?.scrollToIndex(range.current.start, {
+                        align: 'center',
+                        smooth: true
+                    })
+                }}
+                sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: 0,
+                    transform: 'translateY(-50%)',
+                    zIndex: 1,
+                    '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.3)'
+                    }
+                }}
+            >
+                <KeyboardArrowLeftIcon />
+            </IconButton>
+            <IconButton
+                onClick={() => {
+                    listRef.current?.scrollToIndex(range.current.end, {
+                        align: 'center',
+                        smooth: true
+                    })
+                }}
+                sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    right: 0,
+                    transform: 'translateY(-50%)',
+                    zIndex: 1,
+                    '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.3)'
+                    }
+                }}
+            >
+                <KeyboardArrowRightIcon />
+            </IconButton>
         </Box>
     )
 }
