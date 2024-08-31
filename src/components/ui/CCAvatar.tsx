@@ -8,7 +8,6 @@ export interface CCAvatarProps {
     avatarURL?: string
     avatarOverride?: string
     identiconSource?: string
-    onBadgeClick?: () => void
     isLoading?: boolean
 }
 
