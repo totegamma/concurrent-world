@@ -737,7 +737,7 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                                         setModeMenuAnchor(null)
 
                                         if (mode === 'media' && newMode !== 'media') {
-                                            if (newMode !== 'plaintext') {
+                                            if (newMode !== 'plaintext' && medias.length > 0) {
                                                 const mediaLiteral = medias.map((media) => {
                                                     if (media.mediaType.startsWith('image')) {
                                                         return `![image](${media.mediaURL})`
