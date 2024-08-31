@@ -97,7 +97,6 @@ export const EditorModalProvider = (props: EditorModalProps): JSX.Element => {
                     <MessageContainer simple messageID={openOpts.target.id} messageOwner={openOpts.target.author} />
                 </Box>
             ) : undefined,
-            allowEmpty: openOpts?.mode === 'reroute',
             onPost: () => {
                 setPostProps(null)
             },

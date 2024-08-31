@@ -78,7 +78,6 @@ export interface CCPostEditorProps {
     mobile?: boolean
     streamPickerInitial: Array<Timeline<CommunityTimelineSchema>>
     streamPickerOptions: Array<Timeline<CommunityTimelineSchema>>
-    allowEmpty?: boolean
     placeholder?: string
     sx?: SxProps
     value?: string
@@ -175,7 +174,7 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
     const whisper = participants.map((p) => p.ccid)
 
     const post = (postHome: boolean): void => {
-        if (!props.allowEmpty && (draft.length === 0 || draft.trim().length === 0) && mode !== 'media') {
+        if ((draft.length === 0 || draft.trim().length === 0) && !(mode === 'media' || mode === 'reroute')) {
             enqueueSnackbar('Message must not be empty!', { variant: 'error' })
             return
         }
@@ -472,57 +471,61 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                         </CCIconButton>
                     </Tooltip>
                 </Box>
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flexDirection: { xs: 'column', md: 'row' },
-                        alignItems: 'start',
-                        px: 1,
-                        flex: 1,
-                        cursor: 'text',
-                        overflowY: 'auto'
-                    }}
-                    onClick={() => {
-                        if (textInputRef.current) {
-                            textInputRef.current.focus()
-                        }
-                    }}
-                >
-                    <InputBase
-                        multiline
-                        fullWidth
-                        value={draft}
-                        autoFocus={props.autoFocus}
-                        placeholder={props.placeholder ?? t('placeholder')}
-                        minRows={props.minRows}
-                        maxRows={props.maxRows}
-                        onChange={(e) => {
-                            setDraft(e.target.value)
-                        }}
-                        onPaste={(e) => {
-                            handlePasteImage(e)
-                        }}
+                {mode !== 'reroute' ? (
+                    <Box
                         sx={{
-                            width: 1,
-                            fontSize: '0.95rem'
+                            display: 'flex',
+                            flexDirection: { xs: 'column', md: 'row' },
+                            alignItems: 'start',
+                            px: 1,
+                            flex: 1,
+                            cursor: 'text',
+                            overflowY: 'auto'
                         }}
-                        onKeyDown={(e: any) => {
-                            if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
-                                setHoldCtrlShift(true)
-                            }
-                            if (draft.length === 0 || draft.trim().length === 0) return
-                            if (e.key === 'Enter' && (e.ctrlKey === true || e.metaKey === true) && !sending) {
-                                post(postHome)
-                            }
-                        }}
-                        onKeyUp={(e: any) => {
-                            if (e.key === 'Shift' || e.key === 'Control') {
-                                setHoldCtrlShift(false)
+                        onClick={() => {
+                            if (textInputRef.current) {
+                                textInputRef.current.focus()
                             }
                         }}
-                        inputRef={textInputRef}
-                    />
-                </Box>
+                    >
+                        <InputBase
+                            multiline
+                            fullWidth
+                            value={draft}
+                            autoFocus={props.autoFocus}
+                            placeholder={props.placeholder ?? t('placeholder')}
+                            minRows={props.minRows}
+                            maxRows={props.maxRows}
+                            onChange={(e) => {
+                                setDraft(e.target.value)
+                            }}
+                            onPaste={(e) => {
+                                handlePasteImage(e)
+                            }}
+                            sx={{
+                                width: 1,
+                                fontSize: '0.95rem'
+                            }}
+                            onKeyDown={(e: any) => {
+                                if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
+                                    setHoldCtrlShift(true)
+                                }
+                                if (draft.length === 0 || draft.trim().length === 0) return
+                                if (e.key === 'Enter' && (e.ctrlKey === true || e.metaKey === true) && !sending) {
+                                    post(postHome)
+                                }
+                            }}
+                            onKeyUp={(e: any) => {
+                                if (e.key === 'Shift' || e.key === 'Control') {
+                                    setHoldCtrlShift(false)
+                                }
+                            }}
+                            inputRef={textInputRef}
+                        />
+                    </Box>
+                ) : (
+                    <Box p={1} />
+                )}
 
                 <Box display="flex" gap={1}>
                     {medias.map((media, i) => (
@@ -657,8 +660,8 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                             post={() => {
                                 post(postHome)
                             }}
-                            disableMedia={mode === 'plaintext'}
-                            disableEmoji={mode === 'plaintext'}
+                            disableMedia={mode === 'plaintext' || mode === 'reroute'}
+                            disableEmoji={mode === 'plaintext' || mode === 'reroute'}
                             sending={sending}
                             draft={draft}
                             setDraft={setDraft}
