@@ -102,7 +102,7 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
     const [selectedSubprofile, setSelectedSubprofile] = useState<string | undefined>(undefined)
 
     // mode handling
-    const [mode, setMode] = useState<EditorMode>('markdown')
+    let [mode, setMode] = useState<EditorMode>('markdown')
     const [modeMenuAnchor, setModeMenuAnchor] = useState<null | HTMLElement>(null)
     useEffect(() => {
         if (props.mode) {
@@ -279,6 +279,11 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
     }
 
     const uploadImage = async (imageFile: File): Promise<void> => {
+        const mediaExists = draft.match(/!\[[^\]]*\]\([^)]*\)/g)
+        if (!mediaExists && mode === 'markdown') {
+            setMode((mode = 'media'))
+        }
+
         if (mode === 'media') {
             const notif = enqueueSnackbar('Uploading...', { persist: true })
             const result = await uploadFile(imageFile)
@@ -723,8 +728,26 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                             >
                                 <CCIconButton
                                     onClick={() => {
-                                        setMode(key as EditorMode)
+                                        const newMode = key as EditorMode
+                                        setMode(newMode)
                                         setModeMenuAnchor(null)
+
+                                        if (mode === 'media' && newMode !== 'media') {
+                                            if (newMode !== 'plaintext') {
+                                                const mediaLiteral = medias.map((media) => {
+                                                    if (media.mediaType.startsWith('image')) {
+                                                        return `![image](${media.mediaURL})`
+                                                    } else if (media.mediaType.startsWith('video')) {
+                                                        return `<video controls><source src="${media.mediaURL}#t=0.1"></video>`
+                                                    }
+                                                    return ''
+                                                })
+                                                setDraft((draft) => {
+                                                    return draft + '\n' + mediaLiteral.join('\n')
+                                                })
+                                            }
+                                            setMedias([])
+                                        }
                                     }}
                                 >
                                     {ModeSets[key as EditorMode].icon}
