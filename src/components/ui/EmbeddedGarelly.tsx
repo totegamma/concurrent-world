@@ -44,7 +44,12 @@ export const MediaCard = ({ media, onExpand }: { media: WorldMedia; onExpand?: (
                 borderRadius: 1,
                 mx: 0.5,
                 position: 'relative',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                userSelect: 'none'
+            }}
+            onClick={() => {
+                if (isHidden) setAllowedUrl(media.mediaURL)
+                else onExpand?.()
             }}
         >
             {!isHidden ? (
@@ -58,10 +63,6 @@ export const MediaCard = ({ media, onExpand }: { media: WorldMedia; onExpand?: (
                                 height: '100%',
                                 objectFit: 'cover',
                                 cursor: 'pointer'
-                            }}
-                            onClick={() => {
-                                if (isHidden) setAllowedUrl(media.mediaURL)
-                                else onExpand?.()
                             }}
                         />
                     )}
