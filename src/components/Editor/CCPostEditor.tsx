@@ -293,9 +293,10 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                 let blurhash: string | undefined
                 const url = URL.createObjectURL(imageFile)
                 const img = await loadImage(url)
-                const data = getImageData(img, img.width, img.height)
+                const clampedSize = getClampedSize(img.width, img.height, 64)
+                const data = getImageData(img, clampedSize.width, clampedSize.height)
                 if (data) {
-                    blurhash = encode(data.data, img.width, img.height, 4, 4)
+                    blurhash = encode(data.data, clampedSize.width, clampedSize.height, 4, 4)
                 }
 
                 setMedias((medias) => [
@@ -550,7 +551,8 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                             }}
                         >
                             <CCIconButton
-                                onClick={() => {
+                                onClick={(e) => {
+                                    e.stopPropagation()
                                     setMedias((medias) => medias.filter((_, j) => i !== j))
                                 }}
                                 sx={{
@@ -842,5 +844,17 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
         </Box>
     )
 })
+
+const getClampedSize = (width: number, height: number, max: number): { width: number; height: number } => {
+    if (width >= height && width > max) {
+        return { width: max, height: Math.round((height / width) * max) }
+    }
+
+    if (height > width && height > max) {
+        return { width: Math.round((width / height) * max), height: max }
+    }
+
+    return { width, height }
+}
 
 CCPostEditor.displayName = 'CCEditor'
