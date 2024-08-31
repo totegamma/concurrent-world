@@ -25,6 +25,7 @@ export interface Preference {
     customThemes: Record<string, DeepPartial<ConcurrentTheme>>
     hideDisabledSubKey: boolean
     enableConcord: boolean
+    autoSwitchMediaPostType: boolean
 }
 
 export const defaultPreference: Preference = {
@@ -51,7 +52,8 @@ export const defaultPreference: Preference = {
     },
     customThemes: {},
     hideDisabledSubKey: false,
-    enableConcord: false
+    enableConcord: false,
+    autoSwitchMediaPostType: true
 }
 
 interface PreferenceState {

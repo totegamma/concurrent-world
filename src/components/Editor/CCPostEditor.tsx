@@ -45,6 +45,7 @@ import ReplyIcon from '@mui/icons-material/Reply'
 import RepeatIcon from '@mui/icons-material/Repeat'
 import CancelIcon from '@mui/icons-material/Cancel'
 import FeedbackIcon from '@mui/icons-material/Feedback'
+import { usePreference } from '../../context/PreferenceContext'
 
 const ModeSets = {
     plaintext: {
@@ -78,7 +79,6 @@ export interface CCPostEditorProps {
     mobile?: boolean
     streamPickerInitial: Array<Timeline<CommunityTimelineSchema>>
     streamPickerOptions: Array<Timeline<CommunityTimelineSchema>>
-    allowEmpty?: boolean
     placeholder?: string
     sx?: SxProps
     value?: string
@@ -97,13 +97,14 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
     const { t: et } = useTranslation('', { keyPrefix: 'ui.postButton' })
 
     const [dragging, setDragging] = useState<boolean>(false)
+    const [autoSwitchMediaPostType] = usePreference('autoSwitchMediaPostType')
 
     const textInputRef = useRef<HTMLInputElement>(null)
     let [sending, setSending] = useState<boolean>(false)
     const [selectedSubprofile, setSelectedSubprofile] = useState<string | undefined>(undefined)
 
     // mode handling
-    const [mode, setMode] = useState<EditorMode>('markdown')
+    let [mode, setMode] = useState<EditorMode>('markdown')
     const [modeMenuAnchor, setModeMenuAnchor] = useState<null | HTMLElement>(null)
     useEffect(() => {
         if (props.mode) {
@@ -175,7 +176,7 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
     const whisper = participants.map((p) => p.ccid)
 
     const post = (postHome: boolean): void => {
-        if (!props.allowEmpty && (draft.length === 0 || draft.trim().length === 0) && mode !== 'media') {
+        if ((draft.length === 0 || draft.trim().length === 0) && !(mode === 'media' || mode === 'reroute')) {
             enqueueSnackbar('Message must not be empty!', { variant: 'error' })
             return
         }
@@ -280,6 +281,11 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
     }
 
     const uploadImage = async (imageFile: File): Promise<void> => {
+        const mediaExists = draft.match(/!\[[^\]]*\]\([^)]*\)/g)
+        if (!mediaExists && mode === 'markdown' && autoSwitchMediaPostType) {
+            setMode((mode = 'media'))
+        }
+
         if (mode === 'media') {
             const notif = enqueueSnackbar('Uploading...', { persist: true })
             const result = await uploadFile(imageFile)
@@ -289,9 +295,10 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                 let blurhash: string | undefined
                 const url = URL.createObjectURL(imageFile)
                 const img = await loadImage(url)
-                const data = getImageData(img, img.width, img.height)
+                const clampedSize = getClampedSize(img.width, img.height, 64)
+                const data = getImageData(img, clampedSize.width, clampedSize.height)
                 if (data) {
-                    blurhash = encode(data.data, img.width, img.height, 4, 4)
+                    blurhash = encode(data.data, clampedSize.width, clampedSize.height, 4, 4)
                 }
 
                 setMedias((medias) => [
@@ -472,57 +479,61 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                         </CCIconButton>
                     </Tooltip>
                 </Box>
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flexDirection: { xs: 'column', md: 'row' },
-                        alignItems: 'start',
-                        px: 1,
-                        flex: 1,
-                        cursor: 'text',
-                        overflowY: 'auto'
-                    }}
-                    onClick={() => {
-                        if (textInputRef.current) {
-                            textInputRef.current.focus()
-                        }
-                    }}
-                >
-                    <InputBase
-                        multiline
-                        fullWidth
-                        value={draft}
-                        autoFocus={props.autoFocus}
-                        placeholder={props.placeholder ?? t('placeholder')}
-                        minRows={props.minRows}
-                        maxRows={props.maxRows}
-                        onChange={(e) => {
-                            setDraft(e.target.value)
-                        }}
-                        onPaste={(e) => {
-                            handlePasteImage(e)
-                        }}
+                {mode !== 'reroute' ? (
+                    <Box
                         sx={{
-                            width: 1,
-                            fontSize: '0.95rem'
+                            display: 'flex',
+                            flexDirection: { xs: 'column', md: 'row' },
+                            alignItems: 'start',
+                            px: 1,
+                            flex: 1,
+                            cursor: 'text',
+                            overflowY: 'auto'
                         }}
-                        onKeyDown={(e: any) => {
-                            if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
-                                setHoldCtrlShift(true)
-                            }
-                            if (draft.length === 0 || draft.trim().length === 0) return
-                            if (e.key === 'Enter' && (e.ctrlKey === true || e.metaKey === true) && !sending) {
-                                post(postHome)
-                            }
-                        }}
-                        onKeyUp={(e: any) => {
-                            if (e.key === 'Shift' || e.key === 'Control') {
-                                setHoldCtrlShift(false)
+                        onClick={() => {
+                            if (textInputRef.current) {
+                                textInputRef.current.focus()
                             }
                         }}
-                        inputRef={textInputRef}
-                    />
-                </Box>
+                    >
+                        <InputBase
+                            multiline
+                            fullWidth
+                            value={draft}
+                            autoFocus={props.autoFocus}
+                            placeholder={props.placeholder ?? t('placeholder')}
+                            minRows={props.minRows}
+                            maxRows={props.maxRows}
+                            onChange={(e) => {
+                                setDraft(e.target.value)
+                            }}
+                            onPaste={(e) => {
+                                handlePasteImage(e)
+                            }}
+                            sx={{
+                                width: 1,
+                                fontSize: '0.95rem'
+                            }}
+                            onKeyDown={(e: any) => {
+                                if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
+                                    setHoldCtrlShift(true)
+                                }
+                                if (draft.length === 0 || draft.trim().length === 0) return
+                                if (e.key === 'Enter' && (e.ctrlKey === true || e.metaKey === true) && !sending) {
+                                    post(postHome)
+                                }
+                            }}
+                            onKeyUp={(e: any) => {
+                                if (e.key === 'Shift' || e.key === 'Control') {
+                                    setHoldCtrlShift(false)
+                                }
+                            }}
+                            inputRef={textInputRef}
+                        />
+                    </Box>
+                ) : (
+                    <Box p={1} />
+                )}
 
                 <Box display="flex" gap={1}>
                     {medias.map((media, i) => (
@@ -542,7 +553,8 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                             }}
                         >
                             <CCIconButton
-                                onClick={() => {
+                                onClick={(e) => {
+                                    e.stopPropagation()
                                     setMedias((medias) => medias.filter((_, j) => i !== j))
                                 }}
                                 sx={{
@@ -657,8 +669,8 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                             post={() => {
                                 post(postHome)
                             }}
-                            disableMedia={mode === 'plaintext'}
-                            disableEmoji={mode === 'plaintext'}
+                            disableMedia={mode === 'plaintext' || mode === 'reroute'}
+                            disableEmoji={mode === 'plaintext' || mode === 'reroute'}
                             sending={sending}
                             draft={draft}
                             setDraft={setDraft}
@@ -720,8 +732,26 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                             >
                                 <CCIconButton
                                     onClick={() => {
-                                        setMode(key as EditorMode)
+                                        const newMode = key as EditorMode
+                                        setMode(newMode)
                                         setModeMenuAnchor(null)
+
+                                        if (mode === 'media' && newMode !== 'media') {
+                                            if (newMode !== 'plaintext' && medias.length > 0) {
+                                                const mediaLiteral = medias.map((media) => {
+                                                    if (media.mediaType.startsWith('image')) {
+                                                        return `![image](${media.mediaURL})`
+                                                    } else if (media.mediaType.startsWith('video')) {
+                                                        return `<video controls><source src="${media.mediaURL}#t=0.1"></video>`
+                                                    }
+                                                    return ''
+                                                })
+                                                setDraft((draft) => {
+                                                    return draft + '\n' + mediaLiteral.join('\n')
+                                                })
+                                            }
+                                            setMedias([])
+                                        }
                                     }}
                                 >
                                     {ModeSets[key as EditorMode].icon}
@@ -816,5 +846,17 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
         </Box>
     )
 })
+
+const getClampedSize = (width: number, height: number, max: number): { width: number; height: number } => {
+    if (width >= height && width > max) {
+        return { width: max, height: Math.round((height / width) * max) }
+    }
+
+    if (height > width && height > max) {
+        return { width: Math.round((width / height) * max), height: max }
+    }
+
+    return { width, height }
+}
 
 CCPostEditor.displayName = 'CCEditor'

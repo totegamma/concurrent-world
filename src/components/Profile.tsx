@@ -20,6 +20,7 @@ import { enqueueSnackbar } from 'notistack'
 import { useMediaViewer } from '../context/MediaViewer'
 import IosShareIcon from '@mui/icons-material/IosShare'
 import { CCIconButton } from './ui/CCIconButton'
+import ReplayIcon from '@mui/icons-material/Replay'
 
 export interface ProfileProps {
     user?: User
@@ -110,7 +111,8 @@ export function Profile(props: ProfileProps): JSX.Element {
                 }}
                 onClick={() => {
                     if (props.user) {
-                        navigator.clipboard.writeText('https://concrnt.world/' + props.user.ccid)
+                        const id = props.user.alias ?? props.user.ccid
+                        navigator.clipboard.writeText('https://concrnt.world/' + id)
                         enqueueSnackbar('リンクをコピーしました', { variant: 'success' })
                     }
                 }}
@@ -129,6 +131,13 @@ export function Profile(props: ProfileProps): JSX.Element {
                     top: '90px',
                     p: 1
                 }}
+                onClick={() => {
+                    if (subProfile) {
+                        subProfile.document.body.avatar && mediaViewer.openSingle(subProfile.document.body.avatar)
+                    } else {
+                        props.user?.profile?.avatar && mediaViewer.openSingle(props.user?.profile?.avatar)
+                    }
+                }}
             >
                 <CCAvatar
                     isLoading={!props.user}
@@ -140,14 +149,31 @@ export function Profile(props: ProfileProps): JSX.Element {
                         width: '100px',
                         height: '100px'
                     }}
-                    onBadgeClick={() => {
-                        if (props.overrideSubProfileID) {
-                            props.onSubProfileClicked?.('')
-                        } else {
-                            props.user?.profile?.avatar && mediaViewer.openSingle(props.user?.profile?.avatar)
-                        }
-                    }}
                 />
+                {props.overrideSubProfileID && (
+                    <CCIconButton
+                        sx={{
+                            position: 'absolute',
+                            right: 0,
+                            bottom: 0,
+                            padding: 0,
+                            backgroundColor: alpha(theme.palette.primary.main, 0.5),
+                            '&:hover': {
+                                backgroundColor: alpha(theme.palette.primary.main, 0.7)
+                            }
+                        }}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            props.onSubProfileClicked?.('')
+                        }}
+                    >
+                        <ReplayIcon
+                            sx={{
+                                color: theme.palette.primary.contrastText
+                            }}
+                        />
+                    </CCIconButton>
+                )}
             </Box>
 
             <Box
