@@ -145,7 +145,7 @@ export const EmbeddedGallery = (props: EmbeddedGalleryProps): JSX.Element => {
     const listRef = useRef<VListHandle>(null)
     const mediaViewer = useMediaViewer()
 
-    const [range, setRange] = useState({ start: 0, end: 0 })
+    const range = useRef({ start: 0, end: 0 })
 
     return (
         <Box position="relative">
@@ -157,7 +157,8 @@ export const EmbeddedGallery = (props: EmbeddedGalleryProps): JSX.Element => {
                 }}
                 ref={listRef}
                 onRangeChange={(start, end) => {
-                    setRange({ start, end })
+                    range.current.start = start
+                    range.current.end = end
                 }}
             >
                 {props.medias.map((media, index) => {
@@ -172,50 +173,46 @@ export const EmbeddedGallery = (props: EmbeddedGalleryProps): JSX.Element => {
                     )
                 })}
             </VList>
-            {range.start !== range.end && (
-                <>
-                    <IconButton
-                        onClick={() => {
-                            listRef.current?.scrollToIndex(range.start, {
-                                align: 'center',
-                                smooth: true
-                            })
-                        }}
-                        sx={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: 0,
-                            transform: 'translateY(-50%)',
-                            zIndex: 1,
-                            '&:hover': {
-                                backgroundColor: 'rgba(255, 255, 255, 0.3)'
-                            }
-                        }}
-                    >
-                        <KeyboardArrowLeftIcon />
-                    </IconButton>
-                    <IconButton
-                        onClick={() => {
-                            listRef.current?.scrollToIndex(range.end, {
-                                align: 'center',
-                                smooth: true
-                            })
-                        }}
-                        sx={{
-                            position: 'absolute',
-                            top: '50%',
-                            right: 0,
-                            transform: 'translateY(-50%)',
-                            zIndex: 1,
-                            '&:hover': {
-                                backgroundColor: 'rgba(255, 255, 255, 0.3)'
-                            }
-                        }}
-                    >
-                        <KeyboardArrowRightIcon />
-                    </IconButton>
-                </>
-            )}
+            <IconButton
+                onClick={() => {
+                    listRef.current?.scrollToIndex(range.current.start, {
+                        align: 'center',
+                        smooth: true
+                    })
+                }}
+                sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: 0,
+                    transform: 'translateY(-50%)',
+                    zIndex: 1,
+                    '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.3)'
+                    }
+                }}
+            >
+                <KeyboardArrowLeftIcon />
+            </IconButton>
+            <IconButton
+                onClick={() => {
+                    listRef.current?.scrollToIndex(range.current.end, {
+                        align: 'center',
+                        smooth: true
+                    })
+                }}
+                sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    right: 0,
+                    transform: 'translateY(-50%)',
+                    zIndex: 1,
+                    '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.3)'
+                    }
+                }}
+            >
+                <KeyboardArrowRightIcon />
+            </IconButton>
         </Box>
     )
 }
