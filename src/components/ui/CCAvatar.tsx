@@ -1,4 +1,4 @@
-import { Avatar, Badge, Skeleton, type SxProps } from '@mui/material'
+import { Avatar, Skeleton, type SxProps } from '@mui/material'
 import BoringAvatar from 'boring-avatars'
 
 export interface CCAvatarProps {
@@ -18,37 +18,16 @@ export const CCAvatar = (props: CCAvatarProps): JSX.Element => {
     }
 
     return (
-        <Badge
-            overlap="circular"
-            anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right'
+        <Avatar
+            alt={props.alt}
+            src={props.avatarOverride ?? props.avatarURL}
+            sx={{
+                ...props.sx,
+                borderRadius: props.circle ? undefined : 1
             }}
-            badgeContent={
-                props.avatarOverride && (
-                    <CCAvatar
-                        sx={{
-                            width: 24,
-                            height: 24
-                        }}
-                        identiconSource={props.identiconSource}
-                        avatarURL={props.avatarURL}
-                    />
-                )
-            }
-            onClick={() => props.onBadgeClick?.()}
+            variant={props.circle ? 'circular' : 'square'}
         >
-            <Avatar
-                alt={props.alt}
-                src={props.avatarOverride ?? props.avatarURL}
-                sx={{
-                    ...props.sx,
-                    borderRadius: props.circle ? undefined : 1
-                }}
-                variant={props.circle ? 'circular' : 'square'}
-            >
-                <BoringAvatar square={!props.circle} name={props.identiconSource} variant="beam" size={1000} />
-            </Avatar>
-        </Badge>
+            <BoringAvatar square={!props.circle} name={props.identiconSource} variant="beam" size={1000} />
+        </Avatar>
     )
 }

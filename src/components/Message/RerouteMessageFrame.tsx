@@ -14,6 +14,7 @@ import { useClient } from '../../context/ClientContext'
 import { useInspector } from '../../context/Inspector'
 import { MarkdownRendererLite } from '../ui/MarkdownRendererLite'
 import { MarkdownRenderer } from '../ui/MarkdownRenderer'
+import { FaTheaterMasks } from 'react-icons/fa'
 
 export interface RerouteMessageFrameProp {
     message: Message<RerouteMessageSchema>
@@ -61,7 +62,7 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
                         />
                     </IconButton>
                 </Box>
-                <Typography
+                <Box
                     sx={{
                         fontSize: {
                             xs: '0.9rem',
@@ -69,22 +70,17 @@ export const RerouteMessageFrame = (props: RerouteMessageFrameProp): JSX.Element
                         },
                         color: 'text.disabled',
                         fontWeight: 700,
-                        flex: 1
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 0.5
                     }}
                 >
                     {username}
-                    {profileOverride?.avatar && (
-                        <CCAvatar
-                            avatarURL={props.message.authorUser?.profile?.avatar}
-                            identiconSource={props.message.author}
-                            sx={{
-                                width: { xs: '12px', sm: '18px' },
-                                height: { xs: '12px', sm: '18px' }
-                            }}
-                        />
-                    )}{' '}
-                    rerouted {props.message.document.body.body && 'with comment:'}
-                </Typography>
+                    {profileOverride?.avatar && <FaTheaterMasks />} rerouted{' '}
+                    {props.message.document.body.body && 'with comment:'}
+                </Box>
                 <Box display="flex" gap={0.5}>
                     <IconButton
                         sx={{

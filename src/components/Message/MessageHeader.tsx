@@ -10,6 +10,7 @@ import { useClient } from '../../context/ClientContext'
 import { ConcordBadge } from '../ui/Badge'
 import LockIcon from '@mui/icons-material/Lock'
 import { CCUserChip } from '../ui/CCUserChip'
+import { FaTheaterMasks } from 'react-icons/fa'
 
 export interface MessageHeaderProps {
     message: Message<MarkdownMessageSchema | ReplyMessageSchema>
@@ -56,6 +57,8 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                         props.message.authorUser?.profile?.username ||
                         'anonymous'}
                 </Typography>
+                {props.message.document.body.profileOverride &&
+                    Object.keys(props.message.document.body.profileOverride).length > 0 && <FaTheaterMasks />}{' '}
                 {myAck && (
                     <Tooltip arrow title="Ackしています" placement="top">
                         <CheckCircleIcon
