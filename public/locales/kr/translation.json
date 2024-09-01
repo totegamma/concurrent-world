@@ -1,5 +1,14 @@
 {
-    "test": "Test",
+    "test": "테스트",
+    "common": {
+        "watch": "보기",
+        "watching": "보는중",
+        "unwatch": "보지않음",
+        "follow": "팔로우",
+        "following": "팔로잉",
+        "unfollow": "언팔로우",
+        "followers": "팔로워"
+    },
     "pages": {
         "home": {
             "title": "홈"
@@ -8,53 +17,103 @@
             "title": "알림"
         },
         "associations": {
+            "title": "Associations"
         },
         "contacts": {
             "title": "연락하기"
         },
         "explore": {
-            "title": "탐험하기"
+            "title": "탐험하기",
+            "domains": "도메인",
+            "community": "커뮤니티",
+            "createNew": "신규 생성",
+            "createNewCommunity": {
+                "title": "신규 커뮤니티 생성",
+                "desc1": "Create a new stream on ",
+                "desc2": " 팔로잉 새팅과 함께."
+            }
         },
         "devtool": {
-            "title": "개발자 도구"
+            "title": "개발자도구"
         },
         "settings": {
-            "title": "설정"
+            "title": "설정",
+            "actions": {
+                "title": "액션",
+                "clearCache": "캐시 지우기",
+                "forceReload": "강제 리로드",
+                "logout": "로그아웃",
+                "areYouSure": "확실해?",
+                "logoutWarn": "비밀코드 없이는 다시 로그인 못해"
+            }
+        },
+        "lists": {
+            "title": "리스트"
         }
     },
     "time": {
-        "secondsBefore": "초",
-        "minutesBefore": "분",
-        "hoursBefore": "시"
+        "seconds": "초",
+        "minutes": "분",
+        "hours": "시",
+        "before": "이전",
+        "after": "이후",
+        "separator": " ",
+        "now": "방금"
     },
     "ui": {
+        "postButton": {
+            "plaintext": "게시",
+            "markdown": "게시",
+            "media": "게시",
+            "reply": "답글",
+            "reroute": "Reroute"
+        },
         "profileEditor": {
             "update": "업데이트",
-            "updateSuccess": "업데이트 완료",
+            "updateSuccess": "성공적으로 업데이트되었어",
             "updateFailed": "업데이트 실패",
-            "createNew": "새로 만들기"
+            "createNew": "생성"
         },
         "draft": {
-            "placeholder": "오늘 무슨 일 있니??",
+            "placeholder": "오늘 무슨 일 있니?",
             "attachImage": "이미지 붙여넣기",
-            "cantAttachImage": "살정에서 Imgur 클라이언트 ID를 완료하세요.",
-            "preview": "프리뷰",
-            "openPreview": "프리뷰 열기",
-            "closePreview": "프리뷰 닫기",
-            "emoji": "이모지들",
-            "clearDraft": "Clear draft",
-            "postToHome": "홈에도 올리기",
-            "noPostToHome": "홈에는 올리지 않기"
+            "cantAttachImage": "살정에서 Imgur 클라이언트 ID를 완료해야해.",
+            "preview": "미리보기",
+            "openPreview": "미리보기 열기",
+            "closePreview": "미리보기 닫기",
+            "emoji": "이모지",
+            "clearDraft": "작성 중인 글 지우기",
+            "postToHome": "홈스트림으로도 게시하기",
+            "noPostToHome": "홈스트림엔 게시하지 않기",
+            "current": "게시",
+            "whisper": "Whisper"
+        },
+        "secret": {
+            "clickToReveal": "클릭하여 보기",
+            "warn": "누가 너의 화면을 보고있는건 아니지?",
+            "copy": "복사"
+        },
+        "listSettings": {
+            "title": "리스트 설정",
+            "name": "리스트 이름",
+            "update": "업데이트",
+            "defaultDest": "기본 destination",
+            "stream": "스트림",
+            "user": "유저",
+            "pin": "고정",
+            "delete": "삭제"
         }
     },
     "settings": {
+        "title": "설정",
         "general": {
-            "basic": "Basic",
-            "showEditorOnTop": "타임라인 상단에 글 작성란을 표시",
-            "showEditorOnTopMobile": "타임라인 상단에 글 작성란을 표시(모바일)",
+            "title": "일반",
+            "basic": "기본",
+            "showEditorOnTop": "타임라인 상단에 글 작성란 고정하기",
+            "showEditorOnTopMobile": "타임라인 상단에 글 작성란 고정하기(모바일)",
             "developerMode": "개발자 모드",
-            "generateInviteCode": "초대코드 생성하기",
-            "inviteCode": "초대코드 (24시간 동안만 유효함)",
+            "generateInviteCode": "초대코드 생성",
+            "inviteCode": "초대코드 (24시간 동안 유효함)",
             "copyInviteCode": "초대코드 복사",
             "copied": "복사됨",
             "language": "언어"
@@ -62,9 +121,56 @@
         "profile": {
             "title": "프로필",
             "update": "업데이트",
-            "updated": "업데이트됨"
+            "updated": "업데이트됨",
+            "secret": "비밀 코드",
+            "secretCannotBeRestored": "이 계정은 비밀 코드 대신 개인 키를 사용해서 가져왔으니 비밀 코드를 복원할 수 없어"
+        },
+        "identity": {
+            "title": "Identity",
+            "loginType": {
+                "masterKey": "너 마스터키로 로그인했어. 더 안전한 서브키로 즉시 로그인해.",
+                "subKey": "너 지금 서브-키로 로그인 하고 있어.",
+                "secret": "너 지금 비밀키를 직접 입력해서 마스터키를 사용해 로그인한 상태야."
+            },
+            "hideSubKey": "비활성화된 서브키 숨기기",
+            "deactivate": "비활성화",
+            "switchMasterToSub": {
+                "saveMasterKey": "마스터키 안전하게 저장",
+                "descSaveMasterKey": "너 계정 마이그레이션 하거나 복구하려면 이 키가 있어야해. 다른 사람에게 계정이 알려지면 불법적으로 계정에 액세스할 수 있으니까 무조건 비밀로 유지해.",
+                "alertMasterKey": "마스터키를 다운받을 수 있는 마지막 기회야! 여기서 백업 실패하면, 계정 복구는 불가능하다고.<br/>인쇄하여 금고에 보관하는 등 안전하고 신뢰할 수 있는 방법으로 보관하는 것을 추천해.",
+                "masterKeyFormat": "마스터키 포맷:",
+                "sendEmail": "이메일로 보내기",
+                "mailHerf": "mailto:?subject=concrnt secret&body=**Set the recipient of this email to yourself and send it.**%0D%0A%0D%0A=== Identification Info ===%0D%0AIdentifier: {{ ccid }}%0D%0AMaster Key: {{ mnemonic }}%0D%0A================%0D%0A%0D%0A%0D%0AThe master key is the only passphrase that proves you own the account identified by this identifier.%0D%0AIf this key becomes known to a malicious third party, the security of this account will be compromised, and you will need to take steps to freeze the account yourself.%0D%0A%0D%0AThe master key will be used for important operations such as migrating your account or recovering lost sub-keys.%0D%0AUntil then, store it securely, such as by printing it and keeping it in a safe deposit box.%0D%0A",
+                "downloadPDF": "PDF로 다운로드",
+                "next": "다음",
+                "verifyBackup": "백업 인증",
+                "descVerifyBackup": "준비됐어? 마스터키를 제대로 저장했는지 확인할게.",
+                "masterKeyPlaceholder": "12단어 구문",
+                "back": "이전",
+                "testNG": "미스매치",
+                "removeMasterKey": "이 디바이스에서 마스터키 제거하기",
+                "descRemoveMasterKey": "마스터키는 매우 중요한 비밀정보니까, 마스터 키에서 '프록시' 서브키를 생성하고 마스터 키를 이 장치의 서브키로 대체할게.",
+                "processing": "작업중...",
+                "ready": "이 디바이스에서 마스터키를 성공적으로 제거했고 서브키로 대체했어",
+                "identification": "Identification",
+                "confidential": "비밀",
+                "identifier": "Identifier",
+                "undifined": "확인되지않은",
+                "masterKey": "마스터키",
+                "aboutMasterKey": "마스터 키는 이 Identifier로 식별된 계정의 소유자임을 증명하는 유일한 암호 구문이야.<br/>이 키가 악의적인 제3자에게 알려질 경우, 이 계정의 보안이 손상될 수 있고, 계정을 직접 동결하는 조치를 취해야해.<br/>마스터키는 계정 마이그레이션이나 분실된 하위 키 복구와 같은 중요한 작업에 사용해. 그때까지는 인쇄하여 금고에 보관하는 등 안전하고 신뢰할 수 있는 방법으로 보관해야해.",
+                "reference": "레퍼런스 정보",
+                "name": "이름",
+                "unset": "설정 안 된",
+                "domain": "관리 도메인(Governing Domain)",
+                "addition": "The reference information is from when this certificate was issued and may have changed since then.",
+                "date": "Issued on:"
+            }
+        },
+        "theme": {
+            "title": "테마"
         },
         "sound": {
+            "title": "소리",
             "sound": "소리",
             "volume": "볼륨",
             "override": {
@@ -74,28 +180,141 @@
             }
         },
         "emoji": {
-            "emojiPackage": "이모지 팩",
+            "title": "이모지",
+            "emojiPackage": "이모지팩",
             "emojiPackageURL": "이모지 팩 URL",
-            "packageNotFound": "팩이 없습니다.",
+            "packageNotFound": "팩을 찾을 수 없습니다.",
             "copied": "복사됨",
             "alreadyAdded": "이모지팩이 이미 추가되었습니다."
         },
         "media": {
-            "storageProviderLabel": "사용량",
+            "title": "미디어",
+            "storageProviderLabel": "사용할 스토리지 공급자",
             "corsSettings": "CORS 설정",
-            "imagePostSettings": "이미지 업로드 설정",
-            "afterRegisteringImgur": "Imgur 등록 후, 이동하는 곳: ",
+            "imagePostSettings": "이미지 게시 설정",
+            "afterRegisteringImgur": "Imgur 등록 이후, 이동할 곳은 ",
             "thisPage": "이 페이지",
-            "oauth2": "옵션과 함께 앱 생성하기 \"callback URL 없이 OAuth 2 authorization\""
+            "deleteCompletely": "완전히 삭제됨",
+            "copyURL": "URL 복사",
+            "copyID": "ID 복사",
+            "oauth2": " 그리고 옵션과 함께 생성함 \"OAuth 2 authorization without a callback URL\"",
+            "descs": {
+                "domain": "도메인 스토리지는 이 도메인에서 제공하는 스토리지를 말해. 별도의 설정 없이 사용할 수 있지만 최대 용량이 설정되어 있어. 또한 파일 목록은 관리자가 볼 수 있으며 약관을 위반하는 파일은 삭제될 수 있지.",
+                "imgur": "Imgur는 이미지 업로드를 위해 사용해. 비교적 쉽게 설정할 수 있어. 업로드할 수 있는 콘텐츠에는 Imgur의 약관이 적용될거야.",
+                "s3": "S3는 이미지 업로드를 위해 사용해. CloudFlare R2와 같은 S3 호환 서비스도 사용할 수 있어. 설정하는 데 더 많은 노력이 필요하긴 한데, 파일을 직접 제어할 수 있지. 서비스에 따라 요금이 부과될 수 있지만 대부분의 경우 무료 티어에 속할거야."
+            }
         },
         "ap": {
-            "setup": "액티비티펍 아이디 설정.",
-            "cantBeChangedOnceRegistered": "**한번 등록되면 변경 불가능합니다.",
+            "title": "액티비티펍",
+            "setup": "액티비티펍 ID 설정.",
+            "cantBeChangedOnceRegistered": "**등록되면 변경이 불가능해.",
             "confirming": "승인 중...",
-            "register": "가입 완료",
-            "helperText": "숫자, 알파벳(소문자, 대문자)를 사용할 수 있습니다: a-z, A-Z, 0-9",
-            "alreadyRegistered": "이미 존재하는 유저입니다.",
-            "tryAnotherID": "다른 ID로 등록하세요."
+            "register": "등록",
+            "helperText": "사용 가능한 글자: a-z, A-Z, 0-9",
+            "alreadyRegistered": "이 유저는 이미 등록되어있어.",
+            "tryAnotherID": "다른 ID를 사용해봐."
+        },
+        "qr": {
+            "title": "로그인 코드",
+            "createNew": "신규 생성",
+            "showInstalled": "Show installed",
+            "tip1": "생선된 코드는 한 번 만 볼 수 있어. 새 코드는 필요할때만 생성해.",
+            "tip2": "설정에서 생성된 키를 체크할 수 있어 > Identity page.",
+            "createNewSubKey": "신규 서브키 생성하기"
+        },
+        "importexport": {
+            "title": "가져오기/내보내기",
+            "import": "가져오기",
+            "export": "내보내기"
+        },
+        "jobs": {
+            "title": "Jobs"
         }
+    },
+    "welcome": {
+        "tagline1": "하나의 세계,",
+        "tagline2": "무한한 환경.",
+        "description": "콘커런트는 하나의 계정으로 여러 커뮤니티에 연결할 수 있는 새로운 탈중앙화 소셜 네트워킹 서비스야.",
+        "createAccount": "신규 계정 생성",
+        "import": "로그인",
+        "gettingStarted": "시작해볼까?",
+        "mission": {
+            "title1": "SNS계정 만들기",
+            "title2": " 너의 \"인터넷 페르소나.\"",
+            "body1": " 현대 사회에선, SNS계정의 역할이 매우 중요하지.",
+            "body2": "친구, 팬, 아이돌과의 상호작용은 물론 너의 활동 기록까지 담는다는 점을 고려하면 당연한 결과야.",
+            "body3": "그러나 요즘 세상은, 인터넷에서 '페르소나'로 존재하는 이 소중한 SNS 계정은 기업들이 맘대로 쉽게 정지시킬 수 있어. 그건 있어서는 안되는 일이지 .",
+            "body4": "콘커런트는 암호화 기술을 사용해서 계정이 운영 조직이 아닌 사용자의 소유임을 증명해. 서버는 단지 데이터를 배포하는 데 '도움'을 줄 뿐이야.",
+            "body5": "콘커런트와 같이, 네 손으로 네 인터넷 페르소나를 탄생시켜봐!"
+        },
+        "feature1": {
+            "title": "원래의 SNS로 돌아가기",
+            "body1": "매일 SNS에 넘쳐나는 사회 문제, 분노, 슬픔의 끝없는 흐름에 지쳤니? 이러한 문제에 직면하는 것은 때때로 필요하지만, 많은 사람들이 SNS 사용하기 시작한 원래의 이유는 관심 있는 사람들이 '지금' 뭐하고 있는지 알기 위해서였잖아."
+        },
+        "feature2": {
+            "title": "커뮤니티에서 세계로",
+            "body1": "홈 타임라인 왜에도, 콘커런트는 너에게 수많은 커뮤니티 타임라인을 허용해. 게시할 때, 너는 여러 커뮤니티에 같이 게시할 수 있는 모델을 채택할 수 있어. 인간에게 중요한 '여러 커뮤니티와 느슨하게 연결'되는 사회적 행동을 자연스럽게 촉진시키는 거지.",
+            "body2": "콘커런트는 다른 커뮤니티 및 전 세계와 느슨하게 연결되는 소셜 미디어를 지향하며, X(트위터)처럼 지나치게 연결되지도 않고 디스코드처럼 너무 폐쇄적이지도 않아."
+        },
+        "wip": {
+            "title": "콘커런트는 아직 개발 중이야.",
+            "description": "우리는 재밌는 기능들을 추가하는 중에 있지만 아직 많은 기능들을 사용할 수 없어. 여행왔다 생각하고 함께 즐기면 좋을거야!",
+            "contribute": "버그나 개선점을 발견하면, 깃헙에 이슈 요청하고 같이 개발에 참여해줘!",
+            "milestones": {
+                "title": "계획 예정 기능들",
+                "item1": "- 개인 타임라인(Private Timelines)",
+                "item2": "- Media-specific Posts & 사용자 미디어 리스트(Media Lists for Users)",
+                "item3": "- 뮤트와 같은 다양한 필터링 옵션(Various Filtering Options such as Muting)",
+                "item4": "- 다른 유저의 활동 타임라인(Timelines of Other Users' Activities)",
+                "item5": "- 기타 등등..."
+            }
+        }
+    },
+    "registration": {
+        "welcome": {
+            "title": "너의 콘커런트 계정을 생성해보자!",
+            "noticeTitle": "콘커런트는 아직 개발 중이야.",
+            "notice": "우리는 아직 가능을 추가중이고 설명도 간단하긴 해. 여행왔다 생각하고 함께 즐기면 좋을거야!",
+            "next": "ID Card 생성"
+        },
+        "chooseDomain": {
+            "title": "서버(도메인) 고르기",
+            "desc1": "너의 메시지를 저장하고 전달할 서버(도메인)를 찾아볼게.",
+            "desc2": "어떤 서버(도메인)를 고르던, 누구하고나 연결할 수 있어.",
+            "desc3": "또한, (서버 관리자가 열심히 일하는 경우) 언제든지 다른 서버로 이동 가능하지.",
+            "notice": "이제 콘커런트.월드에서 서버(도메인) 관할 사이트로 이동합니다.",
+            "chooseFromList": "목록에서 골라",
+            "or": "or",
+            "directInput": "직접 URL 입력",
+            "tips": "팁: 자체 서버를 설정하는 경우, 여기를 클릭해",
+            "jump": "등록 페이지 가기",
+            "notRegistered": "서버(도메인) 등록이 확인되지 않았어. 이동한 도메인에서 등록해.",
+            "nextDisabled": "도메인 등록이 완료되면 다음 단계로 진행할 수 있어.",
+            "next": "Next: 프로필 생성하기"
+        },
+        "createProfile": {
+            "title": "프로필 생성하기",
+            "desc": "여기서 이름, 아이콘, 자기소개를 설정할 수 있어."
+        },
+        "ready": {
+            "title": "준비 완료!",
+            "next": "시작"
+        },
+        "alreadyHaveAccount": "이미 계정 있다고?",
+        "importAccount": "로그인"
+    },
+    "import": {
+        "searching": "Searching…",
+        "notFound": "너의 서버를 찾을 수 없어. 수동입력해서 계속 할 수 있어.",
+        "invalidSecret": "비밀코드가 틀렸어.",
+        "notFoundOnServer": "해당 서버에서 계정을 찾을 수 없는데?",
+        "connectionError": "해당 서버와는 연결할 수 없어.",
+        "input": "비밀코드나 개인키 입력해",
+        "secretPlaceholder": "12단어 구문",
+        "welcome": "환영해",
+        "domain": "도메인",
+        "import": "로그인",
+        "noAccount": "아직 계정 없니?",
+        "createAccount": "계정 생성"
     }
 }
