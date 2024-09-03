@@ -41,7 +41,7 @@ export const ImportSubkey = (): JSX.Element => {
 
     return (
         <>
-            <Typography variant="h3">サブキーでログイン</Typography>
+            <Typography variant="h3">{t('withSubkey')}</Typography>
             <TextField
                 type={showSecret ? 'text' : 'password'}
                 placeholder={'concurrent-subkey xxx CCxxx@example.com'}

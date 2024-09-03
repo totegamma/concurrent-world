@@ -32,155 +32,154 @@ const Parallax = styled.div<ParallaxProps>`
     animation-timeline: scroll();
 `
 
-const decorations = [
-    // left
-    {
-        username: 'SkylerJay',
-        content: '使い方が新しいけどなれたら快適！',
-        style: {
-            top: '10%',
-            left: '-10%'
-        },
-        parallax: 1000
-    },
-    {
-        username: 'NovaPulse',
-        content: '自分が依存するものは、オープンなものじゃなくっちゃね',
-        style: {
-            top: '20%',
-            left: '-15%'
-        },
-        parallax: 100
-    },
-    {
-        username: 'EchoBlaze',
-        content: '複数のコミュニティに同時に発信したい！',
-        style: {
-            top: '35%',
-            left: '-8%'
-        },
-        parallax: 100
-    },
-    {
-        username: 'RiverStone',
-        content: '自分でサーバー建ててみようかな？',
-        style: {
-            top: '43%',
-            left: '-13%'
-        },
-        parallax: 500
-    },
-    {
-        username: 'LunaDrift',
-        content: '自分が分散しなくていい分散型SNSが欲しい！',
-        style: {
-            top: '60%',
-            left: '-10%'
-        },
-        parallax: 1000
-    },
-    {
-        username: 'ZephyrWind',
-        content: 'いま、なにしてる？',
-        style: {
-            top: '50%',
-            left: '0%'
-        },
-        parallax: 100
-    },
-    {
-        username: 'CrystalWave',
-        content: 'わいわい',
-        style: {
-            top: '90%',
-            left: '-10%'
-        },
-        parallax: 100
-    },
-
-    // right
-    {
-        username: 'OrionShade',
-        content: 'よるほー',
-        style: {
-            top: '8%',
-            right: '-10%'
-        },
-        parallax: 100
-    },
-    {
-        username: 'StarfallX',
-        content: '誰か遊びに行こ！',
-        style: {
-            top: '18%',
-            right: '-20%'
-        },
-        parallax: 100
-    },
-    {
-        username: 'EmberGlow',
-        content: 'テーマのカスタマイズが楽しい！',
-        style: {
-            top: '25%',
-            right: '-17%'
-        },
-        parallax: 500
-    },
-    {
-        username: 'SolarRay',
-        content:
-            '自分のアカウントが自分の手の内にあるから、<br/>安心してインターネットアイデンティティとして利用できる',
-        style: {
-            top: '50%',
-            right: '-20%'
-        },
-        parallax: 100
-    },
-    {
-        username: 'FrostWanderer',
-        content: '絵文字リアクションでのコミュニケーションが快適！',
-        style: {
-            top: '38%',
-            right: '-13%'
-        },
-        parallax: 100
-    },
-    {
-        username: 'MirageVibe',
-        content: 'いまいるサーバーが閉鎖しちゃっても、<br/>関係をそのまま引っ越せるから安心！',
-        style: {
-            top: '60%',
-            right: '-8%'
-        },
-        parallax: 1000
-    },
-
-    {
-        username: 'ZenithRift',
-        content: 'おなかすいたYO',
-        style: {
-            top: '80%',
-            right: '-20%'
-        },
-        parallax: 100
-    },
-
-    // special
-    {
-        username: 'totegamma',
-        icon: 'https://github.com/totegamma.png',
-        content: 'こういうの、あれ！',
-        style: {
-            top: '120%',
-            left: '-10%'
-        },
-        parallax: 2000
-    }
-]
-
 function WelcomeBody(): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'welcome' })
     const theme = useTheme()
+
+    const decorations = [
+        // left
+        {
+            username: 'SkylerJay',
+            content: t('crnt1'),
+            style: {
+                top: '10%',
+                left: '-10%'
+            },
+            parallax: 1000
+        },
+        {
+            username: 'NovaPulse',
+            content: t('crnt2'),
+            style: {
+                top: '20%',
+                left: '-15%'
+            },
+            parallax: 100
+        },
+        {
+            username: 'EchoBlaze',
+            content: t('crnt3'),
+            style: {
+                top: '35%',
+                left: '-8%'
+            },
+            parallax: 100
+        },
+        {
+            username: 'RiverStone',
+            content: t('crnt4'),
+            style: {
+                top: '43%',
+                left: '-13%'
+            },
+            parallax: 500
+        },
+        {
+            username: 'LunaDrift',
+            content: t('crnt5'),
+            style: {
+                top: '60%',
+                left: '-10%'
+            },
+            parallax: 1000
+        },
+        {
+            username: 'ZephyrWind',
+            content: t('crnt6'),
+            style: {
+                top: '50%',
+                left: '0%'
+            },
+            parallax: 100
+        },
+        {
+            username: 'CrystalWave',
+            content: t('crnt7'),
+            style: {
+                top: '90%',
+                left: '-10%'
+            },
+            parallax: 100
+        },
+
+        // right
+        {
+            username: 'OrionShade',
+            content: t('crnt8'),
+            style: {
+                top: '8%',
+                right: '-10%'
+            },
+            parallax: 100
+        },
+        {
+            username: 'StarfallX',
+            content: t('crnt9'),
+            style: {
+                top: '18%',
+                right: '-20%'
+            },
+            parallax: 100
+        },
+        {
+            username: 'EmberGlow',
+            content: t('crnt10'),
+            style: {
+                top: '25%',
+                right: '-17%'
+            },
+            parallax: 500
+        },
+        {
+            username: 'SolarRay',
+            content: t('crnt11'),
+            style: {
+                top: '50%',
+                right: '-20%'
+            },
+            parallax: 100
+        },
+        {
+            username: 'FrostWanderer',
+            content: t('crnt12'),
+            style: {
+                top: '38%',
+                right: '-13%'
+            },
+            parallax: 100
+        },
+        {
+            username: 'MirageVibe',
+            content: t('crnt13'),
+            style: {
+                top: '60%',
+                right: '-8%'
+            },
+            parallax: 1000
+        },
+
+        {
+            username: 'ZenithRift',
+            content: t('crnt14'),
+            style: {
+                top: '80%',
+                right: '-20%'
+            },
+            parallax: 100
+        },
+
+        // special
+        {
+            username: 'totegamma',
+            icon: 'https://github.com/totegamma.png',
+            content: t('crnt_totegamma'),
+            style: {
+                top: '120%',
+                left: '-10%'
+            },
+            parallax: 2000
+        }
+    ]
 
     return (
         <>
@@ -250,7 +249,7 @@ function WelcomeBody(): JSX.Element {
                         zIndex="1"
                         display={{ xs: 'none', sm: 'none', md: 'block' }}
                     >
-                        もし、こんなSNSがあったら...
+                        {t('catch')}
                     </Typography>
 
                     <Paper
@@ -266,25 +265,25 @@ function WelcomeBody(): JSX.Element {
                                 username: 'Concrnt'
                             }}
                             message={{
-                                body: '## もし、こんなSNSがあったら...'
+                                body: '## ' + t('catch')
                             }}
                         />
                     </Paper>
 
                     <Box maxWidth="800px" display="flex" flexDirection="column" gap={2} zIndex="1">
                         <Typography variant="body1" align="center" fontSize={{ xs: '18px', sm: '18px', md: '20px' }}>
-                            自分の友達や興味のある人が「いま、なにしてる」のかをリアルタイムで知れる。
+                            {t('wish1')}
                             <br />
-                            1つのアカウントで、複数のコミュニティと交流できる。
+                            {t('wish2')}
                             <br />
-                            運営が単一でなく、だれに管理をお願いするかを選べる。
+                            {t('wish3')}
                             <br />
-                            そんなSNSが、あったらいいですよね。
+                            {t('wish4')}
                         </Typography>
                         <Typography variant="body1" align="center" fontSize={{ xs: '18px', sm: '18px', md: '20px' }}>
-                            Concrntは、この願いにこたえるために開発されました。
+                            {t('wish5')}
                             <br />
-                            新時代のSNSへ、ようこそ。
+                            {t('wish6')}
                         </Typography>
                     </Box>
                     <Button
@@ -297,7 +296,7 @@ function WelcomeBody(): JSX.Element {
                             fontSize: '16px'
                         }}
                     >
-                        はじめる
+                        {t('start')}
                     </Button>
                 </Box>
             </Box>
@@ -316,26 +315,20 @@ function WelcomeBody(): JSX.Element {
                 <Box flex={1} display="flex" flexDirection="column" gap={2}>
                     <Box>
                         <Typography variant="h1" fontSize="40px">
-                            みんなで楽しむためのSNS
+                            {t('feature1title')}
                         </Typography>
                         <Typography variant="caption" fontSize="15px">
-                            知らない人しか流れてこないおすすめ欄に疲れた？
+                            {t('feature1subtitle')}
                         </Typography>
                         <Divider />
                     </Box>
 
                     <Box display="flex" flexDirection="column" gap={2}>
-                        <Typography>
-                            知らない人しか流れてこないオススメより、自分の好きな人のことの方が、もっと知りたいですよね。
-                        </Typography>
+                        <Typography>{t('feature1p1')}</Typography>
 
-                        <Typography>
-                            Concrntでは、アルゴリズムに任せるのではなく、自分でカスタマイズできるリスト機能を活用して、自分にとって本当に価値のある情報を手に入れることができます。好きな人、興味のあるコミュニティを選び、自分にピッタリなタイムラインを作り上げましょう。
-                        </Typography>
+                        <Typography>{t('feature1p2')}</Typography>
 
-                        <Typography>
-                            Concrntは、あなたが本当に大切にしたいつながりを中心に据えた、みんなで楽しむためのSNSです。
-                        </Typography>
+                        <Typography>{t('feature1p3')}</Typography>
                     </Box>
                 </Box>
                 <Box flex={1}>
@@ -357,26 +350,20 @@ function WelcomeBody(): JSX.Element {
                 <Box flex={3} display="flex" flexDirection="column" gap={2}>
                     <Box>
                         <Typography variant="h1" fontSize="40px">
-                            あなたのアカウントはあなたのもの
+                            {t('feature2title')}
                         </Typography>
                         <Typography variant="caption" fontSize="15px">
-                            凍結に怯える日々とバイバイ👋
+                            {t('feature2subtitle')}
                         </Typography>
                         <Divider />
                     </Box>
 
                     <Box display="flex" flexDirection="column" gap={2}>
-                        <Typography>
-                            Concrntは、ユーザーの自由と安全を最優先に考えた分散型SNSです。一つの企業や組織による独裁的な管理から解放され、複数の個人や組織が独立してサーバーを運営しています。
-                        </Typography>
+                        <Typography>{t('feature2p1')}</Typography>
 
-                        <Typography>
-                            これにより、あなたのアカウントが突然凍結されるリスクに怯える必要はもうありません。仮に一つのサーバーで理不尽な対応を受けたとしても、別のサーバーへと簡単に移行でき、投稿やフォロワーをそのまま引き継いで活動を続けることが可能です。従来のSNSでは考えられなかった、自分自身で管理できる安心感と自由がここにあります。
-                        </Typography>
+                        <Typography>{t('feature2p2')}</Typography>
 
-                        <Typography>
-                            Concrntでは、あなたのアカウントは本当に「あなたのもの」として存在します。
-                        </Typography>
+                        <Typography>{t('feature2p3')}</Typography>
                     </Box>
                 </Box>
                 <Box flex={2}>
@@ -409,22 +396,18 @@ function WelcomeBody(): JSX.Element {
                 <Box flex={2} display="flex" flexDirection="column" gap={2} p={2}>
                     <Box>
                         <Typography variant="h1" fontSize="40px">
-                            1つのSNSで無数の居場所を
+                            {t('feature3title')}
                         </Typography>
                         <Typography variant="caption" fontSize="15px">
-                            趣味に合わせてアカウントを使い分ける時代は終わり
+                            {t('feature3subtitle')}
                         </Typography>
                         <Divider />
                     </Box>
 
                     <Box display="flex" flexDirection="column" gap={2}>
-                        <Typography>
-                            Concrntでは、ホームタイムラインに加え、複数のコミュニティタイムラインを使い分けることができます。投稿時には、複数のコミュニティに同時に投稿できるため、人間にとって自然な「複数のコミュニティとゆるくつながる」ことが簡単に行えます。
-                        </Typography>
+                        <Typography>{t('feature3p1')}</Typography>
 
-                        <Typography>
-                            Xのように世界と過剰につながりすぎることもなく、Discordのように閉じすぎることもない。適度に他のコミュニティと接続しながら、自分に合った居場所を見つけることができるのがConcrntの特徴です。
-                        </Typography>
+                        <Typography>{t('feature3p2')}</Typography>
                     </Box>
                 </Box>
 
@@ -467,7 +450,7 @@ function WelcomeBody(): JSX.Element {
                         width: '100%'
                     }}
                 >
-                    {t('createAccount')}
+                    {t('start')}
                 </Button>
             </Box>
 
@@ -516,7 +499,7 @@ export default function Welcome(): JSX.Element {
                             color: 'primary.contrastText'
                         }}
                     >
-                        ユーザーガイド
+                        {t('guide')}
                     </Button>
                     <Button
                         variant="text"

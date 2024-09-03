@@ -1,8 +1,7 @@
-import { Alert, Box, Button, AlertTitle, Paper, Typography } from '@mui/material'
+import { Alert, Box, Button, AlertTitle, Typography } from '@mui/material'
 import Tilt from 'react-parallax-tilt'
 import { PassportRenderer } from '../theming/Passport'
 import { useTranslation } from 'react-i18next'
-import { IconButtonWithLabel } from '../ui/IconButtonWithLabel'
 
 import LaunchIcon from '@mui/icons-material/Launch'
 import { type Identity } from '@concurrent-world/client'
@@ -22,9 +21,9 @@ export function RegistrationWelcome(props: {
                     wordBreak: 'keep-all'
                 }}
             >
-                Concrntは分散型SNSの1つです。
+                {t('desc1')}
                 <wbr />
-                サーバーを選んで登録します。
+                {t('desc2')}
             </Typography>
             <Box
                 sx={{
@@ -51,10 +50,10 @@ export function RegistrationWelcome(props: {
                 }}
             >
                 <Alert severity="info">
-                    <AlertTitle>どのサーバーでも大丈夫！</AlertTitle>
-                    Concrntではサーバー間の隔たりがありません。携帯キャリアみたいなものです。
+                    <AlertTitle>{t('infoTitle')}</AlertTitle>
+                    {t('info1')}
                     <br />
-                    また、いつでもサーバー間の引っ越しが可能なので、こだわりがない場合はおまかせがオススメです。
+                    {t('info2')}
                 </Alert>
 
                 <Button
@@ -70,9 +69,9 @@ export function RegistrationWelcome(props: {
                     onClick={props.autoSetup}
                 >
                     <Typography>
-                        おまかせでサーバーを選んで
+                        {t('auto1')}
                         <wbr />
-                        はじめる
+                        {t('auto2')}
                     </Typography>
                     <LaunchIcon />
                 </Button>
@@ -84,7 +83,7 @@ export function RegistrationWelcome(props: {
                     }}
                 >
                     <Button id="RegistrationCustomButton" variant="text" onClick={props.customSetup}>
-                        自分でサーバーを選ぶ
+                        {t('custom')}
                     </Button>
                 </Box>
             </Box>
