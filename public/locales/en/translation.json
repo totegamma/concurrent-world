@@ -232,57 +232,95 @@
         }
     },
     "welcome": {
-        "tagline1": "One World,",
-        "tagline2": "Infinite Environments.",
-        "description": "Concrnt is a new decentralized social networking service that allows you to connect with many communities with just one account.",
-        "createAccount": "Create an Account",
-        "import": "Sign in",
-        "gettingStarted": "Let's get started",
-        "mission": {
-            "title1": "Establish your social media accounts",
-            "title2": " as your \"Internet persona.\"",
-            "body1": "In modern society, the role of social media accounts is extremely important.",
-            "body2": "It's only natural, considering they encapsulate interactions with friends, fans, and idols, as well as records of one's activities.",
-            "body3": "However, in today's world, these precious SNS accounts, existing as 'personas' on the internet, can be easily frozen at the whim of a corporation. This should be unacceptable.",
-            "body4": "Concrnt uses cryptographic technology to prove that your account belongs to you, not to the operating organization. Servers merely 'help' in distributing your data.",
-            "body5": "With Concrnt, let's birth your internet persona by your own hands."
+        "start": "Get Started",
+        "guide": "User Guide",
+        "gettingStarted": "Let's Get Started",
+        "import": "Log In",
+
+        "catch": "What if there was an SNS like this...",
+        "wish1": "You could know in real-time what your friends and people you're interested in are doing.",
+        "wish2": "You could interact with multiple communities using a single account.",
+        "wish3": "You could choose who manages the platform, rather than being controlled by a single entity.",
+        "wish4": "Wouldn't it be great if there was such an SNS?",
+        "wish5": "Concrnt was developed to fulfill this wish.",
+        "wish6": "Welcome to the new era of SNS.",
+
+        "feature1title": "An SNS for Enjoying Together",
+        "feature1subtitle": "Tired of recommendation feeds filled with strangers?",
+        "feature1p1": "Wouldn't you rather know more about the people you like than just seeing recommendations filled with strangers?",
+        "feature1p2": "With Concrnt, instead of relying on algorithms, you can use customizable lists to access information that truly matters to you. Select the people you like and the communities you're interested in, and create a timeline that fits you perfectly.",
+        "feature1p3": "Concrnt is an SNS focused on the connections that truly matter to you, making it enjoyable for everyone.",
+
+        "feature2title": "Your Account is Truly Yours",
+        "feature2subtitle": "Say goodbye to the days of fearing account suspension 👋",
+        "feature2p1": "Concrnt is a decentralized SNS that prioritizes user freedom and safety. It is free from the dictatorship of a single company or organization, with independent individuals and organizations running their own servers.",
+        "feature2p2": "This means you no longer have to live in fear of your account being suddenly suspended. Even if you experience unfair treatment on one server, you can easily move to another server, retaining your posts and followers, and continue your activities. Here, you'll find the security and freedom of being able to manage your account in a way that was unimaginable with conventional SNS.",
+        "feature2p3": "On Concrnt, your account truly belongs to you.",
+
+        "feature3title": "Countless Communities in One SNS",
+        "feature3subtitle": "The era of using separate accounts for different interests is over",
+        "feature3p1": "On Concrnt, in addition to the home timeline, you can switch between multiple community timelines. When posting, you can simultaneously share across multiple communities, making it easy to connect loosely with multiple communities, which is natural for humans.",
+        "feature3p2": "It's not about being overly connected to the world like X, nor is it about being too closed off like Discord. The charm of Concrnt is that you can find your place while moderately connecting with other communities.",
+
+        "crnt1": "It’s a new way of using SNS, but once you get used to it, it's comfortable!",
+        "crnt2": "What I depend on must be open!",
+        "crnt3": "I want to broadcast to multiple communities simultaneously!",
+        "crnt4": "Maybe I’ll try setting up my own server?",
+        "crnt5": "I want a decentralized SNS where I don’t have to be decentralized!",
+        "crnt6": "What are you up to?",
+        "crnt7": "Yay!",
+        "crnt8": "Good evening!",
+        "crnt9": "Anyone want to hang out?",
+        "crnt10": "Customizing themes is so fun!",
+        "crnt11": "Because my account is truly in my own hands, <br/> I can use it confidently as my internet identity.",
+        "crnt12": "Communicating with emoji reactions is so smooth!",
+        "crnt13": "Even if the server I’m on shuts down, <br/> I can easily move my relationships to a new server, so no worries!",
+        "crnt14": "I’m hungry YO",
+
+        "crnt_totegamma": "This is exactly it!"
+    },
+
+    "mock": {
+        "home": {
+            "title": "Home",
+            "crnt1": "I really love the quietness at this time. Solo time on holidays is the best.",
+            "crnt2": "Speaking of music, lately I can't get anime songs out of my head. They really pump me up.",
+            "crnt3": "Afternoon music selection—what should I listen to today? It's a tough choice.",
+            "crnt4": "A new book has arrived! Time to brew some tea and dive into it. The perfect holiday.",
+            "crnt5": "It's been a while, but they're rerunning my favorite anime today. Time to relax and watch."
         },
-        "feature1": {
-            "title": "Returning to the Origins of Social Media",
-            "body1": "Are you exhausted by the endless stream of world problems, anger, and sadness flooding Social Media every day? While confronting such issues is sometimes necessary, for many, the original reason to start using Social Media was to know what the people they are interested in are 'doing now'."
+        "game": {
+            "title": "Gaming Scene",
+            "crnt1": "Lost my save data in 'Adventurers of the Netherworld'... I want to cry.",
+            "crnt2": "The new VR game is incredibly realistic! I need to be careful not to get dizzy.",
+            "crnt3": "Last night's online battle was flawless teamwork. Let's do it again, team!",
+            "crnt4": "Found an old arcade game. The feeling of inserting a coin and playing is so nostalgic.",
+            "crnt5": "Collecting game OSTs is my hobby. I got a new one today!"
         },
-        "feature2": {
-            "title": "From Community to the World",
-            "body1": "In addition to a home timeline, Concrnt allows you to use numerous community timelines. When posting, you can adopt a model that allows for simultaneous posting to multiple communities, naturally facilitating the social behavior of 'loosely connecting with multiple communities', which is important for humans.",
-            "body2": "Concrnt aims to be an Social Media that connects moderately with other communities and the world, not being overly connected like X, nor too closed off like Discord."
-        },
-        "wip": {
-            "title": "Concrnt is currently under development.",
-            "description": "We are in the middle of adding exciting features and many functionalities are not available yet. We would be delighted if you could play around with it as a form of sightseeing!",
-            "contribute": "If you find any bugs or have great ideas, raise an issue on Github and join the development now!",
-            "milestones": {
-                "title": "Planned features",
-                "item1": "- Private Timelines",
-                "item2": "- Media-specific Posts & Media Lists for Users",
-                "item3": "- Various Filtering Options such as Muting",
-                "item4": "- Timelines of Other Users' Activities",
-                "item5": "- etc..."
-            }
+        "food": {
+            "title": "Food",
+            "crnt1": "Trying my hand at homemade vegan dishes. Today, it's tomato and quinoa salad.",
+            "crnt2": "Discovered a new spice shop! Time to experiment with some exotic flavors.",
+            "crnt3": "Today's ramen was exceptional. The spice level was just right.",
+            "crnt4": "Homemade cold brew, a summer staple. The choice of coffee beans is key.",
+            "crnt5": "The yakitori I had at the restaurant was crispy on the outside and juicy on the inside. Next time, I'm bringing friends!"
         }
     },
+
     "registration": {
         "welcome": {
-            "title": "Let's create your Concrnt account!",
-            "noticeTitle": "Concrnt is currently under development.",
-            "notice": "We are still adding features and the explanations are brief. We would be happy if you could play with it as a form of sightseeing!",
-            "next": "Create an ID Card"
+            "title": "Let's Create Your Concrnt Account!",
+            "desc1": "Concrnt is a decentralized SNS.",
+            "desc2": "Choose a server to sign up.",
+            "infoTitle": "Any server is OK!",
+            "info1": "On Concrnt, there are no barriers between servers. It's like choosing a mobile carrier.",
+            "info2": "You can move between servers anytime, so if you have no preference, we recommend letting us choose for you.",
+            "auto1": "Pick a server for me",
+            "auto2": "Get Started",
+            "custom": "Choose a server yourself"
         },
         "chooseDomain": {
             "title": "Choosing a Domain",
-            "desc1": "Let's find a domain that will store and deliver your messages.",
-            "desc2": "No matter which domain you choose, you can connect with anyone.",
-            "desc3": "Also, (if the server manager works hard) you can always move to a different domain.",
-            "notice": "You will now move from concrnt.world to a domain jurisdiction site",
             "chooseFromList": "Choose from the list",
             "or": "or",
             "directInput": "Enter URL directly",
@@ -304,12 +342,15 @@
         "importAccount": "Sign in"
     },
     "import": {
+        "scan": "Scan",
+        "manual": "Manual",
         "searching": "Searching…",
         "notFound": "Your server could not be found. You can continue by entering it manually.",
         "invalidSecret": "The secret code is not correct.",
         "notFoundOnServer": "Your account could not be found on the specified server.",
         "connectionError": "Could not connect to the specified server.",
         "input": "Enter the secret code or private key",
+        "withSubkey": "Sign in with a sub-key",
         "secretPlaceholder": "A spell made of 12 words",
         "welcome": "Welcome",
         "domain": "Domain",
