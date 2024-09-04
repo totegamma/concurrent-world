@@ -113,7 +113,7 @@ export function Explorer(): JSX.Element {
                 })
             ).then((e) => {
                 if (unmounted) return
-                setProfiles(e.flat())
+                setProfiles(e.flat().reverse())
             })
         }, 500)
 
@@ -308,9 +308,9 @@ export function Explorer(): JSX.Element {
                         }}
                     >
                         {characters.map((character) => (
-                            <Paper key={character.id} variant="outlined">
+                            <Box key={character.id}>
                                 <SubProfileCard showccid character={character} />
-                            </Paper>
+                            </Box>
                         ))}
                     </Box>
                 </>
