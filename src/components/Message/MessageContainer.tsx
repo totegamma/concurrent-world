@@ -196,7 +196,13 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
         case Schemas.plaintextMessage:
             body = (
                 <Box sx={props.sx}>
-                    <PlainMessageView message={message as Message<PlaintextMessageSchema>} />
+                    <PlainMessageView
+                        simple={props.simple}
+                        message={message as Message<PlaintextMessageSchema>}
+                        lastUpdated={props.lastUpdated}
+                        userCCID={client.ccid}
+                        rerouted={props.rerouted}
+                    />
                 </Box>
             )
             break
