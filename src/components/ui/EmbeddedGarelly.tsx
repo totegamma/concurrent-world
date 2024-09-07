@@ -1,7 +1,7 @@
 import { Box, IconButton, Typography } from '@mui/material'
 import { useMediaViewer } from '../../context/MediaViewer'
 import { VList, type VListHandle } from 'virtua'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
@@ -15,6 +15,9 @@ export interface EmbeddedGalleryProps {
 
 export const MediaCard = ({ media, onExpand }: { media: WorldMedia; onExpand?: () => void }): JSX.Element => {
     const [_, setForceUpdate] = useState(0)
+    const imageRef = useRef<HTMLImageElement>(null)
+    const videoRef = useRef<HTMLVideoElement>(null)
+    const [loadded, setLoadded] = useState(imageRef.current?.complete || videoRef.current?.readyState === 4)
 
     const setAllowedUrl = (url: string): void => {
         const key = 'reveal:' + url
@@ -40,7 +43,6 @@ export const MediaCard = ({ media, onExpand }: { media: WorldMedia; onExpand?: (
             sx={{
                 height: '15vh',
                 aspectRatio: '4/3',
-                backgroundColor: '#111',
                 borderRadius: 1,
                 mx: 0.5,
                 position: 'relative',
@@ -57,12 +59,16 @@ export const MediaCard = ({ media, onExpand }: { media: WorldMedia; onExpand?: (
                     {media.mediaType.startsWith('image') && (
                         <img
                             src={media.mediaURL}
+                            ref={imageRef}
                             style={{
                                 display: isHidden ? 'none' : 'block',
                                 width: '100%',
                                 height: '100%',
                                 objectFit: 'cover',
                                 cursor: 'pointer'
+                            }}
+                            onLoad={() => {
+                                setLoadded(true)
                             }}
                         />
                     )}
@@ -71,6 +77,7 @@ export const MediaCard = ({ media, onExpand }: { media: WorldMedia; onExpand?: (
                         <>
                             <video
                                 controls
+                                ref={videoRef}
                                 style={{
                                     display: isHidden ? 'none' : 'block',
                                     width: '100%',
@@ -79,11 +86,38 @@ export const MediaCard = ({ media, onExpand }: { media: WorldMedia; onExpand?: (
                                     cursor: 'pointer'
                                 }}
                                 muted
+                                onLoadedData={() => {
+                                    setLoadded(true)
+                                }}
                             >
                                 <source src={media.mediaURL} type={media.mediaType} />
+                                <source src={media.mediaURL} />
                             </video>
                         </>
                     )}
+
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            backgroundColor: '#111',
+                            display: loadded ? 'none' : 'block'
+                        }}
+                    >
+                        {media.blurhash && (
+                            <Blurhash
+                                hash={media.blurhash}
+                                height={'100%'}
+                                width={'100%'}
+                                punch={1}
+                                resolutionX={32}
+                                resolutionY={32}
+                            />
+                        )}
+                    </Box>
 
                     {media.flag && (
                         <VisibilityOffIcon
@@ -102,16 +136,17 @@ export const MediaCard = ({ media, onExpand }: { media: WorldMedia; onExpand?: (
                 </>
             ) : (
                 <>
-                    {media.blurhash && (
-                        <Box
-                            sx={{
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                width: '100%',
-                                height: '100%'
-                            }}
-                        >
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            backgroundColor: '#111'
+                        }}
+                    >
+                        {media.blurhash && (
                             <Blurhash
                                 hash={media.blurhash}
                                 height={'100%'}
@@ -120,8 +155,8 @@ export const MediaCard = ({ media, onExpand }: { media: WorldMedia; onExpand?: (
                                 resolutionX={32}
                                 resolutionY={32}
                             />
-                        </Box>
-                    )}
+                        )}
+                    </Box>
                     <Box
                         sx={{
                             position: 'absolute',
@@ -145,7 +180,13 @@ export const EmbeddedGallery = (props: EmbeddedGalleryProps): JSX.Element => {
     const listRef = useRef<VListHandle>(null)
     const mediaViewer = useMediaViewer()
 
-    const range = useRef({ start: 0, end: 0 })
+    const [range, setRange] = useState({ start: 0, end: 0 })
+    const [overflowed, setOverflowed] = useState(false)
+
+    useEffect(() => {
+        const isOverFlow = range.start !== 0 || range.end !== props.medias.length - 1
+        if (isOverFlow) setOverflowed(true)
+    }, [range, props.medias])
 
     return (
         <Box position="relative">
@@ -157,8 +198,7 @@ export const EmbeddedGallery = (props: EmbeddedGalleryProps): JSX.Element => {
                 }}
                 ref={listRef}
                 onRangeChange={(start, end) => {
-                    range.current.start = start
-                    range.current.end = end
+                    setRange({ start, end })
                 }}
             >
                 {props.medias.map((media, index) => {
@@ -173,46 +213,50 @@ export const EmbeddedGallery = (props: EmbeddedGalleryProps): JSX.Element => {
                     )
                 })}
             </VList>
-            <IconButton
-                onClick={() => {
-                    listRef.current?.scrollToIndex(range.current.start, {
-                        align: 'center',
-                        smooth: true
-                    })
-                }}
-                sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: 0,
-                    transform: 'translateY(-50%)',
-                    zIndex: 1,
-                    '&:hover': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.3)'
-                    }
-                }}
-            >
-                <KeyboardArrowLeftIcon />
-            </IconButton>
-            <IconButton
-                onClick={() => {
-                    listRef.current?.scrollToIndex(range.current.end, {
-                        align: 'center',
-                        smooth: true
-                    })
-                }}
-                sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    right: 0,
-                    transform: 'translateY(-50%)',
-                    zIndex: 1,
-                    '&:hover': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.3)'
-                    }
-                }}
-            >
-                <KeyboardArrowRightIcon />
-            </IconButton>
+            {overflowed && (
+                <>
+                    <IconButton
+                        onClick={() => {
+                            listRef.current?.scrollToIndex(range.start, {
+                                align: 'center',
+                                smooth: true
+                            })
+                        }}
+                        sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: 0,
+                            transform: 'translateY(-50%)',
+                            zIndex: 1,
+                            '&:hover': {
+                                backgroundColor: 'rgba(255, 255, 255, 0.3)'
+                            }
+                        }}
+                    >
+                        <KeyboardArrowLeftIcon />
+                    </IconButton>
+                    <IconButton
+                        onClick={() => {
+                            listRef.current?.scrollToIndex(range.end, {
+                                align: 'center',
+                                smooth: true
+                            })
+                        }}
+                        sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            right: 0,
+                            transform: 'translateY(-50%)',
+                            zIndex: 1,
+                            '&:hover': {
+                                backgroundColor: 'rgba(255, 255, 255, 0.3)'
+                            }
+                        }}
+                    >
+                        <KeyboardArrowRightIcon />
+                    </IconButton>
+                </>
+            )}
         </Box>
     )
 }
