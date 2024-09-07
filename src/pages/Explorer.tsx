@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Paper, Tab, Tabs, TextField, Typography, useTheme } from '@mui/material'
+import { Box, Button, Divider, Tab, Tabs, TextField, Typography, useTheme } from '@mui/material'
 import { type CommunityTimelineSchema, Schemas, type CoreProfile } from '@concurrent-world/client'
 import { useClient } from '../context/ClientContext'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -113,7 +113,19 @@ export function Explorer(): JSX.Element {
                 })
             ).then((e) => {
                 if (unmounted) return
-                setProfiles(e.flat())
+                setProfiles(
+                    e
+                        .flat()
+                        .reverse()
+                        .filter((e) => {
+                            return 'username' in e.document.body && 'avatar' in e.document.body
+                        })
+                        .sort((a, b) => {
+                            if (a.cdate < b.cdate) return 1
+                            if (a.cdate > b.cdate) return -1
+                            return 0
+                        })
+                )
             })
         }, 500)
 
@@ -308,9 +320,9 @@ export function Explorer(): JSX.Element {
                         }}
                     >
                         {characters.map((character) => (
-                            <Paper key={character.id} variant="outlined">
+                            <Box key={character.id}>
                                 <SubProfileCard showccid character={character} />
-                            </Paper>
+                            </Box>
                         ))}
                     </Box>
                 </>
