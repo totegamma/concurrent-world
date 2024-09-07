@@ -17,7 +17,7 @@ import {
     Schemas,
     type MarkdownMessageSchema
 } from '@concurrent-world/client'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
@@ -44,9 +44,8 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
 
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
-    const ownFavorite = useMemo(
-        () => props.message?.ownAssociations.find((association) => association.schema === Schemas.likeAssociation),
-        [props.message]
+    const ownFavorite = props.message?.ownAssociations.find(
+        (association) => association.schema === Schemas.likeAssociation
     )
     const [favoriteMembers, setFavoriteMembers] = useState<Array<Association<LikeAssociationSchema>>>([])
 
@@ -162,9 +161,11 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                         }
                         onClick={() => {
                             if (ownFavorite) {
-                                props.message.deleteAssociation(ownFavorite.id)
+                                props.message.deleteAssociation(ownFavorite)
                             } else {
-                                props.message.favorite()
+                                props.message.favorite().catch(() => {
+                                    enqueueSnackbar('通信に失敗しました', { variant: 'error' })
+                                })
                             }
                         }}
                         message={likeCount}
@@ -174,7 +175,9 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     icon={<AddReactionIcon sx={{ fontSize: { xs: '70%', sm: '80%' } }} />}
                     onClick={(e) => {
                         emojiPicker.open(e.currentTarget, (emoji) => {
-                            props.message.reaction(emoji.shortcode, emoji.imageURL)
+                            props.message.reaction(emoji.shortcode, emoji.imageURL).catch(() => {
+                                enqueueSnackbar('通信に失敗しました', { variant: 'error' })
+                            })
                             emojiPicker.close()
                         })
                     }}

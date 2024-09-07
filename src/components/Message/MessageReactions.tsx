@@ -1,7 +1,7 @@
 import { Box, Button, Divider, Tooltip, Typography, alpha, useTheme } from '@mui/material'
 import { CCAvatar } from '../ui/CCAvatar'
 import { CurrencyText } from '../ui/CurrencyText'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link as routerLink } from 'react-router-dom'
 
 import {
@@ -17,6 +17,7 @@ import { useClient } from '../../context/ClientContext'
 import { type UpgradeAssociationSchema } from '@concurrent-world/client/dist/types/schemas/upgradeAssociation'
 import { useConcord } from '../../context/ConcordContext'
 import { MsgSend } from 'cosmjs-types/cosmos/bank/v1beta1/tx'
+import { enqueueSnackbar } from 'notistack'
 
 export interface MessageReactionsProps {
     message: Message<MarkdownMessageSchema | ReplyMessageSchema | RerouteMessageSchema>
@@ -81,14 +82,10 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
             })
     }, [upgradeCount])
 
-    const ownReactions = useMemo(
-        () =>
-            Object.fromEntries(
-                props.message?.ownAssociations
-                    .filter((association) => association.schema === Schemas.reactionAssociation)
-                    .map((association) => [association.document.body.imageUrl, association])
-            ),
-        [props.message]
+    const ownReactions = Object.fromEntries(
+        props.message?.ownAssociations
+            .filter((association) => association.schema === Schemas.reactionAssociation)
+            .map((association) => [association.document.body.imageUrl, association])
     )
 
     const loadReactionMembers = (reaction: string): void => {
@@ -102,7 +99,7 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
         })
     }
 
-    const reactionCounts: Record<string, number> = useMemo(() => {
+    const reactionCounts: Record<string, number> = (() => {
         if (!props.message.reactionCounts) return {}
         const tmp = JSON.parse(JSON.stringify(props.message.reactionCounts)) // deep copy
         for (const superReaction of superReactions) {
@@ -114,7 +111,7 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
             }
         }
         return tmp
-    }, [props.message.reactionCounts, superReactions])
+    })()
 
     if (!props.message.reactionCounts || Object.keys(props.message.reactionCounts).length === 0) {
         return <></>
@@ -264,15 +261,19 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                             variant="outlined"
                             onClick={() => {
                                 if (ownReactions[imageUrl]) {
-                                    props.message.deleteAssociation(ownReactions[imageUrl].id)
+                                    props.message.deleteAssociation(ownReactions[imageUrl])
                                 } else {
                                     if (reactionMembers[imageUrl]) {
                                         const shortcode = reactionMembers[imageUrl]?.[0].document.body.shortcode
-                                        props.message.reaction(shortcode, imageUrl)
+                                        props.message.reaction(shortcode, imageUrl).catch(() => {
+                                            enqueueSnackbar('通信に失敗しました', { variant: 'error' })
+                                        })
                                     } else {
                                         props.message.getReactions(imageUrl).then((reactions) => {
                                             const shortcode = reactions[0].document.body.shortcode
-                                            props.message.reaction(shortcode, imageUrl)
+                                            props.message.reaction(shortcode, imageUrl).catch(() => {
+                                                enqueueSnackbar('通信に失敗しました', { variant: 'error' })
+                                            })
                                         })
                                     }
                                 }
