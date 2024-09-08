@@ -88,6 +88,7 @@ export interface StreamList {
     expanded: boolean
     defaultPostHome: boolean
     defaultPostStreams: string[]
+    defaultProfile?: string
 }
 
 export interface userHomeStream {

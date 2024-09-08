@@ -3,7 +3,8 @@ import {
     type CoreEntity,
     type CommunityTimelineSchema,
     type CoreSubscription,
-    Schemas
+    Schemas,
+    type CoreProfile
 } from '@concurrent-world/client'
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { useClient } from './ClientContext'
@@ -18,6 +19,7 @@ export interface GlobalState {
     allKnownTimelines: Array<Timeline<CommunityTimelineSchema>>
     allKnownSubscriptions: Array<CoreSubscription<any>>
     listedSubscriptions: Record<string, CoreSubscription<any>>
+    allProfiles: Array<CoreProfile<any>>
     reloadList: () => void
 }
 
@@ -37,6 +39,7 @@ export const GlobalStateProvider = ({ children }: GlobalStateProps): JSX.Element
     const [isRegistered, setIsRegistered] = useState<boolean>(true)
     const isMasterSession = JSON.parse(localStorage.getItem('Identity') || 'null') !== null
 
+    const [allProfiles, setAllProfiles] = useState<Array<CoreProfile<any>>>([])
     const [allKnownTimelines, setAllKnownTimelines] = useState<Array<Timeline<CommunityTimelineSchema>>>([])
     const [allKnownSubscriptions, setAllKnownSubscriptions] = useState<Array<CoreSubscription<any>>>([])
     const [listedSubscriptions, setListedSubscriptions] = useState<Record<string, CoreSubscription<any>>>({})
@@ -44,6 +47,10 @@ export const GlobalStateProvider = ({ children }: GlobalStateProps): JSX.Element
     useEffect(() => {
         client.api.getOwnSubscriptions<any>().then((subs) => {
             setAllKnownSubscriptions(subs)
+        })
+        client.api.getProfiles({ author: client.ccid }).then((characters) => {
+            const profiles = (characters ?? []).filter((c) => c.schema !== 'https://schema.concrnt.world/p/main.json')
+            setAllProfiles(profiles)
         })
     }, [])
 
@@ -150,7 +157,8 @@ export const GlobalStateProvider = ({ children }: GlobalStateProps): JSX.Element
                 allKnownTimelines,
                 allKnownSubscriptions,
                 listedSubscriptions,
-                reloadList
+                reloadList,
+                allProfiles
             }}
         >
             {children}
@@ -169,7 +177,8 @@ export function useGlobalState(): GlobalState {
             allKnownTimelines: [],
             allKnownSubscriptions: [],
             listedSubscriptions: {},
-            reloadList: () => {}
+            reloadList: () => {},
+            allProfiles: []
         }
     }
     return context

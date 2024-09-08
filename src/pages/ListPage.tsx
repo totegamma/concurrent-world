@@ -64,13 +64,14 @@ export function ListPage(): JSX.Element {
     useEffect(() => {
         const opts = {
             streamPickerInitial: postStreams,
-            defaultPostHome
+            defaultPostHome,
+            profile: list.defaultProfile
         }
         editorModal.registerOptions(opts)
         return () => {
             editorModal.unregisterOptions(opts)
         }
-    }, [postStreams, defaultPostHome])
+    }, [postStreams, defaultPostHome, list.defaultProfile])
 
     const pinnedSubscriptions = useMemo(() => {
         return Object.keys(lists)
@@ -197,6 +198,7 @@ export function ListPage(): JSX.Element {
                                             <CCPostEditor
                                                 minRows={3}
                                                 maxRows={7}
+                                                subprofile={list.defaultProfile}
                                                 streamPickerOptions={allKnownTimelines}
                                                 streamPickerInitial={postStreams}
                                                 defaultPostHome={defaultPostHome}

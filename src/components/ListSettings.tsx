@@ -14,6 +14,8 @@ import { ListItemTimeline } from './ui/ListItemTimeline'
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove'
 import { useTranslation } from 'react-i18next'
 import { type StreamList } from '../model'
+import { ProfilePicker } from './ui/ProfilePicker'
+import { useGlobalState } from '../context/GlobalState'
 
 export interface ListSettingsProps {
     subscription: CoreSubscription<any>
@@ -25,6 +27,8 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
 
     const [lists, setLists] = usePreference('lists')
     const list = lists[props.subscription.id]
+
+    const { allProfiles } = useGlobalState()
 
     const [listName, setListName] = useState<string>('')
 
@@ -132,6 +136,16 @@ export function ListSettings(props: ListSettingsProps): JSX.Element {
                             updateList(props.subscription.id, {
                                 ...list,
                                 defaultPostHome: !list.defaultPostHome
+                            })
+                        }}
+                    />
+                    <Typography variant="h3">デフォルトプロフィール</Typography>
+                    <ProfilePicker
+                        selected={allProfiles.find((p) => p.id === list.defaultProfile)}
+                        setSelected={(p) => {
+                            updateList(props.subscription.id, {
+                                ...list,
+                                defaultProfile: p?.id
                             })
                         }}
                     />

@@ -83,6 +83,7 @@ export interface CCPostEditorProps {
     sx?: SxProps
     value?: string
     defaultPostHome?: boolean
+    subprofile?: string
     minRows?: number
     maxRows?: number
     onPost?: () => void
@@ -135,6 +136,10 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
         if (props.defaultPostHome === undefined) return
         setPostHomeButton(props.defaultPostHome)
     }, [props.defaultPostHome])
+
+    useEffect(() => {
+        setSelectedSubprofile(props.subprofile)
+    }, [props.subprofile])
 
     // draft handling
     const [draft, setDraft] = usePersistent<string>('draft', '')
