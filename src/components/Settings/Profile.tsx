@@ -34,7 +34,7 @@ export const ProfileSettings = (): JSX.Element => {
     const [allProfiles, setAllProfiles] = useState<Array<CoreProfile<any>>>([])
     const [openProfileEditor, setOpenProfileEditor] = useState(false)
 
-    const [schemaURLDraft, setSchemaURLDraft] = useState<string>('')
+    const [schemaURLDraft, setSchemaURLDraft] = useState<string>('https://schema.concrnt.world/p/basic.json')
     const [schemaURL, setSchemaURL] = useState<any>(null)
     const [editingProfile, setEditingProfile] = useState<CoreProfile<any> | null>(null)
 

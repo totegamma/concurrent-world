@@ -43,7 +43,14 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
     const [isFetching, setIsFetching] = useState<boolean>(true)
     const [devMode] = usePreference('devMode')
     const [forceUpdateCount, setForceUpdateCount] = useState<number>(0)
+    const [_, setStaticUpdateCount] = useState<number>(0)
     const [error, setError] = useState<string | null>(null)
+
+    if (message) {
+        message.onUpdate = () => {
+            setStaticUpdateCount((prev) => prev + 1)
+        }
+    }
 
     useEffect(() => {
         client

@@ -7,6 +7,7 @@ import { useClient } from '../../context/ClientContext'
 import { type User } from '@concurrent-world/client'
 import { UserPicker } from '../ui/UserPicker'
 import { type RegistryWidgetsType, type UiSchema, type WidgetProps } from '@rjsf/utils'
+import { MediaInput } from './MediaInput'
 
 export interface CCEditorProps {
     schemaURL?: string
@@ -42,8 +43,21 @@ const UserPickerWidget = (props: WidgetProps): JSX.Element => {
     )
 }
 
+const MediaInputWidget = (props: WidgetProps): JSX.Element => {
+    return (
+        <MediaInput
+            label={props.label + (props.required ? ' *' : '')}
+            value={props.value}
+            onChange={(value) => {
+                props.onChange(value)
+            }}
+        />
+    )
+}
+
 const widgets: RegistryWidgetsType = {
-    userPicker: UserPickerWidget
+    userPicker: UserPickerWidget,
+    mediaInput: MediaInputWidget
 }
 
 export const CCEditor = memo<CCEditorProps>((props: CCEditorProps): JSX.Element => {

@@ -48,6 +48,14 @@ export function MessagePage(): JSX.Element {
     const [message, setMessage] = useState<Message<
         MarkdownMessageSchema | ReplyMessageSchema | RerouteMessageSchema
     > | null>()
+    const [_, setStaticUpdateCount] = useState<number>(0)
+
+    if (message) {
+        message.onUpdate = () => {
+            setStaticUpdateCount((prev) => prev + 1)
+        }
+    }
+
     const [isFetching, setIsFetching] = useState<boolean>(true)
 
     const [replies, setReplies] = useState<
