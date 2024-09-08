@@ -32,6 +32,7 @@ export interface PostProps extends CCPostEditorProps {
 export interface Options {
     streamPickerInitial?: Array<Timeline<CommunityTimelineSchema>>
     defaultPostHome?: boolean
+    profile?: string
 }
 
 export interface EditorModalProps {
@@ -91,6 +92,7 @@ export const EditorModalProvider = (props: EditorModalProps): JSX.Element => {
             defaultPostHome:
                 opts.defaultPostHome ?? (home?.defaultPostHome === undefined ? true : home.defaultPostHome),
             actionTo: openOpts?.target,
+            subprofile: opts?.profile,
             mode: openOpts?.mode,
             context: openOpts?.target ? (
                 <Box width="100%" maxHeight={isMobileSize ? '3rem' : 'unset'} overflow="auto">

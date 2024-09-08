@@ -22,6 +22,7 @@ import { useGlobalState } from '../context/GlobalState'
 import { ListItemTimeline } from '../components/ui/ListItemTimeline'
 import { CCPostEditor } from '../components/Editor/CCPostEditor'
 import { useEditorModal } from '../components/EditorModal'
+import { type StreamList } from '../model'
 
 export function ListPage(): JSX.Element {
     const { client } = useClient()
@@ -48,7 +49,7 @@ export function ListPage(): JSX.Element {
     const tabSubAnchor = useRef<HTMLDivElement | null>(null)
     const [tabSubscription, setTabSubscription] = useState<CoreSubscriptionItem[] | undefined>()
 
-    const list = lists[id]
+    const list: StreamList | undefined = lists[id]
     const postStreams = useMemo(() => {
         if (!list) return []
         return list.defaultPostStreams
@@ -64,13 +65,14 @@ export function ListPage(): JSX.Element {
     useEffect(() => {
         const opts = {
             streamPickerInitial: postStreams,
-            defaultPostHome
+            defaultPostHome,
+            profile: list?.defaultProfile
         }
         editorModal.registerOptions(opts)
         return () => {
             editorModal.unregisterOptions(opts)
         }
-    }, [postStreams, defaultPostHome])
+    }, [postStreams, defaultPostHome, list?.defaultProfile])
 
     const pinnedSubscriptions = useMemo(() => {
         return Object.keys(lists)
@@ -197,6 +199,7 @@ export function ListPage(): JSX.Element {
                                             <CCPostEditor
                                                 minRows={3}
                                                 maxRows={7}
+                                                subprofile={list.defaultProfile}
                                                 streamPickerOptions={allKnownTimelines}
                                                 streamPickerInitial={postStreams}
                                                 defaultPostHome={defaultPostHome}

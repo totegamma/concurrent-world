@@ -4,11 +4,11 @@ import { DummyMessageView } from '../Message/DummyMessageView'
 import { CCAvatar } from '../ui/CCAvatar'
 import { ErrorBoundary } from 'react-error-boundary'
 import HeartBrokenIcon from '@mui/icons-material/HeartBroken'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useClient } from '../../context/ClientContext'
 import { type EmojiLite } from '../../model'
-import { type CoreProfile } from '@concurrent-world/client'
+import { useGlobalState } from '../../context/GlobalState'
 
 interface EditorPreviewProps {
     draft: string
@@ -22,15 +22,7 @@ export const EditorPreview = (props: EditorPreviewProps): JSX.Element => {
     const { t } = useTranslation('', { keyPrefix: 'ui.draft' })
     const { client } = useClient()
     const [profileSelectAnchorEl, setProfileSelectAnchorEl] = useState<null | HTMLElement>(null)
-
-    const [allProfiles, setAllProfiles] = useState<Array<CoreProfile<any>>>([])
-
-    useEffect(() => {
-        client.api.getProfiles({ author: client.ccid }).then((characters) => {
-            const profiles = (characters ?? []).filter((c) => c.schema !== 'https://schema.concrnt.world/p/main.json')
-            setAllProfiles(profiles)
-        })
-    }, [])
+    const { allProfiles } = useGlobalState()
 
     return (
         <ErrorBoundary
