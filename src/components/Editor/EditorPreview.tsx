@@ -1,14 +1,14 @@
-import { Box, ListItemIcon, Typography, Menu, MenuItem } from '@mui/material'
+import { Box, ListItemIcon, Typography, Menu, MenuItem, Avatar } from '@mui/material'
 
 import { DummyMessageView } from '../Message/DummyMessageView'
-import { SubprofileBadge } from '../ui/SubprofileBadge'
 import { CCAvatar } from '../ui/CCAvatar'
 import { ErrorBoundary } from 'react-error-boundary'
 import HeartBrokenIcon from '@mui/icons-material/HeartBroken'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useClient } from '../../context/ClientContext'
 import { type EmojiLite } from '../../model'
+import { type CoreProfile } from '@concurrent-world/client'
 
 interface EditorPreviewProps {
     draft: string
@@ -22,6 +22,15 @@ export const EditorPreview = (props: EditorPreviewProps): JSX.Element => {
     const { t } = useTranslation('', { keyPrefix: 'ui.draft' })
     const { client } = useClient()
     const [profileSelectAnchorEl, setProfileSelectAnchorEl] = useState<null | HTMLElement>(null)
+
+    const [allProfiles, setAllProfiles] = useState<Array<CoreProfile<any>>>([])
+
+    useEffect(() => {
+        client.api.getProfiles({ author: client.ccid }).then((characters) => {
+            const profiles = (characters ?? []).filter((c) => c.schema !== 'https://schema.concrnt.world/p/main.json')
+            setAllProfiles(profiles)
+        })
+    }, [])
 
     return (
         <ErrorBoundary
@@ -90,17 +99,17 @@ export const EditorPreview = (props: EditorPreviewProps): JSX.Element => {
                     </MenuItem>
                 )}
 
-                {client.user?.profile?.subprofiles?.map((id) => {
-                    if (props.selectedSubprofile === id) return undefined
+                {allProfiles.map((p) => {
+                    if (props.selectedSubprofile === p.id) return undefined
                     return (
                         <MenuItem
-                            key={id}
+                            key={p.id}
                             onClick={() => {
-                                props.setSelectedSubprofile(id)
+                                props.setSelectedSubprofile(p.id)
                             }}
                         >
                             <ListItemIcon>
-                                <SubprofileBadge characterID={id} authorCCID={client.user?.ccid ?? ''} />
+                                <Avatar alt={p.document.body.username} src={p.document.body.avatar} variant="square" />
                             </ListItemIcon>
                         </MenuItem>
                     )
