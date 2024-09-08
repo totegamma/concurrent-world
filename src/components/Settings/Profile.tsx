@@ -305,6 +305,8 @@ export const ProfileSettings = (): JSX.Element => {
                                 onClick={() => {
                                     setSubprofileDraft(character.document.body)
                                     setEditingProfile(character)
+                                    setSchemaURL(character.schema)
+                                    setSchemaURLDraft(character.schema)
                                 }}
                             >
                                 <ListItemIcon>
@@ -375,15 +377,18 @@ export const ProfileSettings = (): JSX.Element => {
                     {editingProfile && (
                         <>
                             <Typography variant="h3">サブプロフィールの編集</Typography>
-                            <CCEditor
-                                schemaURL={editingProfile.schema}
-                                value={subprofileDraft}
-                                setValue={setSubprofileDraft}
+                            <TextField
+                                label="テンプレートのURL"
+                                value={schemaURLDraft}
+                                onChange={(e) => {
+                                    setSchemaURLDraft(e.target.value)
+                                }}
                             />
+                            <CCEditor schemaURL={schemaURL} value={subprofileDraft} setValue={setSubprofileDraft} />
                             <Button
                                 onClick={() => {
                                     client.api
-                                        .upsertProfile(editingProfile.schema, subprofileDraft, {
+                                        .upsertProfile(schemaURL, subprofileDraft, {
                                             id: editingProfile.id
                                         })
                                         .then((_) => {
