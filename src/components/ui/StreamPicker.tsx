@@ -3,6 +3,10 @@ import { type CommunityTimelineSchema, type Timeline } from '@concurrent-world/c
 import { CCChip } from './CCChip'
 import { useMemo } from 'react'
 
+import TagIcon from '@mui/icons-material/Tag'
+import LockIcon from '@mui/icons-material/Lock'
+import { isPrivateTimeline } from '../../util'
+
 export interface StreamPickerProps {
     selected: Array<Timeline<CommunityTimelineSchema>>
     setSelected: (selected: Array<Timeline<CommunityTimelineSchema>>) => void
@@ -12,7 +16,7 @@ export interface StreamPickerProps {
 
 export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
     // WORKAROUND for vite circular JSON dependency
-    const selected = useMemo(
+    const selected: Array<Timeline<CommunityTimelineSchema>> = useMemo(
         () =>
             JSON.parse(
                 JSON.stringify(props.selected ?? [], (key, value) => {
@@ -43,6 +47,23 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
                 options={props.options}
                 getOptionKey={(option: Timeline<CommunityTimelineSchema>) => option.id ?? ''}
                 getOptionLabel={(option: Timeline<CommunityTimelineSchema>) => option.document.body.name}
+                filterOptions={(options: Array<Timeline<CommunityTimelineSchema>>, state) => {
+                    const filtered = options.filter((option) => {
+                        if (selected.some((e) => e.id === option.id)) {
+                            return false
+                        }
+
+                        if (state.inputValue === '') {
+                            return true
+                        }
+
+                        return (
+                            option.document.body.name.toLowerCase().includes(state.inputValue.toLowerCase()) ||
+                            option.document.body.shortname?.toLowerCase().includes(state.inputValue.toLowerCase())
+                        )
+                    })
+                    return filtered
+                }}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 onChange={(_, value) => {
                     props.setSelected(value)
@@ -66,6 +87,8 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
                 renderTags={(value, getTagProps) =>
                     value.map((option, index) => (
                         <CCChip
+                            size="small"
+                            icon={isPrivateTimeline(option) ? <LockIcon /> : <TagIcon />}
                             label={option.document.body.name}
                             sx={{ color: 'text.default' }}
                             {...getTagProps({ index })}
@@ -73,6 +96,22 @@ export const StreamPicker = (props: StreamPickerProps): JSX.Element => {
                         />
                     ))
                 }
+                renderOption={(props, option, _state, _ownerState) => (
+                    <Box
+                        key={option.id}
+                        component="li"
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: 0.5
+                        }}
+                        {...props}
+                    >
+                        {isPrivateTimeline(option) ? <LockIcon /> : <TagIcon />}
+                        {option.document.body.name}
+                    </Box>
+                )}
             />
         </Box>
     )
