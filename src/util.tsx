@@ -2,7 +2,11 @@ import { useTranslation } from 'react-i18next'
 
 import { visit } from 'unist-util-visit'
 import { inspect } from 'unist-util-inspect'
-import { Sign, type CCDocument } from '@concurrent-world/client'
+import { Sign, type CCDocument, type Timeline } from '@concurrent-world/client'
+
+export const isPrivateTimeline = (tl: Timeline<any>): boolean => {
+    return tl.policy === 'https://policy.concrnt.world/t/inline-read-write.json' && !tl.policyParams?.isReadPublic
+}
 
 export const jumpToDomainRegistration = (ccid: string, privateKey: string, fqdn: string, callback: string): void => {
     const affiliation: CCDocument.Affiliation = {

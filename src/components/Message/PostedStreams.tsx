@@ -14,6 +14,10 @@ import { CCUserIcon } from '../ui/CCUserIcon'
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 
+import TagIcon from '@mui/icons-material/Tag'
+import LockIcon from '@mui/icons-material/Lock'
+import { isPrivateTimeline } from '../../util'
+
 export interface PostedStreamsProps {
     useUserIcon?: boolean
     message: Message<MarkdownMessageSchema | ReplyMessageSchema | RerouteMessageSchema>
@@ -53,6 +57,8 @@ export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
                 />
             )}
             {postedStreams.map((e) => {
+                const isPrivate = isPrivateTimeline(e)
+
                 switch (e.schema) {
                     case Schemas.communityTimeline:
                         return (
@@ -65,10 +71,18 @@ export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
                                     fontweight: '400',
                                     fontSize: '12px',
                                     color: 'text.secondary',
-                                    borderColor: 'divider'
+                                    borderColor: 'divider',
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    alignItems: 'center'
                                 }}
                             >
-                                #{e.document.body.shortname || e.document.body.name}
+                                {isPrivate ? (
+                                    <LockIcon sx={{ height: '1rem', width: '1rem' }} />
+                                ) : (
+                                    <TagIcon sx={{ height: '1rem', width: '1rem' }} />
+                                )}
+                                {e.document.body.shortname || e.document.body.name}
                             </Link>
                         )
                     case Schemas.emptyTimeline:
