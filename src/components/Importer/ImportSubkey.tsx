@@ -1,4 +1,4 @@
-import { Button, IconButton, InputAdornment, TextField, Typography } from '@mui/material'
+import { Button, CircularProgress, IconButton, InputAdornment, TextField, Typography } from '@mui/material'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -11,10 +11,13 @@ export const ImportSubkey = (): JSX.Element => {
     const { t } = useTranslation('', { keyPrefix: 'import' })
 
     const [subkey, setSubkey] = useState<string>('')
+    const [subkeyDraft, setSubkeyDraft] = useState<string>('')
     const [showSecret, setShowSecret] = useState<boolean>(true)
     const [errorMessage, setErrorMessage] = useState<string>('')
 
     const [client, setClient] = useState<Client | null>(null)
+
+    const [loading, setLoading] = useState<boolean>(false)
 
     const accountImport = (): void => {
         if (client) {
@@ -26,17 +29,22 @@ export const ImportSubkey = (): JSX.Element => {
 
     const checkLogin = (subkey: string): void => {
         if (subkey.startsWith('concurrent-subkey')) {
-            try {
-                Client.createFromSubkey(subkey).then((client) => {
+            setLoading(true)
+            Client.createFromSubkey(subkey)
+                .then((client) => {
                     setClient(client)
+                    setSubkey(subkey)
                 })
-            } catch (e) {
-                setErrorMessage('Invalid subkey')
-            }
+                .catch((_e) => {
+                    setErrorMessage('Invalid subkey')
+                    setClient(null)
+                })
+                .finally(() => {
+                    setLoading(false)
+                })
         } else {
             setErrorMessage('Invalid subkey')
         }
-        setSubkey(subkey)
     }
 
     return (
@@ -45,8 +53,9 @@ export const ImportSubkey = (): JSX.Element => {
             <TextField
                 type={showSecret ? 'text' : 'password'}
                 placeholder={'concurrent-subkey xxx CCxxx@example.com'}
-                value={subkey}
+                value={subkeyDraft}
                 onChange={(e) => {
+                    setSubkeyDraft(e.target.value)
                     checkLogin(e.target.value)
                 }}
                 onPaste={() => {
@@ -55,14 +64,18 @@ export const ImportSubkey = (): JSX.Element => {
                 InputProps={{
                     endAdornment: (
                         <InputAdornment position="end">
-                            <IconButton
-                                onClick={() => {
-                                    setShowSecret(!showSecret)
-                                }}
-                                color="primary"
-                            >
-                                {client ? <CheckCircleIcon /> : showSecret ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
+                            {loading ? (
+                                <CircularProgress color="primary" size={20} />
+                            ) : (
+                                <IconButton
+                                    onClick={() => {
+                                        setShowSecret(!showSecret)
+                                    }}
+                                    color="primary"
+                                >
+                                    {client ? <CheckCircleIcon /> : showSecret ? <VisibilityOff /> : <Visibility />}
+                                </IconButton>
+                            )}
                         </InputAdornment>
                     )
                 }}
