@@ -44,7 +44,17 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
 
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
-    const ownFavorite = props.message?.ownAssociations.find(
+    let debug = ''
+    try {
+        const _ownFavorite = props.message?.ownAssociations.find(
+            (association) => association.schema === Schemas.likeAssociation
+        )
+    } catch (e: any) {
+        debug = `error: ${e.message},
+props.message?.ownAssociations: ${props.message?.ownAssociations}`
+    }
+
+    const ownFavorite = props.message?.ownAssociations?.find(
         (association) => association.schema === Schemas.likeAssociation
     )
     const [favoriteMembers, setFavoriteMembers] = useState<Array<Association<LikeAssociationSchema>>>([])
@@ -191,6 +201,11 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
                     message={0}
                 />
             </Box>
+            {debug && (
+                <Box>
+                    <pre>{debug}</pre>
+                </Box>
+            )}
             <Menu
                 anchorEl={menuAnchor}
                 open={Boolean(menuAnchor)}
