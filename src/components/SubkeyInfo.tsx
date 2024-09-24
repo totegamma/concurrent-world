@@ -2,6 +2,9 @@ import { Box, Divider, Paper, Typography } from '@mui/material'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import QRCode from 'react-qr-code'
+import { enqueueSnackbar } from 'notistack'
+import { CCIconButton } from './ui/CCIconButton'
+import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 
 export default function SubkeyInfo(props: { subkey: string }): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'ui.secret' })
@@ -50,6 +53,23 @@ export default function SubkeyInfo(props: { subkey: string }): JSX.Element {
                 >
                     {props.subkey}
                 </Typography>
+                <CCIconButton
+                    onClick={() => {
+                        try {
+                            navigator.clipboard.writeText(JSON.parse(localStorage.getItem('SubKey')!))
+                            enqueueSnackbar('Copied', { variant: 'info' })
+                        } catch (e) {
+                            enqueueSnackbar('No SubKey found', { variant: 'error' })
+                        }
+                    }}
+                >
+                    <ContentPasteIcon
+                        sx={{
+                            color: 'text.primary'
+                        }}
+                    />
+                </CCIconButton>
+
                 <Divider orientation="vertical" />
                 <Box
                     style={{
