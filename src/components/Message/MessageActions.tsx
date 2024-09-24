@@ -44,8 +44,6 @@ export const MessageActions = (props: MessageActionsProps): JSX.Element => {
 
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
 
-    console.log(props.message?.ownAssociations)
-
     const ownFavorite = props.message?.ownAssociations.find(
         (association) => association.schema === Schemas.likeAssociation
     )
