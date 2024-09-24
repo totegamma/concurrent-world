@@ -65,7 +65,7 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
     }, [message])
 
     const previewMessage = useMemo(() => {
-        const msg: any = message
+        const msg: any = structuredClone(message)
         if (msg) {
             msg.associations = 'REDACTED'
             msg.ownAssociations = 'REDACTED'
