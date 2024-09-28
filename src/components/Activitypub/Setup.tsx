@@ -78,7 +78,6 @@ export const ApSetup = (): JSX.Element => {
             {
                 semanticID: 'world.concrnt.t-ap',
                 indexable: false,
-                domainOwned: false,
                 policy: 'https://policy.concrnt.world/t/inline-read-write.json',
                 policyParams: JSON.stringify({
                     isWritePublic: false,

@@ -82,7 +82,9 @@ export function ManageSubsPage(): JSX.Element {
                                         {
                                             name: '新しいリスト'
                                         },
-                                        { indexable: false, domainOwned: false }
+                                        {
+                                            indexable: false
+                                        }
                                     )
                                     .then((_subscription) => {
                                         reloadList()

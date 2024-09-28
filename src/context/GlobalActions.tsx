@@ -65,7 +65,7 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                     {
                         name: 'Home'
                     },
-                    { indexable: false, domainOwned: false }
+                    { indexable: false }
                 )
                 .then(async (sub) => {
                     if (timeline) {

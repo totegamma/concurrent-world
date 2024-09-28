@@ -44,7 +44,7 @@ export interface CoreTimeline {
     id: string
     indexable: boolean
     author: string
-    domainOwned: boolean
+    owner: string
     schema: string
     policy?: string
     policyParams?: string
