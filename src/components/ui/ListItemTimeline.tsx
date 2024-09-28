@@ -44,7 +44,7 @@ export const ListItemTimeline = (props: ListItemTimelineProps): JSX.Element | nu
 
     return (
         <ListItemButton dense component={RouterLink} to={link} sx={props.sx} onClick={props.onClick}>
-            {IsCSID(timeline?.owner) ? <TagIcon /> : <AlternateEmailIcon />}
+            {timeline?.owner && IsCSID(timeline.owner) ? <TagIcon /> : <AlternateEmailIcon />}
             {timeline?.document.body.name || userProfile?.profile?.username || 'Unknown'}
         </ListItemButton>
     )
