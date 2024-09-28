@@ -135,9 +135,9 @@ export function Explorer(): JSX.Element {
         }
     }, [profileSchema, selectedDomains, tab])
 
-    const createNewStream = (stream: any): void => {
-        client.api
-            .upsertTimeline(Schemas.communityTimeline, stream)
+    const createNewTimeline = (body: CommunityTimelineSchema): void => {
+        client
+            .createCommunityTimeline(body)
             .then((e: any) => {
                 const id: string = e.id
                 if (id) navigate('/timeline/' + id)
@@ -290,7 +290,7 @@ export function Explorer(): JSX.Element {
                             />
                             <Button
                                 onClick={() => {
-                                    createNewStream(timelineDraft)
+                                    if (timelineDraft) createNewTimeline(timelineDraft)
                                 }}
                             >
                                 作成
