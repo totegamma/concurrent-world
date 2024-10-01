@@ -64,7 +64,6 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
             .upsertTimeline(schemaDraft, documentBody, {
                 id: props.id,
                 indexable: visible,
-                domainOwned: false,
                 policy: policyDraft,
                 policyParams
             })

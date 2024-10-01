@@ -1,7 +1,7 @@
 import { ListItemButton, type SxProps } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
-import { type User, type Timeline, type CommunityTimelineSchema } from '@concurrent-world/client'
+import { type User, type Timeline, type CommunityTimelineSchema, IsCSID } from '@concurrent-world/client'
 import { useClient } from '../../context/ClientContext'
 import TagIcon from '@mui/icons-material/Tag'
 import CloudOffIcon from '@mui/icons-material/CloudOff'
@@ -44,7 +44,7 @@ export const ListItemTimeline = (props: ListItemTimelineProps): JSX.Element | nu
 
     return (
         <ListItemButton dense component={RouterLink} to={link} sx={props.sx} onClick={props.onClick}>
-            {timeline?.domainOwned ? <TagIcon /> : <AlternateEmailIcon />}
+            {timeline?.owner && IsCSID(timeline.owner) ? <TagIcon /> : <AlternateEmailIcon />}
             {timeline?.document.body.name || userProfile?.profile?.username || 'Unknown'}
         </ListItemButton>
     )
