@@ -227,7 +227,7 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
             )
             break
         default:
-            body = <Typography>unknown schema: {(message as any).schema}</Typography>
+            body = <Typography>unknown schema: {(message as any)?.schema ?? '<undefined>'}</Typography>
             break
     }
 

@@ -12,8 +12,8 @@ dependencies:
     specifier: ^3.592.0
     version: 3.592.0
   '@concurrent-world/client':
-    specifier: ^6.1.1
-    version: 6.1.1
+    specifier: ^6.1.2
+    version: 6.1.2
   '@cosmjs/encoding':
     specifier: ^0.32.4
     version: 0.32.4
@@ -2363,14 +2363,14 @@ packages:
     dev: true
     optional: true
 
-  /@concurrent-world/client@6.1.1:
-    resolution: {integrity: sha512-B5qa+icJ4TxCDzav1it8N9Q1v8+lUSRiJ9W9qht0UpMuSvwmiWCYDGjPE6x64gJGLkvRDHJUlWXxZJSmh2Yvdw==}
+  /@concurrent-world/client@6.1.2:
+    resolution: {integrity: sha512-A4NrKsvMnN1/UYPbHfDhQ/sAP/7NH5+3BveOqdr+NyNjaYBEDuqpR85E3bTviuT8DNcKID0phYzI1Ld4MjiABw==}
     dependencies:
       '@cosmjs/amino': 0.32.4
       '@cosmjs/crypto': 0.32.4
       '@cosmjs/encoding': 0.32.4
       elliptic: 6.5.4
-      ethers: 6.13.2
+      ethers: 6.13.3
       uuid: 9.0.1
     transitivePeerDependencies:
       - bufferutil
@@ -7451,8 +7451,8 @@ packages:
     engines: {node: '>= 0.6'}
     dev: true
 
-  /ethers@6.13.2:
-    resolution: {integrity: sha512-9VkriTTed+/27BGuY1s0hf441kqwHJ1wtN2edksEtiRvXx+soxRX3iSXTfFqq2+YwrOqbDoTHjIhQnjJRlzKmg==}
+  /ethers@6.13.3:
+    resolution: {integrity: sha512-/DzbZOLVtoO4fKvvQwpEucHAQgIwBGWuRvBdwE/lMXgXvvHHTSkn7XqAQ2b+gjJzZDJjWA9OD05bVceVOsBHbg==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@adraffy/ens-normalize': 1.10.1
