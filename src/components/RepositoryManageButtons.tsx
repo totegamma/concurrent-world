@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useClient } from '../context/ClientContext'
-import { Button, TextField } from '@mui/material'
+import { Alert, Box, Button, TextField } from '@mui/material'
 import { type CCDocument, Schemas, Sign } from '@concurrent-world/client'
+import { useSnackbar } from 'notistack'
 
 interface v0data {
     content: any[]
@@ -242,27 +243,123 @@ export function V0RepositoryImportButton(): JSX.Element {
 
 export function RepositoryExportButton(): JSX.Element {
     const { client } = useClient()
+    const { enqueueSnackbar } = useSnackbar()
+    const [syncStatus, setSyncStatus] = useState<any>(null)
+
+    useEffect(() => {
+        if (!client.user) return
+
+        client.api
+            .fetchWithCredential(client.host, '/api/v1/repositories/sync', {})
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(data.content)
+                setSyncStatus(data.content)
+            })
+    }, [])
+
+    const isDateValid = syncStatus && new Date(syncStatus?.latestOnFile).getTime() > 0
+
     return (
-        <Button
-            onClick={() => {
-                client.api
-                    .fetchWithCredential(client.host, '/api/v1/repository', {}, 60000)
-                    .then((res) => res.blob())
-                    .then((blob) => {
-                        const url = window.URL.createObjectURL(blob)
-                        const a = document.createElement('a')
-                        a.href = url
-                        a.download =
-                            (client.user?.profile?.username ?? 'anonymous') +
-                            '-backup-' +
-                            new Date().toLocaleDateString() +
-                            '.txt'
-                        a.click()
-                        window.URL.revokeObjectURL(url)
-                    })
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2
             }}
         >
-            レポジトリデータのエクスポート
-        </Button>
+            {syncStatus?.status === 'syncing' && (
+                <Alert
+                    severity="info"
+                    action={
+                        <Button
+                            variant="contained"
+                            onClick={() =>
+                                client.api
+                                    .fetchWithCredential(client.host, '/api/v1/repositories/sync', {})
+                                    .then((res) => res.json())
+                                    .then((data) => {
+                                        setSyncStatus(data.content)
+                                    })
+                            }
+                        >
+                            リロード
+                        </Button>
+                    }
+                >
+                    バックアップデータは現在同期中です。しばらくお待ちください。({syncStatus?.progress})
+                </Alert>
+            )}
+            {syncStatus?.status === 'insync' && (
+                <Alert severity="success">最新のバックアップデータがダウンロード可能です。</Alert>
+            )}
+            {syncStatus?.status === 'outofsync' && (
+                <Alert
+                    severity="info"
+                    action={
+                        <Button
+                            variant="contained"
+                            onClick={() =>
+                                client.api
+                                    .fetchWithCredential(client.host, '/api/v1/repositories/sync', {
+                                        method: 'POST'
+                                    })
+                                    .then((res) => res.json())
+                                    .then((data) => {
+                                        console.log(data)
+                                        setSyncStatus(data.content)
+                                        enqueueSnackbar('更新をリクエストしました。しばらくお待ちください。', {
+                                            variant: 'info'
+                                        })
+                                    })
+                            }
+                        >
+                            更新をリクエスト
+                        </Button>
+                    }
+                >
+                    {isDateValid ? (
+                        <>
+                            現在ダウンロードできるバックアップデータは
+                            {new Date(syncStatus?.latestOnFile).toLocaleDateString()}-
+                            {new Date(syncStatus?.latestOnFile).toLocaleTimeString()}までのデータです。
+                        </>
+                    ) : (
+                        <>バックアップデータが未作成です。更新をリクエストしてください。</>
+                    )}
+                </Alert>
+            )}
+
+            <Button
+                disabled={syncStatus?.status === 'syncing' || !isDateValid}
+                onClick={() => {
+                    client.api
+                        .fetchWithCredential(client.host, '/api/v1/repository', {})
+                        .then((res) => res.blob())
+                        .then((blob) => {
+                            const url = window.URL.createObjectURL(blob)
+                            const a = document.createElement('a')
+                            a.href = url
+                            a.download =
+                                (client.user?.profile?.username ?? 'anonymous') +
+                                '-backup-' +
+                                new Date().toLocaleDateString() +
+                                '.txt'
+                            a.click()
+                            window.URL.revokeObjectURL(url)
+                        })
+                }}
+            >
+                {!isDateValid
+                    ? 'バックアップデータのエクスポート'
+                    : syncStatus?.status === 'syncing'
+                    ? '準備中...'
+                    : syncStatus?.status === 'insync'
+                    ? 'バックアップデータのエクスポート'
+                    : `${new Date(syncStatus?.latestOnFile).toLocaleDateString()}-${new Date(
+                          syncStatus?.latestOnFile
+                      ).toLocaleTimeString()}までのレポジトリデータをエクスポート`}
+            </Button>
+        </Box>
     )
 }
