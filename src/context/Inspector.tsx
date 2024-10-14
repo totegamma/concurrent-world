@@ -1,4 +1,4 @@
-import { Alert, Box, Paper, Typography } from '@mui/material'
+import { Alert, Box, IconButton, List, ListItem, Paper, Typography } from '@mui/material'
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useClient } from './ClientContext'
@@ -8,6 +8,9 @@ import { MessageContainer } from '../components/Message/MessageContainer'
 import { CCDrawer } from '../components/ui/CCDrawer'
 import { type Key } from '@concurrent-world/client/dist/types/model/core'
 import { KeyCard } from '../components/ui/KeyCard'
+import { ListItemTimeline } from '../components/ui/ListItemTimeline'
+import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove'
+import { useSnackbar } from 'notistack'
 
 export interface InspectorState {
     inspectingItem: { messageId: string; author: string } | null
@@ -22,6 +25,7 @@ interface InspectorProps {
 
 export const InspectorProvider = (props: InspectorProps): JSX.Element => {
     const { client } = useClient()
+    const { enqueueSnackbar } = useSnackbar()
     const [inspectingItem, inspectItem] = useState<{ messageId: string; author: string } | null>(null)
     const [message, setMessage] = useState<CoreMessage<any> | undefined>()
     const [associations, setAssociations] = useState<Array<CoreAssociation<any>>>([])
@@ -248,6 +252,41 @@ export const InspectorProvider = (props: InspectorProps): JSX.Element => {
                                 </Box>
                             </>
                         )}
+
+                        <Typography variant="h2" sx={{ mt: 1 }}>
+                            Timeliens:
+                        </Typography>
+
+                        <List>
+                            {message.timelines.map((timeline) => (
+                                <ListItem
+                                    key={timeline}
+                                    disablePadding
+                                    secondaryAction={
+                                        <IconButton
+                                            onClick={(_) => {
+                                                client.api
+                                                    .retractItem(timeline, message.id)
+                                                    .then(() => {
+                                                        enqueueSnackbar('Retracted item from timeline', {
+                                                            variant: 'success'
+                                                        })
+                                                    })
+                                                    .catch((e) => {
+                                                        enqueueSnackbar(`Failed to retract item from timeline: ${e}`, {
+                                                            variant: 'error'
+                                                        })
+                                                    })
+                                            }}
+                                        >
+                                            <PlaylistRemoveIcon color="error" />
+                                        </IconButton>
+                                    }
+                                >
+                                    <ListItemTimeline timelineID={timeline} />
+                                </ListItem>
+                            ))}
+                        </List>
 
                         <Typography variant="h2" sx={{ mt: 1 }}>
                             Message:
