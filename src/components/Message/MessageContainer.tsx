@@ -159,6 +159,8 @@ export const MessageContainer = memo<MessageContainerProps>((props: MessageConta
                 </Box>
             )
         }
+    } else if (!message && !devMode) {
+        return null
     }
 
     let body
