@@ -12,8 +12,8 @@ dependencies:
     specifier: ^3.592.0
     version: 3.592.0
   '@concurrent-world/client':
-    specifier: ^6.1.3
-    version: 6.1.3
+    specifier: ^6.1.4
+    version: 6.1.4
   '@cosmjs/encoding':
     specifier: ^0.32.4
     version: 0.32.4
@@ -2363,8 +2363,8 @@ packages:
     dev: true
     optional: true
 
-  /@concurrent-world/client@6.1.3:
-    resolution: {integrity: sha512-Prldnbqeh/METwfpR/Clf+/BNDi7Tnr1g95T5/c3uAjgsJJdlKH5B+Vv9JrkrxiGRsXYyKpj1I6t9UtXfI60MA==}
+  /@concurrent-world/client@6.1.4:
+    resolution: {integrity: sha512-vWRCjyygByXZHf7m3dtQbsQ7BR/yeq5Ey9CB3dEZbDRz31z29mgFpBj0BHnqHQNDGWGCazht2pdD3lwKVDDBxA==}
     dependencies:
       '@cosmjs/amino': 0.32.4
       '@cosmjs/crypto': 0.32.4
@@ -5370,7 +5370,6 @@ packages:
     resolution: {integrity: sha512-jML7s2NAzMWc//QSJ1a3prpk78cOPchGvXJsC3C6R6PSMoooztvRVQEz89gmBTBY1SPMaqo5teB4uNHPdetShQ==}
     dependencies:
       undici-types: 6.19.8
-    dev: false
 
   /@types/normalize-package-data@2.4.4:
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
@@ -5441,7 +5440,7 @@ packages:
   /@types/resolve@1.17.1:
     resolution: {integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==}
     dependencies:
-      '@types/node': 20.2.1
+      '@types/node': 22.7.5
     dev: true
 
   /@types/resolve@1.20.6:
@@ -8762,7 +8761,7 @@ packages:
     resolution: {integrity: sha512-KWYVV1c4i+jbMpaBC+U++4Va0cp8OisU185o73T1vo99hqi7w8tSJfUXYswwqqrjzwxa6KpRK54WhPvwf5w6PQ==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 20.2.1
+      '@types/node': 22.7.5
       merge-stream: 2.0.0
       supports-color: 7.2.0
     dev: true
@@ -11747,7 +11746,6 @@ packages:
 
   /undici-types@6.19.8:
     resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
-    dev: false
 
   /unicode-canonical-property-names-ecmascript@2.0.0:
     resolution: {integrity: sha512-yY5PpDlfVIU5+y/BSCxAJRBIS1Zc2dDG3Ujq+sR0U+JjUevW2JhocOF+soROYDSaAezOzOKuyyixhD6mBknSmQ==}
