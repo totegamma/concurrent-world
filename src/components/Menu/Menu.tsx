@@ -8,7 +8,9 @@ import {
     ListItemButton,
     ListItemText,
     Typography,
-    Link
+    Link,
+    useMediaQuery,
+    useTheme
 } from '@mui/material'
 import CreateIcon from '@mui/icons-material/Create'
 import { Link as NavLink } from 'react-router-dom'
@@ -38,6 +40,8 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
     const [devMode] = usePreference('devMode')
     const [enableConcord] = usePreference('enableConcord')
     const [showEditorOnTop] = usePreference('showEditorOnTop')
+    const theme = useTheme()
+    const isMobileSize = useMediaQuery(theme.breakpoints.down('sm'))
 
     return (
         <Box
@@ -198,7 +202,7 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                         flex: 1,
                         scrollbarGutter: 'stable',
                         overflowX: 'hidden',
-                        overflowY: 'hidden',
+                        overflowY: isMobileSize ? 'auto' : 'hidden',
                         '&:hover': {
                             overflowY: 'auto'
                         }

@@ -155,7 +155,13 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
         const cacheKey = `emojiPackage:${url}`
         localStorage.removeItem(cacheKey)
         setEmojiPackages((prev) => prev.filter((pkg) => pkg.packageURL !== url))
-        fetchWithTimeout(url, {}, 3000)
+        fetchWithTimeout(
+            url,
+            {
+                cache: 'no-cache'
+            },
+            3000
+        )
             .then((j) => j.json())
             .then((p: RawEmojiPackage) => {
                 const packages: EmojiPackage = {
