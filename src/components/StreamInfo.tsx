@@ -15,7 +15,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useClient } from '../context/ClientContext'
 import { type CommunityTimelineSchema, type CoreTimeline } from '@concurrent-world/client'
 import IosShareIcon from '@mui/icons-material/IosShare'
-import { CCEditor } from './ui/cceditor'
+import { CCEditor, type CCEditorError } from './ui/cceditor'
 import { useSnackbar } from 'notistack'
 import { CCWallpaper } from './ui/CCWallpaper'
 import { WatchButton } from './WatchButton'
@@ -43,6 +43,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
 
     const [documentBody, setDocumentBody] = useState<CommunityTimelineSchema | undefined>(stream?.document.body)
     const [policyParams, setPolicyParams] = useState<string | undefined>()
+    const [policyErrors, setPolicyErrors] = useState<CCEditorError[] | undefined>()
 
     const [tab, setTab] = useState<'info' | 'edit'>('info')
 
@@ -282,6 +283,9 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                                         setValue={(e) => {
                                             setPolicyParams(e)
                                         }}
+                                        setErrors={(e) => {
+                                            setPolicyErrors(e)
+                                        }}
                                     />
                                 </Box>
                             )}
@@ -289,7 +293,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                                 onClick={() => {
                                     updateStream()
                                 }}
-                                disabled={!settingValid}
+                                disabled={!settingValid || (policyErrors && policyErrors.length > 0)}
                             >
                                 保存
                             </Button>
