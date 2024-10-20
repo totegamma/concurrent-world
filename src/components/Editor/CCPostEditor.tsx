@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo } from 'react'
+import { useState, useEffect, useRef, memo, useMemo } from 'react'
 import {
     InputBase,
     Box,
@@ -120,6 +120,17 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
         props.streamPickerInitial
     )
 
+    // check Visibility
+    // 'https://policy.concrnt.world/t/inline-read-write.json'
+    const isPrivate = useMemo(() => {
+        return destTimelines.some((dest) => {
+            if (dest.policy !== 'https://policy.concrnt.world/t/inline-read-write.json') return false
+            // const policyParams = JSON.parse(dest.policyParams)
+            if (dest.policyParams.isReadPublic) return false
+            return true
+        })
+    }, [destTimelines])
+
     useEffect(() => {
         setDestTimelines(props.streamPickerInitial)
     }, [props.streamPickerInitial])
@@ -211,7 +222,8 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
             case 'plaintext':
                 req = client.createPlainTextCrnt(draft, dest, {
                     profileOverride,
-                    whisper
+                    whisper,
+                    isPrivate
                 })
                 break
             case 'markdown':
@@ -219,7 +231,8 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                     emojis,
                     mentions,
                     profileOverride,
-                    whisper
+                    whisper,
+                    isPrivate
                 })
                 break
             case 'media':
@@ -227,7 +240,8 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                     emojis,
                     medias,
                     profileOverride,
-                    whisper
+                    whisper,
+                    isPrivate
                 })
                 break
             case 'reply':
@@ -238,7 +252,8 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                 req = props.actionTo.reply(dest, draft, {
                     emojis,
                     profileOverride,
-                    whisper
+                    whisper,
+                    isPrivate
                 })
                 break
             case 'reroute':
@@ -249,7 +264,8 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                 req = props.actionTo.reroute(dest, draft, {
                     emojis,
                     profileOverride,
-                    whisper
+                    whisper,
+                    isPrivate
                 })
                 break
             default:
@@ -659,6 +675,7 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                             }
                             whisperUsers={participants}
                             setWhisperUsers={setParticipants}
+                            isPrivate={isPrivate}
                         />
                     </>
                 ) : (
@@ -697,6 +714,7 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
                             }
                             whisperUsers={participants}
                             setWhisperUsers={setParticipants}
+                            isPrivate={isPrivate}
                         />
                         <Collapse unmountOnExit in={draft.length > 0}>
                             <Divider
