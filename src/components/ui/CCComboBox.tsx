@@ -7,6 +7,8 @@ export interface CCComboBoxProps {
     value: string
     onChange: (value: string) => void
     label: string
+    error?: boolean
+    helperText?: string
 }
 
 export const CCComboBox = (props: CCComboBoxProps): JSX.Element => {
@@ -18,6 +20,7 @@ export const CCComboBox = (props: CCComboBoxProps): JSX.Element => {
         <Autocomplete
             fullWidth
             freeSolo
+            placeholder={'Select or Input'}
             sx={props.sx}
             value={props.value}
             inputValue={inputValue}
@@ -31,7 +34,9 @@ export const CCComboBox = (props: CCComboBoxProps): JSX.Element => {
             filterOptions={(options, _) => {
                 return options
             }}
-            renderInput={(params) => <TextField {...params} label={props.label} />}
+            renderInput={(params) => (
+                <TextField {...params} label={props.label} error={props.error} helperText={props.helperText} />
+            )}
         />
     )
 }

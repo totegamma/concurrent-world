@@ -22,6 +22,7 @@ import { WatchButton } from './WatchButton'
 import { PolicyEditor } from './ui/PolicyEditor'
 import { CCUserChip } from './ui/CCUserChip'
 import { CCIconButton } from './ui/CCIconButton'
+import { CCComboBox } from './ui/CCComboBox'
 
 export interface StreamInfoProps {
     id: string
@@ -254,7 +255,8 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                                 />
                             </Box>
                             <Typography variant="h3">ポリシー</Typography>
-                            <TextField
+
+                            <CCComboBox
                                 label="Policy"
                                 error={!policyDraft?.startsWith('https://') && policyDraft !== ''}
                                 helperText={
@@ -262,11 +264,15 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                                         ? '空の場合はデフォルトポリシーが適用されます'
                                         : 'PolicyJSONのURLを入力。'
                                 }
-                                value={policyDraft}
-                                onChange={(e) => {
-                                    setPolicyDraft(e.target.value)
+                                options={{
+                                    基本的な権限設定: 'https://policy.concrnt.world/t/inline-read-write.json'
+                                }}
+                                value={policyDraft ?? ''}
+                                onChange={(value) => {
+                                    setPolicyDraft(value)
                                 }}
                             />
+
                             {policyDraft && (
                                 <Box>
                                     <Typography variant="h3">ポリシーパラメーター</Typography>
