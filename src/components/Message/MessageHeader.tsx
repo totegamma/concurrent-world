@@ -60,7 +60,7 @@ export const MessageHeader = (props: MessageHeaderProps): JSX.Element => {
                 {props.message.document.body.profileOverride &&
                     Object.keys(props.message.document.body.profileOverride).length > 0 && <FaTheaterMasks />}{' '}
                 {myAck && (
-                    <Tooltip arrow title="Ackしています" placement="top">
+                    <Tooltip arrow title="フォローしています" placement="top">
                         <CheckCircleIcon
                             sx={{
                                 fontSize: '1rem',
