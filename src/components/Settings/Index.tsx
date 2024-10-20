@@ -47,7 +47,7 @@ export function SettingsIndex(): JSX.Element {
     }
 
     const isDomainApAvailable = useMemo(() => {
-        return 'activitypub' in client.domainServices
+        return 'activitypub' in client.domainServices || 'world.concrnt.ap-bridge' in client.domainServices
     }, [client.domainServices])
 
     return (
