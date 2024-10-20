@@ -1,4 +1,4 @@
-import { type User } from '@concurrent-world/client'
+import { type ProfileSchema, type User } from '@concurrent-world/client'
 import { Box, IconButton, ListItem, Paper, type SxProps, Tooltip } from '@mui/material'
 import { UserProfileCard } from './UserProfileCard'
 import { Link as routerLink } from 'react-router-dom'
@@ -8,6 +8,7 @@ import { type ProfileOverride } from '@concurrent-world/client/dist/types/model/
 export interface ContentWithCCAvatarProps {
     author?: User
     profileOverride?: ProfileOverride
+    characterOverride?: ProfileSchema
     avatarOverride?: string
     children?: JSX.Element | Array<JSX.Element | undefined>
     sx?: SxProps
@@ -42,7 +43,13 @@ export const ContentWithCCAvatar = (props: ContentWithCCAvatarProps): JSX.Elemen
                         }
                     }
                 }}
-                title={<UserProfileCard user={props.author} />}
+                title={
+                    <UserProfileCard
+                        user={props.author}
+                        subProfileID={props.profileOverride?.profileID}
+                        profileOverride={props.characterOverride}
+                    />
+                }
             >
                 <IconButton
                     sx={{
@@ -51,7 +58,12 @@ export const ContentWithCCAvatar = (props: ContentWithCCAvatarProps): JSX.Elemen
                         mt: { xs: '3px', sm: '5px' }
                     }}
                     component={routerLink}
-                    to={props.profileOverride?.link ?? '/' + (props.author?.ccid ?? '')}
+                    to={
+                        props.profileOverride?.link ??
+                        '/' +
+                            (props.author?.ccid ?? '') +
+                            (props.profileOverride?.profileID ? '#' + props.profileOverride.profileID : '')
+                    }
                     target={props.profileOverride?.link ? '_blank' : undefined}
                     rel={props.profileOverride?.link ? 'noopener noreferrer' : undefined}
                 >
