@@ -17,6 +17,7 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 import TagIcon from '@mui/icons-material/Tag'
 import LockIcon from '@mui/icons-material/Lock'
 import { isPrivateTimeline } from '../../util'
+import { useGlobalState } from '../../context/GlobalState'
 
 export interface PostedStreamsProps {
     useUserIcon?: boolean
@@ -25,13 +26,16 @@ export interface PostedStreamsProps {
 
 export const PostedStreams = (props: PostedStreamsProps): JSX.Element => {
     const { client } = useClient()
+    const globalState = useGlobalState()
+
     const postedStreams = useMemo(() => {
         const streams =
             props.message.postedStreams?.filter(
                 (stream) =>
                     (stream.schema === Schemas.communityTimeline &&
                         (stream.author === client.ccid || stream.indexable)) ||
-                    stream.schema === Schemas.emptyTimeline
+                    stream.schema === Schemas.emptyTimeline ||
+                    globalState.allKnownTimelines.map((t) => t.id).includes(stream.id)
             ) ?? []
         const uniq = [...new Set(streams)]
         return uniq
