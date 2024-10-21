@@ -131,7 +131,7 @@ export const StorageProvider = ({ children }: { children: JSX.Element | JSX.Elem
         } else if (storageProvider === 'imgur') {
             return !!imgurClientID
         } else {
-            return 'mediaserver' in client.domainServices
+            return 'mediaserver' in client.domainServices || 'world.concrnt.mediaserver' in client.domainServices
         }
     }, [storageProvider, imgurClientID, s3Client, client.domainServices])
 
