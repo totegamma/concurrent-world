@@ -1,5 +1,6 @@
 import { Avatar, Skeleton, type SxProps } from '@mui/material'
 import BoringAvatar from 'boring-avatars'
+import { useGlobalState } from '../../context/GlobalState'
 
 export interface CCAvatarProps {
     circle?: boolean
@@ -12,6 +13,8 @@ export interface CCAvatarProps {
 }
 
 export const CCAvatar = (props: CCAvatarProps): JSX.Element => {
+    const { getImageURL } = useGlobalState()
+
     if (props.isLoading) {
         return <Skeleton variant="rectangular" sx={props.sx} />
     }
@@ -19,7 +22,7 @@ export const CCAvatar = (props: CCAvatarProps): JSX.Element => {
     return (
         <Avatar
             alt={props.alt}
-            src={props.avatarOverride ?? props.avatarURL}
+            src={getImageURL(props.avatarOverride ?? props.avatarURL, { maxWidth: 256 })}
             sx={{
                 ...props.sx,
                 borderRadius: props.circle ? undefined : 1

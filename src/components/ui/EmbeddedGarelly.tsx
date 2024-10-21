@@ -8,6 +8,7 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import { type WorldMedia } from '../../model'
 import { Blurhash } from 'react-blurhash'
+import { useGlobalState } from '../../context/GlobalState'
 
 export interface EmbeddedGalleryProps {
     medias: WorldMedia[]
@@ -18,6 +19,8 @@ export const MediaCard = ({ media, onExpand }: { media: WorldMedia; onExpand?: (
     const imageRef = useRef<HTMLImageElement>(null)
     const videoRef = useRef<HTMLVideoElement>(null)
     const [loadded, setLoadded] = useState(imageRef.current?.complete || videoRef.current?.readyState === 4)
+
+    const { getImageURL } = useGlobalState()
 
     const setAllowedUrl = (url: string): void => {
         const key = 'reveal:' + url
@@ -58,7 +61,7 @@ export const MediaCard = ({ media, onExpand }: { media: WorldMedia; onExpand?: (
                 <>
                     {media.mediaType.startsWith('image') && (
                         <img
-                            src={media.mediaURL}
+                            src={getImageURL(media.mediaURL, { maxWidth: 512 })}
                             ref={imageRef}
                             style={{
                                 display: isHidden ? 'none' : 'block',

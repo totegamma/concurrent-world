@@ -21,6 +21,7 @@ export interface GlobalState {
     listedSubscriptions: Record<string, CoreSubscription<any>>
     allProfiles: Array<CoreProfile<any>>
     reloadList: () => void
+    getImageURL: (url?: string, params?: { maxWidth?: number; maxHeight?: number }) => string
 }
 
 const GlobalStateContext = createContext<GlobalState | undefined>(undefined)
@@ -43,6 +44,22 @@ export const GlobalStateProvider = ({ children }: GlobalStateProps): JSX.Element
     const [allKnownTimelines, setAllKnownTimelines] = useState<Array<Timeline<CommunityTimelineSchema>>>([])
     const [allKnownSubscriptions, setAllKnownSubscriptions] = useState<Array<CoreSubscription<any>>>([])
     const [listedSubscriptions, setListedSubscriptions] = useState<Record<string, CoreSubscription<any>>>({})
+
+    console.log(client.domainServices)
+
+    const getImageURL = useCallback(
+        (url?: string, opts?: { maxWidth?: number; maxHeight?: number }) => {
+            if (!url) return ''
+            if ('world.concrnt.hyperproxy.image' in client.domainServices) {
+                return `https://${client.host}${client.domainServices['world.concrnt.hyperproxy.image'].path}/${
+                    opts?.maxWidth ?? ''
+                }x${opts?.maxHeight ?? ''}/${url}`
+            } else {
+                return url
+            }
+        },
+        [client]
+    )
 
     useEffect(() => {
         client.api.getOwnSubscriptions<any>().then((subs) => {
@@ -158,7 +175,8 @@ export const GlobalStateProvider = ({ children }: GlobalStateProps): JSX.Element
                 allKnownSubscriptions,
                 listedSubscriptions,
                 reloadList,
-                allProfiles
+                allProfiles,
+                getImageURL
             }}
         >
             {children}
@@ -178,7 +196,8 @@ export function useGlobalState(): GlobalState {
             allKnownSubscriptions: [],
             listedSubscriptions: {},
             reloadList: () => {},
-            allProfiles: []
+            allProfiles: [],
+            getImageURL: (url?: string, _options?: any) => url ?? ''
         }
     }
     return context
