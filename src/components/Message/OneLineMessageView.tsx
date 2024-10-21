@@ -1,16 +1,36 @@
-import { Box, Link, IconButton, Typography, Tooltip } from '@mui/material'
+import { Box, Link, IconButton, Tooltip } from '@mui/material'
 import { Link as routerLink, Link as RouterLink } from 'react-router-dom'
 import { CCAvatar } from '../ui/CCAvatar'
 import { TimeDiff } from '../ui/TimeDiff'
-import { type Message, type ReplyMessageSchema, type MarkdownMessageSchema } from '@concurrent-world/client'
+import {
+    type Message,
+    type ReplyMessageSchema,
+    type MarkdownMessageSchema,
+    type CoreProfile
+} from '@concurrent-world/client'
 import { MarkdownRendererLite } from '../ui/MarkdownRendererLite'
 import { MarkdownRenderer } from '../ui/MarkdownRenderer'
+import { useEffect, useState } from 'react'
+import { useClient } from '../../context/ClientContext'
 
 export interface OneLineMessageViewProps {
     message: Message<MarkdownMessageSchema | ReplyMessageSchema>
 }
 
 export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element => {
+    const { client } = useClient()
+
+    const [characterOverride, setProfileOverride] = useState<CoreProfile<any> | undefined>(undefined)
+
+    useEffect(() => {
+        if (!(client && props.message.document.body.profileOverride?.profileID)) return
+        client.api
+            .getProfileByID(props.message.document.body.profileOverride?.profileID, props.message.author)
+            .then((profile) => {
+                setProfileOverride(profile ?? undefined)
+            })
+    }, [client, props.message])
+
     return (
         <Box
             sx={{
@@ -34,7 +54,9 @@ export const OneLineMessageView = (props: OneLineMessageViewProps): JSX.Element 
                     alt={props.message.authorUser?.profile?.username}
                     avatarURL={props.message.authorUser?.profile?.avatar}
                     identiconSource={props.message.author}
-                    avatarOverride={props.message.document.body.profileOverride?.avatar}
+                    avatarOverride={
+                        characterOverride?.document.body.avatar ?? props.message.document.body.profileOverride?.avatar
+                    }
                     sx={{
                         width: { xs: '38px', sm: '48px' },
                         height: { xs: '12px', sm: '18px' }

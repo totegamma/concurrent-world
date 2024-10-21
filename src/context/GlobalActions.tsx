@@ -257,7 +257,6 @@ export const GlobalActionsProvider = (props: GlobalActionsProps): JSX.Element =>
                             width: '200px',
                             pt: 1,
                             borderRadius: `0 ${theme.shape.borderRadius * 2}px ${theme.shape.borderRadius * 2}px 0`,
-                            overflow: 'hidden',
                             backgroundColor: 'background.default'
                         }
                     }}

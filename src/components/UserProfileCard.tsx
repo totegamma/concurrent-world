@@ -1,5 +1,5 @@
 import { type ProfileSchema, type User } from '@concurrent-world/client'
-import { Box, Chip, Typography } from '@mui/material'
+import { Badge, Box, Chip, Typography } from '@mui/material'
 import { CCAvatar } from './ui/CCAvatar'
 import { useClient } from '../context/ClientContext'
 import { AckButton } from './AckButton'
@@ -12,6 +12,8 @@ import { Link as routerLink } from 'react-router-dom'
 export interface UserProfileCardProps {
     user?: User
     profile?: ProfileSchema
+    subProfileID?: string
+    profileOverride?: ProfileSchema
     ccid?: string
 }
 
@@ -21,7 +23,7 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
     const { enqueueSnackbar } = useSnackbar()
 
     const ccid = props.user?.ccid ?? props.ccid ?? '???????????????????'
-    const profile = props.user?.profile ?? props.profile
+    const profile = props.profileOverride ?? props.user?.profile ?? props.profile
 
     if (!profile) return <></>
 
@@ -37,21 +39,45 @@ export const UserProfileCard = (props: UserProfileCardProps): JSX.Element => {
                 <Box
                     position="relative"
                     component={routerLink}
-                    to={'/' + ccid}
+                    to={'/' + ccid + (props.subProfileID ? '#' + props.subProfileID : '')}
                     sx={{
                         top: '-30px',
                         left: '10px'
                     }}
                 >
-                    <CCAvatar
-                        alt={profile.username}
-                        avatarURL={profile.avatar}
-                        identiconSource={ccid}
-                        sx={{
-                            width: '60px',
-                            height: '60px'
+                    <Badge
+                        overlap="circular"
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'right'
                         }}
-                    />
+                        badgeContent={
+                            props.profileOverride && (
+                                <CCAvatar
+                                    sx={{
+                                        width: 24,
+                                        height: 24
+                                    }}
+                                    identiconSource={ccid}
+                                    avatarURL={props.user?.profile?.avatar ?? props.profile?.avatar}
+                                />
+                            )
+                        }
+                    >
+                        <CCAvatar
+                            alt={profile.username}
+                            avatarURL={
+                                props.profileOverride
+                                    ? profile.avatar
+                                    : props.user?.profile?.avatar ?? props.profile?.avatar
+                            }
+                            identiconSource={ccid}
+                            sx={{
+                                width: '60px',
+                                height: '60px'
+                            }}
+                        />
+                    </Badge>
                 </Box>
             </Box>
             <Box

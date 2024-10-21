@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from '@mui/material'
+import { Alert, AlertTitle, Box, Button, Typography } from '@mui/material'
 import Form from '@rjsf/mui'
 import validator from '@rjsf/validator-ajv8'
 import { memo, useEffect, useState } from 'react'
@@ -16,6 +16,7 @@ export interface CCEditorProps {
     setValue: (_: any) => void
     disabled?: boolean
     showSubmit?: boolean
+    setErrors?: (_: CCEditorError[] | undefined) => void
 }
 
 const UserPickerWidget = (props: WidgetProps): JSX.Element => {
@@ -60,6 +61,10 @@ const widgets: RegistryWidgetsType = {
     mediaInput: MediaInputWidget
 }
 
+export interface CCEditorError {
+    message: string
+}
+
 export const CCEditor = memo<CCEditorProps>((props: CCEditorProps): JSX.Element => {
     const [schema, setSchema] = useState<any>(props.schema)
 
@@ -85,30 +90,56 @@ export const CCEditor = memo<CCEditorProps>((props: CCEditorProps): JSX.Element 
         return <Box>Bad Input</Box>
     }
 
+    const [errors, setErrors] = useState<CCEditorError[] | undefined>(undefined)
+
     return (
         <Box>
             {schema && (
-                <Form
-                    disabled={props.disabled}
-                    schema={schema}
-                    validator={validator}
-                    formData={props.value}
-                    uiSchema={uiSchema}
-                    widgets={widgets}
-                    onChange={(e) => {
-                        props.setValue(e.formData)
-                    }}
-                >
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        sx={{
-                            display: props.showSubmit ? 'block' : 'none'
+                <>
+                    {errors && (
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 1,
+                                mt: 1
+                            }}
+                        >
+                            {errors.map((e, i) => (
+                                <Alert key={i} severity="error">
+                                    <AlertTitle>Validation Error</AlertTitle>
+                                    {e.message}
+                                </Alert>
+                            ))}
+                        </Box>
+                    )}
+
+                    <Form
+                        disabled={props.disabled}
+                        schema={schema}
+                        validator={validator}
+                        formData={props.value}
+                        uiSchema={uiSchema}
+                        widgets={widgets}
+                        onChange={(e) => {
+                            const errors = validator.rawValidation(schema, e.formData).errors
+                            setErrors(errors)
+                            props.setErrors?.(errors)
+                            props.setValue(e.formData)
                         }}
                     >
-                        Submit
-                    </Button>
-                </Form>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            disabled={errors && errors.length > 0}
+                            sx={{
+                                display: props.showSubmit ? 'block' : 'none'
+                            }}
+                        >
+                            Submit
+                        </Button>
+                    </Form>
+                </>
             )}
         </Box>
     )

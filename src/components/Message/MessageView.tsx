@@ -72,6 +72,7 @@ export const MessageView = (props: MessageViewProps): JSX.Element => {
             author={props.message.authorUser}
             profileOverride={props.message.document.body.profileOverride}
             avatarOverride={characterOverride?.document.body.avatar}
+            characterOverride={characterOverride?.document.body}
         >
             <MessageHeader
                 usernameOverride={characterOverride?.document.body.username}

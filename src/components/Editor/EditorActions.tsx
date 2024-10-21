@@ -49,6 +49,7 @@ export interface EditorActionsProps {
     disableEmoji?: boolean
     whisperUsers: User[]
     setWhisperUsers: Dispatch<SetStateAction<User[]>>
+    isPrivate?: boolean
 }
 
 export const EditorActions = (props: EditorActionsProps): JSX.Element => {
@@ -356,6 +357,7 @@ export const EditorActions = (props: EditorActionsProps): JSX.Element => {
                         }}
                         endIcon={<SendIcon />}
                     >
+                        {props.isPrivate ? '🔒' : ''}
                         {props.whisperUsers.length > 0 ? t('whisper') : ''}
                         {props.submitButtonLabel ?? t('current')}
                     </Button>

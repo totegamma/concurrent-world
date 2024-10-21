@@ -15,13 +15,14 @@ import { useCallback, useEffect, useState } from 'react'
 import { useClient } from '../context/ClientContext'
 import { type CommunityTimelineSchema, type CoreTimeline } from '@concurrent-world/client'
 import IosShareIcon from '@mui/icons-material/IosShare'
-import { CCEditor } from './ui/cceditor'
+import { CCEditor, type CCEditorError } from './ui/cceditor'
 import { useSnackbar } from 'notistack'
 import { CCWallpaper } from './ui/CCWallpaper'
 import { WatchButton } from './WatchButton'
 import { PolicyEditor } from './ui/PolicyEditor'
 import { CCUserChip } from './ui/CCUserChip'
 import { CCIconButton } from './ui/CCIconButton'
+import { CCComboBox } from './ui/CCComboBox'
 
 export interface StreamInfoProps {
     id: string
@@ -42,6 +43,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
 
     const [documentBody, setDocumentBody] = useState<CommunityTimelineSchema | undefined>(stream?.document.body)
     const [policyParams, setPolicyParams] = useState<string | undefined>()
+    const [policyErrors, setPolicyErrors] = useState<CCEditorError[] | undefined>()
 
     const [tab, setTab] = useState<'info' | 'edit'>('info')
 
@@ -254,7 +256,8 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                                 />
                             </Box>
                             <Typography variant="h3">ポリシー</Typography>
-                            <TextField
+
+                            <CCComboBox
                                 label="Policy"
                                 error={!policyDraft?.startsWith('https://') && policyDraft !== ''}
                                 helperText={
@@ -262,11 +265,15 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                                         ? '空の場合はデフォルトポリシーが適用されます'
                                         : 'PolicyJSONのURLを入力。'
                                 }
-                                value={policyDraft}
-                                onChange={(e) => {
-                                    setPolicyDraft(e.target.value)
+                                options={{
+                                    基本的な権限設定: 'https://policy.concrnt.world/t/inline-read-write.json'
+                                }}
+                                value={policyDraft ?? ''}
+                                onChange={(value) => {
+                                    setPolicyDraft(value)
                                 }}
                             />
+
                             {policyDraft && (
                                 <Box>
                                     <Typography variant="h3">ポリシーパラメーター</Typography>
@@ -276,6 +283,9 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                                         setValue={(e) => {
                                             setPolicyParams(e)
                                         }}
+                                        setErrors={(e) => {
+                                            setPolicyErrors(e)
+                                        }}
                                     />
                                 </Box>
                             )}
@@ -283,7 +293,7 @@ export function StreamInfo(props: StreamInfoProps): JSX.Element {
                                 onClick={() => {
                                     updateStream()
                                 }}
-                                disabled={!settingValid}
+                                disabled={!settingValid || (policyErrors && policyErrors.length > 0)}
                             >
                                 保存
                             </Button>

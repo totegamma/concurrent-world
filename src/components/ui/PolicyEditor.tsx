@@ -1,7 +1,7 @@
 import { Box, Divider, Typography } from '@mui/material'
 import { memo, useEffect, useState } from 'react'
 import { fetchWithTimeout } from '../../util'
-import { CCEditor } from './cceditor'
+import { CCEditor, type CCEditorError } from './cceditor'
 
 export interface PolicyEditorProps {
     policyURL?: string
@@ -9,6 +9,7 @@ export interface PolicyEditorProps {
     disabled?: boolean
     value?: string
     setValue: (value?: string) => void
+    setErrors?: (_: CCEditorError[] | undefined) => void
 }
 
 interface Policy {
@@ -64,6 +65,7 @@ export const PolicyEditor = memo<PolicyEditorProps>((props: PolicyEditorProps): 
                             if (!value) props.setValue(undefined)
                             else props.setValue(JSON.stringify(value))
                         }}
+                        setErrors={props.setErrors}
                     />
                 </>
             )}

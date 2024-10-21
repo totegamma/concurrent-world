@@ -10,9 +10,9 @@ import {
     type ReplyMessageSchema,
     type RerouteMessageSchema,
     Schemas,
-    type MarkdownMessageSchema
+    type MarkdownMessageSchema,
+    type ReactionAssociationSchema
 } from '@concurrent-world/client'
-import { type EmojiAssociation } from '@concurrent-world/client/dist/types/schemas/emojiAssociation'
 import { useClient } from '../../context/ClientContext'
 import { type UpgradeAssociationSchema } from '@concurrent-world/client/dist/types/schemas/upgradeAssociation'
 import { useConcord } from '../../context/ConcordContext'
@@ -24,7 +24,7 @@ export interface MessageReactionsProps {
 }
 
 interface SuperReaction {
-    reaction: Association<EmojiAssociation>
+    reaction: Association<ReactionAssociationSchema>
     amount: string
     txhash: string
 }
@@ -36,7 +36,9 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
     const theme = useTheme()
     const concord = useConcord()
     const { client } = useClient()
-    const [reactionMembers, setReactionMembers] = useState<Record<string, Array<Association<EmojiAssociation>>>>({})
+    const [reactionMembers, setReactionMembers] = useState<
+        Record<string, Array<Association<ReactionAssociationSchema>>>
+    >({})
     const [superReactions, setSuperReactions] = useState<SuperReaction[]>([])
     const upgradeCount = props.message?.associationCounts?.[Schemas.upgradeAssociation] ?? 0
 
@@ -64,7 +66,10 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                         const tip = msg.amount.find((coin) => coin.denom === 'uAmpere')?.amount
                         if (!tip) return
 
-                        const reaction = await client.getAssociation<EmojiAssociation>(ref, props.message.author)
+                        const reaction = await client.getAssociation<ReactionAssociationSchema>(
+                            ref,
+                            props.message.author
+                        )
                         if (!reaction || reaction.schema !== Schemas.reactionAssociation) return
 
                         setSuperReactions((prev) => {
