@@ -65,7 +65,7 @@ export const MediaSettings = (): JSX.Element => {
     }
 
     const domainProfileAvailable = useMemo(() => {
-        return 'mediaserver' in client.domainServices
+        return 'mediaserver' in client.domainServices || 'world.concrnt.mediaserver' in client.domainServices
     }, [client.domainServices])
 
     const [deleteMenu, setDeleteMenu] = useState<null | HTMLElement>(null)
