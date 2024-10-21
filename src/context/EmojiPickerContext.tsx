@@ -25,6 +25,7 @@ import { Link as RouterLink } from 'react-router-dom'
 import Fuzzysort from 'fuzzysort'
 import { experimental_VGrid as VGrid, type VGridHandle, VList } from 'virtua'
 import { fetchWithTimeout } from '../util'
+import { useGlobalState } from './GlobalState'
 
 export interface EmojiPickerState {
     open: (anchor: HTMLElement, onSelected: (selected: Emoji) => void) => void
@@ -46,6 +47,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
     const [emojiPackageURLs, setEmojiPackageURLs] = usePreference('emojiPackages')
     const theme = useTheme()
     const isMobileSize = useMediaQuery(theme.breakpoints.down('sm')) // TODO: globalStateみたいなところに置くべき
+    const { getImageURL } = useGlobalState()
 
     const [viewportHeight, setViewportHeight] = useState<number>(visualViewport?.height ?? 0)
     useEffect(() => {
@@ -319,7 +321,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                                     aria-label={emojiPackage.name}
                                                     icon={
                                                         <img
-                                                            src={emojiPackage.iconURL}
+                                                            src={getImageURL(emojiPackage.iconURL, { maxHeight: 32 })}
                                                             alt={emojiPackage.name}
                                                             height="20px"
                                                         />
@@ -348,7 +350,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                                     }}
                                                 >
                                                     <img
-                                                        src={emoji.imageURL}
+                                                        src={getImageURL(emoji.imageURL, { maxHeight: 32 })}
                                                         alt={emoji.shortcode}
                                                         height="30px"
                                                         width="30px"
@@ -423,7 +425,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                                     }}
                                                 >
                                                     <img
-                                                        src={emoji.imageURL}
+                                                        src={getImageURL(emoji.imageURL, { maxHeight: 32 })}
                                                         alt={emoji.shortcode}
                                                         height="30px"
                                                         width="30px"
@@ -493,7 +495,13 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                     <Tab
                                         key={emojiPackage.packageURL}
                                         aria-label={emojiPackage.name}
-                                        icon={<img src={emojiPackage.iconURL} alt={emojiPackage.name} height="20px" />}
+                                        icon={
+                                            <img
+                                                src={getImageURL(emojiPackage.iconURL, { maxHeight: 32 })}
+                                                alt={emojiPackage.name}
+                                                height="20px"
+                                            />
+                                        }
                                         sx={tabsx}
                                         onClick={() => {
                                             gridRef.current?.scrollTo(0, 0)
@@ -601,7 +609,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                             }}
                                         >
                                             <img
-                                                src={emoji.imageURL}
+                                                src={getImageURL(emoji.imageURL, { maxHeight: 32 })}
                                                 alt={emoji.shortcode}
                                                 height="30px"
                                                 width="30px"
@@ -616,7 +624,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                             <Box display="flex" alignItems="center" gap={1}>
                                 <Box /* preview */
                                     component="img"
-                                    src={displayEmojis[selected]?.imageURL}
+                                    src={getImageURL(displayEmojis[selected]?.imageURL, { maxHeight: 32 })}
                                     alt={displayEmojis[selected]?.shortcode}
                                     height="30px"
                                     width="30px"

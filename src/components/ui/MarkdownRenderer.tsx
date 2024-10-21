@@ -27,6 +27,7 @@ import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import { useGlobalActions } from '../../context/GlobalActions'
 import { StreamChip } from './StreamChip'
 import { useMediaViewer } from '../../context/MediaViewer'
+import { useGlobalState } from '../../context/GlobalState'
 
 export interface MarkdownRendererProps {
     messagebody: string
@@ -65,6 +66,7 @@ const sanitizeOption = {
 
 export const MarkdownRenderer = memo<MarkdownRendererProps>((props: MarkdownRendererProps): JSX.Element => {
     const actions = useGlobalActions()
+    const { getImageURL } = useGlobalState()
     const mediaViewer = useMediaViewer()
     const { enqueueSnackbar } = useSnackbar()
     const [themeName, setThemeName] = usePreference('themeName')
@@ -434,6 +436,7 @@ export const MarkdownRenderer = memo<MarkdownRendererProps>((props: MarkdownRend
                         return (
                             <Box
                                 {...props}
+                                src={getImageURL(props.src)}
                                 component="img"
                                 maxWidth="100%"
                                 borderRadius={1}
@@ -457,7 +460,7 @@ export const MarkdownRenderer = memo<MarkdownRendererProps>((props: MarkdownRend
                                 title={
                                     <Box display="flex" flexDirection="column" alignItems="center">
                                         <img
-                                            src={emoji?.animURL ?? emoji?.imageURL ?? ''}
+                                            src={getImageURL(emoji?.animURL ?? emoji?.imageURL, { maxHeight: 64 })}
                                             style={{
                                                 height: '5em'
                                             }}
@@ -470,7 +473,7 @@ export const MarkdownRenderer = memo<MarkdownRendererProps>((props: MarkdownRend
                                 }
                             >
                                 <img
-                                    src={emoji?.animURL ?? emoji?.imageURL ?? ''}
+                                    src={getImageURL(emoji?.animURL ?? emoji?.imageURL, { maxHeight: 32 })}
                                     style={{
                                         height: '1.25em',
                                         verticalAlign: '-0.45em',

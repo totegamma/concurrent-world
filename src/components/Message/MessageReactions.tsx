@@ -18,6 +18,7 @@ import { type UpgradeAssociationSchema } from '@concurrent-world/client/dist/typ
 import { useConcord } from '../../context/ConcordContext'
 import { MsgSend } from 'cosmjs-types/cosmos/bank/v1beta1/tx'
 import { enqueueSnackbar } from 'notistack'
+import { useGlobalState } from '../../context/GlobalState'
 
 export interface MessageReactionsProps {
     message: Message<MarkdownMessageSchema | ReplyMessageSchema | RerouteMessageSchema>
@@ -41,6 +42,7 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
     >({})
     const [superReactions, setSuperReactions] = useState<SuperReaction[]>([])
     const upgradeCount = props.message?.associationCounts?.[Schemas.upgradeAssociation] ?? 0
+    const { getImageURL } = useGlobalState()
 
     useEffect(() => {
         if (upgradeCount <= 0) return
@@ -200,7 +202,11 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                         title={
                             <Box display="flex" flexDirection="column" alignItems="right" gap={1}>
                                 <Box display="flex" alignItems="center" gap={1}>
-                                    <Box component="img" height="20px" src={imageUrl}></Box>
+                                    <Box
+                                        component="img"
+                                        height="20px"
+                                        src={getImageURL(imageUrl, { maxHeight: 32 })}
+                                    ></Box>
                                     {reactionMembers[imageUrl]?.[0].document.body.shortcode ?? 'Loading...'}
                                 </Box>
                                 <Divider flexItem></Divider>
@@ -284,7 +290,7 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                                 }
                             }}
                         >
-                            <Box component="img" height="20px" src={imageUrl} />
+                            <Box component="img" height="20px" src={getImageURL(imageUrl, { maxHeight: 32 })} />
                             <Typography color={ownReactions[imageUrl] ? 'primary.contrastText' : 'text.primary'}>
                                 {value}
                             </Typography>
