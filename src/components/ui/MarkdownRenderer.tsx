@@ -460,7 +460,7 @@ export const MarkdownRenderer = memo<MarkdownRendererProps>((props: MarkdownRend
                                 title={
                                     <Box display="flex" flexDirection="column" alignItems="center">
                                         <img
-                                            src={getImageURL(emoji?.animURL ?? emoji?.imageURL, { maxHeight: 64 })}
+                                            src={getImageURL(emoji?.animURL ?? emoji?.imageURL, { maxHeight: 128 })}
                                             style={{
                                                 height: '5em'
                                             }}
@@ -473,7 +473,7 @@ export const MarkdownRenderer = memo<MarkdownRendererProps>((props: MarkdownRend
                                 }
                             >
                                 <img
-                                    src={getImageURL(emoji?.animURL ?? emoji?.imageURL, { maxHeight: 32 })}
+                                    src={getImageURL(emoji?.animURL ?? emoji?.imageURL, { maxHeight: 128 })}
                                     style={{
                                         height: '1.25em',
                                         verticalAlign: '-0.45em',

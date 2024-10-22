@@ -321,7 +321,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                                     aria-label={emojiPackage.name}
                                                     icon={
                                                         <img
-                                                            src={getImageURL(emojiPackage.iconURL, { maxHeight: 32 })}
+                                                            src={getImageURL(emojiPackage.iconURL, { maxHeight: 128 })}
                                                             alt={emojiPackage.name}
                                                             height="20px"
                                                         />
@@ -350,7 +350,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                                     }}
                                                 >
                                                     <img
-                                                        src={getImageURL(emoji.imageURL, { maxHeight: 32 })}
+                                                        src={getImageURL(emoji.imageURL, { maxHeight: 128 })}
                                                         alt={emoji.shortcode}
                                                         height="30px"
                                                         width="30px"
@@ -425,7 +425,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                                     }}
                                                 >
                                                     <img
-                                                        src={getImageURL(emoji.imageURL, { maxHeight: 32 })}
+                                                        src={getImageURL(emoji.imageURL, { maxHeight: 128 })}
                                                         alt={emoji.shortcode}
                                                         height="30px"
                                                         width="30px"
@@ -497,7 +497,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                         aria-label={emojiPackage.name}
                                         icon={
                                             <img
-                                                src={getImageURL(emojiPackage.iconURL, { maxHeight: 32 })}
+                                                src={getImageURL(emojiPackage.iconURL, { maxHeight: 128 })}
                                                 alt={emojiPackage.name}
                                                 height="20px"
                                             />
@@ -609,7 +609,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                                             }}
                                         >
                                             <img
-                                                src={getImageURL(emoji.imageURL, { maxHeight: 32 })}
+                                                src={getImageURL(emoji.imageURL, { maxHeight: 128 })}
                                                 alt={emoji.shortcode}
                                                 height="30px"
                                                 width="30px"
@@ -624,7 +624,7 @@ export const EmojiPickerProvider = (props: EmojiPickerProps): JSX.Element => {
                             <Box display="flex" alignItems="center" gap={1}>
                                 <Box /* preview */
                                     component="img"
-                                    src={getImageURL(displayEmojis[selected]?.imageURL, { maxHeight: 32 })}
+                                    src={getImageURL(displayEmojis[selected]?.imageURL, { maxHeight: 128 })}
                                     alt={displayEmojis[selected]?.shortcode}
                                     height="30px"
                                     width="30px"
