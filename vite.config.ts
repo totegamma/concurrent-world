@@ -59,6 +59,8 @@ export default defineConfig({
                 clientsClaim: true,
                 globDirectory: 'dist',
                 globPatterns: ['**/*.{js,css,png,jpg,jpeg,svg,gif,woff,woff2,eot,ttf,otf,mp3}'],
+                // 10MB
+                maximumFileSizeToCacheInBytes: 10 * 1024 ** 2,
                 runtimeCaching: [
                     {
                         urlPattern: /.*\.(?:png|jpg|jpeg|svg|gif)$/,

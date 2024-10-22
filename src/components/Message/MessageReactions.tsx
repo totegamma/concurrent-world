@@ -205,7 +205,7 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                                     <Box
                                         component="img"
                                         height="20px"
-                                        src={getImageURL(imageUrl, { maxHeight: 32 })}
+                                        src={getImageURL(imageUrl, { maxHeight: 128 })}
                                     ></Box>
                                     {reactionMembers[imageUrl]?.[0].document.body.shortcode ?? 'Loading...'}
                                 </Box>
@@ -290,7 +290,7 @@ export const MessageReactions = (props: MessageReactionsProps): JSX.Element => {
                                 }
                             }}
                         >
-                            <Box component="img" height="20px" src={getImageURL(imageUrl, { maxHeight: 32 })} />
+                            <Box component="img" height="20px" src={getImageURL(imageUrl, { maxHeight: 128 })} />
                             <Typography color={ownReactions[imageUrl] ? 'primary.contrastText' : 'text.primary'}>
                                 {value}
                             </Typography>
