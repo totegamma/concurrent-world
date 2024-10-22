@@ -16,6 +16,7 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import AppsIcon from '@mui/icons-material/Apps'
 import { type WorldMedia } from '../model'
+import { useGlobalState } from './GlobalState'
 
 const zoomFactor = 8
 
@@ -39,6 +40,8 @@ export const MediaViewerProvider = (props: MediaViewerProviderProps): JSX.Elemen
     const [medias, setMedias] = useState<WorldMedia[]>([])
 
     const [mode, setMode] = useState<'single' | 'gallery'>('single')
+
+    const { getImageURL } = useGlobalState()
 
     const openSingle = (src?: string): void => {
         setMode('single')
@@ -176,7 +179,7 @@ export const MediaViewerProvider = (props: MediaViewerProviderProps): JSX.Elemen
                                         }}
                                     >
                                         <img
-                                            src={previewImage}
+                                            src={getImageURL(previewImage)}
                                             alt="preview"
                                             ref={(el: HTMLImageElement | null) => {
                                                 imageRef.current = el
@@ -290,7 +293,7 @@ export const MediaViewerProvider = (props: MediaViewerProviderProps): JSX.Elemen
                                     }}
                                 >
                                     <img
-                                        src={media.thumbnailURL ?? media.mediaURL}
+                                        src={getImageURL(media.thumbnailURL ?? media.mediaURL)}
                                         alt={media.mediaType}
                                         onClick={() => {
                                             setPreviewIndex(index)
