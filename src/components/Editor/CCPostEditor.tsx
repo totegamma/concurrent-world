@@ -163,7 +163,7 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
     }, [props.value])
 
     // emoji
-    const [emojiDict, setEmojiDict] = useState<Record<string, EmojiLite>>({})
+    const [emojiDict, setEmojiDict] = usePersistent<Record<string, EmojiLite>>('draftEmojis', {})
 
     const insertEmoji = (emoji: Emoji): void => {
         const newDraft =
@@ -175,7 +175,7 @@ export const CCPostEditor = memo<CCPostEditorProps>((props: CCPostEditorProps): 
     }
 
     // media
-    const [medias, setMedias] = useState<WorldMedia[]>([])
+    const [medias, setMedias] = usePersistent<WorldMedia[]>('draftMedias', [])
 
     const reset = (): void => {
         setMode('markdown')
