@@ -3,6 +3,7 @@ import { type Emoji, type EmojiLite } from '../../model'
 import { Box, Collapse, List, ListItemButton, ListItemIcon, ListItemText, Paper, Popper } from '@mui/material'
 import caretPosition from 'textarea-caret'
 import { useEmojiPicker } from '../../context/EmojiPickerContext'
+import { useGlobalState } from '../../context/GlobalState'
 
 export interface EmojiSuggestionProps {
     textInputRef: HTMLInputElement
@@ -14,6 +15,7 @@ export interface EmojiSuggestionProps {
 
 export const EmojiSuggestion = (props: EmojiSuggestionProps): JSX.Element => {
     const emojiPicker = useEmojiPicker()
+    const { getImageURL } = useGlobalState()
 
     const ref = props.textInputRef
     const text = props.text
@@ -124,7 +126,7 @@ export const EmojiSuggestion = (props: EmojiSuggestionProps): JSX.Element => {
                     >
                         <Box
                             component="img"
-                            src={emoji.imageURL}
+                            src={getImageURL(emoji.imageURL, { maxHeight: 128 })}
                             sx={{
                                 width: '100%',
                                 height: '100%'
@@ -164,7 +166,11 @@ export const EmojiSuggestion = (props: EmojiSuggestionProps): JSX.Element => {
                             }}
                         >
                             <ListItemIcon>
-                                <Box component="img" src={emoji.imageURL} sx={{ width: '1em', height: '1em' }} />
+                                <Box
+                                    component="img"
+                                    src={getImageURL(emoji.imageURL, { maxHeight: 128 })}
+                                    sx={{ width: '1em', height: '1em' }}
+                                />
                             </ListItemIcon>
                             <ListItemText>{emoji.shortcode}</ListItemText>
                         </ListItemButton>

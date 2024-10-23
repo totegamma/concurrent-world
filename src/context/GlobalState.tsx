@@ -21,7 +21,7 @@ export interface GlobalState {
     listedSubscriptions: Record<string, CoreSubscription<any>>
     allProfiles: Array<CoreProfile<any>>
     reloadList: () => void
-    getImageURL: (url?: string, params?: { maxWidth?: number; maxHeight?: number }) => string
+    getImageURL: (url?: string, params?: { maxWidth?: number; maxHeight?: number; format?: string }) => string
 }
 
 const GlobalStateContext = createContext<GlobalState | undefined>(undefined)
@@ -48,12 +48,12 @@ export const GlobalStateProvider = ({ children }: GlobalStateProps): JSX.Element
     console.log(client.domainServices)
 
     const getImageURL = useCallback(
-        (url?: string, opts?: { maxWidth?: number; maxHeight?: number }) => {
+        (url?: string, opts?: { maxWidth?: number; maxHeight?: number; format?: string }) => {
             if (!url) return ''
             if ('world.concrnt.hyperproxy.image' in client.domainServices) {
                 return `https://${client.host}${client.domainServices['world.concrnt.hyperproxy.image'].path}/${
                     opts?.maxWidth ?? ''
-                }x${opts?.maxHeight ?? ''}/${url}`
+                }x${opts?.maxHeight ?? ''}${opts?.format ? ',' + opts.format : ''}/${url}`
             } else {
                 return url
             }
