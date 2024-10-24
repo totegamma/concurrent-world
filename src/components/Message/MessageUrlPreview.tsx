@@ -76,9 +76,11 @@ export const UrlPreview = (props: { url: string }): JSX.Element | null => {
             })
     }, [props.url])
 
+    const hostname = new URL(props.url).hostname
+
     if (errored) return null
 
-    if (!preview?.title) {
+    if (!preview) {
         return (
             <Paper
                 variant="outlined"
@@ -115,23 +117,25 @@ export const UrlPreview = (props: { url: string }): JSX.Element | null => {
             target="_blank"
             rel="noopener noreferrer"
         >
-            <Box
-                component="img"
-                sx={{
-                    width: '100px',
-                    height: '100px',
-                    objectFit: 'cover'
-                }}
-                src={preview?.thumbnail || preview?.icon || ''}
-                alt={preview?.title ?? ''}
-            />
+            {(preview.thumbnail || preview.icon) && (
+                <Box
+                    component="img"
+                    sx={{
+                        width: '100px',
+                        height: '100px',
+                        objectFit: 'cover'
+                    }}
+                    src={preview.thumbnail || preview.icon}
+                    alt={preview.title || hostname}
+                />
+            )}
             <Box padding={1} height="100px" overflow="hidden">
                 <Typography variant="h3" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" width="100%">
-                    {preview?.title ?? 'No Title'}
+                    {preview?.title || hostname}
                 </Typography>
 
                 <Typography variant="body2" width="100%" height="40px" textOverflow="ellipsis" overflow="hidden">
-                    {preview?.description ?? '説明はありません'}
+                    {preview?.description || '説明はありません'}
                 </Typography>
 
                 <Typography
@@ -141,7 +145,7 @@ export const UrlPreview = (props: { url: string }): JSX.Element | null => {
                     textOverflow="ellipsis"
                     width="100%"
                 >
-                    {props.url ?? ''}
+                    {props.url}
                 </Typography>
             </Box>
         </Paper>
