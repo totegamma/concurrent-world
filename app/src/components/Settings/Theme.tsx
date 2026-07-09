@@ -1,5 +1,6 @@
 import {
     Box,
+    Button,
     Divider,
     IconButton,
     ListItemIcon,
@@ -10,6 +11,7 @@ import {
     Typography,
     useTheme
 } from '@mui/material'
+import { useSnackbar } from 'notistack'
 import { ThemeCreator } from '../ThemeCreator'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -33,6 +35,7 @@ export const ThemeSettings = (): JSX.Element => {
     const theme = useTheme<ConcurrentTheme>()
     const { t } = useTranslation('', { keyPrefix: 'ui' })
     const editorModal = useEditorModal()
+    const { enqueueSnackbar } = useSnackbar()
 
     const previewTheme: Record<string, ConcurrentTheme> = useMemo(
         () => Object.fromEntries(Object.keys(Themes).map((e) => [e, loadConcurrentTheme(e)])),
@@ -95,7 +98,19 @@ export const ThemeSettings = (): JSX.Element => {
                 </Paper>
             </Box>
             <Box display="flex" flexDirection="column" gap={1}>
-                <Typography variant="h3">Select Theme:</Typography>
+                <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1}>
+                    <Typography variant="h3">Select Theme:</Typography>
+                    <Button
+                        variant="outlined"
+                        startIcon={<DataObjectIcon />}
+                        onClick={() => {
+                            window.navigator.clipboard.writeText(JSON.stringify(customThemes))
+                            enqueueSnackbar('全カスタムテーマをコピーしました')
+                        }}
+                    >
+                        全部コピー
+                    </Button>
+                </Box>
                 <Box
                     sx={{
                         display: { xs: 'flex', md: 'grid' },
