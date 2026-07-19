@@ -7,7 +7,7 @@ import { ConcordProvider } from './context/ConcordContext'
 import { Menu } from './components/Menu/Menu'
 import { Explorer, Notifications, Settings, TimelinePage, EntityPage, MessagePage, ListPage, Devtool } from './pages'
 
-import useSound from 'use-sound'
+import { useGuardedSound } from './hooks/useGuardedSound'
 import { MobileMenu } from './components/Menu/MobileMenu'
 import { useClient } from './context/ClientContext'
 import { GlobalActionsProvider } from './context/GlobalActions'
@@ -322,7 +322,10 @@ function App(): JSX.Element {
         })
     }, [client])
 
-    const [playNotification] = useSound(sound.notification, { volume: sound.volume / 100, format: UseSoundFormats })
+    const [playNotification] = useGuardedSound(sound.notification, {
+        volume: sound.volume / 100,
+        format: UseSoundFormats
+    })
     const playNotificationRef = useRef(playNotification)
     useEffect(() => {
         playNotificationRef.current = playNotification

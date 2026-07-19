@@ -26,7 +26,7 @@ import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import HeartBrokenIcon from '@mui/icons-material/HeartBroken'
 import type { TimelineReader } from '@concrnt/client'
 import { useRefWithForceUpdate } from '../hooks/useRefWithForceUpdate'
-import useSound from 'use-sound'
+import { useGuardedSound } from '../hooks/useGuardedSound'
 import { usePreference } from '../context/PreferenceContext'
 import { VList, type VListHandle } from 'virtua'
 import { useClient } from '../context/ClientContext'
@@ -87,7 +87,7 @@ const timeline = forwardRef((props: RealtimeTimelineProps, ref: ForwardedRef<VLi
 
     const [newArrivals, setNewArrivals] = useState<NewArrivalIcons[]>([])
 
-    const [playBubble] = useSound(sound.post, {
+    const [playBubble] = useGuardedSound(sound.post, {
         volume: sound.volume / 100,
         interrupt: false,
         format: UseSoundFormats
