@@ -46,6 +46,7 @@ import { TimelineProvider } from './context/TimelineProvider'
 import { InspectorProvider } from './context/Inspector'
 import { ProfileProvider } from './context/ProfileContext'
 import { AudioPlayerOutlet, AudioPlayerProvider } from './context/AudioPlayer'
+import { V2Migration } from './pages/V2Migration'
 
 const SwitchMasterToSub = lazy(() => import('./components/SwitchMasterToSub'))
 
@@ -532,6 +533,7 @@ function App(): JSX.Element {
                                 <Route path="/concord/*" element={<ConcordPage />} />
                                 <Route path="/tutorial" element={<Tutorial />} />
                                 <Route path="/deck" element={<DeckPage />} />
+                                <Route path="v2-migration" element={<V2Migration />} />
                             </Routes>
                         </Paper>
                         <AudioPlayerOutlet />
