@@ -1,15 +1,9 @@
-
-
 import { Box, Divider, Typography } from '@mui/material'
 import { Helmet } from 'react-helmet-async'
 import { CfmRenderer } from '../components/ui/CfmRenderer'
 import { useClient } from '../context/ClientContext'
 
-import MigrationSchedule from '../resources/migration-schedule.png'
-
-
 export function V2Migration(): JSX.Element {
-
     const { client } = useClient()
 
     return (
@@ -33,9 +27,7 @@ export function V2Migration(): JSX.Element {
                         paddingTop: 1
                     }}
                 >
-                    <Typography variant="h2">
-                        V2移行について
-                    </Typography>
+                    <Typography variant="h2">V2移行について</Typography>
                     <Divider />
                     <Box
                         sx={{
@@ -45,15 +37,23 @@ export function V2Migration(): JSX.Element {
                             gap: 2
                         }}
                     >
-                        <CfmRenderer messagebody={`
+                        <CfmRenderer
+                            messagebody={`
 Concrntはこの度大きなアップデートとして、通称V2移行と呼ばれるアップデートを行います。
 いままでもConcrntは細やかなアップデートをたびたび行ってきましたが、今回のアップデートはそれらに比べると大きな変更となるため、今回は平行運用期間を設けています。
 
 ariakeサーバーでは、このスケジュールにてV2移行を行います。
 
-![${MigrationSchedule}](${document.location.href}/${MigrationSchedule})
+![MigrationSchedule](https://worldfile.cc/con1t0tey8uxhkqkd4wcp4hd4jedt7f0vfhk29xdd2/355d1255-e99c-4f86-8727-581054b51636.png)
+
+平行運用期間中はv1環境とv2環境の両方の利用が可能ですが、これはv2に移行するための期間ですので、できるだけv2環境をご利用いただけますようお願いいたします。
+運用期間中、v1の投稿は定期的にv2環境へ転送されますが、v2環境の投稿はv1環境からは閲覧できません。
+
+また、8/8日にActivityPub連携の切り替えを実施します。8/8まではv1での投稿がActivityPub環境に転送されますが、8/8移行はv2環境での投稿がActivityPub環境に転送されるようになります。
 
 投稿当のデータはv2環境に自動的に移行されているため、v2環境にてマスターキーを使ってログインすることで、そのままご利用いただけます。
+
+当クライアントサイト https://concrnt.world は、平行運用終了期間の8/23までv1環境へのクライアントとして提供されますが、8/23以降はv2環境へのクライアントとして提供されるようになります。
 
 ## V2環境へのアクセス方法
 
@@ -84,12 +84,12 @@ concrntのサーバーを運用されているかたは、サーバーをv2環�
 詳しくは移行ガイド https://square.concrnt.net/operator/migration/ をご覧ください。
 
 
-`} emojiDict={{}}/>
-
+`}
+                            emojiDict={{}}
+                        />
                     </Box>
                 </Box>
             </Box>
         </>
     )
 }
-
