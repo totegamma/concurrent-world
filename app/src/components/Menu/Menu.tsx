@@ -22,6 +22,7 @@ import ContactsIcon from '@mui/icons-material/Contacts'
 import CellTowerIcon from '@mui/icons-material/CellTower'
 import MenuBookIcon from '@mui/icons-material/MenuBook'
 import ViewColumnIcon from '@mui/icons-material/ViewColumn'
+import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 
 import { memo } from 'react'
 import { ListsMenu } from '../ListsMenu/main'
@@ -220,6 +221,26 @@ export const Menu = memo<MenuProps>((props: MenuProps): JSX.Element => {
                                 </ListItemButton>
                             </ListItem>
                         )}
+                        <ListItem disablePadding>
+                            <ListItemButton
+                                sx={{ gap: 1 }}
+                                component={NavLink}
+                                to="/v2-migration"
+                                onClick={props.onClick}
+                            >
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        width: '1.75rem',
+                                        justifyContent: 'center'
+                                    }}
+                                >
+                                    <FlightTakeoffIcon sx={{ color: 'background.contrastText' }} />
+                                </Box>
+                                <ListItemText primary={'V2への移行'} />
+                            </ListItemButton>
+                        </ListItem>
                         {!tutorialCompleted && (
                             <ListItem disablePadding>
                                 <ListItemButton
