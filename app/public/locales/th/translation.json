@@ -136,7 +136,9 @@
             "emojiPackageURL": "URL ของชุดอีโมจิ",
             "packageNotFound": "ไม่พบชุดอีโมจิ",
             "copied": "คัดลอกแล้ว",
-            "alreadyAdded": "ชุดอีโมจินี้ถูกเพิ่มแล้ว"
+            "alreadyAdded": "ชุดอีโมจินี้ถูกเพิ่มแล้ว",
+            "copyAll": "คัดลอกทั้งหมด",
+            "copiedAll": "คัดลอก URL ชุดอีโมจิทั้งหมดแล้ว"
         },
         "media": {
             "title": "มีเดีย",

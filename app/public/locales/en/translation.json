@@ -582,7 +582,9 @@
             "emojiPackageURL": "Emoji package URL",
             "packageNotFound": "Package not found",
             "copied": "Copied",
-            "alreadyAdded": "Emoji pack already added"
+            "alreadyAdded": "Emoji pack already added",
+            "copyAll": "Copy all",
+            "copiedAll": "Copied all emoji package URLs"
         },
         "media": {
             "title": "Media",
