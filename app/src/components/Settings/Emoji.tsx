@@ -21,6 +21,7 @@ import { useLocation } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
 import { useEmojiPicker } from '../../context/EmojiPickerContext'
+import { usePreference } from '../../context/PreferenceContext'
 
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import CachedIcon from '@mui/icons-material/Cached'
@@ -32,6 +33,7 @@ export const EmojiSettings = (): JSX.Element => {
     const path = useLocation()
     const actions = useGlobalActions()
     const { enqueueSnackbar } = useSnackbar()
+    const [emojiPackages] = usePreference('emojiPackages')
 
     const [addingPackageURL, setAddingPackageURL] = useState<string>('')
     const [preview, setPreview] = useState<Partial<EmojiPackage> | null>(null)
@@ -76,18 +78,30 @@ export const EmojiSettings = (): JSX.Element => {
         <Box display="flex" flexDirection="column" gap={1}>
             <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap">
                 <Typography variant="h3">{t('emojiPackage')}</Typography>
-                <Button
-                    onClick={() => {
-                        Object.keys(localStorage)
-                            .filter((k) => k.startsWith('emojiPackage:'))
-                            .forEach((k) => {
-                                localStorage.removeItem(k)
-                            })
-                        window.location.reload()
-                    }}
-                >
-                    {t('updateAll')}
-                </Button>
+                <Box display="flex" gap={1}>
+                    <Button
+                        variant="outlined"
+                        startIcon={<ContentPasteIcon />}
+                        onClick={() => {
+                            navigator.clipboard.writeText(JSON.stringify(emojiPackages))
+                            enqueueSnackbar(t('copiedAll'), { variant: 'success' })
+                        }}
+                    >
+                        {t('copyAll')}
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            Object.keys(localStorage)
+                                .filter((k) => k.startsWith('emojiPackage:'))
+                                .forEach((k) => {
+                                    localStorage.removeItem(k)
+                                })
+                            window.location.reload()
+                        }}
+                    >
+                        {t('updateAll')}
+                    </Button>
+                </Box>
             </Box>
             <Box
                 sx={{

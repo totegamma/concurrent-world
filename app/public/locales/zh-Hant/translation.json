@@ -579,7 +579,9 @@
             "emojiPackageURL": "表情符號包 URL",
             "packageNotFound": "找不到表情符號包",
             "copied": "已複製",
-            "alreadyAdded": "表情符號包已新增"
+            "alreadyAdded": "表情符號包已新增",
+            "copyAll": "全部複製",
+            "copiedAll": "已複製所有表情符號包 URL"
         },
         "media": {
             "title": "媒體",

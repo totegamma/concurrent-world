@@ -581,7 +581,9 @@
             "emojiPackageURL": "絵文字パッケージURL",
             "packageNotFound": "パッケージが見つかりませんでした",
             "copied": "コピーしました",
-            "alreadyAdded": "すでに追加されています"
+            "alreadyAdded": "すでに追加されています",
+            "copyAll": "全部コピー",
+            "copiedAll": "全ての絵文字パッケージURLをコピーしました"
         },
         "media": {
             "title": "メディア",

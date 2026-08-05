@@ -185,7 +185,9 @@
             "emojiPackageURL": "이모지 팩 URL",
             "packageNotFound": "팩을 찾을 수 없습니다.",
             "copied": "복사됨",
-            "alreadyAdded": "이모지팩이 이미 추가되었습니다."
+            "alreadyAdded": "이모지팩이 이미 추가되었습니다.",
+            "copyAll": "전체 복사",
+            "copiedAll": "모든 이모지 팩 URL을 복사했습니다"
         },
         "media": {
             "title": "미디어",
