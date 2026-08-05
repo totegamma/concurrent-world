@@ -710,7 +710,9 @@
         "crnt12": "Communicating with emoji reactions is so smooth!",
         "crnt13": "Even if the server I’m on shuts down, <br/> I can easily move my relationships to a new server, so no worries!",
         "crnt14": "I’m hungry YO",
-        "crnt_totegamma": "This is exactly it!"
+        "crnt_totegamma": "This is exactly it!",
+        "v2NoticeTitle": "Create your account on the Concrnt v2 app",
+        "v2NoticeDescription": "Concrnt is migrating to v2, and new registrations on this site (v1) have closed. Scan the QR code below with your smartphone to get the app and create an account there. You can still log in to existing accounts here."
     },
     "mock": {
         "home": {

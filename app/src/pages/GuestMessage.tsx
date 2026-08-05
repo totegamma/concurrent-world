@@ -111,7 +111,7 @@ export default function GuestMessagePage(): JSX.Element {
                         flex: 1
                     }}
                     additionalButton={
-                        <Button component={NavLink} to="/register">
+                        <Button component={NavLink} to="/welcome">
                             {t('getStarted')}
                         </Button>
                     }

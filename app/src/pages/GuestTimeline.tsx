@@ -66,13 +66,7 @@ export default function GuestTimelinePage(): JSX.Element {
                         flex: 1
                     }}
                     additionalButton={
-                        <Button
-                            component={NavLink}
-                            to="/register"
-                            onClick={() => {
-                                if (id) localStorage.setItem('preferredTimeline', id)
-                            }}
-                        >
+                        <Button component={NavLink} to="/welcome">
                             {t('getStarted')}
                         </Button>
                     }

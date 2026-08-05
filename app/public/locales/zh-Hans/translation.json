@@ -707,7 +707,9 @@
         "crnt12": "用表情反应交流真是顺畅！",
         "crnt13": "即使我所在的服务器关闭了，<br/> 我也可以轻松将关系转移到新服务器，所以不用担心！",
         "crnt14": "饿了 YO",
-        "crnt_totegamma": "就是这个！"
+        "crnt_totegamma": "就是这个！",
+        "v2NoticeTitle": "请在 Concrnt v2 应用中创建新账号",
+        "v2NoticeDescription": "Concrnt 正在迁移至 v2，本站（v1）的新用户注册已经停止。请用智能手机扫描下方二维码获取应用并在其中创建账号。已有账号仍可继续在此登录。"
     },
     "mock": {
         "home": {

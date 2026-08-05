@@ -1,8 +1,9 @@
 import Box from '@mui/material/Box'
 import { Button, Divider, IconButton, Paper, Typography, alpha, useTheme } from '@mui/material'
-import { Link, NavLink } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import GitHubIcon from '@mui/icons-material/GitHub'
 import AppMock from '../components/welcome/AppMock'
+import AppStoreQR from '../components/welcome/AppStoreQR'
 import { useTranslation } from 'react-i18next'
 import { GuestBase } from '../components/GuestBase'
 import { TimelineCard } from '../components/TimelineCard'
@@ -287,18 +288,9 @@ function WelcomeBody(): JSX.Element {
                             {t('wish6')}
                         </Typography>
                     </Box>
-                    <Button
-                        component={NavLink}
-                        to="/register"
-                        sx={{
-                            marginTop: '20px',
-                            px: '80px',
-                            py: '10px',
-                            fontSize: '16px'
-                        }}
-                    >
-                        {t('start')}
-                    </Button>
+                    <Box marginTop="20px" width="100%" display="flex" justifyContent="center">
+                        <AppStoreQR />
+                    </Box>
                 </Box>
             </Box>
 
@@ -443,16 +435,9 @@ function WelcomeBody(): JSX.Element {
                 <Typography gutterBottom variant="h1">
                     {t('gettingStarted')}
                 </Typography>
-                <Button
-                    component={NavLink}
-                    to="/register"
-                    sx={{
-                        marginTop: '20px',
-                        width: '100%'
-                    }}
-                >
-                    {t('start')}
-                </Button>
+                <Box marginTop="20px" width="100%" display="flex" justifyContent="center">
+                    <AppStoreQR />
+                </Box>
             </Box>
 
             <Box /* footer */ display="flex" justifyContent="flex-end" alignItems="center" gap="10px">
