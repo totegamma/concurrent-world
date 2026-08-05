@@ -32,7 +32,7 @@ export default function AccountImport(): JSX.Element {
                 gap: 2
             }}
             additionalButton={
-                <Button component={Link} to="/register">
+                <Button component={Link} to="/welcome">
                     {t('getStarted')}
                 </Button>
             }

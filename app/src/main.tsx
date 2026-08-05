@@ -19,8 +19,6 @@ import { PrivacyPolicy } from './pages/PrivacyPolicy'
 
 const AppPage = lazy(() => import('./App'))
 const Welcome = lazy(() => import('./pages/Welcome'))
-const Invitation = lazy(() => import('./pages/Invitation'))
-const Registration = lazy(() => import('./pages/Registration'))
 const AccountImport = lazy(() => import('./pages/AccountImport'))
 const GuestTimelinePage = lazy(() => import('./pages/GuestTimeline'))
 const GuestMessagePage = lazy(() => import('./pages/GuestMessage'))
@@ -84,31 +82,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                                 </ClientProvider>
                             }
                         />
-                        {!logined ? (
-                            <>
-                                <Route
-                                    path="/register"
-                                    element={
-                                        <GA4Provider tag={tag}>
-                                            <Registration />
-                                        </GA4Provider>
-                                    }
-                                />
-                                <Route
-                                    path="/invitation"
-                                    element={
-                                        <GA4Provider tag={tag}>
-                                            <Invitation />
-                                        </GA4Provider>
-                                    }
-                                />
-                            </>
-                        ) : (
-                            <>
-                                <Route path="/register" element={<Navigate to="/" />} />
-                                <Route path="/invitation" element={<Navigate to="/" />} />
-                            </>
-                        )}
+                        {/* v1の新規登録は停止済み。アカウント作成はv2(world-app)へ誘導する */}
+                        <Route path="/register" element={<Navigate to={logined ? '/' : '/welcome'} />} />
+                        <Route path="/invitation" element={<Navigate to={logined ? '/' : '/welcome'} />} />
                         <Route
                             path="/import"
                             element={

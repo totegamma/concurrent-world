@@ -268,7 +268,9 @@
                 "item4": "- 다른 유저의 활동 타임라인(Timelines of Other Users' Activities)",
                 "item5": "- 기타 등등..."
             }
-        }
+        },
+        "v2NoticeTitle": "새 계정은 Concrnt v2 앱에서 만들어 주세요",
+        "v2NoticeDescription": "Concrnt는 현재 v2로 이행 중이며, 이 사이트(v1)에서의 신규 가입은 종료되었습니다. 스마트폰으로 아래 QR 코드를 스캔하여 앱을 설치하고 계정을 만들어 주세요. 기존 계정 로그인은 계속 이용할 수 있습니다."
     },
     "registration": {
         "welcome": {

@@ -3,7 +3,6 @@ import {
     AccordionActions,
     AccordionDetails,
     AccordionSummary,
-    Alert,
     Box,
     Button,
     Checkbox,
@@ -27,7 +26,7 @@ import { usePreference } from '../../context/PreferenceContext'
 import { useClient } from '../../context/ClientContext'
 import { useEffect, useState } from 'react'
 import { useSnackbar } from 'notistack'
-import { CommunityTimelineSchema, Schemas, Timeline } from '@concrnt/worldlib'
+import { Schemas } from '@concrnt/worldlib'
 import { useTranslation } from 'react-i18next'
 import { type NotificationSubscription } from '../../model'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
@@ -37,7 +36,6 @@ import TextDecreaseIcon from '@mui/icons-material/TextDecrease'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { CCIconButton } from '../ui/CCIconButton'
 import { ListItemTimeline } from '../ui/ListItemTimeline'
-import { TimelineSelector } from '../ui/TimelineSelector'
 
 export const GeneralSettings = (): JSX.Element => {
     const { client } = useClient()
@@ -52,8 +50,6 @@ export const GeneralSettings = (): JSX.Element => {
     const [autoSwitchMediaPostType, setAutoSwitchMediaPostType] = usePreference('autoSwitchMediaPostType')
     const [tutorialCompleted, setTutorialCompleted] = usePreference('tutorialCompleted')
     const [baseFontSize, setBaseFontSize] = usePreference('baseFontSize')
-    const [inviteComment, setInviteComment] = useState<string>('')
-    const [preferredTimeline, setPreferredTimeline] = useState<Timeline<CommunityTimelineSchema> | undefined>(undefined)
 
     const { enqueueSnackbar } = useSnackbar()
 
@@ -656,75 +652,6 @@ export const GeneralSettings = (): JSX.Element => {
                     </DialogActions>
                 </Dialog>
             </Box>
-            <Accordion disableGutters>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography variant="h4">{t('invitation')}</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                    {domainInfo?.meta?.registration == 'invite' && (
-                        <Alert severity="info" sx={{ marginBottom: 2 }}>
-                            {t('inviteNote')}
-                        </Alert>
-                    )}
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: 2
-                        }}
-                    >
-                        <TextField
-                            fullWidth
-                            label={t('inviteComment')}
-                            value={inviteComment}
-                            onChange={(e) => {
-                                setInviteComment(e.target.value)
-                            }}
-                            placeholder={'welcome'}
-                        />
-                        <TimelineSelector
-                            label={t('inviteTimeline')}
-                            selected={preferredTimeline}
-                            setSelected={setPreferredTimeline}
-                        />
-                    </Box>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            gap: 1,
-                            justifyContent: 'flex-end',
-                            marginTop: 2
-                        }}
-                    >
-                        <Button
-                            onClick={(_) => {
-                                if (client.host === undefined) {
-                                    return
-                                }
-
-                                let link = `${window.location.origin}/invitation#inviter=${client.ccid}&domain=${client.host}`
-                                if (inviteComment) link += `&comment=${encodeURIComponent(inviteComment)}`
-                                if (preferredTimeline) link += `&timeline=${preferredTimeline.id}`
-                                if (domainInfo?.meta?.registration == 'invite') {
-                                    const jwt = client.api.authProvider.issueJWT({
-                                        aud: client.host,
-                                        sub: 'CONCRNT_INVITE',
-                                        exp: Math.floor(
-                                            (new Date().getTime() + 14 * 24 * 60 * 60 * 1000) / 1000
-                                        ).toString()
-                                    })
-                                    link += `&ticket=${jwt}`
-                                }
-
-                                navigator.clipboard.writeText(link)
-                                enqueueSnackbar(t('copied'), { variant: 'success' })
-                            }}
-                        >
-                            {t('copyInviteLink')}
-                        </Button>
-                    </Box>
-                </AccordionDetails>
-            </Accordion>
         </Box>
     )
 }

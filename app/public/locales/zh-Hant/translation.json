@@ -707,7 +707,9 @@
         "crnt12": "用表情符號回應來交流真是太順暢了！",
         "crnt13": "即使我所在的伺服器關閉了，<br/> 我也可以輕鬆地將我的關係轉移到新伺服器，所以不用擔心！",
         "crnt14": "我餓了 YO",
-        "crnt_totegamma": "就是這個！"
+        "crnt_totegamma": "就是這個！",
+        "v2NoticeTitle": "請在 Concrnt v2 應用程式中建立新帳號",
+        "v2NoticeDescription": "Concrnt 正在遷移至 v2，本站（v1）的新用戶註冊已經停止。請用智慧型手機掃描下方 QR code 取得應用程式並在其中建立帳號。既有帳號仍可繼續在此登入。"
     },
     "mock": {
         "home": {

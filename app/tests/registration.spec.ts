@@ -1,4 +1,4 @@
-import { test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 test.beforeEach(async ({ page }) => {
     await page.route(`https://www.googletagmanager.com/**`, (route) => {
@@ -7,58 +7,24 @@ test.beforeEach(async ({ page }) => {
     })
 })
 
-test('Account registration', async ({ page }) => {
-    // Access the page
-    await page.goto('http://localhost:5173/')
+test('Registration is closed', async ({ page }) => {
+    // Direct access to /register redirects to /welcome
+    await page.goto('http://localhost:5173/register')
+    await expect(page).toHaveURL(/\/welcome$/)
 
-    // has registration link
-    const link = page.locator('a[href="/register"]').first()
+    // So does /invitation
+    await page.goto('http://localhost:5173/invitation')
+    await expect(page).toHaveURL(/\/welcome$/)
 
-    // Click on the registration link
-    await link.click()
+    // Welcome page guides to the v2 app stores instead of registration
+    await expect(page.locator('a[href="/register"]')).toHaveCount(0)
+    await expect(
+        page.locator('a[href="https://apps.apple.com/jp/app/concrnt-world/id6757524249"]').first()
+    ).toBeVisible()
+    await expect(
+        page.locator('a[href="https://play.google.com/store/apps/details?id=world.concrnt.app"]').first()
+    ).toBeVisible()
 
-    // Select the registration form
-    const customSetupButton = page.locator('#RegistrationCustomButton')
-    await customSetupButton.click()
-
-    // select dev environment
-    const devEnvText = page.locator('text=For Developers')
-    const devEnvButton = page.locator('div[role="button"]').filter({ has: devEnvText })
-    await devEnvButton.click()
-
-    // select zyouya.concrnt.net
-    const zyouyaText = page.locator('text=zyouya.concrnt.net')
-    const zyouyaButton = page.locator('div[role="button"]').filter({ has: zyouyaText })
-    await zyouyaButton.click()
-
-    // Fill the registration form
-    await page.fill('#root_name', 'e2e tester')
-    await page.fill('#root_email', 'e2e-test@example.com')
-    await page.fill('#root_social', '@e2e-test')
-    // check the terms and conditions
-    await page.check('input[name="root_consent"]')
-
-    // Submit the form
-    await page.click('button[type="submit"]')
-
-    // fill profile
-    const profUsername = page.locator('input[name="username"]')
-    await profUsername.fill('e2e-test')
-
-    // fill description
-    const profDescription = page.locator('textarea[name="description"]')
-    await profDescription.fill('e2e-test')
-
-    // Submit
-    const submitButton = page.getByRole('button', { name: 'Create' })
-    await submitButton.click()
-
-    // press start
-    const startButton = page.getByRole('button', { name: 'Start' })
-    await startButton.click()
-
-    // press get started
-    await page.getByRole('button', { name: 'Get Started' }).first().click()
-
-    // ok
+    // Login is still available
+    await expect(page.locator('a[href="/import"]').first()).toBeVisible()
 })
