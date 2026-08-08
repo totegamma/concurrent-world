@@ -57,7 +57,8 @@
         "updateAvailable": "新しいバージョンが利用可能です",
         "updateNow": "更新",
         "isNotCanonicalUser": "現在所属ドメインではないドメインにログインしています。引っ越し作業が完了次第、再ログインしてください。",
-        "domainIsOffline": "あなたのドメイン{{ domain }}は現在オフラインの為、読み込み専用モードです。復旧までしばらくお待ちください。"
+        "domainIsOffline": "あなたのドメイン{{ domain }}は現在オフラインの為、読み込み専用モードです。復旧までしばらくお待ちください。",
+        "v2MigrationNotice": "お使いのクライアントから、新しくアプリへ切り替えましょう。詳しくはこちら"
     },
     "pages": {
         "guestProfile": {

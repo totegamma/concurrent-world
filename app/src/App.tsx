@@ -451,6 +451,33 @@ function App(): JSX.Element {
                         </Typography>
                     )}
                 </Box>
+                {location.pathname !== '/v2-migration' && (
+                    <Box
+                        sx={{
+                            backgroundColor: 'primary.main',
+                            width: '100%',
+                            display: 'flex',
+                            justifyContent: 'center'
+                        }}
+                    >
+                        <Typography
+                            sx={{
+                                textAlign: 'center',
+                                color: 'primary.contrastText',
+                                fontSize: '0.8em',
+                                fontWeight: 'bold',
+                                padding: '10px',
+                                textDecoration: 'underline',
+                                cursor: 'pointer'
+                            }}
+                            onClick={() => {
+                                navigate('/v2-migration')
+                            }}
+                        >
+                            {t('app.v2MigrationNotice')}
+                        </Typography>
+                    </Box>
+                )}
                 <Box
                     sx={{
                         display: 'flex',

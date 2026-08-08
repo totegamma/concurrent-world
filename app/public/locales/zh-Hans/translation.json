@@ -58,7 +58,8 @@
         "updateAvailable": "有新版本可用",
         "updateNow": "更新",
         "isNotCanonicalUser": "您当前登录的域不是您的规范域。请在完成迁移过程后重新登录。",
-        "domainIsOffline": "您的域 {{ domain }} 当前因离线而处于只读模式。请等待其恢复。"
+        "domainIsOffline": "您的域 {{ domain }} 当前因离线而处于只读模式。请等待其恢复。",
+        "v2MigrationNotice": "请从当前客户端切换到新应用。点击此处了解详情"
     },
     "pages": {
         "guestProfile": {

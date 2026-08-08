@@ -2,6 +2,7 @@ import { Box, Divider, Typography } from '@mui/material'
 import { Helmet } from 'react-helmet-async'
 import { CfmRenderer } from '../components/ui/CfmRenderer'
 import { useClient } from '../context/ClientContext'
+import AppStoreQR from '../components/welcome/AppStoreQR'
 
 export function V2Migration(): JSX.Element {
     const { client } = useClient()
@@ -49,7 +50,7 @@ ariakeサーバーでは、このスケジュールにてV2移行を行います
 平行運用期間中はv1環境とv2環境の両方の利用が可能ですが、これはv2に移行するための期間ですので、できるだけv2環境をご利用いただけますようお願いいたします。
 運用期間中、v1の投稿は定期的にv2環境へ転送されますが、v2環境の投稿はv1環境からは閲覧できません。
 
-また、8/8日にActivityPub連携の切り替えを実施します。8/8まではv1での投稿がActivityPub環境に転送されますが、8/8移行はv2環境での投稿がActivityPub環境に転送されるようになります。
+また、8/8にActivityPub連携の切り替えを実施しました。現在はv2環境での投稿がActivityPub環境に転送されており、v1環境での投稿はActivityPub環境には転送されません。
 
 投稿当のデータはv2環境に自動的に移行されているため、v2環境にてマスターキーを使ってログインすることで、そのままご利用いただけます。
 
@@ -58,10 +59,17 @@ ariakeサーバーでは、このスケジュールにてV2移行を行います
 ## V2環境へのアクセス方法
 
 V2環境へのアクセスは、専用アプリの利用がおすすめです。
-
-ios: https://apps.apple.com/jp/app/concrnt-world/id6757524249
-android: https://play.google.com/store/apps/details?id=world.concrnt.app&hl=ja
-
+`}
+                            emojiDict={{}}
+                        />
+                        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                            <AppStoreQR
+                                title="V2環境へは専用アプリで"
+                                description="お使いのスマートフォンで下のQRコードを読み取るか、バッジをタップしてアプリを入手し、マスターキーでログインしてください。"
+                            />
+                        </Box>
+                        <CfmRenderer
+                            messagebody={`
 また、web版は所属しているサーバーのURL https://${client.server?.fqdn} から利用することもできます。
 web版を利用する場合は、web版に直接マスターキーを利用してログインするのではなく、アプリを利用してログインするのがおすすめです。
 

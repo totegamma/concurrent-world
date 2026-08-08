@@ -58,7 +58,8 @@
         "updateAvailable": "有新版本可用",
         "updateNow": "更新",
         "isNotCanonicalUser": "您目前登入的網域不是您的標準網域。請在完成遷移程序後重新登入。",
-        "domainIsOffline": "您的網域 {{ domain }} 目前因離線而處於唯讀模式。請等待恢復。"
+        "domainIsOffline": "您的網域 {{ domain }} 目前因離線而處於唯讀模式。請等待恢復。",
+        "v2MigrationNotice": "請從目前的用戶端切換到新應用程式。點擊此處了解詳情"
     },
     "pages": {
         "guestProfile": {

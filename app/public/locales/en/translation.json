@@ -58,7 +58,8 @@
         "updateAvailable": "New version available",
         "updateNow": "Update",
         "isNotCanonicalUser": "You are currently logged in to a domain that is not your canonical domain. Please log in again after completing the migration process.",
-        "domainIsOffline": "Your domain {{ domain }} is currently in read-only mode due to being offline. Please wait until it is restored."
+        "domainIsOffline": "Your domain {{ domain }} is currently in read-only mode due to being offline. Please wait until it is restored.",
+        "v2MigrationNotice": "Switch from this client to the new app. Tap here for details."
     },
     "pages": {
         "guestProfile": {

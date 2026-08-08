@@ -19,7 +19,12 @@ const stores = [
     }
 ]
 
-export default function AppStoreQR(): JSX.Element {
+export interface AppStoreQRProps {
+    title?: string
+    description?: string
+}
+
+export default function AppStoreQR(props: AppStoreQRProps): JSX.Element {
     const { t } = useTranslation('', { keyPrefix: 'welcome' })
     const theme = useTheme()
 
@@ -55,9 +60,9 @@ export default function AppStoreQR(): JSX.Element {
                     <SmartphoneIcon />
                 </Box>
                 <Box display="flex" flexDirection="column" gap={1}>
-                    <Typography fontWeight={700}>{t('v2NoticeTitle')}</Typography>
+                    <Typography fontWeight={700}>{props.title ?? t('v2NoticeTitle')}</Typography>
                     <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                        {t('v2NoticeDescription')}
+                        {props.description ?? t('v2NoticeDescription')}
                     </Typography>
                 </Box>
             </Box>
