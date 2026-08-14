@@ -484,7 +484,7 @@ function App(): JSX.Element {
                         flex: 1,
                         maxWidth: isDeckPage ? undefined : '1280px',
                         width: '100%',
-                        height: '100%',
+                        minHeight: 0,
                         marginLeft: 'env(safe-area-inset-left)',
                         marginRight: 'env(safe-area-inset-right)'
                     }}
