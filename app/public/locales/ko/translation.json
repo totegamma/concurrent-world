@@ -1,5 +1,8 @@
 {
     "test": "테스트",
+    "app": {
+        "v2MigrationNotice": "지금 사용 중인 클라이언트에서 새 앱으로 전환해 주세요. 자세한 내용은 여기"
+    },
     "common": {
         "watch": "보기",
         "watching": "보는중",
